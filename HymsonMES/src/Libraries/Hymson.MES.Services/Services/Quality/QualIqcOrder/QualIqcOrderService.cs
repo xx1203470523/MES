@@ -379,7 +379,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId)
         {
-            await Task.CompletedTask;
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(orderId);
+            if (entity == null) return Array.Empty<InspectionParameterDetailDto>();
+
+
 
             List<InspectionParameterDetailDto> list = new();
             return list;

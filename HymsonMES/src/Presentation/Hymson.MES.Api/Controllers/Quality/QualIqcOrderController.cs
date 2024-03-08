@@ -39,6 +39,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
 
+        
 
         /// <summary>
         /// 删除检验单附件
@@ -64,6 +65,20 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 生成IQC检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("generated")]
+        public async Task<long> GeneratedOrderAsync([FromBody] GenerateInspectionDto requestDto)
+        {
+            // TODO 生成IQC检验单
+            return await Task.FromResult(0);
+        }
+
+
+
+        /// <summary>
         /// 查询详情（iqc检验单）
         /// </summary>
         /// <param name="id"></param>
@@ -84,20 +99,6 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<PagedInfo<QualIqcOrderDto>> QueryPagedListAsync([FromQuery] QualIqcOrderPagedQueryDto pagedQueryDto)
         {
             return await _qualIqcOrderService.GetPagedListAsync(pagedQueryDto);
-        }
-
-
-
-        /// <summary>
-        /// 生成IQC检验单
-        /// </summary>
-        /// <param name="requestDto"></param>
-        /// <returns></returns>
-        [HttpPost("generated")]
-        public async Task<long> GeneratedOrderAsync([FromBody] GenerateInspectionDto requestDto)
-        {
-            // TODO 生成IQC检验单
-            return await Task.FromResult(0);
         }
 
         /// <summary>
@@ -122,10 +123,6 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualIqcOrderService.QueryOrderAttachmentListByIdAsync(orderId);
         }
 
-        /*
-         根据检验单ID查询出IqcInspectionItemSnapshotId
-         */
-
         /// <summary>
         /// 查询检验单快照数据
         /// </summary>
@@ -148,9 +145,6 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualIqcOrderService.QueryDetailSampleByIdAsync(orderId);
         }
 
-        // TODO 保存
-
-        // TODO 完成
 
     }
 }
