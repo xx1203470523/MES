@@ -24,11 +24,11 @@ namespace Hymson.MES.Services.Services.Quality
         Task<int> ModifyAsync(QualIqcOrderSaveDto saveDto);
 
         /// <summary>
-        /// 删除
+        /// 删除检验单附件
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderAnnexId"></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(long id);
+        Task<int> DeleteAttachmentByIdAsync(long orderAnnexId);
 
         /// <summary>
         /// 批量删除

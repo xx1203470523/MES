@@ -41,6 +41,17 @@ namespace Hymson.MES.Api.Controllers.Quality
 
 
         /// <summary>
+        /// 删除检验单附件
+        /// </summary>
+        /// <param name="orderAnnexId"></param>
+        /// <returns></returns>
+        [HttpDelete("attachment/delete")]
+        public async Task DeleteAttachmentByIdAsync(long orderAnnexId)
+        {
+            await _qualIqcOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
+        }
+
+        /// <summary>
         /// 删除（iqc检验单）
         /// </summary>
         /// <param name="ids"></param>
@@ -110,6 +121,10 @@ namespace Hymson.MES.Api.Controllers.Quality
         {
             return await _qualIqcOrderService.QueryOrderAttachmentListByIdAsync(orderId);
         }
+
+        /*
+         根据检验单ID查询出IqcInspectionItemSnapshotId
+         */
 
         /// <summary>
         /// 查询检验单快照数据
