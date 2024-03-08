@@ -70,14 +70,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId);
+        Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId);
 
         /// <summary>
         /// 查询检验单样本数据
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId);
+        Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId);
 
     }
 }

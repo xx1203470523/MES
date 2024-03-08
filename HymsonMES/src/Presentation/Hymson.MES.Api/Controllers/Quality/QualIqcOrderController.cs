@@ -129,7 +129,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="orderId"></param>
         /// <returns></returns>
         [HttpGet("snapshot/{orderId}")]
-        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId)
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId)
         {
             return await _qualIqcOrderService.QueryDetailSnapshotByIdAsync(orderId);
         }
@@ -140,7 +140,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="orderId"></param>
         /// <returns></returns>
         [HttpGet("sample/{orderId}")]
-        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
         {
             return await _qualIqcOrderService.QueryDetailSampleByIdAsync(orderId);
         }

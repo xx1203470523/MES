@@ -393,18 +393,18 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId)
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId)
         {
             var entity = await _qualIqcOrderRepository.GetByIdAsync(orderId);
-            if (entity == null) return Array.Empty<InspectionParameterDetailDto>();
+            if (entity == null) return Array.Empty<OrderParameterDetailDto>();
 
             var snapshotEntity = await _qualIqcInspectionItemSnapshotRepository.GetByIdAsync(entity.IqcInspectionItemSnapshotId);
-            if (snapshotEntity == null) return Array.Empty<InspectionParameterDetailDto>();
+            if (snapshotEntity == null) return Array.Empty<OrderParameterDetailDto>();
 
             var detailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetBySnapshotIdAsync(snapshotEntity.Id);
-            if (detailEntities == null) return Array.Empty<InspectionParameterDetailDto>();
+            if (detailEntities == null) return Array.Empty<OrderParameterDetailDto>();
 
-            List<InspectionParameterDetailDto> list = new();
+            List<OrderParameterDetailDto> list = new();
             return list;
         }
 
@@ -413,11 +413,11 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
         {
             await Task.CompletedTask;
 
-            List<InspectionParameterDetailDto> list = new();
+            List<OrderParameterDetailDto> list = new();
             return list;
         }
 
