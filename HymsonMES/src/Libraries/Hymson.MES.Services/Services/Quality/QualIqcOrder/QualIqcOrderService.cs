@@ -44,6 +44,16 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly AbstractValidator<QualIqcOrderSaveDto> _validationSaveRules;
 
         /// <summary>
+        /// 仓储接口（iqc检验项目快照）
+        /// </summary>
+        private readonly IQualIqcInspectionItemSnapshotRepository _qualIqcInspectionItemSnapshotRepository;
+
+        /// <summary>
+        /// 仓储接口（iqc检验项目快照明细）
+        /// </summary>
+        private readonly IQualIqcInspectionItemDetailSnapshotRepository _qualIqcInspectionItemDetailSnapshotRepository;
+
+        /// <summary>
         /// 仓储接口（iqc检验单）
         /// </summary>
         private readonly IQualIqcOrderRepository _qualIqcOrderRepository;
@@ -84,6 +94,8 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
+        /// <param name="qualIqcInspectionItemSnapshotRepository"></param>
+        /// <param name="qualIqcInspectionItemDetailSnapshotRepository"></param>
         /// <param name="qualIqcOrderRepository"></param>
         /// <param name="qualIqcOrderTypeRepository"></param>
         /// <param name="qualIqcOrderAnnexRepository"></param>
@@ -93,6 +105,8 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="inteAttachmentRepository"></param>
         public QualIqcOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<QualIqcOrderSaveDto> validationSaveRules,
+            IQualIqcInspectionItemSnapshotRepository qualIqcInspectionItemSnapshotRepository,
+            IQualIqcInspectionItemDetailSnapshotRepository qualIqcInspectionItemDetailSnapshotRepository,
             IQualIqcOrderRepository qualIqcOrderRepository,
             IQualIqcOrderTypeRepository qualIqcOrderTypeRepository,
             IQualIqcOrderAnnexRepository qualIqcOrderAnnexRepository,
@@ -104,6 +118,8 @@ namespace Hymson.MES.Services.Services.Quality
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
+            _qualIqcInspectionItemSnapshotRepository = qualIqcInspectionItemSnapshotRepository;
+            _qualIqcInspectionItemDetailSnapshotRepository = qualIqcInspectionItemDetailSnapshotRepository;
             _qualIqcOrderRepository = qualIqcOrderRepository;
             _qualIqcOrderTypeRepository = qualIqcOrderTypeRepository;
             _qualIqcOrderAnnexRepository = qualIqcOrderAnnexRepository;
@@ -382,7 +398,13 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = await _qualIqcOrderRepository.GetByIdAsync(orderId);
             if (entity == null) return Array.Empty<InspectionParameterDetailDto>();
 
+            var snapshotEntity = await _qualIqcInspectionItemSnapshotRepository.GetByIdAsync(entity.IqcInspectionItemSnapshotId);
+            if (snapshotEntity == null) return Array.Empty<InspectionParameterDetailDto>();
 
+            /*
+            var detailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetBySnapshotIdAsync(snapshotEntity.Id);
+            if (detailEntities == null) return Array.Empty<InspectionParameterDetailDto>();
+            */
 
             List<InspectionParameterDetailDto> list = new();
             return list;
