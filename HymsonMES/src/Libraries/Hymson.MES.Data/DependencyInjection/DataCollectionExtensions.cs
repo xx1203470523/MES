@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.CcdFileUploadCompleteRecord;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.EquEquipmentAlarm;
 using Hymson.MES.Data.Repositories.EquEquipmentHeartRecord;
@@ -398,6 +399,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentHeartRecordRepository, EquEquipmentHeartRecordRepository>();
             services.AddSingleton<IManuEquipmentStatusTimeRepository, ManuEquipmentStatusTimeRepository>();
             services.AddSingleton<IEquEquipmentAlarmRepository, EquEquipmentAlarmRepository>();
+            services.AddSingleton<ICcdFileUploadCompleteRecordRepository, CcdFileUploadCompleteRecordRepository>();
             #endregion
 
             return services;

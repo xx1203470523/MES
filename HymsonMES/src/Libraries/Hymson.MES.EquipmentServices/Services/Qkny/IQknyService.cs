@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,5 +40,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task AlarmAsync(AlarmDto dto);
+
+        /// <summary>
+        /// CCD文件上传完成
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task CcdFileUploadCompleteAsync(CCDFileUploadCompleteDto dto);
     }
 }

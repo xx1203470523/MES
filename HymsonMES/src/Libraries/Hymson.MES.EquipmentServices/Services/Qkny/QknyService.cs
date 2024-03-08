@@ -7,12 +7,15 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
+using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
 using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
+using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Services.EquEquipmentAlarm;
 using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
@@ -77,6 +80,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IEquEquipmentAlarmService _equEquipmentAlarmService;
 
         /// <summary>
+        /// CCD文件上传
+        /// </summary>
+        private readonly ICcdFileUploadCompleteRecordService _ccdFileUploadCompleteRecordService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -86,6 +94,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IEquEquipmentHeartRecordService equEquipmentHeartRecordService,
             IManuEquipmentStatusTimeService manuEquipmentStatusTimeService,
             IEquEquipmentAlarmService equEquipmentAlarmService,
+            ICcdFileUploadCompleteRecordService ccdFileUploadCompleteRecordService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -95,6 +104,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _equEquipmentHeartRecordService = equEquipmentHeartRecordService;
             _manuEquipmentStatusTimeService = manuEquipmentStatusTimeService;
             _equEquipmentAlarmService = equEquipmentAlarmService;
+            _ccdFileUploadCompleteRecordService = ccdFileUploadCompleteRecordService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -247,6 +257,41 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             saveDto.UpdatedOn = saveDto.CreatedOn;
             saveDto.SiteId = equResModel.SiteId;
             await _equEquipmentAlarmService.AddAsync(saveDto);
+        }
+
+        /// <summary>
+        /// CCD文件上传完成006
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task CcdFileUploadCompleteAsync(CCDFileUploadCompleteDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 添加文件信息
+            List<CcdFileUploadCompleteRecordSaveDto> saveDtoList = new List<CcdFileUploadCompleteRecordSaveDto>();
+            foreach(var sfcItem in dto.SfcList)
+            {
+                foreach(var uriItem in sfcItem.UriList)
+                {
+                    CcdFileUploadCompleteRecordSaveDto model = new CcdFileUploadCompleteRecordSaveDto();
+                    model.Id = IdGenProvider.Instance.CreateId();
+                    model.EquipmentId = equResModel.EquipmentId;
+                    model.SiteId = equResModel.SiteId;
+                    model.CreatedOn = HymsonClock.Now();
+                    model.CreatedBy = equResModel.EquipmentCode;
+                    model.UpdatedOn = model.CreatedOn;
+                    model.UpdatedBy = model.CreatedBy;
+                    model.Sfc = sfcItem.Sfc;
+                    model.SfcIsPassed = sfcItem.Passed;
+                    model.Uri = uriItem.Uri;
+                    model.UriIsPassed = uriItem.Passed;
+                    saveDtoList.Add(model);
+                }
+            }
+            await _ccdFileUploadCompleteRecordService.AddMultAsync(saveDtoList);
+            //1. 新增表 ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
+            //2. 明细和主表记录到一张表
         }
 
         /// <summary>

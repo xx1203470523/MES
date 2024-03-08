@@ -9,16 +9,19 @@ using Hymson.MES.EquipmentServices.Services.Qkny;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.MES.EquipmentServices.Validators.Manufacture;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
+using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
 using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
+using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Services.EquEquipmentAlarm;
 using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
+using Hymson.MES.Services.Validators.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Validators.EquEquipmentAlarm;
 using Hymson.MES.Services.Validators.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Validators.EquEquipmentLoginRecord;
@@ -72,6 +75,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentHeartRecordService, EquEquipmentHeartRecordService>();
             services.AddSingleton<IManuEquipmentStatusTimeService, ManuEquipmentStatusTimeService>();
             services.AddSingleton<IEquEquipmentAlarmService, EquEquipmentAlarmService>();
+            services.AddSingleton<ICcdFileUploadCompleteRecordService, CcdFileUploadCompleteRecordService>();
             #endregion
         }
 
@@ -106,6 +110,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<EquEquipmentHeartRecordSaveDto>, EquEquipmentHeartRecordSaveValidator>();
             services.AddSingleton<AbstractValidator<ManuEquipmentStatusTimeSaveDto>, ManuEquipmentStatusTimeSaveValidator>();
             services.AddSingleton<AbstractValidator<EquEquipmentAlarmSaveDto>, EquEquipmentAlarmSaveValidator>();
+            services.AddSingleton<AbstractValidator<CcdFileUploadCompleteRecordSaveDto>, CcdFileUploadCompleteRecordSaveValidator>();
             #endregion
         }
 

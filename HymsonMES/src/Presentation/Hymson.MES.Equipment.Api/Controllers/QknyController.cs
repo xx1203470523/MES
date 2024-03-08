@@ -125,8 +125,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("CCD文件上传完成006", BusinessType.OTHER, "CCDFileUploadComplete006", ReceiverTypeEnum.MES)]
         public async Task CcdFileUploadCompleteAsync(CCDFileUploadCompleteDto dto)
         {
+            await _qknyService.CcdFileUploadCompleteAsync(dto);
             //TODO
-            //1. 新增表ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
+            //1. 新增表 ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
             //  明细和主表记录到一起
         }
 
