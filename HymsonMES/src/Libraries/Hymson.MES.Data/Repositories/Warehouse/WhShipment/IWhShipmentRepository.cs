@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.WhShipment;
 using Hymson.MES.Core.Domain.WhShipmentBarcode;
 using Hymson.MES.Core.Domain.WhShipmentMaterial;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Warehouse.WhShipment.View;
 using Hymson.MES.Data.Repositories.WhShipment.Query;
 
 namespace Hymson.MES.Data.Repositories.WhShipment
@@ -94,6 +95,20 @@ namespace Hymson.MES.Data.Repositories.WhShipment
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<WhShipmentEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<WhShipmentView> GetEntityWithCodeByIdAsync(long id);
+
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<WhShipmentView> GetEntityAsync(WhShipmentQuery query);
 
         /// <summary>
         /// 获取List

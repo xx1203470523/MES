@@ -20,31 +20,36 @@ namespace Hymson.MES.Core.Domain.WHMaterialReceiptDetail
         /// </summary>
         public long MaterialReceiptId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料Id
         /// </summary>
         public long? MaterialId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 供应商生产批次
         /// </summary>
-        public string MaterialBatch { get; set; }
+        public string SupplierBatch { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 内部批次
+        /// </summary>
+        public string InternalBatch { get; set; }
+
+        /// <summary>
         /// 计划发货数量
         /// </summary>
         public decimal? PlanQty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 计划到货时间
         /// </summary>
         public DateTime? PlanTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       
+
     }
 }

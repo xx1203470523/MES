@@ -81,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -115,7 +115,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhMaterialReceiptEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<WhMaterialReceiptEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhMaterialReceiptEntity>(GetByIdsSql, new { Ids = ids });
@@ -169,6 +169,30 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
             return new PagedInfo<WhMaterialReceiptEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        #region 明细
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<WHMaterialReceiptDetailEntity> GetDetailByIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<WHMaterialReceiptDetailEntity>(GetDetailByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据IDs获取数据（批量）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetDetailsByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<WHMaterialReceiptDetailEntity>(GetDetailsByIdsSql, new { Ids = ids });
+        }
+        #endregion
+
     }
 
 
@@ -184,7 +208,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         const string InsertSql = "INSERT INTO wh_material_receipt(  `Id`, `SiteId`, `ReceiptNum`, `SupplierId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ReceiptNum, @SupplierId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO wh_material_receipt(  `Id`, `SiteId`, `ReceiptNum`, `SupplierId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ReceiptNum, @SupplierId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string InsertDetailSql = "INSERT INTO wh_material_receipt_detail(`Id`, `MaterialReceiptId`, `SiteId`, `MaterialId`, `MaterialBatch`, `PlanQty`, `PlanTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES(@Id, @MaterialReceiptId, @SiteId, @MaterialId, @MaterialBatch, @PlanQty, @PlanTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, 0)";
+        const string InsertDetailSql = "INSERT INTO wh_material_receipt_detail(`Id`, `MaterialReceiptId`, `SiteId`, `MaterialId`, `SupplierBatch`, InternalBatch, `PlanQty`, `PlanTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES(@Id, @MaterialReceiptId, @SiteId, @MaterialId, @SupplierBatch, @PlanQty, @PlanTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, 0)";
 
         const string UpdateSql = "UPDATE wh_material_receipt SET   SiteId = @SiteId, ReceiptNum = @ReceiptNum, SupplierId = @SupplierId, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE wh_material_receipt SET   SiteId = @SiteId, ReceiptNum = @ReceiptNum, SupplierId = @SupplierId, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
@@ -195,6 +219,13 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
 
         const string GetByIdSql = @"SELECT * FROM wh_material_receipt WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM wh_material_receipt WHERE Id IN @Ids ";
+
+
+
+
+        const string GetDetailByIdSql = @"SELECT * FROM wh_material_receipt_detail WHERE Id = @Id ";
+        const string GetDetailsByIdsSql = @"SELECT * FROM wh_material_receipt_detail WHERE Id IN @Ids ";
+
 
     }
 }

@@ -1,4 +1,5 @@
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Quality;
 
 namespace Hymson.MES.Services.Validators.Quality
@@ -13,8 +14,8 @@ namespace Hymson.MES.Services.Validators.Quality
         /// </summary>
         public QualOqcOrderSaveValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x.ShipmentDetailIds).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10111));
         }
     }
 
