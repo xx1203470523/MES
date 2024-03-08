@@ -107,10 +107,6 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// OQC检验单分页Dto
     /// </summary>
     public class QualOqcOrderPagedQueryDto : PagerInfo {
-        /// <summary>
-        /// 排序
-        /// </summary>
-        new public string Sorting { get; set; }
 
         /// <summary>
         /// 主键
