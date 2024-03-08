@@ -96,6 +96,13 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
 
 
         /// <summary>
+        /// 根据receiptId获取明细数据
+        /// </summary>
+        /// <param name="receiptId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetDetailsByReceiptIdAsync(long receiptId);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>

@@ -46,7 +46,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         [Route("create")]
         public async Task AddAsync([FromBody] WhMaterialReceiptSaveDto saveDto)
         {
-             await _whMaterialReceiptService.CreateAsync(saveDto);
+            await _whMaterialReceiptService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         [Route("update")]
         public async Task UpdateAsync([FromBody] WhMaterialReceiptSaveDto saveDto)
         {
-             await _whMaterialReceiptService.ModifyAsync(saveDto);
+            await _whMaterialReceiptService.ModifyAsync(saveDto);
         }
 
         /// <summary>
@@ -94,6 +94,17 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         public async Task<PagedInfo<WhMaterialReceiptDto>> QueryPagedListAsync([FromQuery] WhMaterialReceiptPagedQueryDto pagedQueryDto)
         {
             return await _whMaterialReceiptService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 查询详情（物料收货表）
+        /// </summary>
+        /// <param name="receiptId"></param>
+        /// <returns></returns>
+        [HttpGet("details/{receiptId}")]
+        public async Task<IEnumerable<ReceiptMaterialDetailDto>> QueryDetailByReceiptIdAsync(long receiptId)
+        {
+            return await _whMaterialReceiptService.QueryDetailByReceiptIdAsync(receiptId);
         }
 
     }

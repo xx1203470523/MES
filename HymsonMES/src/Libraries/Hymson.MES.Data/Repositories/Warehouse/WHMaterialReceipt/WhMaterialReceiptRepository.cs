@@ -171,6 +171,17 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
 
         #region 明细
         /// <summary>
+        /// 根据receiptId获取明细数据
+        /// </summary>
+        /// <param name="receiptId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetDetailsByReceiptIdAsync(long receiptId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<WHMaterialReceiptDetailEntity>(GetDetailsByReceiptIdSql, new { MaterialReceiptId = receiptId });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -222,7 +233,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
 
 
 
-
+        const string GetDetailsByReceiptIdSql = @"SELECT * FROM wh_material_receipt_detail WHERE MaterialReceiptId = @MaterialReceiptId ";
         const string GetDetailByIdSql = @"SELECT * FROM wh_material_receipt_detail WHERE Id = @Id ";
         const string GetDetailsByIdsSql = @"SELECT * FROM wh_material_receipt_detail WHERE Id IN @Ids ";
 

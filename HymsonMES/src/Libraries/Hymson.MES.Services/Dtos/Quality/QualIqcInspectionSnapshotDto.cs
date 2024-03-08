@@ -1,153 +1,15 @@
-using Hymson.Infrastructure;
-
 namespace Hymson.MES.Services.Dtos.Quality
 {
-    /// <summary>
-    /// 收货单物料分页查询Dto
-    /// </summary>
-    public class ReceiptMaterialPagedQueryDto : PagerInfo
-    {
-        /// <summary>
-        /// 收货单号
-        /// </summary>
-        public string? ReceiptNum { get; set; }
-
-        /// <summary>
-        /// 编码（物料）
-        /// </summary>
-        public string? SupplierCode { get; set; }
-
-        /// <summary>
-        /// 名称（物料）
-        /// </summary>
-        public string? SupplierName { get; set; }
-
-    }
-
-    /// <summary>
-    /// 收货物料
-    /// </summary>
-    public record ReceiptMaterialDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 收货单号
-        /// </summary>
-        public string ReceiptNum { get; set; }
-
-        /// <summary>
-        /// 供应商ID
-        /// </summary>
-        public long SupplierId { get; set; }
-
-        /// <summary>
-        /// 供应商编码
-        /// </summary>
-        public string SupplierCode { get; set; }
-
-        /// <summary>
-        /// 供应商名称
-        /// </summary>
-        public string SupplierName { get; set; }
-
-        /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; }
-
-        /// <summary>
-        /// 修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-    }
-
-    /// <summary>
-    /// 收货物料
-    /// </summary>
-    public record ReceiptMaterialItemDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 收货单号
-        /// </summary>
-        public string ReceiptNum { get; set; }
-
-        /// <summary>
-        /// 供应商ID
-        /// </summary>
-        public long SupplierId { get; set; }
-
-        /// <summary>
-        /// 供应商编码
-        /// </summary>
-        public string SupplierCode { get; set; }
-
-        /// <summary>
-        /// 供应商名称
-        /// </summary>
-        public string SupplierName { get; set; }
-
-        /// <summary>
-        /// 供应商批次
-        /// </summary>
-        public string SupplierBatch { get; set; }
-
-        /// <summary>
-        /// 物料Id
-        /// </summary>
-        public long MaterialId { get; set; }
-
-        /// <summary>
-        /// 物料编码
-        /// </summary>
-        public string MaterialCode { get; set; }
-
-        /// <summary>
-        /// 物料名称
-        /// </summary>
-        public string MaterialName { get; set; }
-
-        /// <summary>
-        /// 物料版本
-        /// </summary>
-        public string MaterialVersion { get; set; }
-
-        /// <summary>
-        /// 内部
-        /// </summary>
-        public string InternalBatch { get; set; }
-
-        /// <summary>
-        /// 计划发货数量
-        /// </summary>
-        public int PlanQty { get; set; }
-
-        /// <summary>
-        /// 计划到货时间
-        /// </summary>
-        public DateTime? PlanTime { get; set; }
-
-    }
-
     /// <summary>
     /// 生成检验单Dto
     /// </summary>
     public record GenerateInspectionDto
     {
+        /// <summary>
+        /// 收货单
+        /// </summary>
+        public long ReceiptId { get; set; }
+
         /// <summary>
         /// 收货单
         /// </summary>

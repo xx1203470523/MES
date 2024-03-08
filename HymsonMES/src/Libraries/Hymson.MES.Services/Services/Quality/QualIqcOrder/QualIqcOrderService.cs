@@ -254,95 +254,6 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
-        /// 转换为Dto对象
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<QualIqcOrderDto>> PrepareDtos(IEnumerable<QualIqcOrderEntity> entities)
-        {
-            List<QualIqcOrderDto> dtos = new();
-
-            // 读取收货单
-            var receiptDetailEntities = await _whMaterialReceiptRepository.GetDetailsByIdsAsync(entities.Select(x => x.MaterialReceiptDetailId));
-            var receiptDetailDic = receiptDetailEntities.ToDictionary(x => x.Id, x => x);
-
-            // 读取收货单
-            var receiptEntities = await _whMaterialReceiptRepository.GetByIdsAsync(receiptDetailEntities.Select(x => x.MaterialReceiptId));
-            var receiptDic = receiptEntities.ToDictionary(x => x.Id, x => x);
-
-            // 读取产品
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
-            var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
-
-            // 读取供应商
-            var supplierEntities = await _whSupplierRepository.GetByIdsAsync(entities.Where(w => w.SupplierId.HasValue).Select(x => x.SupplierId!.Value));
-            var supplierDic = supplierEntities.ToDictionary(x => x.Id, x => x);
-
-            foreach (var entity in entities)
-            {
-                var dto = entity.ToModel<QualIqcOrderDto>();
-                if (dto == null) continue;
-
-                // 收货单明细
-                var receiptDetailEntity = receiptDetailDic[entity.MaterialReceiptDetailId];
-                if (receiptDetailEntity != null)
-                {
-                    dto.SupplierBatch = receiptDetailEntity.SupplierBatch;
-                    dto.InternalBatch = receiptDetailEntity.InternalBatch;
-                    dto.PlanQty = receiptDetailEntity.PlanQty;
-
-                    // 收货单
-                    var receiptEntity = receiptDic[receiptDetailEntity.MaterialReceiptId];
-                    if (receiptEntity != null) dto.ReceiptNum = receiptEntity.ReceiptNum;
-                }
-
-                // TODO 规格型号
-                dto.Specifications = "-";
-
-                // 产品
-                if (!entity.MaterialId.HasValue)
-                {
-                    dto.MaterialCode = "-";
-                    dto.MaterialName = "-";
-                    dto.MaterialVersion = "-";
-                    dto.SupplierCode = "-";
-                    dto.SupplierName = "-";
-                    dtos.Add(dto);
-                    continue;
-                }
-
-                var materialEntity = materialDic[entity.MaterialId.Value];
-                if (materialEntity != null)
-                {
-                    dto.MaterialCode = materialEntity.MaterialCode;
-                    dto.MaterialName = materialEntity.MaterialName;
-                    dto.MaterialVersion = materialEntity.Version ?? "";
-                    dto.Unit = materialEntity.Unit ?? "";
-                }
-
-                // 供应商
-                if (!entity.SupplierId.HasValue)
-                {
-                    dto.SupplierCode = "-";
-                    dto.SupplierName = "-";
-                    dtos.Add(dto);
-                    continue;
-                }
-
-                var supplierEntity = supplierDic[entity.SupplierId.Value];
-                if (supplierEntity != null)
-                {
-                    dto.SupplierCode = supplierEntity.Code;
-                    dto.SupplierName = supplierEntity.Name;
-                }
-
-                dtos.Add(dto);
-            }
-
-            return dtos;
-        }
-
-        /// <summary>
         /// 根据ID查询类型
         /// </summary>
         /// <param name="id"></param>
@@ -451,6 +362,101 @@ namespace Hymson.MES.Services.Services.Quality
             List<InspectionParameterDetailDto> list = new();
             return list;
         }
+
+
+
+
+        #region 内部方法
+        /// <summary>
+        /// 转换为Dto对象
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<QualIqcOrderDto>> PrepareDtos(IEnumerable<QualIqcOrderEntity> entities)
+        {
+            List<QualIqcOrderDto> dtos = new();
+
+            // 读取收货单明细
+            var receiptDetailEntities = await _whMaterialReceiptRepository.GetDetailsByIdsAsync(entities.Select(x => x.MaterialReceiptDetailId));
+            var receiptDetailDic = receiptDetailEntities.ToDictionary(x => x.Id, x => x);
+
+            // 读取收货单
+            var receiptEntities = await _whMaterialReceiptRepository.GetByIdsAsync(receiptDetailEntities.Select(x => x.MaterialReceiptId));
+            var receiptDic = receiptEntities.ToDictionary(x => x.Id, x => x);
+
+            // 读取产品
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
+            var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
+
+            // 读取供应商
+            var supplierEntities = await _whSupplierRepository.GetByIdsAsync(entities.Where(w => w.SupplierId.HasValue).Select(x => x.SupplierId!.Value));
+            var supplierDic = supplierEntities.ToDictionary(x => x.Id, x => x);
+
+            foreach (var entity in entities)
+            {
+                var dto = entity.ToModel<QualIqcOrderDto>();
+                if (dto == null) continue;
+
+                // 收货单明细
+                var receiptDetailEntity = receiptDetailDic[entity.MaterialReceiptDetailId];
+                if (receiptDetailEntity != null)
+                {
+                    dto.SupplierBatch = receiptDetailEntity.SupplierBatch;
+                    dto.InternalBatch = receiptDetailEntity.InternalBatch;
+                    dto.PlanQty = receiptDetailEntity.PlanQty;
+
+                    // 收货单
+                    var receiptEntity = receiptDic[receiptDetailEntity.MaterialReceiptId];
+                    if (receiptEntity != null) dto.ReceiptNum = receiptEntity.ReceiptNum;
+                }
+
+                // TODO 规格型号
+                dto.Specifications = "-";
+
+                // 产品
+                if (entity.MaterialId.HasValue)
+                {
+                    var materialEntity = materialDic[entity.MaterialId.Value];
+                    if (materialEntity != null)
+                    {
+                        dto.MaterialCode = materialEntity.MaterialCode;
+                        dto.MaterialName = materialEntity.MaterialName;
+                        dto.MaterialVersion = materialEntity.Version ?? "";
+                        dto.Unit = materialEntity.Unit ?? "";
+                    }
+                }
+                else
+                {
+                    dto.MaterialCode = "-";
+                    dto.MaterialName = "-";
+                    dto.MaterialVersion = "-";
+                    dto.SupplierCode = "-";
+                    dto.SupplierName = "-";
+                }
+
+                // 供应商
+                if (entity.SupplierId.HasValue)
+                {
+                    var supplierEntity = supplierDic[entity.SupplierId.Value];
+                    if (supplierEntity != null)
+                    {
+                        dto.SupplierCode = supplierEntity.Code;
+                        dto.SupplierName = supplierEntity.Name;
+                    }
+                }
+                else
+                {
+                    dto.SupplierCode = "-";
+                    dto.SupplierName = "-";
+                }
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+        #endregion
+
 
     }
 }
