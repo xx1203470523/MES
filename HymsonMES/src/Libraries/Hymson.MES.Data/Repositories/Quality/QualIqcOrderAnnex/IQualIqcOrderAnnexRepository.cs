@@ -58,7 +58,14 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualIqcOrderAnnexEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 根据ID查询类型
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualIqcOrderAnnexEntity>> GetByOrderIdAsync(long orderId);
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>

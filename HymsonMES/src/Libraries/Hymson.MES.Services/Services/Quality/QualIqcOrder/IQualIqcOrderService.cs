@@ -56,14 +56,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long orderId);
+        Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryOrderTypeListByIdAsync(long orderId);
 
         /// <summary>
         /// 根据ID查询附件
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteAttachmentBaseDto>> QueryAttachmentListByIdAsync(long id);
+        Task<IEnumerable<InteAttachmentBaseDto>> QueryOrderAttachmentListByIdAsync(long orderId);
 
         /// <summary>
         /// 查询检验单快照数据

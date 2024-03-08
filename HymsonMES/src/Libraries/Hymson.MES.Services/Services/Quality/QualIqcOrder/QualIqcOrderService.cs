@@ -5,10 +5,12 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
@@ -51,6 +53,11 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualIqcOrderTypeRepository _qualIqcOrderTypeRepository;
 
         /// <summary>
+        /// 仓储接口（iqc检验样本附件）
+        /// </summary>
+        private readonly IQualIqcOrderAnnexRepository _qualIqcOrderAnnexRepository;
+
+        /// <summary>
         /// 仓储接口（收货单）
         /// </summary>
         private readonly IWhMaterialReceiptRepository _whMaterialReceiptRepository;
@@ -66,6 +73,11 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IWhSupplierRepository _whSupplierRepository;
 
         /// <summary>
+        /// 仓储接口（附件维护）
+        /// </summary>
+        private readonly IInteAttachmentRepository _inteAttachmentRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -73,25 +85,31 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="validationSaveRules"></param>
         /// <param name="qualIqcOrderRepository"></param>
         /// <param name="qualIqcOrderTypeRepository"></param>
+        /// <param name="qualIqcOrderAnnexRepository"></param>
         /// <param name="whMaterialReceiptRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="whSupplierRepository"></param>
+        /// <param name="inteAttachmentRepository"></param>
         public QualIqcOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<QualIqcOrderSaveDto> validationSaveRules,
             IQualIqcOrderRepository qualIqcOrderRepository,
             IQualIqcOrderTypeRepository qualIqcOrderTypeRepository,
+            IQualIqcOrderAnnexRepository qualIqcOrderAnnexRepository,
             IWhMaterialReceiptRepository whMaterialReceiptRepository,
             IProcMaterialRepository procMaterialRepository,
-            IWhSupplierRepository whSupplierRepository)
+            IWhSupplierRepository whSupplierRepository,
+            IInteAttachmentRepository inteAttachmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _qualIqcOrderRepository = qualIqcOrderRepository;
             _qualIqcOrderTypeRepository = qualIqcOrderTypeRepository;
+            _qualIqcOrderAnnexRepository = qualIqcOrderAnnexRepository;
             _whMaterialReceiptRepository = whMaterialReceiptRepository;
             _procMaterialRepository = procMaterialRepository;
             _whSupplierRepository = whSupplierRepository;
+            _inteAttachmentRepository = inteAttachmentRepository;
         }
 
 
@@ -259,15 +277,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long orderId)
+        public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryOrderTypeListByIdAsync(long orderId)
         {
-            /*
             var entities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(orderId);
             return entities.Select(s => s.ToModel<QualIqcOrderTypeBaseDto>());
-            */
 
-            await Task.CompletedTask;
-
+            /*
             // TODO 测试数据
             List<QualIqcOrderTypeBaseDto> list = new()
             {
@@ -287,16 +302,25 @@ namespace Hymson.MES.Services.Services.Quality
                 }
             };
 
-            return list;
+            return await Task.FromResult(list);
+            */
         }
 
         /// <summary>
         /// 根据ID查询附件
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteAttachmentBaseDto>> QueryAttachmentListByIdAsync(long id)
+        public async Task<IEnumerable<InteAttachmentBaseDto>> QueryOrderAttachmentListByIdAsync(long orderId)
         {
+            var iqcOrderAnnexs = await _qualIqcOrderAnnexRepository.GetByOrderIdAsync(orderId);
+            if (iqcOrderAnnexs == null) return Array.Empty<InteAttachmentBaseDto>();
+
+            var attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(iqcOrderAnnexs.Select(s => s.AnnexId));
+            if (attachmentEntities == null) return Array.Empty<InteAttachmentBaseDto>();
+
+            return attachmentEntities.Select(s => s.ToModel<InteAttachmentBaseDto>());
+
             /*
             var inteMessageManageEntity = await _inteMessageManageRepository.GetByIdAsync(id);
             if (inteMessageManageEntity == null) return null;
@@ -319,11 +343,7 @@ namespace Hymson.MES.Services.Services.Quality
             return dto;
              */
 
-
-
-            //var types = await _qualOqcOrderTypeRepository.GetByIdsAsync(id);
-            await Task.CompletedTask;
-
+            /*
             // TODO 测试数据
             List<InteAttachmentBaseDto> list = new()
             {
@@ -339,7 +359,8 @@ namespace Hymson.MES.Services.Services.Quality
                 }
             };
 
-            return list;
+            return await Task.FromResult(list);
+            */
         }
 
         /// <summary>

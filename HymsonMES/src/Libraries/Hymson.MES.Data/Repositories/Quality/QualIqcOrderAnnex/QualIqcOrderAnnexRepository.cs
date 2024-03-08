@@ -97,6 +97,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualIqcOrderAnnexEntity>> GetByOrderIdAsync(long orderId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualIqcOrderAnnexEntity>(GetByOrderIdSql, new { IQCOrderId = orderId });
+        }
+
+        /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
@@ -170,6 +181,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string DeletesSql = "UPDATE qual_iqc_order_annex SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM qual_iqc_order_annex WHERE Id = @Id ";
+        const string GetByOrderIdSql = @"SELECT * FROM qual_iqc_order_annex WHERE IQCOrderId = @IQCOrderId ";
         const string GetByIdsSql = @"SELECT * FROM qual_iqc_order_annex WHERE Id IN @Ids ";
 
     }

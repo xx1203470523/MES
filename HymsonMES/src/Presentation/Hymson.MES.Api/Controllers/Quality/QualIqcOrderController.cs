@@ -97,7 +97,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpGet("type/{orderId}")]
         public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long orderId)
         {
-            return await _qualIqcOrderService.QueryTypeListByIdAsync(orderId);
+            return await _qualIqcOrderService.QueryOrderTypeListByIdAsync(orderId);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpGet("attachment/{orderId}")]
         public async Task<IEnumerable<InteAttachmentBaseDto>> QueryAttachmentListByIdAsync(long orderId)
         {
-            return await _qualIqcOrderService.QueryAttachmentListByIdAsync(orderId);
+            return await _qualIqcOrderService.QueryOrderAttachmentListByIdAsync(orderId);
         }
 
         /// <summary>
