@@ -74,7 +74,7 @@ namespace Hymson.MES.Services.Dtos.WhShipmentMaterial
        /// <summary>
         /// 出货单Id
         /// </summary>
-        public long ShipmentId { get; set; }
+        //public long ShipmentId { get; set; }
 
        /// <summary>
         /// 物料Id
