@@ -23,7 +23,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 工单id
         /// </summary>
-        public long WorkOrderId { get; set; }
+        public long? WorkOrderId { get; set; }
 
         /// <summary>
         /// 产品id

@@ -71,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcMaterialGroupEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<ProcMaterialGroupEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List

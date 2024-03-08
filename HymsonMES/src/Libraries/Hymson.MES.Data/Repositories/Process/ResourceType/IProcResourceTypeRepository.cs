@@ -60,5 +60,12 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="resourceTypeQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceTypeEntity>> GetEntitiesAsync(ProcResourceTypeQuery resourceTypeQuery);
     }
 }

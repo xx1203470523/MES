@@ -44,14 +44,10 @@ namespace Hymson.MES.Equipment.Api
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
             builder.Services.AddEventBusRabbitMQService(builder.Configuration);
-
-#if DEBUG
             builder.Services.AddHostedService<HostedService>();
-#endif
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);
-            builder.Services.AddCoreService(builder.Configuration);
             builder.Services.AddEquipmentService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);

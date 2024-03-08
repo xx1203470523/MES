@@ -96,12 +96,12 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             }
 
             // 验证规则
-            Verification(createDto.RuleList.ToList());
+            Verification(createDto.Details.ToList());
 
             List<ProcMaskCodeRuleEntity> rules = new();
-            for (int i = 0; i < createDto.RuleList.Count; i++)
+            for (int i = 0; i < createDto.Details.Count; i++)
             {
-                var item = createDto.RuleList[i].ToEntity<ProcMaskCodeRuleEntity>();
+                var item = createDto.Details[i].ToEntity<ProcMaskCodeRuleEntity>();
                 item.Id = IdGenProvider.Instance.CreateId();
                 item.SiteId = entity.SiteId;
                 item.MaskCodeId = entity.Id;
@@ -138,12 +138,12 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             entity.UpdatedBy = _currentUser.UserName;
 
             //验证规则
-            Verification(modifyDto.RuleList.ToList());
+            Verification(modifyDto.Details.ToList());
 
             List<ProcMaskCodeRuleEntity> rules = new();
-            for (int i = 0; i < modifyDto.RuleList.Count; i++)
+            for (int i = 0; i < modifyDto.Details.Count; i++)
             {
-                var item = modifyDto.RuleList[i].ToEntity<ProcMaskCodeRuleEntity>();
+                var item = modifyDto.Details[i].ToEntity<ProcMaskCodeRuleEntity>();
                 item.Id = IdGenProvider.Instance.CreateId();
                 item.SiteId = entity.SiteId;
                 item.MaskCodeId = entity.Id;
@@ -205,7 +205,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             var dto = (await _procMaskCodeRepository.GetByIdAsync(id)).ToModel<ProcMaskCodeDto>();
             if (dto != null)
             {
-                dto.RuleList = (await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(dto.Id)).Select(s => s.ToModel<ProcMaskCodeRuleDto>());
+                dto.Details = (await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(dto.Id)).Select(s => s.ToModel<ProcMaskCodeRuleDto>());
                 return dto;
             }
             return new ProcMaskCodeDto();
@@ -220,7 +220,10 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         {
             if (linkeRuleList.Any(a => string.IsNullOrWhiteSpace(a.Rule))) throw new CustomerValidationException(nameof(ErrorCode.MES10803));
             if (linkeRuleList.Any(a => a.MatchWay < 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10804));
-
+            if (linkeRuleList.GroupBy(x => x.MatchWay).Where(x => x.Count() > 1).Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10813));
+            }
             var validationFailures = new List<FluentValidation.Results.ValidationFailure>();
 
             //全码:4,起始:1,结束:3,中间:2;根据匹配方式校验规则

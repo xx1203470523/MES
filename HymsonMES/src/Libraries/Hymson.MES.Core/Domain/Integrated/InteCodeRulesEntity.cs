@@ -15,9 +15,14 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 产品id
         /// </summary>
-        public long ProductId { get; set; }
+        public long? ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 容器id
+        /// </summary>
+        public long? ContainerInfoId { get; set; }
+
+        /// <summary>
         /// 编码类型;1：过程控制序列码；2：包装序列码；
         /// </summary>
         public CodeRuleCodeTypeEnum  CodeType { get; set; }
@@ -40,7 +45,7 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 忽略字符
         /// </summary>
-        public string IgnoreChar { get; set; }
+        public string? IgnoreChar { get; set; }
 
        /// <summary>
         /// 增量
@@ -60,12 +65,12 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 初始值
         /// </summary>
-        public int StartNumber { get; set; }
+        public int StartNumber { get; set; }     
 
         /// <summary>
         /// 手动录入编码规则的描述信息
         /// </summary>
-        public string Remark { get; set; } = "";
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 站点Id

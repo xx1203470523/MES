@@ -1,6 +1,4 @@
-﻿using Hymson.MES.Data.Repositories.Process;
-
-namespace Microsoft.Extensions.DependencyInjection
+﻿namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// 依赖注入服务类（欣世界）
@@ -15,7 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddRepositoryForXinShiJie(this IServiceCollection services)
         {
             #region Process
-            services.AddSingleton<IProcProductTimecontrolRepository, ProcProductTimecontrolRepository>();
+            //services.AddSingleton<IProcProductTimecontrolRepository, ProcProductTimecontrolRepository>();
 
             #endregion
 

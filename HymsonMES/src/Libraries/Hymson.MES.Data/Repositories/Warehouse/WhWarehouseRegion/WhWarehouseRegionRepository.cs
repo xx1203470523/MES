@@ -185,7 +185,7 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseRegion
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("CreatedOn DESC");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 

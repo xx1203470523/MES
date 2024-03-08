@@ -5,7 +5,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using System.Text;
 
-namespace Hymson.MES.Data.Repositories.Manufacture
+namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
 {
     /// <summary>
     /// 仓储（物料加载）
@@ -188,8 +188,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuFeedingEntity>(GetByFeedingPointIdAndResourceIdsSql, query);
         }
-
-
     }
 
 

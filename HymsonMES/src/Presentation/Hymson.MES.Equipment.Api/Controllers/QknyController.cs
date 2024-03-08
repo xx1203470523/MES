@@ -33,7 +33,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 是否调试
         /// </summary>
-        private readonly bool IS_DEBUG = true;
+        private readonly bool IS_DEBUG = false;
 
         /// <summary>
         /// 构造函数

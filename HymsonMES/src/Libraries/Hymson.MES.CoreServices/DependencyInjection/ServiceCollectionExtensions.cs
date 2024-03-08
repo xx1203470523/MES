@@ -1,20 +1,11 @@
 ﻿using FluentValidation;
-using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services;
-using Hymson.MES.CoreServices.Services.Common;
-using Hymson.MES.CoreServices.Services.Integrated;
-using Hymson.MES.CoreServices.Services.Job;
+using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
-using Hymson.MES.CoreServices.Services.Manufacture;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary;
-using Hymson.MES.CoreServices.Services.Parameter;
-using Hymson.MES.CoreServices.Validators;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Hymson.MES.CoreServices.DependencyInjection
 {
@@ -54,49 +45,15 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddManuServices(this IServiceCollection services)
         {
-            services.AddSingleton<IManuDegradedProductExtendService, ManuDegradedProductExtendService>();
-            services.AddSingleton<IManuCreateBarcodeService, ManuCreateBarcodeService>();
-            services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
-            services.AddSingleton<IManuCommonService, ManuCommonService>();
-            services.AddSingleton<IMasterDataService, MasterDataService>();
-            services.AddSingleton<IJobCommonService, JobCommonService>();
             services.AddSingleton<ScopedServiceFactory>();
             services.AddTransient<IJobContextProxy, JobContextProxy>();
-
-            services.AddSingleton<IJobService, BadRecordJobService>();
-            services.AddSingleton<IJobService, BarcodeReceiveService>();
-            services.AddSingleton<IJobService, CrossOperationTimeVerifyJobService>();
-            services.AddSingleton<IJobService, EsopOutJobService>();
-            services.AddSingleton<IJobService, InStationInterceptJobService>();
-            services.AddSingleton<IJobService, InStationJobService>();
-            services.AddSingleton<IJobService, InStationMarkInterceptJobService>();
-            services.AddSingleton<IJobService, IOutputModifyService>();
-            services.AddSingleton<IJobService, OutStationJobService>();
-            services.AddSingleton<IJobService, PackageCloseJobService>();
-            services.AddSingleton<IJobService, PackageIngJobService>();
-            services.AddSingleton<IJobService, PackageOpenJobService>();
-            services.AddSingleton<IJobService, PackageVerifyJobService>();
-            services.AddSingleton<IJobService, ParameterCollectJobService>();
-            services.AddSingleton<IJobService, PartialScrapJobService>();
-            services.AddSingleton<IJobService, ProductBadRecordJobService>();
-            services.AddSingleton<IJobService, ProductsSortingJobService>();
-            services.AddSingleton<IJobService, RepairEndJobService>();
-            services.AddSingleton<IJobService, RepairStartJobService>();
-            services.AddSingleton<IJobService, SFCRequestJobService>();
-            services.AddSingleton<IJobService, SmiFinishedJobService>();
-            services.AddSingleton<IJobService, StopJobService>();
-            services.AddSingleton<IJobService, SupplierBarcodeReceiveService>();
-            services.AddSingleton<IJobService, InterceptMarkingJobService>();
-
-            services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
-            services.AddSingleton<IManuEquipmentParameterService, ManuEquipmentParameterService>();
-            services.AddSingleton<IManuSfcSummaryService, ManuSfcSummaryService>();
-            services.AddSingleton<IManuPassStationService, ManuPassStationService>();
-            services.AddSingleton<IManuBindService, ManuBindService>();
-            services.AddSingleton<ITracingSourceCoreService, TracingSourceCoreService>();
-            
-
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
+            foreach (var keyValuePair in keyValuePairs)
+            {
+                services.AddSingleton(keyValuePair.Value, keyValuePair.Key);
+            }
             return services;
         }
 
@@ -107,7 +64,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddIntegratedServices(this IServiceCollection services)
         {
-            services.AddSingleton<IMessagePushService, MessagePushService>();
+            //services.AddSingleton<IMessagePushService, MessagePushService>();
             return services;
         }
 
@@ -118,12 +75,15 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
-            services.AddSingleton<AbstractValidator<RepairEndRequestBo>, RepairEndJobValidator>();
-            services.AddSingleton<AbstractValidator<PackageIngRequestBo>, PackageIngJobValidator>();
-            services.AddSingleton<AbstractValidator<PackageOpenRequestBo>, PackageOpenJobValidator>();
-            services.AddSingleton<AbstractValidator<PackageCloseRequestBo>, PackageCloseJobValidator>();
-            services.AddSingleton<AbstractValidator<EsopOutRequestBo>, EsopOutJobValidator>();
-
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var abstractValidators = typeFinder.FindClassesOfType(typeof(IValidator<>)).ToList();
+            foreach (var abstractValidator in abstractValidators)
+            {
+                if (abstractValidator.BaseType != null)
+                {
+                    services.TryAddSingleton(abstractValidator.BaseType, abstractValidator);
+                }
+            }
             return services;
         }
 

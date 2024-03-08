@@ -1,9 +1,11 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -94,7 +96,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync( IEnumerable<long>   ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { Ids = ids });
@@ -420,6 +422,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 批量插入
+        /// </summary>
+        /// <param name="resourceEntities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsAsync(IEnumerable<ProcResourceEntity> resourceEntities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, resourceEntities);
+        }
+
+        /// <summary>
         /// 更新资源维护数据
         /// </summary>
         /// <param name="entity"></param>
@@ -428,6 +441,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
+        }
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="procResourceEntities"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatesAsync(IEnumerable<ProcResourceEntity> procResourceEntities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSql, procResourceEntities);
         }
 
         /// <summary>
@@ -529,6 +553,28 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="procResourceQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceEntity>> GetEntitiesAsync(ProcResourceQuery procResourceQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (procResourceQuery.ResCodes != null && procResourceQuery.ResCodes.Any())
+            {
+                sqlBuilder.Where(" ResCode in @ResCodes ");
+            }
+            using var conn = GetMESDbConnection();
+            var procResourceEntities = await conn.QueryAsync<ProcResourceEntity>(template.RawSql, procResourceQuery);
+            return procResourceEntities;
+        }
     }
 
     /// <summary>
@@ -584,5 +630,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string UpdateStatusSql = "UPDATE `proc_resource` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
+        const string GetEntitiesSqlTemplate = "SELECT * FROM `proc_resource` /**where**/ ";
     }
 }

@@ -17,5 +17,14 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// </summary>
         public QCMaterialTypeEnum Type { get; set; }
 
+        /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 客户Id
+        /// </summary>
+        public long? CustomId { get; set; }
     }
 }

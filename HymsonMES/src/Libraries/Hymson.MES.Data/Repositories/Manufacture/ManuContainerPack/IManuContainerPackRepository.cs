@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuContainerPackEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ManuContainerPackEntity> manuContainerPackEntitys);
+        Task<int> InsertsAsync(IEnumerable<ManuContainerPackEntity> manuContainerPackEntitys);
 
         /// <summary>
         /// 更新
@@ -144,6 +144,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="containerBarCodeId"></param>
         /// <returns></returns>
         Task<int> GetCountByrBarCodeIdAsync(long containerBarCodeId);
+        Task<ManuContainerPackEntity> GetOneAsync(ManuContainerPackQuery query);
+        Task<int> GetCountAsync(ManuContainerPackQuery query);
+        Task<IEnumerable<ManuContainerPackEntity>> GetListAsync(ManuContainerPackQuery query);
+        Task<int> InsertIgnoreAsync(ManuContainerPackEntity manuContainerPackEntity);
+        //Task<int> UpdateOutermostContainerBarCodeAndDeepAsync(IEnumerable<UpdateOutermostContainerBarCodeAndDeepCommand> commands);
         #endregion
     }
 }

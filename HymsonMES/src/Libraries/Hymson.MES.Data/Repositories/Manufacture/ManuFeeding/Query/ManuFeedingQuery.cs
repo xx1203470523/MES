@@ -113,4 +113,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public IEnumerable<long> ResourceIds { get; set; }
     }
 
+    /// <summary>
+    /// 上料信息查询对象
+    /// </summary>
+    public class ManuFeedingQuery
+    {
+        /// <summary>
+        /// 上料条码
+        /// </summary>
+        public string BarCode { get; set; }
+    }
+
 }

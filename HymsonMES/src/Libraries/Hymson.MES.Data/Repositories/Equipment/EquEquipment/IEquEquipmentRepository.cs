@@ -21,11 +21,25 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         Task<int> InsertAsync(EquEquipmentEntity equipmentUnitEntity);
 
         /// <summary>
+        /// 批量插入
+        /// </summary>
+        /// <param name="equipmentEntities"></param>
+        /// <returns></returns>
+        Task<int> InsertsAsync(IEnumerable<EquEquipmentEntity> equipmentEntities);
+
+        /// <summary>
         /// equipmentUnitEntity
         /// </summary>
         /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquEquipmentEntity equipmentUnitEntity);
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="equipmentEntities"></param>
+        /// <returns></returns>
+        Task<int> UpdatesAsync(IEnumerable<EquEquipmentEntity> equipmentEntities);
 
         /// <summary>
         /// 批量修改设备的设备组

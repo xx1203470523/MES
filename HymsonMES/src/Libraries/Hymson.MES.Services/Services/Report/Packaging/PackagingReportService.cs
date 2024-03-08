@@ -89,7 +89,7 @@ namespace Hymson.MES.Services.Services.Report
                     return new ManuContainerBarcodeViewDto();
                 }
 
-                barcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(containerPackEntity.ContainerBarCodeId);
+                barcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(containerPackEntity.ContainerBarCodeId.GetValueOrDefault());
                 if (barcodeEntity == null)
                 {
                     return new ManuContainerBarcodeViewDto();
@@ -160,7 +160,7 @@ namespace Hymson.MES.Services.Services.Report
             if (manuContainerPacks.Any())
             {
                 //父容器id列表
-                var parentContainerIds = manuContainerPacks.Select(x => x.ContainerBarCodeId).ToArray();
+                var parentContainerIds = manuContainerPacks.Select(x => x.ContainerBarCodeId.GetValueOrDefault()).ToArray();
                 parentContainers = await _manuContainerBarcodeRepository.GetByIdsAsync(parentContainerIds);
             }
 
@@ -210,7 +210,7 @@ namespace Hymson.MES.Services.Services.Report
             if (manuContainerPacks.Any())
             {
                 //父容器id列表
-                var parentContainerIds = manuContainerPacks.Select(x => x.ContainerBarCodeId).ToArray();
+                var parentContainerIds = manuContainerPacks.Select(x => x.ContainerBarCodeId.GetValueOrDefault()).ToArray();
                 parentContainers = await _manuContainerBarcodeRepository.GetByIdsAsync(parentContainerIds);
             }
 
