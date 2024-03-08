@@ -5,7 +5,7 @@ namespace Hymson.MES.Core.Domain.Quality
     /// <summary>
     /// 数据实体（Iqc样本）   
     /// qual_iqc_order_sample
-    /// @author User
+    /// @author Czhipu
     /// @date 2024-03-06 02:26:31
     /// </summary>
     public class QualIqcOrderSampleEntity : BaseEntity

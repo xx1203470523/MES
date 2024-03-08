@@ -8,6 +8,8 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Qual;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Core.Domain.WHMaterialReceipt;
+using Hymson.MES.Core.Domain.WHMaterialReceiptDetail;
 using Hymson.MES.Core.Domain.WhShipment;
 using Hymson.MES.Core.Domain.WhWareHouse;
 using Hymson.MES.Core.Domain.WhWarehouseLocation;
@@ -55,6 +57,7 @@ using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Hymson.MES.Data.Repositories.WHMaterialReceipt.Query;
 using Hymson.MES.Data.Repositories.WhShipment.Query;
 using Hymson.MES.Data.Repositories.WhWareHouse.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
@@ -70,6 +73,7 @@ using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
+using Hymson.MES.Services.Dtos.WHMaterialReceipt;
 using Hymson.MES.Services.Dtos.WhShipment;
 using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
@@ -787,10 +791,14 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region WhMaterialReceipt
-            CreateMap<WhShipmentSaveDto,WhShipmentEntity>();
+            CreateMap<WhShipmentSaveDto, WhShipmentEntity>();
             CreateMap<WhShipmentEntity, WhShipmentDto>();
             CreateMap<WhShipmentPagedQueryDto, WhShipmentPagedQuery>();
             #endregion
+
+            CreateMap<WhMaterialReceiptPagedQueryDto, WhMaterialReceiptPagedQuery>();
+            CreateMap<WhMaterialReceiptEntity, WhMaterialReceiptDto>();
+            CreateMap<WHMaterialReceiptDetailEntity, ReceiptMaterialDetailDto>();
 
         }
 
@@ -896,7 +904,8 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<QualIqcOrderPagedQueryDto, QualIqcOrderPagedQuery>();
             CreateMap<QualIqcOrderEntity, QualIqcOrderDto>();
-            
+            CreateMap<QualIqcOrderTypeEntity, QualIqcOrderTypeBaseDto>();
+            CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
 
             #region QualIqcInspectionItem
 
