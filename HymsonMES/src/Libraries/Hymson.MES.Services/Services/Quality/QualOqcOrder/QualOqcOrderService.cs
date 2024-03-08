@@ -6,11 +6,14 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.Query;
+using Hymson.MES.Data.Repositories.WhShipment;
 using Hymson.MES.Services.Dtos.Quality;
-using Hymson.Snowflake;
 using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Quality
@@ -38,6 +41,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// 仓储接口（OQC检验单）
         /// </summary>
         private readonly IQualOqcOrderRepository _qualOqcOrderRepository;
+        private readonly IQualOqcOrderTypeRepository _qualOqcOrderTypeRepository;
+        private readonly IWhShipmentRepository _whShipmentRepository;
+        private readonly IWhShipmentMaterialRepository _whShipmentMaterialRepository;
+        private readonly IQualOqcParameterGroupSnapshootRepository _qualOqcParameterGroupSnapshootRepository;
+        private readonly IQualOqcParameterGroupDetailSnapshootRepository _qualOqcParameterGroupDetailSnapshootRepository;
+
+        private readonly IOQCOrderCreateService _oqcOrderCreateService;
 
         /// <summary>
         /// 构造函数
@@ -46,13 +56,33 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="qualOqcOrderRepository"></param>
-        public QualOqcOrderService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<QualOqcOrderSaveDto> validationSaveRules,
-            IQualOqcOrderRepository qualOqcOrderRepository)
+        /// <param name="qualOqcOrderTypeRepository"></param>
+        /// <param name="whShipmentRepository"></param>
+        /// <param name="whShipmentMaterialRepository"></param>
+        /// <param name="qualOqcParameterGroupSnapshootRepository"></param>
+        /// <param name="qualOqcParameterGroupDetailSnapshootRepository"></param>
+        /// <param name="oqcOrderCreateService"></param>
+        public QualOqcOrderService(ICurrentUser currentUser,
+            ICurrentSite currentSite,
+            AbstractValidator<QualOqcOrderSaveDto> validationSaveRules,
+            IQualOqcOrderRepository qualOqcOrderRepository,
+            IQualOqcOrderTypeRepository qualOqcOrderTypeRepository,
+            IWhShipmentRepository whShipmentRepository,
+            IWhShipmentMaterialRepository whShipmentMaterialRepository,
+            IQualOqcParameterGroupSnapshootRepository qualOqcParameterGroupSnapshootRepository,
+            IQualOqcParameterGroupDetailSnapshootRepository qualOqcParameterGroupDetailSnapshootRepository,
+            IOQCOrderCreateService oqcOrderCreateService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _qualOqcOrderRepository = qualOqcOrderRepository;
+            _qualOqcOrderTypeRepository = qualOqcOrderTypeRepository;
+            _whShipmentRepository = whShipmentRepository;
+            _whShipmentMaterialRepository = whShipmentMaterialRepository;
+            _qualOqcParameterGroupSnapshootRepository = qualOqcParameterGroupSnapshootRepository;
+            _qualOqcParameterGroupDetailSnapshootRepository = qualOqcParameterGroupDetailSnapshootRepository;
+            _oqcOrderCreateService = oqcOrderCreateService;
         }
 
 
@@ -69,21 +99,33 @@ namespace Hymson.MES.Services.Services.Quality
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
-            // 更新时间
-            var updatedBy = _currentUser.UserName;
-            var updatedOn = HymsonClock.Now();
+            //出货单明细
+            var shipmentMaterialList = await _whShipmentMaterialRepository.GetByIdsAsync(saveDto.ShipmentDetailIds.ToArray());
+            if (shipmentMaterialList == null || !shipmentMaterialList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+            //校验是否属于同一出货单
+            if (shipmentMaterialList.Select(x => x.ShipmentId).Distinct().Count() > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11800));
+            }
+            //查询出货单
+            var shipmentEntity = await _whShipmentRepository.GetByIdAsync(shipmentMaterialList.First().ShipmentId);
+            if (shipmentEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11801));
+            }
 
-            // DTO转换实体
-            var entity = saveDto.ToEntity<QualOqcOrderEntity>();
-            entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = updatedBy;
-            entity.CreatedOn = updatedOn;
-            entity.UpdatedBy = updatedBy;
-            entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            var bo = new CoreServices.Bos.Quality.OQCOrderCreateBo
+            {
+                ShipmentEntity = shipmentEntity,
+                ShipmentMaterialEntities = shipmentMaterialList,
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+            };
 
-            // 保存
-            return await _qualOqcOrderRepository.InsertAsync(entity);
+            return await _oqcOrderCreateService.CreateAsync(bo);
         }
 
         /// <summary>

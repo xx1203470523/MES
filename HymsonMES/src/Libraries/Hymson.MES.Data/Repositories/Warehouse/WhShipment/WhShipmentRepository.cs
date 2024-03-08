@@ -5,6 +5,7 @@ using Hymson.MES.Core.Domain.WhShipmentBarcode;
 using Hymson.MES.Core.Domain.WhShipmentMaterial;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Warehouse.WhShipment.View;
 using Hymson.MES.Data.Repositories.WhShipment.Query;
 using Microsoft.Extensions.Options;
 
@@ -41,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.WhShipment
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
-        }     
+        }
 
         /// <summary>
         /// INSERT DETAIL
@@ -103,7 +104,7 @@ namespace Hymson.MES.Data.Repositories.WhShipment
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -129,7 +130,7 @@ namespace Hymson.MES.Data.Repositories.WhShipment
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesDetailByDetailIdSql, new { Ids = ids });
-        }        
+        }
 
         /// <summary>
         /// 根据ID获取数据
@@ -147,10 +148,48 @@ namespace Hymson.MES.Data.Repositories.WhShipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhShipmentEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<WhShipmentEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhShipmentEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<WhShipmentView> GetEntityWithCodeByIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<WhShipmentView>(GetEntityWithCodeByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<WhShipmentView> GetEntityAsync(WhShipmentQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitySqlTemplate);
+            sqlBuilder.LeftJoin("inte_custom cus ON T.CustomerId = cus.Id");
+            sqlBuilder.Select("T.*,cus.Code AS CustomerCode");
+            sqlBuilder.Where("T.IsDeleted = 0");
+            if (query.ShipmentId.HasValue)
+            {
+                sqlBuilder.Where("T.Id = @ShipmentId");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ShipmentNum))
+            {
+                query.ShipmentNum = $"%{query.ShipmentNum}%";
+                sqlBuilder.Where("T.ShipmentNum LIKE @ShipmentNum");
+            }
+            //排序
+            if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<WhShipmentView>(template.RawSql, query);
         }
 
         /// <summary>
@@ -162,6 +201,19 @@ namespace Hymson.MES.Data.Repositories.WhShipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("T.*");
+            sqlBuilder.Where("T.IsDeleted = 0");
+            if (query.ShipmentId.HasValue)
+            {
+                sqlBuilder.Where("T.Id = @ShipmentId");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ShipmentNum))
+            {
+                query.ShipmentNum = $"%{query.ShipmentNum}%";
+                sqlBuilder.Where("T.ShipmentNum LIKE @ShipmentNum");
+            }
+            //排序
+            if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhShipmentEntity>(template.RawSql, query);
         }
@@ -179,7 +231,18 @@ namespace Hymson.MES.Data.Repositories.WhShipment
             sqlBuilder.Select("*");
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            //sqlBuilder.Where("SiteId = @SiteId");
+
+            if (pagedQuery.ShipmentNum != null)
+            {
+                sqlBuilder.Where("ShipmentNum = @ShipmentNum");
+            }
+
+            if (pagedQuery.TimeStamp.Any())
+            { 
+                sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.TimeStamp[0], CreatedOnEnd = pagedQuery.TimeStamp[1].AddDays(1) });
+                sqlBuilder.Where("CreatedOn >= @CreatedOnStart and CreatedOn < @CreatedOnEnd");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -203,17 +266,18 @@ namespace Hymson.MES.Data.Repositories.WhShipment
     public partial class WhShipmentRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM wh_shipment /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM wh_shipment /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM wh_shipment /**where**/  ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM wh_shipment /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM wh_shipment T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM wh_shipment T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT 1";
 
-        const string InsertSql = "INSERT INTO wh_shipment(  `Id`, `SiteId`, `ShipmentNum`, `CustomId`, `PlanShipmentTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ShipmentNum, @CustomId, @PlanShipmentTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO wh_shipment(  `Id`, `SiteId`, `ShipmentNum`, `CustomId`, `PlanShipmentTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ShipmentNum, @CustomId, @PlanShipmentTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO wh_shipment(  `Id`, `SiteId`, `ShipmentNum`, `CustomerId`, `PlanShipmentTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ShipmentNum, @CustomerId, @PlanShipmentTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO wh_shipment(  `Id`, `SiteId`, `ShipmentNum`, `CustomerId`, `PlanShipmentTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ShipmentNum, @CustomerId, @PlanShipmentTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
         const string InsertsDetailSql = "INSERT INTO wh_shipment_material(`Id`, `ShipmentId`, `MaterialId`, `Qty`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES(@Id, @ShipmentId, @MaterialId, @Qty, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted)";
-        const string InsertsBarcordSql = "INSERT INTO wh_shipment_barcode((`Id`, `ShipmentDetailId`, `BarCode`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES(@Id, @ShipmentDetailId, @BarCode, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, 0)";
+        const string InsertsBarcordSql = "INSERT INTO wh_shipment_barcode(`Id`, `ShipmentDetailId`, `BarCode`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES(@Id, @ShipmentDetailId, @BarCode, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, 0)";
 
-        const string UpdateSql = "UPDATE wh_shipment SET   SiteId = @SiteId, ShipmentNum = @ShipmentNum, CustomId = @CustomId, PlanShipmentTime = @PlanShipmentTime, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE wh_shipment SET   SiteId = @SiteId, ShipmentNum = @ShipmentNum, CustomId = @CustomId, PlanShipmentTime = @PlanShipmentTime, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE wh_shipment SET   SiteId = @SiteId, ShipmentNum = @ShipmentNum, CustomerId = @CustomerId, PlanShipmentTime = @PlanShipmentTime, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE wh_shipment SET   SiteId = @SiteId, ShipmentNum = @ShipmentNum, CustomerId = @CustomerId, PlanShipmentTime = @PlanShipmentTime, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE wh_shipment SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE wh_shipment SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -224,6 +288,7 @@ namespace Hymson.MES.Data.Repositories.WhShipment
 
         const string GetByIdSql = @"SELECT * FROM wh_shipment WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM wh_shipment WHERE Id IN @Ids ";
+        const string GetEntityWithCodeByIdSql = @"SELECT ws.*,cus.Code AS CustomerCode FROM wh_shipment ws LEFT JOIN inte_custom cus ON ws.CustomerId = cus.Id WHERE ws.Id = @Id ";
 
     }
 }

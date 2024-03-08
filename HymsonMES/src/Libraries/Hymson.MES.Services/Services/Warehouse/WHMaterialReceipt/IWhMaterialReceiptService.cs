@@ -51,5 +51,13 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
         /// <returns></returns>
         Task<PagedInfo<WhMaterialReceiptDto>> GetPagedListAsync(WhMaterialReceiptPagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 查询详情（物料收货表）
+        /// </summary>
+        /// <param name="receiptId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ReceiptMaterialDetailDto>> QueryDetailByReceiptIdAsync(long receiptId);
+
+
     }
 }

@@ -3,34 +3,22 @@
     /// <summary>
     /// 业务类（AQL检验水平）
     /// </summary>
-    public class AQLLevelStandardBo
+    public class AQLLevelBo
     {
         /// <summary>
         /// 检验标准
         /// </summary>
-        public string Standard { get; set; } = "";
+        public string Standard { get; set; }
 
-        /// <summary>
-        /// 检验标准
-        /// </summary>
-        public List<AQLLevelRangeBo> LevelRanges { get; set; } = new();
-
-    }
-
-    /// <summary>
-    /// 业务类（AQL检验水平）
-    /// </summary>
-    public record AQLLevelRangeBo
-    {
         /// <summary>
         /// 批次最小数量
         /// </summary>
-        public string Min { get; set; }
+        public int Min { get; set; }
 
         /// <summary>
         /// 批次最大数量
         /// </summary>
-        public string Max { get; set; }
+        public int Max { get; set; }
 
         /// <summary>
         /// VII

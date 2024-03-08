@@ -68,7 +68,7 @@ namespace Hymson.MES.Services.Dtos.WhShipmentBarcode
        /// <summary>
         /// 出货单详情 Id
         /// </summary>
-        public long ShipmentDetailId { get; set; }
+        //public long ShipmentDetailId { get; set; }
 
        /// <summary>
         /// 出货条码

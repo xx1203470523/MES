@@ -870,8 +870,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         CreatedBy = param.UserName,
                         UpdatedBy = param.UserName
                     });
-
-
                 }
             }
             if (productId == planWorkOrderEntity.ProductId)

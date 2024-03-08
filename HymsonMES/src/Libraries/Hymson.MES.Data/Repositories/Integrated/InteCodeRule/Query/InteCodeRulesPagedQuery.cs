@@ -44,5 +44,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// 编码类型;1：过程控制序列码；2：包装序列码；
         /// </summary>
         public CodeRuleCodeTypeEnum? CodeType { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string ContainerCode { get; set; }
+
+        /// <summary>
+        /// 容器名称
+        /// </summary>
+        public string ContainerName { get; set; }
     }
 }

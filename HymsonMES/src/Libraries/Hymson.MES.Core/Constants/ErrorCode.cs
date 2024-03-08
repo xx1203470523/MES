@@ -43,6 +43,7 @@
         public const string MES10134 = "未获取到导出数据！";
         public const string MES10135 = "不允许删除【已启用】状态的数据！";
         public const string MES10136 = "操作数据丢失";
+        public const string MES10137 = "只允许删除【待检验】状态的数据！";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -430,6 +431,20 @@
         public const string MES11501 = "不能删除启用状态的数据";
         #endregion
 
+        #region OQC检验任务 11800
+
+        public const string MES11800 = "选中数据不属于同一出货单";
+        public const string MES11801 = "出货单不存在";
+        public const string MES11802 = "AQL检验水平不存在";
+        public const string MES11803 = "AQL检验计划不存在";
+        public const string MES11804 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验项目不存在或未激活";
+        public const string MES11805 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验项目下检验参数不能为空";
+        public const string MES11806 = "客户【{CustomerCode}】物料【{MaterialCode}】OQC检验水平不能为空";
+        public const string MES11807 = "客户【{CustomerCode}】物料【{MaterialCode}】OQC检验水平下检验类型不能为空";
+        public const string MES11808 = "客户【{CustomerCode}】物料【{MaterialCode}】OQC检验水平下检验类型【{InspectionType}】未维护";
+
+        #endregion
+
         #region 作业12000
         public const string MES12000 = "作业维护错误";
         public const string MES12001 = "作业{code}已经存在";
@@ -517,6 +532,7 @@
         public const string MES12447 = "编码规则组成取值方式为可变值且分段值为%MULTIPLE_VARIABLE%数据中自定义值的区间值存在重复！";
         public const string MES12448 = "包装序列码的容器编码不可为空";
         public const string MES12449 = "包装序列码必须填写有效的容器编码";
+        public const string MES12450 = "容器{code}编码规则已存在，请删除原规则再进行新增!";
         #endregion
 
         #region 容器维护 12500
@@ -1844,6 +1860,7 @@
         public const string MES19901 = "IQC检验项目编码重复，或物料重复";
         public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19903 = "IQC检验项目必须填写物料，且物料信息必须准确";
+        public const string MES19904 = "以下启用的IQC检验项目不允许删除，{codes}";
 
         #endregion
 
