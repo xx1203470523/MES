@@ -345,31 +345,8 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryOrderTypeListByIdAsync(long orderId)
         {
-            /*
             var entities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(orderId);
             return entities.Select(s => s.ToModel<QualIqcOrderTypeBaseDto>());
-            */
-
-            // TODO 测试数据
-            List<QualIqcOrderTypeBaseDto> list = new()
-            {
-                new QualIqcOrderTypeBaseDto
-                {
-                    Id = 1,
-                    InspectionType = IQCInspectionTypeEnum.RoutineInspection,
-                    SampleQty = 10,
-                    CheckedQty = 1
-                },
-                new QualIqcOrderTypeBaseDto
-                {
-                    Id = 2,
-                    InspectionType = IQCInspectionTypeEnum.InspectionOfAppearance,
-                    SampleQty = 20,
-                    CheckedQty = 2
-                }
-            };
-
-            return await Task.FromResult(list);
         }
 
         /// <summary>
@@ -386,25 +363,6 @@ namespace Hymson.MES.Services.Services.Quality
             if (attachmentEntities == null) return Array.Empty<InteAttachmentBaseDto>();
 
             return PrepareAttachmentBaseDtos(iqcOrderAnnexs, attachmentEntities);
-
-            /*
-            // TODO 测试数据
-            List<InteAttachmentBaseDto> list = new()
-            {
-                new InteAttachmentBaseDto
-                {
-                     Name = "附件1",
-                     Path = "//172.16.11.24:9000/user-center/4c/7a/测试.docx"
-                },
-                new InteAttachmentBaseDto
-                {
-                    Name = "附件2",
-                    Path = "//172.16.11.24:9000/user-center/4c/7a/测试.docx"
-                }
-            };
-
-            return await Task.FromResult(list);
-            */
         }
 
         /// <summary>
@@ -414,9 +372,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync(OrderParameterDetailQueryDto requestDto)
         {
-            /*
             var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.OrderId);
             if (entity == null) return Array.Empty<OrderParameterDetailDto>();
+
+            var orderTypeEntity = await _qualIqcOrderTypeRepository.GetByIdAsync(requestDto.IQCOrderTypeId);
+            if (orderTypeEntity == null) return Array.Empty<OrderParameterDetailDto>();
+
+            // TODO 检查该类型是否已经录入过
 
             var snapshotEntity = await _qualIqcInspectionItemSnapshotRepository.GetByIdAsync(entity.IqcInspectionItemSnapshotId);
             if (snapshotEntity == null) return Array.Empty<OrderParameterDetailDto>();
@@ -424,30 +386,11 @@ namespace Hymson.MES.Services.Services.Quality
             var detailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetEntitiesAsync(new QualIqcInspectionItemDetailSnapshotQuery
             {
                 IqcInspectionItemSnapshotId = snapshotEntity.Id,
-                InspectionType = requestDto.InspectionType
+                InspectionType = orderTypeEntity.Type
             });
             if (detailEntities == null) return Array.Empty<OrderParameterDetailDto>();
 
             return detailEntities.Select(s => s.ToModel<OrderParameterDetailDto>());
-            */
-
-            // TODO 测试数据
-            List<OrderParameterDetailDto> dtos = new();
-            dtos.Add(new OrderParameterDetailDto
-            {
-                Id = 1,
-                Barcode = "1234567890",
-                ParameterId = 1,
-                ParameterCode = "code1",
-                ParameterName = "name1",
-                ParameterUnit = "unit1",
-                ParameterDataType = DataTypeEnum.Numeric,
-                Utensil = IQCUtensilTypeEnum.DynePen,
-
-                InspectionType = IQCInspectionTypeEnum.RoutineInspection,
-
-            });
-            return await Task.FromResult(dtos);
         }
 
         /// <summary>
@@ -457,7 +400,6 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
         {
-            /*
             var entity = await _qualIqcOrderRepository.GetByIdAsync(orderId);
             if (entity == null) return Array.Empty<OrderParameterDetailDto>();
 
@@ -516,25 +458,6 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             return dtos;
-            */
-
-            // TODO 测试数据
-            List<OrderParameterDetailDto> dtos = new();
-            dtos.Add(new OrderParameterDetailDto
-            {
-                Id = 1,
-                Barcode = "1234567890",
-                ParameterId = 1,
-                ParameterCode = "code1",
-                ParameterName = "name1",
-                ParameterUnit = "unit1",
-                ParameterDataType = DataTypeEnum.Numeric,
-                Utensil = IQCUtensilTypeEnum.DynePen,
-
-                InspectionType = IQCInspectionTypeEnum.RoutineInspection,
-
-            });
-            return await Task.FromResult(dtos);
         }
 
 
