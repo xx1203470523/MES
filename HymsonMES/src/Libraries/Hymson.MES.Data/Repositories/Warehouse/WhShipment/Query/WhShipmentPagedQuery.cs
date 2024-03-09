@@ -22,5 +22,15 @@ namespace Hymson.MES.Data.Repositories.WhShipment.Query
         /// </summary>
         public DateTime[]? TimeStamp { get; set; }
 
+        /// <summary>
+        /// 创建时间开始日期
+        /// </summary>
+        public DateTime? PlanShipmentTimeStart { get; set; }
+
+        /// <summary>
+        /// 创建时间结束日期
+        /// </summary>
+        public DateTime? PlanShipmentTimeEnd { get; set; }
+
     }
 }

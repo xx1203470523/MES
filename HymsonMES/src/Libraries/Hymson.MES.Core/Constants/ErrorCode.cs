@@ -1864,6 +1864,14 @@
 
         #endregion
 
+        #region OQC检验项目 19500
+
+        public const string MES17800 = "出货单暂无数据!";
+        public const string MES17801 = "出货单详情暂无数据!";
+        public const string MES17802 = "出货单详情物料,暂无数据!";
+
+        #endregion
+
         #region 基础数据导入 11600
 
         public const string MES11601 = "导入的数据中设备编码重复！";

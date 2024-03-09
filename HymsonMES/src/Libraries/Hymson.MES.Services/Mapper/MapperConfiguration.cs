@@ -958,6 +958,12 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #endregion
+
+            #region QualOqcInspection OQC检验单
+
+            CreateMap<QualOqcOrderPagedQueryDto, QualOqcOrderPagedQuery>();
+
+            #endregion
         }
 
         /// <summary>

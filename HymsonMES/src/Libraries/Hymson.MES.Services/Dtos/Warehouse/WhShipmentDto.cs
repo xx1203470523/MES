@@ -119,6 +119,16 @@ namespace Hymson.MES.Services.Dtos.WhShipment
         /// </summary>
         public DateTime[]? TimeStamp { get; set; }
 
+        /// <summary>
+        /// 创建时间开始日期
+        /// </summary>
+        public DateTime? PlanShipmentTimeStart { get; set; }
+
+        /// <summary>
+        /// 创建时间结束日期
+        /// </summary>
+        public DateTime? PlanShipmentTimeEnd { get; set; }
+
     }
 
     /// <summary>
@@ -188,4 +198,50 @@ namespace Hymson.MES.Services.Dtos.WhShipment
 
     }
 
+    /// <summary>
+    /// 出货单，客户，物料信息View
+    /// </summary>
+    public class WhShipmentSupplierMaterialViewDto
+    {
+        /// <summary>
+        /// 出货单详情Id
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+
+        /// <summary>
+        /// 供应商编码
+        /// </summary>
+        public string? SupplierCode { get; set; }
+
+        /// <summary>
+        /// 出货数量
+        /// </summary>
+        public decimal? Qty { get; set; }
+}
+
+    /// <summary>
+    /// 出货单查询Dto
+    /// </summary>
+    public class WhShipmentQueryDto
+    { 
+        /// <summary>
+        /// 出货单Id
+        /// </summary>
+        public long? Id { get; set; }
+    }
 }

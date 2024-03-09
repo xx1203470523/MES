@@ -121,6 +121,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("ShipmentId = @ShipmentId");
+            sqlBuilder.Where("SiteId = @SiteId");
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhShipmentMaterialEntity>(template.RawSql, query);
         }

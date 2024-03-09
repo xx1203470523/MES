@@ -231,7 +231,7 @@ namespace Hymson.MES.Data.Repositories.WhShipment
             sqlBuilder.Select("*");
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
-            //sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             if (pagedQuery.ShipmentNum != null)
             {
@@ -242,6 +242,16 @@ namespace Hymson.MES.Data.Repositories.WhShipment
             { 
                 sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.TimeStamp[0], CreatedOnEnd = pagedQuery.TimeStamp[1].AddDays(1) });
                 sqlBuilder.Where("CreatedOn >= @CreatedOnStart and CreatedOn < @CreatedOnEnd");
+            }
+
+            if (pagedQuery.PlanShipmentTimeStart.HasValue)
+            {
+                sqlBuilder.Where("PlanShipmentTime >= @PlanShipmentTimeStart");
+            }
+
+            if (pagedQuery.PlanShipmentTimeEnd.HasValue)
+            {
+                sqlBuilder.Where("PlanShipmentTime <= @PlanShipmentTimeEnd");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
