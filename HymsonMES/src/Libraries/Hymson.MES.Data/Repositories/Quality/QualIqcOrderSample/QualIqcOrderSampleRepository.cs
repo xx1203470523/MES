@@ -116,6 +116,8 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderSampleEntity>(template.RawSql, query);
         }

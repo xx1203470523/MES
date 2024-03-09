@@ -15,5 +15,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// </summary>
         public long? IQCOrderId { get; set; }
 
+        /// <summary>
+        /// 检验类型ID
+        /// </summary>
+        public long? IQCOrderTypeId { get; set; }
+
     }
 }

@@ -378,7 +378,17 @@ namespace Hymson.MES.Services.Services.Quality
             var orderTypeEntity = await _qualIqcOrderTypeRepository.GetByIdAsync(requestDto.IQCOrderTypeId);
             if (orderTypeEntity == null) return Array.Empty<OrderParameterDetailDto>();
 
-            // TODO 检查该类型是否已经录入过
+            // 检查该类型是否已经录入
+            var sampleEntities = await _qualIqcOrderSampleRepository.GetEntitiesAsync(new QualIqcOrderSampleQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                IQCOrderId = entity.Id,
+                IQCOrderTypeId = orderTypeEntity.Id
+            });
+            if (sampleEntities != null && sampleEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19905)).WithData("Type", orderTypeEntity.Type.GetDescription());
+            }
 
             var snapshotEntity = await _qualIqcInspectionItemSnapshotRepository.GetByIdAsync(entity.IqcInspectionItemSnapshotId);
             if (snapshotEntity == null) return Array.Empty<OrderParameterDetailDto>();
