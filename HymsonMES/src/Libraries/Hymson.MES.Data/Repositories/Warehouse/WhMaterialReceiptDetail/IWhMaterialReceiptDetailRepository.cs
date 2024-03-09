@@ -1,42 +1,42 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Domain.WHMaterialReceiptDetail;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.WhMaterialReceiptDetail.Query;
 
-namespace Hymson.MES.Data.Repositories.Quality
+namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
 {
     /// <summary>
-    /// 仓储接口（IQC检验项目详情快照表）
+    /// 仓储接口（收料单详情）
     /// </summary>
-    public interface IQualIqcInspectionItemDetailSnapshotRepository
+    public interface IWhMaterialReceiptDetailRepository
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(QualIqcInspectionItemDetailSnapshotEntity entity);
-
+        Task<int> InsertAsync(WHMaterialReceiptDetailEntity entity);
+        
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<QualIqcInspectionItemDetailSnapshotEntity> entities);
+        Task<int> InsertRangeAsync(IEnumerable<WHMaterialReceiptDetailEntity> entities);
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(QualIqcInspectionItemDetailSnapshotEntity entity);
-
+        Task<int> UpdateAsync(WHMaterialReceiptDetailEntity entity);
+        
         /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<QualIqcInspectionItemDetailSnapshotEntity> entities);
+        Task<int> UpdateRangeAsync(IEnumerable<WHMaterialReceiptDetailEntity> entities);
 
         /// <summary>
         /// 软删除  
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-
+        
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -57,35 +57,28 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<QualIqcInspectionItemDetailSnapshotEntity> GetByIdAsync(long id);
-
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="orderId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetBySnapshotIdAsync(long snapshotId);
-
+        Task<WHMaterialReceiptDetailEntity> GetByIdAsync(long id);
+    
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetEntitiesAsync(QualIqcInspectionItemDetailSnapshotQuery query);
-
+        Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetEntitiesAsync(WhMaterialReceiptDetailQuery query);
+        
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualIqcInspectionItemDetailSnapshotEntity>> GetPagedListAsync(QualIqcInspectionItemDetailSnapshotPagedQuery pagedQuery);
+        Task<PagedInfo<WHMaterialReceiptDetailEntity>> GetPagedListAsync(WhMaterialReceiptDetailPagedQuery pagedQuery);
 
     }
 }

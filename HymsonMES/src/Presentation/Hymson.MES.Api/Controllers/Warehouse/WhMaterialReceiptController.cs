@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.WHMaterialReceipt;
+using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 using Hymson.MES.Services.Services.WHMaterialReceipt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -94,6 +95,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         public async Task<PagedInfo<WhMaterialReceiptDto>> QueryPagedListAsync([FromQuery] WhMaterialReceiptPagedQueryDto pagedQueryDto)
         {
             return await _whMaterialReceiptService.GetPagedListAsync(pagedQueryDto);
+ 
         }
 
         /// <summary>
