@@ -10,11 +10,11 @@ namespace Hymson.MES.Services.Services.Quality
     public interface IQualIqcOrderService
     {
         /// <summary>
-        /// 新增
+        /// 保存样品数据
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(QualIqcOrderSaveDto saveDto);
+        Task<int> SaveSampleAsync(QualIqcOrderSaveDto saveDto);
 
         /// <summary>
         /// 修改

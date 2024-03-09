@@ -76,7 +76,16 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await Task.FromResult(0);
         }
 
-
+        /// <summary>
+        /// 保存样品数据
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        [HttpPost("save")]
+        public async Task<long> SaveSampleAsync([FromBody] QualIqcOrderSaveDto saveDto)
+        {
+            return await _qualIqcOrderService.SaveSampleAsync(saveDto);
+        }
 
         /// <summary>
         /// 查询详情（iqc检验单）

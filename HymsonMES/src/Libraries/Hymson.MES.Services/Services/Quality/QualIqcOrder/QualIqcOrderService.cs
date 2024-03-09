@@ -173,11 +173,11 @@ namespace Hymson.MES.Services.Services.Quality
 
 
         /// <summary>
-        /// 创建
+        /// 保存样品数据
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(QualIqcOrderSaveDto saveDto)
+        public async Task<int> SaveSampleAsync(QualIqcOrderSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));

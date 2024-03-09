@@ -33,6 +33,11 @@ namespace Hymson.MES.Core.Domain.Quality
         public string ParameterName { get; set; }
 
         /// <summary>
+        /// 参数单位
+        /// </summary>
+        public string ParameterUnit { get; set; }
+
+        /// <summary>
         /// 参数数据类型
         /// </summary>
         public DataTypeEnum ParameterDataType { get; set; }
