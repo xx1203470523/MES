@@ -8,6 +8,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     public class QualIqcInspectionItemDetailSnapshotQuery
     {
         /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
         /// 快照表ID
         /// </summary>
         public long? IqcInspectionItemSnapshotId { get; set; }

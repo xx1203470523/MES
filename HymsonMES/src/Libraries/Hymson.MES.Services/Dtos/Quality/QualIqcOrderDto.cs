@@ -216,12 +216,12 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// 检验参数Dto
     /// </summary>
-    public record OrderParameterDetailQueryDto
+    public record OrderParameterDetailQueryDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
         /// </summary>
-        public long OrderId { get; set; }
+        public long IQCOrderId { get; set; }
 
         /// <summary>
         /// 检验类型ID
@@ -231,7 +231,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 样品条码
         /// </summary>
-        public string? Barcode { get; set; }
+        public string Barcode { get; set; }
 
     }
 

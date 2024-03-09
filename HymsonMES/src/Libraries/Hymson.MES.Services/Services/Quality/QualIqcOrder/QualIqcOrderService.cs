@@ -370,21 +370,21 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync(OrderParameterDetailQueryDto requestDto)
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotAsync(OrderParameterDetailQueryDto requestDto)
         {
-            var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.OrderId);
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId);
             if (entity == null) return Array.Empty<OrderParameterDetailDto>();
 
             var orderTypeEntity = await _qualIqcOrderTypeRepository.GetByIdAsync(requestDto.IQCOrderTypeId);
             if (orderTypeEntity == null) return Array.Empty<OrderParameterDetailDto>();
 
+            // 站点数据
+            var siteId = _currentSite.SiteId ?? 0;
+
             // 检查该类型是否已经录入
-            var sampleEntities = await _qualIqcOrderSampleRepository.GetEntitiesAsync(new QualIqcOrderSampleQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                IQCOrderId = entity.Id,
-                IQCOrderTypeId = orderTypeEntity.Id
-            });
+            var sampleQuery = requestDto.ToQuery<QualIqcOrderSampleQuery>();
+            sampleQuery.SiteId = siteId;
+            var sampleEntities = await _qualIqcOrderSampleRepository.GetEntitiesAsync(sampleQuery);
             if (sampleEntities != null && sampleEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19905)).WithData("Type", orderTypeEntity.Type.GetDescription());
@@ -395,6 +395,7 @@ namespace Hymson.MES.Services.Services.Quality
 
             var detailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetEntitiesAsync(new QualIqcInspectionItemDetailSnapshotQuery
             {
+                SiteId = siteId,
                 IqcInspectionItemSnapshotId = snapshotEntity.Id,
                 InspectionType = orderTypeEntity.Type
             });
@@ -406,29 +407,27 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 查询检验单样本数据
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleAsync(OrderParameterDetailQueryDto requestDto)
         {
-            var entity = await _qualIqcOrderRepository.GetByIdAsync(orderId);
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId);
             if (entity == null) return Array.Empty<OrderParameterDetailDto>();
 
             // 站点数据
             var siteId = _currentSite.SiteId ?? 0;
 
             // 查询检验单下面的所有样本
-            var sampleEntities = await _qualIqcOrderSampleRepository.GetEntitiesAsync(new QualIqcOrderSampleQuery
-            {
-                SiteId = siteId,
-                IQCOrderId = orderId
-            });
+            var sampleQuery = requestDto.ToQuery<QualIqcOrderSampleQuery>();
+            sampleQuery.SiteId = siteId;
+            var sampleEntities = await _qualIqcOrderSampleRepository.GetEntitiesAsync(sampleQuery);
             if (sampleEntities == null) return Array.Empty<OrderParameterDetailDto>();
 
             // 查询检验单下面的所有样本明细
             var sampleDetailEntities = await _qualIqcOrderSampleDetailRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailQuery
             {
                 SiteId = siteId,
-                IQCOrderId = orderId
+                IQCOrderId = entity.Id
             });
             if (sampleDetailEntities == null) return Array.Empty<OrderParameterDetailDto>();
 
@@ -436,7 +435,7 @@ namespace Hymson.MES.Services.Services.Quality
             var sampleAttachmentEntities = await _qualIqcOrderSampleDetailAnnexRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailAnnexQuery
             {
                 SiteId = siteId,
-                IQCOrderId = orderId
+                IQCOrderId = entity.Id
             });
 
             // 附件集合

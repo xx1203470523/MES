@@ -45,7 +45,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 检验器具
         /// </summary>
-        public bool? Utensil { get; set; }
+        public IQCUtensilTypeEnum? Utensil { get; set; }
 
         /// <summary>
         /// 小数位数

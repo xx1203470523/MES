@@ -128,20 +128,20 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("snapshot")]
-        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync([FromQuery] OrderParameterDetailQueryDto requestDto)
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotAsync([FromQuery] OrderParameterDetailQueryDto requestDto)
         {
-            return await _qualIqcOrderService.QueryDetailSnapshotByIdAsync(requestDto);
+            return await _qualIqcOrderService.QueryDetailSnapshotAsync(requestDto);
         }
 
         /// <summary>
         /// 查询检验单样本数据
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("sample/{orderId}")]
-        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleAsync([FromQuery] OrderParameterDetailQueryDto requestDto)
         {
-            return await _qualIqcOrderService.QueryDetailSampleByIdAsync(orderId);
+            return await _qualIqcOrderService.QueryDetailSampleAsync(requestDto);
         }
 
 
