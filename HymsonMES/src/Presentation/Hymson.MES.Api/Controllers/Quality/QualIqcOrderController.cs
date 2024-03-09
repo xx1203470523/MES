@@ -138,7 +138,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet("sample/{orderId}")]
+        [HttpGet("sample")]
         public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleAsync([FromQuery] OrderParameterDetailQueryDto requestDto)
         {
             return await _qualIqcOrderService.QueryDetailSampleAsync(requestDto);
