@@ -231,7 +231,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 样品条码
         /// </summary>
-        public string Barcode { get; set; }
+        public string? Barcode { get; set; }
 
     }
 
