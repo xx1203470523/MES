@@ -33,7 +33,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 是否调试
         /// </summary>
-        private readonly bool IS_DEBUG = true;
+        private readonly bool IS_DEBUG = false;
 
         /// <summary>
         /// 构造函数
@@ -207,20 +207,25 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //1. 获取proc_equipment_group_param_detail开机参数明细，并转成相应格式
 
-            GetRecipeDetailReturnDto result = new GetRecipeDetailReturnDto();
-
-            List<RecipeParamDto> paramList = new List<RecipeParamDto>();
-            for (var i = 0; i < 3; ++i)
+            if(IS_DEBUG == true)
             {
-                RecipeParamDto param = new RecipeParamDto();
-                param.ParamCode = $"param{i}";
-                param.ParamValue = "";
-                param.ParamLower = "0";
-                param.ParamUpper = "1000";
-                result.ParamList.Add(param);
+                GetRecipeDetailReturnDto resultList = new GetRecipeDetailReturnDto();
+
+                List<RecipeParamDto> paramList = new List<RecipeParamDto>();
+                for (var i = 0; i < 3; ++i)
+                {
+                    RecipeParamDto param = new RecipeParamDto();
+                    param.ParamCode = $"param{i}";
+                    param.ParamValue = "";
+                    param.ParamLower = "0";
+                    param.ParamUpper = "1000";
+                    resultList.ParamList.Add(param);
+                }
+                return resultList;
             }
 
-            return result;
+            var res = await _qknyService.GetRecipeDetailAsync(dto);
+            return res;
         }
 
         /// <summary>

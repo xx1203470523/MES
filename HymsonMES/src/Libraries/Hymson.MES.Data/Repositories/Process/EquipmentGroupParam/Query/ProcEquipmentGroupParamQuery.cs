@@ -74,5 +74,21 @@ namespace Hymson.MES.Data.Repositories.Process
         public string Type { get; set; }
     }
 
+    /// <summary>
+    /// 根据编码查询激活的详情
+    /// </summary>
+    public class ProcEquipmentGroupParamCodeDetailQuery
+    {
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long SiteId { get; set; }
+    }
+
     #endregion
 }

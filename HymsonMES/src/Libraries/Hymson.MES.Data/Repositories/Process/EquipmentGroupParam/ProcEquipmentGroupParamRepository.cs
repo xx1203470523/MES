@@ -235,11 +235,23 @@ namespace Hymson.MES.Data.Repositories.Process
             }
             sqlBuilder.Where("t1.`Type` = @Type");
             sqlBuilder.Where("t4.Id = @EquipmentId");
-            sqlBuilder.Where("t1.Status in ('1', '2')");
+            sqlBuilder.Where("t1.Status = '1'");
             sqlBuilder.Where("t1.IsDeleted = 0");
 
             using var conn = GetMESDbConnection();
             var list = await conn.QueryAsync<ProcEquipmentGroupParamEquProductView>(template.RawSql, query);
+            return list.ToList();
+        }
+
+        /// <summary>
+        /// 根据编码获取激活的数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<List<ProcEquipmentGroupParamDetailView>> GetDetailByCode(ProcEquipmentGroupParamCodeDetailQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            var list = await conn.QueryAsync<ProcEquipmentGroupParamDetailView>(GetDetailByCodeSql, query);
             return list.ToList();
         }
 
@@ -308,6 +320,19 @@ namespace Hymson.MES.Data.Repositories.Process
             inner join proc_process_equipment_group_relation t3 on t3.EquipmentGroupId = t1.EquipmentGroupId and t3.IsDeleted = 0
             inner join equ_equipment t4 on t4.Id = t3.EquipmentId and t4.IsDeleted = 0
             /**where**/ 
+        ";
+
+        /// <summary>
+        /// 根据编码获取激活的数据
+        /// </summary>
+        const string GetDetailByCodeSql = @"
+            select t1.Code, t1.Version, t1.CreatedOn, t1.UpdatedOn, t2.`MaxValue` ,t2.`MinValue` ,t2.ParamId ,t3.ParameterCode ,t3.ParameterName 
+            from proc_equipment_group_param t1
+            left join proc_equipment_group_param_detail t2 on t1.Id = t2.RecipeId and t2.IsDeleted = 0
+            left join proc_parameter t3 on t3.Id = t2.ParamId and t3.IsDeleted = 0
+            where t1.Code = @Code
+            and t1.Status = '1'
+            and t1.SiteId = @SiteId
         ";
         #endregion
     }

@@ -55,6 +55,10 @@ namespace Hymson.MES.Core.Constants
         /// </summary>
         public const string MES45021 = "设备没有维护对应的开机参数，请检查开机参数是否启用或是否关联到对应的设备组";
 
+        /// <summary>
+        /// 配方状态没有激活，请激活后在使用
+        /// </summary>
+        public const string MES45022 = "配方没有激活或不存在，请激活后在使用";
         #endregion
 
 

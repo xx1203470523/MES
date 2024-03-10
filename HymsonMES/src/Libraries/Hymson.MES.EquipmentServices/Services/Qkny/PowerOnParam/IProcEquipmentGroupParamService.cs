@@ -21,5 +21,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam
         /// <param name="query"></param>
         /// <returns></returns>
         Task<List<ProcEquipmentGroupParamEquProductView>> QueryByEquProductAsync(ProcEquipmentGroupParamEquProductQuery query);
+
+        /// <summary>
+        /// 根据编码查询参数详情
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<List<ProcEquipmentGroupParamDetailView>> GetDetailByCode(ProcEquipmentGroupParamCodeDetailQuery query);
     }
 }

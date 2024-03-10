@@ -335,6 +335,42 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
+        /// 获取开机参数明细
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<GetRecipeDetailReturnDto> GetRecipeDetailAsync(GetRecipeDetailDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 获取配方编码的对应激活的数据
+            ProcEquipmentGroupParamCodeDetailQuery query = new ProcEquipmentGroupParamCodeDetailQuery();
+            query.Code = dto.RecipeCode;
+            query.SiteId = equResModel.SiteId;
+            var list = await _procEquipmentGroupParamService.GetDetailByCode(query);
+            GetRecipeDetailReturnDto result = new GetRecipeDetailReturnDto();
+            result.Version = list[0].Version;
+            result.LastUpdateOnTime = list[0].UpdatedOn ?? list[0].CreatedOn;
+            foreach(var item in list)
+            {
+                if(item == null)
+                {
+                    continue;
+                }
+                if(string.IsNullOrEmpty(item.ParameterCode) == false)
+                {
+                    RecipeParamDto param = new RecipeParamDto();
+                    param.ParamUpper = item.MaxValue == null ? "" : item.MaxValue.ToString();
+                    param.ParamLower = item.MinValue == null ? "" : item.MinValue.ToString();
+                    param.ParamCode = item.ParameterCode;
+                    result.ParamList.Add(param);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// 获取设备资源对应的基础信息
         /// </summary>
         /// <param name="param"></param>
