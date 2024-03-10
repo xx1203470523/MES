@@ -90,5 +90,31 @@ namespace Hymson.MES.Data.Repositories.Process
         public long SiteId { get; set; }
     }
 
+    /// <summary>
+    /// 开机参数校验查询
+    /// </summary>
+    public class ProcEquipmentGroupCheckQuery
+    {
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 产品型号
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long SiteId { get; set; }
+    }
+
     #endregion
 }

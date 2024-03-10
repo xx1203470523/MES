@@ -238,6 +238,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("开机参数校验采集009", BusinessType.OTHER, "Recipe009", ReceiverTypeEnum.MES)]
         public async Task RecipeAsync(RecipeDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.RecipeAsync(dto);
+
             //TODO
             //1. 校验开机参数是否启用状态
             //2. 新增proc_recipe_record记录表，用于记录开机参数中设定的实际值

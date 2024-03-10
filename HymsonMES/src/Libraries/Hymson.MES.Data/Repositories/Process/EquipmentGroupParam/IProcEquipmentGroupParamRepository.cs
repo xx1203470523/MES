@@ -116,6 +116,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="query"></param>
         /// <returns></returns>
         Task<List<ProcEquipmentGroupParamDetailView>> GetDetailByCode(ProcEquipmentGroupParamCodeDetailQuery query);
+
+        /// <summary>
+        /// 根据编码版本型号获取激活的数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcEquipmentGroupParamEntity> GetEntityByCodeVersion(ProcEquipmentGroupCheckQuery query);
         #endregion
     }
 }

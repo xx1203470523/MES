@@ -371,6 +371,26 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
+        /// 开机参数校验
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task RecipeAsync(RecipeDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 参数上下限校验
+            //暂不加
+            //3. 版本校验
+            ProcEquipmentGroupCheckQuery query = new ProcEquipmentGroupCheckQuery();
+            query.SiteId = equResModel.SiteId;
+            query.Code = dto.RecipeCode;
+            query.Version = dto.Version;
+            query.MaterialCode = dto.ProductCode;
+            var entity = await _procEquipmentGroupParamService.GetEntityByCodeVersion(query);
+        }
+
+        /// <summary>
         /// 获取设备资源对应的基础信息
         /// </summary>
         /// <param name="param"></param>
@@ -387,6 +407,5 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             }
             return equResAllModel;
         }
-
     }
 }

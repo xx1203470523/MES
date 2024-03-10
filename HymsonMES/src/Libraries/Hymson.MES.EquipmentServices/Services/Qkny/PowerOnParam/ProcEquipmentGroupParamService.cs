@@ -79,6 +79,21 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam
             }
             return list;
         }
+
+        /// <summary>
+        /// 根据编码版本型号获取激活的数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcEquipmentGroupParamEntity> GetEntityByCodeVersion(ProcEquipmentGroupCheckQuery query)
+        {
+            var model = await _procEquipmentGroupParamRepository.GetEntityByCodeVersion(query);
+            if(model == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45023));
+            }
+            return model;
+        }
     }
 
 }

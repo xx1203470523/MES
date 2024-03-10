@@ -255,6 +255,18 @@ namespace Hymson.MES.Data.Repositories.Process
             return list.ToList();
         }
 
+        /// <summary>
+        /// 根据编码版本型号获取激活的数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcEquipmentGroupParamEntity> GetEntityByCodeVersion(ProcEquipmentGroupCheckQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            var model = await conn.QueryFirstOrDefaultAsync<ProcEquipmentGroupParamEntity>(GetEntityByCodeVersionSql, query);
+            return model;
+        }
+
         #endregion
     }
 
@@ -333,6 +345,20 @@ namespace Hymson.MES.Data.Repositories.Process
             where t1.Code = @Code
             and t1.Status = '1'
             and t1.SiteId = @SiteId
+        ";
+
+        /// <summary>
+        /// 根据配方编码和版本获取实体
+        /// </summary>
+        const string GetEntityByCodeVersionSql = @"
+            select t1.*
+            from proc_equipment_group_param t1
+            inner join proc_material t2 on t1.ProductId = t2.Id and t2.IsDeleted = 0
+            where t1.Code = @Code
+            and t1.Version = @Version
+            and t2.MaterialCode = @MaterialCode
+            and t1.SiteId = @SiteId
+            and t1.Status  = '1'         
         ";
         #endregion
     }
