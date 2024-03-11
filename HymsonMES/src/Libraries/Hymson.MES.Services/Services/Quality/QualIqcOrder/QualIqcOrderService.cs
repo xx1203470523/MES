@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -196,8 +197,25 @@ namespace Hymson.MES.Services.Services.Quality
             });
             if (orderOperationEntities != null && orderOperationEntities.Any()) return 0;
 
-            // 插入检验单状态操作记录
-            return await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
+            switch (requestDto.OperationType)
+            {
+                case OrderOperateTypeEnum.Start:
+                    entity.Status = InspectionStatusEnum.Inspecting;
+                    break;
+                case OrderOperateTypeEnum.Complete:
+                    entity.Status = entity.IsQualified == TrueOrFalseEnum.Yes ? InspectionStatusEnum.Closed : InspectionStatusEnum.Completed;
+                    break;
+                case OrderOperateTypeEnum.Close:
+                    entity.Status = InspectionStatusEnum.Closed;
+                    break;
+                default:
+                    break;
+            }
+
+            // 保存
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = entity.SiteId,
@@ -210,6 +228,9 @@ namespace Hymson.MES.Services.Services.Quality
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn
             });
+            rows += await _qualIqcOrderRepository.UpdateAsync(entity);
+            trans.Complete();
+            return rows;
         }
 
         /// <summary>
@@ -505,7 +526,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids)
+        public async Task<int> DeleteOrdersAsync(long[] ids)
         {
             if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 

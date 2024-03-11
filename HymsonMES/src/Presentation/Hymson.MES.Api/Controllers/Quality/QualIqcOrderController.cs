@@ -69,9 +69,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteAsync([FromBody] long[] ids)
+        public async Task DeleteOrdersAsync([FromBody] long[] ids)
         {
-            await _qualIqcOrderService.DeletesAsync(ids);
+            await _qualIqcOrderService.DeleteOrdersAsync(ids);
         }
 
 
