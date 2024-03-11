@@ -100,5 +100,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLoadPointLinkResourcePagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcLoadPointLinkResourceEntity>> GetPagedInfoAsync(ProcLoadPointLinkResourcePagedQuery procLoadPointLinkResourcePagedQuery);
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据上料点编码获取关联的资源
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetByCodeAsync(ProcLoadPointCodeLinkResourceQuery query);
+
+        #endregion
     }
 }

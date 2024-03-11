@@ -1,14 +1,21 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Qkny;
+using Hymson.MES.CoreServices.Dtos.Qkny;
+using Hymson.MES.CoreServices.Services.Qkny;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
 using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
 using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
@@ -92,6 +99,26 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IProcEquipmentGroupParamService _procEquipmentGroupParamService;
 
         /// <summary>
+        /// 工单
+        /// </summary>
+        private readonly IPlanWorkOrderService _planWorkOrderService;
+
+        /// <summary>
+        /// 库存条码接收
+        /// </summary>
+        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+
+        /// <summary>
+        /// 上料
+        /// </summary>
+        private readonly IManuFeedingService _manuFeedingService;
+
+        /// <summary>
+        /// 上料点关联资源
+        /// </summary>
+        private readonly IProcLoadPointLinkResourceRepository _procLoadPointLinkResourceRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -103,6 +130,10 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IEquEquipmentAlarmService equEquipmentAlarmService,
             ICcdFileUploadCompleteRecordService ccdFileUploadCompleteRecordService,
             IProcEquipmentGroupParamService procEquipmentGroupParamService,
+            IPlanWorkOrderService planWorkOrderService,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IManuFeedingService manuFeedingService,
+            IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -114,6 +145,10 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _equEquipmentAlarmService = equEquipmentAlarmService;
             _ccdFileUploadCompleteRecordService = ccdFileUploadCompleteRecordService;
             _procEquipmentGroupParamService = procEquipmentGroupParamService;
+            _planWorkOrderService = planWorkOrderService;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository; 
+            _manuFeedingService = manuFeedingService;
+            _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -388,6 +423,46 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             query.Version = dto.Version;
             query.MaterialCode = dto.ProductCode;
             var entity = await _procEquipmentGroupParamService.GetEntityByCodeVersion(query);
+        }
+
+        /// <summary>
+        /// 原材料上料
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task FeedingAsync(FeedingDto dto)
+        {
+            ManuFeedingMaterialSaveDto saveDto = new ManuFeedingMaterialSaveDto();
+            saveDto.BarCode = dto.Sfc;
+            if (dto.IsFeedingPoint == false)
+            {
+                //1. 获取设备基础信息
+                EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+                PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+
+                saveDto.Source = ManuSFCFeedingSourceEnum.BOM;
+            }
+            else
+            {
+                //根据
+                ProcLoadPointCodeLinkResourceQuery query = new ProcLoadPointCodeLinkResourceQuery();
+                query.LoadPoint = dto.EquipmentCode;
+                var res = await _procLoadPointLinkResourceRepository.GetByCodeAsync(query);
+                if(res == null || res.Any() == false || res.Count() != 1)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45040));
+                }
+                saveDto.Source = ManuSFCFeedingSourceEnum.FeedingPoint;
+                saveDto.FeedingPointId = res.FirstOrDefault().LoadPointId;
+            }
+            //3. 上料
+            var feedResult = await _manuFeedingService.CreateAsync(saveDto);
+
+            //TODO
+            //1. 校验物料是否在lims系统发过来的条码表lims_material(wh_material_inventory)，验证是否存在及合格，以及生成日期
+            //2. 添加上料表信息 manu_feeding
+            //3. 添加上料记录表信息 manu_feeding_record
+            //4. 参考物料加载逻辑 ManuFeedingService.CreateAsync
         }
 
         /// <summary>

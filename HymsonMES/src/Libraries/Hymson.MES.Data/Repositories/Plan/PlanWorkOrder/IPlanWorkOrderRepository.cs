@@ -201,6 +201,5 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command);
-
     }
 }

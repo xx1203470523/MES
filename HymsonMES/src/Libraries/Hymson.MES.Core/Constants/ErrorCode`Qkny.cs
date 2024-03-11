@@ -27,7 +27,6 @@ namespace Hymson.MES.Core.Constants
         /// 资源编码不能为空
         /// </summary>
         public const string MES45003 = "（ResourceCode)资源编码字段不能为空";
-
         #endregion
 
         #region 操作员登录
@@ -66,6 +65,28 @@ namespace Hymson.MES.Core.Constants
         public const string MES45023 = "配方对应版本型号没有激活，请获取最新开机参数";
         #endregion
 
+        #region 工单
+        /// <summary>
+        /// 设备所在线体没有激活工单
+        /// </summary>
+        public const string MES45030 = "设备所在线体没有激活工单";
 
+        /// <summary>
+        /// 设备所在线体激活不止一个工单
+        /// </summary>
+        public const string MES45031 = "设备所在线体激活不止一个工单，请确认";
+
+        /// <summary>
+        /// 设备所在线体工单不是生产中或者已下达
+        /// </summary>
+        public const string MES45032 = "设备所在线体工单不是生产中或者已下达";
+        #endregion
+
+        #region 上料
+        /// <summary>
+        /// 上料点没有维护对应的资源或者维护多个资源
+        /// </summary>
+        public const string MES45040 = "上料点没有维护对应的资源或者维护多个资源";
+        #endregion
     }
 }

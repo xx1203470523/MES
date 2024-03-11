@@ -68,5 +68,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task RecipeAsync(RecipeDto dto);
+
+        /// <summary>
+        /// 原材料上料
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task FeedingAsync(FeedingDto dto);
     }
 }

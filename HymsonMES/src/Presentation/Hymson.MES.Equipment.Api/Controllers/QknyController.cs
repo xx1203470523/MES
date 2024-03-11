@@ -1,7 +1,6 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
@@ -21,11 +20,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
     public class QknyController : ControllerBase
     {
         /// <summary>
-        /// 仓储接口（设备注册）
-        /// </summary>
-        private readonly IEquEquipmentRepository _equEquipmentRepository;
-
-        /// <summary>
         /// 设备接口服务
         /// </summary>
         private readonly IQknyService _qknyService;
@@ -40,7 +34,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         public QknyController(IEquEquipmentRepository equEquipmentRepository, IQknyService qknyService)
         {
-            _equEquipmentRepository = equEquipmentRepository;
             _qknyService = qknyService;
         }
 
@@ -262,8 +255,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("原材料上料010", BusinessType.OTHER, "Feeding010", ReceiverTypeEnum.MES)]
         public async Task FeedingAsync(FeedingDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+            await _qknyService.FeedingAsync(dto);
             //TODO
-            //-- 不校验物料是在wh_material_inventory物料库存表中
+            //-- 不校验物料是在 wh_material_inventory 物料库存表中
             //1. 校验物料是否在lims系统发过来的条码表lims_material(wh_material_inventory)，验证是否存在及合格，以及生成日期
             //2. 添加上料表信息 manu_feeding
             //3. 添加上料记录表信息 manu_feeding_record
