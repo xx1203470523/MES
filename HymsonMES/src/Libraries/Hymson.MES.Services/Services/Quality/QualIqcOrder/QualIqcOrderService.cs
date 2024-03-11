@@ -174,7 +174,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<int> UpdateOperationStatusAsync(QualOrderOperationStatusDto requestDto)
+        public async Task<int> OperationOrderAsync(QualOrderOperationStatusDto requestDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -217,7 +217,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<int> SaveSampleAsync(QualIqcOrderSaveDto requestDto)
+        public async Task<int> SaveOrderAsync(QualIqcOrderSaveDto requestDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -244,6 +244,9 @@ namespace Hymson.MES.Services.Services.Quality
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
+
+            // TODO 更新检验单类型数量
+            //orderTypeEntity.CheckedQty
 
             // 样本
             var sampleId = IdGenProvider.Instance.CreateId();
@@ -329,6 +332,101 @@ namespace Hymson.MES.Services.Services.Quality
             trans.Complete();
             return rows;
         }
+
+        /// <summary>
+        /// 完成检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            // IQC检验单
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            // TODO 只有检验中的状态才允许"完成"
+
+            // 检查类型是否已经存在
+            var operationType = OrderOperateTypeEnum.Complete;
+            var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
+            {
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id,
+                OperationType = operationType
+            });
+            if (orderOperationEntities != null && orderOperationEntities.Any()) return 0;
+
+            // TODO 检验是否样本数量已经足够
+
+            // 插入检验单状态操作记录
+            return await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id,
+                OperationType = operationType,
+                OperateBy = updatedBy,
+                OperateOn = updatedOn,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            });
+        }
+
+        /// <summary>
+        /// 关闭检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> CloseOrderAsync(QualIqcOrderCloseDto requestDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            // IQC检验单
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            // TODO 只有检验中的状态才允许"关闭"
+
+            // 检查类型是否已经存在
+            var operationType = OrderOperateTypeEnum.Close;
+            var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
+            {
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id,
+                OperationType = operationType
+            });
+            if (orderOperationEntities != null && orderOperationEntities.Any()) return 0;
+
+            // 插入检验单状态操作记录
+            return await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id,
+                OperationType = operationType,
+                OperateBy = updatedBy,
+                OperateOn = updatedOn,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            });
+        }
+
 
         /// <summary>
         /// 保存检验单附件

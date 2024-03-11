@@ -67,6 +67,40 @@ namespace Hymson.MES.Services.Dtos.Quality
     }
 
     /// <summary>
+    /// 完成Dto
+    /// </summary>
+    public record QualIqcOrderCompleteDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+    }
+
+    /// <summary>
+    /// 完成Dto
+    /// </summary>
+    public record QualIqcOrderCloseDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式
+        /// </summary>
+        public HandMethodEnum? HandMethod { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+    }
+
+    /// <summary>
     /// iqc检验单新增/更新Dto
     /// </summary>
     public record QualIqcOrderParameterSaveDto

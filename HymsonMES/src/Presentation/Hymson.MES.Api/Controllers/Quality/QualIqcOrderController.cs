@@ -74,6 +74,7 @@ namespace Hymson.MES.Api.Controllers.Quality
             await _qualIqcOrderService.DeletesAsync(ids);
         }
 
+
         /// <summary>
         /// 生成IQC检验单
         /// </summary>
@@ -92,9 +93,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPut("operation")]
-        public async Task UpdateOperationStatusAsync([FromBody] QualOrderOperationStatusDto requestDto)
+        public async Task OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
         {
-            await _qualIqcOrderService.UpdateOperationStatusAsync(requestDto);
+            await _qualIqcOrderService.OperationOrderAsync(requestDto);
         }
 
         /// <summary>
@@ -103,10 +104,33 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("save")]
-        public async Task<long> SaveSampleAsync([FromBody] QualIqcOrderSaveDto requestDto)
+        public async Task<long> SaveOrderAsync([FromBody] QualIqcOrderSaveDto requestDto)
         {
-            return await _qualIqcOrderService.SaveSampleAsync(requestDto);
+            return await _qualIqcOrderService.SaveOrderAsync(requestDto);
         }
+
+        /// <summary>
+        /// 完成检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("complete")]
+        public async Task CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
+        {
+            await _qualIqcOrderService.CompleteOrderAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 关闭检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("close")]
+        public async Task CloseOrderAsync(QualIqcOrderCloseDto requestDto)
+        {
+            await _qualIqcOrderService.CloseOrderAsync(requestDto);
+        }
+
 
         /// <summary>
         /// 查询详情（iqc检验单）
