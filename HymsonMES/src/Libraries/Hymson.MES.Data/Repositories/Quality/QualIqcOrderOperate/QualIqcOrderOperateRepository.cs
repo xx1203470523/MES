@@ -120,6 +120,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
+            if (query.IQCOrderIds != null) sqlBuilder.Where(" IQCOrderId IN @IQCOrderIds ");
             if (query.IQCOrderId.HasValue)
             {
                 sqlBuilder.Where("IQCOrderId = @IQCOrderId");

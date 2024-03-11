@@ -18,6 +18,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public long? IQCOrderId { get; set; }
 
         /// <summary>
+        /// 主键集合
+        /// </summary>
+        public IEnumerable<long>? IQCOrderIds { get; set; }
+
+        /// <summary>
         /// 状态
         /// </summary>
         public OrderOperateTypeEnum? OperationType { get; set; }

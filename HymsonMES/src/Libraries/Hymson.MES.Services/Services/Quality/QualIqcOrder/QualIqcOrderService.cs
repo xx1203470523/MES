@@ -830,6 +830,13 @@ namespace Hymson.MES.Services.Services.Quality
             var receiptEntities = await _whMaterialReceiptRepository.GetByIdsAsync(receiptDetailEntities.Select(x => x.MaterialReceiptId));
             var receiptDic = receiptEntities.ToDictionary(x => x.Id, x => x);
 
+            // 检验单操作
+            var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                IQCOrderIds = entities.Select(s => s.Id)
+            });
+
             // 读取产品
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
             var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
@@ -837,6 +844,7 @@ namespace Hymson.MES.Services.Services.Quality
             // 读取供应商
             var supplierEntities = await _whSupplierRepository.GetByIdsAsync(entities.Where(w => w.SupplierId.HasValue).Select(x => x.SupplierId!.Value));
             var supplierDic = supplierEntities.ToDictionary(x => x.Id, x => x);
+
 
             foreach (var entity in entities)
             {
