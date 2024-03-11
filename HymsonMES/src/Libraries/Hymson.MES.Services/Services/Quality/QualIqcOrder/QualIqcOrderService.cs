@@ -1,4 +1,3 @@
-using Elastic.Transport;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -8,7 +7,6 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -22,7 +20,6 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -198,6 +195,12 @@ namespace Hymson.MES.Services.Services.Quality
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
+            // qual_iqc_order_sample
+
+            // qual_iqc_order_sample_detail
+
+            // qual_iqc_order_sample_detail_annex
+
             // 保存
             return await _qualIqcOrderRepository.InsertAsync(entity);
         }
@@ -221,6 +224,63 @@ namespace Hymson.MES.Services.Services.Quality
             entity.UpdatedOn = HymsonClock.Now();
 
             return await _qualIqcOrderRepository.UpdateAsync(entity);
+        }
+
+
+        /// <summary>
+        /// 保存检验单附件
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        public async Task<int> SaveAttachmentAsync(QualIqcOrderSaveAttachmentDto saveDto)
+        {
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            // IQC检验单
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(saveDto.IQCOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            if (!saveDto.Attachments.Any()) return 0;
+
+            // 附件
+            List<InteAttachmentEntity> attachmentEntities = new();
+            List<QualIqcOrderAnnexEntity> orderAnnexEntities = new();
+            foreach (var item in saveDto.Attachments)
+            {
+                var attachmentId = IdGenProvider.Instance.CreateId();
+                attachmentEntities.Add(new InteAttachmentEntity
+                {
+                    Id = attachmentId,
+                    Name = item.Name,
+                    Path = item.Path,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn,
+                    SiteId = entity.SiteId,
+                });
+
+                orderAnnexEntities.Add(new QualIqcOrderAnnexEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = entity.SiteId,
+                    IQCOrderId = saveDto.IQCOrderId,
+                    AnnexId = attachmentId,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                });
+            }
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
+            rows += await _qualIqcOrderAnnexRepository.InsertRangeAsync(orderAnnexEntities);
+            trans.Complete();
+            return rows;
         }
 
         /// <summary>

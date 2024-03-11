@@ -39,7 +39,16 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
 
-
+        /// <summary>
+        /// 删除检验单附件
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        [HttpDelete("attachment/save")]
+        public async Task SaveAttachmentAsync([FromBody] QualIqcOrderSaveAttachmentDto saveDto)
+        {
+            await _qualIqcOrderService.SaveAttachmentAsync(saveDto);
+        }
 
         /// <summary>
         /// 删除检验单附件
