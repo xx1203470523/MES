@@ -14,8 +14,10 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.WHMaterialReceipt;
+using Hymson.MES.Data.Repositories.WhMaterialReceiptDetail;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
@@ -99,6 +101,11 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IWhMaterialReceiptRepository _whMaterialReceiptRepository;
 
         /// <summary>
+        /// 仓储接口（收货单详情）
+        /// </summary>
+        private readonly IWhMaterialReceiptDetailRepository _whMaterialReceiptDetailRepository;
+
+        /// <summary>
         /// 仓储接口（物料维护）
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
@@ -130,6 +137,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="qualIqcOrderSampleDetailAnnexRepository"></param>
         /// <param name="qualIqcOrderUnqualifiedHandRepository"></param>
         /// <param name="whMaterialReceiptRepository"></param>
+        /// <param name="whMaterialReceiptDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="whSupplierRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
@@ -146,6 +154,7 @@ namespace Hymson.MES.Services.Services.Quality
             IQualIqcOrderSampleDetailAnnexRepository qualIqcOrderSampleDetailAnnexRepository,
             IQualIqcOrderUnqualifiedHandRepository qualIqcOrderUnqualifiedHandRepository,
             IWhMaterialReceiptRepository whMaterialReceiptRepository,
+            IWhMaterialReceiptDetailRepository whMaterialReceiptDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IWhSupplierRepository whSupplierRepository,
             IInteAttachmentRepository inteAttachmentRepository)
@@ -164,6 +173,7 @@ namespace Hymson.MES.Services.Services.Quality
             _qualIqcOrderSampleDetailAnnexRepository = qualIqcOrderSampleDetailAnnexRepository;
             _qualIqcOrderUnqualifiedHandRepository = qualIqcOrderUnqualifiedHandRepository;
             _whMaterialReceiptRepository = whMaterialReceiptRepository;
+            _whMaterialReceiptDetailRepository = whMaterialReceiptDetailRepository;
             _procMaterialRepository = procMaterialRepository;
             _whSupplierRepository = whSupplierRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
@@ -560,7 +570,7 @@ namespace Hymson.MES.Services.Services.Quality
             dto.IsQualifiedText = dto.IsQualified.GetDescription();
 
             // 读取收货单
-            var receiptDetailEntity = await _whMaterialReceiptRepository.GetDetailByIdAsync(entity.MaterialReceiptDetailId);
+            var receiptDetailEntity = await _whMaterialReceiptDetailRepository.GetByIdAsync(entity.MaterialReceiptDetailId);
             if (receiptDetailEntity == null) return dto;
 
             dto.SupplierBatch = receiptDetailEntity.SupplierBatch;
@@ -612,6 +622,48 @@ namespace Hymson.MES.Services.Services.Quality
         {
             var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
+            // 转换产品编码/版本变为产品ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode) || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName))
+            {
+                var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    MaterialCode = pagedQueryDto.MaterialCode,
+                    MaterialName = pagedQueryDto.MaterialName,
+                    Version = pagedQueryDto.MaterialVersion
+                });
+                if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.MaterialIds = procMaterialEntities.Select(s => s.Id);
+                else pagedQuery.MaterialIds = Array.Empty<long>();
+            }
+
+            // 转换供应商编码变为供应商ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode))
+            {
+                var whSupplierEntities = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    Code = pagedQueryDto.SupplierCode,
+                    Name = pagedQueryDto.SupplierName
+                });
+                if (whSupplierEntities != null && whSupplierEntities.Any()) pagedQuery.SupplierIds = whSupplierEntities.Select(s => s.Id);
+                else pagedQuery.SupplierIds = Array.Empty<long>();
+            }
+
+            // 将供应商批次/内部批次转换为收货单详情ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierBatch) || !string.IsNullOrWhiteSpace(pagedQueryDto.InternalBatch))
+            {
+                var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    SupplierBatch = pagedQueryDto.SupplierBatch,
+                    InternalBatch = pagedQueryDto.InternalBatch
+                });
+                if (receiptDetailEntities != null && receiptDetailEntities.Any()) pagedQuery.MaterialReceiptDetailIds = receiptDetailEntities.Select(s => s.Id);
+                else pagedQuery.MaterialReceiptDetailIds = Array.Empty<long>();
+            }
+
+            // 查询数据
             var pagedInfo = await _qualIqcOrderRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -771,7 +823,7 @@ namespace Hymson.MES.Services.Services.Quality
             List<QualIqcOrderDto> dtos = new();
 
             // 读取收货单明细
-            var receiptDetailEntities = await _whMaterialReceiptRepository.GetDetailsByIdsAsync(entities.Select(x => x.MaterialReceiptDetailId));
+            var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetByIdsAsync(entities.Select(x => x.MaterialReceiptDetailId));
             var receiptDetailDic = receiptDetailEntities.ToDictionary(x => x.Id, x => x);
 
             // 读取收货单

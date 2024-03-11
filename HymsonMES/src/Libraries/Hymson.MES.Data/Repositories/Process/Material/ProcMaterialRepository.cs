@@ -272,15 +272,15 @@ namespace Hymson.MES.Data.Repositories.Process
                 procMaterialQuery.MaterialCode = $"%{procMaterialQuery.MaterialCode}%";
                 sqlBuilder.Where(" MaterialCode LIKE @MaterialCode ");
             }
-            if (!string.IsNullOrWhiteSpace(procMaterialQuery.Version))
-            {
-                procMaterialQuery.Version = $"%{procMaterialQuery.Version}%";
-                sqlBuilder.Where(" Version LIKE @Version ");
-            }
             if (!string.IsNullOrWhiteSpace(procMaterialQuery.MaterialName))
             {
                 procMaterialQuery.MaterialName = $"%{procMaterialQuery.MaterialName}%";
                 sqlBuilder.Where(" MaterialName LIKE @MaterialName ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialQuery.Version))
+            {
+                procMaterialQuery.Version = $"%{procMaterialQuery.Version}%";
+                sqlBuilder.Where(" Version LIKE @Version ");
             }
             sqlBuilder.AddParameters(procMaterialQuery);
 

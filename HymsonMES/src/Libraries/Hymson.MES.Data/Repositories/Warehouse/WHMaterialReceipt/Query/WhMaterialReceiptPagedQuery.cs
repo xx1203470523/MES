@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
 
-namespace Hymson.MES.Data.Repositories.WHMaterialReceipt.Query
+namespace Hymson.MES.Data.Repositories.Query
 {
     /// <summary>
     /// 物料收货表 分页参数
