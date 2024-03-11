@@ -7,12 +7,18 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Qual;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services;
+using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -33,79 +39,231 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 参数验证器
         /// </summary>
-        private readonly AbstractValidator<QualOqcParameterGroupSaveDto> _validationSaveRules;
+        private readonly AbstractValidator<QualOqcParameterGroupDto> _validationSaveRules;
+
+        /// <summary>
+        /// 更新验证器
+        /// </summary>
+        private readonly AbstractValidator<QualOqcParameterGroupUpdateDto> _validationUpdateRules;
+
+        /// <summary>
+        /// 删除验证器
+        /// </summary>
+        private readonly AbstractValidator<QualOqcParameterGroupDeleteDto> _validationDeleteRules;
 
         /// <summary>
         /// 仓储接口（OQC检验参数组）
         /// </summary>
         private readonly IQualOqcParameterGroupRepository _qualOqcParameterGroupRepository;
+        private readonly IQualOqcParameterGroupDetailRepository _qualOqcParameterGroupDetailRepository;
+
+
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        private readonly IInteCustomRepository _inteCustomRepository;
 
         /// <summary>
-        /// 构造函数
+        /// 构造
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
+        /// <param name="validationUpdateRules"></param>
+        /// <param name="validationDeleteRules"></param>
         /// <param name="qualOqcParameterGroupRepository"></param>
-        public QualOqcParameterGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<QualOqcParameterGroupSaveDto> validationSaveRules,
-            IQualOqcParameterGroupRepository qualOqcParameterGroupRepository)
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="inteCustomRepository"></param>
+        /// <param name="qualOqcParameterGroupDetailRepository"></param>
+        public QualOqcParameterGroupService(ICurrentUser currentUser, ICurrentSite currentSite,
+            AbstractValidator<QualOqcParameterGroupDto> validationSaveRules,
+            AbstractValidator<QualOqcParameterGroupUpdateDto> validationUpdateRules,
+            AbstractValidator<QualOqcParameterGroupDeleteDto> validationDeleteRules,
+            IQualOqcParameterGroupRepository qualOqcParameterGroupRepository,
+            IProcMaterialRepository procMaterialRepository, IInteCustomRepository inteCustomRepository,
+            IQualOqcParameterGroupDetailRepository qualOqcParameterGroupDetailRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
+            _validationUpdateRules = validationUpdateRules;
+            _validationDeleteRules = validationDeleteRules;
             _qualOqcParameterGroupRepository = qualOqcParameterGroupRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _inteCustomRepository = inteCustomRepository;
+            _qualOqcParameterGroupDetailRepository = qualOqcParameterGroupDetailRepository; 
         }
 
+        /// <summary>
+        /// 获取单个
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<QualOqcParameterGroupOutputDto> GetOneAsync(QualOqcParameterGroupQueryDto queryDto)
+        {
+            var query = queryDto.ToQuery<QualOqcParameterGroupToQuery>();
+            query.SiteId = _currentSite.SiteId;
+
+            var qualIqcInspectionItemEntity = await _qualOqcParameterGroupRepository.GetOneAsync(query);
+            if (qualIqcInspectionItemEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+
+            var result = qualIqcInspectionItemEntity.ToModel<QualOqcParameterGroupOutputDto>();
+            if (result == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+
+            var materialEntity = await _procMaterialRepository.GetByIdAsync(result.MaterialId.GetValueOrDefault());
+            if (materialEntity != null)
+            {
+                result.MaterialName = materialEntity.MaterialName;
+                result.MaterialCode = materialEntity.MaterialCode;
+                result.MaterialUnit = materialEntity.Unit;
+                result.MaterialVersion = materialEntity.Version;
+            }
+
+            var customerEntity = await _inteCustomRepository.GetByIdAsync(result.CustomerId.GetValueOrDefault());
+            if (customerEntity != null)
+            {
+                result.CustomerCode = customerEntity.Code;
+                result.CustomerName = customerEntity.Name;
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(QualOqcParameterGroupSaveDto saveDto)
+        public async Task CreateAsync(QualOqcParameterGroupDto createDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            //// 判断是否有获取到站点码 
+            //if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            //// 验证DTO
+            //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
-            // 更新时间
-            var updatedBy = _currentUser.UserName;
-            var updatedOn = HymsonClock.Now();
+            //// 更新时间
+            //var updatedBy = _currentUser.UserName;
+            //var updatedOn = HymsonClock.Now();
 
-            // DTO转换实体
-            var entity = saveDto.ToEntity<QualOqcParameterGroupEntity>();
-            entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = updatedBy;
-            entity.CreatedOn = updatedOn;
-            entity.UpdatedBy = updatedBy;
-            entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            //// DTO转换实体
+            //var entity = saveDto.ToEntity<QualOqcParameterGroupEntity>();
+            //entity.Id = IdGenProvider.Instance.CreateId();
+            //entity.CreatedBy = updatedBy;
+            //entity.CreatedOn = updatedOn;
+            //entity.UpdatedBy = updatedBy;
+            //entity.UpdatedOn = updatedOn;
+            //entity.SiteId = _currentSite.SiteId ?? 0;
 
-            // 保存
-            return await _qualOqcParameterGroupRepository.InsertAsync(entity);
+            //// 保存
+            //return await _qualOqcParameterGroupRepository.InsertAsync(entity);
+
+
+            await _validationSaveRules.ValidateAndThrowAsync(createDto);
+
+            var command = createDto.ToCommand<QualOqcParameterGroupCreateCommand>();
+            command.Init();
+            command.CreatedBy = _currentUser.UserName;
+            command.UpdatedBy = _currentUser.UserName;
+            command.SiteId = _currentSite.SiteId;
+
+            var detailCommands = Enumerable.Empty<QualOqcParameterGroupDetailCreateCommand>();
+            if (createDto.qualOqcParameterGroupDetailDtos != null && createDto.qualOqcParameterGroupDetailDtos.Any())
+            {
+                detailCommands = createDto.qualOqcParameterGroupDetailDtos.Select(m =>
+                {
+                    var detailCommand = m.ToCommand<QualOqcParameterGroupDetailCreateCommand>();
+                    detailCommand.Init();
+                    detailCommand.ParameterGroupId = command.Id;
+                    detailCommand.CreatedBy = command.CreatedBy;
+                    detailCommand.UpdatedBy = command.UpdatedBy;
+                    detailCommand.SiteId = command.SiteId;
+
+                    return detailCommand;
+                });
+            }
+
+            using var scope = TransactionHelper.GetTransactionScope();
+
+            var affectedRow = await _qualOqcParameterGroupRepository.InsertIgnoreAsync(command);
+            if (affectedRow == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19901));
+            }
+
+            await _qualOqcParameterGroupDetailRepository.InsertAsync(detailCommands);
+
+            scope.Complete();
+
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="updateDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(QualOqcParameterGroupSaveDto saveDto)
+        public async Task ModifyAsync(QualOqcParameterGroupUpdateDto updateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            //// 判断是否有获取到站点码 
+            //if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            //// 验证DTO
+            //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
-            // DTO转换实体
-            var entity = saveDto.ToEntity<QualOqcParameterGroupEntity>();
-            entity.UpdatedBy = _currentUser.UserName;
-            entity.UpdatedOn = HymsonClock.Now();
+            //// DTO转换实体
+            //var entity = saveDto.ToEntity<QualOqcParameterGroupEntity>();
+            //entity.UpdatedBy = _currentUser.UserName;
+            //entity.UpdatedOn = HymsonClock.Now();
 
-            return await _qualOqcParameterGroupRepository.UpdateAsync(entity);
+            //return await _qualOqcParameterGroupRepository.UpdateAsync(entity);
+
+            await _validationUpdateRules.ValidateAndThrowAsync(updateDto);
+
+            var entity = await _qualOqcParameterGroupRepository.GetOneAsync(new QualOqcParameterGroupToQuery { Id = updateDto.Id });
+            if (entity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19902));
+            }
+
+            var command = updateDto.ToCommand<QualOqcParameterGroupUpdateCommand>();
+            command.Init();
+            command.SiteId = _currentSite.SiteId;
+            command.UpdatedBy = _currentUser.UserName;
+
+            var detailCommands = Enumerable.Empty<QualOqcParameterGroupDetailCreateCommand>();
+            if (updateDto.qualOqcParameterGroupDetailDtos != null && updateDto.qualOqcParameterGroupDetailDtos.Any())
+            {
+                detailCommands = updateDto.qualOqcParameterGroupDetailDtos.Select(m =>
+                {
+                    var detailCommand = m.ToCommand<QualOqcParameterGroupDetailCreateCommand>();
+                    detailCommand.Init();
+                    detailCommand.ParameterGroupId = command.Id;
+                    detailCommand.CreatedOn = entity.CreatedOn;
+                    detailCommand.CreatedBy = entity.CreatedBy;
+                    detailCommand.UpdatedBy = command.UpdatedBy;
+                    detailCommand.UpdatedOn = command.UpdatedOn;
+                    detailCommand.SiteId = command.SiteId;
+
+                    return detailCommand;
+                });
+            }
+
+            using var scope = TransactionHelper.GetTransactionScope();
+
+            await _qualOqcParameterGroupDetailRepository.DeleteByMainIdAsync(entity.Id);
+
+            await _qualOqcParameterGroupRepository.UpdateAsync(command);
+
+            await _qualOqcParameterGroupDetailRepository.InsertAsync(detailCommands);
+
+            scope.Complete();
+
         }
 
         /// <summary>
@@ -160,6 +318,101 @@ namespace Hymson.MES.Services.Services.Quality
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<QualOqcParameterGroupDto>());
             return new PagedInfo<QualOqcParameterGroupDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 分页查询-包含参数明细
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<QualOqcParameterGroupOutputDto>> GetPagedAsync(QualOqcParameterGroupPagedQueryDto queryDto)
+        {
+            var _siteId = _currentSite.SiteId;
+
+            var materialIds = Enumerable.Empty<long>();
+            if (!string.IsNullOrWhiteSpace(queryDto.MaterialCode))
+            {
+                var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery { SiteId = _siteId, MaterialCode = queryDto.MaterialCode });
+                materialIds = materialEntities.Select(m => m.Id);
+            }
+            if (!string.IsNullOrWhiteSpace(queryDto.MaterialName))
+            {
+                var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery { SiteId = _siteId, MaterialName = queryDto.MaterialName });
+                materialIds = materialIds.Concat(materialEntities.Select(m => m.Id));
+            }
+            materialIds = materialIds.Distinct();
+
+            var customerIds = Enumerable.Empty<long>();
+            if (!string.IsNullOrWhiteSpace(queryDto.CustomerName))
+            {
+                var customerEntities = await _inteCustomRepository.GetInteCustomEntitiesAsync(new InteCustomQuery { SiteId = _siteId, Name = queryDto.CustomerName });
+                customerIds = customerEntities.Select(m => m.Id);
+            }
+
+            var query = new QualOqcParameterGroupPagedQuery
+            {
+                CodeLike = queryDto.Code,
+                NameLike = queryDto.Name,
+                MaterialIds = materialIds,
+                SupplierIds = customerIds,
+                Status = queryDto.Status,
+                PageIndex = queryDto.PageIndex,
+                PageSize = queryDto.PageSize,
+                SiteId = _siteId
+            };
+            query.Sorting = "Id Desc";
+
+            var result = new PagedInfo<QualOqcParameterGroupOutputDto>(Enumerable.Empty<QualOqcParameterGroupOutputDto>(), query.PageIndex, query.PageSize);
+
+            var pageResult = await _qualOqcParameterGroupRepository.GetPagedListAsync(query);
+            if (pageResult.Data != null && pageResult.Data.Any())
+            {
+                result.Data = pageResult.Data.Select(m => m.ToModel<QualOqcParameterGroupOutputDto>());
+                result.TotalCount = pageResult.TotalCount;
+
+                var resultMaterialIds = result.Data.Select(m => m.MaterialId.GetValueOrDefault());
+                var resultCustomerIds = result.Data.Select(m => m.CustomerId.GetValueOrDefault());
+
+                var materialEntities = await _procMaterialRepository.GetByIdsAsync(resultMaterialIds);
+                var customerEntities = await _inteCustomRepository.GetByIdsAsync(resultCustomerIds);
+
+                result.Data = result.Data.Select(m =>
+                {
+                    var materialEntity = materialEntities.FirstOrDefault(e => e.Id == m.MaterialId);
+                    if (materialEntity != default)
+                    {
+                        m.MaterialCode = materialEntity.MaterialCode;
+                        m.MaterialName = materialEntity.MaterialName;
+                        m.MaterialUnit = materialEntity.Unit;
+                        m.MaterialVersion = materialEntity.Version;
+                    }
+
+                    var customerEntity = customerEntities.FirstOrDefault(e => e.Id == m.CustomerId);
+                    if (customerEntity != default)
+                    {
+                        m.CustomerName = customerEntity.Name;
+                    }
+
+                    return m;
+                });
+            }
+
+            return result;
+        }
+
+
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        /// <param name="deleteDto"></param>
+        /// <returns></returns>
+        public async Task DeleteAsync(QualOqcParameterGroupDeleteDto deleteDto)
+        {
+            await _validationDeleteRules.ValidateAndThrowAsync(deleteDto);
+
+            var command = new DeleteCommand { Ids = deleteDto.Ids };
+
+            await _qualOqcParameterGroupDetailRepository.DeleteMoreAsync(command);
         }
 
     }
