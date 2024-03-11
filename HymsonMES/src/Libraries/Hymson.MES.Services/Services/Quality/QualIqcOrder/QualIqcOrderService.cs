@@ -1,4 +1,3 @@
-using Elastic.Transport;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -171,6 +170,49 @@ namespace Hymson.MES.Services.Services.Quality
 
 
         /// <summary>
+        /// 更改检验单状态
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateOperationStatusAsync(QualOrderOperationStatusDto requestDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            // IQC检验单
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            // 检查类型是否已经存在
+            var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
+            {
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id,
+                OperationType = requestDto.OperationType
+            });
+            if (orderOperationEntities != null && orderOperationEntities.Any()) return 0;
+
+            // 插入检验单状态操作记录
+            return await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id,
+                OperationType = requestDto.OperationType,
+                OperateBy = updatedBy,
+                OperateOn = updatedOn,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            });
+        }
+
+        /// <summary>
         /// 保存样品数据
         /// </summary>
         /// <param name="requestDto"></param>
@@ -286,27 +328,6 @@ namespace Hymson.MES.Services.Services.Quality
             }
             trans.Complete();
             return rows;
-        }
-
-        /// <summary>
-        /// 修改
-        /// </summary>
-        /// <param name="requestDto"></param>
-        /// <returns></returns>
-        public async Task<int> ModifyAsync(QualIqcOrderSaveDto requestDto)
-        {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
-
-            // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(requestDto);
-
-            // DTO转换实体
-            var entity = requestDto.ToEntity<QualIqcOrderEntity>();
-            entity.UpdatedBy = _currentUser.UserName;
-            entity.UpdatedOn = HymsonClock.Now();
-
-            return await _qualIqcOrderRepository.UpdateAsync(entity);
         }
 
         /// <summary>

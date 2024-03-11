@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -83,6 +84,17 @@ namespace Hymson.MES.Api.Controllers.Quality
         {
             // TODO 生成IQC检验单
             return await Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// 更改检验单状态
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("operation")]
+        public async Task UpdateOperationStatusAsync([FromBody] QualOrderOperationStatusDto requestDto)
+        {
+            await _qualIqcOrderService.UpdateOperationStatusAsync(requestDto);
         }
 
         /// <summary>

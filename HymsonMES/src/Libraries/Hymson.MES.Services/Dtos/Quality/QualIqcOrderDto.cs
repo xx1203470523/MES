@@ -23,6 +23,23 @@ namespace Hymson.MES.Services.Dtos.Quality
     }
 
     /// <summary>
+    /// 检验单状态Dto
+    /// </summary>
+    public record QualOrderOperationStatusDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public OrderOperateTypeEnum OperationType { get; set; }
+
+    }
+
+    /// <summary>
     /// iqc检验单新增/更新Dto
     /// </summary>
     public record QualIqcOrderSaveDto : BaseEntityDto

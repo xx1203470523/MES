@@ -1,3 +1,5 @@
+using Hymson.MES.Core.Enums.Quality;
+
 namespace Hymson.MES.Data.Repositories.Quality.Query
 {
     /// <summary>
@@ -5,6 +7,21 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualIqcOrderOperateQuery
     {
-    
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long? IQCOrderId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public OrderOperateTypeEnum? OperationType { get; set; }
+
     }
+
 }
