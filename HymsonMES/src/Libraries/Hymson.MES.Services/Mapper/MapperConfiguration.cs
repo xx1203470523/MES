@@ -8,6 +8,9 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Qual;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Core.Domain.WHMaterialReceipt;
+using Hymson.MES.Core.Domain.WHMaterialReceiptDetail;
+using Hymson.MES.Core.Domain.WhShipment;
 using Hymson.MES.Core.Domain.WhWareHouse;
 using Hymson.MES.Core.Domain.WhWarehouseLocation;
 using Hymson.MES.Core.Domain.WhWarehouseRegion;
@@ -54,6 +57,8 @@ using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Hymson.MES.Data.Repositories.WHMaterialReceipt.Query;
+using Hymson.MES.Data.Repositories.WhShipment.Query;
 using Hymson.MES.Data.Repositories.WhWareHouse.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseRegion.Query;
@@ -68,6 +73,9 @@ using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
+using Hymson.MES.Services.Dtos.WHMaterialReceipt;
+using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
+using Hymson.MES.Services.Dtos.WhShipment;
 using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
@@ -434,7 +442,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteMessageManageEntity, InteMessageManageCloseDto>();
             CreateMap<InteMessageManageView, InteMessageManageDto>();
             CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
-            CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
             #endregion
 
             #region InteCustomField
@@ -783,6 +790,25 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            #region WhShipment
+            CreateMap<WhShipmentSaveDto,WhShipmentEntity>();
+            CreateMap<WhShipmentEntity, WhShipmentDto>();
+            CreateMap<WhShipmentPagedQueryDto, WhShipmentPagedQuery>();
+            #endregion
+
+ 
+
+
+            #region WhMaterialReceipt
+            CreateMap<WhMaterialReceiptEntity, WhMaterialReceiptOutDto>();
+            CreateMap<WhMaterialReceiptSaveDto, WhMaterialReceiptEntity>();
+            CreateMap<WhMaterialReceiptEntity, WhMaterialReceiptDto>();
+            CreateMap<WHMaterialReceiptDetailEntity, ReceiptMaterialDetailDto>();
+
+            CreateMap<WHMaterialReceiptDetailEntity, WHMaterialReceiptDetailDto>();
+            CreateMap<WhMaterialReceiptPagedQueryDto, WhMaterialReceiptPagedQuery>();
+            #endregion
+
         }
 
         /// <summary>
@@ -887,7 +913,11 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<QualIqcOrderPagedQueryDto, QualIqcOrderPagedQuery>();
             CreateMap<QualIqcOrderEntity, QualIqcOrderDto>();
-            
+            CreateMap<QualIqcOrderTypeEntity, QualIqcOrderTypeBaseDto>();
+            CreateMap<QualIqcInspectionItemDetailSnapshotEntity, OrderParameterDetailDto>();
+            CreateMap<QualIqcOrderSampleDetailEntity, OrderParameterDetailDto>();
+            CreateMap<OrderParameterDetailQueryDto, QualIqcOrderSampleQuery>();
+
 
             #region QualIqcInspectionItem
 

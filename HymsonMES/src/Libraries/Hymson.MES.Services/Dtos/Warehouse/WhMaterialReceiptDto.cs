@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 
 namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
 {
@@ -7,11 +8,6 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
     /// </summary>
     public record WhMaterialReceiptSaveDto : BaseEntityDto
     {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
         /// <summary>
         /// 站点ID
         /// </summary>
@@ -32,37 +28,12 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
         /// </summary>
         public string Remark { get; set; }
 
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-        public IList<wh_material_receipt_detailSaveDto> Details { get; set; }
+        public IList<WhMaterialReceiptDetailSaveDto> Details { get; set; }
 
 
     }
 
-    public record wh_material_receipt_detailSaveDto : BaseEntityDto
+    public record WhMaterialReceiptDetailSaveDto : BaseEntityDto
     {
         /// <summary>
         /// 站点ID
@@ -77,7 +48,11 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
         /// <summary>
         /// 供应商生产批次
         /// </summary>
-        public string MaterialBatch { get; set; }
+        public string SupplierBatch { get; set; }
+        /// <summary>
+        /// 内部批次
+        /// </summary>
+        public string InternalBatch { get; set; }
 
         /// <summary>
         /// 计划发货数量
@@ -93,31 +68,6 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
         /// 备注
         /// </summary>
         public string Remark { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
 
 
     }
@@ -148,6 +98,57 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
         public long SupplierId { get; set; }
 
         /// <summary>
+        /// 供应商编码
+        /// </summary>
+        public string SupplierCode { get; set; }
+
+        /// <summary>
+        /// 供应商名称
+        /// </summary>
+        public string SupplierName { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
+
+        /// <summar
+        /// <summary>
+        /// 更新人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
+    }
+
+
+    public record WhMaterialReceiptOutDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 收货单号
+        /// </summary>
+        public string ReceiptNum { get; set; }
+
+        /// <summary>
+        /// 供应商Id
+        /// </summary>
+        public long SupplierId { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
@@ -177,12 +178,31 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
         /// </summary>
         public long IsDeleted { get; set; }
 
-
+ 
     }
+
+
 
     /// <summary>
     /// 物料收货表分页Dto
     /// </summary>
-    public class WhMaterialReceiptPagedQueryDto : PagerInfo { }
+    public class WhMaterialReceiptPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 收货单号
+        /// </summary>
+        public string? ReceiptNum { get; set; }
+
+        /// <summary>
+        /// 编码（物料）
+        /// </summary>
+        public string? SupplierCode { get; set; }
+
+        /// <summary>
+        /// 名称（物料）
+        /// </summary>
+        public string? SupplierName { get; set; }
+
+    }
 
 }

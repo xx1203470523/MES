@@ -526,7 +526,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 if (workShopEntity != null) dto.WorkShopName = workShopEntity.Name;
 
                 var workLineEntity = await _inteWorkCenterRepository.GetByIdAsync(dto.LineId);
-                if (workLineEntity != null) dto.LineName = workLineEntity.Name;
+                if (workLineEntity != null) dto.LineName = workLineEntity.Code;
 
                 if (dto.EquipmentId.HasValue)
                 {

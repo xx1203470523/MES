@@ -7,7 +7,7 @@ namespace Hymson.MES.Core.Domain.Quality
     /// <summary>
     /// 数据实体（iqc检验单）   
     /// qual_iqc_order
-    /// @author User
+    /// @author Czhipu
     /// @date 2024-03-06 02:26:10
     /// </summary>
     public class QualIqcOrderEntity : BaseEntity
@@ -33,9 +33,9 @@ namespace Hymson.MES.Core.Domain.Quality
         public long? SupplierId { get; set; }
 
         /// <summary>
-        /// qual_iqc_inspection_item_copy 的Id
+        /// qual_iqc_inspection_item_snapshot 的Id
         /// </summary>
-        public string IqcInspectionItemId { get; set; }
+        public long IqcInspectionItemSnapshotId { get; set; }
 
         /// <summary>
         /// 收货单详情Id
