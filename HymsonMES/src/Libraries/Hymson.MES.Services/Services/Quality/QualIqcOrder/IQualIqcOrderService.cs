@@ -12,23 +12,23 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 保存样品数据
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> SaveSampleAsync(QualIqcOrderSaveDto saveDto);
+        Task<int> SaveSampleAsync(QualIqcOrderSaveDto requestDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(QualIqcOrderSaveDto saveDto);
+        Task<int> ModifyAsync(QualIqcOrderSaveDto requestDto);
 
         /// <summary>
         /// 保存检验单附件
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> SaveAttachmentAsync(QualIqcOrderSaveAttachmentDto saveDto);
+        Task<int> SaveAttachmentAsync(QualIqcOrderSaveAttachmentDto requestDto);
 
         /// <summary>
         /// 删除检验单附件

@@ -28,6 +28,11 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record QualIqcOrderSaveDto : BaseEntityDto
     {
         /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+        /// <summary>
         /// 检验类型ID
         /// </summary>
         public long IQCOrderTypeId { get; set; }
@@ -67,7 +72,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 参数附件
         /// </summary>
-        public IEnumerable<string>? Attachments { get; set; }
+        public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
 
     }
 

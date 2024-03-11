@@ -791,12 +791,12 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region WhShipment
-            CreateMap<WhShipmentSaveDto,WhShipmentEntity>();
+            CreateMap<WhShipmentSaveDto, WhShipmentEntity>();
             CreateMap<WhShipmentEntity, WhShipmentDto>();
             CreateMap<WhShipmentPagedQueryDto, WhShipmentPagedQuery>();
             #endregion
 
- 
+
 
 
             #region WhMaterialReceipt
@@ -916,8 +916,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIqcOrderTypeEntity, QualIqcOrderTypeBaseDto>();
             CreateMap<QualIqcInspectionItemDetailSnapshotEntity, OrderParameterDetailDto>();
             CreateMap<QualIqcOrderSampleDetailEntity, OrderParameterDetailDto>();
+            CreateMap<QualIqcOrderSaveDto, QualIqcOrderSampleQuery>();
             CreateMap<OrderParameterDetailQueryDto, QualIqcOrderSampleQuery>();
-
 
             #region QualIqcInspectionItem
 

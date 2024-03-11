@@ -42,12 +42,12 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 删除检验单附件
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpDelete("attachment/save")]
-        public async Task SaveAttachmentAsync([FromBody] QualIqcOrderSaveAttachmentDto saveDto)
+        public async Task SaveAttachmentAsync([FromBody] QualIqcOrderSaveAttachmentDto requestDto)
         {
-            await _qualIqcOrderService.SaveAttachmentAsync(saveDto);
+            await _qualIqcOrderService.SaveAttachmentAsync(requestDto);
         }
 
         /// <summary>
@@ -88,12 +88,12 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 保存样品数据
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("save")]
-        public async Task<long> SaveSampleAsync([FromBody] QualIqcOrderSaveDto saveDto)
+        public async Task<long> SaveSampleAsync([FromBody] QualIqcOrderSaveDto requestDto)
         {
-            return await _qualIqcOrderService.SaveSampleAsync(saveDto);
+            return await _qualIqcOrderService.SaveSampleAsync(requestDto);
         }
 
         /// <summary>

@@ -1253,7 +1253,7 @@
         public const string MES16769 = "容器装箱失败，该条码已装入此容器，请勿重复装箱";
         public const string MES16770 = "容器打开失败，已达到可装载的最大数量，请先移除条码再打开容器";
         public const string MES16771 = "容器打开失败，容器可能已被打开";
-        public const string MES16772 = "条码装载失败，未输入任何需要装载条码";        
+        public const string MES16772 = "条码装载失败，未输入任何需要装载条码";
         public const string MES16773 = "容器装载失败，不允许混装不同类型的物件";
         public const string MES16774 = "容器装载失败，存在锁定状态产品序列码，不允许包装！";
         public const string MES16775 = "容器装载失败，被装载容器未关闭";
@@ -1264,7 +1264,7 @@
         public const string MES16780 = "物料编码【{code}】没有维护容器规则！";
         public const string MES16781 = "包装编码【{0}】已被包装，父包装编码为【{1}】";
         public const string MES16782 = "容器未启用!";
-        public const string MES16783 = "生产过站面板不存在或未启用";  
+        public const string MES16783 = "生产过站面板不存在或未启用";
         #endregion
 
         #region 绑定工单激活  MES16800
@@ -1861,7 +1861,8 @@
         public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19903 = "IQC检验项目必须填写物料，且物料信息必须准确";
         public const string MES19904 = "已启用的IQC检验项目不允许删除，{codes}";
-        public const string MES19905 = "已存在检验类型为【{Type}】的样本数据！";
+        public const string MES19905 = "样本条码【{Code}】已存在检验类型为【{Type}】的数据！";
+        public const string MES19906 = "请录入样本条码！";
         #endregion
 
         #region 基础数据导入 11600
