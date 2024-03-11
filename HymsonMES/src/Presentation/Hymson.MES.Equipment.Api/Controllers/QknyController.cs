@@ -360,11 +360,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             //TODO
             //1. 针对制胶匀浆设备时，在开机进行启动时，从MES获取配方列表
-            //2. 获取proc_formula表数据，并进行字段转换
+            //2. 获取 proc_formula 表数据，并进行字段转换
 
             List<FormulaListGetReturnDto> list = new List<FormulaListGetReturnDto>();
             for (var i = 0; i < 3; ++i)
-            { 
+            {
                 FormulaListGetReturnDto model = new FormulaListGetReturnDto();
                 model.FormulaCode = $"formulaCode{i + 1}";
                 model.Version = "1.0";
@@ -586,6 +586,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备过程参数026", BusinessType.OTHER, "EquipmentProcessParam026", ReceiverTypeEnum.MES)]
         public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto)
         {
+            await _qknyService.EquipmentProcessParamAsync(dto);
+
             //TODO
             //1. 写入参数表，参考现有的EquipmentCollectionAsync，
             //2. 支持错误参数不NG，记录或者忽略

@@ -82,5 +82,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task AgvMaterialAsync(AgvMaterialDto dto);
+
+        /// <summary>
+        /// 设备过程参数
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto);
     }
 }

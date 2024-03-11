@@ -24,6 +24,7 @@ using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
 using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Dtos.EquProcessParamRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Services.AgvTaskRecord;
@@ -31,6 +32,7 @@ using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Services.EquEquipmentAlarm;
 using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Services.EquProcessParamRecord;
 using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
 using Hymson.MessagePush.Helper;
@@ -128,6 +130,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IAgvTaskRecordService _agvTaskRecordService;
 
         /// <summary>
+        /// 设备过程参数
+        /// </summary>
+        private readonly IEquProcessParamRecordService _equProcessParamRecordService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -144,6 +151,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuFeedingService manuFeedingService,
             IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository,
             IAgvTaskRecordService agvTaskRecordService,
+            IEquProcessParamRecordService equProcessParamRecordService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -160,6 +168,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuFeedingService = manuFeedingService;
             _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
             _agvTaskRecordService = agvTaskRecordService;
+            _equProcessParamRecordService = equProcessParamRecordService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -502,6 +511,42 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             saveDto.UpdatedOn = saveDto.CreatedOn;
             saveDto.UpdatedBy = saveDto.CreatedBy;
             await _agvTaskRecordService.AddAsync(saveDto);
+        }
+
+        /// <summary>
+        /// 设备过程参数
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto)
+        {
+            if(dto.ParamList == null || dto.ParamList.Count == 0)
+            {
+                return;
+            }
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 添加数据
+            List<EquProcessParamRecordSaveDto> saveDtoList = new List<EquProcessParamRecordSaveDto>();
+            foreach(var item in dto.ParamList)
+            {
+                EquProcessParamRecordSaveDto saveDto = new EquProcessParamRecordSaveDto();
+                saveDto.ParamCode = item.ParamCode;
+                saveDto.ParamValue = item.ParamValue;
+                saveDto.CollectionTime = item.CollectionTime;
+                saveDtoList.Add(saveDto);
+            }
+            saveDtoList.ForEach(m =>
+            {
+                m.SiteId = equResModel.SiteId;
+                m.EquipmentId = equResModel.EquipmentId;
+                m.CreatedOn = HymsonClock.Now();
+                m.CreatedBy = dto.EquipmentCode;
+                m.UpdatedOn = m.CreatedOn;
+                m.UpdatedBy = m.CreatedBy;
+            });
+            //3. 数据操作
+            await _equProcessParamRecordService.AddMultAsync(saveDtoList);
         }
 
         /// <summary>
