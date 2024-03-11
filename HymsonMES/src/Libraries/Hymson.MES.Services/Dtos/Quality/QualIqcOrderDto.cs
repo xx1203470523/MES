@@ -248,7 +248,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检验类型ID
         /// </summary>
-        public long IQCOrderTypeId { get; set; }
+        public long? IQCOrderTypeId { get; set; }
 
         /// <summary>
         /// 样品条码

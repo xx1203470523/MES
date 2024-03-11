@@ -1863,6 +1863,7 @@
         public const string MES19904 = "已启用的IQC检验项目不允许删除，{codes}";
         public const string MES19905 = "样本条码【{Code}】已存在检验类型为【{Type}】的数据！";
         public const string MES19906 = "请录入样本条码！";
+        public const string MES19907 = "请选择检验类型！";
         #endregion
 
         #region 基础数据导入 11600

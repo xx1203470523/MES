@@ -231,7 +231,7 @@ namespace Hymson.MES.Services.Services.Quality
                     SiteId = entity.SiteId,
                     IQCOrderId = entity.Id,
                     IQCOrderSampleId = sampleId,
-                    IQCInspectionSnapshotId = item.Id,
+                    IQCInspectionDetailSnapshotId = item.Id,
                     InspectionValue = item.InspectionValue ?? "",
                     IsQualified = item.IsQualified,
                     CreatedBy = updatedBy,
@@ -514,11 +514,12 @@ namespace Hymson.MES.Services.Services.Quality
         public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotAsync(OrderParameterDetailQueryDto requestDto)
         {
             if (string.IsNullOrWhiteSpace(requestDto.Barcode)) throw new CustomerValidationException(nameof(ErrorCode.MES19906));
+            if (!requestDto.IQCOrderTypeId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19907));
 
             var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId);
             if (entity == null) return Array.Empty<OrderParameterDetailDto>();
 
-            var orderTypeEntity = await _qualIqcOrderTypeRepository.GetByIdAsync(requestDto.IQCOrderTypeId);
+            var orderTypeEntity = await _qualIqcOrderTypeRepository.GetByIdAsync(requestDto.IQCOrderTypeId.Value);
             if (orderTypeEntity == null) return Array.Empty<OrderParameterDetailDto>();
 
             // 检查该类型是否已经录入
@@ -535,15 +536,15 @@ namespace Hymson.MES.Services.Services.Quality
             var snapshotEntity = await _qualIqcInspectionItemSnapshotRepository.GetByIdAsync(entity.IqcInspectionItemSnapshotId);
             if (snapshotEntity == null) return Array.Empty<OrderParameterDetailDto>();
 
-            var detailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetEntitiesAsync(new QualIqcInspectionItemDetailSnapshotQuery
+            var snapshotDetailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetEntitiesAsync(new QualIqcInspectionItemDetailSnapshotQuery
             {
                 SiteId = entity.SiteId,
                 IqcInspectionItemSnapshotId = snapshotEntity.Id,
                 InspectionType = orderTypeEntity.Type
             });
-            if (detailEntities == null) return Array.Empty<OrderParameterDetailDto>();
+            if (snapshotDetailEntities == null) return Array.Empty<OrderParameterDetailDto>();
 
-            return detailEntities.Select(s => s.ToModel<OrderParameterDetailDto>());
+            return snapshotDetailEntities.Select(s => s.ToModel<OrderParameterDetailDto>());
         }
 
         /// <summary>
@@ -570,6 +571,9 @@ namespace Hymson.MES.Services.Services.Quality
             });
             if (sampleDetailEntities == null) return Array.Empty<OrderParameterDetailDto>();
 
+            // 查询样品明细对应的快照明细
+            var snapshotDetailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetByIdsAsync(sampleDetailEntities.Select(s => s.IQCInspectionDetailSnapshotId));
+
             // 查询检验单下面的所有样本附件
             var sampleAttachmentEntities = await _qualIqcOrderSampleDetailAnnexRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailAnnexQuery
             {
@@ -589,7 +593,12 @@ namespace Hymson.MES.Services.Services.Quality
             List<OrderParameterDetailDto> dtos = new();
             foreach (var sampleDetailEntity in sampleDetailEntities)
             {
-                var dto = sampleDetailEntity.ToModel<OrderParameterDetailDto>();
+                // 快照数据
+                var snapshotDetailEntity = snapshotDetailEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCInspectionDetailSnapshotId);
+                if (snapshotDetailEntity == null) continue;
+
+                var dto = snapshotDetailEntity.ToModel<OrderParameterDetailDto>();
+                dto.Id = sampleDetailEntity.Id;
 
                 // 填充条码
                 var sampleEntity = sampleEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCOrderSampleId);

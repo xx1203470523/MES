@@ -71,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
