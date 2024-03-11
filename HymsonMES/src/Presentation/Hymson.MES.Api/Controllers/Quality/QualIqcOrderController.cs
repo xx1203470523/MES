@@ -76,7 +76,16 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await Task.FromResult(0);
         }
 
-
+        /// <summary>
+        /// 保存样品数据
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        [HttpPost("save")]
+        public async Task<long> SaveSampleAsync([FromBody] QualIqcOrderSaveDto saveDto)
+        {
+            return await _qualIqcOrderService.SaveSampleAsync(saveDto);
+        }
 
         /// <summary>
         /// 查询详情（iqc检验单）
@@ -128,20 +137,20 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("snapshot")]
-        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync([FromQuery] OrderParameterDetailQueryDto requestDto)
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotAsync([FromQuery] OrderParameterDetailQueryDto requestDto)
         {
-            return await _qualIqcOrderService.QueryDetailSnapshotByIdAsync(requestDto);
+            return await _qualIqcOrderService.QueryDetailSnapshotAsync(requestDto);
         }
 
         /// <summary>
         /// 查询检验单样本数据
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet("sample/{orderId}")]
-        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
+        [HttpGet("sample")]
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleAsync([FromQuery] OrderParameterDetailQueryDto requestDto)
         {
-            return await _qualIqcOrderService.QueryDetailSampleByIdAsync(orderId);
+            return await _qualIqcOrderService.QueryDetailSampleAsync(requestDto);
         }
 
 

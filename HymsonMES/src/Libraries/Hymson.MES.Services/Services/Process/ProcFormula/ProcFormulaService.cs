@@ -296,7 +296,7 @@ namespace Hymson.MES.Services.Services.Process
                     //校验上下限
                     if ((detailEntity.UpperLimit - detailEntity.LowLimit) < 0)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15730)).WithData("line", index);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15730)).WithData("line", index+1);
                     }
 
                     detailEntity.Id = IdGenProvider.Instance.CreateId();

@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
@@ -10,80 +11,46 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record QualIqcOrderSaveDto : BaseEntityDto
     {
         /// <summary>
+        /// 检验类型ID
+        /// </summary>
+        public long IQCOrderTypeId { get; set; }
+
+        /// <summary>
+        /// 样品条码
+        /// </summary>
+        public string Barcode { get; set; }
+
+        /// <summary>
+        /// 样品参数
+        /// </summary>
+        public IEnumerable<QualIqcOrderParameterSaveDto> Details { get; set; }
+
+    }
+
+    /// <summary>
+    /// iqc检验单新增/更新Dto
+    /// </summary>
+    public record QualIqcOrderParameterSaveDto
+    {
+        /// <summary>
         /// 主键
         /// </summary>
         public long Id { get; set; }
 
         /// <summary>
-        /// 站点ID
+        /// 检验值
         /// </summary>
-        public long SiteId { get; set; }
-
-        /// <summary>
-        /// 检验单号
-        /// </summary>
-        public string InspectionOrder { get; set; }
-
-        /// <summary>
-        /// 物料id
-        /// </summary>
-        public long? MaterialId { get; set; }
-
-        /// <summary>
-        /// 供应商Id
-        /// </summary>
-        public long? SupplierId { get; set; }
-
-        /// <summary>
-        /// qual_iqc_inspection_item_copy 的Id
-        /// </summary>
-        public string IqcInspectionItemId { get; set; }
-
-        /// <summary>
-        /// 收货单详情Id
-        /// </summary>
-        public long? MaterialReceiptDetailId { get; set; }
-
-        /// <summary>
-        /// 状态;1、待检验2、检验中3、已检验4、已关闭
-        /// </summary>
-        public bool Status { get; set; }
+        public string? InspectionValue { get; set; }
 
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public bool? IsQualified { get; set; }
+        public TrueOrFalseEnum IsQualified { get; set; }
 
         /// <summary>
-        /// 备注
+        /// 参数附件
         /// </summary>
-        public string Remark { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
+        public IEnumerable<string>? Attachments { get; set; }
 
     }
 
@@ -249,17 +216,22 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// 检验参数Dto
     /// </summary>
-    public record OrderParameterDetailQueryDto
+    public record OrderParameterDetailQueryDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
         /// </summary>
-        public long OrderId { get; set; }
+        public long IQCOrderId { get; set; }
 
         /// <summary>
-        /// 检验类型;1、常规检验2、外观检验3、包装检验4、特殊性检验5、破坏性检验
+        /// 检验类型ID
         /// </summary>
-        public IQCInspectionTypeEnum InspectionType { get; set; }
+        public long IQCOrderTypeId { get; set; }
+
+        /// <summary>
+        /// 样品条码
+        /// </summary>
+        public string? Barcode { get; set; }
 
     }
 
@@ -332,6 +304,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 检验类型;1、常规检验2、外观检验3、包装检验4、特殊性检验5、破坏性检验
         /// </summary>
         public IQCInspectionTypeEnum InspectionType { get; set; }
+
+        /// <summary>
+        /// 附件集合
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
 
     }
 

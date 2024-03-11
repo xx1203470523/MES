@@ -319,7 +319,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 填充其他设置
             procedureRejudgeBo = await FillingProcedureRejudgeBoAsync(procedureRejudgeBo);
-            _logger.LogInformation($"工序中关于复判的相关参数 -> ", procedureRejudgeBo.ToSerialize());
+            //_logger.LogInformation($"工序中关于复判的相关参数 -> {procedureRejudgeBo.ToSerialize()}");
 
             // 遍历所有条码
             var responseBos = new List<OutStationResponseBo>();
