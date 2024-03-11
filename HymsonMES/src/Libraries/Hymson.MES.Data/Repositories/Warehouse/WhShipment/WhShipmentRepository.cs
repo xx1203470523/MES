@@ -148,7 +148,7 @@ namespace Hymson.MES.Data.Repositories.WhShipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhShipmentEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<WhShipmentEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhShipmentEntity>(GetByIdsSql, new { Ids = ids });

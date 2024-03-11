@@ -63,12 +63,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 状态(1-待检验 2-检验中 3-已检验 4-已关闭)
         /// </summary>
-        public bool Status { get; set; }
+        public InspectionStatusEnum Status { get; set; }
 
         /// <summary>
         /// 是否合格(0-否 1-是)
         /// </summary>
-        public bool? IsQualified { get; set; }
+        public TrueOrFalseEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 备注
@@ -95,12 +95,75 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
+        ///// <summary>
+        ///// 删除标识
+        ///// </summary>
+        //public long IsDeleted { get; set; }
+
         /// <summary>
-        /// 删除标识
+        /// 物料编码
         /// </summary>
-        public long IsDeleted { get; set; }
+        public string? MaterialCode { get; set; }
 
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName { get; set; }
 
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+
+        /// <summary>
+        /// 供应商编码
+        /// </summary>
+        public string? SupplierCode { get; set; }
+
+        /// <summary>
+        /// 供应商名称
+        /// </summary>
+        public string? SupplierName { get; set; }
+
+        /// <summary>
+        /// 计量单位(字典定义)
+        /// </summary>
+        public string? Unit { get; set; }
+
+        /// <summary>
+        /// 检验人
+        /// </summary>
+        public string? OperateBy { get; set; }
+
+        /// <summary>
+        /// 检验时间
+        /// </summary>
+        public DateTime? OperateOn { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式（1-让步 2-挑选 3-返工 4-报废）
+        /// </summary>
+        public OQCHandMethodEnum? HandMethod { get; set; }
+
+        /// <summary>
+        /// 不合格处理人
+        /// </summary>
+        public string? ProcessedBy { get; set; }
+
+        /// <summary>
+        /// 不合格处理时间
+        /// </summary>
+        public DateTime? ProcessedOn { get; set; }
+
+        /// <summary>
+        /// 不合格处理备注
+        /// </summary>
+        public string? UnqualifiedHandRemark { get; set; }
+
+        /// <summary>
+        /// 出货单单号
+        /// </summary>
+        public string? ShipmentNum { get; set; }
     }
 
     /// <summary>
@@ -220,4 +283,10 @@ namespace Hymson.MES.Services.Dtos.Quality
         
     }
 
+    ///// <summary>
+    ///// OQC执行检验描述数据
+    ///// </summary>
+    //public class QualOqcOrderExecDescriptionDto { 
+
+    //}
 }
