@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.Query;
 using Hymson.MES.Data.Repositories.WhShipment;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Utils;
@@ -50,6 +51,8 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IWhSupplierRepository _whSupplierRepository;
         private readonly IQualOqcOrderOperateRepository _qualOqcOrderOperateRepository;
         private readonly IQualOqcOrderUnqualifiedHandleRepository _qualOqcOrderUnqualifiedHandleRepository;
+        private readonly IWhShipmentBarcodeRepository _whShipmentBarcodeRepository;
+        private readonly IQualOqcParameterGroupRepository _qualOqcParameterGroupRepository;
 
         private readonly IOQCOrderCreateService _oqcOrderCreateService;
 
@@ -70,6 +73,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="whSupplierRepository"></param>
         /// <param name="qualOqcOrderOperateRepository"></param>
         /// <param name="qualOqcOrderUnqualifiedHandleRepository"></param>
+        /// <param name="whShipmentBarcodeRepository"></param>
         public QualOqcOrderService(ICurrentUser currentUser,
             ICurrentSite currentSite,
             AbstractValidator<QualOqcOrderSaveDto> validationSaveRules,
@@ -83,7 +87,9 @@ namespace Hymson.MES.Services.Services.Quality
             IProcMaterialRepository procMaterialRepository,
             IWhSupplierRepository whSupplierRepository,
             IQualOqcOrderOperateRepository qualOqcOrderOperateRepository,
-            IQualOqcOrderUnqualifiedHandleRepository qualOqcOrderUnqualifiedHandleRepository)
+            IQualOqcOrderUnqualifiedHandleRepository qualOqcOrderUnqualifiedHandleRepository,
+            IWhShipmentBarcodeRepository whShipmentBarcodeRepository,
+            IQualOqcParameterGroupRepository qualOqcParameterGroupRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -99,6 +105,8 @@ namespace Hymson.MES.Services.Services.Quality
             _whSupplierRepository = whSupplierRepository;
             _qualOqcOrderOperateRepository = qualOqcOrderOperateRepository;
             _qualOqcOrderUnqualifiedHandleRepository = qualOqcOrderUnqualifiedHandleRepository;
+            _whShipmentBarcodeRepository = whShipmentBarcodeRepository;
+            _qualOqcParameterGroupRepository = qualOqcParameterGroupRepository;
         }
 
 
@@ -276,5 +284,73 @@ namespace Hymson.MES.Services.Services.Quality
             return new PagedInfo<QualOqcOrderDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+
+        /// <summary>
+        /// 获取OQC检验单检验类型
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualOqcOrderTypeOutDto>> GetOqcOrderTypeAsync(long id)
+        {
+            var result =new List<QualOqcOrderTypeOutDto>();
+            var qualOqcOrderTypeEntities = await _qualOqcOrderTypeRepository.GetEntitiesAsync(new QualOqcOrderTypeQuery { OQCOrderId= id ,SiteId=_currentSite.SiteId??0});
+            if (qualOqcOrderTypeEntities == null || !qualOqcOrderTypeEntities.Any()) 
+            { 
+                return result;
+            }
+
+            foreach (var item in qualOqcOrderTypeEntities)
+            {
+                var model = new QualOqcOrderTypeOutDto();
+                model.InspectionType= item.InspectionType;
+                model.SampleQty= item.SampleQty;
+                model.CheckedQty= item.CheckedQty;
+
+                result.Add(model);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 校验样品条码
+        /// </summary>
+        /// <param name="checkBarCodeQuqryDto"></param>
+        /// <returns></returns>
+        public async Task<CheckBarCodeOutDto> CheckBarCodeAsync(CheckBarCodeQuqryDto checkBarCodeQuqryDto)
+        {
+            if (checkBarCodeQuqryDto.BarCode == null|| checkBarCodeQuqryDto.ShipmentId==null|| checkBarCodeQuqryDto.InspectionOrderId==null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10111));
+            }
+
+            //获取出货单物料信息
+            var whShipmentMaterialEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { ShipmentId = checkBarCodeQuqryDto.ShipmentId.GetValueOrDefault(), SiteId = _currentSite.SiteId ?? 0 });
+            if (whShipmentMaterialEntities == null || !whShipmentMaterialEntities.Any()) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17802));
+            }
+            var shipmentMaterialIds = whShipmentMaterialEntities.Select(a => a.Id);
+
+            //获取出货单条码信息
+            var whShipmentBarcodeEntities = await _whShipmentBarcodeRepository.GetEntitiesAsync(new WhShipmentBarcodeQuery {ShipmentDetailIds= shipmentMaterialIds,BarCode= checkBarCodeQuqryDto.BarCode,SiteId=_currentSite.SiteId??0 });
+            if (whShipmentBarcodeEntities == null || !whShipmentBarcodeEntities.Any()) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17803)).WithData("barcode", checkBarCodeQuqryDto.BarCode);
+            }
+
+            //获取OQC检验单
+            var qualOqcOrderEntity = await _qualOqcOrderRepository.GetByIdAsync(checkBarCodeQuqryDto.InspectionOrderId.GetValueOrDefault());
+            if (qualOqcOrderEntity == null) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17804));
+            }
+
+            //获取OQC检验参数组快照
+            var qualOqcParameterGroupEntity = await _qualOqcParameterGroupDetailSnapshootRepository.GetByIdAsync(qualOqcOrderEntity.GroupSnapshootId);
+            if (qualOqcParameterGroupEntity == null) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17805));
+            }
+            var result = qualOqcParameterGroupEntity.ToModel<CheckBarCodeOutDto>();
+            result.BarCode= checkBarCodeQuqryDto.BarCode;
+            return result;
+        }
     }
 }

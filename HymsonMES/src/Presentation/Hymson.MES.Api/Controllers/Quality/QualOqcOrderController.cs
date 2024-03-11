@@ -96,5 +96,28 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualOqcOrderService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 获取OQC单价检验类型
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getOqcOrderType/{id}")]
+        public async Task<IEnumerable<QualOqcOrderTypeOutDto>> GetOqcOrderTypeAsync(long id)
+        {
+            return await _qualOqcOrderService.GetOqcOrderTypeAsync(id);
+        }
+
+        /// <summary>
+        /// 校验条码
+        /// </summary>
+        /// <param name="checkBarCodeQuqryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("checkBarCode")]
+        public async Task<CheckBarCodeOutDto> CheckBarCodeAsync([FromQuery] CheckBarCodeQuqryDto checkBarCodeQuqryDto)
+        {
+            return await _qualOqcOrderService.CheckBarCodeAsync(checkBarCodeQuqryDto);
+        }
     }
 }

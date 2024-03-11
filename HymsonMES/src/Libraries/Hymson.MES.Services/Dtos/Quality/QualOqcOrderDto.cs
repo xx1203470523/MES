@@ -283,10 +283,91 @@ namespace Hymson.MES.Services.Dtos.Quality
         
     }
 
-    ///// <summary>
-    ///// OQC执行检验描述数据
-    ///// </summary>
-    //public class QualOqcOrderExecDescriptionDto { 
+    /// <summary>
+    /// 获取OQC单据类型Dto
+    /// </summary>
+    public record QualOqcOrderTypeOutDto {
 
-    //}
+        /// <summary>
+        /// 检验类型
+        /// </summary>
+        public OQCInspectionTypeEnum InspectionType { get; set; }
+
+        /// <summary>
+        /// 样本数量（应检数量）
+        /// </summary>
+        public int SampleQty { get; set; }
+
+        /// <summary>
+        /// 已检数量
+        /// </summary>
+        public int CheckedQty { get; set; }
+    }
+
+    /// <summary>
+    /// 校验样品条码QuqryDto
+    /// </summary>
+    public record CheckBarCodeQuqryDto { 
+
+        /// <summary>
+        /// 样品条码
+        /// </summary>
+        public string? BarCode { get; set; }
+
+        /// <summary>
+        /// 出货单Id
+        /// </summary>
+        public long? ShipmentId { get; set; }
+
+        /// <summary>
+        /// OQC检验单Id
+        /// </summary>
+        public long? InspectionOrderId { get; set;}
+    }
+
+    /// <summary>
+    /// 校验样品条码OutDto
+    /// </summary>
+    public record CheckBarCodeOutDto: BaseEntityDto
+    {
+        /// <summary>
+        /// 样品条码
+        /// </summary>
+        public string? BarCode { get; set; }
+
+        /// <summary>
+        /// 参数编码
+        /// </summary>
+        public string? ParameterCode { get; set; }
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string? ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数单位
+        /// </summary>
+        public string? ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 参数类型
+        /// </summary>
+        public DataTypeEnum? ParameterDataType { get; set; }
+
+        /// <summary>
+        /// 规格上限
+        /// </summary>
+        public decimal? UpperLimit { get; set; }
+
+        /// <summary>
+        /// 参考值
+        /// </summary>
+        public string? ReferenceValue { get; set; }
+
+        /// <summary>
+        /// 规格下限
+        /// </summary>
+        public decimal? LowerLimit { get; set; }
+    }
 }

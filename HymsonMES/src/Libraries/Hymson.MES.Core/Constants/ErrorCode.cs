@@ -1869,6 +1869,9 @@
         public const string MES17800 = "出货单暂无数据!";
         public const string MES17801 = "出货单详情暂无数据!";
         public const string MES17802 = "出货单详情物料,暂无数据!";
+        public const string MES17803 = "样品条码【{barcode}】不存在出货单中！";
+        public const string MES17804 = "检验单数据为空！";
+        public const string MES17805 = "OQC检验参数组明细数据为空！";
 
         #endregion
 
