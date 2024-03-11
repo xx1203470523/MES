@@ -845,7 +845,6 @@ namespace Hymson.MES.Services.Services.Quality
             var supplierEntities = await _whSupplierRepository.GetByIdsAsync(entities.Where(w => w.SupplierId.HasValue).Select(x => x.SupplierId!.Value));
             var supplierDic = supplierEntities.ToDictionary(x => x.Id, x => x);
 
-
             foreach (var entity in entities)
             {
                 var dto = entity.ToModel<QualIqcOrderDto>();
@@ -862,6 +861,22 @@ namespace Hymson.MES.Services.Services.Quality
                     // 收货单
                     var receiptEntity = receiptDic[receiptDetailEntity.MaterialReceiptId];
                     if (receiptEntity != null) dto.ReceiptNum = receiptEntity.ReceiptNum;
+                }
+
+                // 检验人
+                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperationType == OrderOperateTypeEnum.Complete);
+                if (inspectionEntity != null)
+                {
+                    dto.InspectionBy = inspectionEntity.CreatedBy;
+                    dto.InspectionOn = inspectionEntity.CreatedOn;
+                }
+
+                // 处理人
+                var handleEntity = orderOperationEntities.FirstOrDefault(f => f.OperationType == OrderOperateTypeEnum.Close);
+                if (handleEntity != null)
+                {
+                    dto.HandledBy = handleEntity.CreatedBy;
+                    dto.HandledOn = handleEntity.CreatedOn;
                 }
 
                 // TODO 规格型号

@@ -248,6 +248,26 @@ namespace Hymson.MES.Services.Dtos.Quality
         public DateTime? CreatedOn { get; set; }
 
         /// <summary>
+        /// 检验人
+        /// </summary>
+        public string InspectionBy { get; set; }
+
+        /// <summary>
+        /// 检验时间
+        /// </summary>
+        public DateTime? InspectionOn { get; set; }
+
+        /// <summary>
+        /// 处理人
+        /// </summary>
+        public string HandledBy { get; set; }
+
+        /// <summary>
+        /// 处理时间
+        /// </summary>
+        public DateTime? HandledOn { get; set; }
+
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
