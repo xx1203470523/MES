@@ -75,6 +75,9 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public long SiteId { get; set; }
 
-       
+        /// <summary>
+        /// 顺序（正整数，最大值10000）
+        /// </summary>
+        public int Sort { get; set; }
     }
 }
