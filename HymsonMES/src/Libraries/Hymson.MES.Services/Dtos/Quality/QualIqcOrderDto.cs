@@ -6,10 +6,49 @@ using Hymson.MES.Services.Dtos.Integrated;
 namespace Hymson.MES.Services.Dtos.Quality
 {
     /// <summary>
+    /// 附件保存
+    /// </summary>
+    public record QualIqcOrderSaveAttachmentDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+        /// <summary>
+        /// IQC检验单（附件）
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+
+    }
+
+    /// <summary>
+    /// 检验单状态Dto
+    /// </summary>
+    public record QualOrderOperationStatusDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public OrderOperateTypeEnum OperationType { get; set; }
+
+    }
+
+    /// <summary>
     /// iqc检验单新增/更新Dto
     /// </summary>
     public record QualIqcOrderSaveDto : BaseEntityDto
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
         /// <summary>
         /// 检验类型ID
         /// </summary>
@@ -24,6 +63,40 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 样品参数
         /// </summary>
         public IEnumerable<QualIqcOrderParameterSaveDto> Details { get; set; }
+
+    }
+
+    /// <summary>
+    /// 完成Dto
+    /// </summary>
+    public record QualIqcOrderCompleteDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+    }
+
+    /// <summary>
+    /// 完成Dto
+    /// </summary>
+    public record QualIqcOrderCloseDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式
+        /// </summary>
+        public HandMethodEnum? HandMethod { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
 
     }
 
@@ -50,7 +123,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 参数附件
         /// </summary>
-        public IEnumerable<string>? Attachments { get; set; }
+        public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
 
     }
 
@@ -175,6 +248,26 @@ namespace Hymson.MES.Services.Dtos.Quality
         public DateTime? CreatedOn { get; set; }
 
         /// <summary>
+        /// 检验人
+        /// </summary>
+        public string InspectionBy { get; set; }
+
+        /// <summary>
+        /// 检验时间
+        /// </summary>
+        public DateTime? InspectionOn { get; set; }
+
+        /// <summary>
+        /// 处理人
+        /// </summary>
+        public string HandledBy { get; set; }
+
+        /// <summary>
+        /// 处理时间
+        /// </summary>
+        public DateTime? HandledOn { get; set; }
+
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
@@ -189,7 +282,54 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// iqc检验单分页Dto
     /// </summary>
-    public class QualIqcOrderPagedQueryDto : PagerInfo { }
+    public class QualIqcOrderPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 检验单号
+        /// </summary>
+        public string? InspectionOrder { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 供应商编码
+        /// </summary>
+        public string? SupplierCode { get; set; }
+
+        /// <summary>
+        /// 供应商名称
+        /// </summary>
+        public string? SupplierName { get; set; }
+
+        /// <summary>
+        /// 供应商批次
+        /// </summary>
+        public string? SupplierBatch { get; set; }
+
+        /// <summary>
+        /// 内部
+        /// </summary>
+        public string? InternalBatch { get; set; }
+
+        /// <summary>
+        /// 状态;1、待检验2、检验中3、已检验4、已关闭
+        /// </summary>
+        public InspectionStatusEnum? Status { get; set; }
+
+    }
 
     /// <summary>
     /// 生成检验单Dto
@@ -226,7 +366,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检验类型ID
         /// </summary>
-        public long IQCOrderTypeId { get; set; }
+        public long? IQCOrderTypeId { get; set; }
 
         /// <summary>
         /// 样品条码

@@ -10,18 +10,39 @@ namespace Hymson.MES.Services.Services.Quality
     public interface IQualIqcOrderService
     {
         /// <summary>
-        /// 保存样品数据
+        /// 更改检验单状态
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> SaveSampleAsync(QualIqcOrderSaveDto saveDto);
+        Task<int> OperationOrderAsync(QualOrderOperationStatusDto requestDto);
 
         /// <summary>
-        /// 修改
+        /// 保存样品数据
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(QualIqcOrderSaveDto saveDto);
+        Task<int> SaveOrderAsync(QualIqcOrderSaveDto requestDto);
+
+        /// <summary>
+        /// 完成检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto);
+
+        /// <summary>
+        /// 关闭检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> CloseOrderAsync(QualIqcOrderCloseDto requestDto);
+
+        /// <summary>
+        /// 保存检验单附件
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> SaveAttachmentAsync(QualIqcOrderSaveAttachmentDto requestDto);
 
         /// <summary>
         /// 删除检验单附件
@@ -35,7 +56,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] ids);
+        Task<int> DeleteOrdersAsync(long[] ids);
 
         /// <summary>
         /// 根据ID查询

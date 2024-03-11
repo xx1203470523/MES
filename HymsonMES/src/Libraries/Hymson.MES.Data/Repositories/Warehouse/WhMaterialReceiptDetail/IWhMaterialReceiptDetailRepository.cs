@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.WHMaterialReceiptDetail;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.WhMaterialReceiptDetail.Query;
+using Hymson.MES.Data.Repositories.Query;
 
 namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
 {
@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(WHMaterialReceiptDetailEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(WHMaterialReceiptDetailEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -58,13 +58,13 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         /// <param name="id"></param>
         /// <returns></returns>
         Task<WHMaterialReceiptDetailEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
@@ -72,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetEntitiesAsync(WhMaterialReceiptDetailQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

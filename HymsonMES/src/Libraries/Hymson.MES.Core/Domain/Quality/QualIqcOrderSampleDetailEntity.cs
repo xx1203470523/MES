@@ -29,7 +29,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// qual_iqc_inspection_item_detail_snapshot的Id
         /// </summary>
-        public long IQCInspectionSnapshotId { get; set; }
+        public long IQCInspectionDetailSnapshotId { get; set; }
 
         /// <summary>
         /// 检验值

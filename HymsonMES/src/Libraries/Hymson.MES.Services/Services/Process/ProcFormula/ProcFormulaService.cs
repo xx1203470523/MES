@@ -173,11 +173,14 @@ namespace Hymson.MES.Services.Services.Process
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             #region 组装详情数据
+            var sort = 0;
+
             var procFormulaDetailsEntitys = new List<ProcFormulaDetailsEntity>();
             if (saveDto.ProcFormulaDetailsDtos != null)
                 foreach (var (detail, index) in saveDto.ProcFormulaDetailsDtos.Select((value, i) => (value, i)))
                 //foreach (var detail in saveDto.ProcFormulaDetailsDtos)
                 {
+                    sort++;
                     var detailEntity = detail.ToEntity<ProcFormulaDetailsEntity>();
 
                     //校验上下限
@@ -187,6 +190,7 @@ namespace Hymson.MES.Services.Services.Process
                     }
 
                     detailEntity.Id = IdGenProvider.Instance.CreateId();
+                    detailEntity.Sort = sort;
                     detailEntity.CreatedBy = updatedBy;
                     detailEntity.CreatedOn = updatedOn;
                     detailEntity.UpdatedBy = updatedBy;
@@ -287,10 +291,12 @@ namespace Hymson.MES.Services.Services.Process
             #region 组装详情数据
             var procFormulaDetailsEntitys = new List<ProcFormulaDetailsEntity>();
 
+            var sort = 0;
             if (saveDto.ProcFormulaDetailsDtos != null)
                 foreach (var (detail, index) in saveDto.ProcFormulaDetailsDtos.Select((value, i) => (value, i)))
                 //foreach (var detail in saveDto.ProcFormulaDetailsDtos)
                 {
+                    sort++;
                     var detailEntity = detail.ToEntity<ProcFormulaDetailsEntity>();
 
                     //校验上下限
@@ -300,6 +306,7 @@ namespace Hymson.MES.Services.Services.Process
                     }
 
                     detailEntity.Id = IdGenProvider.Instance.CreateId();
+                    detailEntity.Sort = sort;
                     detailEntity.CreatedBy = _currentUser.UserName;
                     detailEntity.CreatedOn = updatedOn;
                     detailEntity.UpdatedBy = _currentUser.UserName;
@@ -491,8 +498,8 @@ namespace Hymson.MES.Services.Services.Process
                 formulaDetailViewDtos.Add(formulaDetailViewDto);
             }
 
-
-            return formulaDetailViewDtos.OrderBy(x => x.Serial).ToList();
+            return formulaDetailViewDtos.ToList();
+            //return formulaDetailViewDtos.OrderBy(x => x.Serial).ToList();
         }
 
 

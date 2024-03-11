@@ -76,7 +76,7 @@ namespace Hymson.MES.Data.Repositories.Process
     {
        const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `proc_product_parameter_group_detail` /**where**/  ";
+                                           FROM `proc_product_parameter_group_detail` /**where**/  ORDER BY Sort";
 
         const string InsertsSql = "INSERT INTO `proc_product_parameter_group_detail`(`Id`, `ParameterGroupId`, `ParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, IsRequired, Sort, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ParameterGroupId, @ParameterId, @UpperLimit, @CenterValue, @LowerLimit, @IsRequired, @Sort, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 

@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,7 +40,16 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
 
-
+        /// <summary>
+        /// 删除检验单附件
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpDelete("attachment/save")]
+        public async Task SaveAttachmentAsync([FromBody] QualIqcOrderSaveAttachmentDto requestDto)
+        {
+            await _qualIqcOrderService.SaveAttachmentAsync(requestDto);
+        }
 
         /// <summary>
         /// 删除检验单附件
@@ -59,10 +69,11 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteAsync([FromBody] long[] ids)
+        public async Task DeleteOrdersAsync([FromBody] long[] ids)
         {
-            await _qualIqcOrderService.DeletesAsync(ids);
+            await _qualIqcOrderService.DeleteOrdersAsync(ids);
         }
+
 
         /// <summary>
         /// 生成IQC检验单
@@ -77,15 +88,49 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 更改检验单状态
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("operation")]
+        public async Task OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
+        {
+            await _qualIqcOrderService.OperationOrderAsync(requestDto);
+        }
+
+        /// <summary>
         /// 保存样品数据
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("save")]
-        public async Task<long> SaveSampleAsync([FromBody] QualIqcOrderSaveDto saveDto)
+        public async Task<long> SaveOrderAsync([FromBody] QualIqcOrderSaveDto requestDto)
         {
-            return await _qualIqcOrderService.SaveSampleAsync(saveDto);
+            return await _qualIqcOrderService.SaveOrderAsync(requestDto);
         }
+
+        /// <summary>
+        /// 完成检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("complete")]
+        public async Task CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
+        {
+            await _qualIqcOrderService.CompleteOrderAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 关闭检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("close")]
+        public async Task CloseOrderAsync(QualIqcOrderCloseDto requestDto)
+        {
+            await _qualIqcOrderService.CloseOrderAsync(requestDto);
+        }
+
 
         /// <summary>
         /// 查询详情（iqc检验单）

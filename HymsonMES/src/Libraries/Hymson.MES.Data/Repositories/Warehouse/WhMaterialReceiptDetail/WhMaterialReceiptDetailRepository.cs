@@ -3,7 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.WHMaterialReceiptDetail;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.WhMaterialReceiptDetail.Query;
+using Hymson.MES.Data.Repositories.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WHMaterialReceiptDetailEntity>(GetByIdsSql, new { Ids = ids });
@@ -116,6 +116,26 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.MaterialReceiptId.HasValue)
+            {
+                sqlBuilder.Where(" MaterialReceiptId = @MaterialReceiptId ");
+            }
+            if (!string.IsNullOrWhiteSpace(query.SupplierBatch))
+            {
+                query.SupplierBatch = $"%{query.SupplierBatch}%";
+                sqlBuilder.Where(" SupplierBatch LIKE @SupplierBatch ");
+            }
+            if (!string.IsNullOrWhiteSpace(query.InternalBatch))
+            {
+                query.InternalBatch = $"%{query.InternalBatch}%";
+                sqlBuilder.Where(" InternalBatch LIKE @InternalBatch ");
+            }
+            sqlBuilder.AddParameters(query);
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WHMaterialReceiptDetailEntity>(template.RawSql, query);
         }

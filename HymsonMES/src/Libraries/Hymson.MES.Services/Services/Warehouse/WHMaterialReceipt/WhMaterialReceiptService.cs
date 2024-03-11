@@ -5,15 +5,14 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.WHMaterialReceipt;
 using Hymson.MES.Core.Domain.WHMaterialReceiptDetail;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.WHMaterialReceipt;
-using Hymson.MES.Data.Repositories.WHMaterialReceipt.Query;
-using Hymson.MES.Services.Dtos.Quality;
+using Hymson.MES.Data.Repositories.WhMaterialReceiptDetail;
 using Hymson.MES.Services.Dtos.WHMaterialReceipt;
 using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 using Hymson.Snowflake;
@@ -48,6 +47,11 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
         private readonly IWhMaterialReceiptRepository _whMaterialReceiptRepository;
 
         /// <summary>
+        /// 仓储接口（物料收货详细表）
+        /// </summary>
+        private readonly IWhMaterialReceiptDetailRepository _whMaterialReceiptDetailRepository;
+
+        /// <summary>
         /// 仓储接口（物料维护）
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
@@ -64,11 +68,13 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="whMaterialReceiptRepository"></param
+        /// <param name="whMaterialReceiptDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="whSupplierRepository"></param>
         public WhMaterialReceiptService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<WhMaterialReceiptSaveDto> validationSaveRules,
             IWhMaterialReceiptRepository whMaterialReceiptRepository,
+            IWhMaterialReceiptDetailRepository whMaterialReceiptDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IWhSupplierRepository whSupplierRepository)
         {
@@ -76,6 +82,7 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _whMaterialReceiptRepository = whMaterialReceiptRepository;
+            _whMaterialReceiptDetailRepository = whMaterialReceiptDetailRepository;
             _procMaterialRepository = procMaterialRepository;
             _whSupplierRepository = whSupplierRepository;
         }
@@ -239,7 +246,11 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
         /// <returns></returns>
         public async Task<IEnumerable<ReceiptMaterialDetailDto>> QueryDetailByReceiptIdAsync(long receiptId)
         {
-            var entities = await _whMaterialReceiptRepository.GetDetailsByReceiptIdAsync(receiptId);
+            var entities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                MaterialReceiptId = receiptId
+            });
 
             // 读取收货单
             var receiptEntities = await _whMaterialReceiptRepository.GetByIdsAsync(entities.Select(x => x.MaterialReceiptId));

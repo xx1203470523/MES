@@ -55,9 +55,9 @@ using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionPatrol.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionTail.View;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
+using Hymson.MES.Data.Repositories.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.MES.Data.Repositories.WHMaterialReceipt.Query;
 using Hymson.MES.Data.Repositories.WhShipment.Query;
 using Hymson.MES.Data.Repositories.WhWareHouse.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
@@ -791,12 +791,12 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region WhShipment
-            CreateMap<WhShipmentSaveDto,WhShipmentEntity>();
+            CreateMap<WhShipmentSaveDto, WhShipmentEntity>();
             CreateMap<WhShipmentEntity, WhShipmentDto>();
             CreateMap<WhShipmentPagedQueryDto, WhShipmentPagedQuery>();
             #endregion
 
- 
+
 
 
             #region WhMaterialReceipt
@@ -916,8 +916,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIqcOrderTypeEntity, QualIqcOrderTypeBaseDto>();
             CreateMap<QualIqcInspectionItemDetailSnapshotEntity, OrderParameterDetailDto>();
             CreateMap<QualIqcOrderSampleDetailEntity, OrderParameterDetailDto>();
+            CreateMap<QualIqcOrderSaveDto, QualIqcOrderSampleQuery>();
             CreateMap<OrderParameterDetailQueryDto, QualIqcOrderSampleQuery>();
-
 
             #region QualIqcInspectionItem
 
