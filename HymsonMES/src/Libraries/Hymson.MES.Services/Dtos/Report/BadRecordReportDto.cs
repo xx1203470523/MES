@@ -235,6 +235,11 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 录入时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get;set; }
     }
 
 }

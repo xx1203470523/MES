@@ -119,34 +119,42 @@ public partial class NgRecordReportRepository
         {
             sqlBuilder.Where("mss.SFC = @SFC");
         }
+
         if (query.EquipmentId != null)
         {
             sqlBuilder.Where("mss.EquipmentId = @EquipmentId");
         }
+
         if (query.EquipmentIds?.Any() == true)
         {
             sqlBuilder.Where("mss.EquipmentId IN @EquipmentIds");
         }
+
         if (query.ProcedureId?.Any() == true)
         {
             sqlBuilder.Where("mss.ProcedureId IN @ProcedureIds");
         }
+
         if (query.ResourceId != null)
         {
             sqlBuilder.Where("mss.ResourceId = @ResourceId");
         }
+
         if (query.ResourceIds?.Any() == true)
         {
             sqlBuilder.Where("mss.ResourceId IN @ResourceIds");
         }
+
         if (query.BeginTime != null)
         {
-            sqlBuilder.Where($"mss.EndTime < '{query.BeginTime?.ToString("yyyy-MM-dd")}'");
+            sqlBuilder.Where($"mss.EndTime >= '{query.BeginTime?.ToString("yyyy-MM-dd")}'");
         }
+
         if (query.EndTime != null)
         {
             sqlBuilder.Where($"mss.EndTime < '{query.EndTime?.ToString("yyyy-MM-dd")}'");
         }
+
         if (query.QualityStatus != null)
         {
             sqlBuilder.Where("mss.QualityStatus = @QualityStatus");

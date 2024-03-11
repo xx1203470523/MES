@@ -511,7 +511,7 @@ public partial class QualUnqualifiedCodeRepository
 
         if (query.UnqualifiedCodes?.Any() == true)
         {
-            sqlBuilder.Where("UnqualifiedCode IN @UnqualifiedCode");
+            sqlBuilder.Where("UnqualifiedCode IN @UnqualifiedCodes");
         }
 
         if (!string.IsNullOrWhiteSpace(query.UnqualifiedCodeLike))

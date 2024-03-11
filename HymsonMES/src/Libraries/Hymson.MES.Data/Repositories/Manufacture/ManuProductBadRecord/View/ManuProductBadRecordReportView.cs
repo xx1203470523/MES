@@ -73,5 +73,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 数量
         /// </summary>
         public decimal Qty { get;set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
     }
 }

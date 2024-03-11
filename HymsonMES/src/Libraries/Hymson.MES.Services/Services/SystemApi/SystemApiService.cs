@@ -1,4 +1,5 @@
 ﻿using Hymson.Authentication;
+using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
@@ -25,6 +26,9 @@ public class SystemApiService : ISystemApiService
 {
     private readonly ICurrentUser _currentUser;
 
+    private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+    private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
     private readonly IProcProcedureRepository _procProcedureRepository;
     private readonly IProcProcedurePlanRepository _procProcedurePlanRepository;
     private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
@@ -50,6 +54,8 @@ public class SystemApiService : ISystemApiService
 
 
     public SystemApiService(ICurrentUser currentUser,
+        IManuSfcInfoRepository manuSfcInfoRepository,
+        IManuSfcStepRepository manuSfcStepRepository,
         IProcProcedureRepository procProcedureRepository,
         IProcProcedurePlanRepository procProcedurePlanRepository,
         IPlanWorkOrderRepository planWorkOrderRepository,
@@ -72,6 +78,8 @@ public class SystemApiService : ISystemApiService
         )
     {
         _currentUser = currentUser;
+        _manuSfcInfoRepository = manuSfcInfoRepository;
+        _manuSfcStepRepository = manuSfcStepRepository;
         _equStatusRepository = equipmentStatusRepository;
         _procProcedureRepository = procProcedureRepository;
         _procProcedurePlanRepository = procProcedurePlanRepository;
@@ -134,11 +142,11 @@ public class SystemApiService : ISystemApiService
         if (HymsonClock.Now() < startDate)
         {
             startDate = DateTime.Parse(startDate.AddDays(-1).ToString("yyyy-MM-dd 18:30:00"));
-            endDate = DateTime.Parse(endDate.AddDays(-1).ToString("yyyy-MM-dd 08:30:00"));
+            endDate = DateTime.Parse(endDate.ToString("yyyy-MM-dd 08:30:00"));
         }
         else if (HymsonClock.Now() > endDate)
         {
-            startDate = DateTime.Parse(startDate.AddDays(1).ToString("yyyy-MM-dd 18:30:00"));
+            startDate = DateTime.Parse(startDate.ToString("yyyy-MM-dd 18:30:00"));
             endDate = DateTime.Parse(endDate.AddDays(1).ToString("yyyy-MM-dd 08:30:00"));
         }
 
@@ -429,13 +437,16 @@ public class SystemApiService : ISystemApiService
             endDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
         }
 
+        if (planWorkOrderIds?.Any() == false) planWorkOrderIds = new long[] { -1 };
+
         var procedureIds = ProcedureEntities.Select(a => a.Id).ToArray();
         var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new()
         {
             StartTime = startDate,
             EndTime = endDate,
             ProcedureIds = procedureIds,
-            ProductIds = productIds
+            ProductIds = productIds,
+            WorkOrderIds = planWorkOrderIds
         });
 
         //电芯段一次合格率
@@ -498,12 +509,16 @@ public class SystemApiService : ISystemApiService
         endDate = DateTime.Parse(nowDate.AddMonths(1).ToString("yyyy-MM-01 08:30:00"));
 
         var procedureIds = ProcedureEntities.Select(a => a.Id).ToArray();
+
+        if (planWorkOrderIds?.Any() == false) planWorkOrderIds = new long[] { -1 };
+
         var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new()
         {
             StartTime = startDate,
             EndTime = endDate,
             ProcedureIds = procedureIds,
-            ProductIds = productIds
+            ProductIds = productIds,
+            WorkOrderIds = planWorkOrderIds
         });
 
 
@@ -513,7 +528,7 @@ public class SystemApiService : ISystemApiService
             {
                 var procedure = ProcedureEntities.Where(a => a.Code == item).FirstOrDefault();
                 var summary = manuSfcSummaryEntities.Where(a => a.ProcedureId == procedure?.Id
-                && endDate >= startDate && endDate <= startDate.AddDays(1));
+                && a.EndTime >= startDate && a.EndTime <= startDate.AddDays(1));
 
                 var outputQty = summary.Sum(a => a.Qty);
                 var oneQuanlifiedQty = summary.Sum(a => a.FirstQualityStatus);
@@ -528,8 +543,10 @@ public class SystemApiService : ISystemApiService
                         "OP170" => "Pack段",
                         _ => ""
                     },
-                    OneQualifiedRate = oneQuanlifiedQty / outputQty
+                    OneQualifiedRate = oneQuanlifiedQty / (outputQty == 0 ? 1 : outputQty)
                 };
+
+                result.Add(newitem);
             }
 
 
@@ -613,8 +630,19 @@ public class SystemApiService : ISystemApiService
         var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetListAsync(new()
         {
             CreatedOnStart = startDate,
-            CreatedOnEnd = endDate
+            CreatedOnEnd = endDate,
+            FoundBadOperationId = procedureEntity?.Id
         });
+
+        //获取SfcInfo，再根据workOrderId筛选
+        var manuSfcInfoIds = manuProductBadRecordEntities.Select(a => a.SfcInfoId.GetValueOrDefault());
+        var sfcinfoEntities = await _manuSfcInfoRepository.GetByIdsAsync(manuSfcInfoIds.ToArray());
+        sfcinfoEntities = sfcinfoEntities.Where(a => planWorkOrderEntities.Any(b => b.Id == a.WorkOrderId));
+
+        //获取manuStep，根据workorderId筛选
+        var manuSfcStepIds = manuSfcStepNgEntities.Select(a => a.BarCodeStepId);
+        var manuSfcStepEntities = await _manuSfcStepRepository.GetByIdsAsync(manuSfcStepIds.ToArray());
+        manuSfcStepEntities = manuSfcStepEntities.Where(a => planWorkOrderEntities.Any(b => b.Id == a.WorkOrderId) && a.ProcedureId == procedureEntity?.Id );
 
         List<QualUnqualifiedCodeEntity> unQualifiedList = new();
         var unQualifiedCodes = manuSfcStepNgEntities.Select(a => a.UnqualifiedCode);
@@ -626,6 +654,9 @@ public class SystemApiService : ISystemApiService
 
         foreach (var item in manuSfcStepNgEntities)
         {
+            var manuSfcStepEntity = manuSfcStepEntities.FirstOrDefault(a=>a.Id == item.BarCodeStepId);
+            if (manuSfcStepEntity == null) continue;
+
             var unQualifiedEntity = unQualifiedEntities.FirstOrDefault(a => a.UnqualifiedCode == item.UnqualifiedCode);
 
             var unQualifiedItem = result.FirstOrDefault(a => a.UnQualifiedName == unQualifiedEntity?.UnqualifiedCodeName);
@@ -636,6 +667,9 @@ public class SystemApiService : ISystemApiService
 
         foreach (var item in manuProductBadRecordEntities)
         {
+            var manuSfcInfo = sfcinfoEntities.FirstOrDefault(a => a.Id == item.SfcInfoId);
+            if (manuSfcInfo == null) continue;
+
             var unQualifiedEntity = unQualifiedEntities.FirstOrDefault(a => a.Id == item.UnqualifiedId);
 
             var unQualifiedItem = result.FirstOrDefault(a => a.UnQualifiedName == unQualifiedEntity?.UnqualifiedCodeName);
@@ -686,6 +720,8 @@ public class SystemApiService : ISystemApiService
             startDate = DateTime.Parse(nowDate.AddDays(-1).ToString("yyyy-MM-dd 08:30:00"));
             endDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
         }
+
+        if (planWorkOrderIds?.Any() == false) planWorkOrderIds = new long[] { -1 };
 
         var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new()
         {
@@ -758,6 +794,8 @@ public class SystemApiService : ISystemApiService
 
         startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-01 08:30:00"));
         endDate = DateTime.Parse(nowDate.AddMonths(1).ToString("yyyy-MM-01 08:30:00"));
+
+        if (planWorkOrderIds?.Any() == false) planWorkOrderIds = new long[] { -1 };
 
         var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new()
         {
@@ -941,7 +979,7 @@ public class SystemApiService : ISystemApiService
 
         if (queryDto.DateType == DateTypeEnum.Month)
         {
-            startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-01 08:30:00")).AddYears(-1);
+            startDate = DateTime.Parse(nowDate.ToString("yyyy-01-01 08:30:00")).AddYears(-1);
             endDate = DateTime.Parse(nowDate.AddMonths(1).ToString("yyyy-01-01 08:30:00"));
             searchEndDate = startDate.AddMonths(1);
         }
@@ -994,7 +1032,7 @@ public class SystemApiService : ISystemApiService
             result.Add(new()
             {
                 EndTime = queryDto.DateType switch { DateTypeEnum.Day => startDate.Day.ToString(), DateTypeEnum.Month => startDate.Month.ToString() + "月", _ => "" },
-                OEE = ((equPlanWorkTime - DurationTime) / equPlanWorkTime) * qualifiedQty / outputQty
+                OEE = ((equPlanWorkTime - DurationTime) / (equPlanWorkTime == 0 ? 1 : equPlanWorkTime)) * qualifiedQty / (outputQty == 0 ? 1 : outputQty)
             });
 
             if (queryDto.DateType == DateTypeEnum.Day)

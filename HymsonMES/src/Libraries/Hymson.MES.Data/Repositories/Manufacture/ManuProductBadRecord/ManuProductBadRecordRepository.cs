@@ -310,7 +310,7 @@ public partial class ManuProductBadRecordRepository : BaseRepository, IManuProdu
         if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length >= 2)
         {
                 sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
-                sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart rbr.CreatedOn < @CreatedOnEnd ");
+                sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart and rbr.CreatedOn < @CreatedOnEnd ");
         }
 
         var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
@@ -577,8 +577,8 @@ public partial class ManuProductBadRecordRepository
                         rbr.`Status` as BadRecordStatus,
                         rbr.Qty,
                         rbr.CreatedBy,
-                        rbr.CreatedOn
-                
+                        rbr.CreatedOn,
+                        rbr.Remark
                 FROM manu_product_bad_record rbr
                 LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
                 LEFT JOIN proc_resource r on r.id=rbr.FoundBadResourceId  -- 为了查询资源
