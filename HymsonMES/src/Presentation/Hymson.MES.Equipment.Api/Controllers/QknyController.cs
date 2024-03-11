@@ -302,9 +302,22 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("上料呼叫Agv012", BusinessType.OTHER, "AgvUpMaterial012", ReceiverTypeEnum.MES)]
         public async Task AgvUpMaterialAsync(AgvUpMaterialDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            AgvMaterialDto agvDto = new AgvMaterialDto();
+            agvDto.EquipmentCode = dto.EquipmentCode;
+            agvDto.ResourceCode = dto.ResourceCode;
+            agvDto.LocalTime = dto.LocalTime;
+            agvDto.Type = "1";
+            agvDto.Content = string.Empty;
+            await _qknyService.AgvMaterialAsync(agvDto);
+
             //TODO
             //1. 针对涂布，辊分，模切，卷绕设备进行上料时，通过MES呼叫AGV，给AGV发一个任务
-            //2. 调用AGV接口，添加agv_task_record记录表进行记录，表中有字段区分上料还是下料
+            //2. 调用AGV接口，添加 agv_task_record 记录表进行记录，表中有字段区分上料还是下料
         }
 
         /// <summary>
@@ -317,6 +330,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("下料呼叫Agv013", BusinessType.OTHER, "AgvDownMaterial013", ReceiverTypeEnum.MES)]
         public async Task AgvDownMaterialAsync(AgvUpMaterialDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            AgvMaterialDto agvDto = new AgvMaterialDto();
+            agvDto.EquipmentCode = dto.EquipmentCode;
+            agvDto.ResourceCode = dto.ResourceCode;
+            agvDto.LocalTime = dto.LocalTime;
+            agvDto.Type = "2";
+            agvDto.Content = string.Empty;
+            await _qknyService.AgvMaterialAsync(agvDto);
+
             //TODO
             //1. 针对涂布，辊分，模切，卷绕设备进行下料时，通过MES呼叫AGV，给AGV发一个任务
             //2. 调用AGV接口，添加agv_task_record记录表进行记录，表中有字段区分上料还是下料

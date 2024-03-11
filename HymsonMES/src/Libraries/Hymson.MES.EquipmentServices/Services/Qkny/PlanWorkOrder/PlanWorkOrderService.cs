@@ -53,8 +53,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
             //2. 查询激活工单
             orderList = orderList.Where(m => m.Status == PlanWorkOrderStatusEnum.InProduction).ToList(); //激活后会变成生产中
             List<long> orderIdList = orderList.Select(m => m.Id).ToList();
-            var activeList = await _planWorkOrderActivationRepository.GetByIdsAsync(orderIdList.ToArray());
-            if(activeList == null || activeList.Any() != false)
+            var activeList = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(orderIdList.ToArray());
+            if(activeList == null || activeList.Any() == false)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45030));
             }

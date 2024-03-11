@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.AgvTaskRecord;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Qkny;
@@ -18,18 +19,21 @@ using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
 using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
+using Hymson.MES.Services.Dtos.AgvTaskRecord;
 using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
 using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
+using Hymson.MES.Services.Services.AgvTaskRecord;
 using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Services.EquEquipmentAlarm;
 using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
+using Hymson.MessagePush.Helper;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -119,6 +123,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IProcLoadPointLinkResourceRepository _procLoadPointLinkResourceRepository;
 
         /// <summary>
+        /// AGV任务记录
+        /// </summary>
+        private readonly IAgvTaskRecordService _agvTaskRecordService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -134,6 +143,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IManuFeedingService manuFeedingService,
             IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository,
+            IAgvTaskRecordService agvTaskRecordService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -149,6 +159,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _whMaterialInventoryRepository = whMaterialInventoryRepository; 
             _manuFeedingService = manuFeedingService;
             _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
+            _agvTaskRecordService = agvTaskRecordService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -463,6 +474,34 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             //2. 添加上料表信息 manu_feeding
             //3. 添加上料记录表信息 manu_feeding_record
             //4. 参考物料加载逻辑 ManuFeedingService.CreateAsync
+        }
+
+        /// <summary>
+        /// AGV叫料
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task AgvMaterialAsync(AgvMaterialDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 校验设备是否激活工单
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //3. 调用AGV接口
+            var result = ""; //await HttpHelper.HttpPostAsync("", dto.Content, "");
+            //4. 存储数据
+            AgvTaskRecordSaveDto saveDto = new AgvTaskRecordSaveDto();
+            saveDto.Id = IdGenProvider.Instance.CreateId();
+            saveDto.SiteId = equResModel.SiteId;
+            saveDto.EquipmentId = equResModel.EquipmentId;
+            saveDto.SendContent = dto.Content;
+            saveDto.TaskType = dto.Type;
+            saveDto.ReceiveContent = result;
+            saveDto.CreatedOn = HymsonClock.Now();
+            saveDto.CreatedBy = dto.EquipmentCode;
+            saveDto.UpdatedOn = saveDto.CreatedOn;
+            saveDto.UpdatedBy = saveDto.CreatedBy;
+            await _agvTaskRecordService.AddAsync(saveDto);
         }
 
         /// <summary>
