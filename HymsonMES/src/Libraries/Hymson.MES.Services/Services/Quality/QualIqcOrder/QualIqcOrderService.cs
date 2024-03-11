@@ -384,6 +384,18 @@ namespace Hymson.MES.Services.Services.Quality
 
             // TODO 只有检验中的状态才允许"完成"
 
+            /*
+            // 检查每种类型是否已经录入
+            var orderTypeEntities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(entity.Id);
+            if (orderTypeEntities.Any(a => a.SampleQty > a.CheckedQty))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19908))
+                    .WithData("Type", "")
+                    .WithData("CheckedQty", "")
+                    .WithData("SampleQty", "");
+            }
+            */
+
             // 检查类型是否已经存在
             var operationType = OrderOperateTypeEnum.Complete;
             var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
