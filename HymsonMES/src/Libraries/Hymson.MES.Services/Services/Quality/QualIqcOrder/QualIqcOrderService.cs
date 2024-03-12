@@ -869,6 +869,20 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderSampleDetailPagedQuery>();
             pagedQuery.SiteId = entity.SiteId;
 
+            // 转换产品编码/版本变为产品ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.Barcode))
+            {
+                // 查询检验单下面的所有样本
+                var sampleEntities = await _qualIqcOrderSampleRepository.GetEntitiesAsync(new QualIqcOrderSampleQuery
+                {
+                    SiteId = entity.SiteId,
+                    IQCOrderId = entity.Id,
+                    Barcode = pagedQueryDto.Barcode
+                });
+                if (sampleEntities != null && sampleEntities.Any()) pagedQuery.IQCOrderSampleIds = sampleEntities.Select(s => s.Id);
+                else pagedQuery.IQCOrderSampleIds = Array.Empty<long>();
+            }
+
             // 查询数据
             var pagedInfo = await _qualIqcOrderSampleDetailRepository.GetPagedListAsync(pagedQuery);
 
@@ -1000,14 +1014,6 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         private async Task<IEnumerable<OrderParameterDetailDto>> PrepareSampleDetailDtos(QualIqcOrderEntity entity, IEnumerable<QualIqcOrderSampleDetailEntity> sampleDetailEntities)
         {
-            // 查询检验单下面的所有样本
-            var sampleEntities = await _qualIqcOrderSampleRepository.GetEntitiesAsync(new QualIqcOrderSampleQuery
-            {
-                SiteId = entity.SiteId,
-                IQCOrderId = entity.Id,
-            });
-            if (sampleEntities == null) return Array.Empty<OrderParameterDetailDto>();
-
             // 查询样品明细对应的快照明细
             var snapshotDetailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetByIdsAsync(sampleDetailEntities.Select(s => s.IQCInspectionDetailSnapshotId));
 
@@ -1017,6 +1023,9 @@ namespace Hymson.MES.Services.Services.Quality
                 SiteId = entity.SiteId,
                 IQCOrderId = entity.Id
             });
+
+            // 所有样品明细对应的样品集合
+            var sampleEntities = await _qualIqcOrderSampleRepository.GetByIdsAsync(sampleDetailEntities.Select(s => s.IQCOrderSampleId));
 
             // 附件集合
             Dictionary<long, IGrouping<long, QualIqcOrderSampleDetailAnnexEntity>> sampleAttachmentDic = new();

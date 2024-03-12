@@ -148,6 +148,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("IQCOrderId = @IQCOrderId");
             }
+            if (pagedQuery.IQCOrderSampleIds != null) sqlBuilder.Where(" IQCOrderSampleId IN @IQCOrderSampleIds ");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
