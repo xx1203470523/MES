@@ -39,7 +39,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 检验数量
         /// </summary>
-        public int? CheckedQty { get; set; }
+        public int CheckedQty { get; set; }
 
         /// <summary>
         /// 备注

@@ -276,8 +276,8 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // TODO 更新检验单类型数量
-            //orderTypeEntity.CheckedQty
+            // 更新检验单类型数量（也可以用乐观锁）
+            orderTypeEntity.CheckedQty += 1;
 
             // 样本
             var sampleId = IdGenProvider.Instance.CreateId();
@@ -360,6 +360,7 @@ namespace Hymson.MES.Services.Services.Quality
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
                 rows += await _qualIqcOrderSampleDetailAnnexRepository.InsertRangeAsync(sampleDetailAttachmentEntities);
             }
+            rows += await _qualIqcOrderTypeRepository.UpdateAsync(orderTypeEntity);
             trans.Complete();
             return rows;
         }
@@ -392,12 +393,15 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 检查每种类型是否已经录入足够
             var orderTypeEntities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(entity.Id);
-            if (orderTypeEntities.Any(a => a.SampleQty > a.CheckedQty))
+
+            // 读取一个未录入完整的类型
+            var orderTypeEntity = orderTypeEntities.FirstOrDefault(f => f.SampleQty > f.CheckedQty);
+            if (orderTypeEntity != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19908))
-                    .WithData("Type", "")
-                    .WithData("CheckedQty", "")
-                    .WithData("SampleQty", "");
+                    .WithData("Type", orderTypeEntity.Type.GetDescription())
+                    .WithData("CheckedQty", orderTypeEntity.CheckedQty)
+                    .WithData("SampleQty", orderTypeEntity.SampleQty);
             }
 
             // 检查类型是否已经存在
