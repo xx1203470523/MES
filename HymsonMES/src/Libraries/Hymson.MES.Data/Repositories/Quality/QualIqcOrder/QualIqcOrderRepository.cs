@@ -48,8 +48,15 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> UpdateAsync(QualIqcOrderEntity entity)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, entity);
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(UpdateSql, entity);
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
         }
 
         /// <summary>
@@ -170,11 +177,11 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_iqc_order(  `Id`, `SiteId`, `InspectionOrder`, `MaterialId`, `SupplierId`, `IqcInspectionItemId`, `MaterialReceiptDetailId`, AcceptanceLevel, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialId, @SupplierId, @IqcInspectionItemId, @MaterialReceiptDetailId, @AcceptanceLevel, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_iqc_order(  `Id`, `SiteId`, `InspectionOrder`, `MaterialId`, `SupplierId`, `IqcInspectionItemId`, `MaterialReceiptDetailId`, AcceptanceLevel, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialId, @SupplierId, @IqcInspectionItemId, @MaterialReceiptDetailId, @AcceptanceLevel, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_iqc_order(  `Id`, `SiteId`, `InspectionOrder`, `MaterialId`, `SupplierId`, `IqcInspectionItemSnapshotId`, `MaterialReceiptDetailId`, AcceptanceLevel, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialId, @SupplierId, @IqcInspectionItemSnapshotId, @MaterialReceiptDetailId, @AcceptanceLevel, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_iqc_order(  `Id`, `SiteId`, `InspectionOrder`, `MaterialId`, `SupplierId`, `IqcInspectionItemSnapshotId`, `MaterialReceiptDetailId`, AcceptanceLevel, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialId, @SupplierId, @IqcInspectionItemSnapshotId, @MaterialReceiptDetailId, @AcceptanceLevel, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_iqc_order SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, MaterialId = @MaterialId, SupplierId = @SupplierId, IqcInspectionItemId = @IqcInspectionItemId, MaterialReceiptDetailId = @MaterialReceiptDetailId, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_iqc_order SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, MaterialId = @MaterialId, SupplierId = @SupplierId, IqcInspectionItemId = @IqcInspectionItemId, MaterialReceiptDetailId = @MaterialReceiptDetailId, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_iqc_order SET SiteId = @SiteId, InspectionOrder = @InspectionOrder, MaterialId = @MaterialId, SupplierId = @SupplierId, IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId, MaterialReceiptDetailId = @MaterialReceiptDetailId, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_iqc_order SET SiteId = @SiteId, InspectionOrder = @InspectionOrder, MaterialId = @MaterialId, SupplierId = @SupplierId, IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId, MaterialReceiptDetailId = @MaterialReceiptDetailId, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_iqc_order SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_iqc_order SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
