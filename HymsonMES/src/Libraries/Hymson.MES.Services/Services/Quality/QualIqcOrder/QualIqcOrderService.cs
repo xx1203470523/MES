@@ -1,3 +1,4 @@
+using Elastic.Transport;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -758,7 +759,7 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedInfo = await _qualIqcOrderRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = await PrepareDtos(pagedInfo.Data);
+            var dtos = await PrepareOrderDtos(pagedInfo.Data);
             return new PagedInfo<QualIqcOrderDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -840,12 +841,6 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId);
             if (entity == null) return Array.Empty<OrderParameterDetailDto>();
 
-            // 查询检验单下面的所有样本
-            var sampleQuery = requestDto.ToQuery<QualIqcOrderSampleQuery>();
-            sampleQuery.SiteId = entity.SiteId;
-            var sampleEntities = await _qualIqcOrderSampleRepository.GetEntitiesAsync(sampleQuery);
-            if (sampleEntities == null) return Array.Empty<OrderParameterDetailDto>();
-
             // 查询检验单下面的所有样本明细
             var sampleDetailEntities = await _qualIqcOrderSampleDetailRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailQuery
             {
@@ -854,50 +849,7 @@ namespace Hymson.MES.Services.Services.Quality
             });
             if (sampleDetailEntities == null) return Array.Empty<OrderParameterDetailDto>();
 
-            // 查询样品明细对应的快照明细
-            var snapshotDetailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetByIdsAsync(sampleDetailEntities.Select(s => s.IQCInspectionDetailSnapshotId));
-
-            // 查询检验单下面的所有样本附件
-            var sampleAttachmentEntities = await _qualIqcOrderSampleDetailAnnexRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailAnnexQuery
-            {
-                SiteId = entity.SiteId,
-                IQCOrderId = entity.Id
-            });
-
-            // 附件集合
-            Dictionary<long, IGrouping<long, QualIqcOrderSampleDetailAnnexEntity>> sampleAttachmentDic = new();
-            IEnumerable<InteAttachmentEntity> attachmentEntities = Array.Empty<InteAttachmentEntity>();
-            if (sampleAttachmentEntities.Any())
-            {
-                sampleAttachmentDic = sampleAttachmentEntities.ToLookup(w => w.IQCOrderSampleDetailId).ToDictionary(d => d.Key, d => d);
-                attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(sampleAttachmentEntities.Select(s => s.AnnexId));
-            }
-
-            List<OrderParameterDetailDto> dtos = new();
-            foreach (var sampleDetailEntity in sampleDetailEntities)
-            {
-                // 快照数据
-                var snapshotDetailEntity = snapshotDetailEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCInspectionDetailSnapshotId);
-                if (snapshotDetailEntity == null) continue;
-
-                var dto = snapshotDetailEntity.ToModel<OrderParameterDetailDto>();
-                dto.Id = sampleDetailEntity.Id;
-
-                // 填充条码
-                var sampleEntity = sampleEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCOrderSampleId);
-                if (sampleEntity == null) continue;
-                dto.Barcode = sampleEntity.Barcode;
-
-                // 填充附件
-                if (attachmentEntities != null && sampleAttachmentDic.TryGetValue(sampleDetailEntity.Id, out var detailAttachmentEntities))
-                {
-                    dto.Attachments = PrepareAttachmentBaseDtos(detailAttachmentEntities, attachmentEntities);
-                }
-
-                dtos.Add(dto);
-            }
-
-            return dtos;
+            return await PrepareSampleDetailDtos(entity, sampleDetailEntities);
         }
 
         /// <summary>
@@ -907,19 +859,22 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<PagedInfo<OrderParameterDetailDto>> QueryDetailSamplePagedListAsync(OrderParameterDetailPagedQueryDto pagedQueryDto)
         {
-            /*
-            var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            // 初始化集合
+            var defaultResult = new PagedInfo<OrderParameterDetailDto>(Array.Empty<OrderParameterDetailDto>(), pagedQueryDto.PageIndex, pagedQueryDto.PageSize, 0);
+
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(pagedQueryDto.IQCOrderId);
+            if (entity == null) return defaultResult;
+
+            // 查询检验单下面的所有样本       
+            var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderSampleDetailPagedQuery>();
+            pagedQuery.SiteId = entity.SiteId;
 
             // 查询数据
-            var pagedInfo = await _qualIqcOrderRepository.GetPagedListAsync(pagedQuery);
+            var pagedInfo = await _qualIqcOrderSampleDetailRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = await PrepareDtos(pagedInfo.Data);
-            return new PagedInfo<QualIqcOrderDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-            */
-
-            return await Task.FromResult<PagedInfo<OrderParameterDetailDto>>(default);
+            var dtos = await PrepareSampleDetailDtos(entity, pagedInfo.Data);
+            return new PagedInfo<OrderParameterDetailDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
 
@@ -930,7 +885,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<QualIqcOrderDto>> PrepareDtos(IEnumerable<QualIqcOrderEntity> entities)
+        private async Task<IEnumerable<QualIqcOrderDto>> PrepareOrderDtos(IEnumerable<QualIqcOrderEntity> entities)
         {
             List<QualIqcOrderDto> dtos = new();
 
@@ -1029,6 +984,68 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     dto.SupplierCode = "-";
                     dto.SupplierName = "-";
+                }
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+
+        /// <summary>
+        /// 转换为Dto对象
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="sampleDetailEntities"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<OrderParameterDetailDto>> PrepareSampleDetailDtos(QualIqcOrderEntity entity, IEnumerable<QualIqcOrderSampleDetailEntity> sampleDetailEntities)
+        {
+            // 查询检验单下面的所有样本
+            var sampleEntities = await _qualIqcOrderSampleRepository.GetEntitiesAsync(new QualIqcOrderSampleQuery
+            {
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id,
+            });
+            if (sampleEntities == null) return Array.Empty<OrderParameterDetailDto>();
+
+            // 查询样品明细对应的快照明细
+            var snapshotDetailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetByIdsAsync(sampleDetailEntities.Select(s => s.IQCInspectionDetailSnapshotId));
+
+            // 查询检验单下面的所有样本附件
+            var sampleAttachmentEntities = await _qualIqcOrderSampleDetailAnnexRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailAnnexQuery
+            {
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id
+            });
+
+            // 附件集合
+            Dictionary<long, IGrouping<long, QualIqcOrderSampleDetailAnnexEntity>> sampleAttachmentDic = new();
+            IEnumerable<InteAttachmentEntity> attachmentEntities = Array.Empty<InteAttachmentEntity>();
+            if (sampleAttachmentEntities.Any())
+            {
+                sampleAttachmentDic = sampleAttachmentEntities.ToLookup(w => w.IQCOrderSampleDetailId).ToDictionary(d => d.Key, d => d);
+                attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(sampleAttachmentEntities.Select(s => s.AnnexId));
+            }
+
+            List<OrderParameterDetailDto> dtos = new();
+            foreach (var sampleDetailEntity in sampleDetailEntities)
+            {
+                // 快照数据
+                var snapshotDetailEntity = snapshotDetailEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCInspectionDetailSnapshotId);
+                if (snapshotDetailEntity == null) continue;
+
+                var dto = snapshotDetailEntity.ToModel<OrderParameterDetailDto>();
+                dto.Id = sampleDetailEntity.Id;
+
+                // 填充条码
+                var sampleEntity = sampleEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCOrderSampleId);
+                if (sampleEntity == null) continue;
+                dto.Barcode = sampleEntity.Barcode;
+
+                // 填充附件
+                if (attachmentEntities != null && sampleAttachmentDic.TryGetValue(sampleDetailEntity.Id, out var detailAttachmentEntities))
+                {
+                    dto.Attachments = PrepareAttachmentBaseDtos(detailAttachmentEntities, attachmentEntities);
                 }
 
                 dtos.Add(dto);
