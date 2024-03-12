@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
 
 namespace Hymson.MES.Services.Services.Quality
@@ -8,19 +9,21 @@ namespace Hymson.MES.Services.Services.Quality
     /// </summary>
     public interface IQualOqcParameterGroupService
     {
+        Task<QualOqcParameterGroupOutputDto> GetOneAsync(QualOqcParameterGroupQueryDto queryDto);
+
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(QualOqcParameterGroupSaveDto saveDto);
+        Task CreateAsync(QualOqcParameterGroupDto createDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="updateDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(QualOqcParameterGroupSaveDto saveDto);
+        Task ModifyAsync(QualOqcParameterGroupUpdateDto updateDto);
 
         /// <summary>
         /// 删除
@@ -49,6 +52,20 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<QualOqcParameterGroupDto>> GetPagedListAsync(QualOqcParameterGroupPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        ///分页查询-包含参数明细
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<QualOqcParameterGroupOutputDto>> GetPagedAsync(QualOqcParameterGroupPagedQueryDto queryDto);
+
+        /// <summary>
+        /// 删除OQC检验项目
+        /// </summary>
+        /// <param name="deleteDto"></param>
+        /// <returns></returns>
+        Task DeleteAsync(QualOqcParameterGroupDeleteDto deleteDto);
 
     }
 }

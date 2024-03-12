@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Qual;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Qual;
 using Hymson.MES.Data.Repositories.Quality.Query;
 
 namespace Hymson.MES.Data.Repositories.Quality
@@ -8,8 +10,15 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// <summary>
     /// 仓储接口（OQC检验参数组）
     /// </summary>
-    public interface IQualOqcParameterGroupRepository
+    public partial interface IQualOqcParameterGroupRepository
     {
+        /// <summary>
+        /// 单条数据查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+
+        Task<QualOqcParameterGroupEntity> GetOneAsync(QualOqcParameterGroupToQuery query);
         /// <summary>
         /// 新增
         /// </summary>
