@@ -276,9 +276,6 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // 更新检验单类型数量（也可以用乐观锁）
-            orderTypeEntity.CheckedQty += 1;
-
             // 样本
             var sampleId = IdGenProvider.Instance.CreateId();
             var sampleEntity = new QualIqcOrderSampleEntity
@@ -288,6 +285,7 @@ namespace Hymson.MES.Services.Services.Quality
                 IQCOrderId = entity.Id,
                 IQCOrderTypeId = orderTypeEntity.Id,
                 Barcode = requestDto.Barcode,
+                IsQualified = TrueOrFalseEnum.Yes,  // 默认合格
                 CreatedBy = updatedBy,
                 CreatedOn = updatedOn,
                 UpdatedBy = updatedBy,
@@ -316,6 +314,7 @@ namespace Hymson.MES.Services.Services.Quality
                     UpdatedOn = updatedOn
                 });
 
+                // 样本附件
                 if (item.Attachments != null && item.Attachments.Any())
                 {
                     foreach (var attachment in item.Attachments)
@@ -349,6 +348,9 @@ namespace Hymson.MES.Services.Services.Quality
                     }
                 }
             }
+
+            // 检查是否不合格
+            if (sampleDetailEntities.Count(a => a.IsQualified == TrueOrFalseEnum.No) >= orderTypeEntity.AcceptanceLevel) sampleEntity.IsQualified = TrueOrFalseEnum.No;
 
             // 保存
             var rows = 0;
@@ -413,6 +415,9 @@ namespace Hymson.MES.Services.Services.Quality
                 OperationType = operationType
             });
             if (orderOperationEntities != null && orderOperationEntities.Any()) return 0;
+
+            // TODO 判断是否不合格
+            //entity.AcceptanceLevel
 
             // 插入检验单状态操作记录
             return await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
