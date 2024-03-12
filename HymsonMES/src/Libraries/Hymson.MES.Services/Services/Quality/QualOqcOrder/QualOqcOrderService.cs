@@ -8,6 +8,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
@@ -46,6 +47,12 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IWhShipmentMaterialRepository _whShipmentMaterialRepository;
         private readonly IQualOqcParameterGroupSnapshootRepository _qualOqcParameterGroupSnapshootRepository;
         private readonly IQualOqcParameterGroupDetailSnapshootRepository _qualOqcParameterGroupDetailSnapshootRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IWhSupplierRepository _whSupplierRepository;
+        private readonly IQualOqcOrderOperateRepository _qualOqcOrderOperateRepository;
+        private readonly IQualOqcOrderUnqualifiedHandleRepository _qualOqcOrderUnqualifiedHandleRepository;
+        private readonly IWhShipmentBarcodeRepository _whShipmentBarcodeRepository;
+        private readonly IQualOqcParameterGroupRepository _qualOqcParameterGroupRepository;
 
         private readonly IOQCOrderCreateService _oqcOrderCreateService;
 
@@ -62,6 +69,11 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="qualOqcParameterGroupSnapshootRepository"></param>
         /// <param name="qualOqcParameterGroupDetailSnapshootRepository"></param>
         /// <param name="oqcOrderCreateService"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="whSupplierRepository"></param>
+        /// <param name="qualOqcOrderOperateRepository"></param>
+        /// <param name="qualOqcOrderUnqualifiedHandleRepository"></param>
+        /// <param name="whShipmentBarcodeRepository"></param>
         public QualOqcOrderService(ICurrentUser currentUser,
             ICurrentSite currentSite,
             AbstractValidator<QualOqcOrderSaveDto> validationSaveRules,
@@ -71,7 +83,13 @@ namespace Hymson.MES.Services.Services.Quality
             IWhShipmentMaterialRepository whShipmentMaterialRepository,
             IQualOqcParameterGroupSnapshootRepository qualOqcParameterGroupSnapshootRepository,
             IQualOqcParameterGroupDetailSnapshootRepository qualOqcParameterGroupDetailSnapshootRepository,
-            IOQCOrderCreateService oqcOrderCreateService)
+            IOQCOrderCreateService oqcOrderCreateService,
+            IProcMaterialRepository procMaterialRepository,
+            IWhSupplierRepository whSupplierRepository,
+            IQualOqcOrderOperateRepository qualOqcOrderOperateRepository,
+            IQualOqcOrderUnqualifiedHandleRepository qualOqcOrderUnqualifiedHandleRepository,
+            IWhShipmentBarcodeRepository whShipmentBarcodeRepository,
+            IQualOqcParameterGroupRepository qualOqcParameterGroupRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -83,6 +101,12 @@ namespace Hymson.MES.Services.Services.Quality
             _qualOqcParameterGroupSnapshootRepository = qualOqcParameterGroupSnapshootRepository;
             _qualOqcParameterGroupDetailSnapshootRepository = qualOqcParameterGroupDetailSnapshootRepository;
             _oqcOrderCreateService = oqcOrderCreateService;
+            _procMaterialRepository = procMaterialRepository;
+            _whSupplierRepository = whSupplierRepository;
+            _qualOqcOrderOperateRepository = qualOqcOrderOperateRepository;
+            _qualOqcOrderUnqualifiedHandleRepository = qualOqcOrderUnqualifiedHandleRepository;
+            _whShipmentBarcodeRepository = whShipmentBarcodeRepository;
+            _qualOqcParameterGroupRepository = qualOqcParameterGroupRepository;
         }
 
 
@@ -194,14 +218,139 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<PagedInfo<QualOqcOrderDto>> GetPagedListAsync(QualOqcOrderPagedQueryDto pagedQueryDto)
         {
+            var resultData=new PagedInfo<QualOqcOrderDto>(Enumerable.Empty<QualOqcOrderDto>(), 0, 0, 0);
             var pagedQuery = pagedQueryDto.ToQuery<QualOqcOrderPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
             var pagedInfo = await _qualOqcOrderRepository.GetPagedListAsync(pagedQuery);
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                return resultData;
+            }
+
+            //获取出货单
+            var shipmentOrderIds = pagedInfo.Data.Select(a => a.ShipmentOrderId).Distinct();
+            var shipmentEntities = await _whShipmentRepository.GetByIdsAsync(shipmentOrderIds);
+
+            //获取物料
+            var materialIds = pagedInfo.Data.Select(a => a.MaterialId).Distinct();
+            var materialEntities=await _procMaterialRepository.GetByIdsAsync(materialIds);
+
+            //获取供应商
+            var supplierIds = pagedInfo.Data.Select(a => a.CustomerId).Distinct();
+            var supplierEntities = await _whSupplierRepository.GetByIdsAsync(supplierIds);
+
+            //获取OQC检验记录
+            var oqcOrderIds = pagedInfo.Data.Select(a => a.Id);
+            var oqcOrderOperateEntities = await _qualOqcOrderOperateRepository.GetEntitiesAsync(new QualOqcOrderOperateQuery { OQCOrderIds = oqcOrderIds, SiteId = _currentSite.SiteId ?? 0 });
+
+            //获取OQC不合格处理结果
+            var oqcOrderUnqualifiedHandleEntities = await _qualOqcOrderUnqualifiedHandleRepository.GetEntitiesAsync(new QualOqcOrderUnqualifiedHandleQuery {OQCOrderIds= oqcOrderIds, SiteId = _currentSite.SiteId ?? 0 });
+
+            //TODO 型号规则暂不确定是那个字段
+
+            var dtos = new List<QualOqcOrderDto>();
+            foreach (var item in pagedInfo.Data) {
+                var model = item.ToModel<QualOqcOrderDto>();
+
+                var shipmentEntity = shipmentEntities.FirstOrDefault(a => a.Id == item.ShipmentOrderId);
+                model.ShipmentNum = shipmentEntity?.ShipmentNum;
+
+                var materialEntitiy = materialEntities.FirstOrDefault(a => a.Id == item.MaterialId);
+                model.MaterialCode = materialEntitiy?.MaterialCode;
+                model.MaterialName = materialEntitiy?.MaterialName;
+                model.Version = materialEntitiy?.Version;
+                model.Unit = materialEntitiy?.Unit;
+
+                var supplierEntity = supplierEntities.FirstOrDefault(a => a.Id == item.CustomerId);
+                model.SupplierCode= supplierEntity?.Code;
+                model.SupplierName = supplierEntity?.Name;
+
+                var oqcOrderOperateEntity = oqcOrderOperateEntities.FirstOrDefault(a => a.OQCOrderId == item.Id);
+                model.OperateBy= oqcOrderOperateEntity?.OperateBy;
+                model.OperateOn = oqcOrderOperateEntity?.OperateOn;
+
+                var oqcOrderUnqualifiedHandleEntity = oqcOrderUnqualifiedHandleEntities.FirstOrDefault(a => a.OQCOrderId == item.Id);
+                model.HandMethod= oqcOrderUnqualifiedHandleEntity?.HandMethod;
+                model.ProcessedBy= oqcOrderUnqualifiedHandleEntity?.ProcessedBy;
+                model.ProcessedOn= oqcOrderUnqualifiedHandleEntity?.ProcessedOn;
+                model.UnqualifiedHandRemark = oqcOrderUnqualifiedHandleEntity?.Remark;
+
+                dtos.Add(model);
+            }
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<QualOqcOrderDto>());
+            //var dtos = pagedInfo.Data.Select(s => s.ToModel<QualOqcOrderDto>());
             return new PagedInfo<QualOqcOrderDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+
+        /// <summary>
+        /// 获取OQC检验单检验类型
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualOqcOrderTypeOutDto>> GetOqcOrderTypeAsync(long id)
+        {
+            var result =new List<QualOqcOrderTypeOutDto>();
+            var qualOqcOrderTypeEntities = await _qualOqcOrderTypeRepository.GetEntitiesAsync(new QualOqcOrderTypeQuery { OQCOrderId= id ,SiteId=_currentSite.SiteId??0});
+            if (qualOqcOrderTypeEntities == null || !qualOqcOrderTypeEntities.Any()) 
+            { 
+                return result;
+            }
+
+            foreach (var item in qualOqcOrderTypeEntities)
+            {
+                var model = new QualOqcOrderTypeOutDto();
+                model.InspectionType= item.InspectionType;
+                model.SampleQty= item.SampleQty;
+                model.CheckedQty= item.CheckedQty;
+
+                result.Add(model);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 校验样品条码
+        /// </summary>
+        /// <param name="checkBarCodeQuqryDto"></param>
+        /// <returns></returns>
+        public async Task<CheckBarCodeOutDto> CheckBarCodeAsync(CheckBarCodeQuqryDto checkBarCodeQuqryDto)
+        {
+            if (checkBarCodeQuqryDto.BarCode == null|| checkBarCodeQuqryDto.ShipmentId==null|| checkBarCodeQuqryDto.InspectionOrderId==null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10111));
+            }
+
+            //获取出货单物料信息
+            var whShipmentMaterialEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { ShipmentId = checkBarCodeQuqryDto.ShipmentId.GetValueOrDefault(), SiteId = _currentSite.SiteId ?? 0 });
+            if (whShipmentMaterialEntities == null || !whShipmentMaterialEntities.Any()) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17802));
+            }
+            var shipmentMaterialIds = whShipmentMaterialEntities.Select(a => a.Id);
+
+            //获取出货单条码信息
+            var whShipmentBarcodeEntities = await _whShipmentBarcodeRepository.GetEntitiesAsync(new WhShipmentBarcodeQuery {ShipmentDetailIds= shipmentMaterialIds,BarCode= checkBarCodeQuqryDto.BarCode,SiteId=_currentSite.SiteId??0 });
+            if (whShipmentBarcodeEntities == null || !whShipmentBarcodeEntities.Any()) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17803)).WithData("barcode", checkBarCodeQuqryDto.BarCode);
+            }
+
+            //获取OQC检验单
+            var qualOqcOrderEntity = await _qualOqcOrderRepository.GetByIdAsync(checkBarCodeQuqryDto.InspectionOrderId.GetValueOrDefault());
+            if (qualOqcOrderEntity == null) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17804));
+            }
+
+            //获取OQC检验参数组快照
+            var qualOqcParameterGroupEntity = await _qualOqcParameterGroupDetailSnapshootRepository.GetByIdAsync(qualOqcOrderEntity.GroupSnapshootId);
+            if (qualOqcParameterGroupEntity == null) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17805));
+            }
+            var result = qualOqcParameterGroupEntity.ToModel<CheckBarCodeOutDto>();
+            result.BarCode= checkBarCodeQuqryDto.BarCode;
+            return result;
+        }
     }
 }

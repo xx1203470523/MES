@@ -96,5 +96,17 @@ namespace Hymson.MES.Api.Controllers.WhShipment
             return await _whShipmentService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 查询列表（出货单详情，物料，客户）
+        /// </summary>
+        /// <param name="whShipmentQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("QueryShipmentSupplierMaterial")]
+        public async Task<IEnumerable<WhShipmentSupplierMaterialViewDto>> QueryShipmentSupplierMaterialAsync([FromQuery] WhShipmentQueryDto whShipmentQueryDto)
+        {
+            return await _whShipmentService.QueryShipmentSupplierMaterialAsync(whShipmentQueryDto);
+        }
+
     }
 }

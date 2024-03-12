@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualOqcParameterGroupDetailSnapshootQuery
     {
-
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long? Id { get; set; }
     }
 }

@@ -117,6 +117,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            if (query.ShipmentDetailIds!=null&& query.ShipmentDetailIds.Any()) {
+                sqlBuilder.Where("ShipmentDetailId IN @ShipmentDetailIds");
+            }
+
+            if (query.BarCode!=null)
+            {
+                sqlBuilder.Where("BarCode=@BarCode");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhShipmentBarcodeEntity>(template.RawSql, query);
         }

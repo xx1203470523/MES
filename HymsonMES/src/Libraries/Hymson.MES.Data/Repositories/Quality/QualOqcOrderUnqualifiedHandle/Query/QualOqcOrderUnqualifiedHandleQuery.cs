@@ -5,6 +5,14 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualOqcOrderUnqualifiedHandleQuery
     {
+        /// <summary>
+        /// OQC检验单Ids
+        /// </summary>
+        public IEnumerable<long>? OQCOrderIds { get; set; }
 
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }
