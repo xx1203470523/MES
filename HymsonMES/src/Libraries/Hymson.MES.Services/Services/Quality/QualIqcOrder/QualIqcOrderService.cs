@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
@@ -120,6 +121,8 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IInteAttachmentRepository _inteAttachmentRepository;
 
+        private readonly IIQCOrderCreateService _iqcOrderCreateService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -141,6 +144,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="procMaterialRepository"></param>
         /// <param name="whSupplierRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
+        /// <param name="iqcOrderCreateService"></param>
         public QualIqcOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<QualIqcOrderSaveDto> validationSaveRules,
             IQualIqcInspectionItemSnapshotRepository qualIqcInspectionItemSnapshotRepository,
@@ -157,7 +161,8 @@ namespace Hymson.MES.Services.Services.Quality
             IWhMaterialReceiptDetailRepository whMaterialReceiptDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IWhSupplierRepository whSupplierRepository,
-            IInteAttachmentRepository inteAttachmentRepository)
+            IInteAttachmentRepository inteAttachmentRepository,
+            IIQCOrderCreateService iqcOrderCreateService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -177,8 +182,43 @@ namespace Hymson.MES.Services.Services.Quality
             _procMaterialRepository = procMaterialRepository;
             _whSupplierRepository = whSupplierRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
+            _iqcOrderCreateService = iqcOrderCreateService;
         }
 
+        /// <summary>
+        /// 生成IQC检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<long> GeneratedOrderAsync(GenerateInspectionDto requestDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            //收货单明细
+            var receiptDetails = await _whMaterialReceiptDetailRepository.GetByIdsAsync(requestDto.Details);
+            if (receiptDetails == null || !receiptDetails.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+            //查询收货单
+            var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(requestDto.ReceiptId);
+            if (receiptEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+
+            var bo = new CoreServices.Bos.Quality.IQCOrderCreateBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                MaterialReceiptEntity = receiptEntity,
+                MaterialReceiptDetailEntities = receiptDetails,
+            };
+
+            return await _iqcOrderCreateService.CreateAsync(bo);
+        }
 
         /// <summary>
         /// 更改检验单状态（点击执行检验）
@@ -193,6 +233,8 @@ namespace Hymson.MES.Services.Services.Quality
             // IQC检验单
             var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            //出货单明细
 
             // 更新时间
             var updatedBy = _currentUser.UserName;

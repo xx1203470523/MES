@@ -45,7 +45,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 检验等级(1-正常 2-加严 3-放宽)
         /// </summary>
-        public int InspectionGrade { get; set; }
+        public InspectionGradeEnum InspectionGrade { get; set; }
 
         /// <summary>
         /// 接收水准

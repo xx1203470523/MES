@@ -108,6 +108,40 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<QualIqcOrderEntity> GetEntityAsync(QualIqcOrderQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitySqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            if (query.MaterialId.HasValue)
+            {
+                sqlBuilder.Where("MaterialId = @MaterialId");
+            }
+            if (query.SupplierId.HasValue)
+            {
+                sqlBuilder.Where("SupplierId = @SupplierId");
+            }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
+            if (query.StatusArr != null && query.StatusArr.Any())
+            {
+                sqlBuilder.Where("Status IN @StatusArr");
+            }
+            //排序
+            if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<QualIqcOrderEntity>(template.RawSql, query);
+        }
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>
@@ -119,7 +153,26 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-
+            if (query.MaterialId.HasValue)
+            {
+                sqlBuilder.Where("MaterialId = @MaterialId");
+            }
+            if (query.SupplierId.HasValue)
+            {
+                sqlBuilder.Where("SupplierId = @SupplierId");
+            }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
+            if (query.StatusArr != null && query.StatusArr.Any())
+            {
+                sqlBuilder.Where("Status IN @StatusArr");
+            }
+            //查询条数
+            sqlBuilder.AddParameters(new { MaxRows = query.MaxRows });
+            //排序
+            if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderEntity>(template.RawSql, query);
         }
@@ -135,9 +188,21 @@ namespace Hymson.MES.Data.Repositories.Quality
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.OrderBy(string.IsNullOrWhiteSpace(pagedQuery.Sorting) ? "CreatedOn DESC" : pagedQuery.Sorting);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+            if (pagedQuery.MaterialId.HasValue)
+            {
+                sqlBuilder.Where("MaterialId = @MaterialId");
+            }
+            if (pagedQuery.SupplierId.HasValue)
+            {
+                sqlBuilder.Where("SupplierId = @SupplierId");
+            }
+            if (pagedQuery.StatusArr != null && pagedQuery.StatusArr.Any())
+            {
+                sqlBuilder.Where("Status IN @StatusArr");
+            }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder)) sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
             if (pagedQuery.MaterialIds != null) sqlBuilder.Where(" MaterialId IN @MaterialIds ");
@@ -168,13 +233,14 @@ namespace Hymson.MES.Data.Repositories.Quality
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order /**where**/ /**orderby**/ LIMIT @MaxRows ";
+        const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order /**where**/ /**orderby**/ LIMIT 1 ";
 
         const string InsertSql = "INSERT INTO qual_iqc_order(  `Id`, `SiteId`, `InspectionOrder`, `MaterialId`, `SupplierId`, `IqcInspectionItemSnapshotId`, `MaterialReceiptDetailId`, AcceptanceLevel, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialId, @SupplierId, @IqcInspectionItemSnapshotId, @MaterialReceiptDetailId, @AcceptanceLevel, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO qual_iqc_order(  `Id`, `SiteId`, `InspectionOrder`, `MaterialId`, `SupplierId`, `IqcInspectionItemSnapshotId`, `MaterialReceiptDetailId`, AcceptanceLevel, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialId, @SupplierId, @IqcInspectionItemSnapshotId, @MaterialReceiptDetailId, @AcceptanceLevel, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_iqc_order SET SiteId = @SiteId, InspectionOrder = @InspectionOrder, MaterialId = @MaterialId, SupplierId = @SupplierId, IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId, MaterialReceiptDetailId = @MaterialReceiptDetailId, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_iqc_order SET SiteId = @SiteId, InspectionOrder = @InspectionOrder, MaterialId = @MaterialId, SupplierId = @SupplierId, IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId, MaterialReceiptDetailId = @MaterialReceiptDetailId, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_iqc_order SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, MaterialId = @MaterialId, SupplierId = @SupplierId, IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId, MaterialReceiptDetailId = @MaterialReceiptDetailId, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_iqc_order SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, MaterialId = @MaterialId, SupplierId = @SupplierId, IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId, MaterialReceiptDetailId = @MaterialReceiptDetailId, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_iqc_order SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_iqc_order SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

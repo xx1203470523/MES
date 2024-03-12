@@ -84,7 +84,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<long> GeneratedOrderAsync([FromBody] GenerateInspectionDto requestDto)
         {
             // TODO 生成IQC检验单
-            return await Task.FromResult(0);
+            return await _qualIqcOrderService.GeneratedOrderAsync(requestDto);
         }
 
         /// <summary>
