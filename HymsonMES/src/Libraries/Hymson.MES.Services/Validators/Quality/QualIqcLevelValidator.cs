@@ -35,7 +35,7 @@ namespace Hymson.MES.Services.Validators.Quality
         public QualIqcLevelDetailSaveValidator()
         {
             RuleFor(x => x).NotNull().WithErrorCode(nameof(ErrorCode.MES10100));
-            RuleFor(x => x.Type).Must(it => it.HasValue && Enum.IsDefined(typeof(InspectionTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES19414));
+            RuleFor(x => x.Type).Must(it => it.HasValue && Enum.IsDefined(typeof(IQCInspectionTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES19414));
             RuleFor(x => x.VerificationLevel).Must(it => it.HasValue && Enum.IsDefined(typeof(VerificationLevelEnum), it)).WithErrorCode(nameof(ErrorCode.MES19415));
             RuleFor(x => x.AcceptanceLevel).NotNull().GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES19416));
         }

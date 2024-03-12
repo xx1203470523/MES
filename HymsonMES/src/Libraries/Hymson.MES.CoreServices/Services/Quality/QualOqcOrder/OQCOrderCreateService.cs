@@ -30,6 +30,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IQualOqcParameterGroupRepository _qualOqcParameterGroupRepository;
         private readonly IQualOqcParameterGroupDetailRepository _qualOqcParameterGroupDetailRepository;
+        private readonly IProcParameterRepository _procParameterRepository;
         private readonly IQualOqcLevelRepository _qualOqcLevelRepository;
         private readonly IQualOqcLevelDetailRepository _qualOqcLevelDetailRepository;
         private readonly IQualOqcParameterGroupSnapshootRepository _qualOqcParameterGroupSnapshootRepository;
@@ -50,6 +51,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
         /// <param name="procMaterialRepository"></param>
         /// <param name="qualOqcParameterGroupRepository"></param>
         /// <param name="qualOqcParameterGroupDetailRepository"></param>
+        /// <param name="procParameterRepository"></param>
         /// <param name="qualOqcLevelRepository"></param>
         /// <param name="qualOqcLevelDetailRepository"></param>
         /// <param name="qualOqcParameterGroupSnapshootRepository"></param>
@@ -65,6 +67,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
             IProcMaterialRepository procMaterialRepository,
             IQualOqcParameterGroupRepository qualOqcParameterGroupRepository,
             IQualOqcParameterGroupDetailRepository qualOqcParameterGroupDetailRepository,
+            IProcParameterRepository procParameterRepository,
             IQualOqcLevelRepository qualOqcLevelRepository,
             IQualOqcLevelDetailRepository qualOqcLevelDetailRepository,
             IQualOqcParameterGroupSnapshootRepository qualOqcParameterGroupSnapshootRepository,
@@ -81,6 +84,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
             _procMaterialRepository = procMaterialRepository;
             _qualOqcParameterGroupRepository = qualOqcParameterGroupRepository;
             _qualOqcParameterGroupDetailRepository = qualOqcParameterGroupDetailRepository;
+            _procParameterRepository = procParameterRepository;
             _qualOqcLevelRepository = qualOqcLevelRepository;
             _qualOqcLevelDetailRepository = qualOqcLevelDetailRepository;
             _qualOqcParameterGroupSnapshootRepository = qualOqcParameterGroupSnapshootRepository;
@@ -191,7 +195,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
 
                 //获取抽样计划
                 AQLPlanBo? aqlPlan = null;
-                if (item.Qty > 1)
+                if (item.Qty >= 2)
                 {
                     //AQL检验水平
                     var aqlLevel = aqlLevels.First(x => x.Min <= item.Qty && x.Max >= item.Qty);
@@ -208,9 +212,9 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     var oqcLevelDetail = oqcLevelDetails.FirstOrDefault(x => x.Type == inspectionType);
                     if (oqcLevelDetail == null)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES11806)).WithData("MaterialCode", materialCode).WithData("CustomerCode", customerCode).WithData("InspectionType", inspectionType.GetDescription());
+                        throw new CustomerValidationException(nameof(ErrorCode.MES11808)).WithData("MaterialCode", materialCode).WithData("CustomerCode", customerCode).WithData("InspectionType", inspectionType.GetDescription());
                     }
-                    if (item.Qty <= 1)
+                    if (item.Qty < 2)
                     {
                         sampleQtyDic.Add(inspectionType, 1);
                         continue;
@@ -236,10 +240,17 @@ namespace Hymson.MES.CoreServices.Services.Quality
                 parameterGroupSnapshoot.Id = IdGenProvider.Instance.CreateId();
                 parameterGroupSnapshootList.Add(parameterGroupSnapshoot);
                 //检验项目明细快照
+                var parameters = await _procParameterRepository.GetByIdsAsync(parameterGroupDetails.Select(x => x.ParameterId).Distinct());
                 foreach (var parameterGroupDetail in parameterGroupDetails)
                 {
+                    var parameterEntity = parameters.First(x => x.Id == parameterGroupDetail.ParameterId);
+
                     var parameterGroupDetailSnapshoot = parameterGroupDetail.ToEntity<QualOqcParameterGroupDetailSnapshootEntity>();
                     parameterGroupDetailSnapshoot.Id = IdGenProvider.Instance.CreateId();
+                    parameterGroupDetailSnapshoot.ParameterCode = parameterEntity.ParameterCode;
+                    parameterGroupDetailSnapshoot.ParameterName = parameterEntity.ParameterName;
+                    parameterGroupDetailSnapshoot.ParameterDataType = parameterEntity.DataType;
+                    parameterGroupDetailSnapshoot.ParameterUnit = parameterEntity.ParameterUnit ?? "";
                     parameterGroupDetailSnapshootList.Add(parameterGroupDetailSnapshoot);
                 }
                 //检验单
@@ -252,8 +263,9 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     GroupSnapshootId = parameterGroupSnapshoot.Id,
                     MaterialId = parameterGroupEntity.MaterialId,
                     CustomerId = parameterGroupEntity.CustomerId,
-                    ShipmentOrderId = bo.ShipmentEntity.Id,
+                    ShipmentMaterialId = item.Id,
                     ShipmentQty = item.Qty,
+                    AcceptanceLevel = oqcLevel.AcceptanceLevel,
                     Status = InspectionStatusEnum.WaitInspect,
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn

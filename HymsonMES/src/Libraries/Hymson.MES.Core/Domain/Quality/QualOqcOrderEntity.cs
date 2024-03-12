@@ -38,14 +38,19 @@ namespace Hymson.MES.Core.Domain.Quality
         public long CustomerId { get; set; }
 
         /// <summary>
-        /// 出货单Id
+        /// 出货单明细Id
         /// </summary>
-        public long ShipmentOrderId { get; set; }
+        public long ShipmentMaterialId { get; set; }
 
         /// <summary>
         /// 出货数量
         /// </summary>
         public decimal ShipmentQty { get; set; }
+
+        /// <summary>
+        /// 接收水准
+        /// </summary>
+        public int AcceptanceLevel {  get; set; }
 
         /// <summary>
         /// 状态(1-待检验 2-检验中 3-已检验 4-已关闭)

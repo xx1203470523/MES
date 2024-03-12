@@ -233,7 +233,7 @@ namespace Hymson.MES.Services.Services.Quality
 
             //TODO 修改为出货单明细Id
             //获取出货单
-            var shipmentOrderIds = pagedInfo.Data.Select(a => a.ShipmentOrderId).Distinct();
+            var shipmentOrderIds = pagedInfo.Data.Select(a => a.ShipmentMaterialId).Distinct();
             var shipmentEntities = await _whShipmentRepository.GetByIdsAsync(shipmentOrderIds);
 
             //获取物料
@@ -257,7 +257,7 @@ namespace Hymson.MES.Services.Services.Quality
             foreach (var item in pagedInfo.Data) {
                 var model = item.ToModel<QualOqcOrderDto>();
 
-                var shipmentEntity = shipmentEntities.FirstOrDefault(a => a.Id == item.ShipmentOrderId);
+                var shipmentEntity = shipmentEntities.FirstOrDefault(a => a.Id == item.ShipmentMaterialId);
                 model.ShipmentNum = shipmentEntity?.ShipmentNum;
 
                 var materialEntitiy = materialEntities.FirstOrDefault(a => a.Id == item.MaterialId);

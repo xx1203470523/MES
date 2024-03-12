@@ -59,6 +59,13 @@ namespace Hymson.MES.Services.Services.Quality
         Task<int> DeleteOrdersAsync(long[] ids);
 
         /// <summary>
+        /// 生成IQC检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<long> GeneratedOrderAsync(GenerateInspectionDto requestDto);
+
+        /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>

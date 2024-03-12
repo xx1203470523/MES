@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Qual;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
@@ -192,5 +193,54 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// OQC检验参数组明细分页Dto
     /// </summary>
     public class QualOqcParameterGroupDetailPagedQueryDto : PagerInfo { }
+
+
+    public record QualOqcParameterGroupDetailOutputDto : QualOqcParameterGroupDetailUpdateDto
+    {
+        /// <summary>
+        /// 参数编码
+        /// </summary>
+        public string? ParameterCode { get; set; }
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string? ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数单位
+        /// </summary>
+        public string? ParameterUnit { get; set; }
+
+        ///// <summary>
+        ///// 创建时间
+        ///// </summary>
+        //public DateTime? CreatedOn { get; set; }
+
+        ///// <summary>
+        ///// 创建人
+        ///// </summary>
+        //public string? CreatedBy { get; set; }
+
+        ///// <summary>
+        ///// 更新时间
+        ///// </summary>
+        //public DateTime? UpdatedOn { get; set; }
+
+        ///// <summary>
+        ///// 更新人
+        ///// </summary>
+        //public string? UpdatedBy { get; set; }
+
+    }
+
+
+    public record QualOqcParameterGroupDetailUpdateDto : QualOqcParameterGroupDetailDto
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long? Id { get; set; }
+    }
 
 }
