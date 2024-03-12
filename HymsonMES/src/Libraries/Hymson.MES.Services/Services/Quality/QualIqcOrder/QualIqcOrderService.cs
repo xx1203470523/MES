@@ -181,7 +181,7 @@ namespace Hymson.MES.Services.Services.Quality
 
 
         /// <summary>
-        /// 更改检验单状态
+        /// 更改检验单状态（点击执行检验）
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -276,9 +276,6 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // TODO 更新检验单类型数量
-            //orderTypeEntity.CheckedQty
-
             // 样本
             var sampleId = IdGenProvider.Instance.CreateId();
             var sampleEntity = new QualIqcOrderSampleEntity
@@ -316,6 +313,7 @@ namespace Hymson.MES.Services.Services.Quality
                     UpdatedOn = updatedOn
                 });
 
+                // 样本附件
                 if (item.Attachments != null && item.Attachments.Any())
                 {
                     foreach (var attachment in item.Attachments)
@@ -350,6 +348,17 @@ namespace Hymson.MES.Services.Services.Quality
                 }
             }
 
+            // 默认情况
+            entity.Status = InspectionStatusEnum.Closed;
+            sampleEntity.IsQualified = TrueOrFalseEnum.Yes;
+
+            // 不合格情况
+            if (sampleDetailEntities.Count(a => a.IsQualified == TrueOrFalseEnum.No) >= orderTypeEntity.AcceptanceLevel)
+            {
+                entity.Status = InspectionStatusEnum.Completed;
+                sampleEntity.IsQualified = TrueOrFalseEnum.No;
+            }
+
             // 保存
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
@@ -360,6 +369,7 @@ namespace Hymson.MES.Services.Services.Quality
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
                 rows += await _qualIqcOrderSampleDetailAnnexRepository.InsertRangeAsync(sampleDetailAttachmentEntities);
             }
+            rows += await _qualIqcOrderTypeRepository.UpdateAsync(orderTypeEntity);
             trans.Complete();
             return rows;
         }
@@ -392,12 +402,15 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 检查每种类型是否已经录入足够
             var orderTypeEntities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(entity.Id);
-            if (orderTypeEntities.Any(a => a.SampleQty > a.CheckedQty))
+
+            // 读取一个未录入完整的类型
+            var orderTypeEntity = orderTypeEntities.FirstOrDefault(f => f.SampleQty > f.CheckedQty);
+            if (orderTypeEntity != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19908))
-                    .WithData("Type", "")
-                    .WithData("CheckedQty", "")
-                    .WithData("SampleQty", "");
+                    .WithData("Type", orderTypeEntity.Type.GetDescription())
+                    .WithData("CheckedQty", orderTypeEntity.CheckedQty)
+                    .WithData("SampleQty", orderTypeEntity.SampleQty);
             }
 
             // 检查类型是否已经存在
@@ -409,6 +422,9 @@ namespace Hymson.MES.Services.Services.Quality
                 OperationType = operationType
             });
             if (orderOperationEntities != null && orderOperationEntities.Any()) return 0;
+
+            // TODO 判断是否不合格
+            //entity.AcceptanceLevel
 
             // 插入检验单状态操作记录
             return await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
@@ -444,11 +460,11 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // 只有"检验中"的状态才允许"关闭"
+            // 只有"已检验"的状态才允许"关闭"
             if (entity.Status != InspectionStatusEnum.Closed)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19909))
-                    .WithData("Before", InspectionStatusEnum.Inspecting.GetDescription())
+                    .WithData("Before", InspectionStatusEnum.Completed.GetDescription())
                     .WithData("After", InspectionStatusEnum.Closed.GetDescription());
             }
 
@@ -631,6 +647,19 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             return dto;
+        }
+
+        /// <summary>
+        /// 根据ID查询
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateOrderAsync(OrderParameterDetailDto requestDto)
+        {
+            var entity = requestDto.ToEntity<QualIqcOrderSampleDetailEntity>();
+            if (entity == null) return 0;
+
+            return await _qualIqcOrderSampleDetailRepository.UpdateAsync(entity);
         }
 
         /// <summary>

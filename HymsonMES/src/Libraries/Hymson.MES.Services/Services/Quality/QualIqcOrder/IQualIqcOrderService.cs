@@ -10,7 +10,7 @@ namespace Hymson.MES.Services.Services.Quality
     public interface IQualIqcOrderService
     {
         /// <summary>
-        /// 更改检验单状态
+        /// 更改检验单状态（点击执行检验）
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -64,6 +64,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualIqcOrderDto?> QueryByIdAsync(long id);
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> UpdateOrderAsync(OrderParameterDetailDto requestDto);
 
         /// <summary>
         /// 获取分页List

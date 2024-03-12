@@ -88,7 +88,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 更改检验单状态
+        /// 更改检验单状态（点击执行检验）
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -141,6 +141,17 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<QualIqcOrderDto?> QueryByIdAsync(long id)
         {
             return await _qualIqcOrderService.QueryByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("update")]
+        public async Task<int> UpdateOrderAsync(OrderParameterDetailDto requestDto)
+        {
+            return await _qualIqcOrderService.UpdateOrderAsync(requestDto);
         }
 
         /// <summary>
