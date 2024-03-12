@@ -439,9 +439,22 @@
         public const string MES11803 = "AQL检验计划不存在";
         public const string MES11804 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验项目不存在或未激活";
         public const string MES11805 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验项目下检验参数不能为空";
-        public const string MES11806 = "客户【{CustomerCode}】物料【{MaterialCode}】OQC检验水平不能为空";
-        public const string MES11807 = "客户【{CustomerCode}】物料【{MaterialCode}】OQC检验水平下检验类型不能为空";
-        public const string MES11808 = "客户【{CustomerCode}】物料【{MaterialCode}】OQC检验水平下检验类型【{InspectionType}】未维护";
+        public const string MES11806 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验水平不能为空";
+        public const string MES11807 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验水平明细列表不能为空";
+        public const string MES11808 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验水平下检验类型【{InspectionType}】未维护";
+
+        #endregion
+
+        #region IQC检验任务 11900
+
+        public const string MES11900 = "选中数据不属于同一收货单";
+        public const string MES11901 = "收货单不存在";
+        public const string MES11902 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验项目不存在或未启用";
+        public const string MES11903 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验项目【{InspectionItemCode}】下检验参数不能为空";
+        public const string MES11904 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验项目【{InspectionItemCode}】下检验参数的检验类型不能为空";
+        public const string MES11905 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验水平不能为空";
+        public const string MES11906 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验水平明细列表不能为空";
+        public const string MES11907 = "供应商【{CustomerCode}】物料【{MaterialCode}】对应IQC检验水平下检验类型【{InspectionType}】未维护";
 
         #endregion
 

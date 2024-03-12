@@ -18,7 +18,7 @@ namespace Hymson.MES.Core.Enums.Quality
         [Description("检验中")]
         Inspecting = 2,
         /// <summary>
-        /// 已检验
+        /// 已检验(待审核)
         /// </summary>
         [Description("已检验")]
         Completed = 3,
