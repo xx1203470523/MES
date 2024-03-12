@@ -88,5 +88,24 @@ namespace Hymson.MES.Core.Constants
         /// </summary>
         public const string MES45040 = "上料点没有维护对应的资源或者维护多个资源";
         #endregion
+
+        #region 配方
+
+        /// <summary>
+        /// 设备没有对应型号为激活状态的配方
+        /// </summary>
+        public const string MES45050 = "设备没有对应型号为激活状态的配方";
+
+        /// <summary>
+        /// 配方没有维护具体的步骤
+        /// </summary>
+        public const string MES45051 = "配方没有维护具体的步骤";
+
+        /// <summary>
+        /// 配方对应版本型号没有激活
+        /// </summary>
+        public const string MES45052 = "配方对应版本型号没有激活，请获取最新配方";
+
+        #endregion
     }
 }

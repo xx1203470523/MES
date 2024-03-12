@@ -13,9 +13,11 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.MES.EquipmentServices.Services.Qkny.Formula;
 using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
 using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
@@ -130,6 +132,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IAgvTaskRecordService _agvTaskRecordService;
 
         /// <summary>
+        /// 配方
+        /// </summary>
+        private readonly IProcFormulaService _procFormulaService;
+
+        /// <summary>
         /// 设备过程参数
         /// </summary>
         private readonly IEquProcessParamRecordService _equProcessParamRecordService;
@@ -152,6 +159,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository,
             IAgvTaskRecordService agvTaskRecordService,
             IEquProcessParamRecordService equProcessParamRecordService,
+            IProcFormulaService procFormulaService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -169,6 +177,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
             _agvTaskRecordService = agvTaskRecordService;
             _equProcessParamRecordService = equProcessParamRecordService;
+            _procFormulaService = procFormulaService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -359,7 +368,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
-        /// 获取配方列表
+        /// 获取开机参数列表
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -398,7 +407,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         {
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
-            //2. 获取配方编码的对应激活的数据
+            //2. 获取开机参数编码的对应激活的数据
             ProcEquipmentGroupParamCodeDetailQuery query = new ProcEquipmentGroupParamCodeDetailQuery();
             query.Code = dto.RecipeCode;
             query.SiteId = equResModel.SiteId;
@@ -511,6 +520,84 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             saveDto.UpdatedOn = saveDto.CreatedOn;
             saveDto.UpdatedBy = saveDto.CreatedBy;
             await _agvTaskRecordService.AddAsync(saveDto);
+        }
+
+        /// <summary>
+        /// 获取配方列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<List<FormulaListGetReturnDto>> FormulaListGetAsync(FormulaListGetDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 获取数据
+            ProcFormulaListQueryDto query = new ProcFormulaListQueryDto();
+            query.EquipmentId = equResModel.EquipmentId;
+            query.ProductCode = dto.ProductCode;
+            var list = await _procFormulaService.GetFormulaListAsync(query);
+            List<FormulaListGetReturnDto> resultList = new List<FormulaListGetReturnDto>();
+            foreach (var item in list)
+            {
+                FormulaListGetReturnDto result = new FormulaListGetReturnDto();
+                result.FormulaCode = item.Code;
+                result.ProductCode = item.MaterialCode;
+                result.Version = item.Version;
+                result.LastUpdateOnTime = item.UpdatedOn ?? item.CreatedOn;
+                resultList.Add(result);
+            }
+            return resultList;
+        }
+
+        /// <summary>
+        /// 获取配方明细
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<FormulaDetailGetReturnDto> FormulaDetailGetAsync(FormulaDetailGetDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 获取数据
+            ProcFormulaDetailQueryDto query = new ProcFormulaDetailQueryDto();
+            query.FormulaCode = dto.FormulaCode;
+            query.SiteId = equResModel.SiteId;
+            var list = await _procFormulaService.GetFormulaDetailAsync(query);
+            FormulaDetailGetReturnDto result = new FormulaDetailGetReturnDto();
+            result.Version = list[0].Version;
+            foreach (var item in list)
+            {
+                FormulaParamList paramModel = new FormulaParamList();
+                paramModel.SepOrder = item.Serial;
+                paramModel.Category = item.OperationCode;
+                paramModel.MarterialCode = item.MaterialCode;
+                paramModel.MarerialGroupCode = item.MaterialGroupCode;
+                paramModel.ParameCode = item.ParameterCode;
+                paramModel.ParamValue = item.Setvalue;
+                paramModel.FunctionCode = item.FunctionName;
+                paramModel.Unit = item.Unit;
+
+                result.ParamList.Add(paramModel);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 配方校验
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task FormulaVersionExamineAsync(FormulaVersionExamineDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 版本校验
+            ProcFormlaGetByCodeVersionDto query = new ProcFormlaGetByCodeVersionDto();
+            query.FormulaCode = dto.FormulaCode;
+            query.Version = dto.Version;
+            query.SiteId = equResModel.SiteId;
+            var entity = await _procFormulaService.GetEntityByCodeVersion(query);
         }
 
         /// <summary>

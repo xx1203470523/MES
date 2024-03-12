@@ -84,6 +84,27 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         Task AgvMaterialAsync(AgvMaterialDto dto);
 
         /// <summary>
+        /// 获取配方列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<List<FormulaListGetReturnDto>> FormulaListGetAsync(FormulaListGetDto dto);
+
+        /// <summary>
+        /// 获取配方明细
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<FormulaDetailGetReturnDto> FormulaDetailGetAsync(FormulaDetailGetDto dto);
+
+        /// <summary>
+        /// 配方校验
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task FormulaVersionExamineAsync(FormulaVersionExamineDto dto);
+
+        /// <summary>
         /// 设备过程参数
         /// </summary>
         /// <param name="dto"></param>

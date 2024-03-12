@@ -362,19 +362,22 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //1. 针对制胶匀浆设备时，在开机进行启动时，从MES获取配方列表
             //2. 获取 proc_formula 表数据，并进行字段转换
 
-            List<FormulaListGetReturnDto> list = new List<FormulaListGetReturnDto>();
-            for (var i = 0; i < 3; ++i)
+            if(IS_DEBUG == true)
             {
-                FormulaListGetReturnDto model = new FormulaListGetReturnDto();
-                model.FormulaCode = $"formulaCode{i + 1}";
-                model.Version = "1.0";
-                model.ProductCode = $"productCode{i}";
-                model.LastUpdateOnTime = DateTime.Now;
+                List<FormulaListGetReturnDto> list = new List<FormulaListGetReturnDto>();
+                for (var i = 0; i < 3; ++i)
+                {
+                    FormulaListGetReturnDto model = new FormulaListGetReturnDto();
+                    model.FormulaCode = $"formulaCode{i + 1}";
+                    model.Version = "1.0";
+                    model.ProductCode = $"productCode{i}";
+                    model.LastUpdateOnTime = DateTime.Now;
 
-                list.Add(model);
+                    list.Add(model);
+                }
             }
 
-            return list;
+            return await _qknyService.FormulaListGetAsync(dto);
         }
 
         /// <summary>
@@ -390,25 +393,30 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //1. 基于proc_formula，proc_formula_details表进行查询
 
-            FormulaDetailGetReturnDto result = new FormulaDetailGetReturnDto();
-            result.Version = "1.0";
-
-            for (var i = 0; i < 5; ++i)
+            if (IS_DEBUG == true)
             {
-                FormulaParamList model = new FormulaParamList();
-                model.SepOrder = i + 1;
-                model.Category = "A|B|C";
-                model.MarterialCode = $"materialCode{i}";
-                model.MarerialGroupCode = $"MarerialGroupCode{i}";
-                model.ParameCode = $"ParameCode{i}";
-                model.ParamValue = $"ParamValue{i}";
-                model.FunctionCode = $"FunctionCode{i}";
-                model.Unit = $"Unit{i}";
+                FormulaDetailGetReturnDto result = new FormulaDetailGetReturnDto();
+                result.Version = "1.0";
 
-                result.ParamList.Add(model);
+                for (var i = 0; i < 5; ++i)
+                {
+                    FormulaParamList model = new FormulaParamList();
+                    model.SepOrder = i + 1;
+                    model.Category = "A|B|C";
+                    model.MarterialCode = $"materialCode{i}";
+                    model.MarerialGroupCode = $"MarerialGroupCode{i}";
+                    model.ParameCode = $"ParameCode{i}";
+                    model.ParamValue = $"ParamValue{i}";
+                    model.FunctionCode = $"FunctionCode{i}";
+                    model.Unit = $"Unit{i}";
+
+                    result.ParamList.Add(model);
+                }
+
+                return result;
             }
 
-            return result;
+            return await _qknyService.FormulaDetailGetAsync(dto);
         }
 
         /// <summary>
@@ -421,6 +429,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("配方版本校验(制胶匀浆)016", BusinessType.OTHER, "FormulaVersionExamine016", ReceiverTypeEnum.MES)]
         public async Task FormulaVersionExamineAsync(FormulaVersionExamineDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.FormulaVersionExamineAsync(dto);
+
             //TODO
             //1. 查询表proc_formula进行配方版本的校验，确认是否是激活的版本
         }
