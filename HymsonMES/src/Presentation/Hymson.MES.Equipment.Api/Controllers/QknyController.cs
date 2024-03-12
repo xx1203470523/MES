@@ -278,6 +278,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("半成品上料011", BusinessType.OTHER, "HalfFeeding011", ReceiverTypeEnum.MES)]
         public async Task HalfFeedingAsync(HalfFeedingDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+            await _qknyService.HalfFeedingAsync(dto);
             //TODO
             //1. 本用于涂布，辊分，模切，卷绕工序，现涂布，辊分，模切改为一个工单，这几个地方改为直接进站
             //2. 校验条码是否在上工序产出(manu_sfc_produce)
@@ -289,7 +294,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
              * 
              * select * from manu_sfc_step mss => 新增
              */
-            //4. 下工序产出时，在制品表manu_sfc_produce删除进站条码，manu_sfc_step新增
+            //4. 工序产出时，在制品表 manu_sfc_produce 删除进站条码, manu_sfc_step 新增
         }
 
         /// <summary>

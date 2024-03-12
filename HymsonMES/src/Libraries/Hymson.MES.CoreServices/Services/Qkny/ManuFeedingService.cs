@@ -182,6 +182,7 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             // 根据条件再查询一次主物料（再次查询一次会更加严谨）
             var manuFeedingMaterialDtos = await GetFeedingMaterialListAsync(new ManuFeedingMaterialQueryDto
             {
+                SiteId = saveDto.SiteId,
                 ResourceId = saveDto.ResourceId,
                 Source = saveDto.Source,
                 FeedingPointId = saveDto.FeedingPointId

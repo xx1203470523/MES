@@ -77,6 +77,13 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         Task FeedingAsync(FeedingDto dto);
 
         /// <summary>
+        /// 半成品上料
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task HalfFeedingAsync(HalfFeedingDto dto);
+
+        /// <summary>
         /// AGV叫料
         /// </summary>
         /// <param name="dto"></param>

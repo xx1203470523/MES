@@ -5,7 +5,9 @@ using Hymson.MES.Core.Domain.AgvTaskRecord;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Qkny;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Qkny;
+using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Qkny;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -142,6 +144,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IEquProcessParamRecordService _equProcessParamRecordService;
 
         /// <summary>
+        /// 服务接口（过站）
+        /// </summary>
+        private readonly IManuPassStationService _manuPassStationService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -160,6 +167,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IAgvTaskRecordService agvTaskRecordService,
             IEquProcessParamRecordService equProcessParamRecordService,
             IProcFormulaService procFormulaService,
+            IManuPassStationService manuPassStationService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -178,6 +186,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _agvTaskRecordService = agvTaskRecordService;
             _equProcessParamRecordService = equProcessParamRecordService;
             _procFormulaService = procFormulaService;
+            _manuPassStationService = manuPassStationService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -470,6 +479,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                 PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
 
                 saveDto.Source = ManuSFCFeedingSourceEnum.BOM;
+                saveDto.SiteId = equResModel.SiteId;
+                saveDto.ResourceId = equResModel.ResId;
             }
             else
             {
@@ -483,6 +494,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                 }
                 saveDto.Source = ManuSFCFeedingSourceEnum.FeedingPoint;
                 saveDto.FeedingPointId = res.FirstOrDefault().LoadPointId;
+                saveDto.SiteId = res.FirstOrDefault().SiteId;
             }
             //3. 上料
             var feedResult = await _manuFeedingService.CreateAsync(saveDto);
@@ -492,6 +504,28 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             //2. 添加上料表信息 manu_feeding
             //3. 添加上料记录表信息 manu_feeding_record
             //4. 参考物料加载逻辑 ManuFeedingService.CreateAsync
+        }
+
+        /// <summary>
+        /// 半成品上料
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task HalfFeedingAsync(HalfFeedingDto dto)
+        {
+            //TODO 和上料保持一致，使用BOM上料
+
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //2. 构造数据
+            ManuFeedingMaterialSaveDto saveDto = new ManuFeedingMaterialSaveDto();
+            saveDto.BarCode = dto.Sfc;
+            saveDto.Source = ManuSFCFeedingSourceEnum.BOM;
+            saveDto.SiteId = equResModel.SiteId;
+            saveDto.ResourceId = equResModel.ResId;
+            //3. 上料
+            var feedResult = await _manuFeedingService.CreateAsync(saveDto);
         }
 
         /// <summary>
