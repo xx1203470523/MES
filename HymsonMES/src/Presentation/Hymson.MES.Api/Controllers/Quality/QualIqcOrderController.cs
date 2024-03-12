@@ -149,7 +149,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPut("update")]
-        public async Task<int> UpdateOrderAsync(QualIqcOrderDto requestDto)
+        public async Task<int> UpdateOrderAsync(OrderParameterDetailDto requestDto)
         {
             return await _qualIqcOrderService.UpdateOrderAsync(requestDto);
         }
