@@ -48,15 +48,8 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> UpdateAsync(QualIqcOrderEntity entity)
         {
-            try
-            {
-                using var conn = GetMESDbConnection();
-                return await conn.ExecuteAsync(UpdateSql, entity);
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
         /// <summary>
