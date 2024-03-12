@@ -27,5 +27,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// </summary>
         public IEnumerable<long>? IQCOrderSampleIds { get; set; }
 
+        /// <summary>
+        /// ID集合（快照明细）
+        /// </summary>
+        public IEnumerable<long>? IQCInspectionDetailSnapshotIds { get; set; }
+
     }
 }

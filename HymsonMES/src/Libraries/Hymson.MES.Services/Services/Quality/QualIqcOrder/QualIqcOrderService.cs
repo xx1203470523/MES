@@ -25,6 +25,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -865,7 +866,7 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = await _qualIqcOrderRepository.GetByIdAsync(pagedQueryDto.IQCOrderId);
             if (entity == null) return defaultResult;
 
-            // 查询检验单下面的所有样本       
+            // 查询检验单下面的所有样本
             var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderSampleDetailPagedQuery>();
             pagedQuery.SiteId = entity.SiteId;
 
@@ -881,6 +882,18 @@ namespace Hymson.MES.Services.Services.Quality
                 });
                 if (sampleEntities != null && sampleEntities.Any()) pagedQuery.IQCOrderSampleIds = sampleEntities.Select(s => s.Id);
                 else pagedQuery.IQCOrderSampleIds = Array.Empty<long>();
+            }
+
+            // 转换项目编码变为快照明细ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.ParameterCode))
+            {
+                var snapshotDetailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetEntitiesAsync(new QualIqcInspectionItemDetailSnapshotQuery
+                {
+                    SiteId = entity.SiteId,
+                    ParameterCode = pagedQueryDto.ParameterCode
+                });
+                if (snapshotDetailEntities != null && snapshotDetailEntities.Any()) pagedQuery.IQCInspectionDetailSnapshotIds = snapshotDetailEntities.Select(s => s.Id);
+                else pagedQuery.IQCInspectionDetailSnapshotIds = Array.Empty<long>();
             }
 
             // 查询数据

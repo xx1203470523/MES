@@ -395,6 +395,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string? Barcode { get; set; }
 
+        /// <summary>
+        /// 项目编码
+        /// </summary>
+        public string? ParameterCode { get; set; }
+
     }
 
     /// <summary>
