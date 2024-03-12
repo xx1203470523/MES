@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
@@ -33,7 +34,7 @@ namespace Hymson.MES.Core.Domain.Quality
        /// <summary>
         /// 状态 0、已禁用 1、启用
         /// </summary>
-        public bool? Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
        /// <summary>
         /// 备注

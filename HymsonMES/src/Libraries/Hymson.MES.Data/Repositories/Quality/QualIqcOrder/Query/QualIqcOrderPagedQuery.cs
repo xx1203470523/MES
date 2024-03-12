@@ -19,6 +19,26 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public string? InspectionOrder { get; set; }
 
         /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 供应商Id
+        /// </summary>
+        public long? SupplierId { get; set; }
+
+        /// <summary>
+        /// 状态;1、待检验2、检验中3、已检验4、已关闭
+        /// </summary>
+        public InspectionStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 状态列表
+        /// </summary>
+        public IEnumerable<InspectionStatusEnum>? StatusArr { get; set; }
+
+        /// <summary>
         /// 物料ID
         /// </summary>
         public IEnumerable<long>? MaterialIds { get; set; }
@@ -32,11 +52,6 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 收货单详情Id
         /// </summary>
         public IEnumerable<long>? MaterialReceiptDetailIds { get; set; }
-
-        /// <summary>
-        /// 状态;1、待检验2、检验中3、已检验4、已关闭
-        /// </summary>
-        public InspectionStatusEnum? Status { get; set; }
 
     }
 }
