@@ -181,7 +181,7 @@ namespace Hymson.MES.Services.Services.Quality
 
 
         /// <summary>
-        /// 更改检验单状态
+        /// 更改检验单状态（点击执行检验）
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -448,11 +448,11 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // 只有"检验中"的状态才允许"关闭"
+            // 只有"已检验"的状态才允许"关闭"
             if (entity.Status != InspectionStatusEnum.Closed)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19909))
-                    .WithData("Before", InspectionStatusEnum.Inspecting.GetDescription())
+                    .WithData("Before", InspectionStatusEnum.Completed.GetDescription())
                     .WithData("After", InspectionStatusEnum.Closed.GetDescription());
             }
 

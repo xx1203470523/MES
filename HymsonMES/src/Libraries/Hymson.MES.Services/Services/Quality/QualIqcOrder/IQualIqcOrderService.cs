@@ -10,7 +10,7 @@ namespace Hymson.MES.Services.Services.Quality
     public interface IQualIqcOrderService
     {
         /// <summary>
-        /// 更改检验单状态
+        /// 更改检验单状态（点击执行检验）
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>

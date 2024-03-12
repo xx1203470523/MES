@@ -88,7 +88,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 更改检验单状态
+        /// 更改检验单状态（点击执行检验）
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
