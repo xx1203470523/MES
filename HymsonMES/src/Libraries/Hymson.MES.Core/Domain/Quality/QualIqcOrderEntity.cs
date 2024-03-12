@@ -43,6 +43,11 @@ namespace Hymson.MES.Core.Domain.Quality
         public long MaterialReceiptDetailId { get; set; }
 
         /// <summary>
+        /// 接收水准
+        /// </summary>
+        public int AcceptanceLevel { get; set; }
+
+        /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
         public InspectionStatusEnum Status { get; set; }
