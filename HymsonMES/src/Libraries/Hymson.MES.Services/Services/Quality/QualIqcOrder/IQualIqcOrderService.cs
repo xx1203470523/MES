@@ -107,5 +107,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleAsync(OrderParameterDetailQueryDto requestDto);
 
+        /// <summary>
+        /// 查询检验单样本数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<OrderParameterDetailDto>> QueryDetailSamplePagedListAsync(OrderParameterDetailPagedQueryDto pagedQueryDto);
+
     }
 }

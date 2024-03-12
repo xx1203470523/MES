@@ -209,6 +209,17 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualIqcOrderService.QueryDetailSampleAsync(requestDto);
         }
 
+        /// <summary>
+        /// 查询检验单样本数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet("sample/pagelist")]
+        public async Task<PagedInfo<OrderParameterDetailDto>> QueryDetailSamplePagedListAsync([FromQuery] OrderParameterDetailPagedQueryDto pagedQueryDto)
+        {
+            return await _qualIqcOrderService.QueryDetailSamplePagedListAsync(pagedQueryDto);
+        }
+
 
     }
 }

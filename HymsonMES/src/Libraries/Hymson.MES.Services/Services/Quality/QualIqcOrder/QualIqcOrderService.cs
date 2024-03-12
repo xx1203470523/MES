@@ -858,6 +858,27 @@ namespace Hymson.MES.Services.Services.Quality
             return dtos;
         }
 
+        /// <summary>
+        /// 查询检验单样本数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<OrderParameterDetailDto>> QueryDetailSamplePagedListAsync(OrderParameterDetailPagedQueryDto pagedQueryDto)
+        {
+            /*
+            var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
+            // 查询数据
+            var pagedInfo = await _qualIqcOrderRepository.GetPagedListAsync(pagedQuery);
+
+            // 实体到DTO转换 装载数据
+            var dtos = await PrepareDtos(pagedInfo.Data);
+            return new PagedInfo<QualIqcOrderDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            */
+
+            return await Task.FromResult<PagedInfo<OrderParameterDetailDto>>(default);
+        }
 
 
 
