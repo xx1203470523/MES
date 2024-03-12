@@ -63,5 +63,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="checkBarCodeQuqryDto"></param>
         /// <returns></returns>
         Task<CheckBarCodeOutDto> CheckBarCodeAsync(CheckBarCodeQuqryDto checkBarCodeQuqryDto);
+
+        /// <summary>
+        /// 保存样品数据
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task SaveOrderAsync(QualOqcOrderSaveDto requestDto);
     }
 }
