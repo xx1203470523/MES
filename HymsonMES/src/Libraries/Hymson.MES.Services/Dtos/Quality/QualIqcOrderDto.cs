@@ -378,6 +378,33 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// 检验参数Dto
     /// </summary>
+    public class OrderParameterDetailPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+        /// <summary>
+        /// 检验类型ID
+        /// </summary>
+        public long? IQCOrderTypeId { get; set; }
+
+        /// <summary>
+        /// 样品条码
+        /// </summary>
+        public string? Barcode { get; set; }
+
+        /// <summary>
+        /// 项目编码
+        /// </summary>
+        public string? ParameterCode { get; set; }
+
+    }
+
+    /// <summary>
+    /// 检验参数Dto
+    /// </summary>
     public record OrderParameterDetailDto : BaseEntityDto
     {
         /// <summary>

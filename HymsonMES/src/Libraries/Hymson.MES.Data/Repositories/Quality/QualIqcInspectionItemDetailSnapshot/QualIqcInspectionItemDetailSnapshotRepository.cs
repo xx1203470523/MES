@@ -139,6 +139,10 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("InspectionType = @InspectionType");
             }
+            if (!string.IsNullOrWhiteSpace(query.ParameterCode))
+            {
+                sqlBuilder.Where("ParameterCode = @ParameterCode");
+            }
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcInspectionItemDetailSnapshotEntity>(template.RawSql, query);

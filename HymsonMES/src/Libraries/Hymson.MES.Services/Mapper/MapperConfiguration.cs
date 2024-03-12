@@ -919,6 +919,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIqcOrderSaveDto, QualIqcOrderSampleQuery>();
             CreateMap<OrderParameterDetailQueryDto, QualIqcOrderSampleQuery>();
             CreateMap<OrderParameterDetailDto, QualIqcOrderSampleDetailEntity>();
+            CreateMap<OrderParameterDetailPagedQueryDto, QualIqcOrderSampleDetailPagedQuery>();
 
             #region QualIqcInspectionItem
 
