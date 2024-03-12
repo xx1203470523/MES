@@ -648,6 +648,15 @@ namespace Hymson.MES.Services.Services.Quality
 
             return dto;
         }
+        /// <summary>
+        /// 根据ID查询
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateOrderAsync(QualIqcOrderDto requestDto)
+        {
+            return await Task.FromResult(0);
+        }
 
         /// <summary>
         /// 根据查询条件获取分页数据

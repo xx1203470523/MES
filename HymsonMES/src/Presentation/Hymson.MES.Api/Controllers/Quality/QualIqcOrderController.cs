@@ -144,6 +144,17 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("update")]
+        public async Task<int> UpdateOrderAsync(QualIqcOrderDto requestDto)
+        {
+            return await _qualIqcOrderService.UpdateOrderAsync(requestDto);
+        }
+
+        /// <summary>
         /// 分页查询列表（iqc检验单）
         /// </summary>
         /// <param name="pagedQueryDto"></param>

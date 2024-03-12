@@ -66,6 +66,13 @@ namespace Hymson.MES.Services.Services.Quality
         Task<QualIqcOrderDto?> QueryByIdAsync(long id);
 
         /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> UpdateOrderAsync(QualIqcOrderDto requestDto);
+
+        /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>
