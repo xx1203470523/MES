@@ -174,12 +174,12 @@ namespace Hymson.MES.Services.Services.Quality
             qualUnqualifiedCodeEntity.CreatedBy = userId;
             qualUnqualifiedCodeEntity.UpdatedBy = userId;
             qualUnqualifiedCodeEntity.SiteId = _currentSite.SiteId ?? 0;
-            List<QualUnqualifiedCodeGroupRelation> list = new List<QualUnqualifiedCodeGroupRelation>();
+            List<QualUnqualifiedCodeGroupRelationCreateCommand> list = new List<QualUnqualifiedCodeGroupRelationCreateCommand>();
             if (param.UnqualifiedGroupIds != null && param.UnqualifiedGroupIds.Any())
             {
                 foreach (var item in param.UnqualifiedGroupIds)
                 {
-                    list.Add(new QualUnqualifiedCodeGroupRelation
+                    list.Add(new QualUnqualifiedCodeGroupRelationCreateCommand
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         UnqualifiedGroupId = item,
@@ -242,12 +242,12 @@ namespace Hymson.MES.Services.Services.Quality
             qualUnqualifiedCodeEntity.UpdatedBy = userId;
             qualUnqualifiedCodeEntity.UpdatedOn = HymsonClock.Now();
 
-            List<QualUnqualifiedCodeGroupRelation> list = new List<QualUnqualifiedCodeGroupRelation>();
+            List<QualUnqualifiedCodeGroupRelationCreateCommand> list = new List<QualUnqualifiedCodeGroupRelationCreateCommand>();
             if (param.UnqualifiedGroupIds != null && param.UnqualifiedGroupIds.Any())
             {
                 foreach (var item in param.UnqualifiedGroupIds)
                 {
-                    list.Add(new QualUnqualifiedCodeGroupRelation
+                    list.Add(new QualUnqualifiedCodeGroupRelationCreateCommand
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         UnqualifiedGroupId = qualUnqualifiedCodeEntity.Id,

@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Proc;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.SystemApi;
@@ -51,6 +52,10 @@ public class SystemApiService : ISystemApiService
     private readonly IManuSfcStepNgRepository _manuSfcStepNgRepository;
     private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
     private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+    private readonly IQualUnqualifiedGroupRepository _qualUnqualifiedGroupRepository;
+    private readonly IQualUnqualifiedGroupProcedureRelationRepository _qualUnqualifiedGroupProcedureRelationRepository;
+    private readonly IQualUnqualifiedCodeGroupRelationRepository _qualUnqualifiedCodeGroupRelationRepository;
+
 
 
     public SystemApiService(ICurrentUser currentUser,
@@ -74,7 +79,10 @@ public class SystemApiService : ISystemApiService
         IEquStatusRepository equipmentStatusRepository,
         IManuSfcStepNgRepository manuSfcStepNgRepository,
         IManuProductBadRecordRepository manuProductBadRecordRepository,
-        IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository
+        IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+        IQualUnqualifiedGroupRepository qualUnqualifiedGroupRepository,
+        IQualUnqualifiedGroupProcedureRelationRepository qualUnqualifiedGroupProcedureRelationRepository,
+        IQualUnqualifiedCodeGroupRelationRepository qualUnqualifiedCodeGroupRelationRepository
         )
     {
         _currentUser = currentUser;
@@ -99,6 +107,9 @@ public class SystemApiService : ISystemApiService
         _manuSfcStepNgRepository = manuSfcStepNgRepository;
         _manuProductBadRecordRepository = manuProductBadRecordRepository;
         _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
+        _qualUnqualifiedGroupRepository = qualUnqualifiedGroupRepository;
+        _qualUnqualifiedGroupProcedureRelationRepository = qualUnqualifiedGroupProcedureRelationRepository;
+        _qualUnqualifiedCodeGroupRelationRepository = qualUnqualifiedCodeGroupRelationRepository;
     }
 
     #region 看板
@@ -584,6 +595,7 @@ public class SystemApiService : ISystemApiService
         //计算每个段的产出只统计尾工序
         var procedureCodes = new string[] { "OP020", "OP220", "OP170" };
         var ProcedureEntities = await _procProcedureRepository.GetByCodesAsync(procedureCodes, 123456);
+        var procedureIds = ProcedureEntities.Select(a => a.Id);
 
         var procedureEntity = ProcedureEntities.FirstOrDefault(a =>
                 a.Code == (queryDto.Type switch
@@ -642,22 +654,50 @@ public class SystemApiService : ISystemApiService
         //获取manuStep，根据workorderId筛选
         var manuSfcStepIds = manuSfcStepNgEntities.Select(a => a.BarCodeStepId);
         var manuSfcStepEntities = await _manuSfcStepRepository.GetByIdsAsync(manuSfcStepIds.ToArray());
-        manuSfcStepEntities = manuSfcStepEntities.Where(a => planWorkOrderEntities.Any(b => b.Id == a.WorkOrderId) && a.ProcedureId == procedureEntity?.Id );
+        manuSfcStepEntities = manuSfcStepEntities.Where(a => planWorkOrderEntities.Any(b => b.Id == a.WorkOrderId) && a.ProcedureId == procedureEntity?.Id);
 
+        //获取需要用到不合格代码
         List<QualUnqualifiedCodeEntity> unQualifiedList = new();
-        var unQualifiedCodes = manuSfcStepNgEntities.Select(a => a.UnqualifiedCode);
+
         var unQualifiedIds = manuProductBadRecordEntities.Select(a => a.UnqualifiedId);
         var unQualifiedEntities = await _qualUnqualifiedCodeRepository.GetListAsync(new() { Ids = unQualifiedIds });
         unQualifiedList.AddRange(unQualifiedEntities);
+
+        var unQualifiedCodes = manuSfcStepNgEntities.Select(a => a.UnqualifiedCode);
         unQualifiedEntities = await _qualUnqualifiedCodeRepository.GetListAsync(new() { UnqualifiedCodes = unQualifiedCodes });
         unQualifiedList.AddRange(unQualifiedEntities);
 
+        //查询工序绑定的不良集合
+        var qualUnqualifiedGroupPrcocedureEntitiees = await _qualUnqualifiedGroupProcedureRelationRepository.GetListAsync(new() {
+            ProcedureIds = procedureIds
+        });
+
+        var groupIds = qualUnqualifiedGroupPrcocedureEntitiees.Select(a => a.UnqualifiedGroupId);
+        //查询不良集合
+        var qualUnqualifiedGroupEntities = await _qualUnqualifiedCodeGroupRelationRepository.GetListAsync(new() { 
+            UnqualifiedGroupIds = groupIds
+        });
+        var unqualifiedIds = qualUnqualifiedGroupEntities.Select(a => a.UnqualifiedCodeId);
+
+        unQualifiedEntities = await _qualUnqualifiedCodeRepository.GetListAsync(new() { Ids = unqualifiedIds });
+        unQualifiedList.AddRange(unQualifiedEntities);
+
+        foreach (var item in unQualifiedEntities)
+        {
+            result.Add(new()
+            {
+                UnQualifiedName = item.UnqualifiedCodeName,
+                UnQualifiedQty = 0
+            });
+        }
+
+
         foreach (var item in manuSfcStepNgEntities)
         {
-            var manuSfcStepEntity = manuSfcStepEntities.FirstOrDefault(a=>a.Id == item.BarCodeStepId);
+            var manuSfcStepEntity = manuSfcStepEntities.FirstOrDefault(a => a.Id == item.BarCodeStepId);
             if (manuSfcStepEntity == null) continue;
 
-            var unQualifiedEntity = unQualifiedEntities.FirstOrDefault(a => a.UnqualifiedCode == item.UnqualifiedCode);
+            var unQualifiedEntity = unQualifiedList.FirstOrDefault(a => a.UnqualifiedCode == item.UnqualifiedCode);
 
             var unQualifiedItem = result.FirstOrDefault(a => a.UnQualifiedName == unQualifiedEntity?.UnqualifiedCodeName);
 
@@ -670,7 +710,7 @@ public class SystemApiService : ISystemApiService
             var manuSfcInfo = sfcinfoEntities.FirstOrDefault(a => a.Id == item.SfcInfoId);
             if (manuSfcInfo == null) continue;
 
-            var unQualifiedEntity = unQualifiedEntities.FirstOrDefault(a => a.Id == item.UnqualifiedId);
+            var unQualifiedEntity = unQualifiedList.FirstOrDefault(a => a.Id == item.UnqualifiedId);
 
             var unQualifiedItem = result.FirstOrDefault(a => a.UnQualifiedName == unQualifiedEntity?.UnqualifiedCodeName);
 

@@ -784,7 +784,9 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             List<EquipmentUtilizationRateDto> equipmentUtilizationRateDtos = new List<EquipmentUtilizationRateDto>();
             //查询需要统计的设备信息
             var equEquipmentEntities = await _equipmentRepository.GetEntitiesAsync(new EquEquipmentQuery { SiteId = param.SiteId, EquipmentCodes = param.EquipmentCodes });
+            //获取设备运行状态
             var equIds = equEquipmentEntities.Select(c => c.Id).ToArray();
+            var equStatusEntities = await _equStatusRepository.GetListAsync(new() { EquipmentIds = equIds });
             if (!equIds.Any())
             {
                 return equipmentUtilizationRateDtos;
@@ -800,6 +802,8 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 var workingHours = param.WorkingHours;//正常出勤时间/计划时间(小时)
                 //当前设备
                 var equEquipmentEntity = equEquipmentEntities.Where(c => c.EquipmentCode == equCode).First();
+                //获取当前设备运行状态
+                var equStatus = equStatusEntities.FirstOrDefault(a => a.EquipmentId == equEquipmentEntity.Id);
                 //获取当前设备异常时长
                 var equipmentStopTime = equipmentStopTimeDtos.Where(c => c.EquipmentId == equEquipmentEntity.Id).FirstOrDefault();
                 //获取当前设备生产数据
@@ -820,7 +824,9 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 {
                     EquipmentCode = equCode,
                     EquipmentName = equEquipmentEntity.EquipmentName,
-                    UtilizationRate = utilizationRate
+                    UtilizationRate = utilizationRate,
+                    EquipmentStatus = equStatus?.EquipmentStatus,
+                    EquipmentStatusName = equStatus?.EquipmentStatus.GetDescription()
                 };
                 equipmentUtilizationRateDtos.Add(equipmentUtilizationRateDto);
             }

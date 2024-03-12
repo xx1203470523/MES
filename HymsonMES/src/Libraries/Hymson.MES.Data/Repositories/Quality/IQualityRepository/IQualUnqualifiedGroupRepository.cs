@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Quality
 {
+
     /// <summary>
     /// 不合格组仓储接口
     /// @author wangkeming
@@ -94,7 +95,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> InsertQualUnqualifiedCodeGroupRelationRangAsync(List<QualUnqualifiedCodeGroupRelation> param);
+        Task<int> InsertQualUnqualifiedCodeGroupRelationRangAsync(List<QualUnqualifiedCodeGroupRelationCreateCommand> param);
 
         /// <summary>
         /// 删除不合格代码组关联不合格代码
@@ -108,7 +109,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> InsertQualUnqualifiedGroupProcedureRelationRangAsync(List<QualUnqualifiedGroupProcedureRelation> param);
+        Task<int> InsertQualUnqualifiedGroupProcedureRelationRangAsync(List<QualUnqualifiedGroupProcedureRelationEntity> param);
 
         /// <summary>
         /// 删除不合格组关联工序

@@ -120,12 +120,12 @@ namespace Hymson.MES.Services.Services.Quality
             qualUnqualifiedGroupEntity.UpdatedBy = userId;
             qualUnqualifiedGroupEntity.SiteId = _currentSite.SiteId ?? 0;
 
-            List<QualUnqualifiedCodeGroupRelation> qualUnqualifiedCodeGroupRelationlist = new List<QualUnqualifiedCodeGroupRelation>();
+            List<QualUnqualifiedCodeGroupRelationCreateCommand> qualUnqualifiedCodeGroupRelationlist = new List<QualUnqualifiedCodeGroupRelationCreateCommand>();
             if (param.UnqualifiedCodeIds != null && param.UnqualifiedCodeIds.Any())
             {
                 foreach (var item in param.UnqualifiedCodeIds)
                 {
-                    qualUnqualifiedCodeGroupRelationlist.Add(new QualUnqualifiedCodeGroupRelation
+                    qualUnqualifiedCodeGroupRelationlist.Add(new QualUnqualifiedCodeGroupRelationCreateCommand
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
@@ -137,12 +137,12 @@ namespace Hymson.MES.Services.Services.Quality
                 }
             }
 
-            List<QualUnqualifiedGroupProcedureRelation> qualUnqualifiedGroupProcedureRelationList = new List<QualUnqualifiedGroupProcedureRelation>();
+            List<QualUnqualifiedGroupProcedureRelationEntity> qualUnqualifiedGroupProcedureRelationList = new List<QualUnqualifiedGroupProcedureRelationEntity>();
             if (param.ProcedureIds != null && param.ProcedureIds.Any())
             {
                 foreach (var item in param.ProcedureIds)
                 {
-                    qualUnqualifiedGroupProcedureRelationList.Add(new QualUnqualifiedGroupProcedureRelation
+                    qualUnqualifiedGroupProcedureRelationList.Add(new QualUnqualifiedGroupProcedureRelationEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
@@ -217,12 +217,12 @@ namespace Hymson.MES.Services.Services.Quality
             qualUnqualifiedGroupEntity.UpdatedBy = userId;
             qualUnqualifiedGroupEntity.UpdatedOn = HymsonClock.Now();
 
-            List<QualUnqualifiedCodeGroupRelation> qualUnqualifiedCodeGroupRelationlist = new List<QualUnqualifiedCodeGroupRelation>();
+            List<QualUnqualifiedCodeGroupRelationCreateCommand> qualUnqualifiedCodeGroupRelationlist = new List<QualUnqualifiedCodeGroupRelationCreateCommand>();
             if (param.UnqualifiedCodeIds != null && param.UnqualifiedCodeIds.Any())
             {
                 foreach (var item in param.UnqualifiedCodeIds)
                 {
-                    qualUnqualifiedCodeGroupRelationlist.Add(new QualUnqualifiedCodeGroupRelation
+                    qualUnqualifiedCodeGroupRelationlist.Add(new QualUnqualifiedCodeGroupRelationCreateCommand
                     {
                         Id=IdGenProvider.Instance.CreateId(),
                         SiteId=_currentSite.SiteId??0,
@@ -235,12 +235,12 @@ namespace Hymson.MES.Services.Services.Quality
                 }
             }
 
-            List<QualUnqualifiedGroupProcedureRelation> qualUnqualifiedGroupProcedureRelationList = new List<QualUnqualifiedGroupProcedureRelation>();
+            List<QualUnqualifiedGroupProcedureRelationEntity> qualUnqualifiedGroupProcedureRelationList = new List<QualUnqualifiedGroupProcedureRelationEntity>();
             if (param.ProcedureIds != null && param.ProcedureIds.Any())
             {
                 foreach (var item in param.ProcedureIds)
                 {
-                    qualUnqualifiedGroupProcedureRelationList.Add(new QualUnqualifiedGroupProcedureRelation
+                    qualUnqualifiedGroupProcedureRelationList.Add(new QualUnqualifiedGroupProcedureRelationEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,

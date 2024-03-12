@@ -7,7 +7,7 @@ namespace Hymson.MES.Core.Domain.Quality
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class QualUnqualifiedGroupProcedureRelation : BaseEntity
+    public class QualUnqualifiedGroupProcedureRelationEntity : BaseEntity
     {
         /// <summary>
         /// 描述 :所属站点代码 

@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -221,14 +222,26 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 设备编码
         /// </summary>
         public string EquipmentCode { get; set; }
+
         /// <summary>
         /// 设备名称
         /// </summary>
         public string EquipmentName { get; set; }
+
         /// <summary>
         /// 稼动率
         /// </summary>
         public decimal UtilizationRate { get; set; }
+
+        /// <summary>
+        /// 设备运行状态
+        /// </summary>
+        public EquipmentStateEnum? EquipmentStatus { get; set; }
+
+        /// <summary>
+        /// 设备运行状态名称
+        /// </summary>
+        public string? EquipmentStatusName { get; set; }
     }
 
     /// <summary>
