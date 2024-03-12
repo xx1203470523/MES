@@ -285,7 +285,6 @@ namespace Hymson.MES.Services.Services.Quality
                 IQCOrderId = entity.Id,
                 IQCOrderTypeId = orderTypeEntity.Id,
                 Barcode = requestDto.Barcode,
-                IsQualified = TrueOrFalseEnum.Yes,  // 默认合格
                 CreatedBy = updatedBy,
                 CreatedOn = updatedOn,
                 UpdatedBy = updatedBy,
@@ -349,8 +348,16 @@ namespace Hymson.MES.Services.Services.Quality
                 }
             }
 
-            // 检查是否不合格
-            if (sampleDetailEntities.Count(a => a.IsQualified == TrueOrFalseEnum.No) >= orderTypeEntity.AcceptanceLevel) sampleEntity.IsQualified = TrueOrFalseEnum.No;
+            // 默认情况
+            entity.Status = InspectionStatusEnum.Closed;
+            sampleEntity.IsQualified = TrueOrFalseEnum.Yes;
+
+            // 不合格情况
+            if (sampleDetailEntities.Count(a => a.IsQualified == TrueOrFalseEnum.No) >= orderTypeEntity.AcceptanceLevel)
+            {
+                entity.Status = InspectionStatusEnum.Completed;
+                sampleEntity.IsQualified = TrueOrFalseEnum.No;
+            }
 
             // 保存
             var rows = 0;
