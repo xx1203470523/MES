@@ -1865,6 +1865,7 @@
         public const string MES19906 = "请录入样本条码！";
         public const string MES19907 = "请选择检验类型！";
         public const string MES19908 = "检验类型【{Type}】的实际应检数量【{CheckedQty}】少于应检数量【{SampleQty}】！";
+        public const string MES19909 = "只有【{Before}】状态的检验单才允许【{After}】！";
         #endregion
 
         #region OQC检验项目 19500

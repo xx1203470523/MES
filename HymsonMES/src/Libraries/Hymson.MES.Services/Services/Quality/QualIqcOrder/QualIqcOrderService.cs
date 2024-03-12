@@ -382,10 +382,15 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // TODO 只有检验中的状态才允许"完成"
+            // 只有"检验中"的状态才允许点击"完成"
+            if (entity.Status != InspectionStatusEnum.Inspecting)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19909))
+                    .WithData("Before", InspectionStatusEnum.Inspecting.GetDescription())
+                    .WithData("After", InspectionStatusEnum.Completed.GetDescription());
+            }
 
-            /*
-            // 检查每种类型是否已经录入
+            // 检查每种类型是否已经录入足够
             var orderTypeEntities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(entity.Id);
             if (orderTypeEntities.Any(a => a.SampleQty > a.CheckedQty))
             {
@@ -394,7 +399,6 @@ namespace Hymson.MES.Services.Services.Quality
                     .WithData("CheckedQty", "")
                     .WithData("SampleQty", "");
             }
-            */
 
             // 检查类型是否已经存在
             var operationType = OrderOperateTypeEnum.Complete;
@@ -405,8 +409,6 @@ namespace Hymson.MES.Services.Services.Quality
                 OperationType = operationType
             });
             if (orderOperationEntities != null && orderOperationEntities.Any()) return 0;
-
-            // TODO 检验是否样本数量已经足够
 
             // 插入检验单状态操作记录
             return await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
@@ -442,7 +444,13 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // TODO 只有检验中的状态才允许"关闭"
+            // 只有"检验中"的状态才允许"关闭"
+            if (entity.Status != InspectionStatusEnum.Closed)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19909))
+                    .WithData("Before", InspectionStatusEnum.Inspecting.GetDescription())
+                    .WithData("After", InspectionStatusEnum.Closed.GetDescription());
+            }
 
             // 检查类型是否已经存在
             var operationType = OrderOperateTypeEnum.Close;
