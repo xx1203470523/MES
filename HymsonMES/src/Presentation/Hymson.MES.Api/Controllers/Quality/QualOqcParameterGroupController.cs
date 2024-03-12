@@ -83,12 +83,12 @@ namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("delete")]
-        public async Task DeleteAsync([FromBody] long[] ids)
-        {
-            await _qualOqcParameterGroupService.DeletesAsync(ids);
-        }
+        //[HttpDelete]
+        //[Route("delete")]
+        //public async Task DeleteAsync([FromBody] long[] ids)
+        //{
+        //    await _qualOqcParameterGroupService.DeletesAsync(ids);
+        //}
 
         /// <summary>
         /// 查询详情（OQC检验参数组）
@@ -132,7 +132,7 @@ namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
         /// <returns></returns>
         [HttpDelete("delete")]
         [LogDescription("删除OQC检验项目", BusinessType.DELETE)]
-        public async Task UpdateAsync(QualOqcParameterGroupDeleteDto deleteDto)
+        public async Task DeleteSoftAsync(QualOqcParameterGroupDeleteDto deleteDto)
         {
             await _qualOqcParameterGroupService.DeleteAsync(deleteDto);
         }
