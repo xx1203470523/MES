@@ -126,10 +126,21 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("save")]
-        public async Task SaveOrderAsync([FromBody] QualOqcOrderSaveDto requestDto)
+        public async Task SaveOrderAsync([FromBody] QualOqcOrderExecSaveDto requestDto)
         {
             await _qualOqcOrderService.SaveOrderAsync(requestDto);
         }
 
+
+        /// <summary>
+        /// 完成检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("complete")]
+        public async Task CompleteOrderAsync(QualOqcOrderCompleteDto requestDto)
+        {
+            await _qualOqcOrderService.CompleteOrderAsync(requestDto);
+        }
     }
 }

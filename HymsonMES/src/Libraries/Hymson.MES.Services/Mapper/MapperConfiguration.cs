@@ -977,6 +977,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualOqcOrderPagedQueryDto, QualOqcOrderPagedQuery>();
             CreateMap<QualOqcOrderEntity, QualOqcOrderDto>();
             CreateMap<QualOqcParameterGroupDetailSnapshootEntity, CheckBarCodeOutDto>();
+            CreateMap<QualOqcOrderExecSaveDto, QualOqcOrderSampleQuery>();
 
             #endregion
         }

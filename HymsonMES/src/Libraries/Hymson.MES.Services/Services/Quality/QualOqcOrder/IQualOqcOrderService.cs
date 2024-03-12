@@ -69,6 +69,6 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task SaveOrderAsync(QualOqcOrderSaveDto requestDto);
+        Task SaveOrderAsync(QualOqcOrderExecSaveDto requestDto);
     }
 }

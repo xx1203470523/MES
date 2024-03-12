@@ -1889,6 +1889,8 @@
         public const string MES17803 = "样品条码【{barcode}】不存在出货单中！";
         public const string MES17804 = "检验单数据为空！";
         public const string MES17805 = "OQC检验参数组明细数据为空！";
+        public const string MES17806 = "保存OQC样品数据失败！";
+        public const string MES17807 = "OQC检验单【{code}】已经完成检验！";
 
         #endregion
 

@@ -14,31 +14,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 出货单明细Ids
         /// </summary>
         public List<long> ShipmentDetailIds { get; set; }
-
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long OQCOrderId { get; set; }
-
-        /// <summary>
-        /// 检验类型ID
-        /// </summary>
-        public long OQCOrderTypeId { get; set; }
-
-        /// <summary>
-        /// 样品条码
-        /// </summary>
-        public string Barcode { get; set; }
-
-        ///// <summary>
-        ///// 检验单文件
-        ///// </summary>
-        //public IEnumerable<InteAttachmentBaseDto>? OredrAttachments { get; set; }
-
-        /// <summary>
-        /// 样品参数
-        /// </summary>
-        public IEnumerable<QualOqcOrderParameterSaveDto> Details { get; set; }
+        
     }
 
     /// <summary>
@@ -407,6 +383,33 @@ namespace Hymson.MES.Services.Dtos.Quality
         public decimal? LowerLimit { get; set; }
     }
 
+
+    /// <summary>
+    /// OQC检验单新增/更新Dto
+    /// </summary>
+    public record QualOqcOrderExecSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long OQCOrderId { get; set; }
+
+        /// <summary>
+        /// 检验类型ID
+        /// </summary>
+        public long OQCOrderTypeId { get; set; }
+
+        /// <summary>
+        /// 样品条码
+        /// </summary>
+        public string Barcode { get; set; }
+
+        /// <summary>
+        /// 样品参数
+        /// </summary>
+        public IEnumerable<QualOqcOrderParameterSaveDto> Details { get; set; }
+    }
+
     /// <summary>
     /// Oqc检验单样品参数
     /// </summary>
@@ -431,6 +434,18 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 参数附件
         /// </summary>
         public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
+
+    }
+
+    /// <summary>
+    /// 完成Dto
+    /// </summary>
+    public record QualOqcOrderCompleteDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long OQCOrderId { get; set; }
 
     }
 }
