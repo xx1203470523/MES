@@ -7,6 +7,7 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualOqcParameterGroupQuery
     {
+        public IEnumerable<long> Ids { get; set; }
         /// <summary>
         /// 排序(默认为 CreatedOn DESC)
         /// </summary>

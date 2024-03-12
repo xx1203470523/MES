@@ -120,6 +120,7 @@ namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("page")]
+        [LogDescription("查询OQC分页检验项目", BusinessType.OTHER)]
         public async Task<PagedInfo<QualOqcParameterGroupOutputDto>> GetPagedAsync([FromQuery] QualOqcParameterGroupPagedQueryDto query)
         {
             return await _qualOqcParameterGroupService.GetPagedAsync(query);

@@ -149,7 +149,7 @@ public partial class QualOqcParameterGroupRepository : BaseRepository, IQualOqcP
         var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
         sqlBuilder.Select("*");
         sqlBuilder.Where("IsDeleted = 0");
-        sqlBuilder.Where("SiteId = @SiteId");
+        //sqlBuilder.Where("SiteId = @SiteId");
         if (query.MaterialId.HasValue)
         {
             sqlBuilder.Where("MaterialId = @MaterialId");
@@ -162,8 +162,13 @@ public partial class QualOqcParameterGroupRepository : BaseRepository, IQualOqcP
         {
             sqlBuilder.Where("Status = @Status");
         }
+        if (query.Ids.Any())
+        {
+            sqlBuilder.Where("Id IN @Ids");
+        }
         //排序
         if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
+        sqlBuilder.AddParameters(query);
         using var conn = GetMESDbConnection();
         return await conn.QueryAsync<QualOqcParameterGroupEntity>(template.RawSql, query);
     }
