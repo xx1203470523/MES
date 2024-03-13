@@ -37,12 +37,12 @@ public class QualOqcParameterGroupDetailCreateCommand : CreateCommandAbstraction
     /// <summary>
     /// 检验类型
     /// </summary>
-    public string? InspectionType { get; set; }
+    public OQCInspectionTypeEnum? InspectionType { get; set; }
 
     /// <summary>
     /// 参考值
     /// </summary>
-    public string? ReferenceValue { get; set; }
+    public decimal? ReferenceValue { get; set; }
 
     /// <summary>
     /// 录入次数
