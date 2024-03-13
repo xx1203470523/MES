@@ -1,4 +1,3 @@
-using Elastic.Transport;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -25,7 +24,6 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -395,13 +393,13 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 默认情况
             entity.Status = InspectionStatusEnum.Closed;
-            sampleEntity.IsQualified = TrueOrFalseEnum.Yes;
+            //sampleEntity.IsQualified = TrueOrFalseEnum.Yes;
 
             // 不合格情况
             if (sampleDetailEntities.Count(a => a.IsQualified == TrueOrFalseEnum.No) >= orderTypeEntity.AcceptanceLevel)
             {
                 entity.Status = InspectionStatusEnum.Completed;
-                sampleEntity.IsQualified = TrueOrFalseEnum.No;
+                //sampleEntity.IsQualified = TrueOrFalseEnum.No;
             }
 
             // 保存
@@ -459,7 +457,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 检查类型是否已经存在
-            var operationType = OrderOperateTypeEnum.Complete;
+            var operationType = OrderOperateTypeEnum.Close;
             var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
             {
                 SiteId = entity.SiteId,
@@ -468,11 +466,23 @@ namespace Hymson.MES.Services.Services.Quality
             });
             if (orderOperationEntities != null && orderOperationEntities.Any()) return 0;
 
-            // TODO 判断是否不合格
-            //entity.AcceptanceLevel
+            // 读取所有明细参数
+            var sampleDetailEntities = await _qualIqcOrderSampleDetailRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailQuery
+            {
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id
+            });
 
-            // 插入检验单状态操作记录
-            return await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
+            // 如果未超过接收水平，则设置为"关闭"
+            if (sampleDetailEntities.Count(c => c.IsQualified == TrueOrFalseEnum.No) > entity.AcceptanceLevel)
+            {
+                operationType = OrderOperateTypeEnum.Complete;
+            }
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _qualIqcOrderRepository.UpdateAsync(entity);
+            rows += await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = entity.SiteId,
@@ -485,6 +495,8 @@ namespace Hymson.MES.Services.Services.Quality
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn
             });
+            trans.Complete();
+            return rows;
         }
 
         /// <summary>
