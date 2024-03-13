@@ -78,7 +78,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 载具条码
         /// </summary>
-        public IEnumerable<OutStationRequestBo> OutStationRequestBos { get; set; }
+        public IEnumerable<OutStationRequestBo> OutStationRequestBos { get; set; }  = new List<OutStationRequestBo>();
     }
 
     /// <summary>
