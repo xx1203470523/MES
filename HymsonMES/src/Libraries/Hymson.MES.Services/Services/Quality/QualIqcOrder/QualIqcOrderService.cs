@@ -234,14 +234,20 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
-            // 检查当前操作类型是否已经执行过（这里存在的话也不进行阻断操作）
-            var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
+            // 检查当前操作类型是否已经执行过
+            if (entity.Status != InspectionStatusEnum.WaitInspect) return default;
+            switch (entity.Status)
             {
-                SiteId = entity.SiteId,
-                IQCOrderId = entity.Id,
-                OperationType = OrderOperateTypeEnum.Start
-            });
-            if (orderOperationEntities != null && orderOperationEntities.Any()) return default;
+                case InspectionStatusEnum.WaitInspect:
+                    // 继续接下来的操作
+                    break;
+                case InspectionStatusEnum.Completed:
+                case InspectionStatusEnum.Closed:
+                    throw new CustomerValidationException(nameof(ErrorCode.MES11914))
+                        .WithData("Status", $"{InspectionStatusEnum.Completed.GetDescription()}/{InspectionStatusEnum.Closed.GetDescription()}");
+                case InspectionStatusEnum.Inspecting:
+                default: return default;
+            }
 
             // 更改状态
             switch (requestDto.OperationType)
@@ -430,9 +436,6 @@ namespace Hymson.MES.Services.Services.Quality
                     .WithData("SampleQty", orderTypeEntity.SampleQty);
             }
 
-            // 检查当前操作类型是否已经执行过
-            await CheckOperationAsync(entity, OrderOperateTypeEnum.Complete);
-
             // 读取所有明细参数
             var sampleDetailEntities = await _qualIqcOrderSampleDetailRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailQuery
             {
@@ -476,6 +479,7 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
+            /*
             // 只有"检验中"的状态才允许点击"免检"
             if (entity.Status != InspectionStatusEnum.Inspecting)
             {
@@ -486,6 +490,7 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 检查当前操作类型是否已经执行过
             await CheckOperationAsync(entity, OrderOperateTypeEnum.Close);
+            */
 
             // 关闭检验单
             entity.Status = InspectionStatusEnum.Closed;
@@ -518,9 +523,6 @@ namespace Hymson.MES.Services.Services.Quality
                     .WithData("Before", InspectionStatusEnum.Completed.GetDescription())
                     .WithData("After", InspectionStatusEnum.Closed.GetDescription());
             }
-
-            // 检查当前操作类型是否已经执行过
-            await CheckOperationAsync(entity, OrderOperateTypeEnum.Close);
 
             // 不合格处理完成之后直接关闭
             entity.Status = InspectionStatusEnum.Closed;
