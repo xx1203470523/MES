@@ -122,6 +122,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IInteAttachmentRepository _inteAttachmentRepository;
 
+        /// <summary>
+        /// 服务接口（检验单生成）
+        /// </summary>
         private readonly IIQCOrderCreateService _iqcOrderCreateService;
 
         /// <summary>
@@ -642,6 +645,7 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 实体到DTO转换
             var dto = entity.ToModel<QualIqcOrderDto>();
+            dto.InspectionGradeText = dto.InspectionGrade.GetDescription();
             dto.StatusText = dto.Status.GetDescription();
             dto.IsQualifiedText = dto.IsQualified.GetDescription();
 

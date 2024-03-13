@@ -41,11 +41,11 @@ namespace Hymson.MES.Api.Controllers.Quality
 
 
         /// <summary>
-        /// 删除检验单附件
+        /// 上传检验单附件
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpDelete("attachment/save")]
+        [HttpPost("attachment/save")]
         public async Task SaveAttachmentAsync([FromBody] QualIqcOrderSaveAttachmentDto requestDto)
         {
             await _qualIqcOrderService.SaveAttachmentAsync(requestDto);
@@ -56,7 +56,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="orderAnnexId"></param>
         /// <returns></returns>
-        [HttpDelete("attachment/delete")]
+        [HttpDelete("attachment/delete/{orderAnnexId}")]
         public async Task DeleteAttachmentByIdAsync(long orderAnnexId)
         {
             await _qualIqcOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
@@ -67,8 +67,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("delete")]
+        [HttpDelete("delete")]
         public async Task DeleteOrdersAsync([FromBody] long[] ids)
         {
             await _qualIqcOrderService.DeleteOrdersAsync(ids);
@@ -92,7 +91,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPut("operation")]
+        [HttpPost("operation")]
         public async Task<long> OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
         {
             return await _qualIqcOrderService.OperationOrderAsync(requestDto);
@@ -114,7 +113,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPut("complete")]
+        [HttpPost("complete")]
         public async Task<long> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
         {
             return await _qualIqcOrderService.CompleteOrderAsync(requestDto);
@@ -125,7 +124,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPut("free")]
+        [HttpPost("free")]
         public async Task<long> FreeOrderAsync(QualIqcOrderFreeDto requestDto)
         {
             return await _qualIqcOrderService.FreeOrderAsync(requestDto);
@@ -136,7 +135,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPut("close")]
+        [HttpPost("close")]
         public async Task<long> CloseOrderAsync(QualIqcOrderCloseDto requestDto)
         {
             return await _qualIqcOrderService.CloseOrderAsync(requestDto);
