@@ -443,9 +443,19 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record QualOqcOrderCompleteDto
     {
         /// <summary>
-        /// 主键
+        /// OQC检验单Id
         /// </summary>
         public long OQCOrderId { get; set; }
 
+    }
+
+    /// <summary>
+    /// 修改检验单状态Dto
+    /// </summary>
+    public record UpdateStatusDto {
+        /// <summary>
+        /// OQC检验单Id
+        /// </summary>
+        public long OQCOrderId { get; set; }
     }
 }

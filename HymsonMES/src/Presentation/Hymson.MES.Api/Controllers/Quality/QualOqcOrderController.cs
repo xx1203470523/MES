@@ -131,7 +131,6 @@ namespace Hymson.MES.Api.Controllers.Quality
             await _qualOqcOrderService.SaveOrderAsync(requestDto);
         }
 
-
         /// <summary>
         /// 完成检验单
         /// </summary>
@@ -141,6 +140,18 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task CompleteOrderAsync(QualOqcOrderCompleteDto requestDto)
         {
             await _qualOqcOrderService.CompleteOrderAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 更新OQC检验单状态
+        /// </summary>
+        /// <param name="updateStatusDto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatus")]
+        public async Task UpdateStatusAsync([FromBody] UpdateStatusDto updateStatusDto)
+        {
+            await _qualOqcOrderService.UpdateStatusAsync(updateStatusDto);
         }
     }
 }

@@ -195,6 +195,25 @@ namespace Hymson.MES.Services.Services.Quality
             return await _qualOqcOrderRepository.UpdateAsync(entity);
         }
 
+
+        /// <summary>
+        /// 修改检验单状态
+        /// </summary>
+        /// <param name="updateStatusDto"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(UpdateStatusDto updateStatusDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+
+            var result = await _qualOqcOrderRepository.UpdateStatusAsync(new QualOqcOrderEntity { Id = updateStatusDto.OQCOrderId, Status = InspectionStatusEnum.Inspecting });
+            if (result == 0) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17809));
+            }
+           
+        }
+
         /// <summary>
         /// 删除
         /// </summary>
@@ -533,13 +552,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
+        public async Task CompleteOrderAsync(QualOqcOrderCompleteDto requestDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 获取OQC检验单
-            var oqcOrderEntity = await _qualOqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
+            var oqcOrderEntity = await _qualOqcOrderRepository.GetByIdAsync(requestDto.OQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 更新时间
@@ -582,20 +601,23 @@ namespace Hymson.MES.Services.Services.Quality
             // TODO 判断是否不合格
             //entity.AcceptanceLevel
 
-            //// 插入检验单状态操作记录
-            //return await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
-            //{
-            //    Id = IdGenProvider.Instance.CreateId(),
-            //    SiteId = entity.SiteId,
-            //    IQCOrderId = entity.Id,
-            //    OperationType = operationType,
-            //    OperateBy = updatedBy,
-            //    OperateOn = updatedOn,
-            //    CreatedBy = updatedBy,
-            //    CreatedOn = updatedOn,
-            //    UpdatedBy = updatedBy,
-            //    UpdatedOn = updatedOn
-            //});
+            // 插入检验单状态操作记录
+            var insertRes= await _qualOqcOrderOperateRepository.InsertAsync(new QualOqcOrderOperateEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = oqcOrderEntity.SiteId,
+                OQCOrderId = oqcOrderEntity.Id,
+                OperateType = operationType,
+                OperateBy = updatedBy,
+                OperateOn = updatedOn,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            });
+            if (insertRes == 0) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17808));
+            }
         }
     }
 }

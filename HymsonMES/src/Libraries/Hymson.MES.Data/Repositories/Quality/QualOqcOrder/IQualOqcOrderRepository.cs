@@ -32,6 +32,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<int> UpdateAsync(QualOqcOrderEntity entity);
 
         /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(QualOqcOrderEntity entity);
+
+        /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>

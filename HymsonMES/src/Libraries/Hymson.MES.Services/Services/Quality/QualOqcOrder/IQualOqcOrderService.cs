@@ -23,6 +23,13 @@ namespace Hymson.MES.Services.Services.Quality
         Task<int> ModifyAsync(QualOqcOrderSaveDto saveDto);
 
         /// <summary>
+        /// 修改检验单状态
+        /// </summary>
+        /// <param name="updateStatusDto"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(UpdateStatusDto updateStatusDto);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
@@ -70,5 +77,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task SaveOrderAsync(QualOqcOrderExecSaveDto requestDto);
+
+        /// <summary>
+        /// 完成检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task CompleteOrderAsync(QualOqcOrderCompleteDto requestDto);
     }
 }
