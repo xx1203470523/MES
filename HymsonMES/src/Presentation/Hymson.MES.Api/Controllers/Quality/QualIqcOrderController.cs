@@ -121,6 +121,17 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 检验单免检
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("free")]
+        public async Task FreeOrderAsync(QualIqcOrderFreeDto requestDto)
+        {
+            await _qualIqcOrderService.FreeOrderAsync(requestDto);
+        }
+
+        /// <summary>
         /// 关闭检验单
         /// </summary>
         /// <param name="requestDto"></param>

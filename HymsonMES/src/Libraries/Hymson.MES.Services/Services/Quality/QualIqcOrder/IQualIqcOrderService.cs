@@ -31,6 +31,13 @@ namespace Hymson.MES.Services.Services.Quality
         Task<int> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto);
 
         /// <summary>
+        /// 免检
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> FreeOrderAsync(QualIqcOrderFreeDto requestDto);
+
+        /// <summary>
         /// 关闭检验单
         /// </summary>
         /// <param name="requestDto"></param>
