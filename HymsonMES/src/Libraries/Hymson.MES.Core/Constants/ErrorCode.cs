@@ -1875,13 +1875,25 @@
         public const string MES19804 = "日历{Dates}已启用无法被删除！";
         #endregion
 
-        #region IQC检验项目
+        #region IQC/OQC检验项目
 
         public const string MES19901 = "IQC检验项目编码重复，或物料重复";
         public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19903 = "IQC检验项目必须填写物料，且物料信息必须准确";
         public const string MES19904 = "已启用的IQC检验项目不允许删除，{codes}";
-        #endregion
+        public const string MES19905 = "样本条码【{Code}】已存在检验类型为【{Type}】的数据！";
+        public const string MES19906 = "请录入样本条码！";
+        public const string MES19907 = "请选择检验类型！";
+        public const string MES19908 = "检验类型【{Type}】的实际应检数量【{CheckedQty}】少于应检数量【{SampleQty}】！";
+        public const string MES19909 = "只有【{Before}】状态的检验单才允许【{After}】！";
+
+        public const string MES19950 = "OQC检验项目编码重复，或物料重复";
+        public const string MES19951 = "OQC检验项目不存在，可能操作时被删除或数据异常";
+        public const string MES19952 = "OQC检验项目必须填写物料，且物料信息必须准确";
+        public const string MES19953 = "已启用的检验项目不允许删除，{codes}";
+
+        #endregion 
+
 
         #region OQC检验项目 19500
 
@@ -1897,6 +1909,9 @@
         public const string MES17809 = "执行检验失败！";
 
         #endregion
+
+   
+
 
         #region 基础数据导入 11600
 

@@ -101,7 +101,7 @@ public partial class QualOqcParameterGroupRepository
 {
     #region 新增
 
-    const string InsertIgnoreSql = "INSERT IGNORE INTO `qual_oqc_parameter_group` (`Id`,`Code`,`Name`,`MaterialId`,`CustomerId`,`SampleQty`,`GenerateCondition`,`GenerateConditionUnit`,`Version`,`Status`,`Remark`,`CreatedOn`,`CreatedBy`,`UpdatedOn`,`UpdatedBy`,`SiteId`,`IsDeleted`) VALUES (@Id,@Code,@Name,@MaterialId,@CustomerId,@SampleQty,@GenerateCondition,@GenerateConditionUnit,@Version,@Status,@Remark,@CreatedOn,@CreatedBy,@UpdatedOn,@UpdatedBy,@SiteId,@IsDeleted);";
+    const string InsertIgnoreSql = "INSERT IGNORE INTO `qual_oqc_parameter_group` (`Id`,`Code`,`Name`,`MaterialId`,`CustomerId`,`Version`,`Status`,`Remark`,`CreatedOn`,`CreatedBy`,`UpdatedOn`,`UpdatedBy`,`SiteId`,`IsDeleted`) VALUES (@Id,@Code,@Name,@MaterialId,@CustomerId,@Version,@Status,@Remark,@CreatedOn,@CreatedBy,@UpdatedOn,@UpdatedBy,@SiteId,@IsDeleted);";
 
     #endregion
 }
