@@ -234,8 +234,14 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
-            // 检查当前操作类型是否已经执行过
-            await CheckOperationAsync(entity, requestDto.OperationType);
+            // 检查当前操作类型是否已经执行过（这里存在的话也不进行阻断操作）
+            var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
+            {
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id,
+                OperationType = OrderOperateTypeEnum.Start
+            });
+            if (orderOperationEntities != null && orderOperationEntities.Any()) return default;
 
             // 更改状态
             switch (requestDto.OperationType)
