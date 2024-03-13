@@ -126,12 +126,13 @@ public partial class ProcProcessRouteDetailLinkRepository : IProcProcessRouteDet
     /// <returns></returns>
     public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetNextProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query)
     {
-        var key = $"proc_process_route_detail_link&{query.ProcessRouteId}&{query.ProcedureId}";
-        return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-        {
+        //工艺路线变更后还按原设置生产，去掉缓存排查
+        //var key = $"proc_process_route_detail_link&{query.ProcessRouteId}&{query.ProcedureId}";
+        //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+        //{
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(GetNextProcedureIDsSql, query);
-        });
+        //});
     }
 
     /// <summary>
