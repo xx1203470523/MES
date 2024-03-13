@@ -119,5 +119,39 @@ namespace Hymson.MES.Api.Controllers.Quality
         {
             return await _qualOqcOrderService.CheckBarCodeAsync(checkBarCodeQuqryDto);
         }
+
+        /// <summary>
+        /// 保存样品数据
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("save")]
+        public async Task SaveOrderAsync([FromBody] QualOqcOrderExecSaveDto requestDto)
+        {
+            await _qualOqcOrderService.SaveOrderAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 完成检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("complete")]
+        public async Task CompleteOrderAsync(QualOqcOrderCompleteDto requestDto)
+        {
+            await _qualOqcOrderService.CompleteOrderAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 更新OQC检验单状态
+        /// </summary>
+        /// <param name="updateStatusDto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatus")]
+        public async Task UpdateStatusAsync([FromBody] UpdateStatusDto updateStatusDto)
+        {
+            await _qualOqcOrderService.UpdateStatusAsync(updateStatusDto);
+        }
     }
 }

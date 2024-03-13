@@ -197,6 +197,7 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
             sqlBuilder.Select("*");
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("Status != 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code)) {
