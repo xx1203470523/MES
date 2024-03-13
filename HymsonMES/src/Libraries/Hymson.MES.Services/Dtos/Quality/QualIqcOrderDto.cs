@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式
         /// </summary>
-        public HandMethodEnum? HandMethod { get; set; }
+        public HandMethodEnum HandMethod { get; set; }
 
         /// <summary>
         /// 备注
