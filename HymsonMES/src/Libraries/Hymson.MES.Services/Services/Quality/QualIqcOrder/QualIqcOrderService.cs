@@ -1173,12 +1173,15 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     dto.Name = "附件不存在";
                     dto.Path = "";
+                    dto.Url = "";
                     dtos.Add(dto);
                     continue;
                 }
 
+                dto.Id = item.Id;
                 dto.Name = attachmentEntity.Name;
                 dto.Path = attachmentEntity.Path;
+                dto.Url = attachmentEntity.Path;
                 dtos.Add(dto);
             }
 
