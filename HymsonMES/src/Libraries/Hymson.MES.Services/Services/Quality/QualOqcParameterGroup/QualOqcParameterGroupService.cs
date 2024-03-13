@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = await _qualOqcParameterGroupRepository.GetOneAsync(new QualOqcParameterGroupToQuery { Id = updateDto.Id });
             if (entity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19902));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19954));
             }
 
             var command = updateDto.ToCommand<QualOqcParameterGroupUpdateCommand>();
@@ -322,7 +322,7 @@ namespace Hymson.MES.Services.Services.Quality
                 CodeLike = queryDto.Code,
                 NameLike = queryDto.Name,
                 MaterialIds = materialIds,
-                SupplierIds = customerIds,
+                CustomerIds = customerIds,
                 Status = queryDto.Status,
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
@@ -385,7 +385,7 @@ namespace Hymson.MES.Services.Services.Quality
             await _validationDeleteRules.ValidateAndThrowAsync(deleteDto);
 
             var qualIqcInspectionItemEntities = await _qualOqcParameterGroupRepository.GetEntitiesAsync(new QualOqcParameterGroupQuery { Ids = deleteDto.Ids });
-      
+
             if (qualIqcInspectionItemEntities.Any(m => m.Status == SysDataStatusEnum.Enable))
             {
                 var codes = new StringBuilder();

@@ -43,12 +43,12 @@ namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
         }
 
         /// <summary>
-        /// IQC检验项目 ; 单条数据查询
-        /// 描述：
+        /// OQC检验项目 ; 单条数据查询
         /// </summary>
         /// <param name="query">查询条件</param>
         /// <returns></returns>
         [HttpGet("one")]
+        [LogDescription("OQC检验项目获取单个", BusinessType.OTHER)]
         public async Task<QualOqcParameterGroupOutputDto> GetOneAsync([FromQuery] QualOqcParameterGroupQueryDto query)
         {
             return await _qualOqcParameterGroupService.GetOneAsync(query);
@@ -61,6 +61,7 @@ namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("OQC检验项目新增", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] QualOqcParameterGroupDto createDto)
         {
              await _qualOqcParameterGroupService.CreateAsync(createDto);
@@ -73,6 +74,7 @@ namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("OQC检验项目更新", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] QualOqcParameterGroupUpdateDto updateDto)
         {
              await _qualOqcParameterGroupService.ModifyAsync(updateDto);
