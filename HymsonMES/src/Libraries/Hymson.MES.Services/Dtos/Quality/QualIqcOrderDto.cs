@@ -79,6 +79,18 @@ namespace Hymson.MES.Services.Dtos.Quality
     }
 
     /// <summary>
+    /// 免检
+    /// </summary>
+    public record QualIqcOrderFreeDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long IQCOrderId { get; set; }
+
+    }
+
+    /// <summary>
     /// 完成Dto
     /// </summary>
     public record QualIqcOrderCloseDto

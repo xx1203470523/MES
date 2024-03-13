@@ -1,4 +1,3 @@
-using Elastic.Transport;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -25,7 +24,6 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -187,6 +185,7 @@ namespace Hymson.MES.Services.Services.Quality
             _iqcOrderCreateService = iqcOrderCreateService;
         }
 
+
         /// <summary>
         /// 生成IQC检验单
         /// </summary>
@@ -236,7 +235,7 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
-            //出货单明细
+            // 出货单明细
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -394,13 +393,13 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 默认情况
             entity.Status = InspectionStatusEnum.Closed;
-            sampleEntity.IsQualified = TrueOrFalseEnum.Yes;
+            //sampleEntity.IsQualified = TrueOrFalseEnum.Yes;
 
             // 不合格情况
             if (sampleDetailEntities.Count(a => a.IsQualified == TrueOrFalseEnum.No) >= orderTypeEntity.AcceptanceLevel)
             {
                 entity.Status = InspectionStatusEnum.Completed;
-                sampleEntity.IsQualified = TrueOrFalseEnum.No;
+                //sampleEntity.IsQualified = TrueOrFalseEnum.No;
             }
 
             // 保存
@@ -458,7 +457,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 检查类型是否已经存在
-            var operationType = OrderOperateTypeEnum.Complete;
+            var operationType = OrderOperateTypeEnum.Close;
             var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
             {
                 SiteId = entity.SiteId,
@@ -467,11 +466,23 @@ namespace Hymson.MES.Services.Services.Quality
             });
             if (orderOperationEntities != null && orderOperationEntities.Any()) return 0;
 
-            // TODO 判断是否不合格
-            //entity.AcceptanceLevel
+            // 读取所有明细参数
+            var sampleDetailEntities = await _qualIqcOrderSampleDetailRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailQuery
+            {
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id
+            });
 
-            // 插入检验单状态操作记录
-            return await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
+            // 如果未超过接收水平，则设置为"关闭"
+            if (sampleDetailEntities.Count(c => c.IsQualified == TrueOrFalseEnum.No) > entity.AcceptanceLevel)
+            {
+                operationType = OrderOperateTypeEnum.Complete;
+            }
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _qualIqcOrderRepository.UpdateAsync(entity);
+            rows += await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = entity.SiteId,
@@ -484,6 +495,69 @@ namespace Hymson.MES.Services.Services.Quality
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn
             });
+            trans.Complete();
+            return rows;
+        }
+
+        /// <summary>
+        /// 免检
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> FreeOrderAsync(QualIqcOrderFreeDto requestDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            // IQC检验单
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            // 只有"检验中"的状态才允许点击"免检"
+            if (entity.Status != InspectionStatusEnum.Inspecting)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19909))
+                    .WithData("Before", InspectionStatusEnum.Inspecting.GetDescription())
+                    .WithData("After", "免检");   // InspectionStatusEnum.Closed.GetDescription()
+            }
+
+            // 检查类型是否已经存在
+            var operationType = OrderOperateTypeEnum.Close;
+            var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
+            {
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id,
+                OperationType = operationType
+            });
+            if (orderOperationEntities != null && orderOperationEntities.Any()) return 0;
+
+            // 关闭检验单
+            entity.Status = InspectionStatusEnum.Closed;
+            entity.UpdatedBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _qualIqcOrderRepository.UpdateAsync(entity);
+            rows += await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.Id,
+                OperationType = operationType,
+                OperateBy = updatedBy,
+                OperateOn = updatedOn,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            });
+            trans.Complete();
+            return rows;
         }
 
         /// <summary>
