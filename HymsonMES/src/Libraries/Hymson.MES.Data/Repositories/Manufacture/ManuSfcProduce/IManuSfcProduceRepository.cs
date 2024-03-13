@@ -394,5 +394,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateQtyByIdAsync(UpdateManuSfcProduceQtyByIdCommand command);
+
+
+        #region 顷刻
+
+        /// <summary>
+        /// 更新数量
+        /// 用于设备产出米数上报接口
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command);
+
+        #endregion
     }
 }

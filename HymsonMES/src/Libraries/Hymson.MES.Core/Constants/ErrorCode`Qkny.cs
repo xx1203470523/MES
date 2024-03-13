@@ -107,5 +107,15 @@ namespace Hymson.MES.Core.Constants
         public const string MES45052 = "配方对应版本型号没有激活，请获取最新配方";
 
         #endregion
+
+        #region 请求产出极卷码
+
+        /// <summary>
+        /// 生成条码失败
+        /// </summary>
+        public const string MES45060 = "生成条码失败";
+
+        #endregion
+
     }
 }

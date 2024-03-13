@@ -117,5 +117,19 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto);
+
+        /// <summary>
+        /// 生成条码
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<List<string>> GenerateSfcAsync(GenerateSfcDto dto);
+
+        /// <summary>
+        /// 产出米数上报
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task OutboundMetersReportAsync(OutboundMetersReportDto dto);
     }
 }

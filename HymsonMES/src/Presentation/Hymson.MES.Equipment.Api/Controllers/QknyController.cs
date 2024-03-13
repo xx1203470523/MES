@@ -554,13 +554,20 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //2. 用的时候生成(需要的时候在生成条码)或从XX表里面取(提前生成就是下发，生成两个或者3个，)
             //3. 考虑提前生成条码如何标记是否使用
 
-            List<string> sfcList = new List<string>();
-            for (var i = 0; i < dto.Qty + 1; ++i)
+            if(IS_DEBUG == true)
             {
-                sfcList.Add($"sfc00{i + 1}");
-            }
+                List<string> sfcList = new List<string>();
+                for (var i = 0; i < dto.Qty + 1; ++i)
+                {
+                    sfcList.Add($"sfc00{i + 1}");
+                }
 
-            return sfcList;
+                return sfcList;
+            }
+            //如果型号设置的是多个，则一次只出一个
+            //如果型号设置的是单个，则一次应该根据指定数量出
+            dto.Qty = 1;
+            return await _qknyService.GenerateSfcAsync(dto);
         }
 
         /// <summary>
@@ -573,6 +580,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产出米数上报024", BusinessType.OTHER, "OutboundMetersReport024", ReceiverTypeEnum.MES)]
         public async Task OutboundMetersReportAsync(OutboundMetersReportDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.OutboundMetersReportAsync(dto);
+
             //TODO
             //1. 设备上报条码和对应的长度
             //2. 去 manu_sfc，manu_sfc_produce 表修改条码的长度，manu_sfc根据manu_sfc_produce的id来
