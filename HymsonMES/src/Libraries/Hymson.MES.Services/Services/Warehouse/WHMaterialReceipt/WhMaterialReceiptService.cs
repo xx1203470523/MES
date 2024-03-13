@@ -134,6 +134,7 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
                         MaterialId = item.MaterialId ?? 0,
                         SupplierBatch = item.SupplierBatch,
                         PlanQty = item.PlanQty,
+                        Qty = item.Qty,
                         InternalBatch = item.InternalBatch,
                         PlanTime = item.PlanTime,
                         Remark = item.Remark,
