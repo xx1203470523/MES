@@ -93,9 +93,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPut("operation")]
-        public async Task OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
+        public async Task<long> OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
         {
-            await _qualIqcOrderService.OperationOrderAsync(requestDto);
+            return await _qualIqcOrderService.OperationOrderAsync(requestDto);
         }
 
         /// <summary>
@@ -115,9 +115,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPut("complete")]
-        public async Task CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
+        public async Task<long> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
         {
-            await _qualIqcOrderService.CompleteOrderAsync(requestDto);
+            return await _qualIqcOrderService.CompleteOrderAsync(requestDto);
         }
 
         /// <summary>
@@ -126,9 +126,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPut("free")]
-        public async Task FreeOrderAsync(QualIqcOrderFreeDto requestDto)
+        public async Task<long> FreeOrderAsync(QualIqcOrderFreeDto requestDto)
         {
-            await _qualIqcOrderService.FreeOrderAsync(requestDto);
+            return await _qualIqcOrderService.FreeOrderAsync(requestDto);
         }
 
         /// <summary>
@@ -137,9 +137,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPut("close")]
-        public async Task CloseOrderAsync(QualIqcOrderCloseDto requestDto)
+        public async Task<long> CloseOrderAsync(QualIqcOrderCloseDto requestDto)
         {
-            await _qualIqcOrderService.CloseOrderAsync(requestDto);
+            return await _qualIqcOrderService.CloseOrderAsync(requestDto);
         }
 
 

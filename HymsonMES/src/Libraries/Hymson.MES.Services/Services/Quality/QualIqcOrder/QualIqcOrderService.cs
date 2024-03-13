@@ -915,7 +915,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11913))
                     .WithData("Code", entity.InspectionOrder)
-                    .WithData("Operation", InspectionStatusEnum.Closed.GetDescription());
+                    .WithData("Operation", orderOperateType.GetDescription());
             }
         }
 
