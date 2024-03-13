@@ -523,7 +523,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 if (eventEntity != null) dto.EventName = eventEntity.Name;
 
                 var workShopEntity = await _inteWorkCenterRepository.GetByIdAsync(dto.WorkShopId);
-                if (workShopEntity != null) dto.WorkShopName = workShopEntity.Name;
+                if (workShopEntity != null) dto.WorkShopName = workShopEntity.Code;
 
                 var workLineEntity = await _inteWorkCenterRepository.GetByIdAsync(dto.LineId);
                 if (workLineEntity != null) dto.LineName = workLineEntity.Code;
