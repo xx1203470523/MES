@@ -122,6 +122,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IInteAttachmentRepository _inteAttachmentRepository;
 
+        /// <summary>
+        /// 服务接口（检验单生成）
+        /// </summary>
         private readonly IIQCOrderCreateService _iqcOrderCreateService;
 
         /// <summary>
