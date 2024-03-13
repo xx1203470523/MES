@@ -15,7 +15,6 @@ public partial class QualOqcParameterGroupDetailRepository
     /// <returns></returns>
     public async Task<int> InsertAsync(QualOqcParameterGroupDetailCreateCommand command)
     {
-        //using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
         using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, command);
     }
@@ -27,7 +26,6 @@ public partial class QualOqcParameterGroupDetailRepository
     /// <returns></returns>
     public async Task<int> InsertAsync(IEnumerable<QualOqcParameterGroupDetailCreateCommand> commands)
     {
-        //using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
         using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, commands);
     }
@@ -43,7 +41,6 @@ public partial class QualOqcParameterGroupDetailRepository
     /// <returns></returns>
     public async Task<int> UpdateAsync(QualOqcParameterGroupDetailUpdateCommand command)
     {
-        //using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
         using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateSql, command);
     }
@@ -55,7 +52,6 @@ public partial class QualOqcParameterGroupDetailRepository
     /// <returns></returns>
     public async Task<int> UpdateAsync(IEnumerable<QualOqcParameterGroupDetailUpdateCommand> commands)
     {
-        //using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
         using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateSql, commands);
     }
@@ -71,7 +67,6 @@ public partial class QualOqcParameterGroupDetailRepository
     /// <returns></returns>
     public async Task<int> DeleteAsync(DeleteCommand command)
     {
-        //using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
         using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteSql, command);
     }
@@ -83,7 +78,6 @@ public partial class QualOqcParameterGroupDetailRepository
     /// <returns></returns>
     public async Task<int> DeleteMoreAsync(DeleteCommand command)
     {
-        //using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
         using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeletesSql, command);
     }
@@ -96,7 +90,7 @@ public partial class QualOqcParameterGroupDetailRepository
     public async Task<int> DeleteByMainIdAsync(long ParameterGroupId)
     {
         using var conn = GetMESDbConnection();
-        return await conn.ExecuteAsync(DeleteByMainIdSql, new { QualIqcInspectionItemId = ParameterGroupId });
+        return await conn.ExecuteAsync(DeleteByMainIdSql, new { ParameterGroupId = ParameterGroupId });
     }
 
     /// <summary>
@@ -107,7 +101,7 @@ public partial class QualOqcParameterGroupDetailRepository
     public async Task<int> DeleteByMainIdsAsync(IEnumerable<long> ParameterGroupIds)
     {
         using var conn = GetMESDbConnection();
-        return await conn.ExecuteAsync(DeleteByMainIdsSql, new { QualIqcInspectionItemIds = ParameterGroupIds });
+        return await conn.ExecuteAsync(DeleteByMainIdsSql, new { ParameterGroupId = ParameterGroupIds });
     }
 
     #endregion

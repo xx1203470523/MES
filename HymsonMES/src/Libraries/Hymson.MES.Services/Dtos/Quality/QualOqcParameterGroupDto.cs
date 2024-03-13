@@ -65,10 +65,6 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// </summary>
     public record QualOqcParameterGroupDto : BaseEntityDto
     {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        //public long Id { get; set; }
 
         /// <summary>
         /// 站点Id
@@ -94,11 +90,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 客户Id
         /// </summary>
         public long? CustomerId { get; set; }
-
-        /// <summary>
-        /// 样本数量
-        /// </summary>
-        //public int SampleQty { get; set; }
 
         /// <summary>
         /// 版本

@@ -117,7 +117,7 @@ public partial class InteCodeRulesRepository
 
     #region 修改
 
-    const string UpdateByIdReSql = "UPDATE `inte_code_rules` SET `ProductId` = @ProductId ,`CodeType` = @CodeType ,`CodeMode` = @CodeMode ,`PackType` = @PackType ,`Base` = @Base ,`IgnoreChar` = @IgnoreChar ,`Increment` = @Increment ,`OrderLength` = @OrderLength ,`ResetType` = @ResetType ,`StartNumber` = @StartNumber ,`ContainerInfoId` = @ContainerInfoId ,`Remark` = @Remark ,`SiteId` = @SiteId  ,`UpdatedBy` = @UpdatedBy ,`UpdatedOn` = @UpdatedOn WHERE Id = @id;";
+    const string UpdateByIdReSql = "UPDATE `inte_code_rules` SET `ProductId` = @ProductId ,`CodeType` = @CodeType ,`CodeMode` = @CodeMode ,`PackType` = @PackType ,`Base` = @Base ,`IgnoreChar` = @IgnoreChar ,`Increment` = @Increment ,`OrderLength` = @OrderLength ,`ResetType` = @ResetType ,`StartNumber` = @StartNumber ,`ContainerInfoId` = @ContainerInfoId ,`Remark` = @Remark ,`UpdatedBy` = @UpdatedBy ,`UpdatedOn` = @UpdatedOn WHERE Id = @id;";
 
     #endregion
 }
