@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
@@ -19,6 +20,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Text;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -90,7 +92,7 @@ namespace Hymson.MES.Services.Services.Quality
             _qualOqcParameterGroupRepository = qualOqcParameterGroupRepository;
             _procMaterialRepository = procMaterialRepository;
             _inteCustomRepository = inteCustomRepository;
-            _qualOqcParameterGroupDetailRepository = qualOqcParameterGroupDetailRepository; 
+            _qualOqcParameterGroupDetailRepository = qualOqcParameterGroupDetailRepository;
         }
 
         /// <summary>
@@ -142,29 +144,6 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task CreateAsync(QualOqcParameterGroupDto createDto)
         {
-            //// 判断是否有获取到站点码 
-            //if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
-
-            //// 验证DTO
-            //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
-
-            //// 更新时间
-            //var updatedBy = _currentUser.UserName;
-            //var updatedOn = HymsonClock.Now();
-
-            //// DTO转换实体
-            //var entity = saveDto.ToEntity<QualOqcParameterGroupEntity>();
-            //entity.Id = IdGenProvider.Instance.CreateId();
-            //entity.CreatedBy = updatedBy;
-            //entity.CreatedOn = updatedOn;
-            //entity.UpdatedBy = updatedBy;
-            //entity.UpdatedOn = updatedOn;
-            //entity.SiteId = _currentSite.SiteId ?? 0;
-
-            //// 保存
-            //return await _qualOqcParameterGroupRepository.InsertAsync(entity);
-
-
             await _validationSaveRules.ValidateAndThrowAsync(createDto);
 
             var command = createDto.ToCommand<QualOqcParameterGroupCreateCommand>();
@@ -189,17 +168,19 @@ namespace Hymson.MES.Services.Services.Quality
                 });
             }
 
+
             using var scope = TransactionHelper.GetTransactionScope();
 
             var affectedRow = await _qualOqcParameterGroupRepository.InsertIgnoreAsync(command);
             if (affectedRow == 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19901));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19950));
             }
 
             await _qualOqcParameterGroupDetailRepository.InsertAsync(detailCommands);
 
             scope.Complete();
+
 
         }
 
@@ -210,19 +191,6 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task ModifyAsync(QualOqcParameterGroupUpdateDto updateDto)
         {
-            //// 判断是否有获取到站点码 
-            //if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
-
-            //// 验证DTO
-            //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
-
-            //// DTO转换实体
-            //var entity = saveDto.ToEntity<QualOqcParameterGroupEntity>();
-            //entity.UpdatedBy = _currentUser.UserName;
-            //entity.UpdatedOn = HymsonClock.Now();
-
-            //return await _qualOqcParameterGroupRepository.UpdateAsync(entity);
-
             await _validationUpdateRules.ValidateAndThrowAsync(updateDto);
 
             var entity = await _qualOqcParameterGroupRepository.GetOneAsync(new QualOqcParameterGroupToQuery { Id = updateDto.Id });
@@ -372,29 +340,35 @@ namespace Hymson.MES.Services.Services.Quality
 
                 var resultMaterialIds = result.Data.Select(m => m.MaterialId.GetValueOrDefault());
                 var resultCustomerIds = result.Data.Select(m => m.CustomerId.GetValueOrDefault());
-
-                var materialEntities = await _procMaterialRepository.GetByIdsAsync(resultMaterialIds);
-                var customerEntities = await _inteCustomRepository.GetByIdsAsync(resultCustomerIds);
-
-                result.Data = result.Data.Select(m =>
+                try
                 {
-                    var materialEntity = materialEntities.FirstOrDefault(e => e.Id == m.MaterialId);
-                    if (materialEntity != default)
-                    {
-                        m.MaterialCode = materialEntity.MaterialCode;
-                        m.MaterialName = materialEntity.MaterialName;
-                        m.MaterialUnit = materialEntity.Unit;
-                        m.MaterialVersion = materialEntity.Version;
-                    }
+                    var materialEntities = await _procMaterialRepository.GetByIdsAsync(resultMaterialIds);
+                    var customerEntities = await _inteCustomRepository.GetByIdsAsync(resultCustomerIds);
 
-                    var customerEntity = customerEntities.FirstOrDefault(e => e.Id == m.CustomerId);
-                    if (customerEntity != default)
+                    result.Data = result.Data.Select(m =>
                     {
-                        m.CustomerName = customerEntity.Name;
-                    }
+                        var materialEntity = materialEntities.FirstOrDefault(e => e.Id == m.MaterialId);
+                        if (materialEntity != default)
+                        {
+                            m.MaterialCode = materialEntity.MaterialCode;
+                            m.MaterialName = materialEntity.MaterialName;
+                            m.MaterialUnit = materialEntity.Unit;
+                            m.MaterialVersion = materialEntity.Version;
+                        }
 
-                    return m;
-                });
+                        var customerEntity = customerEntities.FirstOrDefault(e => e.Id == m.CustomerId);
+                        if (customerEntity != default)
+                        {
+                            m.CustomerName = customerEntity.Name;
+                        }
+
+                        return m;
+                    });
+
+                }
+                catch (Exception ex) { }
+
+
             }
 
             return result;
@@ -410,9 +384,28 @@ namespace Hymson.MES.Services.Services.Quality
         {
             await _validationDeleteRules.ValidateAndThrowAsync(deleteDto);
 
+            var qualIqcInspectionItemEntities = await _qualOqcParameterGroupRepository.GetEntitiesAsync(new QualOqcParameterGroupQuery { Ids = deleteDto.Ids });
+      
+            if (qualIqcInspectionItemEntities.Any(m => m.Status == SysDataStatusEnum.Enable))
+            {
+                var codes = new StringBuilder();
+                foreach (var item in qualIqcInspectionItemEntities.Where(m => m.Status == SysDataStatusEnum.Enable))
+                {
+                    codes.Append(item.Code);
+                    codes.Append(',');
+                }
+                throw new CustomerValidationException(nameof(ErrorCode.MES19953)).WithData("codes", codes.ToString());
+            }
+
             var command = new DeleteCommand { Ids = deleteDto.Ids };
 
-            await _qualOqcParameterGroupDetailRepository.DeleteMoreAsync(command);
+            using var scope = TransactionHelper.GetTransactionScope();
+
+            await _qualOqcParameterGroupRepository.DeleteMoreAsync(command);
+
+            await _qualOqcParameterGroupDetailRepository.DeleteByMainIdsAsync(command.Ids);
+
+            scope.Complete();
         }
 
     }
