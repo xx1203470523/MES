@@ -645,6 +645,7 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 实体到DTO转换
             var dto = entity.ToModel<QualIqcOrderDto>();
+            dto.InspectionGradeText = dto.InspectionGrade.GetDescription();
             dto.StatusText = dto.Status.GetDescription();
             dto.IsQualifiedText = dto.IsQualified.GetDescription();
 

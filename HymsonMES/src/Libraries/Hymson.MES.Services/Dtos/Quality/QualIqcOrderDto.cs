@@ -230,6 +230,16 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string Unit { get; set; }
 
         /// <summary>
+        /// 检验等级(1-正常 2-加严 3-放宽)
+        /// </summary>
+        public InspectionGradeEnum InspectionGrade { get; set; }
+
+        /// <summary>
+        /// 检验等级(1-正常 2-加严 3-放宽)
+        /// </summary>
+        public string InspectionGradeText { get; set; }
+
+        /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
         public InspectionStatusEnum Status { get; set; }
