@@ -943,7 +943,7 @@ namespace Hymson.MES.Services.Services.Quality
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = entity.SiteId,
                 IQCOrderId = entity.Id,
-                OperationType = OrderOperateTypeEnum.Close,
+                OperationType = operationType,
                 OperateBy = updatedBy,
                 OperateOn = updatedOn,
                 CreatedBy = updatedBy,
