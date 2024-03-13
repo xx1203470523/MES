@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
@@ -13,6 +14,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 出货单明细Ids
         /// </summary>
         public List<long> ShipmentDetailIds { get; set; }
+        
     }
 
     /// <summary>
@@ -289,6 +291,11 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record QualOqcOrderTypeOutDto {
 
         /// <summary>
+        /// Id
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
         /// 检验类型
         /// </summary>
         public OQCInspectionTypeEnum InspectionType { get; set; }
@@ -331,6 +338,11 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record CheckBarCodeOutDto: BaseEntityDto
     {
         /// <summary>
+        /// Id
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
         /// 样品条码
         /// </summary>
         public string? BarCode { get; set; }
@@ -369,5 +381,81 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 规格下限
         /// </summary>
         public decimal? LowerLimit { get; set; }
+    }
+
+
+    /// <summary>
+    /// OQC检验单新增/更新Dto
+    /// </summary>
+    public record QualOqcOrderExecSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long OQCOrderId { get; set; }
+
+        /// <summary>
+        /// 检验类型ID
+        /// </summary>
+        public long OQCOrderTypeId { get; set; }
+
+        /// <summary>
+        /// 样品条码
+        /// </summary>
+        public string Barcode { get; set; }
+
+        /// <summary>
+        /// 样品参数
+        /// </summary>
+        public IEnumerable<QualOqcOrderParameterSaveDto> Details { get; set; }
+    }
+
+    /// <summary>
+    /// Oqc检验单样品参数
+    /// </summary>
+    public record QualOqcOrderParameterSaveDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 检验值
+        /// </summary>
+        public string? InspectionValue { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
+        /// 参数附件
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
+
+    }
+
+    /// <summary>
+    /// 完成Dto
+    /// </summary>
+    public record QualOqcOrderCompleteDto
+    {
+        /// <summary>
+        /// OQC检验单Id
+        /// </summary>
+        public long OQCOrderId { get; set; }
+
+    }
+
+    /// <summary>
+    /// 修改检验单状态Dto
+    /// </summary>
+    public record UpdateStatusDto {
+        /// <summary>
+        /// OQC检验单Id
+        /// </summary>
+        public long OQCOrderId { get; set; }
     }
 }
