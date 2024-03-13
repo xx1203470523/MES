@@ -1908,6 +1908,7 @@
         public const string MES17807 = "OQC检验单【{code}】已经完成检验！";
         public const string MES17808 = "完成OQC检验单失败！";
         public const string MES17809 = "执行检验失败！";
+        public const string MES17810 = "检验单附件上传失败！";
 
         #endregion
 

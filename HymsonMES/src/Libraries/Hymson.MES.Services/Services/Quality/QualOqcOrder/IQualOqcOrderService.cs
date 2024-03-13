@@ -84,5 +84,19 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task CompleteOrderAsync(QualOqcOrderCompleteDto requestDto);
+
+        /// <summary>
+        /// 保存检验单附件
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<OQCAnnexOutDto>> SaveAttachmentAsync(QualOqcOrderSaveAttachmentDto requestDto);
+
+        /// <summary>
+        /// 删除检验单附件
+        /// </summary>
+        /// <param name="orderAnnexId"></param>
+        /// <returns></returns>
+        Task DeleteAttachmentByIdAsync(long orderAnnexId);
     }
 }

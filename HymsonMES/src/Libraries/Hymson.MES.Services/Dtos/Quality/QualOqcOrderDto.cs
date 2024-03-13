@@ -458,4 +458,21 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public long OQCOrderId { get; set; }
     }
+
+    public record OQCAnnexOutDto { 
+        /// <summary>
+        /// 附件Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 附件名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// 附件Path
+        /// </summary>
+        public string? Path { get; set; }
+    }
 }
