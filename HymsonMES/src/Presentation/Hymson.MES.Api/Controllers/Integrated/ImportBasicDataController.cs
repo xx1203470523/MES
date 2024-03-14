@@ -35,7 +35,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 基础数据导入
+        /// 设备数据导入
         /// </summary>
         /// <param name="formFile"></param>
         /// <returns></returns>
@@ -44,6 +44,18 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task ImportEquDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
              await _importBasicDataService.ImportEquDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 资源数据导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importResource")]
+        public async Task ImportResourceDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportResourceDataAsync(formFile);
         }
     }
 }

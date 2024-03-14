@@ -8,10 +8,16 @@ namespace Hymson.MES.Services.Services.Integrated
     public interface IImportBasicDataService
     {
         /// <summary>
-        /// 基础数据导入
+        /// 设备数据导入
         /// </summary>
         /// <param name="formFile"></param>
         /// <returns></returns>
         Task ImportEquDataAsync(IFormFile formFile);
+
+        /// <summary>
+        /// 资源数据导入
+        /// </summary>
+        /// <returns></returns>
+        Task ImportResourceDataAsync(IFormFile formFile);
     }
 }

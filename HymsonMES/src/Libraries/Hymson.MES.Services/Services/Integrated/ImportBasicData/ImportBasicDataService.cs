@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Excel.Abstractions;
@@ -21,6 +22,9 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
+using Minio.DataModel;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Transactions;
 using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
@@ -54,6 +58,10 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IProcResourceRepository _procResourceRepository;
 
         private readonly IProcResourceTypeRepository _resourceTypeRepository;
+        /// <summary>
+        /// 资源关联设备仓储
+        /// </summary>
+        private readonly IProcResourceEquipmentBindRepository _resourceEquipmentBindRepository;
 
         private readonly IExcelService _excelService;
         private readonly IMinioService _minioService;
@@ -64,6 +72,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public ImportBasicDataService(ICurrentUser currentUser, ICurrentSite currentSite,
                IEquEquipmentRepository equipmentRepository, IEquEquipmentGroupRepository equipmentGroupRepository,
                IProcResourceRepository procResourceRepository, IProcResourceTypeRepository resourceTypeRepository,
+               IProcResourceEquipmentBindRepository resourceEquipmentBindRepository,
                IExcelService excelService, IMinioService minioService)
         {
             _currentUser = currentUser;
@@ -72,6 +81,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _equipmentGroupRepository = equipmentGroupRepository;
             _procResourceRepository = procResourceRepository;
             _resourceTypeRepository = resourceTypeRepository;
+            _resourceEquipmentBindRepository = resourceEquipmentBindRepository;
             _excelService = excelService;
             _minioService = minioService;
         }
@@ -131,26 +141,32 @@ namespace Hymson.MES.Services.Services.Integrated
             var equGroupCodes = excelImportDtos.Select(x => x.EquipmentGroup).Distinct().ToArray();
             if (equGroupCodes.Any())
             {
-                var groupQuery = new EquEquipmentGroupQuery() { SiteId = _currentSite.SiteId ?? 0, EquipmentGroupCodes = equCodes };
+                var groupQuery = new EquEquipmentGroupQuery() { SiteId = _currentSite.SiteId ?? 0, EquipmentGroupCodes = equGroupCodes };
                 groupEntities = await _equipmentGroupRepository.GetEntitiesAsync(groupQuery);
             }
 
             var errorMessage = new StringBuilder("");
-            var row = 1;
+            var equUseStatus = Enum.GetNames<EquipmentUseStatusEnum>();
+            var row = 0;
             foreach (var entity in excelImportDtos)
             {
+                row++;
                 //使用状态
-                if (!Enum.IsDefined(typeof(EquipmentUseStatusEnum), entity.UseStatus))
-                {
+
+                var sss = (EquipmentUseStatusEnum)Enum.Parse(typeof(EquipmentUseStatusEnum), entity.UseStatus);
+                if (!equUseStatus.Contains(entity.UseStatus))
+                {           
                     errorMessage.Append($"第{row}行使用状态值不合法,");
                 }
 
+                var validFlag = true;
                 //设备类型
                 if (!string.IsNullOrWhiteSpace(entity.EquipmentType))
                 {
                     if (!Enum.IsDefined(typeof(EquipmentTypeEnum), entity.EquipmentType))
                     {
                         errorMessage.Append($"第{row}行设备类型值不合法,");
+                        validFlag = false;
                     }
                 }
 
@@ -163,6 +179,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     if (!isValidDate)
                     {
                         errorMessage.Append($"第{row}行入场日期不是有效的时间,");
+                        validFlag = false;
                     }
                 }
 
@@ -174,8 +191,16 @@ namespace Hymson.MES.Services.Services.Integrated
                     if (group == null)
                     {
                         errorMessage.Append($"第{row}行设备组编码在系统中不存在,");
+                        validFlag = false;
                     }
-                    equGroupId = group?.Id??0;
+                    equGroupId = group?.Id ?? 0;
+                }
+
+                errorMessage.ToString().TrimEnd(',');
+                errorMessage.Append(";");
+                if (!validFlag)
+                {
+                    continue;
                 }
 
                 //读取部门数据,部门数据来源用户中心
@@ -230,12 +255,12 @@ namespace Hymson.MES.Services.Services.Integrated
                     equipment.UpdatedOn = HymsonClock.Now();
                     updateEquipments.Add(equipment);
                 }
-
-                errorMessage.ToString().TrimEnd(',');
-                errorMessage.Append(";");
-                row++;
             }
 
+            if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
+            {
+                throw new CustomerValidationException(errorMessage.ToString());
+            }
             #endregion
 
             #region 入库
@@ -284,9 +309,6 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES10303));
             }
 
-            var addResources = new List<ProcResourceEntity>();
-            var updateResources = new List<ProcResourceEntity>();
-
             //获取资源列表信息
             IEnumerable<ProcResourceEntity> resourceEntities = new List<ProcResourceEntity>();
             var resCodes = excelImportDtos.Select(x => x.ResCode).Distinct().ToArray();
@@ -314,30 +336,15 @@ namespace Hymson.MES.Services.Services.Integrated
                 resourceTypeEntities = await _resourceTypeRepository.GetEntitiesAsync(query);
             }
 
-            var resourceDtos = excelImportDtos.GroupBy(x => x.ResCode).ToList();
+            var importResources = excelImportDtos.DistinctBy(x => x.ResCode).ToList();
+
+            var addResources = new List<ProcResourceEntity>();
+            var updateResources = new List<ProcResourceEntity>();
             var errorMessage = new StringBuilder("");
-            var row = 1;
-
-            foreach (var entity in excelImportDtos)
+            foreach (var entity in importResources)
             {
-                //设备编码验证
-                if (!string.IsNullOrWhiteSpace(entity.EquipmentCode))
-                {
-                    var equipmentEntity = equEquipmentEntities.FirstOrDefault(x => x.EquipmentCode == entity.EquipmentCode.ToTrimSpace().ToUpperInvariant());
-                    if (equipmentEntity == null)
-                    {
-                        errorMessage.Append($"第{row}行设备编码在系统中不存在,");
-                    }
-                }
-
-                //是否主设备
-                if (!string.IsNullOrWhiteSpace(entity.IsMain))
-                {
-                    if (!Enum.IsDefined(typeof(TrueOrFalseEnum), entity.IsMain))
-                    {
-                        errorMessage.Append($"第{row}行是否主设备值不合法,");
-                    }
-                }
+                var resCode = entity.ResCode.ToTrimSpace().ToUpperInvariant();
+                var resourceEntity = resourceEntities.FirstOrDefault(x => x.ResCode == resCode);
 
                 //资源类型验证
                 var resTypeId = 0L;
@@ -346,14 +353,11 @@ namespace Hymson.MES.Services.Services.Integrated
                     var resourceTypeEntity = resourceTypeEntities.FirstOrDefault(x => x.ResType == entity.ResType.ToTrimSpace().ToUpperInvariant());
                     if (resourceTypeEntity == null)
                     {
-                        errorMessage.Append($"第{row}行资源类型在系统中不存在,");
+                        errorMessage.Append($"资源{resCode}的资源类型在系统中不存在,");
                     }
-                    resTypeId = resourceTypeEntity?.Id??0;
+                    resTypeId = resourceTypeEntity?.Id ?? 0;
                 }
 
-                ////读取部门数据,部门数据来源用户中心
-                var resCode = entity.ResCode.ToTrimSpace().ToUpperInvariant();
-                var resourceEntity = resourceEntities.FirstOrDefault(x => x.ResCode == resCode);
                 if (resourceEntity == null)
                 {
                     addResources.Add(new ProcResourceEntity
@@ -378,12 +382,67 @@ namespace Hymson.MES.Services.Services.Integrated
                     resourceEntity.UpdatedBy = _currentUser.UserName;
                     updateResources.Add(resourceEntity);
                 }
+            }
+
+            var resources = new List<ProcResourceEntity>();
+            resources.AddRange(addResources);
+            resources.AddRange(updateResources);
+
+            //设备绑定设置数据
+            var equList = new List<ProcResourceEquipmentBindEntity>();
+            var row = 0;
+            foreach (var entity in excelImportDtos)
+            {
+                row++;
+
+                //设备编码验证
+                var equipmentEntity = new EquEquipmentEntity();
+                var validFlag = true;
+                if (!string.IsNullOrWhiteSpace(entity.EquipmentCode))
+                {
+                    equipmentEntity = equEquipmentEntities.FirstOrDefault(x => x.EquipmentCode == entity.EquipmentCode.ToTrimSpace().ToUpperInvariant());
+                    if (equipmentEntity == null)
+                    {
+                        errorMessage.Append($"第{row}行设备编码在系统中不存在,");
+                        validFlag = false;
+                    }
+                }
+
+                var isMain = false;
+                //是否主设备
+                if (!string.IsNullOrWhiteSpace(entity.IsMain))
+                {
+                    if (!Enum.IsDefined(typeof(TrueOrFalseEnum), entity.IsMain))
+                    {
+                        errorMessage.Append($"第{row}行是否主设备值不合法,");
+                        validFlag = false;
+                    }
+                    isMain = (TrueOrFalseEnum)Enum.Parse(typeof(TrueOrFalseEnum), entity.IsMain) == TrueOrFalseEnum.Yes ? true : false;
+                }
 
                 errorMessage.ToString().TrimEnd(',');
                 errorMessage.Append(";");
-                row++;
+                if (!validFlag)
+                {
+                    continue;
+                }
+                equList.Add(new ProcResourceEquipmentBindEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    ResourceId = resources.FirstOrDefault(x => x.ResCode == entity.ResCode.ToTrimSpace().ToUpperInvariant())?.Id ?? 0,
+                    EquipmentId = equipmentEntity?.Id ?? 0,
+                    IsMain = isMain,
+                    Remark = "",
+                    SiteId = _currentSite.SiteId ?? 0,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                });
             }
 
+            if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
+            {
+                throw new CustomerValidationException(errorMessage.ToString());
+            }
             #endregion
 
             #region 入库
@@ -400,6 +459,10 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 //资源跟设备的关联关系
+                if (equList != null && equList.Count > 0)
+                {
+                    await _resourceEquipmentBindRepository.InsertRangeAsync(equList);
+                }
                 ts.Complete();
             }
             #endregion
