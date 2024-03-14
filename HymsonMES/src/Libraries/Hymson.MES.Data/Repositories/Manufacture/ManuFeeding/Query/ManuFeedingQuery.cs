@@ -108,7 +108,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public long FeedingPointId { get; set; }
 
         /// <summary>
-        /// 
+        /// ID集合（资源）
         /// </summary>
         public IEnumerable<long> ResourceIds { get; set; }
     }

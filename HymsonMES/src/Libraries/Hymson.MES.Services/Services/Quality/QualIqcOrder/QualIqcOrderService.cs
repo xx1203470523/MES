@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Domain.WhShipment;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Bos.Quality;
@@ -25,6 +26,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -207,10 +209,25 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10104));
             }
-
+            //校验是否属于同一收货单
+            if (receiptDetails.Select(x => x.MaterialReceiptId).Distinct().Count() > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11900));
+            }
             // 查询收货单
             var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(requestDto.ReceiptId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES11901));
+
+            //校验是否已生成过检验单
+            var orderList = await _qualIqcOrderRepository.GetEntitiesAsync(new QualIqcOrderQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                MaterialReceiptDetailIds = requestDto.Details
+            });
+            if (orderList != null && orderList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11990)).WithData("ReceiptNum", receiptEntity.ReceiptNum).WithData("MaterialReceiptDetailIds", string.Join(',', orderList.Select(x => x.MaterialReceiptDetailId).Distinct()));
+            }
 
             var bo = new CoreServices.Bos.Quality.IQCOrderCreateBo
             {
@@ -607,6 +624,7 @@ namespace Hymson.MES.Services.Services.Quality
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _inteAttachmentRepository.DeleteAsync(attachmentEntity.AnnexId);
             rows += await _qualIqcOrderAnnexRepository.DeleteAsync(attachmentEntity.Id);
+            trans.Complete();
             return rows;
         }
 
@@ -700,10 +718,94 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> UpdateOrderAsync(OrderParameterDetailDto requestDto)
         {
-            var entity = requestDto.ToEntity<QualIqcOrderSampleDetailEntity>();
+            var requestEntity = requestDto.ToEntity<QualIqcOrderSampleDetailEntity>();
+            if (requestEntity == null) return 0;
+
+            var entity = await _qualIqcOrderSampleDetailRepository.GetByIdAsync(requestEntity.Id);
             if (entity == null) return 0;
 
-            return await _qualIqcOrderSampleDetailRepository.UpdateAsync(entity);
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            entity.IsQualified = requestEntity.IsQualified;
+            entity.InspectionValue = requestDto.InspectionValue;
+            entity.Remark = requestDto.Remark;
+            entity.UpdatedBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
+
+            // 样本附件
+            List<InteAttachmentEntity> attachmentEntities = new();
+            List<QualIqcOrderSampleDetailAnnexEntity> sampleDetailAttachmentEntities = new();
+            if (requestDto.Attachments != null && requestDto.Attachments.Any())
+            {
+                foreach (var attachment in requestDto.Attachments)
+                {
+                    // 附件
+                    var attachmentId = IdGenProvider.Instance.CreateId();
+                    attachmentEntities.Add(new InteAttachmentEntity
+                    {
+                        Id = attachmentId,
+                        Name = attachment.Name,
+                        Path = attachment.Path,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn,
+                        SiteId = requestEntity.SiteId,
+                    });
+
+                    // 样本附件
+                    sampleDetailAttachmentEntities.Add(new QualIqcOrderSampleDetailAnnexEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = requestEntity.SiteId,
+                        IQCOrderId = entity.IQCOrderId,
+                        AnnexId = attachmentId,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn
+                    });
+                }
+            }
+
+            // 之前的附件
+            var beforeAttachments = await _qualIqcOrderSampleDetailAnnexRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailAnnexQuery
+            {
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.IQCOrderId,
+            });
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _qualIqcOrderSampleDetailRepository.UpdateAsync(entity);
+
+            // 先删除再添加
+            if (beforeAttachments != null && beforeAttachments.Any())
+            {
+                rows += await _qualIqcOrderSampleDetailAnnexRepository.DeletesAsync(new DeleteCommand
+                {
+                    UserId = updatedBy,
+                    DeleteOn = updatedOn,
+                    Ids = beforeAttachments.Select(s => s.Id)
+                });
+
+                rows += await _inteAttachmentRepository.DeletesAsync(new DeleteCommand
+                {
+                    UserId = updatedBy,
+                    DeleteOn = updatedOn,
+                    Ids = beforeAttachments.Select(s => s.AnnexId)
+                });
+            }
+
+            if (attachmentEntities.Any())
+            {
+                rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
+                rows += await _qualIqcOrderSampleDetailAnnexRepository.InsertRangeAsync(sampleDetailAttachmentEntities);
+            }
+            trans.Complete();
+            return rows;
         }
 
         /// <summary>

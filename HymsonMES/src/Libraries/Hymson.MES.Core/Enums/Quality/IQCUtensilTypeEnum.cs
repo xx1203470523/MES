@@ -5,7 +5,6 @@ namespace Hymson.MES.Core.Enums.Quality
     /// <summary>
     /// IQC设备
     /// </summary>
-    [Flags]
     public enum IQCUtensilTypeEnum
     {
         /// <summary>
@@ -24,126 +23,126 @@ namespace Hymson.MES.Core.Enums.Quality
         /// 薄膜测厚仪
         /// </summary>
         [Description("薄膜测厚仪")]
-        FilmThicknessGauge = 4,
+        FilmThicknessGauge = 3,
 
         /// <summary>
         /// 千分尺
         /// </summary>
         [Description("千分尺")]
-        MicrometerMeter = 8,
+        MicrometerMeter = 4,
 
         /// <summary>
         /// 钢板尺
         /// </summary>
         [Description("钢板尺")]
-        SteelPlateRuler = 16,
+        SteelPlateRuler = 5,
 
         /// <summary>
         /// 氦检仪器
         /// </summary>
         [Description("氦检仪器")]
-        HeliumDetectingInstrument = 32,
+        HeliumDetectingInstrument = 6,
 
         /// <summary>
         /// 电子秤
         /// </summary>
         [Description("电子秤")]
-        ElectronicScale = 64,
+        ElectronicScale = 7,
 
         /// <summary>
         /// 电子天平
         /// </summary>
         [Description("电子天平")]
-        ElectronicBalance = 128,
+        ElectronicBalance = 8,
 
         /// <summary>
         /// 保压气密设备
         /// </summary>
         [Description("保压气密设备")]
-        PressurizingAndAirtightEquipment = 256,
+        PressurizingAndAirtightEquipment = 9,
 
         /// <summary>
         /// 绝缘耐压测试仪
         /// </summary>
         [Description("绝缘耐压测试仪")]
-        InsulationWithstandVoltageTester = 512,
+        InsulationWithstandVoltageTester = 10,
 
         /// <summary>
         /// 烘箱
         /// </summary>
         [Description("烘箱")]
-        Oven = 1024,
+        Oven = 11,
 
         /// <summary>
         /// 放大镜
         /// </summary>
         [Description("放大镜")]
-        MagnifyingGlass = 2048,
+        MagnifyingGlass = 12,
 
         /// <summary>
         /// 达因笔
         /// </summary>
         [Description("达因笔")]
-        DynePen = 4096,
+        DynePen = 13,
 
         /// <summary>
         /// 拉力测试仪
         /// </summary>
         [Description("拉力测试仪")]
-        TensionTester = 8192,
+        TensionTester = 14,
 
         /// <summary>
         /// 高度卡尺
         /// </summary>
         [Description("高度卡尺")]
-        HeightCaliper = 16384,
+        HeightCaliper = 15,
 
         /// <summary>
         /// 万用表
         /// </summary>
         [Description("万用表")]
-        MultipurposeMeter = 32768,
+        MultipurposeMeter = 16,
 
         /// <summary>
         /// 百分表
         /// </summary>
         [Description("百分表")]
-        DialIndicator = 65536,
+        DialIndicator = 17,
 
         /// <summary>
         /// 直流微电阻测试仪
         /// </summary>
         [Description("直流微电阻测试仪")]
-        DcMicroResistanceTester = 131072,
+        DcMicroResistanceTester = 18,
 
         /// <summary>
         /// 高精度数学显微镜
         /// </summary>
         [Description("高精度数学显微镜")]
-        HighPrecisionMathematicalMicroscope = 262144,
+        HighPrecisionMathematicalMicroscope = 19,
 
         /// <summary>
         /// 卡尔费休滴定仪
         /// </summary>
         [Description("卡尔费休滴定仪")]
-        KarlFischerTitrator = 524288,
+        KarlFischerTitrator = 20,
 
         /// <summary>
         /// 透气度测试仪
         /// </summary>
         [Description("透气度测试仪")]
-        AirPermeabilityTester = 1048576,
+        AirPermeabilityTester = 21,
 
         /// <summary>
         /// 测试
         /// </summary>
         [Description("测试")]
-        Testing = 2097152,
+        Testing = 22,
 
         /// <summary>
         /// 其他
         /// </summary>
         [Description("其他")]
-        Other = 4194304
+        Other = 23
     }
 }

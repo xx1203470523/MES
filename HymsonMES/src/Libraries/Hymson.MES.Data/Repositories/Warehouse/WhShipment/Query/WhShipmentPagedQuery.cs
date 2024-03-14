@@ -10,7 +10,7 @@ namespace Hymson.MES.Data.Repositories.WhShipment.Query
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 出货单号

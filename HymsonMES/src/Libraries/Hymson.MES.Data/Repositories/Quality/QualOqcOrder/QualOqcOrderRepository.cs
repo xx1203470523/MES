@@ -138,6 +138,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            if (query.ShipmentMaterialIds != null && query.ShipmentMaterialIds.Any())
+            {
+                sqlBuilder.Where("ShipmentMaterialId IN @ShipmentMaterialIds");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualOqcOrderEntity>(template.RawSql, query);
         }

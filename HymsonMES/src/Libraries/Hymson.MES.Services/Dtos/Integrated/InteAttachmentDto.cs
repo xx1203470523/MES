@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 文件路径
         /// </summary>
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
     }
 
