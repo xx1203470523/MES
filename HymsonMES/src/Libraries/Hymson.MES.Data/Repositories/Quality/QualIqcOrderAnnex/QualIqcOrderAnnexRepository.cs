@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderAnnexEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualIqcOrderAnnexEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderAnnexEntity>(GetByIdsSql, new { Ids = ids });
@@ -181,7 +181,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string DeletesSql = "UPDATE qual_iqc_order_annex SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM qual_iqc_order_annex WHERE Id = @Id ";
-        const string GetByOrderIdSql = @"SELECT * FROM qual_iqc_order_annex WHERE IQCOrderId = @IQCOrderId ";
+        const string GetByOrderIdSql = @"SELECT * FROM qual_iqc_order_annex WHERE IsDeleted = 0 AND IQCOrderId = @IQCOrderId ";
         const string GetByIdsSql = @"SELECT * FROM qual_iqc_order_annex WHERE Id IN @Ids ";
 
     }
