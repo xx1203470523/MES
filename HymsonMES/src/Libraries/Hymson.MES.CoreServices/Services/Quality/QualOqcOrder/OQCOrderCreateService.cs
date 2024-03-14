@@ -268,7 +268,9 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     AcceptanceLevel = oqcLevel.AcceptanceLevel,
                     Status = InspectionStatusEnum.WaitInspect,
                     CreatedBy = updatedBy,
-                    CreatedOn = updatedOn
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
                 };
                 orderList.Add(orderEntity);
                 //检验单检验类型
@@ -286,7 +288,9 @@ namespace Hymson.MES.CoreServices.Services.Quality
                         AcceptanceLevel = oqcLevelDetail.AcceptanceLevel,
                         SampleQty = sampleQtyDic[inspectionType],
                         CreatedBy = updatedBy,
-                        CreatedOn = updatedOn
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn
                     });
                 }
 
