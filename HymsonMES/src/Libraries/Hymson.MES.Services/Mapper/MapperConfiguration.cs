@@ -979,6 +979,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualOqcOrderEntity, QualOqcOrderDto>();
             CreateMap<QualOqcParameterGroupDetailSnapshootEntity, CheckBarCodeOutDto>();
             CreateMap<QualOqcOrderExecSaveDto, QualOqcOrderSampleQuery>();
+            CreateMap<QualOqcParameterGroupDetailSnapshootEntity, OqcOrderParameterDetailDto>();
+            CreateMap<OqcOrderParameterDetailPagedQueryDto, QualOqcOrderSampleDetailPagedQuery>();
 
             #region OQC检验项目
             //查询对象

@@ -26,5 +26,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 单据状态
         /// </summary>
         public OrderOperateTypeEnum? OperationType { get; set; }
+
+        /// <summary>
+        /// 单据状态s
+        /// </summary>
+        public IEnumerable<OrderOperateTypeEnum>? OperationTypes { get; set; }
     }
 }

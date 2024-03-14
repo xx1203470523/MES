@@ -166,6 +166,16 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 出货单单号
         /// </summary>
         public string? ShipmentNum { get; set; }
+
+        /// <summary>
+        /// 状态Str
+        /// </summary>
+        public string? StatusStr { get; set; }
+
+        /// <summary>
+        /// 附件
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
     }
 
     /// <summary>

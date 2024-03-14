@@ -98,5 +98,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="orderAnnexId"></param>
         /// <returns></returns>
         Task DeleteAttachmentByIdAsync(long orderAnnexId);
+
+        /// <summary>
+        /// 查询检验单样本数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<OqcOrderParameterDetailDto>> OqcOrderQueryDetailSamplePagedListAsync(OqcOrderParameterDetailPagedQueryDto pagedQueryDto);
     }
 }

@@ -176,15 +176,15 @@ namespace Hymson.MES.Api.Controllers.Quality
             await _qualOqcOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
         }
 
-        ///// <summary>
-        ///// 查询检验单样本数据（分页）
-        ///// </summary>
-        ///// <param name="pagedQueryDto"></param>
-        ///// <returns></returns>
-        //[HttpGet("sample/pagelist")]
-        //public async Task<PagedInfo<OrderParameterDetailDto>> QueryDetailSamplePagedListAsync([FromQuery] OrderParameterDetailPagedQueryDto pagedQueryDto)
-        //{
-        //    return await _qualOqcOrderService.QueryDetailSamplePagedListAsync(pagedQueryDto);
-        //}
+        /// <summary>
+        /// 查询检验单样本数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet("sample/pagelist")]
+        public async Task<PagedInfo<OqcOrderParameterDetailDto>> OqcOrderQueryDetailSamplePagedListAsync([FromQuery] OqcOrderParameterDetailPagedQueryDto pagedQueryDto)
+        {
+            return await _qualOqcOrderService.OqcOrderQueryDetailSamplePagedListAsync(pagedQueryDto);
+        }
     }
 }

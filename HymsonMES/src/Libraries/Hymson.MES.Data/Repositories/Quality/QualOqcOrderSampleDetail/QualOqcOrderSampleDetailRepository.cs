@@ -135,6 +135,20 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
+            if (pagedQuery.OQCOrderId != null) {
+                sqlBuilder.Where("OQCOrderId = @OQCOrderId");
+            }
+
+            if (pagedQuery.OQCOrderSampleIds != null&& pagedQuery.OQCOrderSampleIds.Any())
+            {
+                sqlBuilder.Where("OQCOrderSampleId IN @OQCOrderSampleIds");
+            }
+
+            if (pagedQuery.GroupDetailSnapshootIds != null && pagedQuery.GroupDetailSnapshootIds.Any())
+            {
+                sqlBuilder.Where("GroupDetailSnapshootId IN @GroupDetailSnapshootId");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
