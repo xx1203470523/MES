@@ -1891,6 +1891,7 @@
         public const string MES19951 = "OQC检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19952 = "OQC检验项目必须填写物料，且物料信息必须准确";
         public const string MES19953 = "已启用的检验项目不允许删除，{codes}";
+        public const string MES19954 = "检验项目不存在，可能操作时被删除或数据异常";
 
         #endregion 
 

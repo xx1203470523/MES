@@ -60,6 +60,11 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
         public decimal? PlanQty { get; set; }
 
         /// <summary>
+        /// 实收数量
+        /// </summary>
+        public decimal? Qty { get; set; }
+
+        /// <summary>
         /// 计划到货时间
         /// </summary>
         public DateTime? PlanTime { get; set; }

@@ -989,7 +989,11 @@ namespace Hymson.MES.Services.Mapper
             //创建对象
             CreateMap<QualOqcParameterGroupDto, QualOqcParameterGroupCreateCommand>();
             CreateMap<QualOqcParameterGroupDetailDto, QualOqcParameterGroupDetailCreateCommand>();
+            //更新对象
+            CreateMap<QualOqcParameterGroupUpdateDto, QualOqcParameterGroupUpdateCommand>();
+            CreateMap<QualOqcParameterGroupDetailOutputDto, QualOqcParameterGroupDetailCreateCommand>();
             
+
 
             //实体对象转换为数据传输对象（页面输出)
 
