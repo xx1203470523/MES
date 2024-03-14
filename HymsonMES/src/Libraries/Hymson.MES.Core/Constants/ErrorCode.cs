@@ -1019,6 +1019,8 @@
         public const string MES19144 = "Location不能为空";
         public const string MES19145 = "模组对应型号编码ModelCode不能为空";
         public const string MES19146 = "条码：{SFCS}状态为不合格，不允许绑定，请先通过不良复判功能确认不合格状态!";
+        public const string MES19147 = "条码：{SFC}存在Ng，请先判定不合格状态!";
+        public const string MES19148 = "条码：{SFC}在制状态不处于{ProcedureName}工序排队中，请检查在制状态!";
 
         #endregion
 

@@ -54,24 +54,24 @@ namespace Hymson.MES.Core.Enums.Manufacture
         [Description("绑定CCS")]
         BindCCS = 9,
         /// <summary>
-        /// 绑定CCS
+        /// 系统绑PACK
         /// </summary>
-        [Description("集装箱绑PACK")]
+        [Description("系统绑PACK")]
         BindPack1 = 10,
         /// <summary>
-        /// 绑定CCS
+        /// 系统绑高压箱
         /// </summary>
-        [Description("集装箱绑高压箱")]
+        [Description("系统绑高压箱")]
         BindPack2 = 11,
         /// <summary>
-        /// 绑定CCS
+        /// 系统绑插箱
         /// </summary>
-        [Description("集装箱绑插箱")]
+        [Description("系统绑插箱")]
         BindPack3= 12,
         /// <summary>
-        /// 绑定CCS
+        /// 系统绑门包
         /// </summary>
-        [Description("集装箱绑门包")]
+        [Description("系统绑门包")]
         BindPack4 = 13,
     }
 }

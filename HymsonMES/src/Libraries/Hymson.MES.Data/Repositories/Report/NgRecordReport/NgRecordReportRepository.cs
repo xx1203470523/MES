@@ -63,6 +63,7 @@ public partial class NgRecordReportRepository : BaseRepository, INgRecordReportR
         sqlBuilder.Select("mss.*");
 
         WhereFill(sqlBuilder, query);
+        sqlBuilder.AddParameters(query);
 
         using var conn = GetMESDbConnection();
         return await conn.QueryAsync<NgRecordReportView>(templateData.RawSql, templateData.Parameters);
@@ -132,7 +133,7 @@ public partial class NgRecordReportRepository
 
         if (query.ProcedureId?.Any() == true)
         {
-            sqlBuilder.Where("mss.ProcedureId IN @ProcedureIds");
+            sqlBuilder.Where("mss.ProcedureId IN @ProcedureId");
         }
 
         if (query.ResourceId != null)

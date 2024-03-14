@@ -33,6 +33,9 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
     private readonly IProcResourceRepository _procResourceRepository;
     private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
 
+    private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
+    private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
     public ManuSfcCirculationService(ICurrentUser currentUser,
         IMinioService minioService,
         IExcelService excelService,
@@ -41,7 +44,9 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
         IManuSfcCirculationRepository manuSfcCirculationRepository,
         IProcProcedureRepository procProcedureRepository,
         IProcResourceRepository procResourceRepository,
-        IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository)
+        IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
+        IManuSfcSummaryRepository manuSfcSummaryRepository,
+        IManuSfcProduceRepository manuSfcProduceRepository)
     {
         _currentUser = currentUser;
         _excelService = excelService;
@@ -52,6 +57,8 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
         _procProcedureRepository = procProcedureRepository;
         _procResourceRepository = procResourceRepository;
         _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
+        _manuSfcSummaryRepository = manuSfcSummaryRepository;
+        _manuSfcProduceRepository = manuSfcProduceRepository;
     }
 
     /// <summary>
@@ -180,6 +187,16 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
             var equEuipmentEntities = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(new() { ResourceId = resourceEntity.Id })
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10480));
             var equEuipmentEntity = equEuipmentEntities.FirstOrDefault();
+
+            //校验被绑定条码是否存在Ng
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new() { SFCS = new string[] { bindDto.CirculationBarCode } });
+            var hasNg = manuSfcSummaryEntities.Any(a => a.QualityStatus == 0);
+            if (hasNg) throw new CustomerValidationException(nameof(ErrorCode.MES19147)).WithData("SFC", bindDto.CirculationBarCode ?? "");
+
+            //校验绑定条码在制是否处于所选工序排队中的状态
+            var manuSfcProdureEntity = await _manuSfcProduceRepository.GetBySFCAsync(new() {  Sfc = bindDto.CirculationBarCode });
+            if (manuSfcProdureEntity.ProcedureId != procedureEntity.Id && manuSfcProdureEntity.Status != Core.Enums.SfcProduceStatusEnum.lineUp)
+                throw new CustomerValidationException(nameof(ErrorCode.MES19148)).WithData("SFC",bindDto.CirculationBarCode).WithData("ProcedureName",procedureEntity.Name);
 
             //获取条码流转记录
             var bindSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()

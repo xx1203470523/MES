@@ -21,7 +21,7 @@ public class NgRecordReportQueryDto : PagerInfo
     /// <summary>
     /// 工序
     /// </summary>
-    public string? ProdureId { get; set; }
+    public IEnumerable<long>? ProcedureId { get; set; }
 
     /// <summary>
     /// 产品条码
