@@ -624,6 +624,7 @@ namespace Hymson.MES.Services.Services.Quality
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _inteAttachmentRepository.DeleteAsync(attachmentEntity.AnnexId);
             rows += await _qualIqcOrderAnnexRepository.DeleteAsync(attachmentEntity.Id);
+            trans.Complete();
             return rows;
         }
 
@@ -803,6 +804,7 @@ namespace Hymson.MES.Services.Services.Quality
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
                 rows += await _qualIqcOrderSampleDetailAnnexRepository.InsertRangeAsync(sampleDetailAttachmentEntities);
             }
+            trans.Complete();
             return rows;
         }
 
