@@ -166,6 +166,15 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11801));
             }
+            //校验是否已生成过检验单
+            var orderList = await _qualOqcOrderRepository.GetEntitiesAsync(new QualOqcOrderQuery
+            {
+                ShipmentMaterialIds = saveDto.ShipmentDetailIds
+            });
+            if (orderList != null && orderList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11809)).WithData("ShipmentNum", shipmentEntity.ShipmentNum).WithData("ShipmentMaterialIds", string.Join(',', orderList.Select(x => x.ShipmentMaterialId).Distinct()));
+            }
 
             var bo = new CoreServices.Bos.Quality.OQCOrderCreateBo
             {

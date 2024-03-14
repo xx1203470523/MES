@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualOqcOrderQuery
     {
-
+        /// <summary>
+        /// 出货单明细Ids
+        /// </summary>
+        public IEnumerable<long>? ShipmentMaterialIds { get; set; }
     }
 }

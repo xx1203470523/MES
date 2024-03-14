@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Domain.WhShipment;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Bos.Quality;
@@ -208,10 +209,25 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10104));
             }
-
+            //校验是否属于同一收货单
+            if (receiptDetails.Select(x => x.MaterialReceiptId).Distinct().Count() > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11900));
+            }
             // 查询收货单
             var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(requestDto.ReceiptId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES11901));
+
+            //校验是否已生成过检验单
+            var orderList = await _qualIqcOrderRepository.GetEntitiesAsync(new QualIqcOrderQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                MaterialReceiptDetailIds = requestDto.Details
+            });
+            if (orderList != null && orderList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11990)).WithData("ReceiptNum", receiptEntity.ReceiptNum).WithData("MaterialReceiptDetailIds", string.Join(',', orderList.Select(x => x.MaterialReceiptDetailId).Distinct()));
+            }
 
             var bo = new CoreServices.Bos.Quality.IQCOrderCreateBo
             {
