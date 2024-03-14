@@ -1825,6 +1825,7 @@
         public const string MES19419 = "校验水平不能为空！";
         public const string MES19421 = "检验水准不能为空！";
         public const string MES19422 = "接收水准不能为空！";
+        public const string MES19423 = "检验类型列表不能为空！";
         #endregion
 
         #endregion
@@ -1912,7 +1913,7 @@
 
         #endregion
 
-   
+
 
 
         #region 基础数据导入 11600
