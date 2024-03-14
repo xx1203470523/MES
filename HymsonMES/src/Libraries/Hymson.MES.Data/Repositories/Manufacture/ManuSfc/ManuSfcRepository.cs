@@ -274,7 +274,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 var procedureId = await conn.QueryAsync<ManuSfcProduceSelectView>(procedureIdSql, templateData.Parameters);
                 if (procedureId.Count() > 0)
                 {
-                    sqlBuilder.Select("msp.ProcedureId = @ProcedureId ");
                     var procedureIdList = procedureId.ToList();
                     //工序
                     int a = 0;
@@ -285,13 +284,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         a++;
                         if (a == 1)
                         {
-                            pSqlBuilder.Append($"msp.ProcedureId = {item.Id} ");
+                            pSqlBuilder.Append($"(msp.ProcedureId = {item.Id} ");
                         }
                         else
                         {
                             pSqlBuilder.Append($"OR msp.ProcedureId = {item.Id} ");
                         }
                     }
+                    pSqlBuilder.Append(")");
                     string prSql = pSqlBuilder.ToString();
                     sqlBuilder.Where(prSql);
                 }

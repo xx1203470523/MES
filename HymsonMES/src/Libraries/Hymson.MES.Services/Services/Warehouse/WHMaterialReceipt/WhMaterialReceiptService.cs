@@ -228,8 +228,10 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
         public async Task<PagedInfo<WhMaterialReceiptDto>> GetPagedListAsync(WhMaterialReceiptPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<WhMaterialReceiptPagedQuery>();
-
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            if (!pagedQuery.SiteId.HasValue)
+            {
+                pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            }
 
             var pagedInfo = await _whMaterialReceiptRepository.GetPagedListAsync(pagedQuery);
 
