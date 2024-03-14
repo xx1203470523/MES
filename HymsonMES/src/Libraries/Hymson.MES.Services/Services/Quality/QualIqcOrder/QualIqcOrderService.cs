@@ -25,6 +25,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -703,7 +704,64 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = requestDto.ToEntity<QualIqcOrderSampleDetailEntity>();
             if (entity == null) return 0;
 
-            return await _qualIqcOrderSampleDetailRepository.UpdateAsync(entity);
+            var dbEntity = await _qualIqcOrderSampleDetailRepository.GetByIdAsync(entity.Id);
+            if (dbEntity == null) return 0;
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            dbEntity.InspectionValue = requestDto.InspectionValue;
+            dbEntity.Remark = requestDto.Remark;
+            dbEntity.UpdatedBy = updatedBy;
+            dbEntity.UpdatedOn = updatedOn;
+
+            // 样本附件
+            List<InteAttachmentEntity> attachmentEntities = new();
+            List<QualIqcOrderSampleDetailAnnexEntity> sampleDetailAttachmentEntities = new();
+            if (requestDto.Attachments != null && requestDto.Attachments.Any())
+            {
+                foreach (var attachment in requestDto.Attachments)
+                {
+                    // 附件
+                    var attachmentId = IdGenProvider.Instance.CreateId();
+                    attachmentEntities.Add(new InteAttachmentEntity
+                    {
+                        Id = attachmentId,
+                        Name = attachment.Name,
+                        Path = attachment.Path,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn,
+                        SiteId = entity.SiteId,
+                    });
+
+                    // 样本附件
+                    sampleDetailAttachmentEntities.Add(new QualIqcOrderSampleDetailAnnexEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = entity.SiteId,
+                        IQCOrderId = dbEntity.IQCOrderId,
+                        AnnexId = attachmentId,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn
+                    });
+                }
+            }
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _qualIqcOrderSampleDetailRepository.UpdateAsync(entity);
+            if (attachmentEntities.Any())
+            {
+                // 先删除再添加
+                rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
+                rows += await _qualIqcOrderSampleDetailAnnexRepository.InsertRangeAsync(sampleDetailAttachmentEntities);
+            }
+            return rows;
         }
 
         /// <summary>

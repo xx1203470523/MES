@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Services.Dtos.Integrated;
+using Org.BouncyCastle.Crypto.Agreement;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
@@ -493,6 +494,16 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 检验类型;1、常规检验2、外观检验3、包装检验4、特殊性检验5、破坏性检验
         /// </summary>
         public IQCInspectionTypeEnum InspectionType { get; set; }
+
+        /// <summary>
+        /// 检测值
+        /// </summary>
+        public string InspectionValue { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
 
         /// <summary>
         /// 附件集合
