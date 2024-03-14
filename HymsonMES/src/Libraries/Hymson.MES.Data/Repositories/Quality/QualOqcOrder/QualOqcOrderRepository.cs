@@ -64,6 +64,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 更新状态和是否合格
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAndIsQualifiedAsync(QualOqcOrderEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusAndIsQualifiedSql, entity);
+        }
+
+        /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
@@ -176,7 +187,8 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string UpdateSql = "UPDATE qual_oqc_order SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, GroupSnapshootId = @GroupSnapshootId, MaterialId = @MaterialId, CustomerId = @CustomerId, ShipmentMaterialId = @ShipmentMaterialId, ShipmentQty = @ShipmentQty, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_oqc_order SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, GroupSnapshootId = @GroupSnapshootId, MaterialId = @MaterialId, CustomerId = @CustomerId, ShipmentMaterialId = @ShipmentMaterialId, ShipmentQty = @ShipmentQty, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdateStatusSql = "UPDATE qual_oqc_order SET  Status = @Status WHERE Id = @Id ";
+        const string UpdateStatusSql = "UPDATE qual_oqc_order SET  Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateStatusAndIsQualifiedSql = "UPDATE qual_oqc_order SET  Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn,IsQualified = @IsQualified WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_oqc_order SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_oqc_order SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

@@ -142,7 +142,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 是否合格(0-否 1-是)
         /// </summary>
-        public TrueOrFalseEnum? IsQualified { get; set; }
+        public TrueOrFalseEnum IsQualified { get; set; }
 
         /// <summary>
         /// 备注
@@ -152,6 +152,26 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 附件集合
         /// </summary>
-        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+        public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
+    }
+
+    /// <summary>
+    /// OQC不合格处理Dto
+    /// </summary>
+    public record OQCOrderUnqualifiedHandleDto {
+        /// <summary>
+        /// OQCOrderId
+        /// </summary>
+        public long? OQCOrderId { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式;1-让步；2-挑选；3-返工；4-报废；
+        /// </summary>
+        public OQCHandMethodEnum? HandMethod { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
     }
 }

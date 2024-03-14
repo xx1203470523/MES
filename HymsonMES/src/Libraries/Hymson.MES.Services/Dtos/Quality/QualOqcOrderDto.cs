@@ -128,6 +128,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string? SupplierName { get; set; }
 
         /// <summary>
+        /// 供应商批次
+        /// </summary>
+        public string? SupplierBatch { get; set; }
+
+        /// <summary>
         /// 计量单位(字典定义)
         /// </summary>
         public string? Unit { get; set; }

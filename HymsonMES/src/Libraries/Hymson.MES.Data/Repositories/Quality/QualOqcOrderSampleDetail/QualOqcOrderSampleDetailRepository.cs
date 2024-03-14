@@ -53,6 +53,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 更新样品明细
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateSampleDetailAsync(QualOqcOrderSampleDetailEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSampleDetailSql, entity);
+        }
+
+        /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
@@ -149,6 +160,10 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("GroupDetailSnapshootId IN @GroupDetailSnapshootId");
             }
 
+            if (pagedQuery.IsQualified != null) {
+                sqlBuilder.Where("IsQualified = @IsQualified");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -179,6 +194,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string UpdateSql = "UPDATE qual_oqc_order_sample_detail SET   SiteId = @SiteId, OQCOrderId = @OQCOrderId, OQCOrderSampleId = @OQCOrderSampleId, GroupDetailSnapshootId = @GroupDetailSnapshootId, InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_oqc_order_sample_detail SET   SiteId = @SiteId, OQCOrderId = @OQCOrderId, OQCOrderSampleId = @OQCOrderSampleId, GroupDetailSnapshootId = @GroupDetailSnapshootId, InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSampleDetailSql = "UPDATE qual_oqc_order_sample_detail SET   InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_oqc_order_sample_detail SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_oqc_order_sample_detail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

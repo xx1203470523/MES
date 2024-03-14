@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Quality.Query
 {
@@ -26,5 +27,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// OQCOrderId
         /// </summary>
         public long? OQCOrderId { get; set; }
+
+        /// <summary>
+        /// 是否合格(0-否 1-是)
+        /// </summary>
+        public TrueOrFalseEnum? IsQualified { get; set; }
     }
 }
