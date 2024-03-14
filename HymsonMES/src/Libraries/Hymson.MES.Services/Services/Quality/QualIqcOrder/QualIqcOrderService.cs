@@ -701,20 +701,21 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> UpdateOrderAsync(OrderParameterDetailDto requestDto)
         {
-            var entity = requestDto.ToEntity<QualIqcOrderSampleDetailEntity>();
-            if (entity == null) return 0;
+            var requestEntity = requestDto.ToEntity<QualIqcOrderSampleDetailEntity>();
+            if (requestEntity == null) return 0;
 
-            var dbEntity = await _qualIqcOrderSampleDetailRepository.GetByIdAsync(entity.Id);
-            if (dbEntity == null) return 0;
+            var entity = await _qualIqcOrderSampleDetailRepository.GetByIdAsync(requestEntity.Id);
+            if (entity == null) return 0;
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            dbEntity.InspectionValue = requestDto.InspectionValue;
-            dbEntity.Remark = requestDto.Remark;
-            dbEntity.UpdatedBy = updatedBy;
-            dbEntity.UpdatedOn = updatedOn;
+            entity.IsQualified = requestEntity.IsQualified;
+            entity.InspectionValue = requestDto.InspectionValue;
+            entity.Remark = requestDto.Remark;
+            entity.UpdatedBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
 
             // 样本附件
             List<InteAttachmentEntity> attachmentEntities = new();
@@ -734,15 +735,15 @@ namespace Hymson.MES.Services.Services.Quality
                         CreatedOn = updatedOn,
                         UpdatedBy = updatedBy,
                         UpdatedOn = updatedOn,
-                        SiteId = entity.SiteId,
+                        SiteId = requestEntity.SiteId,
                     });
 
                     // 样本附件
                     sampleDetailAttachmentEntities.Add(new QualIqcOrderSampleDetailAnnexEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = entity.SiteId,
-                        IQCOrderId = dbEntity.IQCOrderId,
+                        SiteId = requestEntity.SiteId,
+                        IQCOrderId = entity.IQCOrderId,
                         AnnexId = attachmentId,
                         CreatedBy = updatedBy,
                         CreatedOn = updatedOn,
@@ -755,8 +756,8 @@ namespace Hymson.MES.Services.Services.Quality
             // 之前的附件
             var beforeAttachments = await _qualIqcOrderSampleDetailAnnexRepository.GetEntitiesAsync(new QualIqcOrderSampleDetailAnnexQuery
             {
-                SiteId = dbEntity.SiteId,
-                IQCOrderId = dbEntity.IQCOrderId,
+                SiteId = entity.SiteId,
+                IQCOrderId = entity.IQCOrderId,
             });
 
             var rows = 0;
