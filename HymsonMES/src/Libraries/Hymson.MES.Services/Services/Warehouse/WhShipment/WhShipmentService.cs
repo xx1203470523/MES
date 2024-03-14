@@ -231,7 +231,10 @@ namespace Hymson.MES.Services.Services.WhShipment
         public async Task<PagedInfo<WhShipmentDto>> GetPagedListAsync(WhShipmentPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<WhShipmentPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            if (!pagedQuery.SiteId.HasValue)
+            {
+                pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            }
             var pagedInfo = await _whShipmentRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
