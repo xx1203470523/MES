@@ -44,8 +44,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
-
+        public string? Remark { get; set; }
 
     }
 }
