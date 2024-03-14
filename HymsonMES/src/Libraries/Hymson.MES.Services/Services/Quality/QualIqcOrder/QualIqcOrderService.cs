@@ -762,26 +762,27 @@ namespace Hymson.MES.Services.Services.Quality
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _qualIqcOrderSampleDetailRepository.UpdateAsync(entity);
+
+            // 先删除再添加
+            if (beforeAttachments != null && beforeAttachments.Any())
+            {
+                rows += await _qualIqcOrderSampleDetailAnnexRepository.DeletesAsync(new DeleteCommand
+                {
+                    UserId = updatedBy,
+                    DeleteOn = updatedOn,
+                    Ids = beforeAttachments.Select(s => s.Id)
+                });
+
+                rows += await _inteAttachmentRepository.DeletesAsync(new DeleteCommand
+                {
+                    UserId = updatedBy,
+                    DeleteOn = updatedOn,
+                    Ids = beforeAttachments.Select(s => s.AnnexId)
+                });
+            }
+
             if (attachmentEntities.Any())
             {
-                // 先删除再添加
-                if (beforeAttachments != null && beforeAttachments.Any())
-                {
-                    rows += await _qualIqcOrderSampleDetailAnnexRepository.DeletesAsync(new DeleteCommand
-                    {
-                        UserId = updatedBy,
-                        DeleteOn = updatedOn,
-                        Ids = beforeAttachments.Select(s => s.Id)
-                    });
-
-                    rows += await _inteAttachmentRepository.DeletesAsync(new DeleteCommand
-                    {
-                        UserId = updatedBy,
-                        DeleteOn = updatedOn,
-                        Ids = beforeAttachments.Select(s => s.AnnexId)
-                    });
-                }
-
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
                 rows += await _qualIqcOrderSampleDetailAnnexRepository.InsertRangeAsync(sampleDetailAttachmentEntities);
             }
