@@ -109,6 +109,12 @@ namespace Hymson.MES.Services.Dtos.WhShipment
     /// 出货单分页Dto
     /// </summary>
     public class WhShipmentPagedQueryDto : PagerInfo {
+
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long? SiteId { get; set; }
+
         /// <summary>
         /// 出货单号
         /// </summary>

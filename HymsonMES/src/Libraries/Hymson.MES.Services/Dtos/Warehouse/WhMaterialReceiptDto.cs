@@ -194,6 +194,10 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
     public class WhMaterialReceiptPagedQueryDto : PagerInfo
     {
         /// <summary>
+        /// 站点
+        /// </summary>
+        public string SiteId {  get; set; }
+        /// <summary>
         /// 收货单号
         /// </summary>
         public string? ReceiptNum { get; set; }
