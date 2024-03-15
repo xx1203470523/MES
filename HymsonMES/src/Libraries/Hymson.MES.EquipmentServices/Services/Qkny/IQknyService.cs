@@ -112,6 +112,20 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         Task FormulaVersionExamineAsync(FormulaVersionExamineDto dto);
 
         /// <summary>
+        /// 投料前校验
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task ConsumeEquBeforeCheckAsync(ConsumeEquBeforeCheckDto dto);
+
+        /// <summary>
+        /// 设备投料
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task ConsumeEquAsync(ConsumeEquDto dto);
+
+        /// <summary>
         /// 设备过程参数
         /// </summary>
         /// <param name="dto"></param>

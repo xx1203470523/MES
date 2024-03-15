@@ -3,6 +3,8 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,13 +29,27 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
 
         /// <summary>
+        /// BOM
+        /// </summary>
+        private readonly IProcBomDetailRepository _procBomDetailRepository;
+
+        /// <summary>
+        /// 物料替代料
+        /// </summary>
+        private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public PlanWorkOrderService(IPlanWorkOrderRepository planWorkOrderRepository,
-            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
+            IProcBomDetailRepository procBomDetailRepository,
+            IProcReplaceMaterialRepository procReplaceMaterialRepository)
         {
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
+            _procBomDetailRepository = procBomDetailRepository;
+            _procReplaceMaterialRepository = procReplaceMaterialRepository;
         }
 
         /// <summary>
@@ -68,6 +84,47 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
             var activeIdList = activeList.Select(m => m.WorkOrderId).ToList();
             var curOrder = orderList.Where(m => activeIdList.Contains(m.Id)).FirstOrDefault();
             return curOrder;
+        }
+
+        /// <summary>
+        /// 获取工单对应的物料id
+        /// 包括BOM替代料和物料自身的替代料
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        public async Task<List<long>> GetWorkOrderMaterialAsync(long bomId)
+        {
+            var matList = (await _procBomDetailRepository.GetListMainAsync(bomId)).ToList();
+            var bomMatReplaceList = (await _procBomDetailRepository.GetListReplaceAsync(bomId)).ToList();
+
+            if(matList.IsNullOrEmpty() == true && bomMatReplaceList.IsNullOrEmpty() == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45033));
+            }
+
+            //工单BOM的物料(包括替代料)
+            List<ProcBomDetailView> resultList = new List<ProcBomDetailView>();
+            resultList.AddRange(matList.ToList());
+            resultList.AddRange(bomMatReplaceList.ToList());
+
+            var matIdList = resultList.Select(m => m.MaterialId).ToList();
+            List<long> matIdLongList = new List<long>();
+            foreach(var item in matIdList)
+            {
+                long matId = 0;
+                if(long.TryParse(item, out matId) == true)
+                {
+                    matIdLongList.Add(matId);
+                }
+            }
+            //查询所有的替代料
+            var matReplaceList = await _procReplaceMaterialRepository.GetListByMaterialIdAsync(matIdLongList);
+            if (matReplaceList.IsNullOrEmpty() == false)
+            {
+                matIdLongList.AddRange(matReplaceList.Select(m => m.MaterialId).ToList());
+            }
+
+            return matIdLongList;
         }
     }
 }

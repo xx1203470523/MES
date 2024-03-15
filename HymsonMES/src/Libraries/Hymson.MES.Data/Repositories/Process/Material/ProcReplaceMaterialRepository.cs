@@ -271,6 +271,21 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, procReplaceMaterialEntitys);
         }
+
+        #region 顷刻
+
+        /// <summary>
+        /// 多个-根据物料id查询替代料
+        /// </summary>
+        /// <param name="materialIdList"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcReplaceMaterialEntity>> GetListByMaterialIdAsync(List<long> materialIdList)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcReplaceMaterialEntity>(GetListByMaterialIdSql, new { MaterialIdList = materialIdList });
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -304,5 +319,14 @@ namespace Hymson.MES.Data.Repositories.Process
                                `Id`, `SiteId`, `MaterialId`, `ReplaceMaterialId`, `IsUse`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_replace_material`  WHERE Id = @Id ";
         const string GetByMaterialIdSql = @"SELECT * FROM `proc_replace_material`  WHERE MaterialId = @MaterialId and IsUse=1 ";
+
+        #region 顷刻
+
+        /// <summary>
+        /// 多个-根据物料id查询替代料
+        /// </summary>
+        const string GetListByMaterialIdSql = @"SELECT * FROM proc_replace_material  WHERE MaterialId in @MaterialIdList and IsUse=1 ";
+
+        #endregion
     }
 }

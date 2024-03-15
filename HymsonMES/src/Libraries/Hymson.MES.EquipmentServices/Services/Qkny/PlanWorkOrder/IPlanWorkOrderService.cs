@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Data.Repositories.Process;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
         /// <param name="workLineId"></param>
         /// <returns></returns>
         Task<PlanWorkOrderEntity> GetByWorkLineIdAsync(long workLineId);
+
+        /// <summary>
+        /// 获取工单对应物料
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        Task<List<long>> GetWorkOrderMaterialAsync(long bomId);
     }
 }

@@ -634,5 +634,20 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             };
         }
 
+        /// <summary>
+        /// 根据上料点id获取最新上料记录
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ManuFeedingEntity> GetFeedingPointNewAsync(GetFeedingPointNewQuery query)
+        {
+            var dbModel = await _manuFeedingRepository.GetFeedingPointNewAsync(query);
+            if(dbModel == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45071));
+            }
+            return dbModel!;
+        }
+
     }
 }

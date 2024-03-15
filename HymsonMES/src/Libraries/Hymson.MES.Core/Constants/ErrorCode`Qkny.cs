@@ -80,6 +80,11 @@ namespace Hymson.MES.Core.Constants
         /// 设备所在线体工单不是生产中或者已下达
         /// </summary>
         public const string MES45032 = "设备所在线体工单不是生产中或者已下达";
+
+        /// <summary>
+        /// 工单所在BOM没有物料
+        /// </summary>
+        public const string MES45033 = "工单所在BOM没有物料";
         #endregion
 
         #region 上料
@@ -114,6 +119,34 @@ namespace Hymson.MES.Core.Constants
         /// 生成条码失败
         /// </summary>
         public const string MES45060 = "生成条码失败";
+
+        #endregion
+
+        #region 上料点
+
+        /// <summary>
+        /// 上料点不存在
+        /// </summary>
+        public const string MES45070 = "上料点不存在";
+
+        /// <summary>
+        /// 上料点不存在上料记录
+        /// </summary>
+        public const string MES45071 = "上料点不存在上料记录";
+
+        #endregion
+
+        #region 制胶匀浆
+
+        /// <summary>
+        /// 物料不在工单BOM里
+        /// </summary>
+        public const string MES45080 = "物料不在工单BOM里";
+
+        /// <summary>
+        /// 条码不存在或者数量小于0
+        /// </summary>
+        public const string MES45081 = "条码不存在或者数量小于0";
 
         #endregion
 

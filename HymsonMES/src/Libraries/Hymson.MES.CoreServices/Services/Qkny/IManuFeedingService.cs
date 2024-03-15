@@ -1,4 +1,6 @@
-﻿using Hymson.MES.CoreServices.Dtos.Qkny;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Qkny;
+using Hymson.MES.Data.Repositories.Manufacture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +15,17 @@ namespace Hymson.MES.CoreServices.Services.Qkny
     public interface IManuFeedingService
     {
         /// <summary>
-        /// 
+        /// 上料
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
         Task<ManuFeedingMaterialResponseDto> CreateAsync(ManuFeedingMaterialSaveDto saveDto);
+
+        /// <summary>
+        /// 根据上料点id获取最新上料记录
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuFeedingEntity> GetFeedingPointNewAsync(GetFeedingPointNewQuery query);
     }
 }

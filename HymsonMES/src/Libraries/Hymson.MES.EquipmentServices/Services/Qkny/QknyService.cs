@@ -21,11 +21,14 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Qkny.Formula;
+using Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint;
 using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
 using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
+using Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
 using Hymson.MES.Services.Dtos.AgvTaskRecord;
 using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
@@ -176,6 +179,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuPassStationService _manuPassStationService;
 
         /// <summary>
+        /// 上料点
+        /// </summary>
+        private readonly IProcLoadPointService _procLoadPointService;
+
+        /// <summary>
+        /// 物料库存
+        /// </summary>
+        private readonly IWhMaterialInventoryService _whMaterialInventoryService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -199,6 +212,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuSfcService manuSfcServicecs,
             IEquProductParamRecordService equProductParamRecordService,
             IManuPassStationService manuPassStationService,
+            IProcLoadPointService procLoadPointService,
+            IWhMaterialInventoryService whMaterialInventoryService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -222,6 +237,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuSfcServicecs = manuSfcServicecs;
             _equProductParamRecordService = equProductParamRecordService;
             _manuPassStationService = manuPassStationService;
+            _procLoadPointService = procLoadPointService;
+            _whMaterialInventoryService = whMaterialInventoryService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -528,8 +545,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                     throw new CustomerValidationException(nameof(ErrorCode.MES45040));
                 }
                 saveDto.Source = ManuSFCFeedingSourceEnum.FeedingPoint;
-                saveDto.FeedingPointId = res.FirstOrDefault().LoadPointId;
-                saveDto.SiteId = res.FirstOrDefault().SiteId;
+                saveDto.FeedingPointId = res.FirstOrDefault()!.LoadPointId;
+                saveDto.SiteId = res.FirstOrDefault()!.SiteId!;
+                saveDto.ResourceId = res.FirstOrDefault()!.ResourceId!;
             }
             //3. 上料
             var feedResult = await _manuFeedingService.CreateAsync(saveDto);
@@ -667,6 +685,79 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             query.Version = dto.Version;
             query.SiteId = equResModel.SiteId;
             var entity = await _procFormulaService.GetEntityByCodeVersion(query);
+        }
+
+        /// <summary>
+        /// 设备投料前校验(制胶匀浆)017
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ConsumeEquBeforeCheckAsync(ConsumeEquBeforeCheckDto dto)
+        {
+            //TODO 业务说明
+            //1. 缓存罐(上料点)一次只能有一种物料
+            //2. 从缓存罐投料到搅拌机（中间的计量罐不管）
+            //3. 设备上传的具体条码不管，即使有多个条码，型号也是一致，直接取缓存罐最后一次上料的
+
+            //1. 获取设备基础信息
+            QknyBaseDto equDto = new QknyBaseDto();
+            equDto.EquipmentCode = dto.ConsumeEquipmentCode;
+            equDto.ResourceCode = dto.ConsumeResourceCodeCode;
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(equDto);
+            //2. 查询设备激活工单
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //3. 查询上料点当前物料（缓存罐(上料点)一次只能有一种物料）
+            //3.1 查询上料点
+            ProcLoadPointQuery pointQuery = new ProcLoadPointQuery();
+            pointQuery.SiteId = equResModel.SiteId;
+            pointQuery.LoadPoint = dto.EquipmentCode;
+            var loadPoint = await _procLoadPointService.GetProcLoadPointEntitiesAsync(pointQuery);
+            //3.2 查询当前上料点最后一次的物料
+            //GetFeedingPointNewQuery pointRecrod = new GetFeedingPointNewQuery() { FeedingPointId = loadPoint.Id };
+            //var loadPointRecord = await _manuFeedingService.GetFeedingPointNewAsync(pointRecrod);
+            WhMaterialInventoryBarCodeQuery whMaterialQuery = new WhMaterialInventoryBarCodeQuery();
+            whMaterialQuery.SiteId = equResModel.SiteId;
+            whMaterialQuery.BarCode = dto.SfcList.IsNullOrEmpty() == true ? "" : dto.SfcList[0];
+            var sfcMaterial = await _whMaterialInventoryService.GetByBarCodeAsync(whMaterialQuery);
+            //4. 校验物料是否在激活工单对应的BOM里
+            var curPointMaterialId = sfcMaterial.MaterialId;
+            var orderMaterialList = await _planWorkOrderService.GetWorkOrderMaterialAsync(planEntity.ProductBOMId);
+            if(orderMaterialList.Contains(curPointMaterialId) == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45080));
+            }
+        }
+
+        /// <summary>
+        /// 设备投料(制胶匀浆)018
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ConsumeEquAsync(ConsumeEquDto dto)
+        {
+            //1. 获取设备基础信息
+            QknyBaseDto equDto = new QknyBaseDto();
+            equDto.EquipmentCode = dto.ConsumeEquipmentCode;
+            equDto.ResourceCode = dto.ConsumeResourceCodeCode;
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(equDto);
+            //2. 查询设备激活工单
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //3. 构造数据
+            ManuFeedingMaterialSaveDto saveDto = new ManuFeedingMaterialSaveDto();
+            //saveDto.BarCode = dto.Sfc;
+            saveDto.Source = ManuSFCFeedingSourceEnum.BOM;
+            saveDto.SiteId = equResModel.SiteId;
+            saveDto.ResourceId = equResModel.ResId;
+            //3. 上料（改成对条码进行合批）
+            foreach (var item in dto.ConsumeSfcList)
+            {
+                saveDto.BarCode = item.Sfc;
+                var feedResult = await _manuFeedingService.CreateAsync(saveDto);
+            }  
+
+            //TODO
+            //1. 类似上料，上到搅拌机或者制胶机
+            //2. 进行上料点
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
     /// 顷刻能源设备接口控制器
     /// </summary>
     [ApiController]
-    [Route("QknyEqu/api/v1")]
+    [Route("EquipmentService/api/v1")]
     public class QknyController : ControllerBase
     {
         /// <summary>
@@ -455,6 +455,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备投料前校验(制胶匀浆)017", BusinessType.OTHER, "ConsumeEquBeforeCheck017", ReceiverTypeEnum.MES)]
         public async Task ConsumeEquBeforeCheckAsync(ConsumeEquBeforeCheckDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ConsumeEquBeforeCheckAsync(dto);
+
             //TODO
             //待确认？此时应该应该根据什么是查激活的工单以及对应的BOM
             //1. 校验物料是否在工单BOM里
@@ -471,6 +478,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备投料(制胶匀浆)018", BusinessType.OTHER, "ConsumeEqu018", ReceiverTypeEnum.MES)]
         public async Task ConsumeEquAsync(ConsumeEquDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ConsumeEquAsync(dto);
             //TODO
             //1. 类似上料，上到搅拌机或者制胶机
         }
