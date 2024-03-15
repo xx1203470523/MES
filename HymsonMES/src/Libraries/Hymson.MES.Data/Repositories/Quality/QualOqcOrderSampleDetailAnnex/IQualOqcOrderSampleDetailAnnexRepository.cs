@@ -53,6 +53,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 根据样品明细Id删除附件(软删除)
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeleteAnnexBySampleDetailIdAsync(DeleteCommand command);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
