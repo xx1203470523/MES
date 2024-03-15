@@ -32,7 +32,7 @@ public class QualIqcInspectionItemDetailCreateCommand : CreateCommandAbstraction
     /// <summary>
     /// 检验器具
     /// </summary>
-    public string? Utensil { get; set; }
+    public IQCUtensilTypeEnum? Utensil { get; set; }
 
     /// <summary>
     /// 小数位数
@@ -57,7 +57,7 @@ public class QualIqcInspectionItemDetailCreateCommand : CreateCommandAbstraction
     /// <summary>
     /// 检验类型
     /// </summary>
-    public string? InspectionType { get; set; }
+    public IQCInspectionTypeEnum? InspectionType { get; set; }
 
     /// <summary>
     /// 备注

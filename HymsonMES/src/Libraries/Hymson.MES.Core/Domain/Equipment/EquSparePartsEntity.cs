@@ -93,5 +93,10 @@ namespace Hymson.MES.Core.Domain.Equipment
      /// 关联备件
       /// </summary>
         public IEnumerable<long>? SparePartIds { get; set; }
+
+        /// <summary>
+        /// 备件类型
+        /// </summary>
+        public IEnumerable<long>? SparePartGroupIds { get; set; }
     }
 }

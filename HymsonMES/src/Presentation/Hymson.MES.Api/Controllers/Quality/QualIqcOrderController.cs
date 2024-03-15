@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,14 +40,23 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
 
-        
+        /// <summary>
+        /// 上传检验单附件
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("attachment/save")]
+        public async Task SaveAttachmentAsync([FromBody] QualIqcOrderSaveAttachmentDto requestDto)
+        {
+            await _qualIqcOrderService.SaveAttachmentAsync(requestDto);
+        }
 
         /// <summary>
         /// 删除检验单附件
         /// </summary>
         /// <param name="orderAnnexId"></param>
         /// <returns></returns>
-        [HttpDelete("attachment/delete")]
+        [HttpDelete("attachment/delete/{orderAnnexId}")]
         public async Task DeleteAttachmentByIdAsync(long orderAnnexId)
         {
             await _qualIqcOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
@@ -57,12 +67,12 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("delete")]
-        public async Task DeleteAsync([FromBody] long[] ids)
+        [HttpDelete("delete")]
+        public async Task DeleteOrdersAsync([FromBody] long[] ids)
         {
-            await _qualIqcOrderService.DeletesAsync(ids);
+            await _qualIqcOrderService.DeleteOrdersAsync(ids);
         }
+
 
         /// <summary>
         /// 生成IQC检验单
@@ -73,9 +83,63 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<long> GeneratedOrderAsync([FromBody] GenerateInspectionDto requestDto)
         {
             // TODO 生成IQC检验单
-            return await Task.FromResult(0);
+            return await _qualIqcOrderService.GeneratedOrderAsync(requestDto);
         }
 
+        /// <summary>
+        /// 更改检验单状态（点击执行检验）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("operation")]
+        public async Task<long> OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
+        {
+            return await _qualIqcOrderService.OperationOrderAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 保存样品数据
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("save")]
+        public async Task<long> SaveOrderAsync([FromBody] QualIqcOrderSaveDto requestDto)
+        {
+            return await _qualIqcOrderService.SaveOrderAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 完成检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("complete")]
+        public async Task<long> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
+        {
+            return await _qualIqcOrderService.CompleteOrderAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 检验单免检
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("free")]
+        public async Task<long> FreeOrderAsync(QualIqcOrderFreeDto requestDto)
+        {
+            return await _qualIqcOrderService.FreeOrderAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 关闭检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("close")]
+        public async Task<long> CloseOrderAsync(QualIqcOrderCloseDto requestDto)
+        {
+            return await _qualIqcOrderService.CloseOrderAsync(requestDto);
+        }
 
 
         /// <summary>
@@ -90,12 +154,22 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("update")]
+        public async Task<int> UpdateOrderAsync(OrderParameterDetailSaveDto requestDto)
+        {
+            return await _qualIqcOrderService.UpdateOrderAsync(requestDto);
+        }
+
+        /// <summary>
         /// 分页查询列表（iqc检验单）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("pagelist")]
+        [HttpGet("pagelist")]
         public async Task<PagedInfo<QualIqcOrderDto>> QueryPagedListAsync([FromQuery] QualIqcOrderPagedQueryDto pagedQueryDto)
         {
             return await _qualIqcOrderService.GetPagedListAsync(pagedQueryDto);
@@ -126,23 +200,34 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 查询检验单快照数据
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet("snapshot/{orderId}")]
-        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId)
+        [HttpGet("snapshot")]
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotAsync([FromQuery] OrderParameterDetailQueryDto requestDto)
         {
-            return await _qualIqcOrderService.QueryDetailSnapshotByIdAsync(orderId);
+            return await _qualIqcOrderService.QueryDetailSnapshotAsync(requestDto);
         }
 
         /// <summary>
         /// 查询检验单样本数据
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet("sample/{orderId}")]
-        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
+        [HttpGet("sample")]
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleAsync([FromQuery] OrderParameterDetailQueryDto requestDto)
         {
-            return await _qualIqcOrderService.QueryDetailSampleByIdAsync(orderId);
+            return await _qualIqcOrderService.QueryDetailSampleAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 查询检验单样本数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet("sample/pagelist")]
+        public async Task<PagedInfo<OrderParameterDetailDto>> QueryDetailSamplePagedListAsync([FromQuery] OrderParameterDetailPagedQueryDto pagedQueryDto)
+        {
+            return await _qualIqcOrderService.QueryDetailSamplePagedListAsync(pagedQueryDto);
         }
 
 

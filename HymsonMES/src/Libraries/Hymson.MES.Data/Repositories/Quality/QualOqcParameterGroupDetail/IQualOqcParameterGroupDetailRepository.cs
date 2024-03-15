@@ -8,7 +8,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// <summary>
     /// 仓储接口（OQC检验参数组明细）
     /// </summary>
-    public interface IQualOqcParameterGroupDetailRepository
+    public partial interface IQualOqcParameterGroupDetailRepository
     {
         /// <summary>
         /// 新增

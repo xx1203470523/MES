@@ -27,6 +27,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string Path { get; set; }
 
+        /// <summary>
+        /// 文件路径
+        /// </summary>
+        public string? Url { get; set; }
+
     }
 
     /// <summary>

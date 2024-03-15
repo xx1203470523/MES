@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -97,11 +97,22 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetBySnapshotIdAsync(long snapshotId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualIqcInspectionItemDetailSnapshotEntity>(GetBySnapshotIdSql, new { IqcInspectionItemSnapshotId = snapshotId });
+        }
+
+        /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcInspectionItemDetailSnapshotEntity>(GetByIdsSql, new { Ids = ids });
@@ -116,6 +127,23 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.IqcInspectionItemSnapshotId.HasValue)
+            {
+                sqlBuilder.Where("IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId");
+            }
+            if (query.InspectionType.HasValue)
+            {
+                sqlBuilder.Where("InspectionType = @InspectionType");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ParameterCode))
+            {
+                sqlBuilder.Where("ParameterCode = @ParameterCode");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcInspectionItemDetailSnapshotEntity>(template.RawSql, query);
         }
@@ -160,16 +188,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_inspection_item_detail_snapshot /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_inspection_item_detail_snapshot /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_iqc_inspection_item_detail_snapshot(  `Id`, `ParameterId`, `ParameterCode`, `ParameterName`, `ParameterDataType`, `Type`, `Utensil`, `Scale`, `LowerLimit`, `Center`, `UpperLimit`, `InspectionType`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @ParameterId, @ParameterCode, @ParameterName, @ParameterDataType, @Type, @Utensil, @Scale, @LowerLimit, @Center, @UpperLimit, @InspectionType, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_iqc_inspection_item_detail_snapshot(  `Id`, `ParameterId`, `ParameterCode`, `ParameterName`, `ParameterDataType`, `Type`, `Utensil`, `Scale`, `LowerLimit`, `Center`, `UpperLimit`, `InspectionType`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @ParameterId, @ParameterCode, @ParameterName, @ParameterDataType, @Type, @Utensil, @Scale, @LowerLimit, @Center, @UpperLimit, @InspectionType, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_iqc_inspection_item_detail_snapshot(  `Id`, `IqcInspectionItemSnapshotId`, `ParameterId`, `ParameterCode`, `ParameterName`, `ParameterDataType`, `ParameterUnit`, `Type`, `Utensil`, `Scale`, `LowerLimit`, `Center`, `UpperLimit`, `InspectionType`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @IqcInspectionItemSnapshotId, @ParameterId, @ParameterCode, @ParameterName, @ParameterDataType, @ParameterUnit, @Type, @Utensil, @Scale, @LowerLimit, @Center, @UpperLimit, @InspectionType, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_iqc_inspection_item_detail_snapshot(  `Id`, `IqcInspectionItemSnapshotId`, `ParameterId`, `ParameterCode`, `ParameterName`, `ParameterDataType`, `ParameterUnit`, `Type`, `Utensil`, `Scale`, `LowerLimit`, `Center`, `UpperLimit`, `InspectionType`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @IqcInspectionItemSnapshotId, @ParameterId, @ParameterCode, @ParameterName, @ParameterDataType, @ParameterUnit, @Type, @Utensil, @Scale, @LowerLimit, @Center, @UpperLimit, @InspectionType, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_iqc_inspection_item_detail_snapshot SET   ParameterId = @ParameterId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterDataType = @ParameterDataType, Type = @Type, Utensil = @Utensil, Scale = @Scale, LowerLimit = @LowerLimit, Center = @Center, UpperLimit = @UpperLimit, InspectionType = @InspectionType, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_iqc_inspection_item_detail_snapshot SET   ParameterId = @ParameterId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterDataType = @ParameterDataType, Type = @Type, Utensil = @Utensil, Scale = @Scale, LowerLimit = @LowerLimit, Center = @Center, UpperLimit = @UpperLimit, InspectionType = @InspectionType, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_iqc_inspection_item_detail_snapshot SET   IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId, ParameterId = @ParameterId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterDataType = @ParameterDataType, ParameterUnit = @ParameterUnit, Type = @Type, Utensil = @Utensil, Scale = @Scale, LowerLimit = @LowerLimit, Center = @Center, UpperLimit = @UpperLimit, InspectionType = @InspectionType, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_iqc_inspection_item_detail_snapshot SET   IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId, ParameterId = @ParameterId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterDataType = @ParameterDataType, ParameterUnit = @ParameterUnit, Type = @Type, Utensil = @Utensil, Scale = @Scale, LowerLimit = @LowerLimit, Center = @Center, UpperLimit = @UpperLimit, InspectionType = @InspectionType, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_iqc_inspection_item_detail_snapshot SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_iqc_inspection_item_detail_snapshot SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM qual_iqc_inspection_item_detail_snapshot WHERE Id = @Id ";
+        const string GetBySnapshotIdSql = @"SELECT * FROM qual_iqc_inspection_item_detail_snapshot WHERE IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId ";
         const string GetByIdsSql = @"SELECT * FROM qual_iqc_inspection_item_detail_snapshot WHERE Id IN @Ids ";
 
     }

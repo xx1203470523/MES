@@ -13,6 +13,11 @@ namespace Hymson.MES.Core.Domain.Quality
     public class QualIqcInspectionItemDetailSnapshotEntity : BaseEntity
     {
         /// <summary>
+        /// qual_iqc_inspection_item_snapshot 的Id
+        /// </summary>
+        public long IqcInspectionItemSnapshotId { get; set; }
+
+        /// <summary>
         /// 参数Id proc_parameter 的id
         /// </summary>
         public long ParameterId { get; set; }
@@ -28,6 +33,11 @@ namespace Hymson.MES.Core.Domain.Quality
         public string ParameterName { get; set; }
 
         /// <summary>
+        /// 参数单位
+        /// </summary>
+        public string ParameterUnit { get; set; }
+
+        /// <summary>
         /// 参数数据类型
         /// </summary>
         public DataTypeEnum ParameterDataType { get; set; }
@@ -40,7 +50,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 检验器具
         /// </summary>
-        public bool? Utensil { get; set; }
+        public IQCUtensilTypeEnum? Utensil { get; set; }
 
         /// <summary>
         /// 小数位数

@@ -14,7 +14,7 @@ internal class QualIqcInspectionItemCreateValidator : AbstractValidator<QualIqcI
 {
     public QualIqcInspectionItemCreateValidator()
     {
-        RuleFor(m => m.MaterialId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19903));
+        RuleFor(m => m.MaterialId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11910));
     }
 }
 

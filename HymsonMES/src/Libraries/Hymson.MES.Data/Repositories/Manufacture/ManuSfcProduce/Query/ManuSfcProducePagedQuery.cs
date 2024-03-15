@@ -115,6 +115,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public long? ProcedureId { get; set; }
 
         /// <summary>
+        /// 工序
+        /// </summary>
+        public string? code { get; set; }
+
+        /// <summary>
         /// 条码列表
         /// </summary>
         public string[]? SfcArray { get; set; }

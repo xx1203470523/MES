@@ -175,5 +175,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetByIdSql = @"SELECT * FROM qual_oqc_parameter_group_detail WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_oqc_parameter_group_detail WHERE Id IN @Ids ";
 
+
+        const string DeleteByMainIdSql = "UPDATE `qual_oqc_parameter_group_detail` SET IsDeleted = Id WHERE ParameterGroupId = @ParameterGroupId;";
+
+        const string DeleteByMainIdsSql = "UPDATE `qual_oqc_parameter_group_detail` SET IsDeleted = Id WHERE ParameterGroupId IN @ParameterGroupId;";
+
     }
 }

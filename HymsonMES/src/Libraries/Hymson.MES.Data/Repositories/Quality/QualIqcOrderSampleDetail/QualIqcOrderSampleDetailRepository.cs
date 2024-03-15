@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderSampleDetailEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualIqcOrderSampleDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderSampleDetailEntity>(GetByIdsSql, new { Ids = ids });
@@ -116,6 +116,15 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.IQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("IQCOrderId = @IQCOrderId");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderSampleDetailEntity>(template.RawSql, query);
         }
@@ -134,6 +143,13 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+
+            if (pagedQuery.IQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("IQCOrderId = @IQCOrderId");
+            }
+            if (pagedQuery.IQCOrderSampleIds != null) sqlBuilder.Where(" IQCOrderSampleId IN @IQCOrderSampleIds ");
+            if (pagedQuery.IQCInspectionDetailSnapshotIds != null) sqlBuilder.Where(" IQCInspectionDetailSnapshotId IN @IQCInspectionDetailSnapshotIds ");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -160,11 +176,11 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order_sample_detail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_sample_detail /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_iqc_order_sample_detail(  `Id`, `SiteId`, `IQCOrderSampleId`, `IQCInspectionParameterCopyId`, `InspectionValue`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IQCOrderSampleId, @IQCInspectionParameterCopyId, @InspectionValue, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_iqc_order_sample_detail(  `Id`, `SiteId`, `IQCOrderSampleId`, `IQCInspectionParameterCopyId`, `InspectionValue`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IQCOrderSampleId, @IQCInspectionParameterCopyId, @InspectionValue, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_iqc_order_sample_detail(  `Id`, `SiteId`, `IQCOrderId`, `IQCOrderSampleId`, `IQCInspectionDetailSnapshotId`, `InspectionValue`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IQCOrderId, @IQCOrderSampleId, @IQCInspectionDetailSnapshotId, @InspectionValue, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_iqc_order_sample_detail(  `Id`, `SiteId`, `IQCOrderId`, `IQCOrderSampleId`, `IQCInspectionDetailSnapshotId`, `InspectionValue`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IQCOrderId, @IQCOrderSampleId, @IQCInspectionDetailSnapshotId, @InspectionValue, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_iqc_order_sample_detail SET   SiteId = @SiteId, IQCOrderSampleId = @IQCOrderSampleId, IQCInspectionParameterCopyId = @IQCInspectionParameterCopyId, InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_iqc_order_sample_detail SET   SiteId = @SiteId, IQCOrderSampleId = @IQCOrderSampleId, IQCInspectionParameterCopyId = @IQCInspectionParameterCopyId, InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_iqc_order_sample_detail SET InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_iqc_order_sample_detail SET InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_iqc_order_sample_detail SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_iqc_order_sample_detail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -173,4 +189,5 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetByIdsSql = @"SELECT * FROM qual_iqc_order_sample_detail WHERE Id IN @Ids ";
 
     }
+
 }

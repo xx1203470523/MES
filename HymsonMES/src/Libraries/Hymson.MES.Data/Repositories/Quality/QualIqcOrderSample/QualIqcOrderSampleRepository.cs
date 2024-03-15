@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderSampleEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualIqcOrderSampleEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderSampleEntity>(GetByIdsSql, new { Ids = ids });
@@ -116,6 +116,23 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.IQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("IQCOrderId = @IQCOrderId");
+            }
+            if (query.IQCOrderTypeId.HasValue)
+            {
+                sqlBuilder.Where("IQCOrderTypeId = @IQCOrderTypeId");
+            }
+            if (!string.IsNullOrWhiteSpace(query.Barcode))
+            {
+                sqlBuilder.Where("Barcode = @Barcode");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderSampleEntity>(template.RawSql, query);
         }

@@ -124,7 +124,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 校验工序和资源是否对应
             if (!resourceIds.Any(a => a == commonBo.ResourceId))
             {
-                _logger.LogWarning($"工序{commonBo.ProcedureId}和资源{commonBo.ResourceId}不对应！");
+                //_logger.LogWarning($"工序{commonBo.ProcedureId}和资源{commonBo.ResourceId}不对应！");
                 throw new CustomerValidationException(nameof(ErrorCode.MES16317));
             }
 
@@ -236,7 +236,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         validationFailure.ErrorCode = nameof(ErrorCode.MES16354);
                         validationFailures.Add(validationFailure);
 
-                        _logger.LogWarning($"工艺路线工序节点数据异常，工艺路线ID：{sfcProduce.ProcessRouteId}，条码工序ID：{beginNode.ProcedureId}，进站工序ID：{endNode.ProcedureId}");
+                        //_logger.LogWarning($"工艺路线工序节点数据异常，工艺路线ID：{sfcProduce.ProcessRouteId}，条码工序ID：{beginNode.ProcedureId}，进站工序ID：{endNode.ProcedureId}");
                         continue;
                     }
 

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
@@ -13,33 +14,33 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// IQC检验单Id
         /// </summary>
-        public long? IQCOrderId { get; set; }
+        public long IQCOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 操作人
         /// </summary>
         public string OperateBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 操作时间
         /// </summary>
         public DateTime? OperateOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 操作类型;1、开始检验2、完成检验3、关闭检验
         /// </summary>
-        public bool? OperateType { get; set; }
+        public OrderOperateTypeEnum OperationType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 }

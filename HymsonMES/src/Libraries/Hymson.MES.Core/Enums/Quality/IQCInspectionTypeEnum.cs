@@ -5,7 +5,6 @@ namespace Hymson.MES.Core.Enums.Quality
     /// <summary>
     /// 检验类型
     /// </summary>
-    [Flags]
     public enum IQCInspectionTypeEnum
     {
         /// <summary>
@@ -24,18 +23,18 @@ namespace Hymson.MES.Core.Enums.Quality
         /// 包装检验
         /// </summary>
         [Description("包装检验")]
-        InspectionOfPacking = 4,
+        InspectionOfPacking = 3,
 
         /// <summary>
         /// 特殊性检验
         /// </summary>
         [Description("特殊性检验")]
-        SpecificityTest = 8,
+        SpecificityTest = 4,
 
         /// <summary>
         /// 破坏性检验
         /// </summary>
         [Description("破坏性检验")]
-        DestructiveInspection = 16
+        DestructiveInspection = 5
     }
 }
