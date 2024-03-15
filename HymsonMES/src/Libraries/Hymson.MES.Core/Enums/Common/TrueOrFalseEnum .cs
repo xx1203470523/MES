@@ -8,7 +8,7 @@ namespace Hymson.MES.Core.Enums
     public enum TrueOrFalseEnum : sbyte
     {
         /// <summary>
-        /// 是1
+        /// 是
         /// </summary>
         [Description("是")]
         Yes = 1,
