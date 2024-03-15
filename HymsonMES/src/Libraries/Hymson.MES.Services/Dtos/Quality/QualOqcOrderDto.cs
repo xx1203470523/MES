@@ -128,6 +128,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string? SupplierName { get; set; }
 
         /// <summary>
+        /// 供应商批次
+        /// </summary>
+        public string? SupplierBatch { get; set; }
+
+        /// <summary>
         /// 计量单位(字典定义)
         /// </summary>
         public string? Unit { get; set; }
@@ -166,6 +171,16 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 出货单单号
         /// </summary>
         public string? ShipmentNum { get; set; }
+
+        /// <summary>
+        /// 状态Str
+        /// </summary>
+        public string? StatusStr { get; set; }
+
+        /// <summary>
+        /// 附件
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
     }
 
     /// <summary>
