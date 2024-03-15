@@ -1,5 +1,4 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 
 namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
 {
@@ -183,7 +182,7 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
         /// </summary>
         public long IsDeleted { get; set; }
 
- 
+
     }
 
 
@@ -193,10 +192,6 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
     /// </summary>
     public class WhMaterialReceiptPagedQueryDto : PagerInfo
     {
-        /// <summary>
-        /// 站点
-        /// </summary>
-        public string SiteId {  get; set; }
         /// <summary>
         /// 收货单号
         /// </summary>

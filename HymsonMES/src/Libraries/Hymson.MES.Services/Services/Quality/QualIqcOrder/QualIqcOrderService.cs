@@ -513,6 +513,7 @@ namespace Hymson.MES.Services.Services.Quality
             */
 
             // 关闭检验单
+            entity.IsQualified = TrueOrFalseEnum.Yes;
             entity.Status = InspectionStatusEnum.Closed;
 
             var rows = 0;
@@ -545,6 +546,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 不合格处理完成之后直接关闭
+            entity.IsQualified = TrueOrFalseEnum.Yes;
             entity.Status = InspectionStatusEnum.Closed;
 
             var rows = 0;
