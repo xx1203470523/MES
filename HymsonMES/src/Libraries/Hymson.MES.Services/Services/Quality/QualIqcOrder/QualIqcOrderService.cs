@@ -1232,6 +1232,9 @@ namespace Hymson.MES.Services.Services.Quality
 
                 var dto = snapshotDetailEntity.ToModel<OrderParameterDetailDto>();
                 dto.Id = sampleDetailEntity.Id;
+                dto.InspectionValue = sampleDetailEntity.InspectionValue;
+                dto.IsQualified = sampleDetailEntity.IsQualified;
+                dto.Remark = sampleDetailEntity.Remark;
 
                 // 填充条码
                 var sampleEntity = sampleEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCOrderSampleId);
