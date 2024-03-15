@@ -336,6 +336,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
 
                     var inspectionItemDetailSnapshoot = inspectionItemDetail.ToEntity<QualIqcInspectionItemDetailSnapshotEntity>();
                     inspectionItemDetailSnapshoot.Id = IdGenProvider.Instance.CreateId();
+                    inspectionItemDetailSnapshoot.IqcInspectionItemSnapshotId = inspectionItemSnapshoot.Id;
                     inspectionItemDetailSnapshoot.ParameterCode = parameterEntity.ParameterCode;
                     inspectionItemDetailSnapshoot.ParameterName = parameterEntity.ParameterName;
                     inspectionItemDetailSnapshoot.ParameterDataType = parameterEntity.DataType;

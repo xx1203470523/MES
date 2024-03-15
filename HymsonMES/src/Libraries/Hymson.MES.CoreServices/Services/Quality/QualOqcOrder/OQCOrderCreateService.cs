@@ -256,6 +256,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
 
                     var parameterGroupDetailSnapshoot = parameterGroupDetail.ToEntity<QualOqcParameterGroupDetailSnapshootEntity>();
                     parameterGroupDetailSnapshoot.Id = IdGenProvider.Instance.CreateId();
+                    parameterGroupDetailSnapshoot.ParameterGroupId = parameterGroupSnapshoot.Id;
                     parameterGroupDetailSnapshoot.ParameterCode = parameterEntity.ParameterCode;
                     parameterGroupDetailSnapshoot.ParameterName = parameterEntity.ParameterName;
                     parameterGroupDetailSnapshoot.ParameterDataType = parameterEntity.DataType;
