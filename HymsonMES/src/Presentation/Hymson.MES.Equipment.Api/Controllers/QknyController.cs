@@ -27,7 +27,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 是否调试
         /// </summary>
-        private readonly bool IS_DEBUG = true;
+        private readonly bool IS_DEBUG = false;
 
         /// <summary>
         /// 构造函数
@@ -520,13 +520,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备产出(制胶匀浆)020", BusinessType.OTHER, "OutputEqu020", ReceiverTypeEnum.MES)]
         public async Task<string> OutputEquAsync(QknyBaseDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                string sfc = "SFC001";
+                return sfc;
+            }
+
+            return await _qknyService.OutputEquAsync(dto);
+
             //TODO
             //1. 根据工序返回对应的条码给设备
             //2. 执行条码生成方法
 
-            string sfc = "SFC001";
 
-            return sfc;
         }
 
         /// <summary>

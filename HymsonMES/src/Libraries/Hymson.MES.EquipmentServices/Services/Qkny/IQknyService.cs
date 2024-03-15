@@ -132,6 +132,13 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         Task FeedingCompletedAsync(FeedingCompletedDto dto);
 
         /// <summary>
+        /// 设备产出
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<string> OutputEquAsync(QknyBaseDto dto);
+
+        /// <summary>
         /// 设备过程参数
         /// </summary>
         /// <param name="dto"></param>
