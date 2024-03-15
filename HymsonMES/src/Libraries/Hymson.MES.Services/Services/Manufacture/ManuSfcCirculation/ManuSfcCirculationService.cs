@@ -189,14 +189,17 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
             var equEuipmentEntity = equEuipmentEntities.FirstOrDefault();
 
             //校验被绑定条码是否存在Ng
-            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new() { SFCS = new string[] { bindDto.CirculationBarCode } });
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new() { SFCS = new string[] { bindDto.CirculationBarCode ?? "" } });
             var hasNg = manuSfcSummaryEntities.Any(a => a.QualityStatus == 0);
             if (hasNg) throw new CustomerValidationException(nameof(ErrorCode.MES19147)).WithData("SFC", bindDto.CirculationBarCode ?? "");
 
             //校验绑定条码在制是否处于所选工序排队中的状态
-            var manuSfcProdureEntity = await _manuSfcProduceRepository.GetBySFCAsync(new() {  Sfc = bindDto.CirculationBarCode });
-            if (manuSfcProdureEntity.ProcedureId != procedureEntity.Id && manuSfcProdureEntity.Status != Core.Enums.SfcProduceStatusEnum.lineUp)
-                throw new CustomerValidationException(nameof(ErrorCode.MES19148)).WithData("SFC",bindDto.CirculationBarCode).WithData("ProcedureName",procedureEntity.Name);
+            var manuSfcProdureEntity = await _manuSfcProduceRepository.GetBySFCAsync(new() { Sfc = bindDto.CirculationBarCode ?? "", SiteId = 123456 });
+            if (manuSfcProdureEntity != null)
+            {
+                if (!(manuSfcProdureEntity.ProcedureId == procedureEntity.Id && manuSfcProdureEntity.Status == Core.Enums.SfcProduceStatusEnum.lineUp))
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19148)).WithData("SFC", bindDto.CirculationBarCode ?? "").WithData("ProcedureName", procedureEntity.Name);
+            }
 
             //获取条码流转记录
             var bindSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
@@ -427,6 +430,23 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
     /// <returns></returns>
     public async Task UpdateManuSfcCirculationAsync(ManuSfcCirculationBindDto bindDto)
     {
+
+        var procedureEntity = await _procProcedureRepository.GetByIdAsync(bindDto.ProcedureId.GetValueOrDefault())
+            ?? throw new CustomerValidationException(nameof(ErrorCode.MES17311));
+
+        //校验被绑定条码是否存在Ng
+        var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new() { SFCS = new string[] { bindDto.CirculationBarCode } });
+        var hasNg = manuSfcSummaryEntities.Any(a => a.QualityStatus == 0);
+        if (hasNg) throw new CustomerValidationException(nameof(ErrorCode.MES19147)).WithData("SFC", bindDto.CirculationBarCode ?? "");
+
+        //校验绑定条码在制是否处于所选工序排队中的状态
+        var manuSfcProdureEntity = await _manuSfcProduceRepository.GetBySFCAsync(new() { Sfc = bindDto.CirculationBarCode ?? "", SiteId = 123456 });
+        if (manuSfcProdureEntity != null)
+        {
+            if (!(manuSfcProdureEntity.ProcedureId == procedureEntity.Id && manuSfcProdureEntity.Status == Core.Enums.SfcProduceStatusEnum.lineUp))
+                throw new CustomerValidationException(nameof(ErrorCode.MES19148)).WithData("SFC", bindDto.CirculationBarCode ?? "").WithData("ProcedureName", procedureEntity.Name);
+        }
+
         await _manuSfcCirculationRepository.UpdateSfcAsync(new()
         {
             Id = bindDto.Id,

@@ -394,6 +394,11 @@ public record ManuSfcCirculationModifyDto : BaseEntityDto
 public class ManuSfcCirculationPagedQueryDto : PagerInfo
 {
     /// <summary>
+    /// 工序Id
+    /// </summary>
+    public long? ProcedureId { get; set; }
+
+    /// <summary>
     /// 条码
     /// </summary>
     public string? SFC { get; set; }
