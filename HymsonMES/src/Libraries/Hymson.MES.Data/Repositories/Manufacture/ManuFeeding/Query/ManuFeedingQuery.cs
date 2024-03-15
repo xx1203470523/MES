@@ -124,4 +124,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string BarCode { get; set; }
     }
 
+    #region 顷刻
+
+    /// <summary>
+    /// 获取最新上料记录
+    /// </summary>
+    public class GetFeedingPointNewQuery
+    {
+        /// <summary>
+        /// 上料点
+        /// </summary>
+        public long FeedingPointId { get; set; }
+    }
+    #endregion
 }

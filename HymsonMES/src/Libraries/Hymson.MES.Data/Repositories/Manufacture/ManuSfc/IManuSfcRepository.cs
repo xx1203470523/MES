@@ -268,5 +268,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<ManuSfcEntity> GetOneAsync(ManuSfcQuery query);
         Task<IEnumerable<ManuSfcEntity>> GetListAsync(ManuSfcQuery query);
         #endregion
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据SFCs设置条码状态与数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command);
+
+        #endregion
+
     }
 }

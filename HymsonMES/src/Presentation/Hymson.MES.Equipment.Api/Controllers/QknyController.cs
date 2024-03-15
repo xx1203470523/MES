@@ -1,7 +1,6 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
@@ -17,14 +16,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
     /// 顷刻能源设备接口控制器
     /// </summary>
     [ApiController]
-    [Route("QknyEqu/api/v1")]
+    [Route("EquipmentService/api/v1")]
     public class QknyController : ControllerBase
     {
-        /// <summary>
-        /// 仓储接口（设备注册）
-        /// </summary>
-        private readonly IEquEquipmentRepository _equEquipmentRepository;
-
         /// <summary>
         /// 设备接口服务
         /// </summary>
@@ -33,14 +27,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 是否调试
         /// </summary>
-        private readonly bool IS_DEBUG = true;
+        private readonly bool IS_DEBUG = false;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         public QknyController(IEquEquipmentRepository equEquipmentRepository, IQknyService qknyService)
         {
-            _equEquipmentRepository = equEquipmentRepository;
             _qknyService = qknyService;
         }
 
@@ -207,20 +200,25 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //1. 获取proc_equipment_group_param_detail开机参数明细，并转成相应格式
 
-            GetRecipeDetailReturnDto result = new GetRecipeDetailReturnDto();
-
-            List<RecipeParamDto> paramList = new List<RecipeParamDto>();
-            for (var i = 0; i < 3; ++i)
+            if(IS_DEBUG == true)
             {
-                RecipeParamDto param = new RecipeParamDto();
-                param.ParamCode = $"param{i}";
-                param.ParamValue = "";
-                param.ParamLower = "0";
-                param.ParamUpper = "1000";
-                result.ParamList.Add(param);
+                GetRecipeDetailReturnDto resultList = new GetRecipeDetailReturnDto();
+
+                List<RecipeParamDto> paramList = new List<RecipeParamDto>();
+                for (var i = 0; i < 3; ++i)
+                {
+                    RecipeParamDto param = new RecipeParamDto();
+                    param.ParamCode = $"param{i}";
+                    param.ParamValue = "";
+                    param.ParamLower = "0";
+                    param.ParamUpper = "1000";
+                    resultList.ParamList.Add(param);
+                }
+                return resultList;
             }
 
-            return result;
+            var res = await _qknyService.GetRecipeDetailAsync(dto);
+            return res;
         }
 
         /// <summary>
@@ -233,6 +231,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("开机参数校验采集009", BusinessType.OTHER, "Recipe009", ReceiverTypeEnum.MES)]
         public async Task RecipeAsync(RecipeDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.RecipeAsync(dto);
+
             //TODO
             //1. 校验开机参数是否启用状态
             //2. 新增proc_recipe_record记录表，用于记录开机参数中设定的实际值
@@ -250,8 +255,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("原材料上料010", BusinessType.OTHER, "Feeding010", ReceiverTypeEnum.MES)]
         public async Task FeedingAsync(FeedingDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+            await _qknyService.FeedingAsync(dto);
             //TODO
-            //-- 不校验物料是在wh_material_inventory物料库存表中
+            //-- 不校验物料是在 wh_material_inventory 物料库存表中
             //1. 校验物料是否在lims系统发过来的条码表lims_material(wh_material_inventory)，验证是否存在及合格，以及生成日期
             //2. 添加上料表信息 manu_feeding
             //3. 添加上料记录表信息 manu_feeding_record
@@ -268,6 +278,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("半成品上料011", BusinessType.OTHER, "HalfFeeding011", ReceiverTypeEnum.MES)]
         public async Task HalfFeedingAsync(HalfFeedingDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+            await _qknyService.HalfFeedingAsync(dto);
             //TODO
             //1. 本用于涂布，辊分，模切，卷绕工序，现涂布，辊分，模切改为一个工单，这几个地方改为直接进站
             //2. 校验条码是否在上工序产出(manu_sfc_produce)
@@ -279,7 +294,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
              * 
              * select * from manu_sfc_step mss => 新增
              */
-            //4. 下工序产出时，在制品表manu_sfc_produce删除进站条码，manu_sfc_step新增
+            //4. 工序产出时，在制品表 manu_sfc_produce 删除进站条码, manu_sfc_step 新增
         }
 
         /// <summary>
@@ -292,9 +307,22 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("上料呼叫Agv012", BusinessType.OTHER, "AgvUpMaterial012", ReceiverTypeEnum.MES)]
         public async Task AgvUpMaterialAsync(AgvUpMaterialDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            AgvMaterialDto agvDto = new AgvMaterialDto();
+            agvDto.EquipmentCode = dto.EquipmentCode;
+            agvDto.ResourceCode = dto.ResourceCode;
+            agvDto.LocalTime = dto.LocalTime;
+            agvDto.Type = "1";
+            agvDto.Content = string.Empty;
+            await _qknyService.AgvMaterialAsync(agvDto);
+
             //TODO
             //1. 针对涂布，辊分，模切，卷绕设备进行上料时，通过MES呼叫AGV，给AGV发一个任务
-            //2. 调用AGV接口，添加agv_task_record记录表进行记录，表中有字段区分上料还是下料
+            //2. 调用AGV接口，添加 agv_task_record 记录表进行记录，表中有字段区分上料还是下料
         }
 
         /// <summary>
@@ -307,6 +335,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("下料呼叫Agv013", BusinessType.OTHER, "AgvDownMaterial013", ReceiverTypeEnum.MES)]
         public async Task AgvDownMaterialAsync(AgvUpMaterialDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            AgvMaterialDto agvDto = new AgvMaterialDto();
+            agvDto.EquipmentCode = dto.EquipmentCode;
+            agvDto.ResourceCode = dto.ResourceCode;
+            agvDto.LocalTime = dto.LocalTime;
+            agvDto.Type = "2";
+            agvDto.Content = string.Empty;
+            await _qknyService.AgvMaterialAsync(agvDto);
+
             //TODO
             //1. 针对涂布，辊分，模切，卷绕设备进行下料时，通过MES呼叫AGV，给AGV发一个任务
             //2. 调用AGV接口，添加agv_task_record记录表进行记录，表中有字段区分上料还是下料
@@ -324,21 +365,24 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             //TODO
             //1. 针对制胶匀浆设备时，在开机进行启动时，从MES获取配方列表
-            //2. 获取proc_formula表数据，并进行字段转换
+            //2. 获取 proc_formula 表数据，并进行字段转换
 
-            List<FormulaListGetReturnDto> list = new List<FormulaListGetReturnDto>();
-            for (var i = 0; i < 3; ++i)
-            { 
-                FormulaListGetReturnDto model = new FormulaListGetReturnDto();
-                model.FormulaCode = $"formulaCode{i + 1}";
-                model.Version = "1.0";
-                model.ProductCode = $"productCode{i}";
-                model.LastUpdateOnTime = DateTime.Now;
+            if(IS_DEBUG == true)
+            {
+                List<FormulaListGetReturnDto> list = new List<FormulaListGetReturnDto>();
+                for (var i = 0; i < 3; ++i)
+                {
+                    FormulaListGetReturnDto model = new FormulaListGetReturnDto();
+                    model.FormulaCode = $"formulaCode{i + 1}";
+                    model.Version = "1.0";
+                    model.ProductCode = $"productCode{i}";
+                    model.LastUpdateOnTime = DateTime.Now;
 
-                list.Add(model);
+                    list.Add(model);
+                }
             }
 
-            return list;
+            return await _qknyService.FormulaListGetAsync(dto);
         }
 
         /// <summary>
@@ -354,25 +398,30 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //1. 基于proc_formula，proc_formula_details表进行查询
 
-            FormulaDetailGetReturnDto result = new FormulaDetailGetReturnDto();
-            result.Version = "1.0";
-
-            for (var i = 0; i < 5; ++i)
+            if (IS_DEBUG == true)
             {
-                FormulaParamList model = new FormulaParamList();
-                model.SepOrder = i + 1;
-                model.Category = "A|B|C";
-                model.MarterialCode = $"materialCode{i}";
-                model.MarerialGroupCode = $"MarerialGroupCode{i}";
-                model.ParameCode = $"ParameCode{i}";
-                model.ParamValue = $"ParamValue{i}";
-                model.FunctionCode = $"FunctionCode{i}";
-                model.Unit = $"Unit{i}";
+                FormulaDetailGetReturnDto result = new FormulaDetailGetReturnDto();
+                result.Version = "1.0";
 
-                result.ParamList.Add(model);
+                for (var i = 0; i < 5; ++i)
+                {
+                    FormulaParamList model = new FormulaParamList();
+                    model.SepOrder = i + 1;
+                    model.Category = "A|B|C";
+                    model.MarterialCode = $"materialCode{i}";
+                    model.MarerialGroupCode = $"MarerialGroupCode{i}";
+                    model.ParameCode = $"ParameCode{i}";
+                    model.ParamValue = $"ParamValue{i}";
+                    model.FunctionCode = $"FunctionCode{i}";
+                    model.Unit = $"Unit{i}";
+
+                    result.ParamList.Add(model);
+                }
+
+                return result;
             }
 
-            return result;
+            return await _qknyService.FormulaDetailGetAsync(dto);
         }
 
         /// <summary>
@@ -385,6 +434,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("配方版本校验(制胶匀浆)016", BusinessType.OTHER, "FormulaVersionExamine016", ReceiverTypeEnum.MES)]
         public async Task FormulaVersionExamineAsync(FormulaVersionExamineDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.FormulaVersionExamineAsync(dto);
+
             //TODO
             //1. 查询表proc_formula进行配方版本的校验，确认是否是激活的版本
         }
@@ -399,6 +455,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备投料前校验(制胶匀浆)017", BusinessType.OTHER, "ConsumeEquBeforeCheck017", ReceiverTypeEnum.MES)]
         public async Task ConsumeEquBeforeCheckAsync(ConsumeEquBeforeCheckDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ConsumeEquBeforeCheckAsync(dto);
+
             //TODO
             //待确认？此时应该应该根据什么是查激活的工单以及对应的BOM
             //1. 校验物料是否在工单BOM里
@@ -415,6 +478,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备投料(制胶匀浆)018", BusinessType.OTHER, "ConsumeEqu018", ReceiverTypeEnum.MES)]
         public async Task ConsumeEquAsync(ConsumeEquDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ConsumeEquAsync(dto);
             //TODO
             //1. 类似上料，上到搅拌机或者制胶机
         }
@@ -498,13 +567,20 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //2. 用的时候生成(需要的时候在生成条码)或从XX表里面取(提前生成就是下发，生成两个或者3个，)
             //3. 考虑提前生成条码如何标记是否使用
 
-            List<string> sfcList = new List<string>();
-            for (var i = 0; i < dto.Qty + 1; ++i)
+            if(IS_DEBUG == true)
             {
-                sfcList.Add($"sfc00{i + 1}");
-            }
+                List<string> sfcList = new List<string>();
+                for (var i = 0; i < dto.Qty + 1; ++i)
+                {
+                    sfcList.Add($"sfc00{i + 1}");
+                }
 
-            return sfcList;
+                return sfcList;
+            }
+            //如果型号设置的是多个，则一次只出一个
+            //如果型号设置的是单个，则一次应该根据指定数量出
+            dto.Qty = 1;
+            return await _qknyService.GenerateSfcAsync(dto);
         }
 
         /// <summary>
@@ -517,6 +593,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产出米数上报024", BusinessType.OTHER, "OutboundMetersReport024", ReceiverTypeEnum.MES)]
         public async Task OutboundMetersReportAsync(OutboundMetersReportDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.OutboundMetersReportAsync(dto);
+
             //TODO
             //1. 设备上报条码和对应的长度
             //2. 去 manu_sfc，manu_sfc_produce 表修改条码的长度，manu_sfc根据manu_sfc_produce的id来
@@ -550,6 +633,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备过程参数026", BusinessType.OTHER, "EquipmentProcessParam026", ReceiverTypeEnum.MES)]
         public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto)
         {
+            await _qknyService.EquipmentProcessParamAsync(dto);
+
             //TODO
             //1. 写入参数表，参考现有的EquipmentCollectionAsync，
             //2. 支持错误参数不NG，记录或者忽略

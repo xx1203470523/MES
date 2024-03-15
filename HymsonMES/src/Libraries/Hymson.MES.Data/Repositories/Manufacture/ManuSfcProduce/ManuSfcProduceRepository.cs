@@ -910,6 +910,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
         }
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据条码更改条码状态
+        /// 用于设备接口产出米数上报
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateQtyBySfcsSql, command);
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -982,5 +998,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateStatusAndQtyBySfcsSql = @"UPDATE `manu_sfc_produce` SET Status = @Status, Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND SFC IN @SFCs ";
         const string UpdateQtyByIdSql = @"UPDATE `manu_sfc_produce` SET  Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
+
+        #region 顷刻
+
+        /// <summary>
+        /// 更新条码数量
+        /// </summary>
+        const string UpdateQtyBySfcsSql = @"UPDATE manu_sfc_produce SET Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND SFC = @SFC ";
+
+        #endregion
     }
 }

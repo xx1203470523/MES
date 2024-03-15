@@ -188,6 +188,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuFeedingEntity>(GetByFeedingPointIdAndResourceIdsSql, query);
         }
+
+        #region 顷刻
+
+        /// <summary>
+        /// 获取最新的上料记录
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ManuFeedingEntity> GetFeedingPointNewAsync(GetFeedingPointNewQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuFeedingEntity>(GetFeedingPointNewSql, query);
+        }
+
+        #endregion
+
     }
 
 
@@ -205,5 +221,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         const string GetByResourceIdAndMaterialId = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId AND ProductId = @MaterialId; ";
 
         const string GetByFeedingPointIdAndResourceIdsSql= "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId in @ResourceIds AND FeedingPointId = @FeedingPointId ";
+
+        #region 顷刻
+
+        /// <summary>
+        /// 获取最新一条上料记录
+        /// </summary>
+        const string GetFeedingPointNewSql = $@"
+            select * from manu_feeding mf 
+            where FeedingPointId = @FeedingPointId
+            order by CreatedOn desc 
+            limit 0,1
+        ";
+
+        #endregion
     }
 }

@@ -1,0 +1,36 @@
+﻿using Hymson.MES.Data.Repositories.Manufacture;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Hymson.MES.CoreServices.Services.Qkny
+{
+    /// <summary>
+    /// 在制品服务
+    /// </summary>
+    public class ManuSfcProduceService : IManuSfcProduceService
+    {
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ManuSfcProduceService(IManuSfcProduceRepository manuSfcProduceRepository)
+        {
+            _manuSfcProduceRepository = manuSfcProduceRepository;
+        }
+
+        /// <summary>
+        /// 根据条码更改条码状态
+        /// 用于设备接口产出米数上报
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command)
+        {
+            return await _manuSfcProduceRepository.UpdateQtyBySfcAsync(command);
+        }
+    }
+}
