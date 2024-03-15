@@ -50,5 +50,11 @@ namespace Hymson.MES.Services.Services.WhWareHouse
         /// <returns></returns>
         Task<PagedInfo<WhWarehouseDto>> GetPagedListAsync(WhWarehousePagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 获取分页List
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<WhWarehouseDto>> GetPagedListCopyAsync(WhWarehousePagedQueryDto pagedQueryDto);
     }
 }
