@@ -126,6 +126,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         Task ConsumeEquAsync(ConsumeEquDto dto);
 
         /// <summary>
+        /// 上料完成(制胶匀浆)019
+        /// </summary>
+        /// <param name="dto"></param>
+        Task FeedingCompletedAsync(FeedingCompletedDto dto);
+
+        /// <summary>
         /// 设备过程参数
         /// </summary>
         /// <param name="dto"></param>

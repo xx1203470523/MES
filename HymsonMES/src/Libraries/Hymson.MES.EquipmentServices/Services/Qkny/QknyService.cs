@@ -748,16 +748,27 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             saveDto.Source = ManuSFCFeedingSourceEnum.BOM;
             saveDto.SiteId = equResModel.SiteId;
             saveDto.ResourceId = equResModel.ResId;
-            //3. 上料（改成对条码进行合批）
+            //3. 上料（考虑改成对条码进行合批）
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             foreach (var item in dto.ConsumeSfcList)
             {
                 saveDto.BarCode = item.Sfc;
                 var feedResult = await _manuFeedingService.CreateAsync(saveDto);
-            }  
+            }
+            trans.Complete();
 
             //TODO
             //1. 类似上料，上到搅拌机或者制胶机
             //2. 进行上料点
+        }
+
+        /// <summary>
+        /// 上料完成(制胶匀浆)019
+        /// </summary>
+        /// <param name="dto"></param>
+        public async Task FeedingCompletedAsync(FeedingCompletedDto dto)
+        {
+            return;
         }
 
         /// <summary>

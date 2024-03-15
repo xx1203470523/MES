@@ -469,7 +469,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// 设备投料(制胶匀浆)018
+        /// 设备投料(制胶匀浆)018 
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -498,6 +498,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("上料完成(制胶匀浆)019", BusinessType.OTHER, "FeedingCompleted019", ReceiverTypeEnum.MES)]
         public async Task FeedingCompletedAsync(FeedingCompletedDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.FeedingCompletedAsync(dto);
+
             //TODO
             //1. 类似上料，粉料，匀浆上到中转罐或者料仓（上料点）
             //
