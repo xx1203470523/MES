@@ -39,6 +39,7 @@ using Hymson.MES.Services.Dtos.EquProcessParamRecord;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
+using Hymson.MES.Services.Dtos.ManuFeedingCompletedZjyjRecord;
 using Hymson.MES.Services.Services.AgvTaskRecord;
 using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Services.EquEquipmentAlarm;
@@ -768,6 +769,22 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         public async Task FeedingCompletedAsync(FeedingCompletedDto dto)
         {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 组装数据
+            ManuFeedingCompletedZjyjRecordSaveDto saveDto = new ManuFeedingCompletedZjyjRecordSaveDto();
+            saveDto.SiteId = equResModel.SiteId;
+            saveDto.EquipmentId = equResModel.EquipmentId;
+            saveDto.BeforeFeedingQty = dto.BeforeFeedingQty;
+            saveDto.AfterFeedingQty = dto.AfterFeedingQty;
+            saveDto.FeedingQty = dto.AfterFeedingQty - dto.BeforeFeedingQty;
+            saveDto.CreatedBy = dto.EquipmentCode;
+            saveDto.CreatedOn = HymsonClock.Now();
+            saveDto.UpdatedBy = saveDto.CreatedBy;
+            saveDto.UpdatedOn = saveDto.CreatedOn;
+            //3. 数据库操作
+
+
             return;
         }
 
