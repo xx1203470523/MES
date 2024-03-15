@@ -382,7 +382,7 @@ namespace Hymson.MES.Services.Services.Integrated
             List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys = new List<InteCodeRulesMakeEntity>();
             if (inteCodeRulesModifyDto.CodeRulesMakes != null)
             {
-                int initSeq = 10;
+                int initSeq = 0;
                 //转换物料组成
                 foreach (var item in inteCodeRulesModifyDto.CodeRulesMakes)
                 {

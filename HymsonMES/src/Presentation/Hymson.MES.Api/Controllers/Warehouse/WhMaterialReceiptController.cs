@@ -105,7 +105,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         /// <returns></returns>
         [HttpGet("details/{receiptId}")]
         public async Task<IEnumerable<ReceiptMaterialDetailDto>> QueryDetailByReceiptIdAsync(long receiptId)
-        {
+        {            
             return await _whMaterialReceiptService.QueryDetailByReceiptIdAsync(receiptId);
         }
 
