@@ -624,6 +624,7 @@ namespace Hymson.MES.Services.Services.Quality
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _inteAttachmentRepository.DeleteAsync(attachmentEntity.AnnexId);
             rows += await _qualIqcOrderAnnexRepository.DeleteAsync(attachmentEntity.Id);
+            trans.Complete();
             return rows;
         }
 
@@ -715,20 +716,17 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<int> UpdateOrderAsync(OrderParameterDetailDto requestDto)
+        public async Task<int> UpdateOrderAsync(OrderParameterDetailSaveDto requestDto)
         {
-            var requestEntity = requestDto.ToEntity<QualIqcOrderSampleDetailEntity>();
-            if (requestEntity == null) return 0;
-
-            var entity = await _qualIqcOrderSampleDetailRepository.GetByIdAsync(requestEntity.Id);
+            var entity = await _qualIqcOrderSampleDetailRepository.GetByIdAsync(requestDto.Id);
             if (entity == null) return 0;
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            entity.IsQualified = requestEntity.IsQualified;
-            entity.InspectionValue = requestDto.InspectionValue;
+            entity.IsQualified = requestDto.IsQualified;
+            entity.InspectionValue = requestDto.InspectionValue ?? "";
             entity.Remark = requestDto.Remark;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
@@ -751,14 +749,14 @@ namespace Hymson.MES.Services.Services.Quality
                         CreatedOn = updatedOn,
                         UpdatedBy = updatedBy,
                         UpdatedOn = updatedOn,
-                        SiteId = requestEntity.SiteId,
+                        SiteId = entity.SiteId,
                     });
 
                     // 样本附件
                     sampleDetailAttachmentEntities.Add(new QualIqcOrderSampleDetailAnnexEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = requestEntity.SiteId,
+                        SiteId = entity.SiteId,
                         IQCOrderId = entity.IQCOrderId,
                         AnnexId = attachmentId,
                         CreatedBy = updatedBy,
@@ -803,6 +801,7 @@ namespace Hymson.MES.Services.Services.Quality
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
                 rows += await _qualIqcOrderSampleDetailAnnexRepository.InsertRangeAsync(sampleDetailAttachmentEntities);
             }
+            trans.Complete();
             return rows;
         }
 
@@ -1233,6 +1232,9 @@ namespace Hymson.MES.Services.Services.Quality
 
                 var dto = snapshotDetailEntity.ToModel<OrderParameterDetailDto>();
                 dto.Id = sampleDetailEntity.Id;
+                dto.InspectionValue = sampleDetailEntity.InspectionValue;
+                dto.IsQualified = sampleDetailEntity.IsQualified;
+                dto.Remark = sampleDetailEntity.Remark;
 
                 // 填充条码
                 var sampleEntity = sampleEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCOrderSampleId);
@@ -1244,6 +1246,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     dto.Attachments = PrepareAttachmentBaseDtos(detailAttachmentEntities, attachmentEntities);
                 }
+                else dto.Attachments = Array.Empty<InteAttachmentBaseDto>();
 
                 dtos.Add(dto);
             }

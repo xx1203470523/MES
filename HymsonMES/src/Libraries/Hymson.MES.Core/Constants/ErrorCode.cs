@@ -1908,10 +1908,13 @@
         public const string MES17804 = "检验单数据为空！";
         public const string MES17805 = "OQC检验参数组明细数据为空！";
         public const string MES17806 = "保存OQC样品数据失败！";
-        public const string MES17807 = "OQC检验单【{code}】已经完成检验！";
+        public const string MES17807 = "OQC检验单【{code}】状态必须为待检验！";
         public const string MES17808 = "完成OQC检验单失败！";
         public const string MES17809 = "执行检验失败！";
         public const string MES17810 = "检验单附件上传失败！";
+        public const string MES17811 = "修改已检验数据失败！";
+        public const string MES17812 = "不合格处理保存失败！";
+        public const string MES17813 = "检验单状态必须为检验中或待检验！";
 
         #endregion
 

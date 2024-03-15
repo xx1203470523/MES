@@ -98,5 +98,33 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="orderAnnexId"></param>
         /// <returns></returns>
         Task DeleteAttachmentByIdAsync(long orderAnnexId);
+
+        /// <summary>
+        /// 查询检验单样本数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<OqcOrderParameterDetailDto>> OqcOrderQueryDetailSamplePagedListAsync(OqcOrderParameterDetailPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 修改样品检验数据
+        /// </summary>
+        /// <param name="updateSampleDetailDto"></param>
+        /// <returns></returns>
+        Task UpdateSampleDetailAsync(UpdateSampleDetailDto updateSampleDetailDto);
+
+        /// <summary>
+        /// 不合格处理
+        /// </summary>
+        /// <param name="oQCOrderUnqualifiedHandleDto"></param>
+        /// <returns></returns>
+        Task UnqualifiedHandleAnync(OQCOrderUnqualifiedHandleDto oQCOrderUnqualifiedHandleDto);
+
+        /// <summary>
+        /// 查询不合格样品数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<OqcOrderParameterDetailDto>> OqcOrderQueryUnqualifiedPagedListAsync(OqcOrderParameterDetailPagedQueryDto pagedQueryDto);
     }
 }

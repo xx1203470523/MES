@@ -117,7 +117,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
-            sqlBuilder.Where("SiteId=@SiteId");
+            //sqlBuilder.Where("SiteId=@SiteId");
 
             if (query.OQCOrderId.HasValue) {
                 sqlBuilder.Where("OQCOrderId = @OQCOrderId");

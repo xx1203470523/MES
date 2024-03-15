@@ -84,7 +84,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> UpdateOrderAsync(OrderParameterDetailDto requestDto);
+        Task<int> UpdateOrderAsync(OrderParameterDetailSaveDto requestDto);
 
         /// <summary>
         /// 获取分页List

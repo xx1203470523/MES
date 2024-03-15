@@ -5,7 +5,6 @@ namespace Hymson.MES.Core.Enums.Quality
     /// <summary>
     /// 检验类型
     /// </summary>
-    [Flags]
     public enum IQCInspectionTypeEnum
     {
         /// <summary>
