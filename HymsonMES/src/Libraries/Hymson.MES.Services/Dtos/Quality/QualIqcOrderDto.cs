@@ -491,6 +491,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public decimal LowerLimit { get; set; }
 
         /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
         /// 检验类型;1、常规检验2、外观检验3、包装检验4、特殊性检验5、破坏性检验
         /// </summary>
         public IQCInspectionTypeEnum InspectionType { get; set; }
@@ -498,12 +503,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检测值
         /// </summary>
-        public string InspectionValue { get; set; }
+        public string? InspectionValue { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 附件集合
@@ -511,5 +516,38 @@ namespace Hymson.MES.Services.Dtos.Quality
         public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
 
     }
+
+    /// <summary>
+    /// 检验参数Dto
+    /// </summary>
+    public record OrderParameterDetailSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
+        /// 检测值
+        /// </summary>
+        public string? InspectionValue { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 附件集合
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+
+    }
+
 
 }

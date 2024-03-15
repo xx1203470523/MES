@@ -176,15 +176,49 @@ namespace Hymson.MES.Api.Controllers.Quality
             await _qualOqcOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
         }
 
-        ///// <summary>
-        ///// 查询检验单样本数据（分页）
-        ///// </summary>
-        ///// <param name="pagedQueryDto"></param>
-        ///// <returns></returns>
-        //[HttpGet("sample/pagelist")]
-        //public async Task<PagedInfo<OrderParameterDetailDto>> QueryDetailSamplePagedListAsync([FromQuery] OrderParameterDetailPagedQueryDto pagedQueryDto)
-        //{
-        //    return await _qualOqcOrderService.QueryDetailSamplePagedListAsync(pagedQueryDto);
-        //}
+        /// <summary>
+        /// 查询检验单样本数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet("sample/pagelist")]
+        public async Task<PagedInfo<OqcOrderParameterDetailDto>> OqcOrderQueryDetailSamplePagedListAsync([FromQuery] OqcOrderParameterDetailPagedQueryDto pagedQueryDto)
+        {
+            return await _qualOqcOrderService.OqcOrderQueryDetailSamplePagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 更新已检验
+        /// </summary>
+        /// <param name="updateSampleDetailDto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateSampleDetail")]
+        public async Task UpdateSampleDetailAsync([FromBody] UpdateSampleDetailDto updateSampleDetailDto)
+        {
+            await _qualOqcOrderService.UpdateSampleDetailAsync(updateSampleDetailDto);
+        }
+
+        /// <summary>
+        /// 不合格处理
+        /// </summary>
+        /// <param name="oQCOrderUnqualifiedHandleDto"></param>
+        /// <returns></returns>
+        [HttpPost("unqualifiedHandle")]
+        public async Task UnqualifiedHandleAsync([FromBody] OQCOrderUnqualifiedHandleDto oQCOrderUnqualifiedHandleDto)
+        {
+            await _qualOqcOrderService.UnqualifiedHandleAnync(oQCOrderUnqualifiedHandleDto);
+        }
+
+        /// <summary>
+        /// 查询不合格样品数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet("getUnqualified/pagelist")]
+        public async Task<PagedInfo<OqcOrderParameterDetailDto>> OqcOrderQueryUnqualifiedPagedListAsync([FromQuery] OqcOrderParameterDetailPagedQueryDto pagedQueryDto)
+        {
+            return await _qualOqcOrderService.OqcOrderQueryUnqualifiedPagedListAsync(pagedQueryDto);
+        }
     }
 }

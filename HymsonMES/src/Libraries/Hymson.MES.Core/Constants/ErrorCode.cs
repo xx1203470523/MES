@@ -442,6 +442,7 @@
         public const string MES11806 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验水平不能为空";
         public const string MES11807 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验水平明细列表不能为空";
         public const string MES11808 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验水平下检验类型【{InspectionType}】未维护";
+        public const string MES11809 = "检验单已生成，不允许重复生成！出货单【{ShipmentNum}】明细Id【{ShipmentMaterialIds}】";
 
         #endregion
 
@@ -455,6 +456,7 @@
         public const string MES11905 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验水平不能为空";
         public const string MES11906 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验水平明细列表不能为空";
         public const string MES11907 = "供应商【{CustomerCode}】物料【{MaterialCode}】对应IQC检验水平下检验类型【{InspectionType}】未维护";
+        public const string MES11990 = "检验单已生成，不允许重复生成！收货单【{ReceiptNum}】明细Id【{MaterialReceiptDetailIds}】";
 
         public const string MES11908 = "样本条码【{Code}】已存在检验类型为【{Type}】的数据！";
         public const string MES11909 = "请录入样本条码！";
@@ -1906,10 +1908,13 @@
         public const string MES17804 = "检验单数据为空！";
         public const string MES17805 = "OQC检验参数组明细数据为空！";
         public const string MES17806 = "保存OQC样品数据失败！";
-        public const string MES17807 = "OQC检验单【{code}】已经完成检验！";
+        public const string MES17807 = "OQC检验单【{code}】状态必须为待检验！";
         public const string MES17808 = "完成OQC检验单失败！";
         public const string MES17809 = "执行检验失败！";
         public const string MES17810 = "检验单附件上传失败！";
+        public const string MES17811 = "修改已检验数据失败！";
+        public const string MES17812 = "不合格处理保存失败！";
+        public const string MES17813 = "检验单状态必须为检验中或待检验！";
 
         #endregion
 

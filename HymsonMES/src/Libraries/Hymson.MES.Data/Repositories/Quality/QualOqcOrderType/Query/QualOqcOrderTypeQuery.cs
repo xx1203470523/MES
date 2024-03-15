@@ -10,9 +10,9 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// </summary>
         public long? OQCOrderId { get; set; }
 
-        /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long? SiteId { get; set; }
+        ///// <summary>
+        ///// 站点Id
+        ///// </summary>
+        //public long? SiteId { get; set; }
     }
 }

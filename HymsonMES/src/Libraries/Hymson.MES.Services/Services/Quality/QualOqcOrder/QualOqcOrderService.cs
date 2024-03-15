@@ -1,3 +1,4 @@
+using Elastic.Transport;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -7,6 +8,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -17,10 +19,14 @@ using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.Query;
 using Hymson.MES.Data.Repositories.WhShipment;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Net.Mail;
+using System.Reflection.Emit;
+using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -166,6 +172,15 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11801));
             }
+            //校验是否已生成过检验单
+            var orderList = await _qualOqcOrderRepository.GetEntitiesAsync(new QualOqcOrderQuery
+            {
+                ShipmentMaterialIds = saveDto.ShipmentDetailIds
+            });
+            if (orderList != null && orderList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11809)).WithData("ShipmentNum", shipmentEntity.ShipmentNum).WithData("ShipmentMaterialIds", string.Join(',', orderList.Select(x => x.ShipmentMaterialId).Distinct()));
+            }
 
             var bo = new CoreServices.Bos.Quality.OQCOrderCreateBo
             {
@@ -201,7 +216,7 @@ namespace Hymson.MES.Services.Services.Quality
 
 
         /// <summary>
-        /// 修改检验单状态
+        /// 修改检验单状态（执行检验）
         /// </summary>
         /// <param name="updateStatusDto"></param>
         /// <returns></returns>
@@ -210,11 +225,51 @@ namespace Hymson.MES.Services.Services.Quality
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            var result = await _qualOqcOrderRepository.UpdateStatusAsync(new QualOqcOrderEntity { Id = updateStatusDto.OQCOrderId, Status = InspectionStatusEnum.Inspecting });
-            if (result == 0) {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17809));
+            // OQC检验单
+            var oqcOrderEntity = await _qualOqcOrderRepository.GetByIdAsync(updateStatusDto.OQCOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            // 只有待检验和检验中可以执行检验
+            if (oqcOrderEntity.Status == InspectionStatusEnum.WaitInspect || oqcOrderEntity.Status != InspectionStatusEnum.Inspecting)
+            {
+                // 更新时间
+                var updatedBy = _currentUser.UserName;
+                var updatedOn = HymsonClock.Now();
+
+                var qualOqcOrderOperateEntity = new QualOqcOrderOperateEntity();
+                qualOqcOrderOperateEntity.Id = IdGenProvider.Instance.CreateId();
+                qualOqcOrderOperateEntity.SiteId = oqcOrderEntity.SiteId;
+                qualOqcOrderOperateEntity.OQCOrderId = oqcOrderEntity.Id;
+                qualOqcOrderOperateEntity.OperateType = OrderOperateTypeEnum.Start;
+                qualOqcOrderOperateEntity.OperateBy = updatedBy;
+                qualOqcOrderOperateEntity.OperateOn = updatedOn;
+                qualOqcOrderOperateEntity.CreatedBy = updatedBy;
+                qualOqcOrderOperateEntity.CreatedOn = updatedOn;
+                qualOqcOrderOperateEntity.UpdatedBy = updatedBy;
+                qualOqcOrderOperateEntity.UpdatedOn = updatedOn;
+
+                using (var trans = TransactionHelper.GetTransactionScope())
+                {
+                    //修改检验单状态
+                    var updateOQCOrderRes = await _qualOqcOrderRepository.UpdateStatusAsync(new QualOqcOrderEntity { Id = updateStatusDto.OQCOrderId, Status = InspectionStatusEnum.Inspecting, UpdatedBy = updatedBy, UpdatedOn = updatedOn });
+                    if (updateOQCOrderRes == 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17809));
+                    }
+
+                    //新增检验操作记录
+                    var insertOperateRes = await _qualOqcOrderOperateRepository.InsertAsync(qualOqcOrderOperateEntity);
+                    if (insertOperateRes == 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17809));
+                    }
+
+                    trans.Complete();
+                }
             }
-           
+            else {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17813));
+            }
         }
 
         /// <summary>
@@ -249,10 +304,57 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<QualOqcOrderDto?> QueryByIdAsync(long id)
         {
-            var qualOqcOrderEntity = await _qualOqcOrderRepository.GetByIdAsync(id);
-            if (qualOqcOrderEntity == null) return null;
+            var entity = await _qualOqcOrderRepository.GetByIdAsync(id);
+            if (entity == null) return null;
 
-            return qualOqcOrderEntity.ToModel<QualOqcOrderDto>();
+            // 实体到DTO转换
+            var dto = entity.ToModel<QualOqcOrderDto>();
+            dto.StatusStr = entity.Status.GetDescription();
+
+            // 读取出货单明细
+            var whShipmentMaterialEntity = await _whShipmentMaterialRepository.GetByIdAsync(entity.ShipmentMaterialId);
+            if (whShipmentMaterialEntity == null) return dto;
+
+            //获取出货单
+            var whShipmentEntity = await _whShipmentRepository.GetByIdAsync(whShipmentMaterialEntity.ShipmentId);
+            if (whShipmentEntity == null) {
+                return dto;
+            }
+            dto.ShipmentNum = whShipmentEntity.ShipmentNum;
+
+            // TODO 规格型号
+            //dto.Specifications = "-";
+
+            // 读取产品
+            var materialEntity = await _procMaterialRepository.GetByIdAsync(entity.MaterialId);
+            if (materialEntity != null)
+            {
+                dto.MaterialCode = materialEntity.MaterialCode;
+                dto.MaterialName = materialEntity.MaterialName;
+                dto.Version = materialEntity.Version ?? "";
+            }
+
+            // 读取供应商
+            var supplierEntity = await _whSupplierRepository.GetByIdAsync(whShipmentEntity.CustomerId);
+            if (supplierEntity != null)
+            {
+                dto.SupplierCode = supplierEntity.Code;
+                dto.SupplierName = supplierEntity.Name;
+                //TODO
+                dto.SupplierBatch = "";
+            }
+
+            //获取检验单附件
+            var qualOqcOrderAnnexEntities = await _qualOqcOrderAnnexRepository.GetEntitiesAsync(new QualOqcOrderAnnexQuery { OQCOrderId= id });
+            if (qualOqcOrderAnnexEntities != null && qualOqcOrderAnnexEntities.Any()) {
+                var inteAnnexIds = qualOqcOrderAnnexEntities.Select(a => a.AnnexId).Distinct();
+                var inteAnnexEntities = await _inteAttachmentRepository.GetByIdsAsync(inteAnnexIds);
+                dto.Attachments = inteAnnexEntities.Select((a) => {
+                    return a.ToModel<InteAttachmentBaseDto>();
+                });
+            }
+
+            return dto;
         }
 
         /// <summary>
@@ -344,7 +446,7 @@ namespace Hymson.MES.Services.Services.Quality
         public async Task<IEnumerable<QualOqcOrderTypeOutDto>> GetOqcOrderTypeAsync(long id)
         {
             var result =new List<QualOqcOrderTypeOutDto>();
-            var qualOqcOrderTypeEntities = await _qualOqcOrderTypeRepository.GetEntitiesAsync(new QualOqcOrderTypeQuery { OQCOrderId= id ,SiteId=_currentSite.SiteId??0});
+            var qualOqcOrderTypeEntities = await _qualOqcOrderTypeRepository.GetEntitiesAsync(new QualOqcOrderTypeQuery { OQCOrderId= id});
             if (qualOqcOrderTypeEntities == null || !qualOqcOrderTypeEntities.Any()) 
             { 
                 return result;
@@ -549,7 +651,6 @@ namespace Hymson.MES.Services.Services.Quality
             
         }
 
-
         /// <summary>
         /// 完成检验单
         /// </summary>
@@ -577,7 +678,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 检查每种类型是否已经录入足够
-            var orderTypeEntities = await _qualOqcOrderTypeRepository.GetEntitiesAsync(new QualOqcOrderTypeQuery { OQCOrderId= oqcOrderEntity.Id,SiteId=_currentSite.SiteId??0});
+            var orderTypeEntities = await _qualOqcOrderTypeRepository.GetEntitiesAsync(new QualOqcOrderTypeQuery { OQCOrderId= oqcOrderEntity.Id});
 
             // 读取一个未录入完整的类型
             var orderTypeEntity = orderTypeEntities.FirstOrDefault(f => f.SampleQty > f.CheckedQty);
@@ -589,37 +690,69 @@ namespace Hymson.MES.Services.Services.Quality
                     .WithData("SampleQty", orderTypeEntity.SampleQty);
             }
 
+
             // 检查类型是否已经存在
             var operationType = OrderOperateTypeEnum.Complete;
+            //查询OQC检验单操作记录
             var orderOperationEntities = await _qualOqcOrderOperateRepository.GetEntitiesAsync(new QualOqcOrderOperateQuery
             {
                 SiteId = oqcOrderEntity.SiteId,
                 OQCOrderId = oqcOrderEntity.Id,
-                OperationType = operationType
+                OperationTypes = new List<OrderOperateTypeEnum> { OrderOperateTypeEnum.Complete, OrderOperateTypeEnum.Close}
             });
-            if (orderOperationEntities != null && orderOperationEntities.Any()) {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17807)).WithData("code", oqcOrderEntity.InspectionOrder);
-            } 
-
-            // TODO 判断是否不合格
-            //entity.AcceptanceLevel
-
-            // 插入检验单状态操作记录
-            var insertRes= await _qualOqcOrderOperateRepository.InsertAsync(new QualOqcOrderOperateEntity
+            if (orderOperationEntities != null && orderOperationEntities.Any())
             {
-                Id = IdGenProvider.Instance.CreateId(),
+                throw new CustomerValidationException(nameof(ErrorCode.MES17807)).WithData("code", oqcOrderEntity.InspectionOrder);
+            }
+
+            // 读取所有明细参数
+            var sampleDetailEntities = await _qualOqcOrderSampleDetailRepository.GetEntitiesAsync(new QualOqcOrderSampleDetailQuery
+            {
                 SiteId = oqcOrderEntity.SiteId,
-                OQCOrderId = oqcOrderEntity.Id,
-                OperateType = operationType,
-                OperateBy = updatedBy,
-                OperateOn = updatedOn,
-                CreatedBy = updatedBy,
-                CreatedOn = updatedOn,
-                UpdatedBy = updatedBy,
-                UpdatedOn = updatedOn
+                OQCOrderId = oqcOrderEntity.Id
             });
-            if (insertRes == 0) {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17808));
+            
+            // 如果不合格数超过接收水准，则设置为"完成"
+            if (sampleDetailEntities.Count(c => c.IsQualified == TrueOrFalseEnum.No) > oqcOrderEntity.AcceptanceLevel)
+            {
+                oqcOrderEntity.Status = InspectionStatusEnum.Completed;
+                operationType = OrderOperateTypeEnum.Complete;
+                oqcOrderEntity.IsQualified = TrueOrFalseEnum.Yes;
+            }
+            else
+            {
+                // 默认是关闭
+                oqcOrderEntity.Status = InspectionStatusEnum.Closed;
+                oqcOrderEntity.IsQualified = TrueOrFalseEnum.No;
+                operationType = OrderOperateTypeEnum.Close;
+            }
+
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //修改单据状态
+                var updatequalOqcOrderRes=await _qualOqcOrderRepository.UpdateStatusAndIsQualifiedAsync(oqcOrderEntity);
+                if (updatequalOqcOrderRes == 0) {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17808));
+                }
+
+                // 插入检验单状态操作记录
+                var insertRes = await _qualOqcOrderOperateRepository.InsertAsync(new QualOqcOrderOperateEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = oqcOrderEntity.SiteId,
+                    OQCOrderId = oqcOrderEntity.Id,
+                    OperateType = operationType,
+                    OperateBy = updatedBy,
+                    OperateOn = updatedOn,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                });
+                if (insertRes == 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17808));
+                }
             }
         }
 
@@ -730,55 +863,357 @@ namespace Hymson.MES.Services.Services.Quality
 
         #endregion
 
-        ///// <summary>
-        ///// 查询检验单样本数据（分页）
-        ///// </summary>
-        ///// <param name="pagedQueryDto"></param>
-        ///// <returns></returns>
-        //public async Task<PagedInfo<OrderParameterDetailDto>> QueryDetailSamplePagedListAsync(OrderParameterDetailPagedQueryDto pagedQueryDto)
-        //{
-        //    // 初始化集合
-        //    var defaultResult = new PagedInfo<OrderParameterDetailDto>(Array.Empty<OrderParameterDetailDto>(), pagedQueryDto.PageIndex, pagedQueryDto.PageSize, 0);
+        /// <summary>
+        /// 查询检验单样本数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<OqcOrderParameterDetailDto>> OqcOrderQueryDetailSamplePagedListAsync(OqcOrderParameterDetailPagedQueryDto pagedQueryDto)
+        {
+            // 初始化集合
+            var defaultResult = new PagedInfo<OqcOrderParameterDetailDto>(Array.Empty<OqcOrderParameterDetailDto>(), pagedQueryDto.PageIndex, pagedQueryDto.PageSize, 0);
 
-        //    var entity = await _qualOqcOrderRepository.GetByIdAsync(pagedQueryDto.IQCOrderId);
-        //    if (entity == null) return defaultResult;
+            var entity = await _qualOqcOrderRepository.GetByIdAsync(pagedQueryDto.OQCOrderId.GetValueOrDefault());
+            if (entity == null) return defaultResult;
 
-        //    // 查询检验单下面的所有样本
-        //    var pagedQuery = pagedQueryDto.ToQuery<QualOqcOrderSampleDetailPagedQuery>();
-        //    pagedQuery.SiteId = entity.SiteId;
+            // 查询检验单下面的所有样本
+            var pagedQuery = pagedQueryDto.ToQuery<QualOqcOrderSampleDetailPagedQuery>();
+            pagedQuery.SiteId = entity.SiteId;
 
-        //    // 转换产品编码/版本变为产品ID
-        //    if (!string.IsNullOrWhiteSpace(pagedQueryDto.Barcode))
-        //    {
-        //        // 查询检验单下面的所有样本
-        //        var sampleEntities = await _qualOqcOrderSampleRepository.GetEntitiesAsync(new QualOqcOrderSampleQuery
-        //        {
-        //            SiteId = entity.SiteId,
-        //            OQCOrderId = entity.Id,
-        //            Barcode = pagedQueryDto.Barcode
-        //        });
-        //        if (sampleEntities != null && sampleEntities.Any()) pagedQuery.IQCOrderSampleIds = sampleEntities.Select(s => s.Id);
-        //        else pagedQuery.IQCOrderSampleIds = Array.Empty<long>();
-        //    }
+            // 根据样本条码获取检验样本明细Id
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.BarCode))
+            {
+                // 查询检验单下面的所有样本
+                var sampleEntities = await _qualOqcOrderSampleRepository.GetEntitiesAsync(new QualOqcOrderSampleQuery
+                {
+                    SiteId = entity.SiteId,
+                    OQCOrderId = entity.Id,
+                    Barcode = pagedQueryDto.BarCode
+                });
+                if (sampleEntities != null && sampleEntities.Any()) pagedQuery.OQCOrderSampleIds = sampleEntities.Select(s => s.Id);
+                else pagedQuery.OQCOrderSampleIds = Array.Empty<long>();
+            }
 
-        //    // 转换项目编码变为快照明细ID
-        //    if (!string.IsNullOrWhiteSpace(pagedQueryDto.ParameterCode))
-        //    {
-        //        var snapshotDetailEntities = await _qualOqcInspectionItemDetailSnapshotRepository.GetEntitiesAsync(new QualIqcInspectionItemDetailSnapshotQuery
-        //        {
-        //            SiteId = entity.SiteId,
-        //            ParameterCode = pagedQueryDto.ParameterCode
-        //        });
-        //        if (snapshotDetailEntities != null && snapshotDetailEntities.Any()) pagedQuery.IQCInspectionDetailSnapshotIds = snapshotDetailEntities.Select(s => s.Id);
-        //        else pagedQuery.IQCInspectionDetailSnapshotIds = Array.Empty<long>();
-        //    }
+            // 根据参数编码获取快照明细ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.ParameterCode))
+            {
+                var snapshotDetailEntities = await _qualOqcParameterGroupDetailSnapshootRepository.GetEntitiesAsync(new QualOqcParameterGroupDetailSnapshootQuery
+                {
+                    SiteId = entity.SiteId,
+                    ParameterCode = pagedQueryDto.ParameterCode
+                });
+                if (snapshotDetailEntities != null && snapshotDetailEntities.Any()) pagedQuery.GroupDetailSnapshootIds = snapshotDetailEntities.Select(s => s.Id);
+                else pagedQuery.GroupDetailSnapshootIds = Array.Empty<long>();
+            }
 
-        //    // 查询数据
-        //    var pagedInfo = await _qualOqcOrderSampleDetailRepository.GetPagedListAsync(pagedQuery);
+            // 查询数据
+            var pagedInfo = await _qualOqcOrderSampleDetailRepository.GetPagedListAsync(pagedQuery);
 
-        //    // 实体到DTO转换 装载数据
-        //    var dtos = await PrepareSampleDetailDtos(entity, pagedInfo.Data);
-        //    return new PagedInfo<OrderParameterDetailDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        //}
+            // 实体到DTO转换 装载数据
+            var dtos = await PrepareSampleDetailDtos(entity, pagedInfo.Data);
+            return new PagedInfo<OqcOrderParameterDetailDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 修改样品检验数据
+        /// </summary>
+        /// <param name="updateSampleDetailDto"></param>
+        /// <returns></returns>
+        public async Task UpdateSampleDetailAsync(UpdateSampleDetailDto updateSampleDetailDto) 
+        {
+            //获取样品明细
+            var qualOqcOrderSampleDetailEntity = await _qualOqcOrderSampleDetailRepository.GetByIdAsync(updateSampleDetailDto.Id.GetValueOrDefault());
+            if (qualOqcOrderSampleDetailEntity == null) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17811));
+            }
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+            
+            var model =  new QualOqcOrderSampleDetailEntity();
+            model.Id= updateSampleDetailDto.Id.GetValueOrDefault();
+            model.InspectionValue = updateSampleDetailDto.InspectionValue??"";
+            model.Remark = updateSampleDetailDto.Remark??"";
+            model.IsQualified = updateSampleDetailDto.IsQualified;
+            model.UpdatedBy = updatedBy;
+            model.UpdatedOn = updatedOn;
+
+            //附件文件信息
+            var attachmentEntities = new List<InteAttachmentEntity>();
+            //检验单样品附件信息
+            var orderSampleDetailAnnexEntities = new List<QualOqcOrderSampleDetailAnnexEntity>();
+            if (updateSampleDetailDto.Attachments != null && !updateSampleDetailDto.Attachments.Any()) {
+                foreach (var item in updateSampleDetailDto.Attachments)
+                {
+                    var attachmentId = IdGenProvider.Instance.CreateId();
+                    attachmentEntities.Add(new InteAttachmentEntity
+                    {
+                        Id = attachmentId,
+                        Name = item.Name,
+                        Path = item.Path,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn,
+                        SiteId = _currentSite.SiteId??0,
+                    });
+
+                    orderSampleDetailAnnexEntities.Add(new QualOqcOrderSampleDetailAnnexEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentSite.SiteId ?? 0,
+                        OQCOrderId = qualOqcOrderSampleDetailEntity.OQCOrderId,
+                        AnnexId = attachmentId,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn
+                    });
+                }
+            }
+
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //更新样品明细
+                var updatequalOqcOrderSampleDetail = await _qualOqcOrderSampleDetailRepository.UpdateSampleDetailAsync(model);
+                if (updatequalOqcOrderSampleDetail == 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17811));
+                }
+
+                if (updateSampleDetailDto.Attachments != null && !updateSampleDetailDto.Attachments.Any())
+                {
+                    //删除样品附件
+                    var delSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.DeleteAnnexBySampleDetailIdAsync(new DeleteCommand { Id = qualOqcOrderSampleDetailEntity.Id, UserId = updatedBy, DeleteOn = updatedOn });
+                    if (delSampleDateilAnnexRes == 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17811));
+                    }
+                }
+
+                //新增附件
+                if (attachmentEntities.Any())
+                {
+                    var insertAttachmentRes = await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
+                    if (insertAttachmentRes == 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17811));
+                    }
+                }
+
+                //新增样品附件
+                if (orderSampleDetailAnnexEntities.Any())
+                {
+                    var insertSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.InsertRangeAsync(orderSampleDetailAnnexEntities);
+                    if (insertSampleDateilAnnexRes == 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17811));
+                    }
+                }
+
+                trans.Complete();
+            }
+        }
+
+        /// <summary>
+        /// 不合格处理
+        /// </summary>
+        /// <param name="oQCOrderUnqualifiedHandleDto"></param>
+        /// <returns></returns>
+        public async Task UnqualifiedHandleAnync(OQCOrderUnqualifiedHandleDto oQCOrderUnqualifiedHandleDto)
+        {
+            if (oQCOrderUnqualifiedHandleDto.HandMethod == null || oQCOrderUnqualifiedHandleDto.OQCOrderId == null) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+
+            // OQC检验单
+            var oqcOrderEntity = await _qualOqcOrderRepository.GetByIdAsync(oQCOrderUnqualifiedHandleDto.OQCOrderId.GetValueOrDefault())
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            //只有"已检验"的状态才允许"关闭"
+            if (oqcOrderEntity.Status != InspectionStatusEnum.Completed)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11912))
+                    .WithData("Before", InspectionStatusEnum.Completed.GetDescription())
+                    .WithData("After", InspectionStatusEnum.Closed.GetDescription());
+            }
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            var qualOqcOrderOperateEntity = new QualOqcOrderOperateEntity();
+            qualOqcOrderOperateEntity.Id = IdGenProvider.Instance.CreateId();
+            qualOqcOrderOperateEntity.SiteId = oqcOrderEntity.SiteId;
+            qualOqcOrderOperateEntity.OQCOrderId = oqcOrderEntity.Id;
+            qualOqcOrderOperateEntity.OperateType = OrderOperateTypeEnum.Close;
+            qualOqcOrderOperateEntity.OperateBy = updatedBy;
+            qualOqcOrderOperateEntity.OperateOn = updatedOn;
+            qualOqcOrderOperateEntity.CreatedBy = updatedBy;
+            qualOqcOrderOperateEntity.CreatedOn = updatedOn;
+            qualOqcOrderOperateEntity.UpdatedBy = updatedBy;
+            qualOqcOrderOperateEntity.UpdatedOn = updatedOn;
+
+            var qualOqcOrderUnqualifiedHandleEntity=new QualOqcOrderUnqualifiedHandleEntity();
+            qualOqcOrderUnqualifiedHandleEntity.Id= IdGenProvider.Instance.CreateId();
+            qualOqcOrderUnqualifiedHandleEntity.HandMethod= oQCOrderUnqualifiedHandleDto.HandMethod;
+            qualOqcOrderUnqualifiedHandleEntity.SiteId = oqcOrderEntity.SiteId;
+            qualOqcOrderUnqualifiedHandleEntity.OQCOrderId = oqcOrderEntity.Id;
+            qualOqcOrderUnqualifiedHandleEntity.SourceSystem = SourceSystemEnum.MES;
+            qualOqcOrderUnqualifiedHandleEntity.ProcessedBy = updatedBy;
+            qualOqcOrderUnqualifiedHandleEntity.ProcessedOn = updatedOn;
+            qualOqcOrderUnqualifiedHandleEntity.CreatedBy = updatedBy;
+            qualOqcOrderUnqualifiedHandleEntity.CreatedOn = updatedOn;
+            qualOqcOrderUnqualifiedHandleEntity.CreatedBy = updatedBy;
+            qualOqcOrderUnqualifiedHandleEntity.CreatedOn = updatedOn;
+            qualOqcOrderUnqualifiedHandleEntity.Remark = oQCOrderUnqualifiedHandleDto.Remark??"";
+
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //修改检验单状态
+                var updateOQCOrderRes = await _qualOqcOrderRepository.UpdateStatusAsync(new QualOqcOrderEntity { Id = oQCOrderUnqualifiedHandleDto.OQCOrderId.GetValueOrDefault(), Status = InspectionStatusEnum.Closed,UpdatedBy= _currentUser.UserName ,UpdatedOn= HymsonClock.Now() });
+                if (updateOQCOrderRes == 0) {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17812));
+                }
+
+                //新增不合格处理
+                var insertOqcOrderUnqualifiedHandleRes=await _qualOqcOrderUnqualifiedHandleRepository.InsertAsync(qualOqcOrderUnqualifiedHandleEntity);
+                if (insertOqcOrderUnqualifiedHandleRes == 0) {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17812));
+                }
+
+                //新增检验操作记录
+                var insertOperateRes =await _qualOqcOrderOperateRepository.InsertAsync(qualOqcOrderOperateEntity);
+                if (insertOperateRes == 0) {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17812));
+                }
+
+                trans.Complete();
+            }
+        }
+
+        /// <summary>
+        /// 查询不合格样品数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<OqcOrderParameterDetailDto>> OqcOrderQueryUnqualifiedPagedListAsync(OqcOrderParameterDetailPagedQueryDto pagedQueryDto)
+        {
+            // 初始化集合
+            var defaultResult = new PagedInfo<OqcOrderParameterDetailDto>(Array.Empty<OqcOrderParameterDetailDto>(), pagedQueryDto.PageIndex, pagedQueryDto.PageSize, 0);
+
+            var entity = await _qualOqcOrderRepository.GetByIdAsync(pagedQueryDto.OQCOrderId.GetValueOrDefault());
+            if (entity == null) return defaultResult;
+
+            // 查询检验单下面的所有样本
+            var pagedQuery = pagedQueryDto.ToQuery<QualOqcOrderSampleDetailPagedQuery>();
+            pagedQuery.SiteId = entity.SiteId;
+            pagedQuery.IsQualified = TrueOrFalseEnum.No;
+
+            // 查询数据
+            var pagedInfo = await _qualOqcOrderSampleDetailRepository.GetPagedListAsync(pagedQuery);
+
+            // 实体到DTO转换 装载数据
+            var dtos = await PrepareSampleDetailDtos(entity, pagedInfo.Data);
+            return new PagedInfo<OqcOrderParameterDetailDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        #region 私有方法
+
+        /// <summary>
+        /// 转换为Dto对象
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="sampleDetailEntities">检验单样品明细</param>
+        /// <returns></returns>
+        private async Task<IEnumerable<OqcOrderParameterDetailDto>> PrepareSampleDetailDtos(QualOqcOrderEntity entity, IEnumerable<QualOqcOrderSampleDetailEntity> sampleDetailEntities)
+        {
+            // 查询样品明细对应的快照明细
+            var snapshotDetailEntities = await _qualOqcParameterGroupDetailSnapshootRepository.GetByIdsAsync(sampleDetailEntities.Select(s => s.GroupDetailSnapshootId).ToArray());
+
+            // 查询检验单下面的所有样本附件
+            var sampleAttachmentEntities = await _qualOqcOrderSampleDetailAnnexRepository.GetEntitiesAsync(new QualOqcOrderSampleDetailAnnexQuery
+            {
+                SiteId = entity.SiteId,
+                OQCOrderId = entity.Id
+            });
+
+            // 所有样品明细对应的样品集合
+            var sampleEntities = await _qualOqcOrderSampleRepository.GetByIdsAsync(sampleDetailEntities.Select(s => s.OQCOrderSampleId).ToArray());
+
+            // 附件集合
+            Dictionary<long, IGrouping<long, QualOqcOrderSampleDetailAnnexEntity>> sampleAttachmentDic = new();
+            IEnumerable<InteAttachmentEntity> attachmentEntities = Array.Empty<InteAttachmentEntity>();
+            if (sampleAttachmentEntities.Any())
+            {
+                sampleAttachmentDic = sampleAttachmentEntities.ToLookup(w => w.SampleDetailId).ToDictionary(d => d.Key, d => d);
+                attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(sampleAttachmentEntities.Select(s => s.AnnexId));
+            }
+
+            List<OqcOrderParameterDetailDto> dtos = new();
+            foreach (var sampleDetailEntity in sampleDetailEntities)
+            {
+                // 快照数据
+                var snapshotDetailEntity = snapshotDetailEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.GroupDetailSnapshootId);
+                if (snapshotDetailEntity == null) continue;
+
+                var dto = snapshotDetailEntity.ToModel<OqcOrderParameterDetailDto>();
+                dto.Id = sampleDetailEntity.Id;
+                dto.Remark= sampleDetailEntity.Remark;
+                dto.InspectionValue = sampleDetailEntity.InspectionValue;
+                dto.IsQualified = sampleDetailEntity.IsQualified;
+
+                // 填充条码
+                var sampleEntity = sampleEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.OQCOrderSampleId);
+                if (sampleEntity == null) continue;
+                dto.Barcode = sampleEntity.Barcode;
+
+                // 填充附件
+                if (attachmentEntities != null && sampleAttachmentDic.TryGetValue(sampleDetailEntity.Id, out var detailAttachmentEntities))
+                {
+                    dto.Attachments = PrepareAttachmentBaseDtos(detailAttachmentEntities, attachmentEntities);
+                }
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+
+        /// <summary>
+        /// 转换附件实体为附件Dto
+        /// </summary>
+        /// <param name="linkAttachments"></param>
+        /// <param name="attachmentEntities"></param>
+        /// <returns></returns>
+        private static IEnumerable<InteAttachmentBaseDto> PrepareAttachmentBaseDtos(IEnumerable<dynamic> linkAttachments, IEnumerable<InteAttachmentEntity> attachmentEntities)
+        {
+            List<InteAttachmentBaseDto> dtos = new();
+            foreach (var item in linkAttachments)
+            {
+                var dto = new InteAttachmentBaseDto
+                {
+                    Id = item.Id,
+                    AttachmentId = item.AnnexId
+                };
+
+                var attachmentEntity = attachmentEntities.FirstOrDefault(f => f.Id == item.AnnexId);
+                if (attachmentEntity == null)
+                {
+                    dto.Name = "附件不存在";
+                    dto.Path = "";
+                    dtos.Add(dto);
+                    continue;
+                }
+
+                dto.Name = attachmentEntity.Name;
+                dto.Path = attachmentEntity.Path;
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+
+        #endregion
     }
 }

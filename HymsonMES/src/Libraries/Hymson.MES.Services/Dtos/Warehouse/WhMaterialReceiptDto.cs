@@ -1,5 +1,4 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 
 namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
 {
@@ -183,7 +182,7 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
         /// </summary>
         public long IsDeleted { get; set; }
 
- 
+
     }
 
 

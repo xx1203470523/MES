@@ -228,8 +228,10 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
         public async Task<PagedInfo<WhMaterialReceiptDto>> GetPagedListAsync(WhMaterialReceiptPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<WhMaterialReceiptPagedQuery>();
-
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            if (!pagedQuery.SiteId.HasValue)
+            {
+                pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            }
 
             var pagedInfo = await _whMaterialReceiptRepository.GetPagedListAsync(pagedQuery);
 
@@ -277,8 +279,8 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
                 {
                     dto.ReceiptNum = receiptEntity.ReceiptNum;
 
-                    // 供应商
-                    var supplierEntity = supplierDic[receiptEntity.SupplierId];
+                    // 供应商                    
+                     supplierDic.TryGetValue(receiptEntity.SupplierId,out var supplierEntity);
                     if (supplierEntity != null)
                     {
                         dto.SupplierCode = supplierEntity.Code;
@@ -287,16 +289,13 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
                 }
 
                 // 产品
-                //if (entity.MaterialId.HasValue)
-                //{
-                var materialEntity = materialDic[entity.MaterialId];
+                materialDic.TryGetValue(entity.MaterialId, out var materialEntity);
                 if (materialEntity != null)
                 {
                     dto.MaterialCode = materialEntity.MaterialCode;
                     dto.MaterialName = materialEntity.MaterialName;
                     dto.MaterialVersion = materialEntity.Version ?? "";
                 }
-                //}
 
                 dtos.Add(dto);
             }
