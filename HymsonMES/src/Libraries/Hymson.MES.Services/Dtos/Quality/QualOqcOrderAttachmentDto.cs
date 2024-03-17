@@ -116,12 +116,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检验类型;1、常规检验2、外观检验3、包装检验4、特殊性检验5、破坏性检验
         /// </summary>
-        public IQCInspectionTypeEnum InspectionType { get; set; }
+        public OQCInspectionTypeEnum InspectionType { get; set; }
 
         /// <summary>
         /// 附件集合
         /// </summary>
-        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+        public IEnumerable<InteAttachmentBaseDto> Attachment { get; set; }
 
     }
 
@@ -152,7 +152,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 附件集合
         /// </summary>
-        public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
+        public IEnumerable<InteAttachmentBaseDto>? Attachment { get; set; }
     }
 
     /// <summary>
