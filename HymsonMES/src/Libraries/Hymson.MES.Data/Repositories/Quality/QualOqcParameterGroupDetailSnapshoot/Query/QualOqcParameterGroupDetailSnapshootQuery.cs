@@ -19,5 +19,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 参数编码
         /// </summary>
         public string? ParameterCode { get; set; }
+
+        /// <summary>
+        /// OQC检验参数组Id
+        /// </summary>
+        public long? ParameterGroupId { get; set; }
     }
 }

@@ -85,6 +85,18 @@ namespace Hymson.MES.Data.Repositories.Quality
             return await conn.ExecuteAsync(DeletesSql, command);
         }
 
+
+        /// <summary>
+        /// 软删除附件
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAnnexAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteAnnexSql, new { Id = id });
+        }
+
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
@@ -174,6 +186,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string DeleteSql = "UPDATE qual_oqc_order_annex SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_oqc_order_annex SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteAnnexSql = "UPDATE qual_oqc_order_annex SET IsDeleted = Id WHERE AnnexId = @Id ";
 
         const string GetByIdSql = @"SELECT * FROM qual_oqc_order_annex WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_oqc_order_annex WHERE Id IN @Ids ";

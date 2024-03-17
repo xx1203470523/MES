@@ -39,6 +39,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<int> UpdateRangeAsync(IEnumerable<QualOqcOrderTypeEntity> entities);
 
         /// <summary>
+        /// 更新已检数
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateCheckedQtyAsync(QualOqcOrderTypeEntity entity);
+
+        /// <summary>
         /// 软删除  
         /// </summary>
         /// <param name="id"></param>
@@ -67,6 +74,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<IEnumerable<QualOqcOrderTypeEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualOqcOrderTypeEntity>> GetByOQCOrderIdAsync(long orderId);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
@@ -80,5 +94,11 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         Task<PagedInfo<QualOqcOrderTypeEntity>> GetPagedListAsync(QualOqcOrderTypePagedQuery pagedQuery);
 
+        /// <summary>
+        /// 查询Entity
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<QualOqcOrderTypeEntity> GetEntityAsync(QualOqcOrderTypeQuery query);
     }
 }
