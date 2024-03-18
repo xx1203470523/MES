@@ -128,7 +128,7 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("OQCOrderTypeId=@OQCOrderTypeId");
             }
 
-            if (query.Barcode!=null)
+            if (!string.IsNullOrWhiteSpace(query.Barcode))
             {
                 sqlBuilder.Where("Barcode=@Barcode");
             }

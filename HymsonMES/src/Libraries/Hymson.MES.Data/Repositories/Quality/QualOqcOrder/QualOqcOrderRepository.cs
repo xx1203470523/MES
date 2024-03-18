@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Microsoft.Extensions.Options;
 
@@ -162,6 +163,33 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrderLike)) {
+                pagedQuery.InspectionOrderLike = $"%{pagedQuery.InspectionOrderLike}%";
+                sqlBuilder.Where("InspectionOrder LIKE @InspectionOrderLike");
+            }
+
+            if (pagedQuery.Status != null) {
+                sqlBuilder.Where("Status = @Status");
+            }
+
+            if (pagedQuery.MaterialIds != null && pagedQuery.MaterialIds.Any()) {
+                sqlBuilder.Where("MaterialId IN @MaterialIds");
+            }
+
+            if (pagedQuery.CustomerIds != null && pagedQuery.CustomerIds.Any())
+            {
+                sqlBuilder.Where("CustomerId IN @CustomerIds");
+            }
+
+            if (pagedQuery.ShipmentMaterialIds != null && pagedQuery.ShipmentMaterialIds.Any()) {
+                sqlBuilder.Where("ShipmentMaterialId IN @ShipmentMaterialIds");
+            }
+
+            if (pagedQuery.IsQualified != null)
+            {
+                sqlBuilder.Where("IsQualified = @IsQualified");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

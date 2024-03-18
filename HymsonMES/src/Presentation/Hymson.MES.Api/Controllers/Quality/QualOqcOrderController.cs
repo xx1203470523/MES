@@ -115,7 +115,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpGet]
         [Route("checkBarCode")]
-        public async Task<CheckBarCodeOutDto> CheckBarCodeAsync([FromQuery] CheckBarCodeQuqryDto checkBarCodeQuqryDto)
+        public async Task<IEnumerable<CheckBarCodeOutDto>> CheckBarCodeAsync([FromQuery] CheckBarCodeQuqryDto checkBarCodeQuqryDto)
         {
             return await _qualOqcOrderService.CheckBarCodeAsync(checkBarCodeQuqryDto);
         }
@@ -168,12 +168,12 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 删除检验单附件
         /// </summary>
-        /// <param name="orderAnnexId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("attachment/delete")]
-        public async Task DeleteAttachmentByIdAsync(long orderAnnexId)
+        [HttpDelete("attachment/delete/{id}")]
+        public async Task DeleteAttachmentByIdAsync(long id)
         {
-            await _qualOqcOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
+            await _qualOqcOrderService.DeleteAttachmentByIdAsync(id);
         }
 
         /// <summary>
@@ -219,6 +219,27 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<PagedInfo<OqcOrderParameterDetailDto>> OqcOrderQueryUnqualifiedPagedListAsync([FromQuery] OqcOrderParameterDetailPagedQueryDto pagedQueryDto)
         {
             return await _qualOqcOrderService.OqcOrderQueryUnqualifiedPagedListAsync(pagedQueryDto);
+        }
+
+        ///// <summary>
+        ///// 查询检验类型
+        ///// </summary>
+        ///// <param name="orderId"></param>
+        ///// <returns></returns>
+        //[HttpGet("type/{orderId}")]
+        //public async Task<IEnumerable<QualOqcOrderTypeDto>> QueryTypeListByIdAsync(long orderId)
+        //{
+        //    return await _qualOqcOrderService.QueryOrderTypeListByIdAsync(orderId);
+        //}
+
+        /// <summary>
+        /// 获取已检数据和样本数量
+        /// </summary>
+        /// <param name="sampleQtyAndCheckedQtyQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet("getSampleQtyAndCheckedQty")]
+        public async Task<SampleQtyAndCheckedQtyQueryOutDto> GetSampleQtyAndCheckedQtyAsync([FromQuery] SampleQtyAndCheckedQtyQueryDto sampleQtyAndCheckedQtyQueryDto) {
+            return await _qualOqcOrderService.GetSampleQtyAndCheckedQtyAsync(sampleQtyAndCheckedQtyQueryDto);
         }
     }
 }
