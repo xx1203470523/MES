@@ -669,7 +669,9 @@ namespace Hymson.MES.Services.Services.Quality
             var dto = entity.ToModel<QualIqcOrderDto>();
             dto.InspectionGradeText = dto.InspectionGrade.GetDescription();
             dto.StatusText = dto.Status.GetDescription();
-            dto.IsQualifiedText = dto.IsQualified.GetDescription();
+
+            if (dto.IsQualified.HasValue) dto.IsQualifiedText = dto.IsQualified.GetDescription();
+            else dto.IsQualifiedText = "";
 
             // 读取收货单
             var receiptDetailEntity = await _whMaterialReceiptDetailRepository.GetByIdAsync(entity.MaterialReceiptDetailId);
