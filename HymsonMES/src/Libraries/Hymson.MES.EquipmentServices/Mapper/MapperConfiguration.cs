@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.EquProcessParamRecord;
 using Hymson.MES.Core.Domain.EquProductParamRecord;
 using Hymson.MES.Core.Domain.ManuEquipmentStatusTime;
 using Hymson.MES.Core.Domain.ManuEuqipmentNewestInfoEntity;
+using Hymson.MES.Core.Domain.ManuFeedingCompletedZjyjRecord;
 using Hymson.MES.Services.Dtos.AgvTaskRecord;
 using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
@@ -18,6 +19,7 @@ using Hymson.MES.Services.Dtos.EquProcessParamRecord;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
+using Hymson.MES.Services.Dtos.ManuFeedingCompletedZjyjRecord;
 
 namespace Hymson.MES.EquipmentServices.Mapper
 {
@@ -53,6 +55,7 @@ namespace Hymson.MES.EquipmentServices.Mapper
             CreateMap<AgvTaskRecordSaveDto, AgvTaskRecordEntity>();
             CreateMap<EquProcessParamRecordSaveDto, EquProcessParamRecordEntity>();
             CreateMap<EquProductParamRecordSaveDto, EquProductParamRecordEntity>();
+            CreateMap<ManuFeedingCompletedZjyjRecordSaveDto, ManuFeedingCompletedZjyjRecordEntity>();
             #endregion
 
         }

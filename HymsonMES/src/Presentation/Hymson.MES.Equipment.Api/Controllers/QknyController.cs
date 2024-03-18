@@ -27,7 +27,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 是否调试
         /// </summary>
-        private readonly bool IS_DEBUG = false;
+        private readonly bool IS_DEBUG = true;
 
         /// <summary>
         /// 构造函数
@@ -469,7 +469,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// 设备投料(制胶匀浆)018
+        /// 设备投料(制胶匀浆)018 
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -498,6 +498,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("上料完成(制胶匀浆)019", BusinessType.OTHER, "FeedingCompleted019", ReceiverTypeEnum.MES)]
         public async Task FeedingCompletedAsync(FeedingCompletedDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.FeedingCompletedAsync(dto);
+
             //TODO
             //1. 类似上料，粉料，匀浆上到中转罐或者料仓（上料点）
             //
@@ -513,13 +520,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备产出(制胶匀浆)020", BusinessType.OTHER, "OutputEqu020", ReceiverTypeEnum.MES)]
         public async Task<string> OutputEquAsync(QknyBaseDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                string sfc = "SFC001";
+                return sfc;
+            }
+
+            return await _qknyService.OutputEquAsync(dto);
+
             //TODO
             //1. 根据工序返回对应的条码给设备
             //2. 执行条码生成方法
 
-            string sfc = "SFC001";
 
-            return sfc;
         }
 
         /// <summary>

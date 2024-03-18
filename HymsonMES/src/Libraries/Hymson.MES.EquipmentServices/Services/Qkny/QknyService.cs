@@ -39,6 +39,7 @@ using Hymson.MES.Services.Dtos.EquProcessParamRecord;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
+using Hymson.MES.Services.Dtos.ManuFeedingCompletedZjyjRecord;
 using Hymson.MES.Services.Services.AgvTaskRecord;
 using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Services.EquEquipmentAlarm;
@@ -48,6 +49,7 @@ using Hymson.MES.Services.Services.EquProcessParamRecord;
 using Hymson.MES.Services.Services.EquProductParamRecord;
 using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
+using Hymson.MES.Services.Services.ManuFeedingCompletedZjyjRecord;
 using Hymson.MessagePush.Helper;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -189,6 +191,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IWhMaterialInventoryService _whMaterialInventoryService;
 
         /// <summary>
+        /// 上料完成记录(制胶匀浆)
+        /// </summary>
+        private readonly IManuFeedingCompletedZjyjRecordService _manuFeedingCompletedZjyjRecordService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -214,6 +221,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuPassStationService manuPassStationService,
             IProcLoadPointService procLoadPointService,
             IWhMaterialInventoryService whMaterialInventoryService,
+            IManuFeedingCompletedZjyjRecordService manuFeedingCompletedZjyjRecordService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -239,6 +247,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuPassStationService = manuPassStationService;
             _procLoadPointService = procLoadPointService;
             _whMaterialInventoryService = whMaterialInventoryService;
+            _manuFeedingCompletedZjyjRecordService = manuFeedingCompletedZjyjRecordService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -748,16 +757,83 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             saveDto.Source = ManuSFCFeedingSourceEnum.BOM;
             saveDto.SiteId = equResModel.SiteId;
             saveDto.ResourceId = equResModel.ResId;
-            //3. 上料（改成对条码进行合批）
+            //3. 上料（考虑改成对条码进行合批）
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             foreach (var item in dto.ConsumeSfcList)
             {
                 saveDto.BarCode = item.Sfc;
                 var feedResult = await _manuFeedingService.CreateAsync(saveDto);
-            }  
+            }
+            trans.Complete();
 
             //TODO
             //1. 类似上料，上到搅拌机或者制胶机
             //2. 进行上料点
+        }
+
+        /// <summary>
+        /// 上料完成(制胶匀浆)019
+        /// </summary>
+        /// <param name="dto"></param>
+        public async Task FeedingCompletedAsync(FeedingCompletedDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 组装数据
+            ManuFeedingCompletedZjyjRecordSaveDto saveDto = new ManuFeedingCompletedZjyjRecordSaveDto();
+            saveDto.SiteId = equResModel.SiteId;
+            saveDto.EquipmentId = equResModel.EquipmentId;
+            saveDto.BeforeFeedingQty = dto.BeforeFeedingQty;
+            saveDto.AfterFeedingQty = dto.AfterFeedingQty;
+            saveDto.FeedingQty = dto.AfterFeedingQty - dto.BeforeFeedingQty;
+            saveDto.CreatedBy = dto.EquipmentCode;
+            saveDto.CreatedOn = HymsonClock.Now();
+            saveDto.UpdatedBy = saveDto.CreatedBy;
+            saveDto.UpdatedOn = saveDto.CreatedOn;
+            //3. 数据库操作
+            await _manuFeedingCompletedZjyjRecordService.AddAsync(saveDto);
+
+            return;
+        }
+
+        /// <summary>
+        /// 设备产出
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<string> OutputEquAsync(QknyBaseDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 查询设备激活工单
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //3. 构造数据
+            //3.1 产出条码
+            CreateBarcodeByWorkOrderBo query = new CreateBarcodeByWorkOrderBo();
+            query.WorkOrderId = planEntity.Id;
+            query.ResourceId = equResModel.ResId;
+            query.SiteId = equResModel.SiteId;
+            query.Qty = 1;
+            query.ProcedureId = equResModel.ProcedureId;
+            query.UserName = equResModel.EquipmentCode;
+            //3.2 出站数据
+            SFCOutStationBo sfcOutBo = new SFCOutStationBo();
+            OutStationRequestBo outBo = new OutStationRequestBo();
+            outBo.IsQualified = true;
+            sfcOutBo.OutStationRequestBos = new List<OutStationRequestBo>() { outBo };
+            sfcOutBo.EquipmentId = equResModel.EquipmentId;
+            sfcOutBo.ResourceId = equResModel.ResId;
+            sfcOutBo.ProcedureId = equResModel.ProcedureId;
+            sfcOutBo.SiteId = equResModel.SiteId;
+            sfcOutBo.UserName = equResModel.EquipmentName;
+            //4. 数据库操作
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            var sfcList = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(query, null);
+            outBo.SFC = sfcList.Select(m => m.SFC).FirstOrDefault();
+            var outResult = await _manuPassStationService.OutStationRangeBySFCAsync(sfcOutBo, RequestSourceEnum.EquipmentApi);
+            trans.Complete();
+
+            return sfcList.Select(m => m.SFC).First();
         }
 
         /// <summary>
@@ -772,19 +848,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
 
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
-            //2. 创建条码
-            //var manuSFCEntities = await _manuCreateBarcodeService.CreateBarcodeBySemiProductIdAsync(new CreateBarcodeBySemiProductId
-            //{
-            //    SiteId = equResModel.SiteId,
-            //    UserName = equResModel.EquipmentCode,
-            //    ResourceCode = equResModel.ResCode
-            //});
-            //if (manuSFCEntities.IsNullOrEmpty() == true)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES45060));
-            //}
-            //return manuSFCEntities.Select(s => s.SFC).ToList();
-
+            //2. 构造数据
+            //2.1 条码数据
             PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
             CreateBarcodeByWorkOrderBo query = new CreateBarcodeByWorkOrderBo();
             query.WorkOrderId = planEntity.Id;
@@ -793,9 +858,22 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             query.Qty = dto.Qty;
             query.ProcedureId = equResModel.ProcedureId;
             query.UserName = equResModel.EquipmentCode;
-            var sfcList = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(query, null);
+            //2.2 进站数据
+            SFCInStationBo inBo = new SFCInStationBo();
+            inBo.SiteId = equResModel.SiteId;
+            inBo.UserName = equResModel.EquipmentCode;
+            inBo.ProcedureId = equResModel.ProcedureId;
+            inBo.ResourceId = equResModel.ResId;
+            inBo.EquipmentId = equResModel.EquipmentId;
+            //数据库操作
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            var sfcObjList = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(query, null);
+            List<string> sfcList = sfcObjList.Select(m => m.SFC).ToList();
+            inBo.SFCs = sfcList.ToArray();
+            var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
+            trans.Complete();
 
-            return sfcList.Select(m => m.SFC).ToList();
+            return sfcList;
         }
 
         /// <summary>
