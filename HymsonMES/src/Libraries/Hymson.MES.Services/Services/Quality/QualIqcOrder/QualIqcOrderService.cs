@@ -820,7 +820,9 @@ namespace Hymson.MES.Services.Services.Quality
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
             // 转换产品编码/版本变为产品ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode) || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName))
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode)
+                || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName)
+                || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialVersion))
             {
                 var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
                 {
@@ -834,7 +836,8 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 转换供应商编码变为供应商ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode))
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode)
+                || !string.IsNullOrWhiteSpace(pagedQueryDto.SupplierName))
             {
                 var whSupplierEntities = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery
                 {
@@ -847,7 +850,8 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 将供应商批次/内部批次转换为收货单详情ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierBatch) || !string.IsNullOrWhiteSpace(pagedQueryDto.InternalBatch))
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierBatch)
+                || !string.IsNullOrWhiteSpace(pagedQueryDto.InternalBatch))
             {
                 var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
                 {
