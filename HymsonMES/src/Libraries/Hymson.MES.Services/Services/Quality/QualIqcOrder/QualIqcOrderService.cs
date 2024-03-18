@@ -464,11 +464,13 @@ namespace Hymson.MES.Services.Services.Quality
             });
 
             var operationType = OrderOperateTypeEnum.Complete;
+            entity.IsQualified = TrueOrFalseEnum.Yes;
 
             // 如果不合格数超过接收水准，则设置为"完成"
             if (sampleDetailEntities.Count(c => c.IsQualified == TrueOrFalseEnum.No) > entity.AcceptanceLevel)
             {
                 entity.Status = InspectionStatusEnum.Completed;
+                entity.IsQualified = TrueOrFalseEnum.No;
                 operationType = OrderOperateTypeEnum.Complete;
             }
             else
