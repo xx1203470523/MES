@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Dtos.WhShipment
        /// <summary>
         /// 计划出现时间
         /// </summary>
-        public string PlanShipmentTime { get; set; }
+        public DateTime? PlanShipmentTime { get; set; }
 
        /// <summary>
         /// 备注
