@@ -540,7 +540,7 @@ namespace Hymson.MES.Services.Services.Quality
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 只有"已检验"的状态才允许"关闭"
-            if (entity.Status != InspectionStatusEnum.Closed)
+            if (entity.Status != InspectionStatusEnum.Completed)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11912))
                     .WithData("Before", InspectionStatusEnum.Completed.GetDescription())
