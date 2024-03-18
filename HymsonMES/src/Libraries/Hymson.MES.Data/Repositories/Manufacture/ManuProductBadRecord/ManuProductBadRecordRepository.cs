@@ -383,8 +383,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(pageQuery);
 
             using var conn = GetMESDbConnection();
-            var manuProductBadRecordEntitiesTask = conn.QueryAsync<ManuProductBadRecordReportView>(templateData.RawSql, templateData.Parameters);
-            return await manuProductBadRecordEntitiesTask;
+            return await conn.QueryAsync<ManuProductBadRecordReportView>(templateData.RawSql, templateData.Parameters); 
         }
 
         /// <summary>
@@ -512,7 +511,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetPagedInfoReportDataSqlTemplate = @"
                     select 
-                        rbr.UnqualifiedId, Sum(rbr.Qty)  as num
+                            rbr.UnqualifiedId, COUNT(rbr.SFC) as num 
                     from manu_product_bad_record rbr
                     LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
 
