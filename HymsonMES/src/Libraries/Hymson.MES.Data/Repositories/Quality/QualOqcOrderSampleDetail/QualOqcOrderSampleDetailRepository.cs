@@ -164,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
             if (pagedQuery.GroupDetailSnapshootIds != null && pagedQuery.GroupDetailSnapshootIds.Any())
             {
-                sqlBuilder.Where("GroupDetailSnapshootId IN @GroupDetailSnapshootId");
+                sqlBuilder.Where("GroupDetailSnapshootId IN @GroupDetailSnapshootIds");
             }
 
             if (pagedQuery.IsQualified != null) {
