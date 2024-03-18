@@ -165,5 +165,13 @@ namespace Hymson.MES.Core.Constants
 
         #endregion
 
+        #region 在制品
+
+        /// <summary>
+        /// 设备无产出条码
+        /// </summary>
+        public const string MES45090 = "设备无产出条码";
+
+        #endregion
     }
 }

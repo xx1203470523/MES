@@ -531,8 +531,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //1. 根据工序返回对应的条码给设备
             //2. 执行条码生成方法
-
-
         }
 
         /// <summary>
@@ -568,6 +566,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备投料非生产投料(制胶匀浆)022", BusinessType.OTHER, "ConsumeInNonProductionEqu022", ReceiverTypeEnum.MES)]
         public async Task ConsumeInNonProductionEquAsync(ConsumeInNonProductionEquDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ConsumeInNonProductionEquAsync(dto);
+
             //TODO
             //1. 使用NMP和DIW洗罐子用到
         }
@@ -635,12 +640,16 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("获取下发条码(用于CCD面密度)025", BusinessType.OTHER, "CcdGetBarcode025", ReceiverTypeEnum.MES)]
         public async Task<CcdGetBarcodeReturnDto> CcdGetBarcodeAsync(CCDFileUploadCompleteDto dto)
         {
+            if(IS_DEBUG ==true)
+            {
+                CcdGetBarcodeReturnDto model = new CcdGetBarcodeReturnDto();
+                return model;
+            }
+
+            return await _qknyService.CcdGetBarcodeAsync(dto);
+
             //TODO
             //1. 用于异常情况，返回设备产出最近的一个条码，从manu_sfc_produce中取
-
-            CcdGetBarcodeReturnDto model = new CcdGetBarcodeReturnDto();
-
-            return model;
         }
 
         /// <summary>

@@ -25,4 +25,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public long? ProcedureId { get; set; }
     }
+
+    /// <summary>
+    /// 设备最新的条码
+    /// </summary>
+    public class ManuSfcEquipmentNewestQuery
+    {
+        /// <summary>
+        /// 设备id
+        /// </summary>
+        public long EquipmentId { get; set; }
+    }
 }

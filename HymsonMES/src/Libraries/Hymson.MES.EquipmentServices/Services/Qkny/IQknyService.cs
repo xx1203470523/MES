@@ -146,11 +146,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         Task BatchMoveAsync(BatchMoveDto dto);
 
         /// <summary>
-        /// 设备过程参数
+        /// 设备投料非生产投料(制胶匀浆)022
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto);
+        Task ConsumeInNonProductionEquAsync(ConsumeInNonProductionEquDto dto);
 
         /// <summary>
         /// 生成条码
@@ -165,5 +165,19 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task OutboundMetersReportAsync(OutboundMetersReportDto dto);
+
+        /// <summary>
+        /// 获取下发条码(用于CCD面密度)025
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<CcdGetBarcodeReturnDto> CcdGetBarcodeAsync(CCDFileUploadCompleteDto dto);
+
+        /// <summary>
+        /// 设备过程参数
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto);
     }
 }

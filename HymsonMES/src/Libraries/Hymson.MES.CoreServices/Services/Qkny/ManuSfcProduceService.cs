@@ -1,4 +1,7 @@
-﻿using Hymson.MES.Data.Repositories.Manufacture;
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +34,20 @@ namespace Hymson.MES.CoreServices.Services.Qkny
         public async Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command)
         {
             return await _manuSfcProduceRepository.UpdateQtyBySfcAsync(command);
+        }
+
+        /// <summary>
+        /// 获取设备最近条码
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ManuSfcProductMaterialView> GetEquipmentNewestSfc(ManuSfcEquipmentNewestQuery query)
+        {
+            var dbModel = await _manuSfcProduceRepository.GetEquipmentNewestSfc(query);
+            if (dbModel == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45090));
+            }
+            return dbModel!;
         }
     }
 }

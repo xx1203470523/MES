@@ -197,4 +197,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public long ProductBomId {  get; set; }
     }
+
+    #region 顷刻
+
+    /// <summary>
+    /// 在制品信息+产品型号
+    /// </summary>
+    public class ManuSfcProductMaterialView : ManuSfcProduceEntity
+    {
+        /// <summary>
+        /// 产品型号
+        /// </summary>
+        public string MaterialCode { get; set; }
+    }
+
+    #endregion
+
 }

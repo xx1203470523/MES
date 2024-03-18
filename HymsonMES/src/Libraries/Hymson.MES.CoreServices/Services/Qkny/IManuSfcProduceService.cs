@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Data.Repositories.Manufacture;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,11 @@ namespace Hymson.MES.CoreServices.Services.Qkny
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command);
+
+        /// <summary>
+        /// 获取设备最近条码
+        /// </summary>
+        /// <returns></returns>
+        Task<ManuSfcProductMaterialView> GetEquipmentNewestSfc(ManuSfcEquipmentNewestQuery query);
     }
 }

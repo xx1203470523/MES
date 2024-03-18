@@ -42,6 +42,7 @@ using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Dtos.ManuFeedingCompletedZjyjRecord;
+using Hymson.MES.Services.Dtos.ManuFeedingNoProductionRecord;
 using Hymson.MES.Services.Dtos.ManuFeedingTransferRecord;
 using Hymson.MES.Services.Services.AgvTaskRecord;
 using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
@@ -53,11 +54,14 @@ using Hymson.MES.Services.Services.EquProductParamRecord;
 using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Services.ManuFeedingCompletedZjyjRecord;
+using Hymson.MES.Services.Services.ManuFeedingNoProductionRecord;
 using Hymson.MES.Services.Services.ManuFeedingTransferRecord;
 using Hymson.MessagePush.Helper;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
@@ -205,6 +209,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuFeedingTransferRecordService _manuFeedingTransferRecordService;
 
         /// <summary>
+        /// 设备投料非生产投料
+        /// </summary>
+        private readonly IManuFeedingNoProductionRecordService _manuFeedingNoProductionRecordService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -232,6 +241,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IWhMaterialInventoryService whMaterialInventoryService,
             IManuFeedingCompletedZjyjRecordService manuFeedingCompletedZjyjRecordService,
             IManuFeedingTransferRecordService manuFeedingTransferRecordService,
+            IManuFeedingNoProductionRecordService manuFeedingNoProductionRecordService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -259,6 +269,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _whMaterialInventoryService = whMaterialInventoryService;
             _manuFeedingCompletedZjyjRecordService = manuFeedingCompletedZjyjRecordService;
             _manuFeedingTransferRecordService = manuFeedingTransferRecordService;
+            _manuFeedingNoProductionRecordService = manuFeedingNoProductionRecordService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -931,15 +942,44 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
+        /// 设备投料非生产投料(制胶匀浆)022
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ConsumeInNonProductionEquAsync(ConsumeInNonProductionEquDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //
+            DateTime curDate = HymsonClock.Now();
+            List<ManuFeedingNoProductionRecordSaveDto> saveDtoList = new List<ManuFeedingNoProductionRecordSaveDto>();
+            foreach(var item in dto.ConsumeSfcList)
+            {
+                ManuFeedingNoProductionRecordSaveDto model = new ManuFeedingNoProductionRecordSaveDto();
+                model.EquipmentId = equResModel.EquipmentId;
+                model.ConsumeEquipmentCode = dto.ConsumeEquipmentCode;
+                model.ConsumeResourceCodeCode = dto.ConsumeResourceCodeCode;
+                model.Sfc = item.Sfc;
+                model.Qty = item.Qty;
+                model.Category = item.Category;
+                model.CreatedBy = dto.EquipmentCode;
+                model.CreatedOn = curDate;
+                model.UpdatedBy = dto.EquipmentCode;
+                model.UpdatedOn = curDate;
+                saveDtoList.Add(model);
+            }
+            await _manuFeedingNoProductionRecordService.AddMultAsync(saveDtoList);
+            //TODO
+            //1. 使用NMP和DIW洗罐子用到
+        }
+
+        /// <summary>
         /// 请求产出极卷码023
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         public async Task<List<string>> GenerateSfcAsync(GenerateSfcDto dto)
         {
-            //TODO
-            //是否校验指定工序才能生成条码
-
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
             //2. 构造数据
@@ -959,7 +999,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             inBo.ProcedureId = equResModel.ProcedureId;
             inBo.ResourceId = equResModel.ResId;
             inBo.EquipmentId = equResModel.EquipmentId;
-            //数据库操作
+            //3. 数据库操作
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             var sfcObjList = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(query, null);
             List<string> sfcList = sfcObjList.Select(m => m.SFC).ToList();
@@ -1022,8 +1062,30 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             await _manuSfcProduceService.UpdateQtyBySfcAsync(command);
             await _manuSfcServicecs.UpdateQtyBySfcAsync(command);
             await _equProductParamRecordService.AddMultAsync(saveDtoList);
-            _ = await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
+            await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
             trans.Complete();
+        }
+
+        /// <summary>
+        /// 获取下发条码(用于CCD面密度)025
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<CcdGetBarcodeReturnDto> CcdGetBarcodeAsync(CCDFileUploadCompleteDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 查询数据
+            ManuSfcEquipmentNewestQuery query = new ManuSfcEquipmentNewestQuery();
+            query.EquipmentId = equResModel.EquipmentId;
+            var dbModel = await _manuSfcProduceService.GetEquipmentNewestSfc(query);
+            //3. 构造数据
+            CcdGetBarcodeReturnDto result = new CcdGetBarcodeReturnDto();
+            result.Id = dbModel.Id.ToString();
+            result.Sfc = dbModel.SFC;
+            result.Qty = dbModel.Qty;
+            result.ProductCode = dbModel.MaterialCode;
+            return result;
         }
 
         /// <summary>
