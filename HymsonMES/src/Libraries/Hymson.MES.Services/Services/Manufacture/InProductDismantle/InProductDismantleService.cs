@@ -181,7 +181,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SFC = queryDto.Sfc,
                 Type = queryDto.Type
             });
-            if (!manuSfcCirculations.Any()) return bomDetailViews;
+            if (!manuSfcCirculations.Any() && queryDto.Type != SFCCirculationReportTypeEnum.Whole) return bomDetailViews;
 
             // 组件物料
             var barCodeMaterialIds = manuSfcCirculations.Select(x => x.CirculationProductId).Distinct();
@@ -283,7 +283,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task<List<ProcResourceEntity>> GetResourcesAsync(IEnumerable<ManuSfcCirculationEntity> manuSfcCirculations)
         {
             var resourceIds = new List<long>();
-            foreach (var item in manuSfcCirculations.Select(x=>x.ResourceId))
+            foreach (var item in manuSfcCirculations.Select(x => x.ResourceId))
             {
                 if (item.HasValue && item.Value > 0 && !resourceIds.Contains(item.Value))
                 {

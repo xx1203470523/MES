@@ -174,20 +174,22 @@ namespace Hymson.MES.CoreServices.Services.Quality
                 var inspectionTypes = inspectionItemDetails.Select(x => x.InspectionType).Distinct().ToList();
 
                 //获取供应商物料检验水平
-                var iqcLevels = await _qualIqcLevelRepository.GetEntitiesAsync(new Data.Repositories.Quality.Query.QualIqcLevelQuery
+                var iqcLevels = await _qualIqcLevelRepository.GetEntitiesAsync(new QualIqcLevelQuery
                 {
                     SiteId = bo.SiteId,
                     MaterialId = inspectionItem.MaterialId,
                     SupplierId = inspectionItem.SupplierId,
-                    Type = QCMaterialTypeEnum.Material
+                    Type = QCMaterialTypeEnum.Material,
+                    Status = Core.Enums.DisableOrEnableEnum.Enable
                 });
                 if (iqcLevels == null || !iqcLevels.Any())
                 {
                     //供应商物料检验水平为空则使用通用检验水平
-                    iqcLevels = await _qualIqcLevelRepository.GetEntitiesAsync(new Data.Repositories.Quality.Query.QualIqcLevelQuery
+                    iqcLevels = await _qualIqcLevelRepository.GetEntitiesAsync(new QualIqcLevelQuery
                     {
                         SiteId = bo.SiteId,
-                        Type = QCMaterialTypeEnum.General
+                        Type = QCMaterialTypeEnum.General,
+                        Status = Core.Enums.DisableOrEnableEnum.Enable
                     });
                     if (iqcLevels == null || !iqcLevels.Any())
                     {
@@ -197,7 +199,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
                 var iqcLevel = iqcLevels.First();
 
                 // 检验水平详情
-                var iqcLevelDetails = await _qualIqcLevelDetailRepository.GetEntitiesAsync(new Data.Repositories.Quality.Query.QualIqcLevelDetailQuery
+                var iqcLevelDetails = await _qualIqcLevelDetailRepository.GetEntitiesAsync(new QualIqcLevelDetailQuery
                 {
                     IqcLevelIds = new[] { iqcLevel.Id }
                 });

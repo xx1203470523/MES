@@ -464,11 +464,13 @@ namespace Hymson.MES.Services.Services.Quality
             });
 
             var operationType = OrderOperateTypeEnum.Complete;
+            entity.IsQualified = TrueOrFalseEnum.Yes;
 
             // 如果不合格数超过接收水准，则设置为"完成"
             if (sampleDetailEntities.Count(c => c.IsQualified == TrueOrFalseEnum.No) > entity.AcceptanceLevel)
             {
                 entity.Status = InspectionStatusEnum.Completed;
+                entity.IsQualified = TrueOrFalseEnum.No;
                 operationType = OrderOperateTypeEnum.Complete;
             }
             else
@@ -538,7 +540,7 @@ namespace Hymson.MES.Services.Services.Quality
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 只有"已检验"的状态才允许"关闭"
-            if (entity.Status != InspectionStatusEnum.Closed)
+            if (entity.Status != InspectionStatusEnum.Completed)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11912))
                     .WithData("Before", InspectionStatusEnum.Completed.GetDescription())
@@ -667,7 +669,9 @@ namespace Hymson.MES.Services.Services.Quality
             var dto = entity.ToModel<QualIqcOrderDto>();
             dto.InspectionGradeText = dto.InspectionGrade.GetDescription();
             dto.StatusText = dto.Status.GetDescription();
-            dto.IsQualifiedText = dto.IsQualified.GetDescription();
+
+            if (dto.IsQualified.HasValue) dto.IsQualifiedText = dto.IsQualified.GetDescription();
+            else dto.IsQualifiedText = "";
 
             // 读取收货单
             var receiptDetailEntity = await _whMaterialReceiptDetailRepository.GetByIdAsync(entity.MaterialReceiptDetailId);
@@ -818,7 +822,9 @@ namespace Hymson.MES.Services.Services.Quality
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
             // 转换产品编码/版本变为产品ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode) || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName))
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode)
+                || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName)
+                || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialVersion))
             {
                 var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
                 {
@@ -832,7 +838,8 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 转换供应商编码变为供应商ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode))
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode)
+                || !string.IsNullOrWhiteSpace(pagedQueryDto.SupplierName))
             {
                 var whSupplierEntities = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery
                 {
@@ -845,7 +852,8 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 将供应商批次/内部批次转换为收货单详情ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierBatch) || !string.IsNullOrWhiteSpace(pagedQueryDto.InternalBatch))
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierBatch)
+                || !string.IsNullOrWhiteSpace(pagedQueryDto.InternalBatch))
             {
                 var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
                 {
@@ -855,6 +863,18 @@ namespace Hymson.MES.Services.Services.Quality
                 });
                 if (receiptDetailEntities != null && receiptDetailEntities.Any()) pagedQuery.MaterialReceiptDetailIds = receiptDetailEntities.Select(s => s.Id);
                 else pagedQuery.MaterialReceiptDetailIds = Array.Empty<long>();
+            }
+
+            // 将不合格处理方式转换为检验单ID
+            if (pagedQueryDto.HandMethod.HasValue)
+            {
+                var unqualifiedHandEntities = await _qualIqcOrderUnqualifiedHandRepository.GetEntitiesAsync(new QualIqcOrderUnqualifiedHandQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    HandMethod = pagedQueryDto.HandMethod
+                });
+                if (unqualifiedHandEntities != null && unqualifiedHandEntities.Any()) pagedQuery.IQCOrderIds = unqualifiedHandEntities.Select(s => s.IQCOrderId);
+                else pagedQuery.IQCOrderIds = Array.Empty<long>();
             }
 
             // 查询数据

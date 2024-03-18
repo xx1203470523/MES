@@ -95,7 +95,6 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         public async Task<PagedInfo<WhMaterialReceiptDto>> QueryPagedListAsync([FromQuery] WhMaterialReceiptPagedQueryDto pagedQueryDto)
         {
             return await _whMaterialReceiptService.GetPagedListAsync(pagedQueryDto);
- 
         }
 
         /// <summary>
@@ -105,7 +104,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         /// <returns></returns>
         [HttpGet("details/{receiptId}")]
         public async Task<IEnumerable<ReceiptMaterialDetailDto>> QueryDetailByReceiptIdAsync(long receiptId)
-        {            
+        {
             return await _whMaterialReceiptService.QueryDetailByReceiptIdAsync(receiptId);
         }
 

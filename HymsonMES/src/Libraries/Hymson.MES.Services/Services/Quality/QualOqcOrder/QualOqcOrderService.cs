@@ -790,14 +790,14 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 oqcOrderEntity.Status = InspectionStatusEnum.Completed;
                 operationType = OrderOperateTypeEnum.Complete;
-                //oqcOrderEntity.IsQualified = TrueOrFalseEnum.Yes;
+                oqcOrderEntity.IsQualified = TrueOrFalseEnum.No;
             }
             else
             {
                 // 默认是关闭
                 oqcOrderEntity.Status = InspectionStatusEnum.Closed;
-                oqcOrderEntity.IsQualified = TrueOrFalseEnum.No;
-                //operationType = OrderOperateTypeEnum.Close;
+                oqcOrderEntity.IsQualified = TrueOrFalseEnum.Yes;
+                operationType = OrderOperateTypeEnum.Close;
             }
 
             using (var trans = TransactionHelper.GetTransactionScope())
@@ -970,20 +970,6 @@ namespace Hymson.MES.Services.Services.Quality
                 pagedQuery.OQCOrderSampleIds = sampleEntities.Select(s => s.Id);
             }
 
-            //// 根据样本条码获取检验样本明细Id
-            //    if (!string.IsNullOrWhiteSpace(pagedQueryDto.BarCode))
-            //{
-            //    //// 查询检验单下面的所有样本
-            //    //var sampleEntities = await _qualOqcOrderSampleRepository.GetEntitiesAsync(new QualOqcOrderSampleQuery
-            //    //{
-            //    //    SiteId = entity.SiteId,
-            //    //    OQCOrderId = entity.Id,
-            //    //    Barcode = pagedQueryDto.BarCode
-            //    //});
-            //    if (sampleEntities != null && sampleEntities.Any()) pagedQuery.OQCOrderSampleIds = sampleEntities.Select(s => s.Id);
-            //    else pagedQuery.OQCOrderSampleIds = Array.Empty<long>();
-            //}
-
             // 根据参数编码获取快照明细ID
             var snapshotDetailEntities = await _qualOqcParameterGroupDetailSnapshootRepository.GetEntitiesAsync(new QualOqcParameterGroupDetailSnapshootQuery
             {
@@ -997,16 +983,6 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 pagedQuery.GroupDetailSnapshootIds = snapshotDetailEntities.Select(s => s.Id);
             }
-            //    if (!string.IsNullOrWhiteSpace(pagedQueryDto.ParameterCode))
-            //{
-            //    var snapshotDetailEntities = await _qualOqcParameterGroupDetailSnapshootRepository.GetEntitiesAsync(new QualOqcParameterGroupDetailSnapshootQuery
-            //    {
-            //        SiteId = entity.SiteId,
-            //        ParameterCode = pagedQueryDto.ParameterCode
-            //    });
-            //    if (snapshotDetailEntities != null && snapshotDetailEntities.Any()) pagedQuery.GroupDetailSnapshootIds = snapshotDetailEntities.Select(s => s.Id);
-            //    else pagedQuery.GroupDetailSnapshootIds = Array.Empty<long>();
-            //}
 
             // 查询数据
             var pagedInfo = await _qualOqcOrderSampleDetailRepository.GetPagedListAsync(pagedQuery);

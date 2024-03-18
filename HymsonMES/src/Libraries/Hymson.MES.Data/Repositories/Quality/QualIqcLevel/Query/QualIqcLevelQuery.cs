@@ -31,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// <summary>
         /// 状态 0、已禁用 1、启用
         /// </summary>
-        public DisableOrEnableEnum Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
     }
 }
