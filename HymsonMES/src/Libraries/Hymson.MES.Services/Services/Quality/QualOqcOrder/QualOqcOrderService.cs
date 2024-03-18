@@ -790,14 +790,14 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 oqcOrderEntity.Status = InspectionStatusEnum.Completed;
                 operationType = OrderOperateTypeEnum.Complete;
-                //oqcOrderEntity.IsQualified = TrueOrFalseEnum.Yes;
+                oqcOrderEntity.IsQualified = TrueOrFalseEnum.No;
             }
             else
             {
                 // 默认是关闭
                 oqcOrderEntity.Status = InspectionStatusEnum.Closed;
-                oqcOrderEntity.IsQualified = TrueOrFalseEnum.No;
-                //operationType = OrderOperateTypeEnum.Close;
+                oqcOrderEntity.IsQualified = TrueOrFalseEnum.Yes;
+                operationType = OrderOperateTypeEnum.Close;
             }
 
             using (var trans = TransactionHelper.GetTransactionScope())
