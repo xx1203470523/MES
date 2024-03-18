@@ -252,8 +252,11 @@ namespace Hymson.MES.Services.Services.Quality
                         Id = IdGenProvider.Instance.CreateId(),
                         UnqualifiedGroupId = qualUnqualifiedCodeEntity.Id,
                         UnqualifiedCodeId = item,
+                        SiteId = _currentSite.SiteId ?? 123456,
                         CreatedBy = userId,
-                        UpdatedBy = userId
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedBy = userId,
+                        UpdatedOn = HymsonClock.Now()
                     });
                 }
             }
