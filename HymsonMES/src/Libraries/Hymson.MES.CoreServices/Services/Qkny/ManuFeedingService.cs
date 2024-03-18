@@ -25,6 +25,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.CoreServices.Dtos.Qkny;
+using System.Transactions;
 
 namespace Hymson.MES.CoreServices.Services.Qkny
 {
@@ -647,6 +648,106 @@ namespace Hymson.MES.CoreServices.Services.Qkny
                 throw new CustomerValidationException(nameof(ErrorCode.MES45071));
             }
             return dbModel!;
+        }
+
+        /// <summary>
+        /// 上料物料转移
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public async Task<bool> ManuFeedingTransfer(ManuFeedingTransferSaveDto saveDto)
+        {
+            if (saveDto.SourceId == saveDto.DestId)
+            {
+                return true;
+            }
+            ManuSFCFeedingSourceEnum addSource = ManuSFCFeedingSourceEnum.FeedingPoint;
+            //查询条码信息
+            GetManuFeedingSfcQuery sfcQuery = new GetManuFeedingSfcQuery();
+            sfcQuery.BarCode = saveDto.Sfc;
+            if(saveDto.TransferType == ManuSFCFeedingTransferEnum.FeedingPoint 
+                || saveDto.TransferType == ManuSFCFeedingTransferEnum.FeedingPointResource)
+            {
+                sfcQuery.LoadSource = ManuSFCFeedingSourceEnum.FeedingPoint;
+                addSource = ManuSFCFeedingSourceEnum.BOM;
+            }
+            else
+            {
+                sfcQuery.LoadSource = ManuSFCFeedingSourceEnum.BOM;
+                addSource = ManuSFCFeedingSourceEnum.FeedingPoint;
+            }
+            var manuFeedingEntity = await _manuFeedingRepository.GetManuFeedingSfcAsync(sfcQuery);
+
+            //校验
+            if(manuFeedingEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45072));
+            }
+            if(manuFeedingEntity.Qty <= 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45073));
+            }
+
+            DateTime curDate = HymsonClock.Now();
+            //更新数据
+            UpdateFeedingQtyCommand command = new UpdateFeedingQtyCommand();
+            command.BarCode = saveDto.Sfc;
+            command.Qty = saveDto.Qty ?? manuFeedingEntity.Qty;
+            command.UpdatedBy = saveDto.OpeationBy;
+            command.UpdatedOn = curDate;
+            //新增数据
+            manuFeedingEntity.Id = IdGenProvider.Instance.CreateId();
+            manuFeedingEntity.CreatedOn = curDate;
+            manuFeedingEntity.CreatedBy = saveDto.OpeationBy;
+            manuFeedingEntity.InitQty = command.Qty;
+            manuFeedingEntity.Qty = command.Qty;
+            manuFeedingEntity.WorkOrderId = null;
+            manuFeedingEntity.LoadSource = addSource;
+            manuFeedingEntity.UpdatedOn = curDate;
+            manuFeedingEntity.UpdatedBy = "";
+
+            //更新数量
+            if (saveDto.TransferType == ManuSFCFeedingTransferEnum.Resource)
+            {
+                //更新-修改旧资源数量
+                command.ResourceId = saveDto.SourceId;
+                command.FeedingPointId = 0;
+                //添加记录-添加新资源数据，修改资源id
+                manuFeedingEntity.ResourceId = saveDto.DestId;
+                manuFeedingEntity.FeedingPointId = null;
+            }
+            else if(saveDto.TransferType == ManuSFCFeedingTransferEnum.FeedingPoint)
+            {
+                //更新
+                command.ResourceId = 0;
+                command.FeedingPointId = saveDto.SourceId;
+                //添加记录
+                manuFeedingEntity.ResourceId = saveDto.LoadPointResoucesId;
+                manuFeedingEntity.FeedingPointId = saveDto.DestId;
+            }
+            else if(saveDto.TransferType == ManuSFCFeedingTransferEnum.FeedingPointResource)
+            {
+                //更新
+                command.ResourceId = 0;
+                command.FeedingPointId = saveDto.SourceId;
+                //添加记录
+                manuFeedingEntity.FeedingPointId = null;
+                manuFeedingEntity.ResourceId = saveDto.DestId;
+            }
+            else if(saveDto.TransferType == ManuSFCFeedingTransferEnum.ResourceFeedingPoint)
+            {
+                //更新
+                command.ResourceId = saveDto.SourceId;
+                command.FeedingPointId = 0;
+                //添加记录
+                manuFeedingEntity.ResourceId = saveDto.LoadPointResoucesId;
+                manuFeedingEntity.FeedingPointId = saveDto.DestId;
+            }
+
+            await _manuFeedingRepository.UpdateFeedingQtyAsync(command);
+            await _manuFeedingRepository.InsertAsync(manuFeedingEntity);
+
+            return true;
         }
 
     }

@@ -18,10 +18,12 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.LoadPoint.View;
 using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Hymson.MES.EquipmentServices.Dtos.Manufacture.ProductionProcess;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Qkny.Formula;
@@ -40,6 +42,7 @@ using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Dtos.ManuFeedingCompletedZjyjRecord;
+using Hymson.MES.Services.Dtos.ManuFeedingTransferRecord;
 using Hymson.MES.Services.Services.AgvTaskRecord;
 using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Services.EquEquipmentAlarm;
@@ -50,6 +53,7 @@ using Hymson.MES.Services.Services.EquProductParamRecord;
 using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Services.ManuFeedingCompletedZjyjRecord;
+using Hymson.MES.Services.Services.ManuFeedingTransferRecord;
 using Hymson.MessagePush.Helper;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -196,6 +200,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuFeedingCompletedZjyjRecordService _manuFeedingCompletedZjyjRecordService;
 
         /// <summary>
+        /// 批次转移
+        /// </summary>
+        private readonly IManuFeedingTransferRecordService _manuFeedingTransferRecordService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -222,6 +231,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IProcLoadPointService procLoadPointService,
             IWhMaterialInventoryService whMaterialInventoryService,
             IManuFeedingCompletedZjyjRecordService manuFeedingCompletedZjyjRecordService,
+            IManuFeedingTransferRecordService manuFeedingTransferRecordService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -248,6 +258,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _procLoadPointService = procLoadPointService;
             _whMaterialInventoryService = whMaterialInventoryService;
             _manuFeedingCompletedZjyjRecordService = manuFeedingCompletedZjyjRecordService;
+            _manuFeedingTransferRecordService = manuFeedingTransferRecordService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -816,7 +827,15 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             query.Qty = 1;
             query.ProcedureId = equResModel.ProcedureId;
             query.UserName = equResModel.EquipmentCode;
-            //3.2 出站数据
+            //3.2 进站数据
+            SFCInStationBo inStationBo = new SFCInStationBo();
+            inStationBo.UserName = equResModel.EquipmentCode;
+            inStationBo.EquipmentId = equResModel.EquipmentId;
+            inStationBo.ResourceId = equResModel.ResId;
+            inStationBo.ProcedureId = equResModel.ProcedureId;
+            inStationBo.SiteId = equResModel.SiteId;
+            inStationBo.SFCs = new List<string>() { };
+            //3.3 出站数据
             SFCOutStationBo sfcOutBo = new SFCOutStationBo();
             OutStationRequestBo outBo = new OutStationRequestBo();
             outBo.IsQualified = true;
@@ -828,12 +847,87 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             sfcOutBo.UserName = equResModel.EquipmentName;
             //4. 数据库操作
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
-            var sfcList = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(query, null);
+            var sfcList = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(query, null);   
+            inStationBo.SFCs = sfcList.Select(m => m.SFC).ToList();
+            var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inStationBo, RequestSourceEnum.EquipmentApi);
             outBo.SFC = sfcList.Select(m => m.SFC).FirstOrDefault();
             var outResult = await _manuPassStationService.OutStationRangeBySFCAsync(sfcOutBo, RequestSourceEnum.EquipmentApi);
             trans.Complete();
 
             return sfcList.Select(m => m.SFC).First();
+        }
+
+        /// <summary>
+        /// 批次转移021
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task BatchMoveAsync(BatchMoveDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 查询设备激活工单
+            //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //3. 查询转移的类型及数据
+            List<string> codeList = new List<string>() { dto.EquipmentCodeIn, dto.EquipmentCodeOut };
+            ProcLoadPointEquipmentQuery query = new ProcLoadPointEquipmentQuery();
+            query.CodeList = codeList;
+            var dbList = await _procLoadPointService.GetPointOrEquipmmentAsync(query);
+            #region 构造数据
+            //4. 构造数据
+            //4.1 转移数据
+            var outEqu = dbList.Where(m => m.Code == dto.EquipmentCodeOut).FirstOrDefault()!;
+            var inEqu = dbList.Where(m =>m.Code == dto.EquipmentCodeIn).FirstOrDefault()!;
+            ManuFeedingTransferSaveDto saveDto = new ManuFeedingTransferSaveDto();
+            saveDto.Sfc = dto.Sfc;
+            saveDto.Qty = dto.Qty > 0 ? dto.Qty : null;
+            saveDto.OpeationBy = equResModel.EquipmentCode;
+            saveDto.LoadPointResoucesId = inEqu.ResId;
+            saveDto.SourceId = outEqu.Id;
+            saveDto.DestId = inEqu.Id;
+            if (outEqu.DataType == "1" && inEqu.DataType == "1")
+            {
+                saveDto.TransferType = ManuSFCFeedingTransferEnum.FeedingPoint;
+                saveDto.SourceId = outEqu.Id;
+                saveDto.DestId = inEqu.Id;
+                saveDto.LoadPointResoucesId = inEqu.ResId;
+            }
+            else if(outEqu.DataType == "2" && inEqu.DataType == "2")
+            {
+                saveDto.TransferType = ManuSFCFeedingTransferEnum.Resource;
+                saveDto.SourceId = outEqu.ResId;
+                saveDto.DestId = inEqu.ResId;
+            }
+            else if(outEqu.DataType == "1" && inEqu.DataType == "2")
+            {
+                saveDto.TransferType = ManuSFCFeedingTransferEnum.FeedingPointResource;
+                saveDto.SourceId= outEqu.ResId;
+                saveDto.DestId = inEqu.ResId;
+            }
+            else if(outEqu.DataType == "2" && inEqu.DataType == "1")
+            {
+                saveDto.TransferType = ManuSFCFeedingTransferEnum.ResourceFeedingPoint;
+                saveDto.SourceId = outEqu.ResId; //转出设备的资源id
+                saveDto.DestId = inEqu.Id; //转入设备的上料点id
+                saveDto.LoadPointResoucesId = inEqu.ResId; //转入设备的资源id
+            }
+            //4.2 记录数据
+            ManuFeedingTransferRecordSaveDto recordDto = new ManuFeedingTransferRecordSaveDto();
+            recordDto.EquipmentId = equResModel.EquipmentId;
+            recordDto.Sfc = dto.Sfc;
+            recordDto.EquipmentCodeOut = dto.EquipmentCodeOut;
+            recordDto.EquipmentCodeIn = dto.EquipmentCodeIn;
+            recordDto.Qty = dto.Qty;
+            recordDto.CreatedBy = dto.EquipmentCode;
+            recordDto.CreatedOn = HymsonClock.Now();
+            recordDto.UpdatedBy = recordDto.CreatedBy;
+            recordDto.UpdatedOn = recordDto.CreatedOn;
+            #endregion
+            //5. 数据库操作
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            await _manuFeedingService.ManuFeedingTransfer(saveDto);
+            await _manuFeedingTransferRecordService.AddAsync(recordDto);
+            trans.Complete();
         }
 
         /// <summary>

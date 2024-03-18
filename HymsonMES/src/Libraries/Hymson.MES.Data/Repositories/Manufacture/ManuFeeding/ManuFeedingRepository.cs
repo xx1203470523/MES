@@ -202,6 +202,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
             return await conn.QueryFirstOrDefaultAsync<ManuFeedingEntity>(GetFeedingPointNewSql, query);
         }
 
+        /// <summary>
+        /// 查询条码信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ManuFeedingEntity> GetManuFeedingSfcAsync(GetManuFeedingSfcQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuFeedingEntity>(GetManuFeedingSfcSql, query);
+        }
+
+        /// <summary>
+        /// 更新数量
+        /// </summary>
+        /// <param name="loadPointId"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateFeedingQtyAsync(UpdateFeedingQtyCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateFeedingQtySql, command);
+        }
+
         #endregion
 
     }
@@ -227,11 +249,32 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <summary>
         /// 获取最新一条上料记录
         /// </summary>
-        const string GetFeedingPointNewSql = $@"
+        const string GetFeedingPointNewSql = @"
             select * from manu_feeding mf 
             where FeedingPointId = @FeedingPointId
             order by CreatedOn desc 
             limit 0,1
+        ";
+
+        /// <summary>
+        /// 获取条码信息
+        /// </summary>
+        const string GetManuFeedingSfcSql = @"
+            select * from manu_feeding mf 
+            where LoadSource  = @LoadSource
+            and BarCode = @BarCode
+            and IsDeleted = 0
+            order by CreatedOn desc
+        ";
+
+        /// <summary>
+        /// 更新数量
+        /// </summary>
+        const string UpdateFeedingQtySql = @"
+            update manu_feeding
+            set Qty = Qty - @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn
+            where BarCode = @BarCode
+            and ( ResourceId = @ResourceId or FeedingPointId = @FeedingPointId )
         ";
 
         #endregion

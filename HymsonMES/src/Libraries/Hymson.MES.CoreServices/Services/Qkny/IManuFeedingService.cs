@@ -27,5 +27,12 @@ namespace Hymson.MES.CoreServices.Services.Qkny
         /// <param name="query"></param>
         /// <returns></returns>
         Task<ManuFeedingEntity> GetFeedingPointNewAsync(GetFeedingPointNewQuery query);
+
+        /// <summary>
+        /// 上料物料转移
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        Task<bool> ManuFeedingTransfer(ManuFeedingTransferSaveDto saveDto);
     }
 }

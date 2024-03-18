@@ -545,6 +545,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("批次转移(制胶匀浆)021", BusinessType.OTHER, "BatchMove021", ReceiverTypeEnum.MES)]
         public async Task BatchMoveAsync(BatchMoveDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.BatchMoveAsync(dto);
+
             //TODO
             //1. 当浆料或胶液在罐体间转移后，上报浆料或胶液条码、重量、转出罐和转入罐的编码
             //2. 处理罐子前后的数量

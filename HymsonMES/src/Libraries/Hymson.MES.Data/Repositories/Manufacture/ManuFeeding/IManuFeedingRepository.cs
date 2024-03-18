@@ -115,6 +115,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<ManuFeedingEntity> GetFeedingPointNewAsync(GetFeedingPointNewQuery query);
 
+        /// <summary>
+        /// 根据上料点获取最新的上料记录
+        /// </summary>
+        /// <param name="loadPointId"></param>
+        /// <returns></returns>
+        Task<ManuFeedingEntity> GetManuFeedingSfcAsync(GetManuFeedingSfcQuery query);
+
+        /// <summary>
+        /// 更新上料点数量
+        /// </summary>
+        /// <param name="loadPointId"></param>
+        /// <returns></returns>
+        Task<int> UpdateFeedingQtyAsync(UpdateFeedingQtyCommand command);
+
         #endregion
     }
 }

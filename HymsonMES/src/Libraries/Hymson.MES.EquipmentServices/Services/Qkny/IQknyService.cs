@@ -139,6 +139,13 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         Task<string> OutputEquAsync(QknyBaseDto dto);
 
         /// <summary>
+        /// 批次转移
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task BatchMoveAsync(BatchMoveDto dto);
+
+        /// <summary>
         /// 设备过程参数
         /// </summary>
         /// <param name="dto"></param>
