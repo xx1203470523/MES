@@ -859,6 +859,18 @@ namespace Hymson.MES.Services.Services.Quality
                 else pagedQuery.MaterialReceiptDetailIds = Array.Empty<long>();
             }
 
+            // 将不合格处理方式转换为检验单ID
+            if (pagedQueryDto.HandMethod.HasValue)
+            {
+                var unqualifiedHandEntities = await _qualIqcOrderUnqualifiedHandRepository.GetEntitiesAsync(new QualIqcOrderUnqualifiedHandQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    HandMethod = pagedQueryDto.HandMethod
+                });
+                if (unqualifiedHandEntities != null && unqualifiedHandEntities.Any()) pagedQuery.IQCOrderIds = unqualifiedHandEntities.Select(s => s.IQCOrderId);
+                else pagedQuery.IQCOrderIds = Array.Empty<long>();
+            }
+
             // 查询数据
             var pagedInfo = await _qualIqcOrderRepository.GetPagedListAsync(pagedQuery);
 

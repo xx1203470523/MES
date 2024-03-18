@@ -1,3 +1,5 @@
+using Hymson.MES.Core.Enums.Quality;
+
 namespace Hymson.MES.Data.Repositories.Quality.Query
 {
     /// <summary>
@@ -5,6 +7,15 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualIqcOrderUnqualifiedHandQuery
     {
-    
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式
+        /// </summary>
+        public IQCHandMethodEnum? HandMethod { get; set; }
+
     }
 }

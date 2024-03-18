@@ -191,24 +191,14 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.OrderBy(string.IsNullOrWhiteSpace(pagedQuery.Sorting) ? "CreatedOn DESC" : pagedQuery.Sorting);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-            if (pagedQuery.MaterialId.HasValue)
-            {
-                sqlBuilder.Where("MaterialId = @MaterialId");
-            }
-            if (pagedQuery.SupplierId.HasValue)
-            {
-                sqlBuilder.Where("SupplierId = @SupplierId");
-            }
-            if (pagedQuery.StatusArr != null && pagedQuery.StatusArr.Any())
-            {
-                sqlBuilder.Where("Status IN @StatusArr");
-            }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder)) sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
+            if (pagedQuery.IQCOrderIds != null) sqlBuilder.Where(" Id IN @IQCOrderIds ");
             if (pagedQuery.MaterialIds != null) sqlBuilder.Where(" MaterialId IN @MaterialIds ");
             if (pagedQuery.SupplierIds != null) sqlBuilder.Where(" SupplierId IN @SupplierIds ");
             if (pagedQuery.MaterialReceiptDetailIds != null) sqlBuilder.Where(" MaterialReceiptDetailId IN @MaterialReceiptDetailIds ");
             if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
+            if (pagedQuery.IsQualified.HasValue) sqlBuilder.Where("IsQualified = @IsQualified");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
