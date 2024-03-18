@@ -178,7 +178,8 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     SiteId = bo.SiteId,
                     MaterialId = parameterGroupEntity.MaterialId,
                     CustomId = parameterGroupEntity.CustomerId,
-                    Type = Core.Enums.Quality.QCMaterialTypeEnum.Material
+                    Type = Core.Enums.Quality.QCMaterialTypeEnum.Material,
+                    Status = Core.Enums.DisableOrEnableEnum.Enable
                 });
                 if (oqcLevels == null || !oqcLevels.Any())
                 {
@@ -186,7 +187,8 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     oqcLevels = await _qualOqcLevelRepository.GetEntitiesAsync(new QualOqcLevelQuery
                     {
                         SiteId = bo.SiteId,
-                        Type = Core.Enums.Quality.QCMaterialTypeEnum.General
+                        Type = Core.Enums.Quality.QCMaterialTypeEnum.General,
+                        Status = Core.Enums.DisableOrEnableEnum.Enable
                     });
                     if (oqcLevels == null || !oqcLevels.Any())
                     {

@@ -169,6 +169,10 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("Status IN @StatusArr");
             }
+            if (query.MaterialReceiptDetailIds != null && query.MaterialReceiptDetailIds.Any())
+            {
+                sqlBuilder.Where("MaterialReceiptDetailId IN @MaterialReceiptDetailIds");
+            }
             //查询条数
             sqlBuilder.AddParameters(new { MaxRows = query.MaxRows });
             //排序
