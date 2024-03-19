@@ -649,10 +649,10 @@ namespace Hymson.MES.Services.Services.Quality
             //样本明细附件
             var sampleDetailAttachmentEntities = new List<QualOqcOrderSampleDetailAnnexEntity>();
 
-            var checkedQty = 0;
+            //var checkedQty = 0;
             foreach (var item in requestDto.Details)
             {
-                checkedQty += 1;
+                //checkedQty += 1;
                 var sampleDetailId = IdGenProvider.Instance.CreateId();
                 sampleDetailEntities.Add(new QualOqcOrderSampleDetailEntity
                 {
@@ -735,7 +735,7 @@ namespace Hymson.MES.Services.Services.Quality
                 }
 
                 //更新已检验数量
-                var updateQtyRes = await _qualOqcOrderTypeRepository.UpdateCheckedQtyAsync(new QualOqcOrderTypeEntity {Id= oqcOrderTypeEntity.Id,UpdatedBy= updatedBy,UpdatedOn=updatedOn,CheckedQty=checkedQty });
+                var updateQtyRes = await _qualOqcOrderTypeRepository.UpdateCheckedQtyAsync(new QualOqcOrderTypeEntity {Id= oqcOrderTypeEntity.Id,UpdatedBy= updatedBy,UpdatedOn=updatedOn,CheckedQty=1 });
                 if (updateQtyRes == 0) {
                     throw new CustomerValidationException(nameof(ErrorCode.MES17806));
                 }
