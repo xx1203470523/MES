@@ -881,7 +881,7 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedInfo = await _qualIqcOrderRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = await PrepareOrderDtos(pagedInfo.Data);
+            var dtos = await PrepareOrderDtosAsync(pagedInfo.Data);
             return new PagedInfo<QualIqcOrderDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -971,7 +971,7 @@ namespace Hymson.MES.Services.Services.Quality
             });
             if (sampleDetailEntities == null) return Array.Empty<OrderParameterDetailDto>();
 
-            return await PrepareSampleDetailDtos(entity, sampleDetailEntities);
+            return await PrepareSampleDetailDtosAsync(entity, sampleDetailEntities);
         }
 
         /// <summary>
@@ -1021,7 +1021,7 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedInfo = await _qualIqcOrderSampleDetailRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = await PrepareSampleDetailDtos(entity, pagedInfo.Data);
+            var dtos = await PrepareSampleDetailDtosAsync(entity, pagedInfo.Data);
             return new PagedInfo<OrderParameterDetailDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -1108,7 +1108,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<QualIqcOrderDto>> PrepareOrderDtos(IEnumerable<QualIqcOrderEntity> entities)
+        private async Task<IEnumerable<QualIqcOrderDto>> PrepareOrderDtosAsync(IEnumerable<QualIqcOrderEntity> entities)
         {
             List<QualIqcOrderDto> dtos = new();
 
@@ -1229,7 +1229,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="entity"></param>
         /// <param name="sampleDetailEntities"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<OrderParameterDetailDto>> PrepareSampleDetailDtos(QualIqcOrderEntity entity, IEnumerable<QualIqcOrderSampleDetailEntity> sampleDetailEntities)
+        private async Task<IEnumerable<OrderParameterDetailDto>> PrepareSampleDetailDtosAsync(QualIqcOrderEntity entity, IEnumerable<QualIqcOrderSampleDetailEntity> sampleDetailEntities)
         {
             // 查询样品明细对应的快照明细
             var snapshotDetailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetByIdsAsync(sampleDetailEntities.Select(s => s.IQCInspectionDetailSnapshotId));
