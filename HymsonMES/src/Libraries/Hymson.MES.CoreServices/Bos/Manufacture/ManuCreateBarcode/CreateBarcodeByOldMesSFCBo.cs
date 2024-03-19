@@ -24,7 +24,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         public long WorkOrderId { set; get; }
 
         /// <summary>
-        /// 就条码
+        /// 旧条码
         /// </summary>
         public IEnumerable<BarcodeDto> OldSFCs { set; get; } = new List<BarcodeDto>();
     }
