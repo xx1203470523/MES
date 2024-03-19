@@ -397,18 +397,24 @@ namespace Hymson.MES.Services.Services.Quality
                 pagedQuery.CustomerIds = supplierEntities.Select(a => a.Id).Distinct();
             }
 
+            var whShipmentMaterialQuery = new WhShipmentMaterialQuery();
+            whShipmentMaterialQuery.SiteId = _currentSite.SiteId ?? 0;
+            var shipmentIds=new List<long>();
+
             //出货单信息
-            var shipmentEntity = await _whShipmentRepository.GetEntityAsync(new WhShipmentQuery { ShipmentNum = pagedQueryDto.ShipmentNum??"" });
-            if (shipmentEntity == null)
+            if (!string.IsNullOrEmpty(pagedQueryDto.ShipmentNum))
             {
-                return resultData;
+                var shipmentByShipmentNumEntity = await _whShipmentRepository.GetEntityAsync(new WhShipmentQuery { ShipmentNum = pagedQueryDto.ShipmentNum ?? "" });
+                if (shipmentByShipmentNumEntity == null)
+                {
+                    return resultData;
+                }
+                whShipmentMaterialQuery.ShipmentId = shipmentByShipmentNumEntity.Id;
+                shipmentIds.Add(shipmentByShipmentNumEntity.Id);
             }
+
             //获取出货单明细
-            var shipmentMaterialEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery
-            {
-                ShipmentId = shipmentEntity.Id,
-                SiteId = _currentSite.SiteId ?? 0
-            });
+            var shipmentMaterialEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(whShipmentMaterialQuery);
             if (shipmentMaterialEntities == null || !shipmentMaterialEntities.Any())
             {
                 return resultData;
@@ -417,7 +423,16 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 pagedQuery.ShipmentMaterialIds = shipmentMaterialEntities.Select(a => a.Id).Distinct();
             }
+            else {
+                shipmentIds.AddRange(shipmentMaterialEntities.Select(a => a.ShipmentId).Distinct());
+            }
             
+
+            var shipmentEntities = await _whShipmentRepository.GetByIdsAsync(shipmentIds.Distinct());
+            if (shipmentEntities == null || !shipmentEntities.Any()) {
+                return resultData;
+            }
+
             #endregion
 
             var pagedInfo = await _qualOqcOrderRepository.GetPagedListAsync(pagedQuery);
@@ -441,7 +456,14 @@ namespace Hymson.MES.Services.Services.Quality
             var dtos = new List<QualOqcOrderDto>();
             foreach (var item in pagedInfo.Data) {
                 var model = item.ToModel<QualOqcOrderDto>();
-                
+
+                var shipmentMaterialEntity = shipmentMaterialEntities.FirstOrDefault(a => a.Id == item.ShipmentMaterialId);
+                if (shipmentMaterialEntity == null) {
+                    return resultData;
+                }
+                var shipmentEntity = shipmentEntities.FirstOrDefault(a => a.Id == shipmentMaterialEntity.ShipmentId);
+                if(shipmentEntity==null) { return resultData; }
+
                 model.ShipmentNum = shipmentEntity.ShipmentNum;
                 model.ShipmentOrderId = shipmentEntity.Id;
 
