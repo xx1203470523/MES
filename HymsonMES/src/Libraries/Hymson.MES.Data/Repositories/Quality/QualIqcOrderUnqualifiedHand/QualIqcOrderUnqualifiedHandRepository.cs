@@ -120,11 +120,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
+            if (query.IQCOrderIds != null) sqlBuilder.Where(" IQCOrderId IN @IQCOrderIds ");
             if (query.HandMethod.HasValue)
             {
                 sqlBuilder.Where(" HandMethod = @HandMethod ");
             }
-            sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderUnqualifiedHandEntity>(template.RawSql, query);
