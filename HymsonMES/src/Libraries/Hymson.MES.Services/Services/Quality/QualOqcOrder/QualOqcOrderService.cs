@@ -807,7 +807,7 @@ namespace Hymson.MES.Services.Services.Quality
                 OQCOrderId = oqcOrderEntity.Id
             });
             
-            // 如果不合格数超过接收水准，
+            // 如果不合格数超过接收水准，单据为不合格，状态为待检验
             if (sampleDetailEntities.Count(c => c.IsQualified == TrueOrFalseEnum.No) > oqcOrderEntity.AcceptanceLevel)
             {
                 oqcOrderEntity.Status = InspectionStatusEnum.Completed;
