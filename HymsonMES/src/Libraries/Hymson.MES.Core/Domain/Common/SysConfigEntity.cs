@@ -31,5 +31,10 @@ namespace Hymson.MES.Core.Domain.Common
         /// </summary>
         public long SiteId { get; set; }
 
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; } = "";
+
     }
 }

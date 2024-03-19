@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.WhShipment;
 using Hymson.MES.Core.Domain.WhShipmentBarcode;
 using Hymson.MES.Core.Domain.WhShipmentMaterial;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.Query;
@@ -45,9 +46,10 @@ namespace Hymson.MES.Services.Services.WhShipment
         /// 仓储接口（出货单）
         /// </summary>
         private readonly IWhShipmentRepository _whShipmentRepository;
-        private readonly IWhSupplierRepository _whSupplierRepository;
+        //private readonly IWhSupplierRepository _whSupplierRepository;
         private readonly IWhShipmentMaterialRepository _whShipmentMaterialRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IInteCustomRepository _inteCustomRepository;
 
         /// <summary>
         /// 构造函数
@@ -56,19 +58,20 @@ namespace Hymson.MES.Services.Services.WhShipment
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="whShipmentRepository"></param>
-        /// <param name="whSupplierRepository"></param>
         /// <param name="whShipmentMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
+        /// <param name="inteCustomRepository"></param>
         public WhShipmentService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<WhShipmentSaveDto> validationSaveRules,
-            IWhShipmentRepository whShipmentRepository, IWhSupplierRepository whSupplierRepository, IWhShipmentMaterialRepository whShipmentMaterialRepository, IProcMaterialRepository procMaterialRepository)
+            IWhShipmentRepository whShipmentRepository,  IWhShipmentMaterialRepository whShipmentMaterialRepository, IProcMaterialRepository procMaterialRepository, IInteCustomRepository inteCustomRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _whShipmentRepository = whShipmentRepository;
-            _whSupplierRepository = whSupplierRepository;
+            //_whSupplierRepository = whSupplierRepository;
             _whShipmentMaterialRepository = whShipmentMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
+            _inteCustomRepository = inteCustomRepository;
         }
 
 
@@ -258,7 +261,7 @@ namespace Hymson.MES.Services.Services.WhShipment
             }
 
             //获取供应商
-            var whSupplierEntity = await _whSupplierRepository.GetByIdAsync(whShipmentEntity.CustomerId);
+            var inteCustomEntity = await _inteCustomRepository.GetByIdAsync(whShipmentEntity.CustomerId);
 
             //获取出货详情
             var whShipmentDetailEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { ShipmentId = whShipmentQueryDto.Id.GetValueOrDefault(),SiteId=_currentSite.SiteId??0 });
@@ -286,7 +289,7 @@ namespace Hymson.MES.Services.Services.WhShipment
                 model.MaterialName= procMaterialEntity.MaterialName;
                 model.Qty = item.Qty;
                 model.Version = procMaterialEntity.Version;
-                model.SupplierCode = whSupplierEntity?.Code;
+                model.CustomCode = inteCustomEntity?.Code;
                 model.Id = item.Id;
                 result.Add(model);
             }

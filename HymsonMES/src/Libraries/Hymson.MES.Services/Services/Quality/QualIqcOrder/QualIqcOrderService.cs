@@ -1135,6 +1135,13 @@ namespace Hymson.MES.Services.Services.Quality
             var supplierEntities = await _whSupplierRepository.GetByIdsAsync(entities.Where(w => w.SupplierId.HasValue).Select(x => x.SupplierId!.Value));
             var supplierDic = supplierEntities.ToDictionary(x => x.Id, x => x);
 
+            // 查询不合格处理数据
+            var unqualifiedHandEntities = await _qualIqcOrderUnqualifiedHandRepository.GetEntitiesAsync(new QualIqcOrderUnqualifiedHandQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                IQCOrderIds = entities.Select(s => s.Id)
+            });
+
             foreach (var entity in entities)
             {
                 var dto = entity.ToModel<QualIqcOrderDto>();
@@ -1162,9 +1169,10 @@ namespace Hymson.MES.Services.Services.Quality
                 }
 
                 // 处理人
-                var handleEntity = orderOperationEntities.FirstOrDefault(f => f.OperationType == OrderOperateTypeEnum.Close);
+                var handleEntity = unqualifiedHandEntities.FirstOrDefault(f => f.IQCOrderId == entity.Id);
                 if (handleEntity != null)
                 {
+                    dto.HandMethod = handleEntity.HandMethod;
                     dto.HandledBy = handleEntity.CreatedBy;
                     dto.HandledOn = handleEntity.CreatedOn;
                 }

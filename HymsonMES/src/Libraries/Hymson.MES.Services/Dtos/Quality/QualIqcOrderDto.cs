@@ -2,7 +2,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Services.Dtos.Integrated;
-using Org.BouncyCastle.Crypto.Agreement;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
@@ -259,6 +258,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 是否合格;0、不合格 1、合格
         /// </summary>
         public string IsQualifiedText { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式
+        /// </summary>
+        public HandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 报检人
