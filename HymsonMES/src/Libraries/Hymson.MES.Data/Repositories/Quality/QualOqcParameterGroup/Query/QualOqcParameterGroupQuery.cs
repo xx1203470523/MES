@@ -164,5 +164,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// </summary>
         public IEnumerable<long>? SiteIds { get; set; }
 
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+
     }
 }
