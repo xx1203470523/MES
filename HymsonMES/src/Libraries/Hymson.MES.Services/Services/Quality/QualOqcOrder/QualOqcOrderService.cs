@@ -807,7 +807,7 @@ namespace Hymson.MES.Services.Services.Quality
                 OQCOrderId = oqcOrderEntity.Id
             });
             
-            // 如果不合格数超过接收水准，则设置为"完成"
+            // 如果不合格数超过接收水准，单据为不合格，状态为待检验
             if (sampleDetailEntities.Count(c => c.IsQualified == TrueOrFalseEnum.No) > oqcOrderEntity.AcceptanceLevel)
             {
                 oqcOrderEntity.Status = InspectionStatusEnum.Completed;
@@ -1082,18 +1082,6 @@ namespace Hymson.MES.Services.Services.Quality
                     throw new CustomerValidationException(nameof(ErrorCode.MES17811));
                 }
 
-                //删除样品附件
-                var delSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.DeleteAnnexBySampleDetailIdAsync(new DeleteCommand { Id = qualOqcOrderSampleDetailEntity.Id, UserId = updatedBy, DeleteOn = updatedOn });
-                if (delSampleDateilAnnexRes == 0)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17811));
-                }
-
-                //if (updateSampleDetailDto.Attachment != null && !updateSampleDetailDto.Attachment.Any())
-                //{
-                    
-                //}
-
                 //新增附件
                 if (attachmentEntities.Any())
                 {
@@ -1107,6 +1095,13 @@ namespace Hymson.MES.Services.Services.Quality
                 //新增样品附件
                 if (orderSampleDetailAnnexEntities.Any())
                 {
+                    //删除样品附件
+                    var delSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.DeleteAnnexBySampleDetailIdAsync(new DeleteCommand { Id = qualOqcOrderSampleDetailEntity.Id, UserId = updatedBy, DeleteOn = updatedOn });
+                    if (delSampleDateilAnnexRes == 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17811));
+                    }
+
                     var insertSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.InsertRangeAsync(orderSampleDetailAnnexEntities);
                     if (insertSampleDateilAnnexRes == 0)
                     {

@@ -20,7 +20,7 @@ namespace Hymson.MES.Core.Enums.Quality
         /// <summary>
         /// 已检验(待审核)
         /// </summary>
-        [Description("已检验")]
+        [Description("待审核")]
         Completed = 3,
         /// <summary>
         /// 已关闭
