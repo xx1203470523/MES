@@ -8,6 +8,7 @@ using Hymson.MES.Core.Enums.Qkny;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Qkny;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
@@ -1004,7 +1005,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             var sfcObjList = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(query, null);
             List<string> sfcList = sfcObjList.Select(m => m.SFC).ToList();
             inBo.SFCs = sfcList.ToArray();
-            var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
+            //var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
             trans.Complete();
 
             return sfcList;
@@ -1089,7 +1090,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
-        /// 设备过程参数
+        /// 设备过程参数026
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -1124,6 +1125,202 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             await _equProcessParamRecordService.AddMultAsync(saveDtoList);
         }
 
+        /// <summary>
+        /// 出站027
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task InboundAsync(InboundDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 构造数据
+            SFCInStationBo inBo = new SFCInStationBo();
+            inBo.SiteId = equResModel.SiteId;
+            inBo.UserName = equResModel.EquipmentCode;
+            inBo.ProcedureId = equResModel.ProcedureId;
+            inBo.ResourceId = equResModel.ResId;
+            inBo.EquipmentId = equResModel.EquipmentId;
+            List<string> sfcList = new List<string>() { dto.Sfc };
+            inBo.SFCs = sfcList.ToArray();
+            //3. 进站
+            var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
+        }
+
+        /// <summary>
+        /// 出站028
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task OutboundAsync(OutboundDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 构造数据
+            //2.1 出站数据
+            SFCOutStationBo outBo = new SFCOutStationBo();
+            outBo.SiteId = equResModel.SiteId;
+            outBo.EquipmentId = equResModel.EquipmentId;
+            outBo.ResourceId = equResModel.ResId;
+            outBo.ProcedureId = equResModel.ProcedureId;
+            outBo.UserName = equResModel.EquipmentCode;
+            OutStationRequestBo outReqBo = new OutStationRequestBo();
+            outReqBo.SFC = dto.Sfc;
+            outReqBo.IsQualified = dto.Passed == 1;
+            if(dto.BindFeedingCodeList.IsNullOrEmpty() == false)
+            {
+                List<OutStationConsumeBo> conList = new List<OutStationConsumeBo>();
+                foreach(var item in  dto.BindFeedingCodeList)
+                {
+                    conList.Add(new OutStationConsumeBo() { BarCode = item });
+                }
+                outReqBo.ConsumeList = conList;
+            }
+            if(dto.NgList.IsNullOrEmpty() == false)
+            {
+                List<OutStationUnqualifiedBo> unCodeList = new List<OutStationUnqualifiedBo>();
+                foreach(var item in dto.NgList)
+                {
+                    unCodeList.Add(new OutStationUnqualifiedBo() { UnqualifiedCode = item });
+                }
+                outReqBo.OutStationUnqualifiedList = unCodeList;
+            }
+            outBo.OutStationRequestBos = new List<OutStationRequestBo>() { outReqBo };
+            //2.2 出站参数
+            List<EquProductParamRecordSaveDto> saveDtoList = new List<EquProductParamRecordSaveDto>();
+            foreach (var item in dto.ParamList)
+            {
+                EquProductParamRecordSaveDto saveDto = new EquProductParamRecordSaveDto();
+                saveDto.ParamCode = item.ParamCode;
+                saveDto.ParamValue = item.ParamValue;
+                saveDto.CollectionTime = item.CollectionTime;
+                saveDtoList.Add(saveDto);
+            }
+            saveDtoList.ForEach(m =>
+            {
+                m.SiteId = equResModel.SiteId;
+                m.Sfc = dto.Sfc;
+                m.EquipmentId = equResModel.EquipmentId;
+                m.CreatedOn = HymsonClock.Now();
+                m.CreatedBy = dto.EquipmentCode;
+                m.UpdatedOn = m.CreatedOn;
+                m.UpdatedBy = m.CreatedBy;
+            });
+            //3. 出站
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
+            await _equProductParamRecordService.AddMultAsync(saveDtoList);
+            trans.Complete();
+        }
+
+        /// <summary>
+        /// 进站多个029
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<List<InboundMoreReturnDto>> InboundMoreAsync(InboundMoreDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 构造数据
+            SFCInStationBo inBo = new SFCInStationBo();
+            inBo.SiteId = equResModel.SiteId;
+            inBo.UserName = equResModel.EquipmentCode;
+            inBo.ProcedureId = equResModel.ProcedureId;
+            inBo.ResourceId = equResModel.ResId;
+            inBo.EquipmentId = equResModel.EquipmentId;
+            inBo.SFCs = dto.SfcList.ToArray();
+            //3. 进站
+            var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
+            //4. 返回
+            List<InboundMoreReturnDto> resultList = new List<InboundMoreReturnDto>();
+            foreach(var item in dto.SfcList)
+            {
+                InboundMoreReturnDto model = new InboundMoreReturnDto();
+                model.Sfc = item;
+                resultList.Add(model);
+            }
+
+            return resultList;
+        }
+
+        /// <summary>
+        /// 出站多个
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<List<OutboundMoreReturnDto>> OutboundMoreAsync(OutboundMoreDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 构造数据
+            SFCOutStationBo outBo = new SFCOutStationBo();
+            outBo.SiteId = equResModel.SiteId;
+            outBo.EquipmentId = equResModel.EquipmentId;
+            outBo.ResourceId = equResModel.ResId;
+            outBo.ProcedureId = equResModel.ProcedureId;
+            outBo.UserName = equResModel.EquipmentCode;
+            List<OutStationRequestBo> outStationRequestBos = new();
+            List<EquProductParamRecordSaveDto> saveDtoList = new List<EquProductParamRecordSaveDto>();
+            foreach (var item in dto.SfcList)
+            {
+                //出站数据
+                var outStationRequestBo = new OutStationRequestBo
+                {
+                    SFC = item.Sfc,
+                    IsQualified = item.Passed == 1
+                };
+                // 消耗条码
+                if (item.BindFeedingCodeList != null && item.BindFeedingCodeList.Any())
+                {
+                    outStationRequestBo.ConsumeList = item.BindFeedingCodeList.Select(s => new OutStationConsumeBo { BarCode = s });
+                }
+                // 不合格代码
+                if (item.NgList != null && item.NgList.Any())
+                {
+                    outStationRequestBo.OutStationUnqualifiedList = item.NgList.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s });
+                }
+                outStationRequestBos.Add(outStationRequestBo);
+
+                //出站参数
+                List<EquProductParamRecordSaveDto> curSfcParamList = new List<EquProductParamRecordSaveDto>();
+                foreach (var paramItem in item.ParamList)
+                {
+                    EquProductParamRecordSaveDto saveDto = new EquProductParamRecordSaveDto();
+                    saveDto.ParamCode = paramItem.ParamCode;
+                    saveDto.ParamValue = paramItem.ParamValue;
+                    saveDto.CollectionTime = paramItem.CollectionTime;
+                    curSfcParamList.Add(saveDto);
+                }
+                curSfcParamList.ForEach(m =>
+                {
+                    m.SiteId = equResModel.SiteId;
+                    m.Sfc = item.Sfc;
+                    m.EquipmentId = equResModel.EquipmentId;
+                    m.CreatedOn = HymsonClock.Now();
+                    m.CreatedBy = dto.EquipmentCode;
+                    m.UpdatedOn = m.CreatedOn;
+                    m.UpdatedBy = m.CreatedBy;
+                });
+                saveDtoList.AddRange(curSfcParamList);
+            }
+            outBo.OutStationRequestBos = outStationRequestBos;
+            //3. 出站
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            var outResult = await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
+            await _equProductParamRecordService.AddMultAsync(saveDtoList);
+            trans.Complete();
+            //4. 返回
+            List<OutboundMoreReturnDto> resultList = new List<OutboundMoreReturnDto>();
+            foreach (var item in dto.SfcList)
+            {
+                OutboundMoreReturnDto model = new OutboundMoreReturnDto();
+                model.Sfc = item.Sfc;
+                resultList.Add(model);
+            }
+
+            return resultList;
+        }
 
         /// <summary>
         /// 获取设备资源对应的基础信息

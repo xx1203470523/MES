@@ -662,6 +662,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备过程参数026", BusinessType.OTHER, "EquipmentProcessParam026", ReceiverTypeEnum.MES)]
         public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
             await _qknyService.EquipmentProcessParamAsync(dto);
 
             //TODO
@@ -679,6 +684,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产品进站027", BusinessType.OTHER, "Inbound027", ReceiverTypeEnum.MES)]
         public async Task InboundAsync(InboundDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+            
+            await _qknyService.InboundAsync(dto);
+
             //TODO
             //1. 上工序出站校验
             //2. 是否合格校验
@@ -696,6 +708,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产品进站028", BusinessType.OTHER, "Outbound028", ReceiverTypeEnum.MES)]
         public async Task OutboundAsync(OutboundDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.OutboundAsync(dto);
+
             //TODO
             //1. 添加参数记录
             //2. 参考现有出站
@@ -715,18 +734,23 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //1. 参考现有进站
 
-            List<InboundMoreReturnDto> result = new List<InboundMoreReturnDto>();
-            for(var i = 0;i < dto.SfcList.Count; ++i)
+            if (IS_DEBUG == true)
             {
-                InboundMoreReturnDto model = new InboundMoreReturnDto();
-                model.Code = 0;
-                model.Msg = "11";
-                model.Sfc = $"sfc00{i+1}";
+                List<InboundMoreReturnDto> result = new List<InboundMoreReturnDto>();
+                for (var i = 0; i < dto.SfcList.Count; ++i)
+                {
+                    InboundMoreReturnDto model = new InboundMoreReturnDto();
+                    model.Code = 0;
+                    model.Msg = "11";
+                    model.Sfc = $"sfc00{i + 1}";
 
-                result.Add(model);
+                    result.Add(model);
+                }
+
+                return result;
             }
 
-            return result;
+            return await _qknyService.InboundMoreAsync(dto);
         }
 
         /// <summary>
@@ -741,19 +765,23 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             //TODO
             //1. 参考现有出站
-
-            List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
-            for (var i = 0; i < dto.SfcList.Count; ++i)
+            if(IS_DEBUG == true)
             {
-                OutboundMoreReturnDto model = new OutboundMoreReturnDto();
-                model.Code = 0;
-                model.Msg = "11";
-                model.Sfc = $"sfc00{i + 1}";
+                List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
+                for (var i = 0; i < dto.SfcList.Count; ++i)
+                {
+                    OutboundMoreReturnDto model = new OutboundMoreReturnDto();
+                    model.Code = 0;
+                    model.Msg = "11";
+                    model.Sfc = $"sfc00{i + 1}";
 
-                result.Add(model);
+                    result.Add(model);
+                }
+
+                return result;
             }
 
-            return result;
+            return await _qknyService.OutboundMoreAsync(dto);
         }
 
         /// <summary>

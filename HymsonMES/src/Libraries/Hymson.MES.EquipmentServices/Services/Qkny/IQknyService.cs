@@ -179,5 +179,33 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto);
+
+        /// <summary>
+        /// 进站
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task InboundAsync(InboundDto dto);
+
+        /// <summary>
+        /// 出站
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task OutboundAsync(OutboundDto dto);
+
+        /// <summary>
+        /// 进站多个029
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<List<InboundMoreReturnDto>> InboundMoreAsync(InboundMoreDto dto);
+
+        /// <summary>
+        /// 出站多个
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<List<OutboundMoreReturnDto>> OutboundMoreAsync(OutboundMoreDto dto);
     }
 }
