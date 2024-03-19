@@ -170,6 +170,9 @@ namespace Hymson.MES.Services.Services.Quality
             }
             #endregion
 
+            // 检验类型必须填写
+            if (saveDto.Details == null || !saveDto.Details.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES19423));
+
             List<QualIqcLevelDetailEntity> details = new();
             foreach (var item in saveDto.Details)
             {
@@ -279,6 +282,9 @@ namespace Hymson.MES.Services.Services.Quality
                     break;
             }
             #endregion
+
+            // 检验类型必须填写
+            if (saveDto.Details == null || !saveDto.Details.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES19423));
 
             List<QualIqcLevelDetailEntity> details = new();
             foreach (var item in saveDto.Details)

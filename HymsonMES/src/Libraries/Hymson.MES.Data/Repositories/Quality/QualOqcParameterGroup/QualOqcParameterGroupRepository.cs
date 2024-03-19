@@ -149,7 +149,7 @@ public partial class QualOqcParameterGroupRepository : BaseRepository, IQualOqcP
         var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
         sqlBuilder.Select("*");
         sqlBuilder.Where("IsDeleted = 0");
-        sqlBuilder.Where("SiteId = @SiteId");
+        //sqlBuilder.Where("SiteId = @SiteId");
         if (query.MaterialId.HasValue)
         {
             sqlBuilder.Where("MaterialId = @MaterialId");
@@ -162,8 +162,13 @@ public partial class QualOqcParameterGroupRepository : BaseRepository, IQualOqcP
         {
             sqlBuilder.Where("Status = @Status");
         }
+        if (query.Ids.Any())
+        {
+            sqlBuilder.Where("Id IN @Ids");
+        }
         //排序
         if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
+        sqlBuilder.AddParameters(query);
         using var conn = GetMESDbConnection();
         return await conn.QueryAsync<QualOqcParameterGroupEntity>(template.RawSql, query);
     }
@@ -180,8 +185,16 @@ public partial class QualOqcParameterGroupRepository : BaseRepository, IQualOqcP
         var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
         sqlBuilder.Select("*");
         sqlBuilder.OrderBy(string.IsNullOrWhiteSpace(pagedQuery.Sorting) ? "CreatedOn DESC" : pagedQuery.Sorting);
-        sqlBuilder.Where("IsDeleted = 0");
-        sqlBuilder.Where("SiteId = @SiteId");
+
+        WhereFill(sqlBuilder, new QualOqcParameterGroupToQuery
+        {
+            CodeLike = pagedQuery.CodeLike,
+            NameLike = pagedQuery.NameLike,
+            MaterialIds = pagedQuery.MaterialIds,
+            CustomerIds = pagedQuery.CustomerIds,
+            Status = pagedQuery.Status,
+            SiteId = pagedQuery.SiteId
+        });
 
         var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
         sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -228,8 +241,8 @@ public partial class QualOqcParameterGroupRepository
     const string InsertSql = "INSERT INTO qual_oqc_parameter_group(  `Id`, `SiteId`, `Code`, `Name`, `MaterialId`, `CustomerId`, `SampleQty`, `Version`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @MaterialId, @CustomerId, @SampleQty, @Version, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
     const string InsertsSql = "INSERT INTO qual_oqc_parameter_group(  `Id`, `SiteId`, `Code`, `Name`, `MaterialId`, `CustomerId`, `SampleQty`, `Version`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @MaterialId, @CustomerId, @SampleQty, @Version, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-    const string UpdateSql = "UPDATE qual_oqc_parameter_group SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaterialId = @MaterialId, CustomerId = @CustomerId, SampleQty = @SampleQty, Version = @Version, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-    const string UpdatesSql = "UPDATE qual_oqc_parameter_group SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaterialId = @MaterialId, CustomerId = @CustomerId, SampleQty = @SampleQty, Version = @Version, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+    const string UpdateSql = "UPDATE qual_oqc_parameter_group SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaterialId = @MaterialId, CustomerId = @CustomerId, Version = @Version, Status = @Status, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+    const string UpdatesSql = "UPDATE qual_oqc_parameter_group SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaterialId = @MaterialId, CustomerId = @CustomerId, Version = @Version, Status = @Status, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
     const string DeleteSql = "UPDATE qual_oqc_parameter_group SET IsDeleted = Id WHERE Id = @Id ";
     const string DeletesSql = "UPDATE qual_oqc_parameter_group SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -245,8 +258,6 @@ public partial class QualOqcParameterGroupRepository
 {
     private static SqlBuilder WhereFill(SqlBuilder sqlBuilder, QualOqcParameterGroupToQuery query)
     {
-
-
         if (query.Id.HasValue)
         {
             sqlBuilder.Where("Id = @Id");
@@ -265,7 +276,7 @@ public partial class QualOqcParameterGroupRepository
 
         if (!string.IsNullOrWhiteSpace(query.CodeLike))
         {
-            query.CodeLike = $"{query.CodeLike}%";
+            query.CodeLike = $"%{query.CodeLike}%";
             sqlBuilder.Where("Code Like @CodeLike");
         }
 
@@ -277,7 +288,7 @@ public partial class QualOqcParameterGroupRepository
 
         if (!string.IsNullOrWhiteSpace(query.NameLike))
         {
-            query.NameLike = $"{query.NameLike}%";
+            query.NameLike = $"%{query.NameLike}%";
             sqlBuilder.Where("Name Like @NameLike");
         }
 

@@ -43,12 +43,12 @@ namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
         }
 
         /// <summary>
-        /// IQC检验项目 ; 单条数据查询
-        /// 描述：
+        /// OQC检验项目 ; 单条数据查询
         /// </summary>
         /// <param name="query">查询条件</param>
         /// <returns></returns>
         [HttpGet("one")]
+        [LogDescription("OQC检验项目获取单个", BusinessType.OTHER)]
         public async Task<QualOqcParameterGroupOutputDto> GetOneAsync([FromQuery] QualOqcParameterGroupQueryDto query)
         {
             return await _qualOqcParameterGroupService.GetOneAsync(query);
@@ -61,6 +61,7 @@ namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("OQC检验项目新增", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] QualOqcParameterGroupDto createDto)
         {
              await _qualOqcParameterGroupService.CreateAsync(createDto);
@@ -73,22 +74,11 @@ namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("OQC检验项目更新", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] QualOqcParameterGroupUpdateDto updateDto)
         {
              await _qualOqcParameterGroupService.ModifyAsync(updateDto);
         }
-
-        /// <summary>
-        /// 删除（OQC检验参数组）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        //[HttpDelete]
-        //[Route("delete")]
-        //public async Task DeleteAsync([FromBody] long[] ids)
-        //{
-        //    await _qualOqcParameterGroupService.DeletesAsync(ids);
-        //}
 
         /// <summary>
         /// 查询详情（OQC检验参数组）
@@ -120,6 +110,7 @@ namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("page")]
+        [LogDescription("查询OQC分页检验项目", BusinessType.OTHER)]
         public async Task<PagedInfo<QualOqcParameterGroupOutputDto>> GetPagedAsync([FromQuery] QualOqcParameterGroupPagedQueryDto query)
         {
             return await _qualOqcParameterGroupService.GetPagedAsync(query);

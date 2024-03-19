@@ -1,3 +1,5 @@
+using Hymson.MES.Core.Enums.Quality;
+
 namespace Hymson.MES.Data.Repositories.Quality.Query
 {
     /// <summary>
@@ -10,9 +12,15 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// </summary>
         public long? OQCOrderId { get; set; }
 
+        ///// <summary>
+        ///// 站点Id
+        ///// </summary>
+        //public long? SiteId { get; set; }
+
+
         /// <summary>
-        /// 站点Id
+        /// 检验类型
         /// </summary>
-        public long? SiteId { get; set; }
+        public OQCInspectionTypeEnum? InspectionType { get; set; }
     }
 }

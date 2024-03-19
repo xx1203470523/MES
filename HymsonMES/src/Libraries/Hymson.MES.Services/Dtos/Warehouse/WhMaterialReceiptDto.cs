@@ -1,5 +1,4 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 
 namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
 {
@@ -58,6 +57,11 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
         /// 计划发货数量
         /// </summary>
         public decimal? PlanQty { get; set; }
+
+        /// <summary>
+        /// 实收数量
+        /// </summary>
+        public decimal? Qty { get; set; }
 
         /// <summary>
         /// 计划到货时间
@@ -178,7 +182,7 @@ namespace Hymson.MES.Services.Dtos.WHMaterialReceipt
         /// </summary>
         public long IsDeleted { get; set; }
 
- 
+
     }
 
 

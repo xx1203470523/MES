@@ -65,25 +65,21 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// </summary>
     public record QualOqcParameterGroupDto : BaseEntityDto
     {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
 
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 参数集编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 参数集名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 产品Id
@@ -96,24 +92,19 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long? CustomerId { get; set; }
 
         /// <summary>
-        /// 样本数量
-        /// </summary>
-        public int SampleQty { get; set; }
-
-        /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 参数组
@@ -241,7 +232,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// Id
         /// </summary>
-        //public long? Id { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// 参数组

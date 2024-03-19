@@ -41,11 +41,11 @@ namespace Hymson.MES.Api.Controllers.Quality
 
 
         /// <summary>
-        /// 删除检验单附件
+        /// 上传检验单附件
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpDelete("attachment/save")]
+        [HttpPost("attachment/save")]
         public async Task SaveAttachmentAsync([FromBody] QualIqcOrderSaveAttachmentDto requestDto)
         {
             await _qualIqcOrderService.SaveAttachmentAsync(requestDto);
@@ -56,7 +56,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="orderAnnexId"></param>
         /// <returns></returns>
-        [HttpDelete("attachment/delete")]
+        [HttpDelete("attachment/delete/{orderAnnexId}")]
         public async Task DeleteAttachmentByIdAsync(long orderAnnexId)
         {
             await _qualIqcOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
@@ -67,8 +67,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("delete")]
+        [HttpDelete("delete")]
         public async Task DeleteOrdersAsync([FromBody] long[] ids)
         {
             await _qualIqcOrderService.DeleteOrdersAsync(ids);
@@ -92,10 +91,10 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPut("operation")]
-        public async Task OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
+        [HttpPost("operation")]
+        public async Task<long> OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
         {
-            await _qualIqcOrderService.OperationOrderAsync(requestDto);
+            return await _qualIqcOrderService.OperationOrderAsync(requestDto);
         }
 
         /// <summary>
@@ -114,10 +113,10 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPut("complete")]
-        public async Task CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
+        [HttpPost("complete")]
+        public async Task<long> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
         {
-            await _qualIqcOrderService.CompleteOrderAsync(requestDto);
+            return await _qualIqcOrderService.CompleteOrderAsync(requestDto);
         }
 
         /// <summary>
@@ -125,10 +124,10 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPut("free")]
-        public async Task FreeOrderAsync(QualIqcOrderFreeDto requestDto)
+        [HttpPost("free")]
+        public async Task<long> FreeOrderAsync(QualIqcOrderFreeDto requestDto)
         {
-            await _qualIqcOrderService.FreeOrderAsync(requestDto);
+            return await _qualIqcOrderService.FreeOrderAsync(requestDto);
         }
 
         /// <summary>
@@ -136,10 +135,10 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPut("close")]
-        public async Task CloseOrderAsync(QualIqcOrderCloseDto requestDto)
+        [HttpPost("close")]
+        public async Task<long> CloseOrderAsync(QualIqcOrderCloseDto requestDto)
         {
-            await _qualIqcOrderService.CloseOrderAsync(requestDto);
+            return await _qualIqcOrderService.CloseOrderAsync(requestDto);
         }
 
 
@@ -160,7 +159,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPut("update")]
-        public async Task<int> UpdateOrderAsync(OrderParameterDetailDto requestDto)
+        public async Task<int> UpdateOrderAsync(OrderParameterDetailSaveDto requestDto)
         {
             return await _qualIqcOrderService.UpdateOrderAsync(requestDto);
         }

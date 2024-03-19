@@ -58,14 +58,14 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
 
 
         /// <summary>
-        /// wh_supplier id 供应商id
+        /// 客户Id
         /// </summary>
-        public long? SupplierId { get; set; }
+        public long? CustomerId { get; set; }
 
         /// <summary>
-        /// wh_supplier id 供应商id组
+        /// 客户Id组
         /// </summary>
-        public IEnumerable<long>? SupplierIds { get; set; }
+        public IEnumerable<long>? CustomerIds { get; set; }
 
 
         /// <summary>

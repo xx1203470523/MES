@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Microsoft.Extensions.Options;
 
@@ -50,6 +51,28 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
+        }
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(QualOqcOrderEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusSql, entity);
+        }
+
+        /// <summary>
+        /// 更新状态和是否合格
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAndIsQualifiedAsync(QualOqcOrderEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusAndIsQualifiedSql, entity);
         }
 
         /// <summary>
@@ -116,6 +139,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            if (query.ShipmentMaterialIds != null && query.ShipmentMaterialIds.Any())
+            {
+                sqlBuilder.Where("ShipmentMaterialId IN @ShipmentMaterialIds");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualOqcOrderEntity>(template.RawSql, query);
         }
@@ -134,6 +163,33 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrderLike)) {
+                pagedQuery.InspectionOrderLike = $"%{pagedQuery.InspectionOrderLike}%";
+                sqlBuilder.Where("InspectionOrder LIKE @InspectionOrderLike");
+            }
+
+            if (pagedQuery.Status != null) {
+                sqlBuilder.Where("Status = @Status");
+            }
+
+            if (pagedQuery.MaterialIds != null && pagedQuery.MaterialIds.Any()) {
+                sqlBuilder.Where("MaterialId IN @MaterialIds");
+            }
+
+            if (pagedQuery.CustomerIds != null && pagedQuery.CustomerIds.Any())
+            {
+                sqlBuilder.Where("CustomerId IN @CustomerIds");
+            }
+
+            if (pagedQuery.ShipmentMaterialIds != null && pagedQuery.ShipmentMaterialIds.Any()) {
+                sqlBuilder.Where("ShipmentMaterialId IN @ShipmentMaterialIds");
+            }
+
+            if (pagedQuery.IsQualified != null)
+            {
+                sqlBuilder.Where("IsQualified = @IsQualified");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -165,6 +221,8 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string UpdateSql = "UPDATE qual_oqc_order SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, GroupSnapshootId = @GroupSnapshootId, MaterialId = @MaterialId, CustomerId = @CustomerId, ShipmentMaterialId = @ShipmentMaterialId, ShipmentQty = @ShipmentQty, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_oqc_order SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, GroupSnapshootId = @GroupSnapshootId, MaterialId = @MaterialId, CustomerId = @CustomerId, ShipmentMaterialId = @ShipmentMaterialId, ShipmentQty = @ShipmentQty, AcceptanceLevel = @AcceptanceLevel, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateStatusSql = "UPDATE qual_oqc_order SET  Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateStatusAndIsQualifiedSql = "UPDATE qual_oqc_order SET  Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn,IsQualified = @IsQualified WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_oqc_order SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_oqc_order SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

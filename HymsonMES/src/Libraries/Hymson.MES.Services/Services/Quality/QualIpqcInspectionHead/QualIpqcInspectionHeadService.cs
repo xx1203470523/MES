@@ -23,6 +23,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -507,7 +508,7 @@ namespace Hymson.MES.Services.Services.Quality
         public async Task<PagedInfo<QualIpqcInspectionHeadSampleDto>> GetPagedSampleListAsync(QualIpqcInspectionHeadSamplePagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<QualIpqcInspectionHeadSamplePagedQuery>();
-
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _qualIpqcInspectionHeadSampleRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

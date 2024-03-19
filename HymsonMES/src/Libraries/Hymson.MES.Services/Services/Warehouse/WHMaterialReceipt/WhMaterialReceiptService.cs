@@ -134,6 +134,7 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
                         MaterialId = item.MaterialId ?? 0,
                         SupplierBatch = item.SupplierBatch,
                         PlanQty = item.PlanQty,
+                        Qty = item.Qty,
                         InternalBatch = item.InternalBatch,
                         PlanTime = item.PlanTime,
                         Remark = item.Remark,
@@ -227,16 +228,31 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
         public async Task<PagedInfo<WhMaterialReceiptDto>> GetPagedListAsync(WhMaterialReceiptPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<WhMaterialReceiptPagedQuery>();
+            if (!pagedQuery.SiteId.HasValue)
+            {
+                pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            }
 
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            // 转换供应商编码变为供应商ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode)
+                || !string.IsNullOrWhiteSpace(pagedQueryDto.SupplierName))
+            {
+                var whSupplierEntities = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    Code = pagedQueryDto.SupplierCode,
+                    Name = pagedQueryDto.SupplierName
+                });
+                if (whSupplierEntities != null && whSupplierEntities.Any()) pagedQuery.SupplierIds = whSupplierEntities.Select(s => s.Id);
+                else pagedQuery.SupplierIds = Array.Empty<long>();
+            }
 
+            // 查询数据
             var pagedInfo = await _whMaterialReceiptRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = await PrepareDtos(pagedInfo.Data);
             return new PagedInfo<WhMaterialReceiptDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-
-
         }
 
         /// <summary>
@@ -276,8 +292,8 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
                 {
                     dto.ReceiptNum = receiptEntity.ReceiptNum;
 
-                    // 供应商
-                    var supplierEntity = supplierDic[receiptEntity.SupplierId];
+                    // 供应商                    
+                    supplierDic.TryGetValue(receiptEntity.SupplierId, out var supplierEntity);
                     if (supplierEntity != null)
                     {
                         dto.SupplierCode = supplierEntity.Code;
@@ -286,16 +302,13 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
                 }
 
                 // 产品
-                //if (entity.MaterialId.HasValue)
-                //{
-                var materialEntity = materialDic[entity.MaterialId];
+                materialDic.TryGetValue(entity.MaterialId, out var materialEntity);
                 if (materialEntity != null)
                 {
                     dto.MaterialCode = materialEntity.MaterialCode;
                     dto.MaterialName = materialEntity.MaterialName;
                     dto.MaterialVersion = materialEntity.Version ?? "";
                 }
-                //}
 
                 dtos.Add(dto);
             }

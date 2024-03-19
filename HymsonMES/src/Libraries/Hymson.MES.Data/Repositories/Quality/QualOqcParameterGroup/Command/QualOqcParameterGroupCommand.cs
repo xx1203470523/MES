@@ -32,6 +32,11 @@ public class QualOqcParameterGroupCreateCommand : CreateCommandAbstraction
     public DisableOrEnableEnum? Status { get; set; }
 
     /// <summary>
+    /// 版本
+    /// </summary>
+    public string? Version { get; set; }
+
+    /// <summary>
     /// 备注
     /// </summary>
     public string? Remark { get; set; }
@@ -76,6 +81,11 @@ public class QualOqcParameterGroupUpdateCommand : UpdateCommandAbstraction
     /// 状态 0、已禁用 2、启用
     /// </summary>
     public DisableOrEnableEnum? Status { get; set; }
+
+    /// <summary>
+    /// 版本
+    /// </summary>
+    public string? Version { get; set; }
 
     /// <summary>
     /// 备注

@@ -116,6 +116,18 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            if (!string.IsNullOrWhiteSpace(query.ParameterCode)) {
+                sqlBuilder.Where("ParameterCode=@ParameterCode");
+            }
+
+            if (query.ParameterGroupId != null)
+            {
+                sqlBuilder.Where("ParameterGroupId=@ParameterGroupId");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualOqcParameterGroupDetailSnapshootEntity>(template.RawSql, query);
         }

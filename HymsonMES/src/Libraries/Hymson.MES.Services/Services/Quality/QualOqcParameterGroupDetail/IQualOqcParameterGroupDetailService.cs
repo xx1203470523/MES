@@ -1,26 +1,27 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.WhWareHouse;
+using Hymson.MES.Services.Dtos.Qual;
+using Hymson.MES.Services.Dtos.Quality;
 
-namespace Hymson.MES.Services.Services.WhWareHouse
+namespace Hymson.MES.Services.Services.Quality
 {
     /// <summary>
-    /// 服务接口（仓库）
+    /// 服务接口（OQC检验参数组明细）
     /// </summary>
-    public interface IWhWarehouseService
+    public interface IQualOqcParameterGroupDetailService
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(WhWarehouseSaveDto saveDto);
+        Task<int> CreateAsync(QualOqcParameterGroupDetailSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="modifyDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(WhWarehouseModifyDto modifyDto);
+        Task<int> ModifyAsync(QualOqcParameterGroupDetailSaveDto saveDto);
 
         /// <summary>
         /// 删除
@@ -41,20 +42,17 @@ namespace Hymson.MES.Services.Services.WhWareHouse
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<WhWarehouseDto?> QueryByIdAsync(long id);
+        Task<QualOqcParameterGroupDetailDto?> QueryByIdAsync(long id);
 
         /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<WhWarehouseDto>> GetPagedListAsync(WhWarehousePagedQueryDto pagedQueryDto);
+        Task<PagedInfo<QualOqcParameterGroupDetailDto>> GetPagedListAsync(QualOqcParameterGroupDetailPagedQueryDto pagedQueryDto);
 
-        /// <summary>
-        /// 获取分页List
-        /// </summary>
-        /// <param name="pagedQueryDto"></param>
-        /// <returns></returns>
-        Task<PagedInfo<WhWarehouseDto>> GetPagedListCopyAsync(WhWarehousePagedQueryDto pagedQueryDto);
+
+        Task<IEnumerable<QualOqcParameterGroupDetailOutputDto>> GetListAsync(QualOqcParameterGroupDetailQueryDto queryDto);
+
     }
 }

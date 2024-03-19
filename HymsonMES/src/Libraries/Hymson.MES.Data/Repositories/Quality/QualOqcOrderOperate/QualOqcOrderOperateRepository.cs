@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Microsoft.Extensions.Options;
+using System.Reflection.Emit;
 
 namespace Hymson.MES.Data.Repositories.Quality
 {
@@ -121,6 +122,15 @@ namespace Hymson.MES.Data.Repositories.Quality
 
             if (query.OQCOrderIds != null && query.OQCOrderIds.Any()) {
                 sqlBuilder.Where("OQCOrderId IN @OQCOrderIds");
+            }
+
+            if (query.OQCOrderId != null) {
+                sqlBuilder.Where("OQCOrderId = @OQCOrderId");
+            }
+
+            if (query.OperationTypes != null && query.OperationTypes.Any())
+            {
+                sqlBuilder.Where("OperateType IN @OperationTypes");
             }
 
             using var conn = GetMESDbConnection();

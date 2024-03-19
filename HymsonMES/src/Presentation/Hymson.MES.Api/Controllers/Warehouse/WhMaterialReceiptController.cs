@@ -95,7 +95,6 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         public async Task<PagedInfo<WhMaterialReceiptDto>> QueryPagedListAsync([FromQuery] WhMaterialReceiptPagedQueryDto pagedQueryDto)
         {
             return await _whMaterialReceiptService.GetPagedListAsync(pagedQueryDto);
- 
         }
 
         /// <summary>

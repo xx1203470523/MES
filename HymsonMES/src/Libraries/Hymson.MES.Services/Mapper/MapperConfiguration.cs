@@ -978,6 +978,33 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualOqcOrderPagedQueryDto, QualOqcOrderPagedQuery>();
             CreateMap<QualOqcOrderEntity, QualOqcOrderDto>();
             CreateMap<QualOqcParameterGroupDetailSnapshootEntity, CheckBarCodeOutDto>();
+            CreateMap<QualOqcOrderExecSaveDto, QualOqcOrderSampleQuery>();
+            CreateMap<QualOqcParameterGroupDetailSnapshootEntity, OqcOrderParameterDetailDto>();
+            CreateMap<OqcOrderParameterDetailPagedQueryDto, QualOqcOrderSampleDetailPagedQuery>();
+            CreateMap<QualOqcOrderTypeEntity, QualOqcOrderTypeDto>();
+            CreateMap<QualOqcOrderTypeEntity, SampleQtyAndCheckedQtyQueryOutDto>();
+
+            #region OQC检验项目
+            //查询对象
+            CreateMap<QualOqcParameterGroupQueryDto, QualOqcParameterGroupToQuery>();
+            CreateMap<QualOqcParameterGroupDetailQueryDto, QualOqcParameterGroupDetailQuery>();
+            //创建对象
+            CreateMap<QualOqcParameterGroupDto, QualOqcParameterGroupCreateCommand>();
+            CreateMap<QualOqcParameterGroupDetailDto, QualOqcParameterGroupDetailCreateCommand>();
+            //更新对象
+            CreateMap<QualOqcParameterGroupUpdateDto, QualOqcParameterGroupUpdateCommand>();
+            CreateMap<QualOqcParameterGroupDetailOutputDto, QualOqcParameterGroupDetailCreateCommand>();
+            
+
+
+            //实体对象转换为数据传输对象（页面输出)
+
+            CreateMap<QualOqcParameterGroupEntity, QualOqcParameterGroupOutputDto>();
+            CreateMap<QualOqcParameterGroupDetailEntity, QualOqcParameterGroupDetailOutputDto>();
+            #endregion
+
+
+
 
             #endregion
         }
