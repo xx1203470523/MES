@@ -225,6 +225,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.LeftJoin("inte_work_center_resource_relation  IWCRR ON IWCRR.IsDeleted = 0 AND  IWCRR.ResourceId = proc_resource.Id");
             sqlBuilder.Where("proc_resource.IsDeleted=0");
             sqlBuilder.Where("proc_resource.Status=1");
+            sqlBuilder.Where("proc_resource.ResTypeId=@ResTypeId");
             if (string.IsNullOrEmpty(query.Sorting))
             {
                 sqlBuilder.OrderBy("proc_resource.UpdatedOn DESC");

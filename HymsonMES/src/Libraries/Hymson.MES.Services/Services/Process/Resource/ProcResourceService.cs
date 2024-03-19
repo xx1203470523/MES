@@ -238,10 +238,10 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcResourceDto>> GetPageListBylineIdAndProcProcedureIdAsync(ProcResourcePagedlineIdAndProcProcedureIdDto query)
         {
             var resourcePagedQuery = query.ToQuery<ProcResourcePagedlineIdAndProcProcedureIdQuery>();
-            //if(!query.WorkCenterLineId.HasValue || !query.ResTypeId.HasValue)
-            //{
-            //    return new PagedInfo<ProcResourceDto>(new List<ProcResourceDto>(), query.PageIndex, query.PageSize, 0);
-            //}
+            if (!query.WorkCenterLineId.HasValue || !query.ResTypeId.HasValue)
+            {
+                return new PagedInfo<ProcResourceDto>(new List<ProcResourceDto>(), query.PageIndex, query.PageSize, 0);
+            }
             var workCenters = await _inteWorkCenterRepository.GetInteWorkCenterRelationAsync(query.WorkCenterLineId ?? 0);
             if (workCenters != null && workCenters.Any())
             {
