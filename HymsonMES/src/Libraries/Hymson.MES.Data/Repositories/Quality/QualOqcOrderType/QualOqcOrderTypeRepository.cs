@@ -194,6 +194,10 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("OQCOrderId = @OQCOrderId");
             }
 
+            if (query.InspectionType != null) {
+                sqlBuilder.Where("InspectionType = @InspectionType");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<QualOqcOrderTypeEntity>(template.RawSql, query);
         }
