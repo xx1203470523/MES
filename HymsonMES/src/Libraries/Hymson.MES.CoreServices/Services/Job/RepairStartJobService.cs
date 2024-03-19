@@ -322,6 +322,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 sfcProduceEntity.Status = SfcStatusEnum.Activity;
                 sfcProduceEntity.ProcedureId = commonBo.ProcedureId;
                 sfcProduceEntity.ResourceId = commonBo.ResourceId;
+                sfcProduceEntity.EquipmentId = commonBo.EquipmentId;
                 sfcProduceEntity.UpdatedBy = commonBo.UserName;
                 sfcProduceEntity.UpdatedOn = commonBo.Time;
                 responseBo.SFCProduceEntitiy = sfcProduceEntity;
@@ -339,10 +340,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ProductBOMId = sfcProduceEntity.ProductBOMId,
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
+                    EquipmentId = sfcProduceEntity.EquipmentId,
                     SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                     Qty = sfcProduceEntity.Qty,
                     VehicleCode = requestBo.VehicleCode,
-                    EquipmentId = commonBo.EquipmentId,
                     SiteId = commonBo.SiteId,
                     CreatedBy = commonBo.UserName,
                     CreatedOn = commonBo.Time,
@@ -366,6 +367,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Id = sfcProduceEntity.Id,
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
+                    EquipmentId = sfcProduceEntity.EquipmentId,
                     Status = sfcProduceEntity.Status,
                     CurrentStatus = currentStatus,
                     RepeatedCount = sfcProduceEntity.RepeatedCount,
