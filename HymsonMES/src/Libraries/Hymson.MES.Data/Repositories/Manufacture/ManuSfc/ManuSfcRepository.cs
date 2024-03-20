@@ -81,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlCopyTemplate);
             sqlBuilder.LeftJoin("manu_sfc_info MSI ON MSI.SfcId = MS.Id AND MSI.IsUsed = 1");
             sqlBuilder.LeftJoin("plan_work_order PWO ON PWO.Id = MSI.WorkOrderId");
             sqlBuilder.LeftJoin("proc_material PM ON PM.Id = MSI.ProductId");
@@ -728,6 +728,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM manu_sfc MS /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY MS.CreatedOn DESC  LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_sfc MS /**innerjoin**/ /**leftjoin**/ /**where**/ ";
+        const string GetPagedInfoCountSqlCopyTemplate = @"SELECT COUNT(*) FROM manu_sfc MS/**innerjoin**/ /**where**/AND EXISTS ( SELECT 1 FROM manu_sfc_info MSI JOIN plan_work_order PWO ON PWO.Id = MSI.WorkOrderId JOIN proc_material PM ON PM.Id = MSI.ProductId WHERE MSI.SfcId = MS.Id AND MSI.IsUsed = 1) ";
 
         const string GetManuSfcInfoEntitiesSqlTemplate = @"SELECT 
                                             sfc.Id ,sfc.SiteId ,sfc.SFC ,sfc.Qty ,sfc.Status ,
