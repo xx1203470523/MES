@@ -172,6 +172,11 @@ namespace Hymson.MES.Core.Constants
         /// </summary>
         public const string MES45090 = "设备无产出条码";
 
+        /// <summary>
+        /// 条码是NG状态
+        /// </summary>
+        public const string MES45091 = "条码是NG状态";
+
         #endregion
 
         #region 条码生成
@@ -236,9 +241,14 @@ namespace Hymson.MES.Core.Constants
         public const string MES45119 = "载具装载数量加上这次已超过最大值";
 
         /// <summary>
-        /// 载具中条码和系统中不匹配，部分条码没有解绑"
+        /// 载具中条码和系统中不匹配，部分条码没有解绑
         /// </summary>
         public const string MES45120 = "载具中条码和系统中不匹配，部分条码没有解绑";
+
+        /// <summary>
+        /// 托盘NG中上传的不合格代码在系统中不存在
+        /// </summary>
+        public const string MES45121 = "托盘NG中上传的不合格代码在系统中都不存在";
 
         #endregion
     }

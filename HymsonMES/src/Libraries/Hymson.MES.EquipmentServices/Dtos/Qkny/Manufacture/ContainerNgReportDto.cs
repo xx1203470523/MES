@@ -20,6 +20,22 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// <summary>
         /// NG电芯条码
         /// </summary>
-        public List<string> NgSfcList { get; set; } = new List<string>();
+        public List<ContainerNgSfcDto> NgSfcList { get; set; } = new List<ContainerNgSfcDto>();
+    }
+
+    /// <summary>
+    /// NG条码信息
+    /// </summary>
+    public class ContainerNgSfcDto
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public string NgCode { get; set; } = string.Empty;
     }
 }

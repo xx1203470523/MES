@@ -244,5 +244,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task UnBindContainerAsync(UnBindContainerDto dto);
+
+        /// <summary>
+        /// 托盘NG电芯上报039
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task ContainerNgReportAsync(ContainerNgReportDto dto);
     }
 }

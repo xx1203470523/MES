@@ -1424,7 +1424,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             ManuSfcProduceBySfcQuery query = new ManuSfcProduceBySfcQuery();
             query.SiteId = equResModel.SiteId;
             query.Sfc = dto.Sfc;
-            await _manuSfcProduceService.GetBySFCAsync(query);
+            var sfcEntity = await _manuSfcProduceService.GetBySFCAsync(query);
+            //校验电芯是否合格
+            if(sfcEntity.Status == SfcStatusEnum.Scrapping) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45091));
+            }
         }
 
         /// <summary>
@@ -1469,6 +1474,27 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             //1. 校验电芯是否在托盘中
             //2. inte_vehicle_freight_stack 删除绑定数据
             //3. 添加 inte_vehicle_freight_record 解绑记录
+        }
+
+        /// <summary>
+        /// 托盘NG电芯上报039
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ContainerNgReportAsync(ContainerNgReportDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+
+            InteVehicleNgSfcDto ngDto = new InteVehicleNgSfcDto();
+            ngDto.ContainerCode = dto.ContainerCode;
+            foreach(var item in dto.NgSfcList)
+            {
+                ngDto.NgSfcList.Add(new InteVehicleSfcDetailDto { NgCode = item.NgCode, Sfc = item.Sfc });
+            }
+            ngDto.ResourceId = equResModel.ResId;
+            ngDto.OperationId = equResModel.ProcedureId;
+            await _inteVehicleService.ContainerNgReportAsync(ngDto);
         }
 
         /// <summary>

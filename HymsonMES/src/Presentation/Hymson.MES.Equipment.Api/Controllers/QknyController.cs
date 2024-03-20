@@ -974,6 +974,15 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task ContainerNgReportAsync(ContainerNgReportDto dto)
         {
             //TODO
+            //1. 确认设备能否给出不合格代码及发现不良工序
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ContainerNgReportAsync(dto);
+
+            //TODO
             //1. inte_vehicle_freight_stack 删除绑定数据
             //2. 添加冗余表 inte_vehicle_freight_ng_record，NG解绑记录
             //3. 添加 inte_vehicle_freight_record 解绑记录
@@ -989,7 +998,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("InboundInContainer")]
         [LogDescription("托盘进站(容器进站)040", BusinessType.OTHER, "InboundInContainer040", ReceiverTypeEnum.MES)]
         public async Task InboundInContainerAsync(InboundInContainerDto dto)
-        {
+        { 
+            //托盘进站如果条码中电芯存在NG，需要运行进站
+
             //TODO
             //1. 参考 InBoundCarrierAsync 进站
         }

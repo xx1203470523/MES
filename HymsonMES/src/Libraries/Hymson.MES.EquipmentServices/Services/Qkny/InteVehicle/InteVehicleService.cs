@@ -16,6 +16,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 using Hymson.MES.Data.Repositories.Integrated.InteVehicleFreight.Command;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.Data.Repositories.Quality;
+using Microsoft.IdentityModel.Tokens;
+using Google.Protobuf.WellKnownTypes;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
 {
@@ -55,6 +61,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
         private readonly IInteVehicleFreightRecordRepository _inteVehicleFreightRecordRepository;
 
         /// <summary>
+        /// 仓储接口（产品不良录入）
+        /// </summary>
+        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+
+        /// <summary>
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public InteVehicleService(IInteVehicleRepository inteVehicleRepository,
@@ -62,7 +78,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
             IInteVehicleTypeRepository inteVehicleTypeRepository,
             IInteVehicleFreightRepository inteVehicleFreightRepository,
-            IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository)
+            IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository,
+            IManuProductBadRecordRepository manuProductBadRecordRepository,
+            IMasterDataService masterDataService)
         {
             _inteVehicleRepository = inteVehicleRepository;
             _inteVehicleRepository = inteVehicleRepository;
@@ -71,6 +89,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             _inteVehicleTypeRepository = inteVehicleTypeRepository;
             _inteVehicleFreightRepository = inteVehicleFreightRepository;
             _inteVehicleFreightRecordRepository = inteVehicleFreightRecordRepository;
+            _manuProductBadRecordRepository = manuProductBadRecordRepository;
+            _masterDataService = masterDataService;
         }
 
         /// <summary>
@@ -273,6 +293,84 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             trans.Complete();
 
             return delNum;
+        }
+
+        /// <summary>
+        /// 托盘NG电芯上报
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task ContainerNgReportAsync(InteVehicleNgSfcDto param)
+        {
+            //获取托盘
+            InteVehicleCodeQuery vehicleQuery = new InteVehicleCodeQuery();
+            vehicleQuery.SiteId = param.SiteId;
+            vehicleQuery.Code = param.ContainerCode;
+            var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(vehicleQuery);
+            if (inteVehicleEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45112));
+            }
+
+            List<string> ngCodeList = param.NgSfcList.Select(m => m.NgCode).Distinct().ToList();
+            QualUnqualifiedCodeByCodesQuery ngCodeQuery = new QualUnqualifiedCodeByCodesQuery();
+            ngCodeQuery.SiteId = param.SiteId;
+            ngCodeQuery.Codes = ngCodeList;
+            var ngEntityList = await _masterDataService.GetUnqualifiedEntitiesByCodesAsync(ngCodeQuery);
+            if(ngEntityList.IsNullOrEmpty() == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45121));
+            }
+            if(ngEntityList.Count() != ngCodeList.Count())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45121));
+            }
+
+            //数据组装
+            DateTime curDate = HymsonClock.Now();
+            List<UpdateVehicleFreightStackCommand> updateList = new List<UpdateVehicleFreightStackCommand>();
+            List<InteVehicleFreightRecordEntity> recordList = new List<InteVehicleFreightRecordEntity>();
+            List<ManuProductBadRecordEntity> badList = new List<ManuProductBadRecordEntity>();
+            foreach (var item in param.NgSfcList)
+            {
+                UpdateVehicleFreightStackCommand updateModel = new UpdateVehicleFreightStackCommand();
+                updateModel.BarCode = item.Sfc;
+                updateModel.VehicleId = inteVehicleEntity.Id;
+                updateModel.UpdatedOn = curDate;
+                updateModel.UpdatedBy = param.UserName;
+                updateList.Add(updateModel);
+
+                InteVehicleFreightRecordEntity recordEntity = new InteVehicleFreightRecordEntity();
+                recordEntity.Id = IdGenProvider.Instance.CreateId();
+                recordEntity.BarCode = item.Sfc;
+                recordEntity.LocationId = 0;
+                recordEntity.SiteId = param.SiteId;
+                recordEntity.CreatedBy = param.UserName;
+                recordEntity.UpdatedBy = param.UserName;
+                recordEntity.CreatedOn = curDate;
+                recordEntity.UpdatedOn = curDate;
+                recordEntity.VehicleId = inteVehicleEntity.Id;
+                recordEntity.OperateType = (int)VehicleOperationEnum.NgUnbind;
+                recordList.Add(recordEntity);
+
+                ManuProductBadRecordEntity badModel = new ManuProductBadRecordEntity();
+                badModel.SiteId = param.SiteId;
+                badModel.CreatedBy = param.UserName;
+                badModel.CreatedOn = curDate;
+                badModel.Id = IdGenProvider.Instance.CreateId();
+                badModel.FoundBadOperationId = param.OperationId;
+                badModel.FoundBadResourceId = param.ResourceId;
+                badModel.Status = Core.Enums.Manufacture.ProductBadRecordStatusEnum.Open;
+                badModel.Source = Core.Enums.Manufacture.ProductBadRecordSourceEnum.EquipmentReBad;
+                badModel.Qty = 1;
+            }
+
+            //数据库操作
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            await _inteVehiceFreightStackRepository.DeleteByVehiceBarCode(updateList);
+            await _inteVehicleFreightRecordRepository.InsertsAsync(recordList);
+            await _manuProductBadRecordRepository.InsertRangeAsync(badList);
+            trans.Complete();
         }
 
     }
