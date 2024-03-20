@@ -765,6 +765,7 @@ namespace Hymson.MES.Services.Services.Quality
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = entity.SiteId,
                         IQCOrderId = entity.IQCOrderId,
+                        IQCOrderSampleDetailId = entity.Id,
                         AnnexId = attachmentId,
                         CreatedBy = updatedBy,
                         CreatedOn = updatedOn,
