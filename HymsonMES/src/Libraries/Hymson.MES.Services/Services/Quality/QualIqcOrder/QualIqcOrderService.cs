@@ -357,6 +357,7 @@ namespace Hymson.MES.Services.Services.Quality
                     IQCInspectionDetailSnapshotId = item.Id,
                     InspectionValue = item.InspectionValue ?? "",
                     IsQualified = item.IsQualified,
+                    Remark = item.Remark,
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
                     UpdatedBy = updatedBy,
@@ -1265,6 +1266,7 @@ namespace Hymson.MES.Services.Services.Quality
                 dto.InspectionValue = sampleDetailEntity.InspectionValue;
                 dto.IsQualified = sampleDetailEntity.IsQualified;
                 dto.Remark = sampleDetailEntity.Remark;
+                dto.Scale = snapshotDetailEntity.Scale;
 
                 // 填充条码
                 var sampleEntity = sampleEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCOrderSampleId);

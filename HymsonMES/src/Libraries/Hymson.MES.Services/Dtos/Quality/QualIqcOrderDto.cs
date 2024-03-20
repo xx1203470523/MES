@@ -133,6 +133,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public TrueOrFalseEnum IsQualified { get; set; }
 
         /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
         /// 参数附件
         /// </summary>
         public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
@@ -487,7 +492,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 小数位数
         /// </summary>
-        public float Scale { get; set; }
+        public int? Scale { get; set; }
 
         /// <summary>
         /// 规格下限
