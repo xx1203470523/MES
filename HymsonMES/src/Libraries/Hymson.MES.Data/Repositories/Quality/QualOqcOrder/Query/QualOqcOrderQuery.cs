@@ -9,5 +9,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 出货单明细Ids
         /// </summary>
         public IEnumerable<long>? ShipmentMaterialIds { get; set; }
+
+        /// <summary>
+        /// SiteId
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

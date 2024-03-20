@@ -212,6 +212,11 @@ namespace Hymson.MES.Data.Repositories.WhShipment
                 query.ShipmentNum = $"%{query.ShipmentNum}%";
                 sqlBuilder.Where("T.ShipmentNum LIKE @ShipmentNum");
             }
+
+            if (query.Ids != null && query.Ids.Any()) {
+                sqlBuilder.Where("T.Id IN @Ids");
+            }
+
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
@@ -252,6 +257,10 @@ namespace Hymson.MES.Data.Repositories.WhShipment
             if (pagedQuery.PlanShipmentTimeEnd.HasValue)
             {
                 sqlBuilder.Where("PlanShipmentTime <= @PlanShipmentTimeEnd");
+            }
+
+            if (pagedQuery.NotInIds != null && pagedQuery.NotInIds.Any()) {
+                sqlBuilder.Where("Id NOT IN @NotInIds");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;

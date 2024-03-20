@@ -1,7 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
-using MimeKit.Encodings;
 
 namespace Hymson.MES.Data.Repositories.Quality.Query
 {
@@ -10,6 +9,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualOqcOrderPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// Ids
+        /// </summary>
+        public IEnumerable<long>? Ids { get; set; }
+
         /// <summary>
         /// 站点Id
         /// </summary>
