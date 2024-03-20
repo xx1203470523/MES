@@ -1161,7 +1161,7 @@ namespace Hymson.MES.Services.Services.Quality
                 }
 
                 // 检验人
-                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperationType == OrderOperateTypeEnum.Complete);
+                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperationType == OrderOperateTypeEnum.Start);
                 if (inspectionEntity != null)
                 {
                     dto.InspectionBy = inspectionEntity.CreatedBy;
