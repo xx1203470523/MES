@@ -777,7 +777,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             }
 
             var processRouteDetailNodeEntities = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(planWorkOrderEntity.ProcessRouteId);
-            var processRouteDetailNodeEntity = processRouteDetailNodeEntities.FirstOrDefault(x => x.ProcedureId == param.ProcedureId);
+            var processRouteDetailNodeEntity = processRouteDetailNodeEntities.FirstOrDefault(x => x.ProcedureId == procProcedureEntity.Id);
             if (processRouteDetailNodeEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16509));
