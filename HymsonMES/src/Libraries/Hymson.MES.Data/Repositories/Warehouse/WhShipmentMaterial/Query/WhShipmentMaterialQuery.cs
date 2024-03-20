@@ -14,5 +14,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse.Query
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// Ids
+        /// </summary>
+        public IEnumerable<long>? Ids { get; set; }
     }
 }
