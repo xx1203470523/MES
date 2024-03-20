@@ -489,6 +489,7 @@
         public const string MES12124 = "工作中心类型不合法，请检查.";
         public const string MES12125 = "对应工作中心数据不存在.";
         public const string MES12126 = "存在已被关联产线,不允许重复关联!";
+        public const string MES12127 = "新建状态的产线不能用于工作中心!";
         #endregion
 
         #region 编码规则 12400
