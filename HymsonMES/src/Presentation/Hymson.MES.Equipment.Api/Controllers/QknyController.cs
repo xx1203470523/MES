@@ -32,7 +32,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 构造函数
         /// </summary>
-        public QknyController(IEquEquipmentRepository equEquipmentRepository, IQknyService qknyService)
+        public QknyController(IQknyService qknyService)
         {
             _qknyService = qknyService;
         }
@@ -858,6 +858,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("补液数据上报034", BusinessType.OTHER, "FillingData034", ReceiverTypeEnum.MES)]
         public async Task FillingDataAsync(FillingDataDto dto)
         {
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.FillingDataAsync(dto);
+
             //TODO
             //1. 新增表进行记录
         }
@@ -872,6 +879,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("空托盘校验035", BusinessType.OTHER, "EmptyContainerCheck035", ReceiverTypeEnum.MES)]
         public async Task EmptyContainerCheckAsync(EmptyContainerCheckDto dto)
         {
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.EmptyContainerCheckAsync(dto);
+
             //TODO
             //2. 校验托盘是否存在系统中（待确认）
             //3. 托盘(载具)表 inte_vehicle_freight_stack 是否存在数据
@@ -887,6 +901,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("单电芯校验036", BusinessType.OTHER, "ContainerSfcCheck036", ReceiverTypeEnum.MES)]
         public async Task ContainerSfcCheckAsync(ContainerSfcCheckDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ContainerSfcCheckAsync(dto);
+
             //TODO
             //1. 校验电芯是否合格
             //2. 校验电芯是否在托盘中 inte_vehicle_freight_stack
@@ -904,6 +925,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘电芯绑定(在制品容器)037", BusinessType.OTHER, "BindContainer037", ReceiverTypeEnum.MES)]
         public async Task BindContainerAsync(BindContainerDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.BindContainerAsync(dto);
+
             //TODO
             //1. 校验托盘数量
             //2. 校验电芯是否已经做校验 inte_vehicle_check_record
@@ -922,6 +950,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘电芯解绑(在制品容器)038", BusinessType.OTHER, "UnBindContainer038", ReceiverTypeEnum.MES)]
         public async Task UnBindContainerAsync(UnBindContainerDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.UnBindContainerAsync(dto);
+
             //TODO
             //1. 校验电芯是否在托盘中
             //2. inte_vehicle_freight_stack 删除绑定数据
