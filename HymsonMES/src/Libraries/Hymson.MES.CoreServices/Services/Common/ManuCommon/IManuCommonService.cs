@@ -60,5 +60,18 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <returns></returns>
         /// <exception cref="ValidationException">状态(在 无效 删除 报废 锁定) 产品序列码状态为【xxxx】，不允许操作  包装验证  产品序列码已经被包装，不允许操作 </exception>
         Task<IEnumerable<ManuSfcBo>> GetManuSfcInfos(MultiSFCBo param, ILocalizationService localizationService);
+
+        #region 顷刻
+
+        /// <summary>
+        /// 获取载具里面的条码
+        /// 为空不异常
+        /// 用于空托盘校验接口
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        Task<List<string>> GetSfcListByVehicleCodesAsync(VehicleSFCRequestBo requestBo);
+
+        #endregion
     }
 }

@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteVehicleFreight.Command;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -218,6 +219,31 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
         #endregion
 
+        #region 顷刻
+
+        /// <summary>
+        /// 查询已绑定条码列表
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteVehicleFreightStackEntity>> GetBySfcListAsync(InteVehiceSfcListQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteVehicleFreightStackEntity>(GetBySfcListSql, query);
+        }
+
+        /// <summary>
+        /// 根据托盘id和条码进行删除
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByVehiceBarCode(List<UpdateVehicleFreightStackCommand> commandList)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByVehicleIdBarCodeSql, commandList);
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -243,6 +269,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdSql = @"SELECT * FROM `inte_vehicle_freight_stack`  WHERE Id = @Id ";
         const string GetBySFCSql = @"SELECT * FROM `inte_vehicle_freight_stack`  WHERE SiteId=@SiteId and BarCode = @BarCode ";
         const string GetByIdsSql = @"SELECT * FROM `inte_vehicle_freight_stack`  WHERE Id IN @Ids ";
+        #endregion
+
+        #region 顷刻
+
+        /// <summary>
+        /// 获取已绑定条码列表
+        /// </summary>
+        const string GetBySfcListSql = @"SELECT * FROM `inte_vehicle_freight_stack`  WHERE SiteId=@SiteId and BarCode IN @SfcList ";
+
+        /// <summary>
+        /// 根据载具id和电芯条码进行删除
+        /// </summary>
+        const string DeleteByVehicleIdBarCodeSql = "DELETE from `inte_vehicle_freight_stack`  WHERE VehicleId = @VehicleId AND BarCode = @BarCode";
+
         #endregion
     }
 }

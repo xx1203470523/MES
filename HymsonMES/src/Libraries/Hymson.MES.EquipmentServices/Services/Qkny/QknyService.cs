@@ -10,6 +10,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Qkny;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Services.Qkny;
@@ -17,6 +18,7 @@ using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.LoadPoint.View;
@@ -28,6 +30,7 @@ using Hymson.MES.EquipmentServices.Dtos.Manufacture.ProductionProcess;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Qkny.Formula;
+using Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle;
 using Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint;
 using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
 using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
@@ -45,6 +48,7 @@ using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Dtos.ManuFeedingCompletedZjyjRecord;
 using Hymson.MES.Services.Dtos.ManuFeedingNoProductionRecord;
 using Hymson.MES.Services.Dtos.ManuFeedingTransferRecord;
+using Hymson.MES.Services.Dtos.ManuFillingDataRecord;
 using Hymson.MES.Services.Services.AgvTaskRecord;
 using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Services.EquEquipmentAlarm;
@@ -57,6 +61,7 @@ using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Services.ManuFeedingCompletedZjyjRecord;
 using Hymson.MES.Services.Services.ManuFeedingNoProductionRecord;
 using Hymson.MES.Services.Services.ManuFeedingTransferRecord;
+using Hymson.MES.Services.Services.ManuFillingDataRecord;
 using Hymson.MessagePush.Helper;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -65,6 +70,7 @@ using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
+using Org.BouncyCastle.Pqc.Crypto.Lms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -215,6 +221,21 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuFeedingNoProductionRecordService _manuFeedingNoProductionRecordService;
 
         /// <summary>
+        /// 补液数据上报
+        /// </summary>
+        private readonly IManuFillingDataRecordService _manuFillingDataRecordService;
+
+        /// <summary>
+        /// 载具
+        /// </summary>
+        private readonly IInteVehicleService _inteVehicleService;
+
+        /// <summary>
+        /// 通用接口
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -243,6 +264,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuFeedingCompletedZjyjRecordService manuFeedingCompletedZjyjRecordService,
             IManuFeedingTransferRecordService manuFeedingTransferRecordService,
             IManuFeedingNoProductionRecordService manuFeedingNoProductionRecordService,
+            IManuFillingDataRecordService manuFillingDataRecordService,
+            IInteVehicleService inteVehicleService,
+            IManuCommonService manuCommonService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -271,6 +295,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuFeedingCompletedZjyjRecordService = manuFeedingCompletedZjyjRecordService;
             _manuFeedingTransferRecordService = manuFeedingTransferRecordService;
             _manuFeedingNoProductionRecordService = manuFeedingNoProductionRecordService;
+            _manuFillingDataRecordService = manuFillingDataRecordService;
+            _inteVehicleService = inteVehicleService;
+            _manuCommonService = manuCommonService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -1005,7 +1032,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             var sfcObjList = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(query, null);
             List<string> sfcList = sfcObjList.Select(m => m.SFC).ToList();
             inBo.SFCs = sfcList.ToArray();
-            //var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
+            var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
             trans.Complete();
 
             return sfcList;
@@ -1320,6 +1347,128 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             }
 
             return resultList;
+        }
+
+        /// <summary>
+        /// 补液数据上报034
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task FillingDataAsync(FillingDataDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 构造数据
+            ManuFillingDataRecordSaveDto saveDto = new ManuFillingDataRecordSaveDto();
+            saveDto.Sfc = dto.Sfc;
+            saveDto.EquipmentId = equResModel.EquipmentId;
+            saveDto.InTime = dto.InTime;
+            saveDto.OutTime = dto.OutTime;
+            saveDto.BeforeWeight = dto.BeforeWeight;
+            saveDto.AfterWeight = dto.AfterWeight;
+            saveDto.ElWeight = dto.ElWeight;
+            saveDto.AddEl = dto.AddEl;
+            saveDto.TotalEl = dto.TotalEl;
+            saveDto.ManualEl = dto.ManualEl;
+            saveDto.FinalEl = dto.FinalEl;
+            saveDto.IsOk = dto.IsOk;
+            saveDto.CreatedBy = equResModel.EquipmentCode;
+            saveDto.CreatedOn = HymsonClock.Now();
+            saveDto.UpdatedBy = saveDto.CreatedBy;
+            saveDto.UpdatedOn = saveDto.CreatedOn;
+            await _manuFillingDataRecordService.AddAsync(saveDto);
+
+            //TODO
+            //1. 新增表进行记录
+        }
+
+        /// <summary>
+        /// 空托盘校验035
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task EmptyContainerCheckAsync(EmptyContainerCheckDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 托盘校验
+            //InteVehicleCodeQuery query = new InteVehicleCodeQuery();
+            //query.Code = dto.ContainerCode;
+            //query.SiteId = equResModel.SiteId;
+            //await _inteVehicleService.GetByCodeAsync(query);
+            //3. 校验托盘是否为空
+            VehicleSFCRequestBo vehicleQuery = new VehicleSFCRequestBo();
+            vehicleQuery.SiteId = equResModel.SiteId;
+            vehicleQuery.VehicleCodes = new List<string>() { dto.ContainerCode };
+            var vehicleList = await _manuCommonService.GetSfcListByVehicleCodesAsync(vehicleQuery);
+            if(vehicleList.IsNullOrEmpty() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45111));
+            }
+
+            //TODO
+            //2. 校验托盘是否存在系统中（待确认）
+            //3. 托盘(载具)表 inte_vehicle_freight_stack 是否存在数据
+        }
+
+        /// <summary>
+        /// 单电芯校验036
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ContainerSfcCheckAsync(ContainerSfcCheckDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 校验电芯是否存在
+            ManuSfcProduceBySfcQuery query = new ManuSfcProduceBySfcQuery();
+            query.SiteId = equResModel.SiteId;
+            query.Sfc = dto.Sfc;
+            await _manuSfcProduceService.GetBySFCAsync(query);
+        }
+
+        /// <summary>
+        /// 托盘电芯绑定(在制品容器)037
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task BindContainerAsync(BindContainerDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 托盘电芯绑定
+            InteVehicleBindDto bindDto = new InteVehicleBindDto();
+            bindDto.ContainerCode = dto.ContainerCode;
+            foreach(var item in dto.ContainerSfcList)
+            {
+                bindDto.SfcList.Add(new InteVehicleSfcDto { Sfc = item.Sfc, Location = item.Location });
+            }
+            bindDto.SiteId = equResModel.SiteId;
+            bindDto.UserName = dto.EquipmentCode;
+            await _inteVehicleService.VehicleBindOperationAsync(bindDto);
+        }
+
+        /// <summary>
+        /// 托盘电芯解绑(在制品容器)038
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task UnBindContainerAsync(UnBindContainerDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 托盘电芯绑定
+            InteVehicleUnBindDto bindDto = new InteVehicleUnBindDto();
+            bindDto.ContainerCode = dto.ContainCode;
+            bindDto.SfcList = dto.SfcList;
+            bindDto.SiteId = equResModel.SiteId;
+            bindDto.UserName = dto.EquipmentCode;
+            await _inteVehicleService.VehicleUnBindOperationAsync(bindDto);
+
+            //TODO
+            //1. 校验电芯是否在托盘中
+            //2. inte_vehicle_freight_stack 删除绑定数据
+            //3. 添加 inte_vehicle_freight_record 解绑记录
         }
 
         /// <summary>

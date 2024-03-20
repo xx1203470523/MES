@@ -173,5 +173,73 @@ namespace Hymson.MES.Core.Constants
         public const string MES45090 = "设备无产出条码";
 
         #endregion
+
+        #region 条码生成
+
+        /// <summary>
+        /// 没有配置对应的线体
+        /// </summary>
+        public const string MES45100 = "配置项中没有对应的线体";
+
+        #endregion
+
+        #region 载具
+
+        /// <summary>
+        /// 载具不存在
+        /// </summary>
+        public const string MES45110 = "载具不存在";
+
+        /// <summary>
+        /// 载具已经绑定条码
+        /// </summary>
+        public const string MES45111 = "载具已经绑定条码";
+
+        /// <summary>
+        /// 载具中条码系统不存在
+        /// </summary>
+        public const string MES45112 = "载具在条码系统不存在";
+
+        /// <summary>
+        /// 载具中条码数量和数据库中不匹配
+        /// </summary>
+        public const string MES45113 = "载具中条码数量和数据库中不匹配";
+
+        /// <summary>
+        /// 载具中条码和数据库中不匹配
+        /// </summary>
+        public const string MES45114 = "载具中条码和数据库中不匹配";
+
+        /// <summary>
+        /// 存在已经绑定的条码
+        /// </summary>
+        public const string MES45115 = "存在已经绑定的条码";
+
+        /// <summary>
+        /// 载具没有关联载具类型
+        /// </summary>
+        public const string MES45116 = "载具没有关联载具类型";
+
+        /// <summary>
+        /// 载具对应载具类型异常
+        /// </summary>
+        public const string MES45117 = "载具对应载具类型异常";
+
+        /// <summary>
+        /// 载具对应载具类型状态已禁用
+        /// </summary>
+        public const string MES45118 = "载具对应载具类型状态已禁用";
+
+        /// <summary>
+        /// 载具对应载具类型状态已禁用
+        /// </summary>
+        public const string MES45119 = "载具装载数量加上这次已超过最大值";
+
+        /// <summary>
+        /// 载具中条码和系统中不匹配，部分条码没有解绑"
+        /// </summary>
+        public const string MES45120 = "载具中条码和系统中不匹配，部分条码没有解绑";
+
+        #endregion
     }
 }

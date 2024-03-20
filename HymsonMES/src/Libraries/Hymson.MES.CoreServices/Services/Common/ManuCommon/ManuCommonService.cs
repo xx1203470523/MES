@@ -400,5 +400,77 @@ namespace Hymson.MES.CoreServices.Services.Common
             };
         }
 
+        #region 顷刻
+
+        /// <summary>
+        /// 获取载具里面的条码
+        /// 为空不异常
+        /// 用于空托盘校验接口
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        public async Task<List<string>> GetSfcListByVehicleCodesAsync(VehicleSFCRequestBo requestBo)
+        {
+            if (requestBo.VehicleCodes == null || !requestBo.VehicleCodes.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
+            }
+
+            // 读取载具信息
+            var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
+            {
+                SiteId = requestBo.SiteId,
+                Codes = requestBo.VehicleCodes
+            });
+
+            // 不在系统中的载具代码
+            var notInSystem = requestBo.VehicleCodes.Except(vehicleEntities.Select(s => s.Code));
+            if (notInSystem.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18624))
+                    .WithData("Code", string.Join(',', notInSystem));
+            }
+
+            // 检查是否是"禁用"状态的载具
+            var disabledVehicles = vehicleEntities.Where(w => w.Status == DisableOrEnableEnum.Disable);
+            if (disabledVehicles.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18625))
+                    .WithData("Code", string.Join(',', disabledVehicles.Select(s => s.Code)));
+            }
+
+            // 检查是否是"禁用"状态的载具类型
+            var vehicleTypeEntities = await _inteVehicleTypeRepository.GetByIdsAsync(vehicleEntities.Select(s => s.VehicleTypeId));
+            var disabledVehicleTypes = vehicleTypeEntities.Where(w => w.Status == DisableOrEnableEnum.Disable);
+            if (disabledVehicleTypes.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18627))
+                    .WithData("Code", string.Join(',', disabledVehicleTypes.Select(s => s.Code)));
+            }
+
+            // 查询载具关联的条码明细
+            var stackList = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
+            {
+                SiteId = requestBo.SiteId,
+                ParentIds = vehicleEntities.Select(s => s.Id)
+            });
+
+            List<string> sfcList = new List<string>();
+            if (stackList == null || stackList.Count() == 0)
+            {
+                return sfcList;
+            }
+
+            foreach(var item in stackList)
+            {
+                sfcList.Add(item.BarCode);
+            }
+
+            return sfcList;
+        }
+
+
+        #endregion
+
     }
 }

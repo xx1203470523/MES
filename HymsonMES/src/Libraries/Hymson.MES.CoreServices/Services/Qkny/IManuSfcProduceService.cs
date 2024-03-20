@@ -26,5 +26,12 @@ namespace Hymson.MES.CoreServices.Services.Qkny
         /// </summary>
         /// <returns></returns>
         Task<ManuSfcProductMaterialView> GetEquipmentNewestSfc(ManuSfcEquipmentNewestQuery query);
+
+        /// <summary>
+        /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="sfcQuery"></param>
+        /// <returns></returns>
+        Task<ManuSfcProduceEntity> GetBySFCAsync(ManuSfcProduceBySfcQuery sfcQuery);
     }
 }

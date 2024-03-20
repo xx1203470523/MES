@@ -1,5 +1,7 @@
 ﻿using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -207,5 +209,40 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<List<OutboundMoreReturnDto>> OutboundMoreAsync(OutboundMoreDto dto);
+
+        /// <summary>
+        /// 补液数据上报034
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task FillingDataAsync(FillingDataDto dto);
+
+        /// <summary>
+        /// 空托盘校验035
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task EmptyContainerCheckAsync(EmptyContainerCheckDto dto);
+
+        /// <summary>
+        /// 单电芯校验036
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task ContainerSfcCheckAsync(ContainerSfcCheckDto dto);
+
+        /// <summary>
+        /// 托盘电芯绑定(在制品容器)037
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task BindContainerAsync(BindContainerDto dto);
+
+        /// <summary>
+        /// 托盘电芯解绑(在制品容器)038
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task UnBindContainerAsync(UnBindContainerDto dto);
     }
 }
