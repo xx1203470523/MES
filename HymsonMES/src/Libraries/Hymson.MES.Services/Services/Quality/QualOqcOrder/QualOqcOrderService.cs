@@ -696,8 +696,8 @@ namespace Hymson.MES.Services.Services.Quality
                         attachmentEntities.Add(new InteAttachmentEntity
                         {
                             Id = attachmentId,
-                            Name = attachment.OriginalName,
-                            Path = attachment.FileUrl,
+                            Name = attachment.Name,
+                            Path = attachment.Path,
                             CreatedBy = updatedBy,
                             CreatedOn = updatedOn,
                             UpdatedBy = updatedBy,
