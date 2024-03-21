@@ -166,13 +166,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// <returns></returns>
         public async Task<List<CreateBarcodeByWorkOrderOutputBo>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderBo param, ILocalizationService localizationService)
         {
-            await CreateBarcodeInProductionAsync(new CreateBarcodeInProductionBo
-            {
-                EquipmentId = 0,
-                ResourceId = param.ResourceId,
-                UserName = param.UserName,
-            });
-
             var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
             {
                 WorkOrderId = param.WorkOrderId,
