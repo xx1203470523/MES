@@ -241,7 +241,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式（1-让步 2-挑选 3-返工 4-报废）
         /// </summary>
-        public OQCHandMethodEnum? HandMethod { get; set; }
+        public OQCHandMethodEnum? HandMethodResult { get; set; }
 
     }
 
@@ -290,6 +290,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// OQC检验单Id
         /// </summary>
         public long? InspectionOrderId { get; set;}
+
+        /// <summary>
+        /// 检验类型
+        /// </summary>
+        public OQCInspectionTypeEnum InspectionType { get; set; }
     }
 
     /// <summary>
