@@ -406,15 +406,25 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// OQC样品附件Dto
     /// </summary>
     public record OQCSampleInteAttachmentBaseDto : BaseEntityDto {
+        ///// <summary>
+        ///// 文件名称
+        ///// </summary>
+        //public string? OriginalName { get; set; }
+
+        ///// <summary>
+        ///// 文件路径
+        ///// </summary>
+        //public string? FileUrl { get; set; }
+
         /// <summary>
         /// 文件名称
         /// </summary>
-        public string OriginalName { get; set; }
+        public string Path { get; set; }
 
         /// <summary>
         /// 文件路径
         /// </summary>
-        public string FileUrl { get; set; }
+        public string Name { get; set; }
     }
 
     /// <summary>
