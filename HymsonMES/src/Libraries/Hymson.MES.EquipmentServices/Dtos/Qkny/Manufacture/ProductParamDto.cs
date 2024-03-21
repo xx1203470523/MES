@@ -23,7 +23,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
     }
 
     /// <summary>
-    /// 条码餐宿
+    /// 条码参数
     /// </summary>
     public record ProductParamSfcDto
     {

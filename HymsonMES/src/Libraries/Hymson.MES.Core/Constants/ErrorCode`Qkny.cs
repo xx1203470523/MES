@@ -251,5 +251,14 @@ namespace Hymson.MES.Core.Constants
         public const string MES45121 = "托盘NG中上传的不合格代码在系统中都不存在";
 
         #endregion
+
+        #region 分选规则
+
+        /// <summary>
+        /// 工单对应型号没有对应的分选规则
+        /// </summary>
+        public const string MES45160 = "工单对应型号没有对应的分选规则";
+
+        #endregion
     }
 }

@@ -26,14 +26,18 @@ using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.Manufacture.ProductionProcess;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
+using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Qkny.Formula;
 using Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle;
 using Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint;
 using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
 using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
+using Hymson.MES.EquipmentServices.Services.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
 using Hymson.MES.Services.Dtos.AgvTaskRecord;
@@ -43,6 +47,7 @@ using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Dtos.EquProcessParamRecord;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
+using Hymson.MES.Services.Dtos.EquToolLifeRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Dtos.ManuFeedingCompletedZjyjRecord;
@@ -56,6 +61,7 @@ using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Services.EquProcessParamRecord;
 using Hymson.MES.Services.Services.EquProductParamRecord;
+using Hymson.MES.Services.Services.EquToolLifeRecord;
 using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Services.ManuFeedingCompletedZjyjRecord;
@@ -236,6 +242,26 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
+        /// NG记录
+        /// </summary>
+        private readonly IManuProductNgRecordRepository _manuProductNgRecordRepository;
+
+        /// <summary>
+        /// 生产服务
+        /// </summary>
+        private readonly IManufactureService _manufactureService;
+
+        /// <summary>
+        /// 工装夹具寿命
+        /// </summary>
+        private readonly IEquToolLifeRecordService _equToolLifeRecordService;
+
+        /// <summary>
+        /// 分选规则
+        /// </summary>
+        private readonly IProcSortingRuleService _procSortingRuleService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -267,6 +293,10 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuFillingDataRecordService manuFillingDataRecordService,
             IInteVehicleService inteVehicleService,
             IManuCommonService manuCommonService,
+            IManuProductNgRecordRepository manuProductNgRecordRepository,
+            IManufactureService manufactureService,
+            IEquToolLifeRecordService equToolLifeRecordService,
+            IProcSortingRuleService procSortingRuleService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -298,6 +328,10 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuFillingDataRecordService = manuFillingDataRecordService;
             _inteVehicleService = inteVehicleService;
             _manuCommonService = manuCommonService;
+            _manuProductNgRecordRepository = manuProductNgRecordRepository;
+            _manufactureService = manufactureService;
+            _equToolLifeRecordService = equToolLifeRecordService;
+            _procSortingRuleService = procSortingRuleService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -1032,7 +1066,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             var sfcObjList = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(query, null);
             List<string> sfcList = sfcObjList.Select(m => m.SFC).ToList();
             inBo.SFCs = sfcList.ToArray();
-            var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
+            //var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
             trans.Complete();
 
             return sfcList;
@@ -1451,6 +1485,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             bindDto.SiteId = equResModel.SiteId;
             bindDto.UserName = dto.EquipmentCode;
             await _inteVehicleService.VehicleBindOperationAsync(bindDto);
+            //TODO 添加进出站逻辑
+            //拿完整的工艺路线进行测试
         }
 
         /// <summary>
@@ -1469,6 +1505,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             bindDto.SiteId = equResModel.SiteId;
             bindDto.UserName = dto.EquipmentCode;
             await _inteVehicleService.VehicleUnBindOperationAsync(bindDto);
+            //TODO 添加进出站逻辑
+            //拿完整的工艺路线进行测试
 
             //TODO
             //1. 校验电芯是否在托盘中
@@ -1485,16 +1523,198 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         {
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
-
+            //2. 获取实际NG设备信息
+            MultEquResAllQuery factQuery = new MultEquResAllQuery();
+            factQuery.EquipmentCodeList = dto.NgSfcList.Select(m => m.NgEquipmentCode).ToList();
+            factQuery.ResCodeList = dto.NgSfcList.Select(m => m.NgResourceCode).ToList();
+            var factList = await GetMultEquResAllAsync(factQuery);
+            if(factList.IsNullOrEmpty() == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+            }
+            //3. 组装数据
             InteVehicleNgSfcDto ngDto = new InteVehicleNgSfcDto();
             ngDto.ContainerCode = dto.ContainerCode;
             foreach(var item in dto.NgSfcList)
             {
-                ngDto.NgSfcList.Add(new InteVehicleSfcDetailDto { NgCode = item.NgCode, Sfc = item.Sfc });
+                var sfcEquResModel = factList.Where(m => m.EquipmentCode == item.NgEquipmentCode && m.ResCode == item.NgResourceCode).FirstOrDefault();
+                if(sfcEquResModel == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+                }
+
+                InteVehicleSfcDetailDto ngModel = new InteVehicleSfcDetailDto();
+                ngModel.NgCode = item.NgCode;
+                ngModel.Sfc = item.Sfc;
+                ngModel.OperationId = sfcEquResModel.ProcedureId;
+                ngModel.ResourceId = sfcEquResModel.ResId;
+                ngDto.NgSfcList.Add(ngModel);
             }
-            ngDto.ResourceId = equResModel.ResId;
+            ngDto.SiteId = equResModel.SiteId;
+            ngDto.UserName = equResModel.EquipmentName;
             ngDto.OperationId = equResModel.ProcedureId;
+            //数据库
             await _inteVehicleService.ContainerNgReportAsync(ngDto);
+        }
+
+        /// <summary>
+        /// 托盘进站(容器进站)040
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task InboundInContainerAsync(InboundInContainerDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 托盘进站
+            VehicleInStationBo inDto = new VehicleInStationBo();
+            inDto.EquipmentId = equResModel.EquipmentId;
+            inDto.ResourceId = equResModel.ResId;
+            inDto.SiteId = equResModel.SiteId;
+            inDto.ProcedureId = equResModel.ProcedureId;
+            inDto.UserName = dto.EquipmentCode;
+            inDto.VehicleCodes = new List<string> { dto.ContainerCode };
+            await _manuPassStationService.InStationRangeByVehicleAsync(inDto, RequestSourceEnum.EquipmentApi);
+        }
+
+        /// <summary>
+        /// 托盘出站(容器出站)041
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task OutboundInContainerAsync(OutboundInContainerDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 构造数据
+            //2.1 托盘出站时护具
+            VehicleOutStationBo outDto = new VehicleOutStationBo();
+            outDto.EquipmentId = equResModel.EquipmentId;
+            outDto.ResourceId = equResModel.ResId;
+            outDto.SiteId = equResModel.SiteId;
+            outDto.ProcedureId = equResModel.ProcedureId;
+            outDto.UserName = dto.EquipmentCode;
+            OutStationRequestBo outBo = new OutStationRequestBo();
+            outBo.VehicleCode = dto.ContainerCode;
+            outBo.IsQualified = true;
+            outDto.OutStationRequestBos = new List<OutStationRequestBo>() { outBo };
+            //2.2 托盘参数
+            List<EquProductParamRecordSaveDto> saveDtoList = new List<EquProductParamRecordSaveDto>();
+            foreach (var item in dto.ParamList)
+            {
+                EquProductParamRecordSaveDto saveDto = new EquProductParamRecordSaveDto();
+                saveDto.ParamCode = item.ParamCode;
+                saveDto.ParamValue = item.ParamValue;
+                saveDto.CollectionTime = item.CollectionTime;
+                saveDtoList.Add(saveDto);
+            }
+            saveDtoList.ForEach(m =>
+            {
+                m.SiteId = equResModel.SiteId;
+                m.Sfc = dto.ContainerCode;
+                m.EquipmentId = equResModel.EquipmentId;
+                m.CreatedOn = HymsonClock.Now();
+                m.CreatedBy = dto.EquipmentCode;
+                m.UpdatedOn = m.CreatedOn;
+                m.UpdatedBy = m.CreatedBy;
+            });
+            //3. 数据库操作
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            await _manuPassStationService.OutStationRangeByVehicleAsync(outDto, RequestSourceEnum.EquipmentApi);
+            await _equProductParamRecordService.AddMultAsync(saveDtoList);
+            trans.Complete();
+        }
+
+        /// <summary>
+        /// 工装寿命上报042
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ToolLifeAsync(ToolLifeDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 添加记录
+            EquToolLifeRecordSaveDto saveDto = new EquToolLifeRecordSaveDto();
+            saveDto.EquipmentId = equResModel.EquipmentId;
+            saveDto.ToolCode = dto.ToolCode;
+            saveDto.ToolLife = dto.UsedLife;
+            saveDto.CreatedBy = dto.EquipmentCode;
+            saveDto.CreatedOn = HymsonClock.Now();
+            saveDto.UpdatedBy = dto.EquipmentCode;
+            saveDto.UpdatedOn = saveDto.CreatedOn;
+            //3 数据库操作
+            await _equToolLifeRecordService.AddAsync(saveDto);
+
+            //TODO
+            //1. 添加设备工装寿命记录表，进行数据更新或者插入
+        }
+
+        /// <summary>
+        /// 产品参数上传043
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ProductParamAsync(ProductParamDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 出站参数
+            List<EquProductParamRecordSaveDto> saveDtoList = new List<EquProductParamRecordSaveDto>();
+            foreach (var item in dto.SfcList)
+            {
+                List<EquProductParamRecordSaveDto> sfcParamList = new List<EquProductParamRecordSaveDto>();
+                foreach (var sfcItem in item.ParamList)
+                {
+                    EquProductParamRecordSaveDto saveDto = new EquProductParamRecordSaveDto();
+                    saveDto.ParamCode = sfcItem.ParamCode;
+                    saveDto.ParamValue = sfcItem.ParamValue;
+                    saveDto.CollectionTime = sfcItem.CollectionTime;
+                    sfcParamList.Add(saveDto);
+                }
+                sfcParamList.ForEach(m =>
+                {
+                    m.SiteId = equResModel.SiteId;
+                    m.Sfc = item.Sfc;
+                    m.EquipmentId = equResModel.EquipmentId;
+                    m.CreatedOn = HymsonClock.Now();
+                    m.CreatedBy = dto.EquipmentCode;
+                    m.UpdatedOn = m.CreatedOn;
+                    m.UpdatedBy = m.CreatedBy;
+                });
+                saveDtoList.AddRange(sfcParamList);
+            }
+            //3. 出站
+            await _equProductParamRecordService.AddMultAsync(saveDtoList);
+        }
+
+        /// <summary>
+        /// 卷绕极组产出上报
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task CollingPolarAsync(CollingPolarDto dto)
+        {
+
+        }
+
+        /// <summary>
+        /// 分选规则
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<List<ProcSortRuleDetailEquDto>> SortingRuleAsync(SortingRuleDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 查询激活的工单
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //3. 查询分选规则
+            ProcSortRuleDetailEquQuery query = new ProcSortRuleDetailEquQuery();
+            query.MaterialId = planEntity.ProductId;
+            var resultList = (await _procSortingRuleService.GetSortRuleDetailAsync(query)).ToList();
+            //
+            return resultList;
         }
 
         /// <summary>
@@ -1513,6 +1733,22 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                 throw new CustomerValidationException(nameof(ErrorCode.MES45001));
             }
             return equResAllModel;
+        }
+
+        /// <summary>
+        /// 获取设备资源对应的基础信息
+        /// 用于化成NG电芯上报，此时实际发生不良的工序是可能是上面的多个工序出现的
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private async Task<List<EquEquipmentResAllView>> GetMultEquResAllAsync(MultEquResAllQuery query)
+        {
+            var list = await _equEquipmentRepository.GetMultEquResAllAsync(query);
+            if (list == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+            }
+            return list.ToList(); ;
         }
     }
 }

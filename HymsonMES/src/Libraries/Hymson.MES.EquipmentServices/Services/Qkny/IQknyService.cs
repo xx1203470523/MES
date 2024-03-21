@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -251,5 +252,47 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task ContainerNgReportAsync(ContainerNgReportDto dto);
+
+        /// <summary>
+        /// 托盘进站(容器进站)040
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task InboundInContainerAsync(InboundInContainerDto dto);
+
+        /// <summary>
+        /// 托盘出站(容器出站)041
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task OutboundInContainerAsync(OutboundInContainerDto dto);
+
+        /// <summary>
+        /// 工装寿命上报042
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task ToolLifeAsync(ToolLifeDto dto);
+
+        /// <summary>
+        /// 产品参数上传043
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task ProductParamAsync(ProductParamDto dto);
+
+        /// <summary>
+        /// 卷绕极组产出上报
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task CollingPolarAsync(CollingPolarDto dto);
+
+        /// <summary>
+        /// 分选规则
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<List<ProcSortRuleDetailEquDto>> SortingRuleAsync(SortingRuleDto dto);
     }
 }

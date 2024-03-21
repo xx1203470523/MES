@@ -73,14 +73,9 @@ namespace Hymson.MES.CoreServices.Dtos.Qkny
         public string ContainerCode { get; set; } = "";
 
         /// <summary>
-        /// 工序id
+        /// 当前工序
         /// </summary>
         public long OperationId { get; set; }
-
-        /// <summary>
-        /// 资源ID
-        /// </summary>
-        public long ResourceId { get; set; }
 
         /// <summary>
         /// NG电芯条码
@@ -102,5 +97,15 @@ namespace Hymson.MES.CoreServices.Dtos.Qkny
         /// 不合格代码
         /// </summary>
         public string NgCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long OperationId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
     }
 }

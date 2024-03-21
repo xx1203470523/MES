@@ -4,11 +4,13 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Services.Qkny;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace Hymson.MES.Equipment.Api.Controllers
 {
@@ -917,6 +919,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 托盘电芯绑定(在制品容器)037
+        /// 绑盘拆盘作为单独工序，需要做进出站
+        /// 绑盘完后才会告诉MES，不会出现绑一半告诉MES
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -929,6 +933,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
             {
                 return;
             }
+            //TODO
+            //绑盘拆盘作为单独工序，需要做进出站
 
             await _qknyService.BindContainerAsync(dto);
 
@@ -942,6 +948,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 托盘电芯解绑(在制品容器)038
+        /// 绑盘拆盘作为单独工序，需要做进出站
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -954,6 +961,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
             {
                 return;
             }
+            //TODO
+            //绑盘拆盘作为单独工序，需要做进出站
 
             await _qknyService.UnBindContainerAsync(dto);
 
@@ -999,14 +1008,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘进站(容器进站)040", BusinessType.OTHER, "InboundInContainer040", ReceiverTypeEnum.MES)]
         public async Task InboundInContainerAsync(InboundInContainerDto dto)
         { 
-            //托盘进站如果条码中电芯存在NG，需要运行进站
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.InboundInContainerAsync(dto);
 
             //TODO
             //1. 参考 InBoundCarrierAsync 进站
         }
 
         /// <summary>
-        /// 托盘出站(容器进站)041
+        /// 托盘出站(容器出站)041
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -1015,6 +1029,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘出站(容器出站)041", BusinessType.OTHER, "OutboundInContainer041", ReceiverTypeEnum.MES)]
         public async Task OutboundInContainerAsync(OutboundInContainerDto dto)
         {
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.OutboundInContainerAsync(dto);
+
             //TODO
             //1. 托盘如果存在参数，在记录数据时，需要在额外记录托盘当时的条码
             //2. 添加托盘出站记录
@@ -1030,6 +1051,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("工装寿命上报042", BusinessType.OTHER, "ToolLife042", ReceiverTypeEnum.MES)]
         public async Task ToolLifeAsync(ToolLifeDto dto)
         {
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ToolLifeAsync(dto);
+
             //TODO
             //1. 添加设备工装寿命记录表，进行数据更新或者插入
         }
@@ -1044,8 +1072,64 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产品参数上传043", BusinessType.OTHER, "ProductParam043", ReceiverTypeEnum.MES)]
         public async Task ProductParamAsync(ProductParamDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ProductParamAsync(dto);
+
             //TODO
-            //1. 参考ProductCollectionAsync
+            //1. 参考 ProductCollectionAsync
+        }
+
+        /// <summary>
+        /// 卷绕极组产出044
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CollingPolar")]
+        [LogDescription("卷绕极组产出044", BusinessType.OTHER, "CollingPolar044", ReceiverTypeEnum.MES)]
+        public async Task CollingPolarAsync(CollingPolarDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.CollingPolarAsync(dto);
+        }
+
+        /// <summary>
+        /// 分选规则045
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SortingRule")]
+        [LogDescription("分选规则045", BusinessType.OTHER, "SortingRule045", ReceiverTypeEnum.MES)]
+        public async Task<List<ProcSortRuleDetailEquDto>> SortingRuleAsync(SortingRuleDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                List<ProcSortRuleDetailEquDto> sortList = new List<ProcSortRuleDetailEquDto>();
+                for(var i = 0;i < 3; ++i)
+                {
+                    ProcSortRuleDetailEquDto sortModel = new ProcSortRuleDetailEquDto();
+                    sortModel.MinValue = i;
+                    sortModel.MinContainingType = Core.Enums.Process.ContainingTypeEnum.Lt;
+                    sortModel.MaxValue = i + 10;
+                    sortModel.MaxContainingType = Core.Enums.Process.ContainingTypeEnum.LtOrE;
+                    sortModel.ParameterCode = $"param{i}";
+                    sortModel.ParameterName = $"paramname{i}";
+                    sortList.Add(sortModel);
+                }    
+
+                return sortList;
+            }
+
+            return await _qknyService.SortingRuleAsync(dto);
         }
     }
 }

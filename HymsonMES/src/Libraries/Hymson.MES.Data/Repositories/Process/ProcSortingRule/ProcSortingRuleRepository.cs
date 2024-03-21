@@ -12,6 +12,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.ProcSortingRule.Query;
+using Hymson.MES.Data.Repositories.Process.ProcSortingRule.View;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -266,6 +267,21 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据产品id获取分选规则详情
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcSortRuleDetailEquView>> GetSortRuleDetailAsync(ProcSortRuleDetailEquQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcSortRuleDetailEquView>(GetSortRuleDetailEquSql, param);
+        }
+
+        #endregion
     }
 
     public partial class ProcSortingRuleRepository
@@ -305,5 +321,22 @@ namespace Hymson.MES.Data.Repositories.Process
         #endregion
 
         const string UpdateStatusSql = "UPDATE `proc_sorting_rule` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+
+        #region 顷刻
+
+        /// <summary>
+        /// 获取设备用的分选规则
+        /// </summary>
+        const string GetSortRuleDetailEquSql = @"
+            select t1.Code, t1.Name, t1.MaterialId, t2.* ,t3.ParameterCode ,t3.ParameterName 
+            from proc_sorting_rule t1
+            inner join proc_sorting_rule_detail t2 on t1.Id = t2.SortingRuleId and t2.IsDeleted = 0
+            inner join proc_parameter t3 on t3.Id = t2.ParameterId and t3.IsDeleted = 0
+            where t1.IsDeleted = 0
+            and t1.Status in ('1','2')
+            and t1.MaterialId = @MaterialId
+        ";
+
+        #endregion
     }
 }

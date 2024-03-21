@@ -83,7 +83,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
             //获取激活工单
             var activeIdList = activeList.Select(m => m.WorkOrderId).ToList();
             var curOrder = orderList.Where(m => activeIdList.Contains(m.Id)).FirstOrDefault();
-            return curOrder;
+            return curOrder!;
         }
 
         /// <summary>
