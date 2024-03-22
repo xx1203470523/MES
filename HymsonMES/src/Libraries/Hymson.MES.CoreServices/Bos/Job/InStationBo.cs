@@ -76,5 +76,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 更新在制品表
         /// </summary>
         public IEnumerable<UpdateProduceInStationSFCCommand> UpdateProduceInStationSFCCommands { get; set; } = new List<UpdateProduceInStationSFCCommand>();
+
     }
 }

@@ -146,10 +146,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Select("T.*, pp.ParameterCode, pp.ParameterName, pp.ParameterUnit, pp.DataType, qiip.UpperLimit, qiip.LowerLimit, qiip.CenterValue, qiip.EnterNumber, qiip.IsDeviceCollect, qiip.Sequence");
             sqlBuilder.OrderBy("T.CreatedOn DESC");
             sqlBuilder.Where("T.IsDeleted = 0");
-            if (pagedQuery.SiteId.HasValue)
-            {
-                sqlBuilder.Where("T.SiteId = @SiteId");
-            }
+            sqlBuilder.Where("T.SiteId = @SiteId");
             if (pagedQuery.InspectionOrderId.HasValue)
             {
                 sqlBuilder.Where("T.IpqcInspectionHeadId = @InspectionOrderId");

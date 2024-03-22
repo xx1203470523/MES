@@ -137,6 +137,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var template = sqlBuilder.AddTemplate(GetProcEquipmentGroupParamEntitiesSqlTemplate);
             sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Where("Status=1");
             if (procEquipmentGroupParamQuery.ProductId.HasValue&& procEquipmentGroupParamQuery.ProductId>0) 
             {
                 sqlBuilder.Where("ProductId=@ProductId");

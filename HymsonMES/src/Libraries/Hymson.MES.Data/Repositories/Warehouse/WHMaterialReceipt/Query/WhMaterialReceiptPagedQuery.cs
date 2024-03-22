@@ -23,9 +23,9 @@ namespace Hymson.MES.Data.Repositories.Query
         public string? ReceiptNum { get; set; }
 
         /// <summary>
-        /// 供应商Id
+        /// ID集合（供应商）
         /// </summary>
-        public long? SupplierId { get; set; }
+        public IEnumerable<long>? SupplierIds { get; set; }
 
     }
 }

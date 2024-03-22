@@ -2,7 +2,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Services.Dtos.Integrated;
-using Org.BouncyCastle.Crypto.Agreement;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
@@ -134,6 +133,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public TrueOrFalseEnum IsQualified { get; set; }
 
         /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
         /// 参数附件
         /// </summary>
         public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
@@ -231,6 +235,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string Unit { get; set; }
 
         /// <summary>
+        /// 是否免检
+        /// </summary>
+        public TrueOrFalseEnum IsExemptInspection { get; set; }
+
+        /// <summary>
         /// 检验等级(1-正常 2-加严 3-放宽)
         /// </summary>
         public InspectionGradeEnum InspectionGrade { get; set; }
@@ -253,12 +262,17 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public TrueOrFalseEnum IsQualified { get; set; }
+        public TrueOrFalseEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
         public string IsQualifiedText { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式
+        /// </summary>
+        public HandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 报检人
@@ -348,9 +362,24 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string? InternalBatch { get; set; }
 
         /// <summary>
+        /// 是否免检
+        /// </summary>
+        public TrueOrFalseEnum? IsExemptInspection { get; set; }
+
+        /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
         public InspectionStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public TrueOrFalseEnum? IsQualified { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式
+        /// </summary>
+        public IQCHandMethodEnum? HandMethod { get; set; }
 
     }
 
@@ -473,7 +502,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 小数位数
         /// </summary>
-        public float Scale { get; set; }
+        public int? Scale { get; set; }
 
         /// <summary>
         /// 规格下限

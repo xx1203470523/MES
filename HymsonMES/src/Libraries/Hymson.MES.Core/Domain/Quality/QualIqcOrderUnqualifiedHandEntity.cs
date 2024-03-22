@@ -14,7 +14,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// IQC检验单Id
         /// </summary>
-        public long? IQCOrderId { get; set; }
+        public long IQCOrderId { get; set; }
 
         /// <summary>
         /// 来源系统;1、本系统 2、OA

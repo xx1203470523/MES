@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Bos.Quality;
 using Hymson.MES.CoreServices.Extension;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
@@ -35,9 +36,11 @@ namespace Hymson.MES.CoreServices.Services.Quality
         private readonly IQualOqcLevelDetailRepository _qualOqcLevelDetailRepository;
         private readonly IQualOqcParameterGroupSnapshootRepository _qualOqcParameterGroupSnapshootRepository;
         private readonly IQualOqcParameterGroupDetailSnapshootRepository _qualOqcParameterGroupDetailSnapshootRepository;
+        private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
 
         private readonly IAQLLevelQueryService _aqlLevelQueryService;
         private readonly IAQLPlanQueryService _aqlPlanQueryService;
+        private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
         private readonly ISequenceService _sequenceService;
 
         /// <summary>
@@ -56,8 +59,10 @@ namespace Hymson.MES.CoreServices.Services.Quality
         /// <param name="qualOqcLevelDetailRepository"></param>
         /// <param name="qualOqcParameterGroupSnapshootRepository"></param>
         /// <param name="qualOqcParameterGroupDetailSnapshootRepository"></param>
+        /// <param name="inteCodeRulesRepository"></param>
         /// <param name="aqlLevelQueryService"></param>
         /// <param name="aqlPlanQueryService"></param>
+        /// <param name="manuGenerateBarcodeService"></param>
         /// <param name="sequenceService"></param>
         public OQCOrderCreateService(IQualOqcOrderRepository qualOqcOrderRepository,
             IQualOqcOrderTypeRepository qualOqcOrderTypeRepository,
@@ -72,8 +77,10 @@ namespace Hymson.MES.CoreServices.Services.Quality
             IQualOqcLevelDetailRepository qualOqcLevelDetailRepository,
             IQualOqcParameterGroupSnapshootRepository qualOqcParameterGroupSnapshootRepository,
             IQualOqcParameterGroupDetailSnapshootRepository qualOqcParameterGroupDetailSnapshootRepository,
+            IInteCodeRulesRepository inteCodeRulesRepository,
             IAQLLevelQueryService aqlLevelQueryService,
             IAQLPlanQueryService aqlPlanQueryService,
+            IManuGenerateBarcodeService manuGenerateBarcodeService,
             ISequenceService sequenceService)
         {
             _qualOqcOrderRepository = qualOqcOrderRepository;
@@ -89,8 +96,10 @@ namespace Hymson.MES.CoreServices.Services.Quality
             _qualOqcLevelDetailRepository = qualOqcLevelDetailRepository;
             _qualOqcParameterGroupSnapshootRepository = qualOqcParameterGroupSnapshootRepository;
             _qualOqcParameterGroupDetailSnapshootRepository = qualOqcParameterGroupDetailSnapshootRepository;
+            _inteCodeRulesRepository = inteCodeRulesRepository;
             _aqlLevelQueryService = aqlLevelQueryService;
             _aqlPlanQueryService = aqlPlanQueryService;
+            _manuGenerateBarcodeService = manuGenerateBarcodeService;
             _sequenceService = sequenceService;
         }
 
@@ -169,7 +178,8 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     SiteId = bo.SiteId,
                     MaterialId = parameterGroupEntity.MaterialId,
                     CustomId = parameterGroupEntity.CustomerId,
-                    Type = Core.Enums.Quality.QCMaterialTypeEnum.Material
+                    Type = Core.Enums.Quality.QCMaterialTypeEnum.Material,
+                    Status = Core.Enums.DisableOrEnableEnum.Enable
                 });
                 if (oqcLevels == null || !oqcLevels.Any())
                 {
@@ -177,7 +187,8 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     oqcLevels = await _qualOqcLevelRepository.GetEntitiesAsync(new QualOqcLevelQuery
                     {
                         SiteId = bo.SiteId,
-                        Type = Core.Enums.Quality.QCMaterialTypeEnum.General
+                        Type = Core.Enums.Quality.QCMaterialTypeEnum.General,
+                        Status = Core.Enums.DisableOrEnableEnum.Enable
                     });
                     if (oqcLevels == null || !oqcLevels.Any())
                     {
@@ -247,6 +258,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
 
                     var parameterGroupDetailSnapshoot = parameterGroupDetail.ToEntity<QualOqcParameterGroupDetailSnapshootEntity>();
                     parameterGroupDetailSnapshoot.Id = IdGenProvider.Instance.CreateId();
+                    parameterGroupDetailSnapshoot.ParameterGroupId = parameterGroupSnapshoot.Id;
                     parameterGroupDetailSnapshoot.ParameterCode = parameterEntity.ParameterCode;
                     parameterGroupDetailSnapshoot.ParameterName = parameterEntity.ParameterName;
                     parameterGroupDetailSnapshoot.ParameterDataType = parameterEntity.DataType;
@@ -254,12 +266,13 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     parameterGroupDetailSnapshootList.Add(parameterGroupDetailSnapshoot);
                 }
                 //检验单
-                var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "OQC");  //流水号
+                //var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "OQC");  //流水号
                 var orderEntity = new QualOqcOrderEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = bo.SiteId,
-                    InspectionOrder = $"OQC{updatedOn.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(4, '0')}",
+                    //InspectionOrder = $"OQC{updatedOn.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(4, '0')}",
+                    InspectionOrder = await GenerateOQCOrderCodeAsync(bo),
                     GroupSnapshootId = parameterGroupSnapshoot.Id,
                     MaterialId = parameterGroupEntity.MaterialId,
                     CustomerId = parameterGroupEntity.CustomerId,
@@ -308,6 +321,39 @@ namespace Hymson.MES.CoreServices.Services.Quality
                 trans.Complete();
             }
             return rows;
+        }
+
+        /// <summary>
+        /// 检验单号生成
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        private async Task<string> GenerateOQCOrderCodeAsync(OQCOrderCreateBo bo)
+        {
+            var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
+            {
+                SiteId = bo.SiteId,
+                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.OQC
+            });
+            if (codeRules == null || !codeRules.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11810));
+            }
+            if (codeRules.Count() > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11811));
+            }
+
+            var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new Bos.Manufacture.ManuGenerateBarcode.GenerateBarcodeBo
+            {
+                SiteId = bo.SiteId,
+                UserName = bo.UserName,
+                CodeRuleId = codeRules.First().Id,
+                Count = 1
+            });
+
+            return orderCodes.First();
         }
 
     }

@@ -119,8 +119,17 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId=@SiteId");
 
-            if (query.ParameterCode != null) {
+            if (!string.IsNullOrWhiteSpace(query.ParameterCode)) {
                 sqlBuilder.Where("ParameterCode=@ParameterCode");
+            }
+
+            if (query.ParameterGroupId != null)
+            {
+                sqlBuilder.Where("ParameterGroupId=@ParameterGroupId");
+            }
+
+            if (query.InspectionType != null) {
+                sqlBuilder.Where("InspectionType=@InspectionType");
             }
 
             using var conn = GetMESDbConnection();

@@ -1,13 +1,9 @@
 using Dapper;
-using Hymson.DbConnection.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.Utils;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 using System.Text;
 using ConnectionOptions = Hymson.MES.Data.Options.ConnectionOptions;
 
@@ -71,51 +67,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcEntity>(GetByIdsSql, new { Ids = ids });
         }
-
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="pagedQuery"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcPassDownView>> GetPagedListAsync(ManuSfcPassDownPagedQuery pagedQuery)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.LeftJoin("manu_sfc_info MSI ON MSI.SfcId = MS.Id AND MSI.IsUsed = 1");
-            sqlBuilder.LeftJoin("plan_work_order PWO ON PWO.Id = MSI.WorkOrderId");
-            sqlBuilder.LeftJoin("proc_material PM ON PM.Id = MSI.ProductId");
-            sqlBuilder.Where("MS.IsDeleted = 0");
-            sqlBuilder.Where("MS.SiteId = @SiteId");
-            sqlBuilder.OrderBy("MS.CreatedOn DESC");
-            sqlBuilder.Select("MS.Id, MS.SFC, MS.IsUsed, MS.CreatedOn, PWO.OrderCode, PM.MaterialCode, PM.MaterialName, PM.BuyType");
-
-            if (pagedQuery.IsUsed.HasValue) sqlBuilder.Where("MS.IsUsed = @IsUsed");
-
-            if (!string.IsNullOrWhiteSpace(pagedQuery.OrderCode))
-            {
-                pagedQuery.OrderCode = $"%{pagedQuery.OrderCode}%";
-                sqlBuilder.Where("PWO.OrderCode LIKE @OrderCode");
-            }
-
-            if (!string.IsNullOrWhiteSpace(pagedQuery.SFC))
-            {
-                pagedQuery.SFC = $"%{pagedQuery.SFC}%";
-                sqlBuilder.Where("MS.SFC LIKE @SFC");
-            }
-
-            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
-            sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
-            sqlBuilder.AddParameters(pagedQuery);
-
-            using var conn = GetMESDbConnection();
-            var entities = await conn.QueryAsync<ManuSfcPassDownView>(templateData.RawSql, templateData.Parameters);
-            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-
-            return new PagedInfo<ManuSfcPassDownView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
-        }
-
 
         /// <summary>
         /// 分页查询（查询所有条码信息）
@@ -193,7 +144,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return new PagedInfo<ManuSfcProduceView>(manuSfcProduceEntities, manuSfcProducePagedQuery.PageIndex, manuSfcProducePagedQuery.PageSize, totalCount);
         }
 
-
         /// <summary>
         /// 分页查询（查询所有条码信息）
         /// 优化
@@ -205,7 +155,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            
+
 
             sqlBuilder.Where("ms.SiteId = @SiteId");
             sqlBuilder.Where("ms.IsDeleted=0");

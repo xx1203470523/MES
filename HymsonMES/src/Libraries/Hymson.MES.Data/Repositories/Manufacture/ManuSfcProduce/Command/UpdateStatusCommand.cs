@@ -114,6 +114,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public long? ProcedureId { get; set; }
 
         /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
         /// 循环次数
         /// </summary>
         public int RepeatedCount { get; set; }

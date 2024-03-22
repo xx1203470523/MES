@@ -128,6 +128,10 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("CustomId = @CustomId");
             }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualOqcLevelEntity>(template.RawSql, query);

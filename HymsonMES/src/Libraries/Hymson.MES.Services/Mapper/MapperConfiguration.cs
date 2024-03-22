@@ -981,6 +981,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualOqcOrderExecSaveDto, QualOqcOrderSampleQuery>();
             CreateMap<QualOqcParameterGroupDetailSnapshootEntity, OqcOrderParameterDetailDto>();
             CreateMap<OqcOrderParameterDetailPagedQueryDto, QualOqcOrderSampleDetailPagedQuery>();
+            CreateMap<QualOqcOrderTypeEntity, QualOqcOrderTypeDto>();
+            CreateMap<QualOqcOrderTypeEntity, SampleQtyAndCheckedQtyQueryOutDto>();
 
             #region OQC检验项目
             //查询对象
@@ -1153,7 +1155,9 @@ namespace Hymson.MES.Services.Mapper
 
             #region PlanSfcPrint
             CreateMap<PlanSfcPrintPagedQueryDto, ManuSfcPassDownPagedQuery>();
+            CreateMap<PlanSfcPrintPagedQueryDto, ManuSfcProduceNewPagedQuery>();
             CreateMap<ManuSfcPassDownView, PlanSfcPrintDto>();
+            CreateMap<ManuSfcProduceEntity, PlanSfcPrintDto>();
             #endregion
 
             #region PlanCalendar

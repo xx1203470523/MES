@@ -332,6 +332,7 @@
         public const string MES10811 = "掩码编码最大长度为50";
         public const string MES10812 = "掩码名称最大长度为50";
         public const string MES10813 = "掩码匹配方式重复";
+        public const string MES10814 = "起始、中间、结束与全码互斥";
 
         #endregion
 
@@ -437,12 +438,14 @@
         public const string MES11801 = "出货单不存在";
         public const string MES11802 = "AQL检验水平不存在";
         public const string MES11803 = "AQL检验计划不存在";
-        public const string MES11804 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验项目不存在或未激活";
+        public const string MES11804 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验项目不存在或未启用";
         public const string MES11805 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验项目下检验参数不能为空";
-        public const string MES11806 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验水平不能为空";
+        public const string MES11806 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验水平不存在或未启用";
         public const string MES11807 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验水平明细列表不能为空";
         public const string MES11808 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验水平下检验类型【{InspectionType}】未维护";
         public const string MES11809 = "检验单已生成，不允许重复生成！出货单【{ShipmentNum}】明细Id【{ShipmentMaterialIds}】";
+        public const string MES11810 = "检验单号生成失败：OQC类型编码规则未维护！";
+        public const string MES11811 = "检验单号生成失败：编码规则错误，不允许同时存在多条OQC类型编码规则！";
 
         #endregion
 
@@ -453,10 +456,12 @@
         public const string MES11902 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验项目不存在或未启用";
         public const string MES11903 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验项目【{InspectionItemCode}】下检验参数不能为空";
         public const string MES11904 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验项目【{InspectionItemCode}】下检验参数的检验类型不能为空";
-        public const string MES11905 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验水平不能为空";
+        public const string MES11905 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验水平不存在或未启用";
         public const string MES11906 = "供应商【{SupplierCode}】物料【{MaterialCode}】对应IQC检验水平明细列表不能为空";
         public const string MES11907 = "供应商【{CustomerCode}】物料【{MaterialCode}】对应IQC检验水平下检验类型【{InspectionType}】未维护";
         public const string MES11990 = "检验单已生成，不允许重复生成！收货单【{ReceiptNum}】明细Id【{MaterialReceiptDetailIds}】";
+        public const string MES11991 = "检验单号生成失败：IQC类型编码规则未维护！";
+        public const string MES11992 = "检验单号生成失败：编码规则错误，不允许同时存在多条IQC类型编码规则！";
 
         public const string MES11908 = "样本条码【{Code}】已存在检验类型为【{Type}】的数据！";
         public const string MES11909 = "请录入样本条码！";
@@ -510,6 +515,7 @@
         public const string MES12124 = "工作中心类型不合法，请检查.";
         public const string MES12125 = "对应工作中心数据不存在.";
         public const string MES12126 = "存在已被关联产线,不允许重复关联!";
+        public const string MES12127 = "新建状态的产线不能用于工作中心!";
         #endregion
 
         #region 编码规则 12400
@@ -555,6 +561,7 @@
         public const string MES12448 = "包装序列码的容器编码不可为空";
         public const string MES12449 = "包装序列码必须填写有效的容器编码";
         public const string MES12450 = "容器{code}编码规则已存在，请删除原规则再进行新增!";
+        public const string MES12451 = "编码类型{type}已经存在记录";
         #endregion
 
         #region 容器维护 12500
@@ -1895,6 +1902,8 @@
         public const string MES19952 = "OQC检验项目必须填写物料，且物料信息必须准确";
         public const string MES19953 = "已启用的检验项目不允许删除，{codes}";
         public const string MES19954 = "检验项目不存在，可能操作时被删除或数据异常";
+        public const string MES19955 = "检验项目编码重复，数据新增失败";
+        public const string MES19956 = "客户{customCode}物料{materialCode}检验项目版本{version}已存在，不允许重复添加！";
 
         #endregion 
 

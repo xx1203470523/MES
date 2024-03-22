@@ -124,6 +124,11 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("OQCOrderId IN @OQCOrderIds");
             }
 
+            if (query.HandMethod != null)
+            {
+                sqlBuilder.Where("HandMethod = @HandMethod");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualOqcOrderUnqualifiedHandleEntity>(template.RawSql, query);
         }

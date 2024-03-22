@@ -161,10 +161,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
                 sqlBuilder.Where(" ReceiptNum = @ReceiptNum ");
             }
 
-            if (pagedQuery.SupplierId != null)
-            {
-                sqlBuilder.Where(" SupplierId = @SupplierId ");
-            }
+            if (pagedQuery.SupplierIds != null) sqlBuilder.Where(" SupplierId IN @SupplierIds ");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

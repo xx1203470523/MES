@@ -120,6 +120,18 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("Type = @Type");
+            if (query.MaterialId.HasValue)
+            {
+                sqlBuilder.Where("MaterialId = @MaterialId");
+            }
+            if (query.SupplierId.HasValue)
+            {
+                sqlBuilder.Where("SupplierId = @SupplierId");
+            }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcLevelEntity>(template.RawSql, query);

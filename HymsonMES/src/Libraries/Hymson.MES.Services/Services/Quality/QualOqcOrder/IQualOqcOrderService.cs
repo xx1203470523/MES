@@ -69,7 +69,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="checkBarCodeQuqryDto"></param>
         /// <returns></returns>
-        Task<CheckBarCodeOutDto> CheckBarCodeAsync(CheckBarCodeQuqryDto checkBarCodeQuqryDto);
+        Task<IEnumerable<CheckBarCodeOutDto>> CheckBarCodeAsync(CheckBarCodeQuqryDto checkBarCodeQuqryDto);
 
         /// <summary>
         /// 保存样品数据
@@ -126,5 +126,19 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<OqcOrderParameterDetailDto>> OqcOrderQueryUnqualifiedPagedListAsync(OqcOrderParameterDetailPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 获取已检数据和样本数量
+        /// </summary>
+        /// <param name="sampleQtyAndCheckedQtyQueryDto"></param>
+        /// <returns></returns>
+        Task<SampleQtyAndCheckedQtyQueryOutDto> GetSampleQtyAndCheckedQtyAsync(SampleQtyAndCheckedQtyQueryDto sampleQtyAndCheckedQtyQueryDto);
+
+        ///// <summary>
+        ///// 根据ID查询类型
+        ///// </summary>
+        ///// <param name="orderId"></param>
+        ///// <returns></returns>
+        //Task<IEnumerable<QualOqcOrderTypeDto>> QueryOrderTypeListByIdAsync(long orderId);
     }
 }

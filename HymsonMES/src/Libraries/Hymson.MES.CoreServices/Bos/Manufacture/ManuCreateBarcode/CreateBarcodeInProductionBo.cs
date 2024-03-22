@@ -1,12 +1,16 @@
 ﻿using Hymson.MES.CoreServices.Bos.Common;
-using Hymson.MES.CoreServices.Dtos.Manufacture;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
 {
     /// <summary>
-    /// 根据老条码生成新条码
+    /// 生产中生成条码
     /// </summary>
-    public class CreateBarcodeByOldMesSFCBo : CoreBaseBo
+    public class CreateBarcodeInProductionBo : CoreBaseBo
     {
         /// <summary>
         /// 设备Id
@@ -16,16 +20,16 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         /// <summary>
         /// 资源Id
         /// </summary>
-        public long? ResourceId { set; get; }
+        public long ResourceId { set; get; }
 
         /// <summary>
-        /// 工单Id
+        /// 条码次数
         /// </summary>
-        public long WorkOrderId { set; get; }
+        public int Count { set; get; } = 1;
 
         /// <summary>
-        /// 旧条码
+        ///是否置于活动中
         /// </summary>
-        public IEnumerable<BarcodeDto> OldSFCs { set; get; } = new List<BarcodeDto>();
+        public bool IsInActive { set; get; } = false;
     }
 }

@@ -51,6 +51,13 @@ namespace Hymson.MES.Services.Services.WhShipment
         Task<PagedInfo<WhShipmentDto>> GetPagedListAsync(WhShipmentPagedQueryDto pagedQueryDto);
 
         /// <summary>
+        /// OQC检验单获取出货单
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<WhShipmentDto>> GetPagedListToOQCAsync(WhShipmentPagedQueryDto pagedQueryDto);
+
+        /// <summary>
         /// 根据条件查询出货单详情
         /// </summary>
         /// <param name="whShipmentQueryDto"></param>

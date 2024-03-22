@@ -8,11 +8,16 @@ namespace Hymson.MES.Data.Repositories.Warehouse.Query
         /// <summary>
         /// 出货单Id
         /// </summary>
-        public long ShipmentId { get; set; }
+        public long? ShipmentId { get; set; }
 
         /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// Ids
+        /// </summary>
+        public IEnumerable<long>? Ids { get; set; }
     }
 }

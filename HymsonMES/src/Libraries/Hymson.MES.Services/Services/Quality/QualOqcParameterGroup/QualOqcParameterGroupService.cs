@@ -1,3 +1,5 @@
+using AutoMapper.Execution;
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -152,6 +154,39 @@ namespace Hymson.MES.Services.Services.Quality
             command.UpdatedBy = _currentUser.UserName;
             command.SiteId = _currentSite.SiteId;
 
+            if (command.Code != null || command.Name != null)
+            {
+                var projectCode = new QualOqcParameterGroupToQuery
+                {
+                    Code = command.Code,
+                    Name = command.Name,
+                };
+                //校验项目编码
+                var qualIqcInspectionItemEntity = await _qualOqcParameterGroupRepository.GetOneAsync(projectCode);
+                if (qualIqcInspectionItemEntity != null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19955));
+                }
+            }
+
+            if (command.MaterialId != null && command.CustomerId != null && command.Version != null)
+            {
+                var projectCode = new QualOqcParameterGroupToQuery
+                {
+                    MaterialId = command.MaterialId,
+                    CustomerId = command.CustomerId,
+                    Version = command.Version,
+                };
+                //相同的客户 + 物料 + 检验项目版本
+                var Entity = await _qualOqcParameterGroupRepository.GetOneAsync(projectCode);
+                if (Entity != null)
+                {
+                    var materialEntity = await _procMaterialRepository.GetByIdAsync(Entity.MaterialId);
+                    var customerEntity = await _inteCustomRepository.GetByIdAsync(Entity.CustomerId);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19956)).WithData("materialCode", materialEntity.MaterialCode).WithData("customCode", customerEntity.Code).WithData("version", command.Version);
+                }
+            }
+
             var detailCommands = Enumerable.Empty<QualOqcParameterGroupDetailCreateCommand>();
             if (createDto.qualOqcParameterGroupDetailDtos != null && createDto.qualOqcParameterGroupDetailDtos.Any())
             {
@@ -296,17 +331,26 @@ namespace Hymson.MES.Services.Services.Quality
         public async Task<PagedInfo<QualOqcParameterGroupOutputDto>> GetPagedAsync(QualOqcParameterGroupPagedQueryDto queryDto)
         {
             var _siteId = _currentSite.SiteId;
+            List<long> emptyDefault = new List<long> { 0 };
 
             var materialIds = Enumerable.Empty<long>();
             if (!string.IsNullOrWhiteSpace(queryDto.MaterialCode))
             {
                 var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery { SiteId = _siteId, MaterialCode = queryDto.MaterialCode });
                 materialIds = materialEntities.Select(m => m.Id);
+                if (!materialIds.Any())
+                {
+                    materialIds = emptyDefault;
+                }
             }
             if (!string.IsNullOrWhiteSpace(queryDto.MaterialName))
             {
                 var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery { SiteId = _siteId, MaterialName = queryDto.MaterialName });
                 materialIds = materialIds.Concat(materialEntities.Select(m => m.Id));
+                if (!materialIds.Any())
+                {
+                    materialIds = emptyDefault;
+                }
             }
             materialIds = materialIds.Distinct();
 
@@ -315,6 +359,10 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 var customerEntities = await _inteCustomRepository.GetInteCustomEntitiesAsync(new InteCustomQuery { SiteId = _siteId, Name = queryDto.CustomerName });
                 customerIds = customerEntities.Select(m => m.Id);
+                if (!customerIds.Any())
+                {
+                    customerIds = emptyDefault;
+                }
             }
 
             var query = new QualOqcParameterGroupPagedQuery

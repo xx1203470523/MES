@@ -1,3 +1,4 @@
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Data.Repositories.Quality.Query
@@ -26,5 +27,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 客户Id
         /// </summary>
         public long? CustomId { get; set; }
+
+        /// <summary>
+        /// 状态 0、已禁用 1、启用
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
     }
 }

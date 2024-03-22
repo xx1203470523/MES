@@ -64,6 +64,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 更新已检数
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateCheckedQtyAsync(QualOqcOrderTypeEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdatesCheckedQtySql, entity);
+        }
+
+        /// <summary>
         /// 软删除
         /// </summary>
         /// <param name="id"></param>
@@ -105,6 +116,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualOqcOrderTypeEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 根据oqcID获取数据
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualOqcOrderTypeEntity>> GetByOQCOrderIdAsync(long orderId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualOqcOrderTypeEntity>(GetByOrderIdSql, new { IQCOrderId = orderId });
         }
 
         /// <summary>
@@ -155,6 +177,30 @@ namespace Hymson.MES.Data.Repositories.Quality
             return new PagedInfo<QualOqcOrderTypeEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 查询Entity
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<QualOqcOrderTypeEntity> GetEntityAsync(QualOqcOrderTypeQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            //sqlBuilder.Where("SiteId=@SiteId");
+
+            if (query.OQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("OQCOrderId = @OQCOrderId");
+            }
+
+            if (query.InspectionType != null) {
+                sqlBuilder.Where("InspectionType = @InspectionType");
+            }
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<QualOqcOrderTypeEntity>(template.RawSql, query);
+        }
     }
 
 
@@ -172,12 +218,14 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string UpdateSql = "UPDATE qual_oqc_order_type SET   SiteId = @SiteId, OQCOrderId = @OQCOrderId, InspectionType = @InspectionType, VerificationLevel = @VerificationLevel, AcceptanceLevel = @AcceptanceLevel, SampleQty = @SampleQty, CheckedQty = @CheckedQty, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_oqc_order_type SET   SiteId = @SiteId, OQCOrderId = @OQCOrderId, InspectionType = @InspectionType, VerificationLevel = @VerificationLevel, AcceptanceLevel = @AcceptanceLevel, SampleQty = @SampleQty, CheckedQty = @CheckedQty, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesCheckedQtySql = "UPDATE qual_oqc_order_type SET  CheckedQty =CheckedQty+@CheckedQty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn,IsQualified=@IsQualified WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_oqc_order_type SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_oqc_order_type SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM qual_oqc_order_type WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_oqc_order_type WHERE Id IN @Ids ";
+        const string GetByOrderIdSql = @"SELECT * FROM qual_oqc_order_type WHERE OQCOrderId = @OQCOrderId ";
 
     }
 }

@@ -87,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List

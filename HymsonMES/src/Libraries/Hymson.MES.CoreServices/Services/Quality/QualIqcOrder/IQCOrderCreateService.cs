@@ -4,6 +4,8 @@ using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Bos.Quality;
 using Hymson.MES.CoreServices.Extension;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Qual;
 using Hymson.MES.Data.Repositories.Quality;
@@ -32,9 +34,11 @@ namespace Hymson.MES.CoreServices.Services.Quality
         private readonly IProcParameterRepository _procParameterRepository;
         private readonly IQualIqcLevelRepository _qualIqcLevelRepository;
         private readonly IQualIqcLevelDetailRepository _qualIqcLevelDetailRepository;
+        private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
 
         private readonly IAQLLevelQueryService _aqlLevelQueryService;
         private readonly IAQLPlanQueryService _aqlPlanQueryService;
+        private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
         private readonly ISequenceService _sequenceService;
 
         /// <summary>
@@ -51,8 +55,10 @@ namespace Hymson.MES.CoreServices.Services.Quality
         /// <param name="procParameterRepository"></param>
         /// <param name="qualIqcLevelRepository"></param>
         /// <param name="qualIqcLevelDetailRepository"></param>
+        /// <param name="inteCodeRulesRepository"></param>
         /// <param name="aqlLevelQueryService"></param>
         /// <param name="aqlPlanQueryService"></param>
+        /// <param name="manuGenerateBarcodeService"></param>
         /// <param name="sequenceService"></param>
         public IQCOrderCreateService(IQualIqcOrderRepository qualIqcOrderRepository,
             IQualIqcOrderTypeRepository qualIqcOrderTypeRepository,
@@ -65,8 +71,10 @@ namespace Hymson.MES.CoreServices.Services.Quality
             IProcParameterRepository procParameterRepository,
             IQualIqcLevelRepository qualIqcLevelRepository,
             IQualIqcLevelDetailRepository qualIqcLevelDetailRepository,
+            IInteCodeRulesRepository inteCodeRulesRepository,
             IAQLLevelQueryService aqlLevelQueryService,
             IAQLPlanQueryService aqlPlanQueryService,
+            IManuGenerateBarcodeService manuGenerateBarcodeService,
             ISequenceService sequenceService)
         {
             _qualIqcOrderRepository = qualIqcOrderRepository;
@@ -80,8 +88,10 @@ namespace Hymson.MES.CoreServices.Services.Quality
             _procParameterRepository = procParameterRepository;
             _qualIqcLevelRepository = qualIqcLevelRepository;
             _qualIqcLevelDetailRepository = qualIqcLevelDetailRepository;
+            _inteCodeRulesRepository = inteCodeRulesRepository;
             _aqlLevelQueryService = aqlLevelQueryService;
             _aqlPlanQueryService = aqlPlanQueryService;
+            _manuGenerateBarcodeService = manuGenerateBarcodeService;
             _sequenceService = sequenceService;
         }
 
@@ -164,20 +174,22 @@ namespace Hymson.MES.CoreServices.Services.Quality
                 var inspectionTypes = inspectionItemDetails.Select(x => x.InspectionType).Distinct().ToList();
 
                 //获取供应商物料检验水平
-                var iqcLevels = await _qualIqcLevelRepository.GetEntitiesAsync(new Data.Repositories.Quality.Query.QualIqcLevelQuery
+                var iqcLevels = await _qualIqcLevelRepository.GetEntitiesAsync(new QualIqcLevelQuery
                 {
                     SiteId = bo.SiteId,
                     MaterialId = inspectionItem.MaterialId,
                     SupplierId = inspectionItem.SupplierId,
-                    Type = QCMaterialTypeEnum.Material
+                    Type = QCMaterialTypeEnum.Material,
+                    Status = Core.Enums.DisableOrEnableEnum.Enable
                 });
                 if (iqcLevels == null || !iqcLevels.Any())
                 {
                     //供应商物料检验水平为空则使用通用检验水平
-                    iqcLevels = await _qualIqcLevelRepository.GetEntitiesAsync(new Data.Repositories.Quality.Query.QualIqcLevelQuery
+                    iqcLevels = await _qualIqcLevelRepository.GetEntitiesAsync(new QualIqcLevelQuery
                     {
                         SiteId = bo.SiteId,
-                        Type = QCMaterialTypeEnum.General
+                        Type = QCMaterialTypeEnum.General,
+                        Status = Core.Enums.DisableOrEnableEnum.Enable
                     });
                     if (iqcLevels == null || !iqcLevels.Any())
                     {
@@ -187,7 +199,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
                 var iqcLevel = iqcLevels.First();
 
                 // 检验水平详情
-                var iqcLevelDetails = await _qualIqcLevelDetailRepository.GetEntitiesAsync(new Data.Repositories.Quality.Query.QualIqcLevelDetailQuery
+                var iqcLevelDetails = await _qualIqcLevelDetailRepository.GetEntitiesAsync(new QualIqcLevelDetailQuery
                 {
                     IqcLevelIds = new[] { iqcLevel.Id }
                 });
@@ -326,6 +338,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
 
                     var inspectionItemDetailSnapshoot = inspectionItemDetail.ToEntity<QualIqcInspectionItemDetailSnapshotEntity>();
                     inspectionItemDetailSnapshoot.Id = IdGenProvider.Instance.CreateId();
+                    inspectionItemDetailSnapshoot.IqcInspectionItemSnapshotId = inspectionItemSnapshoot.Id;
                     inspectionItemDetailSnapshoot.ParameterCode = parameterEntity.ParameterCode;
                     inspectionItemDetailSnapshoot.ParameterName = parameterEntity.ParameterName;
                     inspectionItemDetailSnapshoot.ParameterDataType = parameterEntity.DataType;
@@ -333,12 +346,13 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     inspectionItemDetailSnapshootList.Add(inspectionItemDetailSnapshoot);
                 }
                 //检验单
-                var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "IQC");  //流水号
+                //var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "IQC");  //流水号
                 var orderEntity = new QualIqcOrderEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = bo.SiteId,
-                    InspectionOrder = $"IQC{updatedOn.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(4, '0')}",
+                    //InspectionOrder = $"IQC{updatedOn.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(4, '0')}",
+                    InspectionOrder = await GenerateIQCOrderCodeAsync(bo),
                     MaterialId = inspectionItem.MaterialId,
                     SupplierId = inspectionItem.SupplierId,
                     IqcInspectionItemSnapshotId = inspectionItemSnapshoot.Id,
@@ -388,6 +402,39 @@ namespace Hymson.MES.CoreServices.Services.Quality
                 trans.Complete();
             }
             return rows;
+        }
+
+        /// <summary>
+        /// 检验单号生成
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        private async Task<string> GenerateIQCOrderCodeAsync(IQCOrderCreateBo bo)
+        {
+            var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
+            {
+                SiteId = bo.SiteId,
+                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.IQC
+            });
+            if (codeRules == null || !codeRules.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11991));
+            }
+            if (codeRules.Count() > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11992));
+            }
+
+            var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new Bos.Manufacture.ManuGenerateBarcode.GenerateBarcodeBo
+            {
+                SiteId = bo.SiteId,
+                UserName = bo.UserName,
+                CodeRuleId = codeRules.First().Id,
+                Count = 1
+            });
+
+            return orderCodes.First();
         }
 
     }
