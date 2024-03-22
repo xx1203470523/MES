@@ -465,6 +465,7 @@ namespace Hymson.MES.Services.Services.Plan
                 dto.UpdatedOn = entity.CreatedOn;    // 这里用创建时间作为条码生成时间更准确
 
                 // 条码信息
+                if (!sfcDic.ContainsKey(entity.SFCId)) continue;
                 var sfcEntity = sfcDic[entity.SFCId];
                 if (sfcEntity != null)
                 {
@@ -474,6 +475,7 @@ namespace Hymson.MES.Services.Services.Plan
                 }
 
                 // 工单
+                if (!workOrderDic.ContainsKey(entity.WorkOrderId)) continue;
                 var workOrderEntity = workOrderDic[entity.WorkOrderId];
                 if (workOrderEntity != null)
                 {
@@ -481,6 +483,7 @@ namespace Hymson.MES.Services.Services.Plan
                 }
 
                 // 产品
+                if (!materialDic.ContainsKey(entity.ProductId)) continue;
                 var materialEntity = materialDic[entity.ProductId];
                 if (materialEntity != null)
                 {

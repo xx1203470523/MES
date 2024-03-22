@@ -187,12 +187,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetProducePagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.OrderBy("Id DESC");
             sqlBuilder.Select("Id, SFCId, SFC, ProductId, WorkOrderId, CreatedOn");
 
             if (pagedQuery.IsUsed.HasValue) sqlBuilder.Where("CreatedOn = UpdatedOn");
             if (pagedQuery.WorkOrderIds != null) sqlBuilder.Where("WorkOrderId IN @WorkOrderIds");
-            if (!string.IsNullOrWhiteSpace(pagedQuery.SFC)) sqlBuilder.Where("SFC LIKE @SFC");
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SFC)) sqlBuilder.Where("SFC = @SFC");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
