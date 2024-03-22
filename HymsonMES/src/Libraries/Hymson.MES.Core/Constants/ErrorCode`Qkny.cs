@@ -45,6 +45,7 @@ namespace Hymson.MES.Core.Constants
         /// 用户名或密码不能为空
         /// </summary>
         public const string MES45013 = "用户名或密码不能为空";
+
         #endregion
 
         #region 开机参数
@@ -258,6 +259,42 @@ namespace Hymson.MES.Core.Constants
         /// 工单对应型号没有对应的分选规则
         /// </summary>
         public const string MES45160 = "工单对应型号没有对应的分选规则";
+
+        #endregion
+
+        #region 设备心跳
+
+        /// <summary>
+        /// 设备状态不能为空
+        /// </summary>
+        public const string MES45170 = "设备状态不能为空";
+
+        #endregion
+
+        #region 设备心跳
+
+        /// <summary>
+        /// 报警状态不能为空
+        /// </summary>
+        public const string MES45180 = "报警状态不能为空";
+
+        #endregion
+
+        #region CCD上传文件完成
+
+        /// <summary>
+        /// CCD上传文件列表不能为空
+        /// </summary>
+        public const string MES45190 = "CCD上传文件列表不能为空";
+
+        #endregion
+
+        #region 工装夹具
+
+        /// <summary>
+        /// 工装夹具不能为空
+        /// </summary>
+        public const string MES45200 = "工装夹具不能为空";
 
         #endregion
     }

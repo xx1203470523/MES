@@ -6,6 +6,7 @@ using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Services.Qkny;
+using Hymson.MES.EquipmentServices.Services.Qkny.Common;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Http;
@@ -27,16 +28,24 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IQknyService _qknyService;
 
         /// <summary>
+        /// 通用服务
+        /// </summary>
+        private readonly IEquCommonService _equCommonService;
+
+        /// <summary>
         /// 是否调试
         /// </summary>
-        private readonly bool IS_DEBUG = true;
+        private readonly bool IS_DEBUG = false;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public QknyController(IQknyService qknyService)
+        public QknyController(
+            IQknyService qknyService,
+            IEquCommonService equCommonService)
         {
             _qknyService = qknyService;
+            _equCommonService = equCommonService;
         }
 
         /// <summary>
@@ -54,7 +63,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.OperatorLoginAsync(dto);
+            await _equCommonService.OperatorLoginAsync(dto);
+            //await _qknyService.OperatorLoginAsync(dto);
         }
 
         /// <summary>
@@ -72,10 +82,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
+            await _equCommonService.HeartbeatAsync(dto);
+
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最后心跳时间
             //2. 记录心跳记录
-            await _qknyService.HeartbeatAsync(dto);
+            //await _qknyService.HeartbeatAsync(dto);
         }
 
         /// <summary>
@@ -93,7 +105,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.StateAsync(dto);
+            await _equCommonService.StateAsync(dto);
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最新状态和最后时间
             //2. 新增 equ_equipment_status_time 记录每个状态持续的时间
@@ -115,7 +127,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.AlarmAsync(dto);
+            await _equCommonService.AlarmAsync(dto);
             //TODO 业务逻辑
             //1. 新增equ_equipment_alarm记录故障时间和恢复时间，用于统计每台设备故障具体时间和故障代码
         }
@@ -150,7 +162,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.CcdFileUploadCompleteAsync(dto);
+            await _equCommonService.CcdFileUploadCompleteAsync(dto);
             //TODO
             //1. 新增表 ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
             //  明细和主表记录到一起
@@ -181,7 +193,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return resultList;
             }
 
-            var result = await _qknyService.GetRecipeListAsync(dto);
+            var result = await _equCommonService.GetRecipeListAsync(dto);
             return result;
             //TODO
             //1. 获取 proc_equipment_group_param 表中type=1的数据，并转换成相应数据格式
@@ -219,7 +231,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return resultList;
             }
 
-            var res = await _qknyService.GetRecipeDetailAsync(dto);
+            var res = await _equCommonService.GetRecipeDetailAsync(dto);
             return res;
         }
 
@@ -238,7 +250,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.RecipeAsync(dto);
+            await _equCommonService.RecipeAsync(dto);
 
             //TODO
             //1. 校验开机参数是否启用状态
@@ -1056,7 +1068,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.ToolLifeAsync(dto);
+            await _equCommonService.ToolLifeAsync(dto);
 
             //TODO
             //1. 添加设备工装寿命记录表，进行数据更新或者插入
