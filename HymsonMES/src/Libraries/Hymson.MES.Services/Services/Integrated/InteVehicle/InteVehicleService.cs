@@ -390,9 +390,16 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES18619));
             }
             var baseobj = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicle.VehicleTypeId);
-            view.VehicleType = baseobj;
-            view.Capacity = baseobj.CellQty;
-            view.Vehicle = inteVehicle;
+            if (baseobj == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18644));
+            }
+            else
+            {
+                view.VehicleType = baseobj;
+                view.Capacity = baseobj.CellQty;
+                view.Vehicle = inteVehicle;
+            }
             var inteVehicleFreights = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicle.Id });
             var inteVehicleFreightDtos = new List<InteVehicleFreightDto>();
             if (inteVehicleFreights != null && inteVehicleFreights.Any())
