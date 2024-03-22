@@ -55,6 +55,20 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
         Task<int> UpdateAsync(ProcResourceTypeUpdateCommand updateCommand);
 
         /// <summary>
+        /// 批量插入
+        /// </summary>
+        /// <param name="resourceTypeEntities"></param>
+        /// <returns></returns>
+        Task<int> InsertsAsync(IEnumerable<ProcResourceTypeEntity> resourceTypeEntities);
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="resourceTypeEntities"></param>
+        /// <returns></returns>
+        Task<int> UpdatesAsync(IEnumerable<ProcResourceTypeEntity> resourceTypeEntities);
+
+        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="command"></param>

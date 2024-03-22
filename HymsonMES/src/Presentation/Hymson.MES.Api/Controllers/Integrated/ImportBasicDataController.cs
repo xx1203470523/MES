@@ -43,7 +43,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("importEqu")]
         public async Task ImportEquDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
-             await _importBasicDataService.ImportEquDataAsync(formFile);
+            await _importBasicDataService.ImportEquDataAsync(formFile);
         }
 
         /// <summary>
@@ -56,6 +56,52 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task ImportResourceDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportResourceDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 资源类型数据导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importResType")]
+        public async Task ImportResourceTypeDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportResourceTypeDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 工序数据导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importProcedure")]
+        public async Task ImportProcedureDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportProcedureDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 产线数据导入
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importWorkLine")]
+        public async Task ImportWorkLineDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportWorkLineDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 车间数据导入
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importWorkShop")]
+        public async Task ImportWorkShopDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportWorkShopDataAsync(formFile);
         }
     }
 }
