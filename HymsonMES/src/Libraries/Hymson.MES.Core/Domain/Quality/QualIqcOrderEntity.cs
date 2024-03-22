@@ -50,7 +50,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 是否免检
         /// </summary>
-        public TrueOrFalseEnum IsExemptInspection { get; set; } = TrueOrFalseEnum.No;
+        public TrueOrFalseEnum? IsExemptInspection { get; set; }
 
         /// <summary>
         /// 接收水准
