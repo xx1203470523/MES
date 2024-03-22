@@ -24,6 +24,7 @@ using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Reflection.Emit;
 using System.Security.Policy;
 using System.Transactions;
 
@@ -83,6 +84,19 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             await _validationCreateRules.ValidateAndThrowAsync(inteCodeRulesCreateDto);
+
+            //校验OQC与IQC只能创建一个
+            if (inteCodeRulesCreateDto.CodeType != null)
+            {
+                if(inteCodeRulesCreateDto.CodeType== CodeRuleCodeTypeEnum.OQC|| inteCodeRulesCreateDto.CodeType== CodeRuleCodeTypeEnum.IQC)
+                {
+                    var Entities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId = _currentSite.SiteId ?? 0, CodeType = inteCodeRulesCreateDto.CodeType });
+                    if (Entities.Any())
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12451)).WithData("type", inteCodeRulesCreateDto.CodeType.GetDescription());
+                    }
+                }
+            }
 
             if (inteCodeRulesCreateDto.CodeRulesMakes == null)
             {

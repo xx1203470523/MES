@@ -28,4 +28,5 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public YesOrNoEnum? IsUsed { get; set; }
     }
+
 }

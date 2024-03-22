@@ -155,7 +155,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public SfcStatusEnum? SfcStatus { get; set; }
     }
 
-    public class ManuSfcAboutInfoPagedQuery : PagerInfo 
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ManuSfcAboutInfoPagedQuery : PagerInfo
     {
         /// <summary>
         /// 站点
@@ -170,7 +173,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 条码 - 硬查
         /// </summary>
-        public string? SfcHard {  get; set; }
+        public string? SfcHard { get; set; }
 
         /// <summary>
         /// 工单ID
@@ -199,6 +202,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ManuSfcAboutInfoBySfcQuery : PagerInfo
     {
         /// <summary>
@@ -211,4 +217,32 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public string Sfc { get; set; }
     }
+
+    /// <summary>
+    /// 条码表 分页参数
+    /// </summary>
+    public class ManuSfcProduceNewPagedQuery : PagerInfo
+    {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public IEnumerable<long>? WorkOrderIds { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string? SFC { get; set; }
+
+        /// <summary>
+        /// 是否使用
+        /// </summary>
+        public YesOrNoEnum? IsUsed { get; set; }
+
+    }
+
 }

@@ -25,6 +25,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public InspectionStatusEnum? Status { get; set; }
 
         /// <summary>
+        /// 是否免检
+        /// </summary>
+        public TrueOrFalseEnum? IsExemptInspection { get; set; }
+
+        /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
         public TrueOrFalseEnum? IsQualified { get; set; }

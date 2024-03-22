@@ -167,11 +167,11 @@ namespace Hymson.MES.Data.Repositories.Common
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM sys_config /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM sys_config /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/  ";
 
-        const string InsertSql = "REPLACE INTO sys_config(  `Id`, `Type`, `Code`, `Value`, `SiteId`, `CreatedBy`, `CreatedOn`, `IsDeleted`) VALUES (  @Id, @Type, @Code, @Value, @SiteId, @CreatedBy, @CreatedOn, @IsDeleted) ";
-        const string InsertsSql = "REPLACE INTO sys_config(  `Id`, `Type`, `Code`, `Value`, `SiteId`, `CreatedBy`, `CreatedOn`, `IsDeleted`) VALUES (  @Id, @Type, @Code, @Value, @SiteId, @CreatedBy, @CreatedOn, @IsDeleted) ";
+        const string InsertSql = "REPLACE INTO sys_config(  `Id`, `Type`, `Code`, `Value`, `SiteId`, Remark, `CreatedBy`, `CreatedOn`, `IsDeleted`) VALUES (  @Id, @Type, @Code, @Value, @SiteId, @Remark, @CreatedBy, @CreatedOn, @IsDeleted) ";
+        const string InsertsSql = "REPLACE INTO sys_config(  `Id`, `Type`, `Code`, `Value`, `SiteId`, Remark, `CreatedBy`, `CreatedOn`, `IsDeleted`) VALUES (  @Id, @Type, @Code, @Value, @SiteId, @Remark, @CreatedBy, @CreatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE sys_config SET   Type = @Type, Code = @Code, Value = @Value, SiteId = @SiteId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE sys_config SET   Type = @Type, Code = @Code, Value = @Value, SiteId = @SiteId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE sys_config SET   Type = @Type, Code = @Code, Value = @Value, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE sys_config SET   Type = @Type, Code = @Code, Value = @Value, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE sys_config SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE sys_config SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

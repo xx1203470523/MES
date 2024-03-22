@@ -357,6 +357,7 @@ namespace Hymson.MES.Services.Services.Quality
                     IQCInspectionDetailSnapshotId = item.Id,
                     InspectionValue = item.InspectionValue ?? "",
                     IsQualified = item.IsQualified,
+                    Remark = item.Remark,
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
                     UpdatedBy = updatedBy,
@@ -388,6 +389,7 @@ namespace Hymson.MES.Services.Services.Quality
                             Id = IdGenProvider.Instance.CreateId(),
                             SiteId = entity.SiteId,
                             IQCOrderId = requestDto.IQCOrderId,
+                            IQCOrderSampleDetailId = sampleDetailId,
                             AnnexId = attachmentId,
                             CreatedBy = updatedBy,
                             CreatedOn = updatedOn,
@@ -515,6 +517,7 @@ namespace Hymson.MES.Services.Services.Quality
             */
 
             // 关闭检验单
+            entity.IsExemptInspection = TrueOrFalseEnum.Yes;
             entity.IsQualified = TrueOrFalseEnum.Yes;
             entity.Status = InspectionStatusEnum.Closed;
 
@@ -547,8 +550,8 @@ namespace Hymson.MES.Services.Services.Quality
                     .WithData("After", InspectionStatusEnum.Closed.GetDescription());
             }
 
-            // 不合格处理完成之后直接关闭
-            entity.IsQualified = TrueOrFalseEnum.Yes;
+            // 不合格处理完成之后直接关闭（无需变为合格）
+            //entity.IsQualified = TrueOrFalseEnum.Yes;
             entity.Status = InspectionStatusEnum.Closed;
 
             var rows = 0;
@@ -764,6 +767,7 @@ namespace Hymson.MES.Services.Services.Quality
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = entity.SiteId,
                         IQCOrderId = entity.IQCOrderId,
+                        IQCOrderSampleDetailId = entity.Id,
                         AnnexId = attachmentId,
                         CreatedBy = updatedBy,
                         CreatedOn = updatedOn,
@@ -881,7 +885,7 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedInfo = await _qualIqcOrderRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = await PrepareOrderDtos(pagedInfo.Data);
+            var dtos = await PrepareOrderDtosAsync(pagedInfo.Data);
             return new PagedInfo<QualIqcOrderDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -971,7 +975,7 @@ namespace Hymson.MES.Services.Services.Quality
             });
             if (sampleDetailEntities == null) return Array.Empty<OrderParameterDetailDto>();
 
-            return await PrepareSampleDetailDtos(entity, sampleDetailEntities);
+            return await PrepareSampleDetailDtosAsync(entity, sampleDetailEntities);
         }
 
         /// <summary>
@@ -1021,7 +1025,7 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedInfo = await _qualIqcOrderSampleDetailRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = await PrepareSampleDetailDtos(entity, pagedInfo.Data);
+            var dtos = await PrepareSampleDetailDtosAsync(entity, pagedInfo.Data);
             return new PagedInfo<OrderParameterDetailDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -1108,7 +1112,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<QualIqcOrderDto>> PrepareOrderDtos(IEnumerable<QualIqcOrderEntity> entities)
+        private async Task<IEnumerable<QualIqcOrderDto>> PrepareOrderDtosAsync(IEnumerable<QualIqcOrderEntity> entities)
         {
             List<QualIqcOrderDto> dtos = new();
 
@@ -1135,6 +1139,13 @@ namespace Hymson.MES.Services.Services.Quality
             var supplierEntities = await _whSupplierRepository.GetByIdsAsync(entities.Where(w => w.SupplierId.HasValue).Select(x => x.SupplierId!.Value));
             var supplierDic = supplierEntities.ToDictionary(x => x.Id, x => x);
 
+            // 查询不合格处理数据
+            var unqualifiedHandEntities = await _qualIqcOrderUnqualifiedHandRepository.GetEntitiesAsync(new QualIqcOrderUnqualifiedHandQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                IQCOrderIds = entities.Select(s => s.Id)
+            });
+
             foreach (var entity in entities)
             {
                 var dto = entity.ToModel<QualIqcOrderDto>();
@@ -1154,7 +1165,7 @@ namespace Hymson.MES.Services.Services.Quality
                 }
 
                 // 检验人
-                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperationType == OrderOperateTypeEnum.Complete);
+                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperationType == OrderOperateTypeEnum.Start);
                 if (inspectionEntity != null)
                 {
                     dto.InspectionBy = inspectionEntity.CreatedBy;
@@ -1162,9 +1173,10 @@ namespace Hymson.MES.Services.Services.Quality
                 }
 
                 // 处理人
-                var handleEntity = orderOperationEntities.FirstOrDefault(f => f.OperationType == OrderOperateTypeEnum.Close);
+                var handleEntity = unqualifiedHandEntities.FirstOrDefault(f => f.IQCOrderId == entity.Id);
                 if (handleEntity != null)
                 {
+                    dto.HandMethod = handleEntity.HandMethod;
                     dto.HandledBy = handleEntity.CreatedBy;
                     dto.HandledOn = handleEntity.CreatedOn;
                 }
@@ -1221,7 +1233,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="entity"></param>
         /// <param name="sampleDetailEntities"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<OrderParameterDetailDto>> PrepareSampleDetailDtos(QualIqcOrderEntity entity, IEnumerable<QualIqcOrderSampleDetailEntity> sampleDetailEntities)
+        private async Task<IEnumerable<OrderParameterDetailDto>> PrepareSampleDetailDtosAsync(QualIqcOrderEntity entity, IEnumerable<QualIqcOrderSampleDetailEntity> sampleDetailEntities)
         {
             // 查询样品明细对应的快照明细
             var snapshotDetailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetByIdsAsync(sampleDetailEntities.Select(s => s.IQCInspectionDetailSnapshotId));
@@ -1257,6 +1269,7 @@ namespace Hymson.MES.Services.Services.Quality
                 dto.InspectionValue = sampleDetailEntity.InspectionValue;
                 dto.IsQualified = sampleDetailEntity.IsQualified;
                 dto.Remark = sampleDetailEntity.Remark;
+                dto.Scale = snapshotDetailEntity.Scale;
 
                 // 填充条码
                 var sampleEntity = sampleEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCOrderSampleId);
