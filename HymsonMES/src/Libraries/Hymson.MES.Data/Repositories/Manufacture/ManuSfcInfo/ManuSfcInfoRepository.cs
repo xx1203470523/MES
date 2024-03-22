@@ -82,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ManuSfcInfoEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcInfoEntity>(GetByIdsSql, new { Ids = ids });

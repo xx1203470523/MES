@@ -1155,7 +1155,9 @@ namespace Hymson.MES.Services.Mapper
 
             #region PlanSfcPrint
             CreateMap<PlanSfcPrintPagedQueryDto, ManuSfcPassDownPagedQuery>();
+            CreateMap<PlanSfcPrintPagedQueryDto, ManuSfcProduceNewPagedQuery>();
             CreateMap<ManuSfcPassDownView, PlanSfcPrintDto>();
+            CreateMap<ManuSfcProduceEntity, PlanSfcPrintDto>();
             #endregion
 
             #region PlanCalendar

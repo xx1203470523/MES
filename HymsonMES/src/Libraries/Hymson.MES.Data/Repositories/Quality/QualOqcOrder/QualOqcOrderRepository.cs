@@ -141,6 +141,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
             if (query.ShipmentMaterialIds != null && query.ShipmentMaterialIds.Any())
             {
                 sqlBuilder.Where("ShipmentMaterialId IN @ShipmentMaterialIds");
@@ -191,6 +192,10 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("IsQualified = @IsQualified");
             }
 
+            if (pagedQuery.Ids != null && pagedQuery.Ids.Any()) {
+                sqlBuilder.Where("Id IN @Ids");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -225,7 +230,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string UpdateStatusAndIsQualifiedSql = "UPDATE qual_oqc_order SET  Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn,IsQualified = @IsQualified WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_oqc_order SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE qual_oqc_order SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeletesSql = "UPDATE qual_oqc_order SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids AND Status=1";
 
         const string GetByIdSql = @"SELECT * FROM qual_oqc_order WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_oqc_order WHERE Id IN @Ids ";

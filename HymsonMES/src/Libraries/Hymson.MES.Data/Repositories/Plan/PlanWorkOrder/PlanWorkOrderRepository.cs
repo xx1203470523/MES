@@ -194,19 +194,20 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="planWorkOrderQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PlanWorkOrderEntity>> GetPlanWorkOrderEntitiesAsync(PlanWorkOrderQuery planWorkOrderQuery)
+        public async Task<IEnumerable<PlanWorkOrderEntity>> GetEntitiesAsync(PlanWorkOrderNewQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetPlanWorkOrderEntitiesSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
+            if (!string.IsNullOrWhiteSpace(query.OrderCode)) sqlBuilder.Where("OrderCode LIKE @OrderCode");
+
             using var conn = GetMESDbConnection();
-            var planWorkOrderEntities = await conn.QueryAsync<PlanWorkOrderEntity>(template.RawSql, planWorkOrderQuery);
-            return planWorkOrderEntities;
+            return await conn.QueryAsync<PlanWorkOrderEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -417,6 +418,8 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public partial class PlanWorkOrderRepository
     {
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM plan_work_order /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
                           wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`, wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
                           wor.InputQty, wor.FinishProductQuantity, wor.PassDownQuantity, wor.RealStart, wor.RealEnd,

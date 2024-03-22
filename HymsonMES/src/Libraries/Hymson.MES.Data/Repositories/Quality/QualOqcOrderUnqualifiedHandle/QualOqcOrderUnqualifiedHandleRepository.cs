@@ -126,7 +126,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
             if (query.HandMethod != null)
             {
-                sqlBuilder.Where("HandMethod IN @HandMethod");
+                sqlBuilder.Where("HandMethod = @HandMethod");
             }
 
             using var conn = GetMESDbConnection();

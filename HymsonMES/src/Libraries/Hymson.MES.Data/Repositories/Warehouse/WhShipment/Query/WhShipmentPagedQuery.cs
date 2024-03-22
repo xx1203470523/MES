@@ -32,5 +32,10 @@ namespace Hymson.MES.Data.Repositories.WhShipment.Query
         /// </summary>
         public DateTime? PlanShipmentTimeEnd { get; set; }
 
+        /// <summary>
+        /// Ids
+        /// </summary>
+        public IEnumerable<long>? NotInIds { get; set; }
+
     }
 }

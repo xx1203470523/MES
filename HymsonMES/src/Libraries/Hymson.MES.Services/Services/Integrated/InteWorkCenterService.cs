@@ -255,6 +255,12 @@ namespace Hymson.MES.Services.Services.Integrated
                     if (inteWorkCenterByLineEntities != null && inteWorkCenterByLineEntities.Any()) {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12126));
                     }
+                    // 判断资源的状态是否存在新建和废除状态
+                    var resourcesFarm = await _inteWorkCenterRepository.GetByIdsAsync(param.WorkCenterIds.ToArray());
+                    if (resourcesFarm != null && resourcesFarm.Any(a => a.Status == SysDataStatusEnum.Build))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12127)).WithData("code", param.Code);
+                    }
 
                     break;
                 case WorkCenterTypeEnum.Line:

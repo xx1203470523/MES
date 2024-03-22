@@ -13,6 +13,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public long? SiteId { get; set; }
 
         /// <summary>
+        /// 主键集合
+        /// </summary>
+        public IEnumerable<long>? IQCOrderIds { get; set; }
+
+        /// <summary>
         /// 不合格处理方式
         /// </summary>
         public IQCHandMethodEnum? HandMethod { get; set; }

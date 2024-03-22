@@ -338,6 +338,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 单条码返回值
                 var responseBo = new OutStationResponseBo();
 
+                // 2024.03.19 克明大佬说出站时需要清除设备ID值
+                sfcProduceEntity.EquipmentId = null;
+
                 // 是否有传是否合格标识
                 if (requestBo.IsQualified.HasValue && !requestBo.IsQualified.Value)
                 {
