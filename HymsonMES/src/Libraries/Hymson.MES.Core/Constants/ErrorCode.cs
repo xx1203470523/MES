@@ -1611,6 +1611,7 @@
 
         public const string MES18642 = "存在不符合要求的条码，解绑失败！";
         public const string MES18643 = "载具条码列表为空，解绑失败！";
+        public const string MES18644 = "未绑定载具类型无法使用！";
         #endregion
 
         #region Recipe参数 18700
