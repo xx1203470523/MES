@@ -297,5 +297,23 @@ namespace Hymson.MES.Core.Constants
         public const string MES45200 = "工装夹具不能为空";
 
         #endregion
+
+        #region 设备过程参数
+
+        /// <summary>
+        /// 设备过程参数不能为空
+        /// </summary>
+        public const string MES45210 = "设备过程参数不能为空";
+
+        #endregion
+
+        #region 产品过程参数
+
+        /// <summary>
+        /// 产品过程参数不能为空
+        /// </summary>
+        public const string MES45220 = "产品过程参数不能为空";
+
+        #endregion
     }
 }

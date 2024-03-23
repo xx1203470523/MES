@@ -75,5 +75,19 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         /// <param name="dto"></param>
         /// <returns></returns>
         Task ToolLifeAsync(ToolLifeDto dto);
+
+        /// <summary>
+        /// 设备过程参数
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto);
+
+        /// <summary>
+        /// 产品参数上传043
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task ProductParamAsync(ProductParamDto dto);
     }
 }

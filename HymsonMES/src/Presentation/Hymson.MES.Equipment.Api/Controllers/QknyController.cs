@@ -681,7 +681,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.EquipmentProcessParamAsync(dto);
+            await _equCommonService.EquipmentProcessParamAsync(dto);
 
             //TODO
             //1. 写入参数表，参考现有的EquipmentCollectionAsync，
@@ -1089,7 +1089,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.ProductParamAsync(dto);
+            await _equCommonService.ProductParamAsync(dto);
 
             //TODO
             //1. 参考 ProductCollectionAsync
