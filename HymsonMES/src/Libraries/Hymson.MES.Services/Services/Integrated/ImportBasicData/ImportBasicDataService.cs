@@ -126,7 +126,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             //重复的设备编码
-            var equCodes = excelImportDtos.Where(x => string.IsNullOrWhiteSpace(x.EquipmentCode)).Select(x => x.EquipmentCode).Distinct().ToArray();
+            var equCodes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.EquipmentCode)).Select(x => x.EquipmentCode).Distinct().ToArray();
             if (equCodes.Length < excelImportDtos.Count())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11601));
@@ -213,6 +213,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     continue;
                 }
 
+                //TODO
                 //读取部门数据,部门数据来源用户中心
                 var equipmentCode = entity.EquipmentCode.ToTrimSpace().ToUpperInvariant();
                 var equipment = equipmentEntities.FirstOrDefault(x => x.EquipmentCode == equipmentCode);
@@ -474,6 +475,12 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 throw new CustomerValidationException(errorMessage.ToString());
             }
+
+            if (equList.GroupBy(m => new { m.ResourceId, m.EquipmentId }).Any(x=>x.Count()>1))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10314));
+            }
+            //TODO 一个资源只能对应一个主设备
             #endregion
 
             #region 入库
@@ -589,7 +596,7 @@ namespace Hymson.MES.Services.Services.Integrated
             //    var resourceQuery = new ProcResourceQuery() { SiteId = _currentSite.SiteId ?? 0, ResCodes = resCodes };
             //    resourceEntities = await _procResourceRepository.GetEntitiesAsync(resourceQuery);
             //}
-            //验证资源信息,资源的资源类型信息修改
+            //TODO 修改资源的资源类型,验证资源信息,资源的资源类型信息修改
             #endregion
 
             #region 入库
@@ -629,11 +636,11 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             //重复的工序编码
-            var equCodes = excelImportDtos.Where(x => string.IsNullOrWhiteSpace(x.Code)).Select(x => x.Code).Distinct().ToArray();
-            if (equCodes.Length < excelImportDtos.Count())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11607));
-            }
+            //var equCodes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.Code)).Select(x => x.Code).Distinct().ToArray();
+            //if (equCodes.Length < excelImportDtos.Count())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES11607));
+            //}
 
             var addProcedureEntities = new List<ProcProcedureEntity>();
             var updateProcedureeEntities = new List<ProcProcedureEntity>();
@@ -706,6 +713,7 @@ namespace Hymson.MES.Services.Services.Integrated
                         Type = entity.Type,
                         IsRepairReturn = (byte)isRepairReturn,
                         ResourceTypeId = resTypeId,
+                        SiteId=_currentSite.SiteId??0,
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     });

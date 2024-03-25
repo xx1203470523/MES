@@ -284,7 +284,7 @@ namespace Hymson.MES.Data.Repositories.Process
             }
             if (procMaterialQuery.MaterialCodes != null && procMaterialQuery.MaterialCodes.Any())
             {
-                sqlBuilder.Where(" MaterialCode in @MaterialCode ");
+                sqlBuilder.Where(" MaterialCode in @MaterialCodes ");
             }
             sqlBuilder.AddParameters(procMaterialQuery);
 

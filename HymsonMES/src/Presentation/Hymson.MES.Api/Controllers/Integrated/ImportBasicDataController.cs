@@ -103,5 +103,16 @@ namespace Hymson.MES.Api.Controllers.Integrated
         {
             await _importBasicDataService.ImportWorkShopDataAsync(formFile);
         }
+
+        /// <summary>
+        /// 车间数据导入
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importMaterialGroup")]
+        public async Task ImportMaterialGroupDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportMaterialGroupDataAsync(formFile);
+        }
     }
 }
