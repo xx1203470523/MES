@@ -7,6 +7,7 @@ using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Services.Qkny;
 using Hymson.MES.EquipmentServices.Services.Qkny.Common;
+using Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Http;
@@ -33,6 +34,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IEquCommonService _equCommonService;
 
         /// <summary>
+        /// 制胶匀浆
+        /// </summary>
+        private readonly IGlueHomogenateService _glueHomogenateService;
+
+        /// <summary>
         /// 是否调试
         /// </summary>
         private readonly bool IS_DEBUG = false;
@@ -42,10 +48,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         public QknyController(
             IQknyService qknyService,
-            IEquCommonService equCommonService)
+            IEquCommonService equCommonService,
+            IGlueHomogenateService glueHomogenateService)
         {
             _qknyService = qknyService;
             _equCommonService = equCommonService;
+            _glueHomogenateService = glueHomogenateService;
         }
 
         /// <summary>
@@ -396,7 +404,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 }
             }
 
-            return await _qknyService.FormulaListGetAsync(dto);
+            return await _glueHomogenateService.FormulaListGetAsync(dto);
         }
 
         /// <summary>
@@ -435,7 +443,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return result;
             }
 
-            return await _qknyService.FormulaDetailGetAsync(dto);
+            return await _glueHomogenateService.FormulaDetailGetAsync(dto);
         }
 
         /// <summary>
@@ -453,7 +461,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.FormulaVersionExamineAsync(dto);
+            await _glueHomogenateService.FormulaVersionExamineAsync(dto);
 
             //TODO
             //1. 查询表proc_formula进行配方版本的校验，确认是否是激活的版本
@@ -474,7 +482,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.ConsumeEquBeforeCheckAsync(dto);
+            await _glueHomogenateService.ConsumeEquBeforeCheckAsync(dto);
 
             //TODO
             //待确认？此时应该应该根据什么是查激活的工单以及对应的BOM
@@ -497,7 +505,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.ConsumeEquAsync(dto);
+            await _glueHomogenateService.ConsumeEquAsync(dto);
             //TODO
             //1. 类似上料，上到搅拌机或者制胶机
         }
@@ -517,7 +525,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.FeedingCompletedAsync(dto);
+            await _glueHomogenateService.FeedingCompletedAsync(dto);
 
             //TODO
             //1. 类似上料，粉料，匀浆上到中转罐或者料仓（上料点）
@@ -540,7 +548,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return sfc;
             }
 
-            return await _qknyService.OutputEquAsync(dto);
+            return await _glueHomogenateService.OutputEquAsync(dto);
 
             //TODO
             //1. 根据工序返回对应的条码给设备
@@ -562,7 +570,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.BatchMoveAsync(dto);
+            await _glueHomogenateService.BatchMoveAsync(dto);
 
             //TODO
             //1. 当浆料或胶液在罐体间转移后，上报浆料或胶液条码、重量、转出罐和转入罐的编码
@@ -585,7 +593,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.ConsumeInNonProductionEquAsync(dto);
+            await _glueHomogenateService.ConsumeInNonProductionEquAsync(dto);
 
             //TODO
             //1. 使用NMP和DIW洗罐子用到
