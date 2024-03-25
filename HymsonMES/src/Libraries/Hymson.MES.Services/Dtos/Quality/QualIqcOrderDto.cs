@@ -237,7 +237,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 是否免检
         /// </summary>
-        public TrueOrFalseEnum IsExemptInspection { get; set; }
+        public TrueOrFalseEnum? IsExemptInspection { get; set; }
 
         /// <summary>
         /// 检验等级(1-正常 2-加严 3-放宽)
