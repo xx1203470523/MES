@@ -140,6 +140,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted=0");
 
             if (query.OQCOrderId != null) {
                 sqlBuilder.Where("OQCOrderId = @OQCOrderId");

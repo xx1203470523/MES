@@ -355,7 +355,10 @@ namespace Hymson.MES.Services.Services.Quality
                 var inteAnnexIds = qualOqcOrderAnnexEntities.Select(a => a.AnnexId).Distinct();
                 var inteAnnexEntities = await _inteAttachmentRepository.GetByIdsAsync(inteAnnexIds);
                 dto.Attachments = inteAnnexEntities.Select((a) => {
-                    return a.ToModel<InteAttachmentBaseDto>();
+                    var model= a.ToModel<InteAttachmentBaseDto>();
+                    model.Url = a.Path;
+                    model.AttachmentId = a.Id;
+                    return model;
                 });
             }
 
@@ -1349,6 +1352,7 @@ namespace Hymson.MES.Services.Services.Quality
 
                 dto.Name = attachmentEntity.Name;
                 dto.Path = attachmentEntity.Path;
+                dto.Url = attachmentEntity.Path;
                 dtos.Add(dto);
             }
 

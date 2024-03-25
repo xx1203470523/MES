@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 工单信息表 视图类 
- *builder:  Karl
- *build datetime: 2023-03-21 18:39:17
- */
-
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
@@ -118,6 +110,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         public string ProcessRouteCode { get; set; }
 
         /// <summary>
+        /// 工艺路线名称
+        /// </summary>
+        public string ProcessRouteName { get; set; }
+
+        /// <summary>
         /// 工艺路线版本
         /// </summary>
         public string ProcessRouteVersion { get; set; }
@@ -127,6 +124,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         public string WorkCenterCode { get; set; }
 
+        /// <summary>
+        /// 工作中心名称
+        /// </summary>
+        public string WorkCenterName { get; set; }
 
         /// <summary>
         /// 投入数量

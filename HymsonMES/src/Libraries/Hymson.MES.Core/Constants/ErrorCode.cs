@@ -890,7 +890,8 @@
         public const string MES15504 = "未找到资源关联的产线！";
         public const string MES15505 = "未找到该条码相匹配的物料！";
         public const string MES15506 = "该条码与选定的物料不匹配！";
-        public const string MES15507 = "该条码{BarCode}已存在于当前上料点！";
+        public const string MES15507 = "条码【{BarCode}】已存在于当前上料点！";
+        public const string MES15508 = "条码【{BarCode}】已过期，有效期为【{DueDate}】，无法加载！";
         #endregion
 
         #region 自定义字段 15600
@@ -1611,6 +1612,7 @@
 
         public const string MES18642 = "存在不符合要求的条码，解绑失败！";
         public const string MES18643 = "载具条码列表为空，解绑失败！";
+        public const string MES18644 = "未绑定载具类型无法使用！";
         #endregion
 
         #region Recipe参数 18700
