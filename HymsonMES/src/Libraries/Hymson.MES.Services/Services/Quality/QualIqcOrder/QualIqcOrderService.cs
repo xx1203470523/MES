@@ -517,6 +517,7 @@ namespace Hymson.MES.Services.Services.Quality
             */
 
             // 关闭检验单
+            entity.IsExemptInspection = TrueOrFalseEnum.Yes;
             entity.IsQualified = TrueOrFalseEnum.Yes;
             entity.Status = InspectionStatusEnum.Closed;
 
@@ -549,8 +550,8 @@ namespace Hymson.MES.Services.Services.Quality
                     .WithData("After", InspectionStatusEnum.Closed.GetDescription());
             }
 
-            // 不合格处理完成之后直接关闭
-            entity.IsQualified = TrueOrFalseEnum.Yes;
+            // 不合格处理完成之后直接关闭（无需变为合格）
+            //entity.IsQualified = TrueOrFalseEnum.Yes;
             entity.Status = InspectionStatusEnum.Closed;
 
             var rows = 0;
