@@ -142,5 +142,11 @@ namespace Hymson.MES.Core.Domain.Process
         /// 保质期（天）
         /// </summary>
         public int? ShelfLife { get; set; }
+
+        /// <summary>
+        /// 规格型号
+        /// </summary>
+        public string Specifications { get; set; }
+
     }
 }
