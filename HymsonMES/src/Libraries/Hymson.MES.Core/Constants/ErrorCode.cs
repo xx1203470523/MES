@@ -890,7 +890,8 @@
         public const string MES15504 = "未找到资源关联的产线！";
         public const string MES15505 = "未找到该条码相匹配的物料！";
         public const string MES15506 = "该条码与选定的物料不匹配！";
-        public const string MES15507 = "该条码{BarCode}已存在于当前上料点！";
+        public const string MES15507 = "条码【{BarCode}】已存在于当前上料点！";
+        public const string MES15508 = "条码【{BarCode}】已过期，有效期为【{DueDate}】，无法加载！";
         #endregion
 
         #region 自定义字段 15600
