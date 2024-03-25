@@ -120,5 +120,37 @@ namespace Hymson.MES.Api.Controllers.Plan
             await _planWorkOrderActivationService.ActivationWorkOrderAsync(activationWorkOrderDto);
         }
 
+        /// <summary>
+        /// 设备扫描
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpGet("equipment/scan")]
+        public async Task<EquipmentCodeScanOutputDto> EquipmentCodeScanAsync(string code)
+        {
+            return await _planWorkOrderActivationService.EquipmentCodeScanAsync(code);
+        }
+
+        /// <summary>
+        /// 获取激活工单
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("equipment/activityWorkOrder")]
+        public async Task<IEnumerable<EquipmentActivityWorkOrderOutputDto>> GetActivityWorkOrderAsync([FromQuery] ActivationWorkOrderPagedQueryDto query)
+        {
+            return await _planWorkOrderActivationService.GetActivityWorkOrderAsync(query);
+        }
+
+        /// <summary>
+        /// 获取未激活工单
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("equipment/notActivityWorkOrder")]
+        public async Task<IEnumerable<EquipmentActivityWorkOrderOutputDto>> GetNotActivityWorkOrderAsync([FromQuery] ActivationWorkOrderPagedQueryDto query)
+        {
+            return await _planWorkOrderActivationService.GetNotActivityWorkOrderAsync(query);
+        }
     }
 }

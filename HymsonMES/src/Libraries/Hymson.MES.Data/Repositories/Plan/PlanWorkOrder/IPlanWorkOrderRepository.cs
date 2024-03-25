@@ -202,5 +202,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         Task<int> UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command);
 
+        /// <summary>
+        /// 获取激活工单列表
+        /// </summary>
+        /// <param name="workLineIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetActivationWorkOrderDataAsync(PlanWorkOrderPagedQuery query);
+        Task<IEnumerable<PlanWorkOrderEntity>> GetWorkOrderDataAsync(PlanWorkOrderPagedQuery query);
     }
 }

@@ -8,6 +8,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.View;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -106,7 +107,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteWorkCenterEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<InteWorkCenterEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteWorkCenterEntity>(GetByIdsSql, new { ids });
@@ -325,6 +326,18 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetHigherInteWorkCenterSql, new { Id = id });
         }
+
+        /// <summary>
+        /// 根据下级工作中心Id获取上级工作中心
+        /// (只获取一级)
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteWorkCenterEntity>> GetHigherInteWorkCenterAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteWorkCenterEntity>(GetHigherInteWorkCentersSql, new { Ids = ids });
+        }
         #endregion
 
         #region 关联资源
@@ -442,8 +455,15 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                                                 From  inte_work_center_relation  wcr 
                                                 left join inte_work_center wc on wc.Id=wcr.WorkCenterId
                                                 Where wcr.SubWorkCenterId = @Id ";
+
+        const string GetHigherInteWorkCentersSql = @"select wc.*
+                                                From  inte_work_center_relation  wcr 
+                                                left join inte_work_center wc on wc.Id=wcr.WorkCenterId
+                                                Where wcr.SubWorkCenterId IN @Ids ";
+
         const string GetWorkCenterIdByResourceIdSql = "SELECT WorkCenterId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND ResourceId IN @resourceIds";
-        const string GetResourceIdsByWorkCenterIdSql = "SELECT ResourceId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND WorkCenterId IN @workCenterIds ";
+
+        const string GetResourceIdsByWorkCenterIdSql = "SELECT ResourceId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND WorkCenterId IN @workCenterIds";
 
         const string UpdateStatusSql = "UPDATE `inte_work_center` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
     }

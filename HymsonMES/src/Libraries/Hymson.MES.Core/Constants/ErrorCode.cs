@@ -1170,6 +1170,7 @@
         public const string MES16414 = "当前资源所对应的工作中心不是线体";
         public const string MES16415 = "工单[{orderCode}]处于暂停中，无法操作！";
         public const string MES16416 = "工单【{Code}】状态为【未激活】，不允许生产，具体请查看【工单激活】！";
+        public const string MES16417 = "当前选择的设备不存在！";        
         #endregion
 
         #region 条码下达 MES16500
