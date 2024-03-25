@@ -19,5 +19,10 @@ namespace Hymson.MES.Data.Repositories.WhShipment.Query
         /// 出货单号
         /// </summary>
         public string ShipmentNum { get; set; }
+
+        /// <summary>
+        /// Ids
+        /// </summary>
+        public IEnumerable<long> Ids { get; set; }
     }
 }

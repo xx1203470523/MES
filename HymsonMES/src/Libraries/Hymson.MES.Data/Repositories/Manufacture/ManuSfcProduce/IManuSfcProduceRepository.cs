@@ -23,6 +23,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<PagedInfo<ManuSfcProduceEntity>> GetPagedListAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery);
 
         /// <summary>
+        /// 分页查询（在制）
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcProduceEntity>> GetPagedListAsync(ManuSfcProduceNewPagedQuery pagedQuery);
+
+        /// <summary>
         /// 质量锁定
         /// </summary>
         /// <param name="command"></param>

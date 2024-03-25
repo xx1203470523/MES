@@ -377,6 +377,11 @@ public partial class QualOqcParameterGroupRepository
             sqlBuilder.Where("SiteId IN @SiteIds");
         }
 
+        if (!string.IsNullOrWhiteSpace(query.Version))
+        {
+            sqlBuilder.Where("Version = @Version");
+        }
+
 
         sqlBuilder.Where("IsDeleted = 0");
 

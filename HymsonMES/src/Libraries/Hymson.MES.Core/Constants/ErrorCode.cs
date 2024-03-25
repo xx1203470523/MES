@@ -515,6 +515,7 @@
         public const string MES12124 = "工作中心类型不合法，请检查.";
         public const string MES12125 = "对应工作中心数据不存在.";
         public const string MES12126 = "存在已被关联产线,不允许重复关联!";
+        public const string MES12127 = "新建状态的产线不能用于工作中心!";
         #endregion
 
         #region 编码规则 12400
@@ -560,6 +561,7 @@
         public const string MES12448 = "包装序列码的容器编码不可为空";
         public const string MES12449 = "包装序列码必须填写有效的容器编码";
         public const string MES12450 = "容器{code}编码规则已存在，请删除原规则再进行新增!";
+        public const string MES12451 = "编码类型{type}已经存在记录";
         #endregion
 
         #region 容器维护 12500
@@ -1610,6 +1612,7 @@
 
         public const string MES18642 = "存在不符合要求的条码，解绑失败！";
         public const string MES18643 = "载具条码列表为空，解绑失败！";
+        public const string MES18644 = "未绑定载具类型无法使用！";
         #endregion
 
         #region Recipe参数 18700
@@ -1901,6 +1904,8 @@
         public const string MES19952 = "OQC检验项目必须填写物料，且物料信息必须准确";
         public const string MES19953 = "已启用的检验项目不允许删除，{codes}";
         public const string MES19954 = "检验项目不存在，可能操作时被删除或数据异常";
+        public const string MES19955 = "检验项目编码重复，数据新增失败";
+        public const string MES19956 = "客户{customCode}物料{materialCode}检验项目版本{version}已存在，不允许重复添加！";
 
         #endregion 
 

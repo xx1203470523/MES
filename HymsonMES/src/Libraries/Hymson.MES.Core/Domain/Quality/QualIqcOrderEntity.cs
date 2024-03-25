@@ -48,6 +48,11 @@ namespace Hymson.MES.Core.Domain.Quality
         public InspectionGradeEnum InspectionGrade { get; set; }
 
         /// <summary>
+        /// 是否免检
+        /// </summary>
+        public TrueOrFalseEnum? IsExemptInspection { get; set; }
+
+        /// <summary>
         /// 接收水准
         /// </summary>
         public int AcceptanceLevel { get; set; }
