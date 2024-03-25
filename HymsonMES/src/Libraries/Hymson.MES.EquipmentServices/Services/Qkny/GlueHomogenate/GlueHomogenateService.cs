@@ -338,6 +338,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
         /// <returns></returns>
         public async Task<string> OutputEquAsync(QknyBaseDto dto)
         {
+            //TODO
+            //条码实际数量根据上料进行计算
+
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             //2. 查询设备激活工单
