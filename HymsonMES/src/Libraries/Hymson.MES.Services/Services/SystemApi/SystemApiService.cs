@@ -907,7 +907,7 @@ public class SystemApiService : ISystemApiService
                 EquipmentName = equipmentEntity?.EquipmentName,
                 LocalTime = item?.LocalTime,
                 EquipmentStatus = item?.EquipmentStatus,
-                EquipmentStatusName = item.EquipmentStatus.GetDescription()
+                EquipmentStatusName = item?.EquipmentStatus.GetDescription()
             });
         }
 
@@ -1112,7 +1112,7 @@ public class SystemApiService : ISystemApiService
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    private decimal GetEquAlarmDurationTimeSum(IEnumerable<EquAlarmEntity> data)
+    private static decimal GetEquAlarmDurationTimeSum(IEnumerable<EquAlarmEntity> data)
     {
         EquAlarmDurationTimeDto result = new();
 

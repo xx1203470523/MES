@@ -138,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         /// <summary>
         /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：已关闭；组
         /// </summary>
-        public IEnumerable<long>? Statuss { get; set; }
+        public IEnumerable<PlanWorkOrderStatusEnum>? Statuss { get; set; }
 
 
         /// <summary>

@@ -796,12 +796,12 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             //查询设备当天生产数据汇总
             var equipmentYieldDtos = await GetEquipmentYieldAsync(param.SiteId, equIds);
             //统计设备OEE
-            foreach (var equCode in param.EquipmentCodes)
+            foreach (var item in equEquipmentEntities)
             {
                 var theoryCycle = param.TheoryCycle;//理想加工周期
                 var workingHours = param.WorkingHours;//正常出勤时间/计划时间(小时)
                 //当前设备
-                var equEquipmentEntity = equEquipmentEntities.Where(c => c.EquipmentCode == equCode).First();
+                var equEquipmentEntity = equEquipmentEntities.Where(c => c.EquipmentCode == item.EquipmentCode).First();
                 //获取当前设备运行状态
                 var equStatus = equStatusEntities.FirstOrDefault(a => a.EquipmentId == equEquipmentEntity.Id);
                 //获取当前设备异常时长
@@ -822,7 +822,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 var utilizationRate = decimal.Parse((availability * expressive * qualityIndex).ToString("0.00"));
                 var equipmentUtilizationRateDto = new EquipmentUtilizationRateDto
                 {
-                    EquipmentCode = equCode,
+                    EquipmentCode = item.EquipmentCode,
                     EquipmentName = equEquipmentEntity.EquipmentName,
                     UtilizationRate = utilizationRate,
                     EquipmentStatus = equStatus?.EquipmentStatus,

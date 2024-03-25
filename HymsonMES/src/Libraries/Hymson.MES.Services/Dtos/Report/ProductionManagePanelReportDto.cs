@@ -210,7 +210,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 设备编码
         /// </summary>
-        public string[] EquipmentCodes { get; set; }
+        public string[]? EquipmentCodes { get; set; }
     }
 
     /// <summary>
