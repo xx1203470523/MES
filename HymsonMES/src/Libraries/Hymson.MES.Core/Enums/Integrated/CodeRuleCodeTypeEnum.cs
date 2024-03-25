@@ -28,6 +28,12 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// OQC
         /// </summary>
         [Description("OQC")]
-        OQC = 4
+        OQC = 4,
+
+        /// <summary>
+        /// FQC
+        /// </summary>
+       [Description("FQC")]
+        FQC = 5
     }
 }

@@ -224,6 +224,16 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10813));
             }
+            if (linkeRuleList.Any(a => a.MatchWay == MatchModeEnum.Whole))
+            {
+                if (linkeRuleList.Any(a => a.MatchWay == MatchModeEnum.Start) ||
+                   linkeRuleList.Any(a => a.MatchWay == MatchModeEnum.Middle) ||
+                   linkeRuleList.Any(a => a.MatchWay == MatchModeEnum.End))
+                {
+                    // 如果存在 Whole 的情况，并且同时存在 Start、Middle、End 中的任何一种情况，提示起始、中间、结束与全码互斥
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10814)); // 添加相应的错误代码
+                }
+            }
             var validationFailures = new List<FluentValidation.Results.ValidationFailure>();
 
             //全码:4,起始:1,结束:3,中间:2;根据匹配方式校验规则

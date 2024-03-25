@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
@@ -173,4 +174,34 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// </summary>
     public class QualOqcOrderTypePagedQueryDto : PagerInfo { }
 
+    /// <summary>
+    /// 获取应检数量和已检数量
+    /// </summary>
+    public record SampleQtyAndCheckedQtyQueryDto {
+        /// <summary>
+        /// OQC检验单Id
+        /// </summary>
+        public long OQCOrderId { get; set; }
+
+        /// <summary>
+        /// 检验类型
+        /// </summary>
+        public OQCInspectionTypeEnum InspectionType { get; set; }
+    }
+
+    /// <summary>
+    /// 获取应检数量和已检数量OutDto
+    /// </summary>
+    public record SampleQtyAndCheckedQtyQueryOutDto: BaseEntityDto
+    {
+        /// <summary>
+        /// 已检数量
+        /// </summary>
+        public int CheckedQty { get; set; }
+
+        /// <summary>
+        /// 样本数量
+        /// </summary>
+        public int SampleQty { get; set; }
+    }
 }

@@ -174,7 +174,7 @@ namespace Hymson.MES.Services.Services.Plan
             if (current != null)
             {
                 //判断当前状态  
-                if (current.Status != PlanWorkOrderStatusEnum.NotStarted) 
+                if (current.Status != PlanWorkOrderStatusEnum.NotStarted)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16046));
                 }
@@ -260,7 +260,7 @@ namespace Hymson.MES.Services.Services.Plan
             List<UpdateStatusCommand> planWorkOrderEntities = new List<UpdateStatusCommand>();
             List<long> updateWorkOrderRealEndList = new List<long>();
             List<long> deleteActivationWorkOrderIds = new List<long>();//需要取消激活工单
-           
+
             foreach (var item in parms)
             {
                 var workOrder = workOrders.FirstOrDefault(x => x.Id == item.Id);
@@ -277,7 +277,7 @@ namespace Hymson.MES.Services.Services.Plan
                 }
 
                 //对是需要修改为关闭状态的做特殊处理： 给 工单记录表 更新 真实结束时间
-                if (item.Status == PlanWorkOrderStatusEnum.Closed) 
+                if (item.Status == PlanWorkOrderStatusEnum.Closed)
                 {
                     updateWorkOrderRealEndList.Add(item.Id);
                 }
@@ -290,7 +290,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
 
             List<PlanWorkOrderActivationRecordEntity> planWorkOrderActivationRecordEntitys = new List<PlanWorkOrderActivationRecordEntity>();//对取消激活的做记录
-            if (deleteActivationWorkOrderIds.Any()) 
+            if (deleteActivationWorkOrderIds.Any())
             {
                 var deleteActivationWorkOrders = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(deleteActivationWorkOrderIds.ToArray());
                 foreach (var item in deleteActivationWorkOrders)
@@ -349,19 +349,19 @@ namespace Hymson.MES.Services.Services.Plan
                 }
 
                 //对是需要修改为关闭状态的做特殊处理： 取消掉 对应工单激活的信息
-                if (deleteActivationWorkOrderIds.Any()) 
+                if (deleteActivationWorkOrderIds.Any())
                 {
                     await _planWorkOrderActivationRepository.DeletesTrueByWorkOrderIdsAsync(deleteActivationWorkOrderIds.ToArray());
-                    if (planWorkOrderActivationRecordEntitys.Any()) 
+                    if (planWorkOrderActivationRecordEntitys.Any())
                     {
                         await _planWorkOrderActivationRecordRepository.InsertsAsync(planWorkOrderActivationRecordEntitys);
                     }
                 }
 
                 await _planWorkOrderStatusRecordRepository.InsertsAsync(planWorkOrderStatusRecordEntities);
- 
+
                 ts.Complete();
-               
+
             }
         }
 
@@ -389,7 +389,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             if (parms.First().IsLocked == YesOrNoEnum.Yes) //需要修改为锁定
             {
-                if (workOrders.Any(x=>x.Status != PlanWorkOrderStatusEnum.InProduction))//判断是否有不是生产中的则无法更改为锁定
+                if (workOrders.Any(x => x.Status != PlanWorkOrderStatusEnum.InProduction))//判断是否有不是生产中的则无法更改为锁定
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16007));
                 }
@@ -400,7 +400,7 @@ namespace Hymson.MES.Services.Services.Plan
                     {
                         Id = item.Id,
                         Status = PlanWorkOrderStatusEnum.Pending,
-                        LockedStatus =item.Status,
+                        LockedStatus = item.Status,
 
                         UpdatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now()
@@ -509,6 +509,8 @@ namespace Hymson.MES.Services.Services.Plan
             var pagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
+
+            // TODO 这个应该在这里组装，不应该的DB查询全部数据，再直接转（看到了，但没时间改 -。-）
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<PlanWorkOrderListDetailViewDto>());

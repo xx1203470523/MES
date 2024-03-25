@@ -35,12 +35,27 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// qual_iqc_inspection_item_snapshot 的Id
         /// </summary>
-        public string IqcInspectionItemSnapshotId { get; set; }
+        public long IqcInspectionItemSnapshotId { get; set; }
 
         /// <summary>
         /// 收货单详情Id
         /// </summary>
         public long MaterialReceiptDetailId { get; set; }
+
+        /// <summary>
+        /// 检验等级(1-正常 2-加严 3-放宽)
+        /// </summary>
+        public InspectionGradeEnum InspectionGrade { get; set; }
+
+        /// <summary>
+        /// 是否免检
+        /// </summary>
+        public TrueOrFalseEnum? IsExemptInspection { get; set; }
+
+        /// <summary>
+        /// 接收水准
+        /// </summary>
+        public int AcceptanceLevel { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭

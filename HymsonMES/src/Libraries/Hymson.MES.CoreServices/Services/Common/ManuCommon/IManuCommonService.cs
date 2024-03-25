@@ -1,5 +1,6 @@
 ﻿using Hymson.Localization.Services;
 using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 
 namespace Hymson.MES.CoreServices.Services.Common
@@ -61,6 +62,13 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <exception cref="ValidationException">状态(在 无效 删除 报废 锁定) 产品序列码状态为【xxxx】，不允许操作  包装验证  产品序列码已经被包装，不允许操作 </exception>
         Task<IEnumerable<ManuSfcBo>> GetManuSfcInfos(MultiSFCBo param, ILocalizationService localizationService);
 
+        /// <summary>
+        /// 校验工序是否合法
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task VerifyProcedureAsync(JobRequestBo param);
+
         #region 顷刻
 
         /// <summary>
@@ -73,5 +81,6 @@ namespace Hymson.MES.CoreServices.Services.Common
         Task<List<string>> GetSfcListByVehicleCodesAsync(VehicleSFCRequestBo requestBo);
 
         #endregion
+
     }
 }

@@ -182,6 +182,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string MaterialName {  get; set; }
 
         /// <summary>
+        /// 物料单位
+        /// </summary>
+        public string Unit { get; set; }
+
+        /// <summary>
         /// 工艺路线/版本
         /// </summary>
         public string ProcessRouteCodeVersion { get; set; }

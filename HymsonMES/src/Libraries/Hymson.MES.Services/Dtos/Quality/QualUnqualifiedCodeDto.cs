@@ -97,12 +97,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格代码
         /// </summary>
-        public string UnqualifiedCode { get; set; }
+        public string ? UnqualifiedCode { get; set; }
 
         /// <summary>
         /// 不合格代码名称
         /// </summary>
-        public string UnqualifiedCodeName { get; set; }
+        public string ? UnqualifiedCodeName { get; set; }
     }
 
     public record UnqualifiedCodeGroupRelationDto

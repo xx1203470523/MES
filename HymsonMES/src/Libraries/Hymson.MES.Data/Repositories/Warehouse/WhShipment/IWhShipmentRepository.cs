@@ -94,7 +94,7 @@ namespace Hymson.MES.Data.Repositories.WhShipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<WhShipmentEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<WhShipmentEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 根据ID获取数据

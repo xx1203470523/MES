@@ -28,16 +28,16 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procMaterialCreateDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<long> CreateProcMaterialAsync(ProcMaterialCreateDto procMaterialCreateDto);
+        Task<long> CreateProcMaterialAsync(ProcMaterialCreateDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procMaterialModifyDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task ModifyProcMaterialAsync(ProcMaterialModifyDto procMaterialModifyDto);
+        Task ModifyProcMaterialAsync(ProcMaterialModifyDto saveDto);
 
         /// <summary>
         /// 删除

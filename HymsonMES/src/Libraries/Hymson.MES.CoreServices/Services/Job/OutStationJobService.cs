@@ -319,7 +319,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 填充其他设置
             procedureRejudgeBo = await FillingProcedureRejudgeBoAsync(procedureRejudgeBo);
-            _logger.LogInformation($"工序中关于复判的相关参数 -> ", procedureRejudgeBo.ToSerialize());
+            //_logger.LogInformation($"工序中关于复判的相关参数 -> {procedureRejudgeBo.ToSerialize()}");
 
             // 遍历所有条码
             var responseBos = new List<OutStationResponseBo>();
@@ -337,6 +337,9 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 // 单条码返回值
                 var responseBo = new OutStationResponseBo();
+
+                // 2024.03.19 克明大佬说出站时需要清除设备ID值
+                sfcProduceEntity.EquipmentId = null;
 
                 // 是否有传是否合格标识
                 if (requestBo.IsQualified.HasValue && !requestBo.IsQualified.Value)
@@ -472,8 +475,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 未更新到全部需更新的数据，事务回滚
                 if (data.UpdateFeedingQtyByIdCommands.Count() > responseBo.Rows)
                 {
-                    _logger.LogError($"MES18218 -> Rows: {responseBo.Rows}");
-                    _logger.LogError($"MES18218 -> Command: {data.UpdateFeedingQtyByIdCommands.ToSerialize()}");
+                    //_logger.LogError($"MES18218 -> Rows: {responseBo.Rows}");
+                    //_logger.LogError($"MES18218 -> Command: {data.UpdateFeedingQtyByIdCommands.ToSerialize()}");
 
                     responseBo.IsSuccess = false;
                     responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18218), string.Join(',', data.SFCProduceEntities!.Select(s => s.SFC)));

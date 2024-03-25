@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.WHMaterialReceiptDetail;
 using Hymson.MES.Services.Dtos.WHMaterialReceipt;
+using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 
 namespace Hymson.MES.Services.Services.WHMaterialReceipt
 {

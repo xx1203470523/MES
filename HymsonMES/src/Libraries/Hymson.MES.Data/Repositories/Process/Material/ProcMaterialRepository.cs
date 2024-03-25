@@ -272,15 +272,15 @@ namespace Hymson.MES.Data.Repositories.Process
                 procMaterialQuery.MaterialCode = $"%{procMaterialQuery.MaterialCode}%";
                 sqlBuilder.Where(" MaterialCode LIKE @MaterialCode ");
             }
-            if (!string.IsNullOrWhiteSpace(procMaterialQuery.Version))
-            {
-                procMaterialQuery.Version = $"%{procMaterialQuery.Version}%";
-                sqlBuilder.Where(" Version LIKE @Version ");
-            }
             if (!string.IsNullOrWhiteSpace(procMaterialQuery.MaterialName))
             {
                 procMaterialQuery.MaterialName = $"%{procMaterialQuery.MaterialName}%";
                 sqlBuilder.Where(" MaterialName LIKE @MaterialName ");
+            }
+            if (!string.IsNullOrWhiteSpace(procMaterialQuery.Version))
+            {
+                procMaterialQuery.Version = $"%{procMaterialQuery.Version}%";
+                sqlBuilder.Where(" Version LIKE @Version ");
             }
             sqlBuilder.AddParameters(procMaterialQuery);
 
@@ -418,7 +418,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByCodeAndVersionSql = "SELECT * FROM proc_material WHERE `IsDeleted` = 0 AND SiteId = @SiteId AND MaterialCode= @MaterialCode AND Version =@Version LIMIT 1";
         const string GetByCodeSql = "SELECT * FROM proc_material WHERE `IsDeleted` = 0 AND SiteId = @Site AND MaterialCode = @Code LIMIT 1";
 
-        const string InsertSql = "INSERT INTO `proc_material`(  `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `ConsumeRatio`,`MaskCodeId`, QuantityLimit ) VALUES (   @Id, @SiteId, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @BomId, @Batch, @PackageNum, @Unit, @SerialNumber, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @ConsumeRatio,@MaskCodeId ,@QuantityLimit )  ";
+        const string InsertSql = "INSERT INTO `proc_material`(`Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `ConsumeRatio`,`MaskCodeId`, QuantityLimit, Specifications) VALUES (   @Id, @SiteId, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @BomId, @Batch, @PackageNum, @Unit, @SerialNumber, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @ConsumeRatio, @MaskCodeId, @QuantityLimit, @Specifications)";
         const string UpdateSql = "UPDATE `proc_material` SET  GroupId = @GroupId, MaterialName = @MaterialName, Origin = @Origin, Version = @Version, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, BomId = @BomId, Batch = @Batch, PackageNum = @PackageNum, Unit = @Unit, SerialNumber = @SerialNumber, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, IsDefaultVersion=@IsDefaultVersion, MaskCodeId=@MaskCodeId, QuantityLimit=@QuantityLimit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , ConsumeRatio=@ConsumeRatio  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_material` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_material` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
@@ -447,6 +447,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                         g.SerialNumber,
                                         g.BaseTime,
                                         g.ConsumptionTolerance,
+                                        g.Specifications,
                                         g.IsDefaultVersion,
                                         g.UpdatedBy,
                                         g.UpdatedOn,
@@ -459,31 +460,28 @@ namespace Hymson.MES.Data.Repositories.Process
                             LEFT JOIN proc_bom q on g.BomId = q.Id 
                             WHERE g.Id = @Id and g.SiteId=@SiteId ";
 
-        const string GetMaterialByIdSql = @"SELECT * FROM `proc_material`
-                            WHERE Id = @Id";
-        const string GetByIdsSql = @"SELECT * FROM `proc_material`
-                            WHERE Id IN @ids and IsDeleted=0 ";
+        const string GetMaterialByIdSql = @"SELECT * FROM proc_material WHERE Id = @Id";
+        const string GetByIdsSql = @"SELECT * FROM proc_material WHERE Id IN @ids AND IsDeleted = 0 ";
         const string GetBySiteIdSql = @"SELECT * FROM proc_material WHERE SiteId = @SiteId AND IsDeleted = 0 ";
 
         /// <summary>
         /// 根据物料组ID查询物料
         /// </summary>
-        const string GetByGroupIdSql = @"SELECT * FROM `proc_material`
-                            WHERE IsDeleted = 0 and GroupId IN @groupIds ";
-        const string UpdateSameMaterialCodeToNoVersionSql = "UPDATE `proc_material` SET IsDefaultVersion= 0 WHERE MaterialCode= @MaterialCode and IsDeleted = 0 ";
+        const string GetByGroupIdSql = @"SELECT * FROM proc_material WHERE IsDeleted = 0 AND GroupId IN @groupIds ";
+        const string UpdateSameMaterialCodeToNoVersionSql = "UPDATE proc_material SET IsDefaultVersion = 0 WHERE MaterialCode = @MaterialCode AND IsDeleted = 0 ";
 
         /// <summary>
         /// 更改物料的物料组
         /// </summary>
-        const string UpdateProcMaterialGroupSql = "UPDATE `proc_material` SET GroupId= @GroupId, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+        const string UpdateProcMaterialGroupSql = "UPDATE proc_material SET GroupId = @GroupId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         /// <summary>
         /// 更新某物料组下的物料为未绑定物料组
         /// </summary>
-        const string UpdateProcMaterialUnboundSql = "UPDATE `proc_material` SET GroupId= 0 WHERE GroupId = @GroupId ";
+        const string UpdateProcMaterialUnboundSql = "UPDATE proc_material SET GroupId = 0 WHERE GroupId = @GroupId ";
 
-        const string UpdateStatusSql = "UPDATE `proc_material` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+        const string UpdateStatusSql = "UPDATE proc_material SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
-        const string GetByCodesSql = @"SELECT * FROM `proc_material` WHERE MaterialCode IN @MaterialCodes AND SiteId= @SiteId  AND IsDeleted=0 ";
+        const string GetByCodesSql = @"SELECT * FROM proc_material WHERE MaterialCode IN @MaterialCodes AND SiteId = @SiteId AND IsDeleted = 0 ";
     }
 }

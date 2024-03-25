@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Qual;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Parameter;
@@ -65,6 +66,9 @@ namespace Hymson.MES.CoreServices.Mapper
         {
             CreateMap<QualOqcParameterGroupEntity, QualOqcParameterGroupSnapshootEntity>();
             CreateMap<QualOqcParameterGroupDetailEntity, QualOqcParameterGroupDetailSnapshootEntity>();
+
+            CreateMap<QualIqcInspectionItemEntity, QualIqcInspectionItemSnapshotEntity>();
+            CreateMap<QualIqcInspectionItemDetailEntity, QualIqcInspectionItemDetailSnapshotEntity>();
         }
 
         /// <summary>

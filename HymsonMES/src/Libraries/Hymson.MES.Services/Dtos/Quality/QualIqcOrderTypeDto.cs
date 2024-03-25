@@ -177,7 +177,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检验类型
         /// </summary>
-        public IQCInspectionTypeEnum InspectionType { get; set; }
+        public IQCInspectionTypeEnum Type { get; set; }
 
         /// <summary>
         /// 样本数量

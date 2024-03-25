@@ -1270,7 +1270,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Remark = unqualified.Remark ?? "",
                     Status = ProductBadRecordStatusEnum.Close,
                     UserId = _currentUser.UserName,
-                    UpdatedOn = HymsonClock.Now()
+                    UpdatedOn = HymsonClock.Now(),
+                    CurrentStatus= ProductBadRecordStatusEnum.Open
                 });
             }
             #endregion

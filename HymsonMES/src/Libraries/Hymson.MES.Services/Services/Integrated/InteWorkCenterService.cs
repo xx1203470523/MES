@@ -255,6 +255,12 @@ namespace Hymson.MES.Services.Services.Integrated
                     if (inteWorkCenterByLineEntities != null && inteWorkCenterByLineEntities.Any()) {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12126));
                     }
+                    // 判断资源的状态是否存在新建和废除状态
+                    var resourcesFarm = await _inteWorkCenterRepository.GetByIdsAsync(param.WorkCenterIds.ToArray());
+                    if (resourcesFarm != null && resourcesFarm.Any(a => a.Status == SysDataStatusEnum.Build))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12127)).WithData("code", param.Code);
+                    }
 
                     break;
                 case WorkCenterTypeEnum.Line:
@@ -312,7 +318,7 @@ namespace Hymson.MES.Services.Services.Integrated
             // 验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
 
-            var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
+             var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES12111));
 
             //验证某些状态是不能编辑的
@@ -368,7 +374,10 @@ namespace Hymson.MES.Services.Services.Integrated
                     var inteWorkCenterByLineEntities = await _inteWorkCenterRepository.GetInteWorkCenterRelationEntityAsync(new InteWorkCenterRelationQuery { SubWorkCenterIds = param.WorkCenterIds });
                     if (inteWorkCenterByLineEntities != null && inteWorkCenterByLineEntities.Any())
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES12126));
+                        if (inteWorkCenterByLineEntities.First().WorkCenterId != param.Id)
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES12126));
+                        }
                     }
 
                     break;

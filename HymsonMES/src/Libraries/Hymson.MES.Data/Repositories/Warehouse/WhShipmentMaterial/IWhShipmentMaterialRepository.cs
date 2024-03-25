@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<WhShipmentMaterialEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<WhShipmentMaterialEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List

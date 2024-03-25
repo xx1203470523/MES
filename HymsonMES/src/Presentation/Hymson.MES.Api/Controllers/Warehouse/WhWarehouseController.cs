@@ -96,5 +96,17 @@ namespace Hymson.MES.Api.Controllers.WhWareHouse
             return await _whWarehouseService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 分页查询列表（仓库）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pagelistCopy")]
+        public async Task<PagedInfo<WhWarehouseDto>> QueryPagedListCopyAsync([FromQuery] WhWarehousePagedQueryDto pagedQueryDto)
+        {
+            return await _whWarehouseService.GetPagedListCopyAsync(pagedQueryDto);
+        }
+
     }
 }

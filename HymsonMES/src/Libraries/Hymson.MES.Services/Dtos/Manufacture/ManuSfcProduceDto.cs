@@ -548,6 +548,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 工序Id
         /// </summary>
         public long? ProcedureId { get; set; }
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public string? code { get; set; }
 
         /// <summary>
         /// 条码列表
@@ -577,7 +581,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 产品版本
         /// </summary>
-        public string? MaterialVersion { get; set; }
+        public string? MaterialVersion { get; set; }      
     }
 
 

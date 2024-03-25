@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
@@ -291,7 +292,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
 
                 var sfcProcedureInfoEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = sfc, SiteId = _currentSite.SiteId ?? 0 });
 
-                var resourceEntity = await _procResourceRepository.GetByIdAsync(sfcProcedureInfoEntity.ResourceId.GetValueOrDefault());
+                var resourceEntity = new ProcResourceView();
+                if (sfcProcedureInfoEntity != null) {
+                    resourceEntity = await _procResourceRepository.GetByIdAsync(sfcProcedureInfoEntity.ResourceId.GetValueOrDefault());
+                }
 
                 foreach (var item in manuProductBadRecordEntities)
                 {

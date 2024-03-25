@@ -3,7 +3,10 @@ using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
-    public class ProcBomDetailView: BaseEntity
+    /// <summary>
+    /// BOM明细
+    /// </summary>
+    public class ProcBomDetailView : BaseEntity
     {
         /// <summary>
         /// 物料Id
@@ -16,7 +19,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public string ReplaceMaterialId { get; set; }
 
         /// <summary>
-        /// 
+        /// BOM明细ID
         /// </summary>
         public long BomDetailId { get; set; }
 
@@ -86,7 +89,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 是否主物料，1：主物料
         /// </summary>
         public int IsMain { get; set; }
-
 
     }
 }

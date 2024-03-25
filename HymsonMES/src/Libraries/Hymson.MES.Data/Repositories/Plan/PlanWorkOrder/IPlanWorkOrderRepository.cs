@@ -103,14 +103,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<IEnumerable<PlanWorkOrderEntity>> GetByWorkLineIdAsync(long workLineId);
 
         /// <summary>
-        /// 获取List 
-        /// 条件模糊
-        /// </summary>
-        /// <param name="planWorkOrderQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<PlanWorkOrderEntity>> GetPlanWorkOrderEntitiesAsync(PlanWorkOrderQuery planWorkOrderQuery);
-
-        /// <summary>
         /// 获取List   
         /// 条件具体
         /// </summary>
@@ -124,6 +116,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="pageQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoAsync(PlanWorkOrderPagedQuery pageQuery);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetEntitiesAsync(PlanWorkOrderNewQuery query);
 
         /// <summary>
         /// 修改工单状态

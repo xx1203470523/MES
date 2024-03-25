@@ -103,7 +103,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhShipmentMaterialEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<WhShipmentMaterialEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhShipmentMaterialEntity>(GetByIdsSql, new { Ids = ids });
@@ -120,7 +120,16 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("ShipmentId = @ShipmentId");
+            if (query.ShipmentId != null)
+            {
+                sqlBuilder.Where("ShipmentId = @ShipmentId");
+            }
+
+            if (query.Ids != null && query.Ids.Any()) {
+                sqlBuilder.Where("Id IN @Ids");
+            }
+
+            sqlBuilder.Where("SiteId = @SiteId");
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhShipmentMaterialEntity>(template.RawSql, query);
         }

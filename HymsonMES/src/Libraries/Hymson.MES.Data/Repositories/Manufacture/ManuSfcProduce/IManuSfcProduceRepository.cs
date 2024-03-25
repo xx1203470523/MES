@@ -23,6 +23,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<PagedInfo<ManuSfcProduceEntity>> GetPagedListAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery);
 
         /// <summary>
+        /// 分页查询（在制）
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcProduceEntity>> GetPagedListAsync(ManuSfcProduceNewPagedQuery pagedQuery);
+
+        /// <summary>
         /// 质量锁定
         /// </summary>
         /// <param name="command"></param>
@@ -86,25 +93,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdateAsync(ManuSfcProduceEntity manuSfcProduceEntity);
 
         /// <summary>
-        /// 更新（带状态检查）
-        /// </summary>
-        /// <param name="manuSfcProduceEntity"></param>
-        /// <returns></returns>
-        Task<int> UpdateWithStatusCheckAsync(ManuSfcProduceEntity manuSfcProduceEntity);
-
-        /// <summary>
         /// 批量更新（带状态检查）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
         Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcProduceEntity>? entities);
-
-        /// <summary>
-        /// 批量更新（带状态检查）
-        /// </summary>
-        /// <param name="multiUpdateStatusCommand"></param>
-        /// <returns></returns>
-        Task<int> MultiUpdateRangeWithStatusCheckAsync(MultiUpdateProduceSFCCommand multiUpdateStatusCommand);
 
         /// <summary>
         /// 批量更新（带状态检查）

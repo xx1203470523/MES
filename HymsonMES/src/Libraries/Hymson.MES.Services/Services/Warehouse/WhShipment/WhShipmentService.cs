@@ -9,6 +9,12 @@ using Hymson.MES.Core.Domain.WhShipment;
 using Hymson.MES.Core.Domain.WhShipmentBarcode;
 using Hymson.MES.Core.Domain.WhShipmentMaterial;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality;
+using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.Query;
 using Hymson.MES.Data.Repositories.WhShipment;
 using Hymson.MES.Data.Repositories.WhShipment.Query;
 using Hymson.MES.Services.Dtos.WhShipment;
@@ -42,6 +48,11 @@ namespace Hymson.MES.Services.Services.WhShipment
         /// 仓储接口（出货单）
         /// </summary>
         private readonly IWhShipmentRepository _whShipmentRepository;
+        //private readonly IWhSupplierRepository _whSupplierRepository;
+        private readonly IWhShipmentMaterialRepository _whShipmentMaterialRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IInteCustomRepository _inteCustomRepository;
+        private readonly IQualOqcOrderRepository _qualOqcOrderRepository;
 
         /// <summary>
         /// 构造函数
@@ -50,14 +61,25 @@ namespace Hymson.MES.Services.Services.WhShipment
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="whShipmentRepository"></param>
+        /// <param name="whShipmentMaterialRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="inteCustomRepository"></param>
+        /// <param name="qualOqcOrderRepository"></param>
         public WhShipmentService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<WhShipmentSaveDto> validationSaveRules,
-            IWhShipmentRepository whShipmentRepository)
+            IWhShipmentRepository whShipmentRepository, IWhShipmentMaterialRepository whShipmentMaterialRepository, IProcMaterialRepository procMaterialRepository, IInteCustomRepository inteCustomRepository, IQualOqcOrderRepository qualOqcOrderRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _whShipmentRepository = whShipmentRepository;
+            //_whSupplierRepository = whSupplierRepository;
+            _whShipmentMaterialRepository = whShipmentMaterialRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _inteCustomRepository = inteCustomRepository;
+            _qualOqcOrderRepository = qualOqcOrderRepository;
         }
+
+
 
 
         /// <summary>
@@ -217,13 +239,109 @@ namespace Hymson.MES.Services.Services.WhShipment
         public async Task<PagedInfo<WhShipmentDto>> GetPagedListAsync(WhShipmentPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<WhShipmentPagedQuery>();
-            //pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            if (!pagedQuery.SiteId.HasValue)
+            {
+                pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            }
             var pagedInfo = await _whShipmentRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<WhShipmentDto>());
+
             return new PagedInfo<WhShipmentDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+        /// <summary>
+        /// OQC检验单获取出货单
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<WhShipmentDto>> GetPagedListToOQCAsync(WhShipmentPagedQueryDto pagedQueryDto)
+        {
+            //获取已经生成的出货单明细
+            var qualOqcOrderEntities = await _qualOqcOrderRepository.GetEntitiesAsync(new QualOqcOrderQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0
+            });
+
+            //获取出货单物料明细
+            var shipmentDetailIds = qualOqcOrderEntities?.Select(a => a.ShipmentMaterialId).Distinct();
+            var whShipmentDetailEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { Ids= shipmentDetailIds, SiteId = _currentSite.SiteId ?? 0 });
+
+            //获取出货单
+            var whShipmentIds = whShipmentDetailEntities.Select(a => a.ShipmentId).Distinct();
+            //var whShipmentEntities = await _whShipmentRepository.GetEntitiesAsync(new WhShipmentQuery {Ids= whShipmentIds });
+
+            var pagedQuery = pagedQueryDto.ToQuery<WhShipmentPagedQuery>();
+            if (!pagedQuery.SiteId.HasValue)
+            {
+                pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            }
+            pagedQuery.NotInIds = whShipmentIds;
+
+            var pagedInfo = await _whShipmentRepository.GetPagedListAsync(pagedQuery);
+
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<WhShipmentDto>());
+
+            return new PagedInfo<WhShipmentDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 根据条件查询出货单详情
+        /// </summary>
+        /// <param name="whShipmentQueryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WhShipmentSupplierMaterialViewDto>> QueryShipmentSupplierMaterialAsync(WhShipmentQueryDto whShipmentQueryDto)
+        {
+            //获取出货单
+            var whShipmentEntity = await _whShipmentRepository.GetByIdAsync(whShipmentQueryDto.Id.GetValueOrDefault());
+            if (whShipmentEntity==null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17800));
+            }
+
+            //获取供应商
+            var inteCustomEntity = await _inteCustomRepository.GetByIdAsync(whShipmentEntity.CustomerId);
+
+            //获取出货详情
+            var whShipmentDetailEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { ShipmentId = whShipmentQueryDto.Id.GetValueOrDefault(),SiteId=_currentSite.SiteId??0 });
+            if (whShipmentDetailEntities == null || !whShipmentDetailEntities.Any()) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17801));
+            }
+
+            //获取物料
+            var materialIds = whShipmentDetailEntities.Select(a => a.MaterialId).Distinct();
+            var procMaterialEntities =await _procMaterialRepository.GetByIdsAsync(materialIds);
+            if (procMaterialEntities == null || !procMaterialEntities.Any()) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17802));
+            }
+
+            var result = new List<WhShipmentSupplierMaterialViewDto>();
+            foreach (var item in whShipmentDetailEntities) {
+
+                //var qualOqcOrderEntity = qualOqcOrderEntities.FirstOrDefault(a => a.ShipmentMaterialId == item.Id);
+                //if (qualOqcOrderEntity == null) 
+                //{ 
+                //    continue; 
+                //}
+                var model = new WhShipmentSupplierMaterialViewDto();
+
+                var procMaterialEntity = procMaterialEntities.Where(a => a.Id == item.MaterialId).FirstOrDefault();
+                if (procMaterialEntity == null) {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17802));
+                }
+
+                model.MaterialCode= procMaterialEntity.MaterialCode;
+                model.MaterialName= procMaterialEntity.MaterialName;
+                model.Qty = item.Qty;
+                model.Version = procMaterialEntity.Version;
+                model.CustomCode = inteCustomEntity?.Code;
+                model.Id = item.Id;
+                result.Add(model);
+            }
+
+            return result;
+        }
     }
 }

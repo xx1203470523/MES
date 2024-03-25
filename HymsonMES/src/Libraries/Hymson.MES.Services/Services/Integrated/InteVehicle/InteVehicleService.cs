@@ -6,10 +6,12 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -41,6 +43,8 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
         private readonly IInteVehicleFreightRecordRepository _inteVehicleFreightRecordRepository;
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+        private readonly IInteVehicleTypeVerifyRepository _inteVehicleTypeVerifyRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
 
         public InteVehicleService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleRepository inteVehicleRepository, AbstractValidator<InteVehicleCreateDto> validationCreateRules, AbstractValidator<InteVehicleModifyDto> validationModifyRules, IInteVehicleTypeRepository inteVehicleTypeRepository,
             IInteVehicleVerifyRepository inteVehicleVerifyRepository,
@@ -48,8 +52,10 @@ namespace Hymson.MES.Services.Services.Integrated
             IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             AbstractValidator<InteVehicleBindOperationDto> validateBindOperationRules,
+            IInteVehicleTypeVerifyRepository inteVehicleTypeVerifyRepository,
             AbstractValidator<InteVehicleUnbindOperationDto> validationUnbindOperationRules,
-            IInteVehicleFreightRepository inteVehicleFreightRepository)
+            IInteVehicleFreightRepository inteVehicleFreightRepository,
+            IProcMaterialRepository proMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -62,6 +68,8 @@ namespace Hymson.MES.Services.Services.Integrated
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
             _inteVehicleFreightRecordRepository = inteVehicleFreightRecordRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _inteVehicleTypeVerifyRepository = inteVehicleTypeVerifyRepository;
+            _procMaterialRepository = proMaterialRepository;
             _validateBindOperationRules = validateBindOperationRules;
             _validationUnbindOperationRules = validationUnbindOperationRules;
         }
@@ -382,9 +390,16 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES18619));
             }
             var baseobj = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicle.VehicleTypeId);
-            view.VehicleType = baseobj;
-            view.Capacity = baseobj.CellQty;
-            view.Vehicle = inteVehicle;
+            if (baseobj == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18644));
+            }
+            else
+            {
+                view.VehicleType = baseobj;
+                view.Capacity = baseobj.CellQty;
+                view.Vehicle = inteVehicle;
+            }
             var inteVehicleFreights = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicle.Id });
             var inteVehicleFreightDtos = new List<InteVehicleFreightDto>();
             if (inteVehicleFreights != null && inteVehicleFreights.Any())
@@ -431,7 +446,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             switch (dto.OperationType)
             {
-                case Core.Enums.Integrated.VehicleOperationEnum.Bind: { await VehicleBindOperationAsync(dto); } break;
+                case Core.Enums.Integrated.VehicleOperationEnum.Bind: { await VehicleBindOperationAsync(dto, v); } break;
                 case Core.Enums.Integrated.VehicleOperationEnum.Unbind: { await VehicleUnBindOperationAsync(dto); } break;
                 case Core.Enums.Integrated.VehicleOperationEnum.Clear: { await VehicleClearAsync(dto); } break;
             }
@@ -482,8 +497,9 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 绑盘操作
         /// </summary>
         /// <param name="ivo"></param>
+        /// <param name="v"></param>
         /// <returns></returns>
-        private async Task VehicleBindOperationAsync(InteVehicleOperationDto ivo)
+        private async Task VehicleBindOperationAsync(InteVehicleOperationDto ivo, InteVehicleEntity v)
         {
             /* 指定位置绑定条码
              * inte_vehicle_freight表 更新已装载数量信息
@@ -534,6 +550,38 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             else
             {
+                //验证装载的是不是指定的物料或者物料组
+                var inteVehicleTypeEntitys = await _inteVehicleTypeVerifyRepository.GetInteVehicleTypeVerifyEntitiesByVehicleTyleIdAsync(new long[] { v.VehicleTypeId });
+                if (inteVehicleTypeEntitys != null && inteVehicleTypeEntitys.Any())
+                {
+                    bool materialcheck = false;
+                    var bar = inteVehicleTypeEntitys.Where(v => v.Type == Core.Enums.Integrated.VehicleTypeVerifyTypeEnum.Material).ToList();
+                    if (!bar.Any(v => v.VerifyId == manuSfcProduceEntity.ProductId))
+                    {
+                        materialcheck = false;
+                    }
+                    else
+                    {
+                        materialcheck = true;
+                    }
+                    bool materialgroupcheck = false;
+                    var bargroup = inteVehicleTypeEntitys.Where(v => v.Type == Core.Enums.Integrated.VehicleTypeVerifyTypeEnum.MaterialGroup).ToList();
+                    var material = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId);
+                    if (!bargroup.Any(v => v.VerifyId == material.GroupId))
+                    {
+                        materialgroupcheck = false;
+                    }
+                    else
+                    {
+                        materialgroupcheck = true;
+                    }
+                    if (!materialcheck && !materialgroupcheck)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19936)).WithData("SFC", dto.SFC)
+                            .WithData("P1", material.MaterialCode);
+                    }
+                }
+
                 //获取指定位置信息
                 var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
                 {

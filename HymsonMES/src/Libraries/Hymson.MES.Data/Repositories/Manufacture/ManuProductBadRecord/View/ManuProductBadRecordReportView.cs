@@ -14,7 +14,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 汇总数量
         /// </summary>
-        public decimal Num { get; set; }
+        //public decimal Num { get; set; }
+        public int Num { get; set; }
     }
 
     public class ManuProductBadRecordLogReportView : BaseEntity

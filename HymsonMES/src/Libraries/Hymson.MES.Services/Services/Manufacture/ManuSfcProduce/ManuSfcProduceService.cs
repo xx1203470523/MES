@@ -943,14 +943,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                                 });
 
                                 deleteSfcProduceBusinessIds.Add(sfcProduceBusinessEntity?.Id ?? 0);
-  manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
+                                manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
                                 {
                                     Id = manuSfcEntity.Id,
                                     Status = SfcStatusEnum.InProductionComplete,
                                     CurrentStatus = manuSfcEntity.Status,
                                     UpdatedOn = HymsonClock.Now(),
                                     UpdatedBy = _currentUser.UserName
-                                });                            }
+                                });
+                            }
                             else
                             {
                                 manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
@@ -1080,7 +1081,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                         }
                         else
                         {
-                            //修改在制品条码状态
+                            // 1991 如果条码处于首工序，且更改前状态为"排队中"，更改后状态为"活动中"，则需要更新工单的投入数量
+                           
+                            // 修改在制品条码状态
                             updateProduceInStationSFCCommands.Add(new UpdateProduceInStationSFCCommand
                             {
                                 Id = manuSfcProduceEntity.Id,
@@ -1093,7 +1096,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                             });
                         }
                         break;
-                    default: 
+                    default:
                         break;
                 }
             }

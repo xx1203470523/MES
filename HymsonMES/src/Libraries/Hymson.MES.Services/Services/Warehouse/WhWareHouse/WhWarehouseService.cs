@@ -200,6 +200,28 @@ namespace Hymson.MES.Services.Services.WhWareHouse
             });
             return new PagedInfo<WhWarehouseDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
-        
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<WhWarehouseDto>> GetPagedListCopyAsync(WhWarehousePagedQueryDto pagedQueryDto)
+        {
+            var pagedQuery = pagedQueryDto.ToQuery<WhWarehousePagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _whWarehouseRepository.GetPagedListCopyAsync(pagedQuery);
+
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s =>
+            {
+                var model = s.ToModel<WhWarehouseDto>();
+                model.WarehouseCode = model.Code;
+
+                return model;
+            });
+            return new PagedInfo<WhWarehouseDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
     }
 }

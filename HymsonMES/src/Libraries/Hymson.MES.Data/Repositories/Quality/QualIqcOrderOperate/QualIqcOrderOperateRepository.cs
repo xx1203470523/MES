@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderOperateEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualIqcOrderOperateEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderOperateEntity>(GetByIdsSql, new { Ids = ids });
@@ -116,6 +116,20 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.IQCOrderIds != null) sqlBuilder.Where(" IQCOrderId IN @IQCOrderIds ");
+            if (query.IQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("IQCOrderId = @IQCOrderId");
+            }
+            if (query.OperationType.HasValue)
+            {
+                sqlBuilder.Where("OperationType = @OperationType");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderOperateEntity>(template.RawSql, query);
         }
@@ -160,11 +174,11 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order_operate /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_operate /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_iqc_order_operate(  `Id`, `IQCOrderId`, `OperateBy`, `OperateOn`, `OperateType`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @IQCOrderId, @OperateBy, @OperateOn, @OperateType, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_iqc_order_operate(  `Id`, `IQCOrderId`, `OperateBy`, `OperateOn`, `OperateType`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @IQCOrderId, @OperateBy, @OperateOn, @OperateType, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_iqc_order_operate(  `Id`, `IQCOrderId`, `OperateBy`, `OperateOn`, `OperationType`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @IQCOrderId, @OperateBy, @OperateOn, @OperationType, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_iqc_order_operate(  `Id`, `IQCOrderId`, `OperateBy`, `OperateOn`, `OperationType`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @IQCOrderId, @OperateBy, @OperateOn, @OperationType, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_iqc_order_operate SET   IQCOrderId = @IQCOrderId, OperateBy = @OperateBy, OperateOn = @OperateOn, OperateType = @OperateType, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_iqc_order_operate SET   IQCOrderId = @IQCOrderId, OperateBy = @OperateBy, OperateOn = @OperateOn, OperateType = @OperateType, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_iqc_order_operate SET   IQCOrderId = @IQCOrderId, OperateBy = @OperateBy, OperateOn = @OperateOn, OperationType = @OperationType, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_iqc_order_operate SET   IQCOrderId = @IQCOrderId, OperateBy = @OperateBy, OperateOn = @OperateOn, OperationType = @OperationType, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_iqc_order_operate SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_iqc_order_operate SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

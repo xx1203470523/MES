@@ -116,6 +116,23 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            if (query.OQCOrderId.HasValue) {
+                sqlBuilder.Where("OQCOrderId=@OQCOrderId");
+            }
+
+            if (query.OQCOrderTypeId.HasValue)
+            {
+                sqlBuilder.Where("OQCOrderTypeId=@OQCOrderTypeId");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Barcode))
+            {
+                sqlBuilder.Where("Barcode=@Barcode");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualOqcOrderSampleEntity>(template.RawSql, query);
         }

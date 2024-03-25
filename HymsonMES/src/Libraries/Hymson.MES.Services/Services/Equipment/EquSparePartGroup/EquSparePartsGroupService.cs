@@ -6,17 +6,20 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Data.Repositories.Plan.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Org.BouncyCastle.Crypto;
 using System.Diagnostics.Tracing;
 
 namespace Hymson.MES.Services.Services.Equipment
@@ -228,7 +231,7 @@ namespace Hymson.MES.Services.Services.Equipment
             //关联备件
             var updatedTypeEntity = new UpdateSparePartsTypeEntity
             {
-                Id = entity.Id,
+                SparePartGroupIds = new[] { entity.Id },
                 SparePartIds = saveDto.SparePartIds,
                 UpdatedBy = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
@@ -272,12 +275,34 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<int> DeletesEquSparePartsGroupAsync(long[] ids)
         {
-            return await _equSparePartsGroupRepository.DeletesAsync(new DeleteCommand
+            if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
+
+            var entities = await _equSparePartsGroupRepository.GetByIdsAsync(ids);
+            if (entities != null && entities.Any(a => a.Status == DisableOrEnableEnum.Enable))
             {
-                Ids = ids,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+                throw new CustomerValidationException(nameof(ErrorCode.MES10135));
+            }
+
+            var rows = 0;
+            var nowTime = HymsonClock.Now();
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //未启用状态的类型删除时解绑备件
+                rows += await _equSparePartsRepository.CleanTypeAsync(new UpdateSparePartsTypeEntity
+                {
+                    SparePartGroupIds = ids,
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = nowTime
+                });
+                rows += await _equSparePartsGroupRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = ids,
+                    DeleteOn = nowTime,
+                    UserId = _currentUser.UserName,
+                });
+                trans.Complete();
+            }
+            return rows;
         }
 
         /// <summary>

@@ -155,10 +155,13 @@ namespace Hymson.MES.Services.Services.Process
             // 验证参数项目
             CheckGroupDetails(saveDto.Details);
 
+            var sort = 0;
             var details = saveDto.Details.Select(s =>
             {
+                sort++;
                 var detailEntity = s.ToEntity<ProcProductParameterGroupDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.Sort = sort;
                 detailEntity.ParameterGroupId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
@@ -228,10 +231,13 @@ namespace Hymson.MES.Services.Services.Process
             // 验证参数项目
             CheckGroupDetails(saveDto.Details);
 
+            var sort = 0;
             var details = saveDto.Details.Select(s =>
             {
+                sort++;
                 var detailEntity = s.ToEntity<ProcProductParameterGroupDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.Sort = sort;
                 detailEntity.ParameterGroupId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;

@@ -116,6 +116,19 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.OQCOrderIds != null && query.OQCOrderIds.Any())
+            {
+                sqlBuilder.Where("OQCOrderId IN @OQCOrderIds");
+            }
+
+            if (query.HandMethod != null)
+            {
+                sqlBuilder.Where("HandMethod = @HandMethod");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualOqcOrderUnqualifiedHandleEntity>(template.RawSql, query);
         }
@@ -160,11 +173,11 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_oqc_order_unqualified_handle /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_oqc_order_unqualified_handle /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_oqc_order_unqualified_handle(  `Id`, `SiteId`, `FQCOrderId`, `SourceSystem`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @FQCOrderId, @SourceSystem, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_oqc_order_unqualified_handle(  `Id`, `SiteId`, `FQCOrderId`, `SourceSystem`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @FQCOrderId, @SourceSystem, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_oqc_order_unqualified_handle(  `Id`, `SiteId`, `OQCOrderId`, `SourceSystem`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @OQCOrderId, @SourceSystem, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_oqc_order_unqualified_handle(  `Id`, `SiteId`, `OQCOrderId`, `SourceSystem`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @OQCOrderId, @SourceSystem, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_oqc_order_unqualified_handle SET   SiteId = @SiteId, FQCOrderId = @FQCOrderId, SourceSystem = @SourceSystem, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_oqc_order_unqualified_handle SET   SiteId = @SiteId, FQCOrderId = @FQCOrderId, SourceSystem = @SourceSystem, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_oqc_order_unqualified_handle SET   SiteId = @SiteId, OQCOrderId = @OQCOrderId, SourceSystem = @SourceSystem, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_oqc_order_unqualified_handle SET   SiteId = @SiteId, OQCOrderId = @OQCOrderId, SourceSystem = @SourceSystem, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_oqc_order_unqualified_handle SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_oqc_order_unqualified_handle SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
