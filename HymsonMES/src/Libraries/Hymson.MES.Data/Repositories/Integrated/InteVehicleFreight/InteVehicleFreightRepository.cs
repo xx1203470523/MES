@@ -186,6 +186,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
             return await conn.ExecuteAsync(DeletesTrueByVehicleIdsSql, new { VehicleIds = vehicleIds });
         }
 
+        #region 顷刻
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="entityList"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQtyByLocationAsync(List<InteVehicleFreightEntity> entityList)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateQtyByLocationSql, entityList);
+        }
+
+        #endregion
     }
 
     public partial class InteVehicleFreightRepository
@@ -217,5 +231,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         const string GetByVehicleIdsSql = "SELECT * from `inte_vehicle_freight` WHERE VehicleId in @VehicleIds and IsDeleted=0 ";
         const string DeletesTrueByVehicleIdsSql = "DELETE From `inte_vehicle_freight` WHERE  VehicleId in @VehicleIds";
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据位置更新数量
+        /// </summary>
+        const string UpdateQtyByLocationSql = @"
+            UPDATE `inte_vehicle_freight` 
+            SET Qty = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn
+            WHERE VehicleId = @VehicleId
+            AND Location = @Location
+        ";
+
+
+        #endregion
     }
 }

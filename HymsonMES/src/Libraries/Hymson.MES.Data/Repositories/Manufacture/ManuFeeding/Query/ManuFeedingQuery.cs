@@ -136,5 +136,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public long FeedingPointId { get; set; }
     }
+
+    /// <summary>
+    /// 查询条码信息
+    /// </summary>
+    public class GetManuFeedingSfcQuery
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string BarCode { get; set; }
+
+        /// <summary>
+        /// 来源
+        /// </summary>
+        public ManuSFCFeedingSourceEnum LoadSource { get; set; }
+    }
+
     #endregion
 }

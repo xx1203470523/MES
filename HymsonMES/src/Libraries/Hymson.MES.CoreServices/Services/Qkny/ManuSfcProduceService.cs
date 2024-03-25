@@ -1,5 +1,9 @@
-﻿using Hymson.MES.Data.Repositories.Manufacture;
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,6 +35,35 @@ namespace Hymson.MES.CoreServices.Services.Qkny
         public async Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command)
         {
             return await _manuSfcProduceRepository.UpdateQtyBySfcAsync(command);
+        }
+
+        /// <summary>
+        /// 获取设备最近条码
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ManuSfcProductMaterialView> GetEquipmentNewestSfc(ManuSfcEquipmentNewestQuery query)
+        {
+            var dbModel = await _manuSfcProduceRepository.GetEquipmentNewestSfc(query);
+            if (dbModel == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45090));
+            }
+            return dbModel!;
+        }
+
+        /// <summary>
+        /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="sfcQuery"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcProduceEntity> GetBySFCAsync(ManuSfcProduceBySfcQuery query)
+        {
+            var dbModel = await _manuSfcProduceRepository.GetBySFCAsync(query);
+            if (dbModel == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45090));
+            }
+            return dbModel!;
         }
     }
 }

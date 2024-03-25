@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.LoadPoint.View;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Process
@@ -197,6 +198,21 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
 
+        #region 顷刻
+
+        /// <summary>
+        /// 获取上料点或者设备
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PointOrEquipmentView>> GetPointOrEquipmmentAsync(ProcLoadPointEquipmentQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<PointOrEquipmentView>(GetPointOrEquipmentSql, query);
+        }
+
+        #endregion
+
     }
 
     /// <summary>
@@ -228,5 +244,29 @@ namespace Hymson.MES.Data.Repositories.Process
 
 
         const string UpdateStatusSql = "UPDATE `proc_load_point` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+
+        #region 顷刻
+
+        /// <summary>
+        /// 获取上料或者设备
+        /// </summary>
+        const string GetPointOrEquipmentSql = @"
+            select '1' as DataType, t1.Id, t1.LoadPoint Code, t3.id ResId, t3.ResCode ,t3.ResName
+            from proc_load_point t1
+            inner join proc_load_point_link_resource t2 on t1.Id  = t2.LoadPointId and t2.IsDeleted = 0
+            inner join proc_resource t3 on t3.Id = t2.ResourceId and t3.IsDeleted = 0
+            where t1.LoadPoint in @CodeList
+            and t1.IsDeleted = 0
+            union
+            select '2' as DataType, m1.Id, m1.EquipmentCode Code, m3.id ResId, m3.ResCode ,m3.ResName 
+            from equ_equipment m1
+            inner join proc_resource_equipment_bind m2 on m1.Id = m2.EquipmentId and m2.IsDeleted = 0
+            inner join proc_resource m3 on m3.Id = m2.ResourceId and m3.IsDeleted = 0
+            where m1.IsDeleted = 0
+            and m1.EquipmentCode in @CodeList
+        ";
+
+        #endregion
+
     }
 }

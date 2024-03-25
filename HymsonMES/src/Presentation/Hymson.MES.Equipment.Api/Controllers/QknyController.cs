@@ -4,11 +4,15 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Services.Qkny;
+using Hymson.MES.EquipmentServices.Services.Qkny.Common;
+using Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace Hymson.MES.Equipment.Api.Controllers
 {
@@ -25,16 +29,31 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IQknyService _qknyService;
 
         /// <summary>
+        /// 通用服务
+        /// </summary>
+        private readonly IEquCommonService _equCommonService;
+
+        /// <summary>
+        /// 制胶匀浆
+        /// </summary>
+        private readonly IGlueHomogenateService _glueHomogenateService;
+
+        /// <summary>
         /// 是否调试
         /// </summary>
-        private readonly bool IS_DEBUG = true;
+        private readonly bool IS_DEBUG = false;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public QknyController(IEquEquipmentRepository equEquipmentRepository, IQknyService qknyService)
+        public QknyController(
+            IQknyService qknyService,
+            IEquCommonService equCommonService,
+            IGlueHomogenateService glueHomogenateService)
         {
             _qknyService = qknyService;
+            _equCommonService = equCommonService;
+            _glueHomogenateService = glueHomogenateService;
         }
 
         /// <summary>
@@ -52,7 +71,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.OperatorLoginAsync(dto);
+            await _equCommonService.OperatorLoginAsync(dto);
+            //await _qknyService.OperatorLoginAsync(dto);
         }
 
         /// <summary>
@@ -70,10 +90,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
+            await _equCommonService.HeartbeatAsync(dto);
+
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最后心跳时间
             //2. 记录心跳记录
-            await _qknyService.HeartbeatAsync(dto);
+            //await _qknyService.HeartbeatAsync(dto);
         }
 
         /// <summary>
@@ -91,7 +113,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.StateAsync(dto);
+            await _equCommonService.StateAsync(dto);
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最新状态和最后时间
             //2. 新增 equ_equipment_status_time 记录每个状态持续的时间
@@ -113,7 +135,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.AlarmAsync(dto);
+            await _equCommonService.AlarmAsync(dto);
             //TODO 业务逻辑
             //1. 新增equ_equipment_alarm记录故障时间和恢复时间，用于统计每台设备故障具体时间和故障代码
         }
@@ -148,7 +170,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.CcdFileUploadCompleteAsync(dto);
+            await _equCommonService.CcdFileUploadCompleteAsync(dto);
             //TODO
             //1. 新增表 ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
             //  明细和主表记录到一起
@@ -179,7 +201,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return resultList;
             }
 
-            var result = await _qknyService.GetRecipeListAsync(dto);
+            var result = await _equCommonService.GetRecipeListAsync(dto);
             return result;
             //TODO
             //1. 获取 proc_equipment_group_param 表中type=1的数据，并转换成相应数据格式
@@ -217,7 +239,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return resultList;
             }
 
-            var res = await _qknyService.GetRecipeDetailAsync(dto);
+            var res = await _equCommonService.GetRecipeDetailAsync(dto);
             return res;
         }
 
@@ -236,7 +258,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.RecipeAsync(dto);
+            await _equCommonService.RecipeAsync(dto);
 
             //TODO
             //1. 校验开机参数是否启用状态
@@ -382,7 +404,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 }
             }
 
-            return await _qknyService.FormulaListGetAsync(dto);
+            return await _glueHomogenateService.FormulaListGetAsync(dto);
         }
 
         /// <summary>
@@ -421,7 +443,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return result;
             }
 
-            return await _qknyService.FormulaDetailGetAsync(dto);
+            return await _glueHomogenateService.FormulaDetailGetAsync(dto);
         }
 
         /// <summary>
@@ -439,7 +461,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.FormulaVersionExamineAsync(dto);
+            await _glueHomogenateService.FormulaVersionExamineAsync(dto);
 
             //TODO
             //1. 查询表proc_formula进行配方版本的校验，确认是否是激活的版本
@@ -460,7 +482,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.ConsumeEquBeforeCheckAsync(dto);
+            await _glueHomogenateService.ConsumeEquBeforeCheckAsync(dto);
 
             //TODO
             //待确认？此时应该应该根据什么是查激活的工单以及对应的BOM
@@ -483,7 +505,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.ConsumeEquAsync(dto);
+            await _glueHomogenateService.ConsumeEquAsync(dto);
             //TODO
             //1. 类似上料，上到搅拌机或者制胶机
         }
@@ -503,7 +525,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.FeedingCompletedAsync(dto);
+            await _glueHomogenateService.FeedingCompletedAsync(dto);
 
             //TODO
             //1. 类似上料，粉料，匀浆上到中转罐或者料仓（上料点）
@@ -526,13 +548,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return sfc;
             }
 
-            return await _qknyService.OutputEquAsync(dto);
+            return await _glueHomogenateService.OutputEquAsync(dto);
 
             //TODO
             //1. 根据工序返回对应的条码给设备
             //2. 执行条码生成方法
-
-
         }
 
         /// <summary>
@@ -545,6 +565,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("批次转移(制胶匀浆)021", BusinessType.OTHER, "BatchMove021", ReceiverTypeEnum.MES)]
         public async Task BatchMoveAsync(BatchMoveDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _glueHomogenateService.BatchMoveAsync(dto);
+
             //TODO
             //1. 当浆料或胶液在罐体间转移后，上报浆料或胶液条码、重量、转出罐和转入罐的编码
             //2. 处理罐子前后的数量
@@ -561,6 +588,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备投料非生产投料(制胶匀浆)022", BusinessType.OTHER, "ConsumeInNonProductionEqu022", ReceiverTypeEnum.MES)]
         public async Task ConsumeInNonProductionEquAsync(ConsumeInNonProductionEquDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _glueHomogenateService.ConsumeInNonProductionEquAsync(dto);
+
             //TODO
             //1. 使用NMP和DIW洗罐子用到
         }
@@ -628,12 +662,16 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("获取下发条码(用于CCD面密度)025", BusinessType.OTHER, "CcdGetBarcode025", ReceiverTypeEnum.MES)]
         public async Task<CcdGetBarcodeReturnDto> CcdGetBarcodeAsync(CCDFileUploadCompleteDto dto)
         {
+            if(IS_DEBUG ==true)
+            {
+                CcdGetBarcodeReturnDto model = new CcdGetBarcodeReturnDto();
+                return model;
+            }
+
+            return await _qknyService.CcdGetBarcodeAsync(dto);
+
             //TODO
             //1. 用于异常情况，返回设备产出最近的一个条码，从manu_sfc_produce中取
-
-            CcdGetBarcodeReturnDto model = new CcdGetBarcodeReturnDto();
-
-            return model;
         }
 
         /// <summary>
@@ -646,7 +684,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备过程参数026", BusinessType.OTHER, "EquipmentProcessParam026", ReceiverTypeEnum.MES)]
         public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto)
         {
-            await _qknyService.EquipmentProcessParamAsync(dto);
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _equCommonService.EquipmentProcessParamAsync(dto);
 
             //TODO
             //1. 写入参数表，参考现有的EquipmentCollectionAsync，
@@ -663,6 +706,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产品进站027", BusinessType.OTHER, "Inbound027", ReceiverTypeEnum.MES)]
         public async Task InboundAsync(InboundDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+            
+            await _qknyService.InboundAsync(dto);
+
             //TODO
             //1. 上工序出站校验
             //2. 是否合格校验
@@ -680,6 +730,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产品进站028", BusinessType.OTHER, "Outbound028", ReceiverTypeEnum.MES)]
         public async Task OutboundAsync(OutboundDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.OutboundAsync(dto);
+
             //TODO
             //1. 添加参数记录
             //2. 参考现有出站
@@ -699,18 +756,23 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //1. 参考现有进站
 
-            List<InboundMoreReturnDto> result = new List<InboundMoreReturnDto>();
-            for(var i = 0;i < dto.SfcList.Count; ++i)
+            if (IS_DEBUG == true)
             {
-                InboundMoreReturnDto model = new InboundMoreReturnDto();
-                model.Code = 0;
-                model.Msg = "11";
-                model.Sfc = $"sfc00{i+1}";
+                List<InboundMoreReturnDto> result = new List<InboundMoreReturnDto>();
+                for (var i = 0; i < dto.SfcList.Count; ++i)
+                {
+                    InboundMoreReturnDto model = new InboundMoreReturnDto();
+                    model.Code = 0;
+                    model.Msg = "11";
+                    model.Sfc = $"sfc00{i + 1}";
 
-                result.Add(model);
+                    result.Add(model);
+                }
+
+                return result;
             }
 
-            return result;
+            return await _qknyService.InboundMoreAsync(dto);
         }
 
         /// <summary>
@@ -725,19 +787,23 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             //TODO
             //1. 参考现有出站
-
-            List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
-            for (var i = 0; i < dto.SfcList.Count; ++i)
+            if(IS_DEBUG == true)
             {
-                OutboundMoreReturnDto model = new OutboundMoreReturnDto();
-                model.Code = 0;
-                model.Msg = "11";
-                model.Sfc = $"sfc00{i + 1}";
+                List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
+                for (var i = 0; i < dto.SfcList.Count; ++i)
+                {
+                    OutboundMoreReturnDto model = new OutboundMoreReturnDto();
+                    model.Code = 0;
+                    model.Msg = "11";
+                    model.Sfc = $"sfc00{i + 1}";
 
-                result.Add(model);
+                    result.Add(model);
+                }
+
+                return result;
             }
 
-            return result;
+            return await _qknyService.OutboundMoreAsync(dto);
         }
 
         /// <summary>
@@ -814,6 +880,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("补液数据上报034", BusinessType.OTHER, "FillingData034", ReceiverTypeEnum.MES)]
         public async Task FillingDataAsync(FillingDataDto dto)
         {
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.FillingDataAsync(dto);
+
             //TODO
             //1. 新增表进行记录
         }
@@ -828,6 +901,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("空托盘校验035", BusinessType.OTHER, "EmptyContainerCheck035", ReceiverTypeEnum.MES)]
         public async Task EmptyContainerCheckAsync(EmptyContainerCheckDto dto)
         {
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.EmptyContainerCheckAsync(dto);
+
             //TODO
             //2. 校验托盘是否存在系统中（待确认）
             //3. 托盘(载具)表 inte_vehicle_freight_stack 是否存在数据
@@ -843,6 +923,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("单电芯校验036", BusinessType.OTHER, "ContainerSfcCheck036", ReceiverTypeEnum.MES)]
         public async Task ContainerSfcCheckAsync(ContainerSfcCheckDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ContainerSfcCheckAsync(dto);
+
             //TODO
             //1. 校验电芯是否合格
             //2. 校验电芯是否在托盘中 inte_vehicle_freight_stack
@@ -852,6 +939,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 托盘电芯绑定(在制品容器)037
+        /// 绑盘拆盘作为单独工序，需要做进出站
+        /// 绑盘完后才会告诉MES，不会出现绑一半告诉MES
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -860,6 +949,15 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘电芯绑定(在制品容器)037", BusinessType.OTHER, "BindContainer037", ReceiverTypeEnum.MES)]
         public async Task BindContainerAsync(BindContainerDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+            //TODO
+            //绑盘拆盘作为单独工序，需要做进出站
+
+            await _qknyService.BindContainerAsync(dto);
+
             //TODO
             //1. 校验托盘数量
             //2. 校验电芯是否已经做校验 inte_vehicle_check_record
@@ -870,6 +968,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 托盘电芯解绑(在制品容器)038
+        /// 绑盘拆盘作为单独工序，需要做进出站
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -878,6 +977,15 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘电芯解绑(在制品容器)038", BusinessType.OTHER, "UnBindContainer038", ReceiverTypeEnum.MES)]
         public async Task UnBindContainerAsync(UnBindContainerDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+            //TODO
+            //绑盘拆盘作为单独工序，需要做进出站
+
+            await _qknyService.UnBindContainerAsync(dto);
+
             //TODO
             //1. 校验电芯是否在托盘中
             //2. inte_vehicle_freight_stack 删除绑定数据
@@ -895,6 +1003,15 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task ContainerNgReportAsync(ContainerNgReportDto dto)
         {
             //TODO
+            //1. 确认设备能否给出不合格代码及发现不良工序
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.ContainerNgReportAsync(dto);
+
+            //TODO
             //1. inte_vehicle_freight_stack 删除绑定数据
             //2. 添加冗余表 inte_vehicle_freight_ng_record，NG解绑记录
             //3. 添加 inte_vehicle_freight_record 解绑记录
@@ -910,13 +1027,20 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("InboundInContainer")]
         [LogDescription("托盘进站(容器进站)040", BusinessType.OTHER, "InboundInContainer040", ReceiverTypeEnum.MES)]
         public async Task InboundInContainerAsync(InboundInContainerDto dto)
-        {
+        { 
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.InboundInContainerAsync(dto);
+
             //TODO
             //1. 参考 InBoundCarrierAsync 进站
         }
 
         /// <summary>
-        /// 托盘出站(容器进站)041
+        /// 托盘出站(容器出站)041
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -925,6 +1049,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘出站(容器出站)041", BusinessType.OTHER, "OutboundInContainer041", ReceiverTypeEnum.MES)]
         public async Task OutboundInContainerAsync(OutboundInContainerDto dto)
         {
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.OutboundInContainerAsync(dto);
+
             //TODO
             //1. 托盘如果存在参数，在记录数据时，需要在额外记录托盘当时的条码
             //2. 添加托盘出站记录
@@ -940,6 +1071,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("工装寿命上报042", BusinessType.OTHER, "ToolLife042", ReceiverTypeEnum.MES)]
         public async Task ToolLifeAsync(ToolLifeDto dto)
         {
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _equCommonService.ToolLifeAsync(dto);
+
             //TODO
             //1. 添加设备工装寿命记录表，进行数据更新或者插入
         }
@@ -954,8 +1092,64 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产品参数上传043", BusinessType.OTHER, "ProductParam043", ReceiverTypeEnum.MES)]
         public async Task ProductParamAsync(ProductParamDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _equCommonService.ProductParamAsync(dto);
+
             //TODO
-            //1. 参考ProductCollectionAsync
+            //1. 参考 ProductCollectionAsync
+        }
+
+        /// <summary>
+        /// 卷绕极组产出044
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CollingPolar")]
+        [LogDescription("卷绕极组产出044", BusinessType.OTHER, "CollingPolar044", ReceiverTypeEnum.MES)]
+        public async Task CollingPolarAsync(CollingPolarDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.CollingPolarAsync(dto);
+        }
+
+        /// <summary>
+        /// 分选规则045
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SortingRule")]
+        [LogDescription("分选规则045", BusinessType.OTHER, "SortingRule045", ReceiverTypeEnum.MES)]
+        public async Task<List<ProcSortRuleDetailEquDto>> SortingRuleAsync(SortingRuleDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                List<ProcSortRuleDetailEquDto> sortList = new List<ProcSortRuleDetailEquDto>();
+                for(var i = 0;i < 3; ++i)
+                {
+                    ProcSortRuleDetailEquDto sortModel = new ProcSortRuleDetailEquDto();
+                    sortModel.MinValue = i;
+                    sortModel.MinContainingType = Core.Enums.Process.ContainingTypeEnum.Lt;
+                    sortModel.MaxValue = i + 10;
+                    sortModel.MaxContainingType = Core.Enums.Process.ContainingTypeEnum.LtOrE;
+                    sortModel.ParameterCode = $"param{i}";
+                    sortModel.ParameterName = $"paramname{i}";
+                    sortList.Add(sortModel);
+                }    
+
+                return sortList;
+            }
+
+            return await _qknyService.SortingRuleAsync(dto);
         }
     }
 }

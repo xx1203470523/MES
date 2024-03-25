@@ -45,4 +45,25 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         public string BarCode { get; set; }
     }
+
+    #region 顷刻
+
+    /// <summary>
+    /// 已绑定条码查询
+    /// </summary>
+    public class InteVehiceSfcListQuery
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public List<string> SfcList { get; set; } = new List<string>();
+    }
+
+    #endregion
+
 }

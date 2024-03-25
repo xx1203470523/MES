@@ -254,4 +254,49 @@ namespace Hymson.MES.CoreServices.Dtos.Qkny
         public DateTime CreatedOn { get; set; }
     }
 
+    #region 顷刻
+
+    /// <summary>
+    /// 上料转移
+    /// </summary>
+    public record ManuFeedingTransferSaveDto
+    {
+        /// <summary>
+        /// 转移类型
+        /// </summary>
+        public ManuSFCFeedingTransferEnum TransferType { get; set; }
+
+        /// <summary>
+        /// 源id
+        /// </summary>
+        public long SourceId { get; set; }
+
+        /// <summary>
+        /// 目标id
+        /// </summary>
+        public long DestId { get; set; }
+
+        /// <summary>
+        /// 上料点类型的资源id
+        /// </summary>
+        public long LoadPointResoucesId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal? Qty { get; set; }
+
+        /// <summary>
+        /// 操作人
+        /// </summary>
+        public string OpeationBy {  get; set; }
+    }
+
+    #endregion
+
 }

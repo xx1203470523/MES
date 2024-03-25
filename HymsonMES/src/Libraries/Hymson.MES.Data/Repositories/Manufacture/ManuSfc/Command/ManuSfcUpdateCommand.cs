@@ -279,7 +279,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     #region 顷刻
 
     /// <summary>
-    /// 条码状态更新 
+    /// 条码数量更新 
     /// </summary>
     public class UpdateQtyBySfcCommand : UpdateCommand
     {

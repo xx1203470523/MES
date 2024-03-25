@@ -45,6 +45,7 @@ namespace Hymson.MES.Core.Constants
         /// 用户名或密码不能为空
         /// </summary>
         public const string MES45013 = "用户名或密码不能为空";
+
         #endregion
 
         #region 开机参数
@@ -134,6 +135,21 @@ namespace Hymson.MES.Core.Constants
         /// </summary>
         public const string MES45071 = "上料点不存在上料记录";
 
+        /// <summary>
+        /// 条码在上料表不存在
+        /// </summary>
+        public const string MES45072 = "条码在上料表不存在";
+
+        /// <summary>
+        /// 条码数量小于等于0
+        /// </summary>
+        public const string MES45073 = "条码数量小于等于0";
+
+        /// <summary>
+        /// 上料点或设备数据不存在或者缺少
+        /// </summary>
+        public const string MES45074 = "上料点或设备数据不存在或者缺少";
+
         #endregion
 
         #region 制胶匀浆
@@ -150,5 +166,154 @@ namespace Hymson.MES.Core.Constants
 
         #endregion
 
+        #region 在制品
+
+        /// <summary>
+        /// 设备无产出条码
+        /// </summary>
+        public const string MES45090 = "设备无产出条码";
+
+        /// <summary>
+        /// 条码是NG状态
+        /// </summary>
+        public const string MES45091 = "条码是NG状态";
+
+        #endregion
+
+        #region 条码生成
+
+        /// <summary>
+        /// 没有配置对应的线体
+        /// </summary>
+        public const string MES45100 = "配置项中没有对应的线体";
+
+        #endregion
+
+        #region 载具
+
+        /// <summary>
+        /// 载具不存在
+        /// </summary>
+        public const string MES45110 = "载具不存在";
+
+        /// <summary>
+        /// 载具已经绑定条码
+        /// </summary>
+        public const string MES45111 = "载具已经绑定条码";
+
+        /// <summary>
+        /// 载具中条码系统不存在
+        /// </summary>
+        public const string MES45112 = "载具在条码系统不存在";
+
+        /// <summary>
+        /// 载具中条码数量和数据库中不匹配
+        /// </summary>
+        public const string MES45113 = "载具中条码数量和数据库中不匹配";
+
+        /// <summary>
+        /// 载具中条码和数据库中不匹配
+        /// </summary>
+        public const string MES45114 = "载具中条码和数据库中不匹配";
+
+        /// <summary>
+        /// 存在已经绑定的条码
+        /// </summary>
+        public const string MES45115 = "存在已经绑定的条码";
+
+        /// <summary>
+        /// 载具没有关联载具类型
+        /// </summary>
+        public const string MES45116 = "载具没有关联载具类型";
+
+        /// <summary>
+        /// 载具对应载具类型异常
+        /// </summary>
+        public const string MES45117 = "载具对应载具类型异常";
+
+        /// <summary>
+        /// 载具对应载具类型状态已禁用
+        /// </summary>
+        public const string MES45118 = "载具对应载具类型状态已禁用";
+
+        /// <summary>
+        /// 载具对应载具类型状态已禁用
+        /// </summary>
+        public const string MES45119 = "载具装载数量加上这次已超过最大值";
+
+        /// <summary>
+        /// 载具中条码和系统中不匹配，部分条码没有解绑
+        /// </summary>
+        public const string MES45120 = "载具中条码和系统中不匹配，部分条码没有解绑";
+
+        /// <summary>
+        /// 托盘NG中上传的不合格代码在系统中不存在
+        /// </summary>
+        public const string MES45121 = "托盘NG中上传的不合格代码在系统中都不存在";
+
+        #endregion
+
+        #region 分选规则
+
+        /// <summary>
+        /// 工单对应型号没有对应的分选规则
+        /// </summary>
+        public const string MES45160 = "工单对应型号没有对应的分选规则";
+
+        #endregion
+
+        #region 设备心跳
+
+        /// <summary>
+        /// 设备状态不能为空
+        /// </summary>
+        public const string MES45170 = "设备状态不能为空";
+
+        #endregion
+
+        #region 设备心跳
+
+        /// <summary>
+        /// 报警状态不能为空
+        /// </summary>
+        public const string MES45180 = "报警状态不能为空";
+
+        #endregion
+
+        #region CCD上传文件完成
+
+        /// <summary>
+        /// CCD上传文件列表不能为空
+        /// </summary>
+        public const string MES45190 = "CCD上传文件列表不能为空";
+
+        #endregion
+
+        #region 工装夹具
+
+        /// <summary>
+        /// 工装夹具不能为空
+        /// </summary>
+        public const string MES45200 = "工装夹具不能为空";
+
+        #endregion
+
+        #region 设备过程参数
+
+        /// <summary>
+        /// 设备过程参数不能为空
+        /// </summary>
+        public const string MES45210 = "设备过程参数不能为空";
+
+        #endregion
+
+        #region 产品过程参数
+
+        /// <summary>
+        /// 产品过程参数不能为空
+        /// </summary>
+        public const string MES45220 = "产品过程参数不能为空";
+
+        #endregion
     }
 }

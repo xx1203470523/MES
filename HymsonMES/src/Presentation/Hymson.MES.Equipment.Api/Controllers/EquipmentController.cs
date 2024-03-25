@@ -69,7 +69,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("InBound")]
+        [HttpPost("MES-InBound")]
         [LogDescription("进站", BusinessType.OTHER, "InBound", ReceiverTypeEnum.MES)]
         public async Task InBoundAsync(InBoundDto request)
         {
@@ -81,7 +81,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("InBoundMore")]
+        [HttpPost("MES-InBoundMore")]
         [LogDescription("多个进站", BusinessType.OTHER, "InBoundMore", ReceiverTypeEnum.MES)]
         public async Task InBoundMoreAsync(InBoundMoreDto request)
         {
@@ -93,7 +93,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("OutBound")]
+        [HttpPost("MES-OutBound")]
         [LogDescription("出站", BusinessType.OTHER, "OutBound", ReceiverTypeEnum.MES)]
         public async Task OutBoundAsync(OutBoundDto request)
         {
@@ -105,7 +105,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("OutBoundMore")]
+        [HttpPost("MES-OutBoundMore")]
         [LogDescription("多个出站", BusinessType.OTHER, "OutBoundMore", ReceiverTypeEnum.MES)]
         public async Task OutBoundMoreAsync(OutBoundMoreDto request)
         {

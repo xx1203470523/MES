@@ -2,6 +2,7 @@
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.LoadPoint.View;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,35 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
                 throw new CustomerValidationException(nameof(ErrorCode.MES45070));
             }
             return dbList.First();
+        }
+
+        /// <summary>
+        /// 获取上料点或者设备
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<List<PointOrEquipmentView>> GetPointOrEquipmmentAsync(ProcLoadPointEquipmentQuery query)
+        {
+            if(query == null || query.CodeList == null || query.CodeList.Count != 2)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45074));
+            }
+            var dbList = await _procLoadPointRepository.GetPointOrEquipmmentAsync(query);
+            if (dbList.IsNullOrEmpty() == true || dbList.Count() != query.CodeList.Count)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45074));
+            }
+            var dbCode = dbList.Where(m => m.Code == query.CodeList[0]).FirstOrDefault();
+            if(dbCode == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45074));
+            }
+            dbCode = dbList.Where(m => m.Code == query.CodeList[1]).FirstOrDefault();
+            if(dbCode == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45074));
+            }
+            return dbList.ToList();
         }
     }
 }

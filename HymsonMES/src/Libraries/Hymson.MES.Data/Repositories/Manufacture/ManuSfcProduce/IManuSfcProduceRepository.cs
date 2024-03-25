@@ -388,7 +388,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateQtyByIdAsync(UpdateManuSfcProduceQtyByIdCommand command);
 
-
         #region 顷刻
 
         /// <summary>
@@ -398,6 +397,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command);
+
+        /// <summary>
+        /// 获取设备最近条码
+        /// </summary>
+        /// <returns></returns>
+        Task<ManuSfcProductMaterialView> GetEquipmentNewestSfc(ManuSfcEquipmentNewestQuery query);
 
         #endregion
     }
