@@ -192,7 +192,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 规格型号
         /// </summary>
-        public string Specifications { get; set; }
+        public string? Specifications { get; set; }
 
         /// <summary>
         /// 备注
@@ -350,7 +350,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 规格型号
         /// </summary>
-        public string Specifications { get; set; }
+        public string? Specifications { get; set; }
 
         /// <summary>
         /// 是否默认版本

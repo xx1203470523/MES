@@ -13,7 +13,6 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Services.Dtos.Common;
@@ -127,7 +126,6 @@ namespace Hymson.MES.Services.Services.Process
             saveDto.MaterialCode = saveDto.MaterialCode.ToTrimSpace().ToUpperInvariant();
             saveDto.MaterialName = saveDto.MaterialName.Trim();
             saveDto.Version = saveDto.Version.Trim();
-            saveDto.Specifications = saveDto.Specifications.Trim();
             saveDto.Remark = saveDto?.Remark ?? "".Trim();
             saveDto!.Unit = saveDto?.Unit ?? "".Trim();
 
@@ -153,7 +151,7 @@ namespace Hymson.MES.Services.Services.Process
             #endregion
 
             #region 组装数据
-            //DTO转换实体
+            // DTO转换实体
             var procMaterialEntity = saveDto.ToEntity<ProcMaterialEntity>();
             procMaterialEntity.Id = IdGenProvider.Instance.CreateId();
             procMaterialEntity.CreatedBy = _currentUser.UserName;
@@ -258,7 +256,6 @@ namespace Hymson.MES.Services.Services.Process
         {
             saveDto.MaterialName = saveDto.MaterialName.Trim();
             saveDto.Version = saveDto.Version.Trim();
-            saveDto.Specifications = saveDto.Specifications.Trim();
             saveDto.Remark = saveDto?.Remark ?? "".Trim();
             saveDto!.Unit = saveDto?.Unit ?? "".Trim();
 
@@ -268,7 +265,7 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialEntity.UpdatedOn = HymsonClock.Now();
 
             #region 校验
-            //验证DTO
+            // 验证DTO
             await _validationModifyRules!.ValidateAndThrowAsync(saveDto);
 
             var modelOrigin = await _procMaterialRepository.GetByIdAsync(saveDto!.Id, _currentSite.SiteId ?? 0);
@@ -277,7 +274,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new NotFoundException(nameof(ErrorCode.MES10204));
             }
 
-            //验证某些是不能编辑的
+            // 验证某些是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == modelOrigin.Status))
             {

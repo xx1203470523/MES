@@ -146,7 +146,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// <summary>
         /// 规格型号
         /// </summary>
-        public string Specifications { get; set; }
+        public string? Specifications { get; set; }
 
     }
 }

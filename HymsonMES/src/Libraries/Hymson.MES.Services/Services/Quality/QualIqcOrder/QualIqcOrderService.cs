@@ -699,7 +699,7 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.MaterialCode = materialEntity.MaterialCode;
                     dto.MaterialName = materialEntity.MaterialName;
                     dto.MaterialVersion = materialEntity.Version ?? "";
-                    dto.Specifications = materialEntity.Specifications;
+                    dto.Specifications = materialEntity.Specifications ?? "";
                     dto.Unit = materialEntity.Unit ?? "";
                 }
             }
@@ -1188,7 +1188,7 @@ namespace Hymson.MES.Services.Services.Quality
                         dto.MaterialCode = materialEntity.MaterialCode;
                         dto.MaterialName = materialEntity.MaterialName;
                         dto.MaterialVersion = materialEntity.Version ?? "";
-                        dto.Specifications = materialEntity.Specifications;
+                        dto.Specifications = materialEntity.Specifications ?? "";
                         dto.Unit = materialEntity.Unit ?? "";
                     }
                 }
