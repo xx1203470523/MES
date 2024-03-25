@@ -690,9 +690,6 @@ namespace Hymson.MES.Services.Services.Quality
 
             dto.ReceiptNum = receiptEntity.ReceiptNum;
 
-            // TODO 规格型号
-            dto.Specifications = "-";
-
             // 读取产品
             if (entity.MaterialId.HasValue)
             {
@@ -702,6 +699,7 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.MaterialCode = materialEntity.MaterialCode;
                     dto.MaterialName = materialEntity.MaterialName;
                     dto.MaterialVersion = materialEntity.Version ?? "";
+                    dto.Specifications = materialEntity.Specifications;
                     dto.Unit = materialEntity.Unit ?? "";
                 }
             }
@@ -1181,9 +1179,6 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.HandledOn = handleEntity.CreatedOn;
                 }
 
-                // TODO 规格型号
-                dto.Specifications = "-";
-
                 // 产品
                 if (entity.MaterialId.HasValue)
                 {
@@ -1193,6 +1188,7 @@ namespace Hymson.MES.Services.Services.Quality
                         dto.MaterialCode = materialEntity.MaterialCode;
                         dto.MaterialName = materialEntity.MaterialName;
                         dto.MaterialVersion = materialEntity.Version ?? "";
+                        dto.Specifications = materialEntity.Specifications;
                         dto.Unit = materialEntity.Unit ?? "";
                     }
                 }
