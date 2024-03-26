@@ -1940,6 +1940,7 @@
         public const string MES11604 = "存放位置不能为空！";
         public const string MES11605 = "使用状态不能为空！";
         public const string MES11606 = "导入的数据中资源编码重复！";
+        public const string MES11607 = "导入的数据中工序编码重复！";
         #endregion
     }
 }

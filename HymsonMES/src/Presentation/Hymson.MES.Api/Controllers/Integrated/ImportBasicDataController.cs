@@ -35,7 +35,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 基础数据导入
+        /// 设备数据导入
         /// </summary>
         /// <param name="formFile"></param>
         /// <returns></returns>
@@ -43,7 +43,76 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("importEqu")]
         public async Task ImportEquDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
-             await _importBasicDataService.ImportEquDataAsync(formFile);
+            await _importBasicDataService.ImportEquDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 资源数据导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importResource")]
+        public async Task ImportResourceDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportResourceDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 资源类型数据导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importResType")]
+        public async Task ImportResourceTypeDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportResourceTypeDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 工序数据导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importProcedure")]
+        public async Task ImportProcedureDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportProcedureDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 产线数据导入
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importWorkLine")]
+        public async Task ImportWorkLineDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportWorkLineDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 车间数据导入
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importWorkShop")]
+        public async Task ImportWorkShopDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportWorkShopDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 车间数据导入
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importMaterialGroup")]
+        public async Task ImportMaterialGroupDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportMaterialGroupDataAsync(formFile);
         }
     }
 }

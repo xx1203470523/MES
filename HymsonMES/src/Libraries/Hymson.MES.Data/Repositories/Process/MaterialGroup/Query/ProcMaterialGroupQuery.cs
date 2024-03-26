@@ -30,5 +30,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 空值 : false  
         /// </summary>
         public string? GroupCode { get; set; }
+
+        public IEnumerable<string>? GroupCodes { get; set; }
     }
 }
