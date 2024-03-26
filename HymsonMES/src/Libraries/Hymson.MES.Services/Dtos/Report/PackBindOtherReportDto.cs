@@ -81,18 +81,18 @@ public record PackBindOtherReportExcelDto : BaseExcelDto
     /// 绑定类型
     /// </summary>
     [EpplusTableColumn(Header = "绑定类型", Order = 1)]
-    public SfcCirculationTypeEnum? CirculationType { get; set; }
+    public string? CirculationTypeName { get; set; }
 
     /// <summary>
     /// 条码
     /// </summary>
-    [EpplusTableColumn(Header = "条码", Order = 2)]
+    [EpplusTableColumn(Header = "门箱包条码", Order = 2)]
     public string? SFC { get; set; }
 
     /// <summary>
     /// 绑定条码
     /// </summary>
-    [EpplusTableColumn(Header = "绑定条码", Order = 3)]
+    [EpplusTableColumn(Header = "系统条码", Order = 3)]
     public string? BindSfc { get; set; }
 
     /// <summary>

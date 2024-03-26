@@ -6,6 +6,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.Minio;
+using Hymson.Utils;
 using Microsoft.AspNetCore.Components.Web;
 using MySqlX.XDevAPI.Common;
 using System;
@@ -88,7 +89,8 @@ namespace Hymson.MES.Services.Services.Report.PackBindOtherReport
             foreach (var item in manuSfcCirculationEntities)
             {
                 PackBindOtherReportExcelDto newItem = item.ToExcelModel<PackBindOtherReportExcelDto>();
-
+                newItem.BindSfc = item.CirculationBarCode;
+                newItem.CirculationTypeName = item.CirculationType.GetDescription();
                 resultData.Add(newItem);
             }
 
