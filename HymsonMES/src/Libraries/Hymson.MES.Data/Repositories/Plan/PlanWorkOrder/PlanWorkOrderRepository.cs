@@ -150,7 +150,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
             sqlBuilder.AddParameters(query);
 
-            sqlBuilder.OrderBy("PWOA.CreatedOn");
+            sqlBuilder.OrderBy("PWOA.CreatedOn DESC");
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderEntity>(templateData.RawSql, templateData.Parameters);
@@ -181,12 +181,22 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("Id NOT IN @NotInIds");
             }
 
+            if (query.Statuss != null && query.Statuss.Any())
+            {
+                sqlBuilder.Where("Status IN @Statuss");
+            }
+
+            if (query.SiteId.HasValue)
+            {
+                sqlBuilder.Where("SiteId = @SiteId");
+            }
+
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
             sqlBuilder.AddParameters(query);
 
-            sqlBuilder.OrderBy("CreatedOn");
+            sqlBuilder.OrderBy("CreatedOn DESC");
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderEntity>(templateData.RawSql, templateData.Parameters);

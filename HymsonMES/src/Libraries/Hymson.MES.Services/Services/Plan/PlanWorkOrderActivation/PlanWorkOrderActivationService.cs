@@ -263,7 +263,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         {
             WorkOrderId = workOrder.Id,
             SiteId = _currentSite.SiteId ?? 0
-        })).FirstOrDefault();
+        })).FirstOrDefault();        
 
         var isActivationed = workOrderActivation != null;//是否已经激活
         if (isActivationed && isActivationed == activationWorkOrderDto.IsNeedActivation)
@@ -304,11 +304,13 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         }
 
         if (line.IsMixLine!.Value)
-        {//混线
+        {
+            //混线
             await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto);
         }
         else
-        {//不混线
+        {
+            //不混线
             //判断当前线体是否有无激活的工单
             var hasActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery { LineId = activationWorkOrderDto.LineId, SiteId = _currentSite.SiteId ?? 0 })).FirstOrDefault();
             if (hasActivation != null)
@@ -361,9 +363,9 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         {
             switch (workOrder.Status)
             {
-                case Core.Enums.PlanWorkOrderStatusEnum.NotStarted:
+                case PlanWorkOrderStatusEnum.NotStarted:
                     throw new CustomerValidationException(nameof(ErrorCode.MES16405)).WithData("orderCode", workOrder.OrderCode);
-                case Core.Enums.PlanWorkOrderStatusEnum.SendDown:
+                case PlanWorkOrderStatusEnum.SendDown:
                     await _planWorkOrderActivationRepository.InsertAsync(planWorkOrderActivationEntity);
 
                     //记录下激活状态变化
@@ -384,23 +386,25 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
 
 
                     //修改工单状态为生产中
-                    List<UpdateStatusCommand> updateStatusCommands = new List<UpdateStatusCommand>();
-                    updateStatusCommands.Add(new UpdateStatusCommand()
+                    List<UpdateStatusCommand> updateStatusCommands = new List<UpdateStatusCommand>
                     {
-                        Id = activationWorkOrderDto.Id,
-                        Status = Core.Enums.PlanWorkOrderStatusEnum.InProduction,
-                        BeforeStatus = workOrder.Status,
-                        UpdatedBy = _currentUser.UserName,
-                        UpdatedOn = HymsonClock.Now()
-                    });
+                        new UpdateStatusCommand()
+                        {
+                            Id = activationWorkOrderDto.Id,
+                            Status = Core.Enums.PlanWorkOrderStatusEnum.InProduction,
+                            BeforeStatus = workOrder.Status,
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now()
+                        }
+                    };
                     await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(updateStatusCommands);
 
                     //TODO  修改工单状态还需要在 工单记录表中记录
                     await _planWorkOrderStatusRecordRepository.InsertAsync(record);
 
                     break;
-                case Core.Enums.PlanWorkOrderStatusEnum.InProduction:
-                case Core.Enums.PlanWorkOrderStatusEnum.Finish:
+                case PlanWorkOrderStatusEnum.InProduction:
+                case PlanWorkOrderStatusEnum.Finish:
                     await _planWorkOrderActivationRepository.InsertAsync(planWorkOrderActivationEntity);
 
                     //记录下激活状态变化
@@ -427,8 +431,6 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
 
             ts.Complete();
         }
-
-
     }
 
     /// <summary>
@@ -549,7 +551,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         var activationWorkOrderEntities = await _planWorkOrderRepository.GetActivationWorkOrderDataAsync(
             new PlanWorkOrderPagedQuery
             {
-                WorkCenterIds = aggregationWorkCenterIds,
+                WorkCenterIds = aggregationWorkCenterIds,                
                 PageIndex = 1,
                 PageSize = int.MaxValue,
                 SiteId = _currentSite.SiteId
@@ -563,6 +565,12 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
                 PageSize = query.PageSize,
                 WorkCenterIds = aggregationWorkCenterIds,
                 NotInIds = activationWorkOrderIds,
+                Statuss = new List<PlanWorkOrderStatusEnum>()
+                {
+                    PlanWorkOrderStatusEnum.SendDown,
+                    PlanWorkOrderStatusEnum.InProduction,
+                    PlanWorkOrderStatusEnum.Finish
+                },
                 SiteId = _currentSite.SiteId
             });
         if (workOrderEntities == null || !workCenterEntities.Any())
@@ -612,11 +620,17 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
             return result;
         }
 
+        var higherWorkCenterEntities = await _inteWorkCenterRepository.GetHigherInteWorkCenterAsync(query.WirebodyIds);
+        var higherWorkCenterIds = higherWorkCenterEntities.Select(m => m.Id);
+
+        var wirebodyIds = higherWorkCenterIds.Concat(query.WirebodyIds).Distinct();
+
         var activationWorkOrderEntities = await _planWorkOrderRepository.GetActivationWorkOrderDataAsync(new PlanWorkOrderPagedQuery
-        {
-            WorkCenterIds = query.WirebodyIds,
+        {            
             PageIndex = query.PageIndex,
-            PageSize = query.PageSize
+            PageSize = query.PageSize,
+            WorkCenterIds = wirebodyIds,
+            SiteId = _currentSite.SiteId
         });
         if (!activationWorkOrderEntities.Any())
         {
@@ -633,7 +647,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
                 WorkOrderId = m.Id,
                 WorkOrderCode = m.OrderCode,
                 WorkOrderPlannedQuantity = m.Qty,
-                WorkCenterId = m.WorkCenterId
+                WorkCenterId = m.WorkCenterId                
             };
 
             var productEntity = productEntities.FirstOrDefault(prop => prop.Id == m.ProductId);
