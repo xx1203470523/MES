@@ -505,17 +505,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
                           wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`, wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
                           wor.InputQty, wor.FinishProductQuantity, wor.PassDownQuantity, wor.RealStart, wor.RealEnd,
-                          m.MaterialCode, m.MaterialName,m.Version as MaterialVersion,
-                          b.BomCode,b.Version as BomVersion,
-                          pr.`Code` as ProcessRouteCode ,pr.Version as ProcessRouteVersion,
-                          wc.`Code`  as WorkCenterCode
+                          m.MaterialCode, m.MaterialName,m.Version AS MaterialVersion,
+                          b.BomCode, b.Version AS BomVersion,
+                          pr.`Code` AS ProcessRouteCode, pr.`Name` AS ProcessRouteName, pr.Version AS ProcessRouteVersion,
+                          wc.`Code` AS WorkCenterCode, wc.`Name` AS WorkCenterName
                          FROM `plan_work_order` wo 
                          LEFT JOIN plan_work_order_record wor on wo.Id = wor.WorkOrderId
                          LEFT JOIN proc_material m on wo.ProductId = m.Id
                          LEFT JOIN proc_bom b on wo.ProductBOMId = b.Id
                          LEFT JOIN proc_process_route pr on wo.ProcessRouteId = pr.Id
                          LEFT JOIN inte_work_center wc on wo.WorkCenterId = wc.Id
-                        /**where**/  Order by wo.CreatedOn desc  LIMIT @Offset,@Rows ";
+                        /**where**/ Order by wo.CreatedOn DESC LIMIT @Offset, @Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                          FROM `plan_work_order` wo 
                          LEFT JOIN plan_work_order_record wor on wo.Id = wor.WorkOrderId

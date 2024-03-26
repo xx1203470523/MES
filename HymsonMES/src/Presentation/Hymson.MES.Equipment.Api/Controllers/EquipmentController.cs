@@ -35,11 +35,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
             ISfcBindingService sfcBindingService)
         {
             _manufactureService = manufactureService;
-            _sfcBindingService= sfcBindingService;
+            _sfcBindingService = sfcBindingService;
         }
 
         /// <summary>
-        /// 创建条码
+        /// 创建条码（半成品）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -49,6 +49,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<IEnumerable<string>> CreateBarCodeBySemiProductAsync(BaseDto dto)
         {
             return await _manufactureService.CreateBarcodeBySemiProductIdAsync(dto);
+        }
+
+        /// <summary>
+        /// 创建条码（电芯）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CreateCellBarCode")]
+        [LogDescription("创建电芯条码", BusinessType.OTHER, "CreateCellBarCode", ReceiverTypeEnum.MES)]
+        public async Task<IEnumerable<string>> CreateCellBarCodeAsync(BaseDto dto)
+        {
+            return await _manufactureService.CreateCellBarCodeAsync(dto);
         }
 
         /// <summary>
@@ -69,8 +82,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("InBound")]
-        [LogDescription("进站", BusinessType.OTHER, "InBound", ReceiverTypeEnum.MES)]
+        [HttpPost("InStation")]
+        [LogDescription("进站", BusinessType.OTHER, "InStation", ReceiverTypeEnum.MES)]
         public async Task InBoundAsync(InBoundDto request)
         {
             await _manufactureService.InBoundAsync(request);
@@ -81,8 +94,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("InBoundMore")]
-        [LogDescription("多个进站", BusinessType.OTHER, "InBoundMore", ReceiverTypeEnum.MES)]
+        [HttpPost("InStationMore")]
+        [LogDescription("多个进站", BusinessType.OTHER, "InStationMore", ReceiverTypeEnum.MES)]
         public async Task InBoundMoreAsync(InBoundMoreDto request)
         {
             await _manufactureService.InBoundMoreAsync(request);
@@ -93,8 +106,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("OutBound")]
-        [LogDescription("出站", BusinessType.OTHER, "OutBound", ReceiverTypeEnum.MES)]
+        [HttpPost("OutStation")]
+        [LogDescription("出站", BusinessType.OTHER, "OutStation", ReceiverTypeEnum.MES)]
         public async Task OutBoundAsync(OutBoundDto request)
         {
             await _manufactureService.OutBoundAsync(request);
@@ -105,8 +118,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("OutBoundMore")]
-        [LogDescription("多个出站", BusinessType.OTHER, "OutBoundMore", ReceiverTypeEnum.MES)]
+        [HttpPost("OutStationMore")]
+        [LogDescription("多个出站", BusinessType.OTHER, "OutStationMore", ReceiverTypeEnum.MES)]
         public async Task OutBoundMoreAsync(OutBoundMoreDto request)
         {
             await _manufactureService.OutBoundMoreAsync(request);

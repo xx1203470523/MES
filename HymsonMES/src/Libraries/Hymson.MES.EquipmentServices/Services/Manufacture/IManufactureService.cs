@@ -8,11 +8,18 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
     public interface IManufactureService
     {
         /// <summary>
-        /// 创建条码
+        /// 创建条码（半成品）
         /// </summary>
         /// <param name="baseDto"></param>
         /// <returns></returns>
         Task<IEnumerable<string>> CreateBarcodeBySemiProductIdAsync(BaseDto baseDto);
+
+        /// <summary>
+        /// 创建条码（电芯）
+        /// </summary>
+        /// <param name="baseDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<string>> CreateCellBarCodeAsync(BaseDto baseDto);
 
         /// <summary>
         /// 进站

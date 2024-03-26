@@ -969,11 +969,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         }
 
         /// <summary>
-        /// 半成品条码生成
+        /// 条码生成（半成品）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<List<ManuSfcEntity>> CreateBarcodeBySemiProductIdAsync(CreateBarcodeBySemiProductId param)
+        public async Task<List<ManuSfcEntity>> CreateBarcodeBySemiProductIdAsync(CreateBarcodeByResourceCode param)
         {
             // 查询资源
             var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
@@ -1181,5 +1181,17 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
 
             return manuSfcList;
         }
+
+        /// <summary>
+        /// 条码生成（电芯）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<List<ManuSfcEntity>> CreateCellBarCodeAsync(CreateBarcodeByResourceCode param)
+        {
+            // TODO
+            return await Task.FromResult(new List<ManuSfcEntity> { });
+        }
+
     }
 }

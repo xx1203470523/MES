@@ -1,10 +1,12 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.View;
@@ -410,6 +412,28 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="workCenterQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteWorkCenterEntity>> GetEntitiesAsync(InteWorkCenterQuery workCenterQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (workCenterQuery.Codes != null && workCenterQuery.Codes.Any())
+            {
+                sqlBuilder.Where(" Code in @Codes ");
+            }
+            using var conn = GetMESDbConnection();
+            var inteWorkCenters = await conn.QueryAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
+            return inteWorkCenters;
+        }
     }
 
     /// <summary>
@@ -466,5 +490,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string GetResourceIdsByWorkCenterIdSql = "SELECT ResourceId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND WorkCenterId IN @workCenterIds";
 
         const string UpdateStatusSql = "UPDATE `inte_work_center` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+        const string GetEntitiesSqlTemplate = "SELECT * FROM `inte_work_center` /**where**/ ";
     }
 }

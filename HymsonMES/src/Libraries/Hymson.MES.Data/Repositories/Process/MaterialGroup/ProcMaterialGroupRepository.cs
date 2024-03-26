@@ -179,6 +179,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" GroupCode = @GroupCode ");
             }
+            if (procMaterialGroupQuery.GroupCodes!=null&& procMaterialGroupQuery.GroupCodes.Any())
+            {
+                sqlBuilder.Where(" GroupCode in @GroupCodes ");
+            }
 
             using var conn = GetMESDbConnection();
             var procMaterialGroupEntities = await conn.QueryAsync<ProcMaterialGroupEntity>(template.RawSql, procMaterialGroupQuery);

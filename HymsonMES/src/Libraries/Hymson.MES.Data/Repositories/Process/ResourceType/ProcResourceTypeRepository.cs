@@ -160,6 +160,28 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 批量插入
+        /// </summary>
+        /// <param name="resourceTypeEntities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsAsync(IEnumerable<ProcResourceTypeEntity> resourceTypeEntities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, resourceTypeEntities);
+        }
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="resourceTypeEntities"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatesAsync(IEnumerable<ProcResourceTypeEntity> resourceTypeEntities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSql, resourceTypeEntities);
+        }
+
+        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="command"></param>
@@ -185,7 +207,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
             if (resourceTypeQuery.ResTypes != null && resourceTypeQuery.ResTypes.Any())
             {
-                sqlBuilder.Where(" ResType in @ResType ");
+                sqlBuilder.Where(" ResType in @ResTypes ");
             }
             using var conn = GetMESDbConnection();
             var resourceTypeEntities = await conn.QueryAsync<ProcResourceTypeEntity>(template.RawSql, resourceTypeQuery);

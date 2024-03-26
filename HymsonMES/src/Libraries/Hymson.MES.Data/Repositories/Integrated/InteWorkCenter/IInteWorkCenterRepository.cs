@@ -196,5 +196,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// <param name="procMaterialEntitys"></param>
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="workCenterQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteWorkCenterEntity>> GetEntitiesAsync(InteWorkCenterQuery workCenterQuery);
     }
 }
