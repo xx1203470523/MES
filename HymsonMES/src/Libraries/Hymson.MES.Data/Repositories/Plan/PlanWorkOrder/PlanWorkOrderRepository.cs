@@ -126,6 +126,83 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 获取激活工单数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderEntity>> GetActivationWorkOrderDataAsync(PlanWorkOrderPagedQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetActivationWorkOrderDataSqlTemplate);
+
+            if (query.WorkCenterIds != null && query.WorkCenterIds.Any())
+            {
+                sqlBuilder.Where("PWOA.LineId IN @WorkCenterIds");
+            }
+
+            if (query.SiteId.HasValue)
+            {
+                sqlBuilder.Where("PWO.SiteId = @SiteId");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
+
+            sqlBuilder.OrderBy("PWOA.CreatedOn DESC");
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<PlanWorkOrderEntity>(templateData.RawSql, templateData.Parameters);
+        }
+
+        /// <summary>
+        /// 获取所有工单数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderEntity>> GetWorkOrderDataAsync(PlanWorkOrderPagedQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetWorkOrderDataSqlTemplate);
+
+            if (query.WorkCenterIds != null && query.WorkCenterIds.Any())
+            {
+                sqlBuilder.Where("WorkCenterId IN @WorkCenterIds");
+            }
+
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
+
+            if (query.NotInIds != null && query.NotInIds.Any())
+            {
+                sqlBuilder.Where("Id NOT IN @NotInIds");
+            }
+
+            if (query.Statuss != null && query.Statuss.Any())
+            {
+                sqlBuilder.Where("Status IN @Statuss");
+            }
+
+            if (query.SiteId.HasValue)
+            {
+                sqlBuilder.Where("SiteId = @SiteId");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
+
+            sqlBuilder.OrderBy("CreatedOn DESC");
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<PlanWorkOrderEntity>(templateData.RawSql, templateData.Parameters);
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pageQuery"></param>
@@ -143,16 +220,19 @@ namespace Hymson.MES.Data.Repositories.Plan
                 pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
                 sqlBuilder.Where("wo.OrderCode LIKE @OrderCode");
             }
+
             if (!string.IsNullOrWhiteSpace(pageQuery.MaterialCode))
             {
                 pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
                 sqlBuilder.Where("m.MaterialCode LIKE @MaterialCode");
             }
+
             if (!string.IsNullOrWhiteSpace(pageQuery.MaterialVersion))
             {
                 pageQuery.MaterialVersion = $"%{pageQuery.MaterialVersion}%";
                 sqlBuilder.Where("m.Version LIKE @MaterialVersion");
             }
+
             if (!string.IsNullOrWhiteSpace(pageQuery.WorkCenterCode))
             {
                 pageQuery.WorkCenterCode = $"%{pageQuery.WorkCenterCode}%";
@@ -366,6 +446,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         #region 工单记录表
+
         /// <summary>
         /// 新增工单记录表
         /// </summary>
@@ -409,6 +490,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateRecordRealEndSql, command);
         }
+
         #endregion
     }
 
@@ -434,7 +516,6 @@ namespace Hymson.MES.Data.Repositories.Plan
                          LEFT JOIN proc_process_route pr on wo.ProcessRouteId = pr.Id
                          LEFT JOIN inte_work_center wc on wo.WorkCenterId = wc.Id
                         /**where**/ Order by wo.CreatedOn DESC LIMIT @Offset, @Rows ";
-
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                          FROM `plan_work_order` wo 
                          LEFT JOIN plan_work_order_record wor on wo.Id = wor.WorkOrderId
@@ -443,17 +524,14 @@ namespace Hymson.MES.Data.Repositories.Plan
                          LEFT JOIN proc_process_route pr on wo.ProcessRouteId = pr.Id
                          LEFT JOIN inte_work_center wc on wo.WorkCenterId = wc.Id
                         /**where**/   ";
-
-        const string GetPlanWorkOrderEntitiesSqlTemplate = @"SELECT
-    /**select**/
-    FROM `plan_work_order` /**where**/  ";
+        const string GetPlanWorkOrderEntitiesSqlTemplate = @"SELECT /**select**/ FROM `plan_work_order` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `plan_work_order`(  `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @OrderCode, @ProductId, @WorkCenterType, @WorkCenterId, @ProcessRouteId, @ProductBOMId, @Type, @Qty, @Status, @OverScale, @PlanStartTime, @PlanEndTime, @IsLocked, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `plan_work_order`(  `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @OrderCode, @ProductId, @WorkCenterType, @WorkCenterId, @ProcessRouteId, @ProductBOMId, @Type, @Qty, @Status, @OverScale, @PlanStartTime, @PlanEndTime, @IsLocked, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertPlanWorkOrderRecordSql = "INSERT INTO `plan_work_order_record`(  `Id`, `RealStart`, `RealEnd`, `InputQty`, `UnqualifiedQuantity`, `FinishProductQuantity`, `PassDownQuantity`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `WorkOrderId`) VALUES (   @Id, @RealStart, @RealEnd, @InputQty, @UnqualifiedQuantity, @FinishProductQuantity, @PassDownQuantity, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId )";
+
         const string UpdateSql = "UPDATE `plan_work_order` SET  ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `plan_work_order` SET   OrderCode = @OrderCode, ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, Status = @Status, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, IsLocked = @IsLocked, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-
         const string UpdatePassDownQuantitySql = "UPDATE plan_work_order_record SET PassDownQuantity= ifnull(PassDownQuantity,0)+@PassDownQuantity,UpdatedBy=@UserName,UpdatedOn=@UpdateDate WHERE WorkOrderId=@WorkOrderId AND  ifnull(PassDownQuantity,0)<=@PlanQuantity-@PassDownQuantity AND IsDeleted=0";
         const string UpdateInputQtySql = "UPDATE plan_work_order_record SET " +
             "InputQty = (CASE WHEN InputQty IS NULL THEN 0 ELSE InputQty END) + @Qty, " +
@@ -465,6 +543,7 @@ namespace Hymson.MES.Data.Repositories.Plan
 
         const string DeleteSql = "UPDATE `plan_work_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
+
         const string GetByIdSql = @"SELECT * FROM `plan_work_order`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT
       `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId` ,LockedStatus
@@ -482,12 +561,17 @@ namespace Hymson.MES.Data.Repositories.Plan
             "LEFT JOIN inte_work_center_relation IWCR ON IWCR.WorkCenterId = PWO.WorkCenterId " +
             "LEFT JOIN inte_work_center IWC ON IWC.Id = IWCR.SubWorkCenterId " +
             "WHERE PWO.IsDeleted = 0 AND PWO.WorkCenterType = @WorkCenterType AND IWCR.SubWorkCenterId = @workFarmId ";
+
         const string GetByWorkLineId = "SELECT PWO.* FROM plan_work_order_activation PWOA " +
             "LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId " +
             "WHERE PWO.IsDeleted = 0 AND PWO.WorkCenterType = @WorkCenterType AND PWOA.LineId = @workLineId ";
+
         const string UpdateWorkOrderStatusSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id  AND  Status=@BeforeStatus ";
         const string UpdateWorkOrderLockedSql = @"UPDATE `plan_work_order` SET Status = @Status, LockedStatus=@LockedStatus,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateRecordRealStartSql = "UPDATE plan_work_order_record SET RealStart = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND RealStart IS NULL AND WorkOrderId IN @WorkOrderIds; ";
         const string UpdateRecordRealEndSql = "UPDATE plan_work_order_record SET RealEnd = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE WorkOrderId IN @WorkOrderIds AND IsDeleted = 0 ";
+
+        const string GetActivationWorkOrderDataSqlTemplate = "SELECT PWO.* FROM plan_work_order_activation PWOA LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
+        const string GetWorkOrderDataSqlTemplate = "SELECT * FROM plan_work_order /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
     }
 }
