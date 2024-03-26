@@ -276,10 +276,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             foreach (var outBoundSFCDto in outBoundMoreDto.SFCs)
             {
                 var sfcEntity = sfclist.Where(c => c.SFC == outBoundSFCDto.SFC).First();
-                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC && c.WorkOrderId == planWorkOrderEntity.Id).FirstOrDefault();
+                //var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC && c.WorkOrderId == planWorkOrderEntity.Id).FirstOrDefault();
+                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC).FirstOrDefault();
                 if (sfcProduceEntity == null)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19147)).WithData("SFC", outBoundSFCDto.SFC).WithData("OrderCode", planWorkOrderEntity.OrderCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18023)).WithData("SFC", outBoundSFCDto.SFC).WithData("OrderCode", planWorkOrderEntity.OrderCode);
                 }
                 //汇总信息
                 var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC ).FirstOrDefault();
