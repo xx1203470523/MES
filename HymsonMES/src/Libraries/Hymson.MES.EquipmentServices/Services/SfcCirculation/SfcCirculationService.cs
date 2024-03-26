@@ -949,7 +949,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //查找当前已有的绑定记录
             var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
             {
-                SiteId = _currentEquipment.SiteId,
+                SiteId = 123456,
                 CirculationBarCode = sfcCirculationCCSNgSetDto.SFC,
                 IsDisassemble = TrueOrFalseEnum.No,
                 CirculationType = SfcCirculationTypeEnum.BindCCS
@@ -962,7 +962,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             var delEntities = manuSfcCirculationEntities;
             //根据传入条件找出已经NG的CSS绑定记录   
             //BindSFCs 和  Locations 允许为空
-            if (sfcCirculationCCSNgSetDto.BindSFCs == null && sfcCirculationCCSNgSetDto.Locations == null)
+            if (sfcCirculationCCSNgSetDto.BindSFCs?.Any() == false && sfcCirculationCCSNgSetDto.Locations?.Any() == false)
             {
                 delEntities = manuSfcCirculationEntities;
             }
@@ -982,7 +982,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //记录CCS的NG记录
             List<ManuSfcCcsNgRecordEntity> manuSfcCcsNgRecords = new();
             //只存在一个
-            var manuSfcCirculation = delEntities.First();
+            var manuSfcCirculation = delEntities.FirstOrDefault();
             manuSfcCcsNgRecords.Add(new ManuSfcCcsNgRecordEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
