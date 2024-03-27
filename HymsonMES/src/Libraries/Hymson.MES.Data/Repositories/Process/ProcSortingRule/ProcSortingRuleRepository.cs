@@ -328,11 +328,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 获取设备用的分选规则
         /// </summary>
         const string GetSortRuleDetailEquSql = @"
-            select t1.Code, t1.Name, t1.MaterialId, t2.* ,t3.ParameterCode ,t3.ParameterName 
+            select t1.Code, t1.Name, t1.MaterialId, t2.* ,t3.ParameterCode ,t3.ParameterName,t4.Code ProcedureCode ,t6.Grade 
             from proc_sorting_rule t1
             inner join proc_sorting_rule_detail t2 on t1.Id = t2.SortingRuleId and t2.IsDeleted = 0
             inner join proc_parameter t3 on t3.Id = t2.ParameterId and t3.IsDeleted = 0
-            where t1.IsDeleted = 0
+            inner join proc_procedure t4 on t4.Id = t2.ProcedureId and t4.IsDeleted = 0
+            inner join proc_sorting_rule_grade_details t5 on t5.SortingRuleDetailId = t2.id and t5.IsDeleted = 0
+            inner join proc_sorting_rule_grade t6 on t6.Id  = t5.SortingRuleGradeId and t6.IsDeleted = 0
+            where t1.IsDeleted = 0        
             and t1.Status in ('1','2')
             and t1.MaterialId = @MaterialId
         ";
