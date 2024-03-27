@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hymson.Localization" Version="2.1.128" />
-    <PackageReference Include="Hymson.Sequences" Version="2.1.128" />
-    <PackageReference Include="Hymson.Snowflake" Version="2.1.128" />
+    <PackageReference Include="Hymson.Localization" Version="2.1.147" />
+    <PackageReference Include="Hymson.Sequences" Version="2.1.147" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.147" />
   </ItemGroup>
 
   <ItemGroup>
