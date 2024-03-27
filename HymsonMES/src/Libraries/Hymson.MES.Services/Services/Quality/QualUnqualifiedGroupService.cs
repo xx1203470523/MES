@@ -132,7 +132,9 @@ namespace Hymson.MES.Services.Services.Quality
                         UnqualifiedGroupId = qualUnqualifiedGroupEntity.Id,
                         UnqualifiedCodeId = item,
                         CreatedBy = userId,
-                        UpdatedBy = userId
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedBy = userId,
+                        UpdatedOn = HymsonClock.Now()
                     });
                 }
             }
@@ -149,7 +151,9 @@ namespace Hymson.MES.Services.Services.Quality
                         UnqualifiedGroupId = qualUnqualifiedGroupEntity.Id,
                         ProcedureId = item,
                         CreatedBy = userId,
-                        UpdatedBy = userId
+                        CreatedOn= HymsonClock.Now(),
+                        UpdatedBy = userId,
+                        UpdatedOn= HymsonClock.Now()
                     });
                 }
             }
@@ -249,7 +253,9 @@ namespace Hymson.MES.Services.Services.Quality
                         UnqualifiedGroupId = qualUnqualifiedGroupEntity.Id,
                         ProcedureId = item,
                         CreatedBy = userId,
-                        UpdatedBy = userId
+                        CreatedOn= HymsonClock.Now(),
+                        UpdatedBy = userId,
+                        UpdatedOn = HymsonClock.Now()
                     });
                 }
             }
