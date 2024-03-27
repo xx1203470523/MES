@@ -429,9 +429,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 BarCode = saveDto.BarCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16908)).WithData("barCode", saveDto.BarCode);
 
+            // 是否有剩余数量
             if (inventory.QuantityResidue <= 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16909)).WithData("barCode", saveDto.BarCode);
+            }
+
+            // 是否过期
+            if (inventory.DueDate.HasValue && HymsonClock.Now() > inventory.DueDate.Value)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15508))
+                    .WithData("BarCode", saveDto.BarCode)
+                    .WithData("DueDate", inventory.DueDate.Value.ToShortDateString());
             }
 
             // 当是上料点类型时，一定要选择具体挂载的上料点

@@ -117,11 +117,13 @@ namespace Hymson.MES.Services.Services.Process
             if (createDto.UpperLimitMinute < createDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES14209));
             if (createDto.UpperLimitMinute == createDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES14210));
 
+            /*
             // 验证工序：起始工序是否与到达工序为同一工序,	起始工序是否为到达工序的前工序
             if (createDto.FromProcedureId == createDto.ToProcedureId)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES14207));
             }
+            */
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -158,14 +160,18 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES14206));
             }
 
-            var procMaterial = await _procMaterialRepository.GetByIdAsync(entity.ProductId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES14214));
-
-            // 根据设备查工艺路线验证工序是否在工艺路线上，验证到达工序是否在起始工序之前
-            if (procMaterial.ProcessRouteId.HasValue)
+            // 当起始和结束为不同工序时，验证起始工序是否在结束工序之前
+            if (createDto.FromProcedureId != createDto.ToProcedureId)
             {
-                var isProcessStartBeforeEnd = await _manuCommonOldService.IsProcessStartBeforeEndAsync(procMaterial.ProcessRouteId.Value, entity.FromProcedureId, entity.ToProcedureId);
-                if (!isProcessStartBeforeEnd) throw new CustomerValidationException(nameof(ErrorCode.MES14208));
+                var procMaterial = await _procMaterialRepository.GetByIdAsync(entity.ProductId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES14214));
+
+                // 根据设备查工艺路线验证工序是否在工艺路线上，验证到达工序是否在起始工序之前
+                if (procMaterial.ProcessRouteId.HasValue)
+                {
+                    var isProcessStartBeforeEnd = await _manuCommonOldService.IsProcessStartBeforeEndAsync(procMaterial.ProcessRouteId.Value, entity.FromProcedureId, entity.ToProcedureId);
+                    if (!isProcessStartBeforeEnd) throw new CustomerValidationException(nameof(ErrorCode.MES14208));
+                }
             }
 
             return await _procProcedureTimeControlRepository.InsertAsync(entity);
@@ -190,11 +196,13 @@ namespace Hymson.MES.Services.Services.Process
             if (modifyDto.UpperLimitMinute < modifyDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES14209));
             if (modifyDto.UpperLimitMinute == modifyDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES14210));
 
+            /*
             // 验证工序：起始工序是否与到达工序为同一工序,	起始工序是否为到达工序的前工序
             if (modifyDto.FromProcedureId == modifyDto.ToProcedureId)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES14207));
             }
+            */
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -226,14 +234,18 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES14206));
             }
 
-            var procMaterial = await _procMaterialRepository.GetByIdAsync(entity.ProductId)
+            // 当起始和结束为不同工序时，验证起始工序是否在结束工序之前
+            if (modifyDto.FromProcedureId != modifyDto.ToProcedureId)
+            {
+                var procMaterial = await _procMaterialRepository.GetByIdAsync(entity.ProductId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES14214));
 
-            // 根据设备查工艺路线验证工序是否在工艺路线上，验证到达工序是否在起始工序之前
-            if (procMaterial.ProcessRouteId.HasValue)
-            {
-                var isProcessStartBeforeEnd = await _manuCommonOldService.IsProcessStartBeforeEndAsync(procMaterial.ProcessRouteId.Value, entity.FromProcedureId, entity.ToProcedureId);
-                if (!isProcessStartBeforeEnd) throw new CustomerValidationException(nameof(ErrorCode.MES14208));
+                // 根据设备查工艺路线验证工序是否在工艺路线上，验证到达工序是否在起始工序之前
+                if (procMaterial.ProcessRouteId.HasValue)
+                {
+                    var isProcessStartBeforeEnd = await _manuCommonOldService.IsProcessStartBeforeEndAsync(procMaterial.ProcessRouteId.Value, entity.FromProcedureId, entity.ToProcedureId);
+                    if (!isProcessStartBeforeEnd) throw new CustomerValidationException(nameof(ErrorCode.MES14208));
+                }
             }
 
             return await _procProcedureTimeControlRepository.UpdateAsync(entity);

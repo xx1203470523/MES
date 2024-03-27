@@ -100,6 +100,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteVehicleFreightRecordEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            if (inteVehicleFreightRecordQuery.VehicleId != null) {
+                sqlBuilder.Where("VehicleId=@VehicleId");
+            }
+
+            if (inteVehicleFreightRecordQuery.OperateType != null) {
+                sqlBuilder.Where("OperateType=@OperateType");
+            }
+
             using var conn = GetMESDbConnection();
             var inteVehicleFreightRecordEntities = await conn.QueryAsync<InteVehicleFreightRecordEntity>(template.RawSql, inteVehicleFreightRecordQuery);
             return inteVehicleFreightRecordEntities;

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -68,6 +69,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="dto"></param>
         /// <returns></returns>
         Task VehicleOperationAsync(InteVehicleOperationDto dto);
-        
+
+        /// <summary>
+        /// 通过托盘码获取托盘视图信息(装载记录表)（PDA）
+        /// </summary>
+        /// <param name="palletNo"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordBypalletNoAsync(string palletNo);
     }
 }

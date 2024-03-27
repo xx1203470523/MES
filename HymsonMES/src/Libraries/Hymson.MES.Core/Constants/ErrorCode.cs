@@ -890,7 +890,8 @@
         public const string MES15504 = "未找到资源关联的产线！";
         public const string MES15505 = "未找到该条码相匹配的物料！";
         public const string MES15506 = "该条码与选定的物料不匹配！";
-        public const string MES15507 = "该条码{BarCode}已存在于当前上料点！";
+        public const string MES15507 = "条码【{BarCode}】已存在于当前上料点！";
+        public const string MES15508 = "条码【{BarCode}】已过期，有效期为【{DueDate}】，无法加载！";
         #endregion
 
         #region 自定义字段 15600
@@ -1172,6 +1173,7 @@
         public const string MES16414 = "当前资源所对应的工作中心不是线体";
         public const string MES16415 = "工单[{orderCode}]处于暂停中，无法操作！";
         public const string MES16416 = "工单【{Code}】状态为【未激活】，不允许生产，具体请查看【工单激活】！";
+        public const string MES16417 = "当前选择的设备不存在！";        
         #endregion
 
         #region 条码下达 MES16500
@@ -1939,6 +1941,7 @@
         public const string MES11604 = "存放位置不能为空！";
         public const string MES11605 = "使用状态不能为空！";
         public const string MES11606 = "导入的数据中资源编码重复！";
+        public const string MES11607 = "导入的数据中工序编码重复！";
         #endregion
     }
 }

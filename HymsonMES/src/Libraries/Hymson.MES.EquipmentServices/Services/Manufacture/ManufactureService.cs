@@ -78,13 +78,31 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         }
 
         /// <summary>
-        /// 创建条码
+        /// 创建条码（半成品）
         /// </summary>
         /// <param name="baseDto"></param>
         /// <returns></returns>
         public async Task<IEnumerable<string>> CreateBarcodeBySemiProductIdAsync(BaseDto baseDto)
         {
-            var manuSFCEntities = await _manuCreateBarcodeService.CreateBarcodeBySemiProductIdAsync(new CreateBarcodeBySemiProductId
+            var manuSFCEntities = await _manuCreateBarcodeService.CreateBarcodeBySemiProductIdAsync(new CreateBarcodeByResourceCode
+            {
+                SiteId = _currentEquipment.SiteId,
+                UserName = _currentEquipment.Name,
+                ResourceCode = baseDto.ResourceCode
+            });
+
+            if (manuSFCEntities == null || !manuSFCEntities.Any()) return Enumerable.Empty<string>();
+            return manuSFCEntities.Select(s => s.SFC);
+        }
+
+        /// <summary>
+        /// 创建条码（电芯）
+        /// </summary>
+        /// <param name="baseDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<string>> CreateCellBarCodeAsync(BaseDto baseDto)
+        {
+            var manuSFCEntities = await _manuCreateBarcodeService.CreateCellBarCodeAsync(new CreateBarcodeByResourceCode
             {
                 SiteId = _currentEquipment.SiteId,
                 UserName = _currentEquipment.Name,
