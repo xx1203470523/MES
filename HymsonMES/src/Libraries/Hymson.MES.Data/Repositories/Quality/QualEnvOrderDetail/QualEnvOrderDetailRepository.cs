@@ -9,6 +9,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.QualEnvOrderDetail;
+using Hymson.MES.Core.Domain.QualEnvParameterGroupDetailSnapshoot;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
@@ -19,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
     /// <summary>
     /// 环境检验单检验明细仓储
     /// </summary>
-    public partial class QualEnvOrderDetailRepository :BaseRepository, IQualEnvOrderDetailRepository
+    public partial class QualEnvOrderDetailRepository : BaseRepository, IQualEnvOrderDetailRepository
     {
 
-        public QualEnvOrderDetailRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public QualEnvOrderDetailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         public async Task<QualEnvOrderDetailEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<QualEnvOrderDetailEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<QualEnvOrderDetailEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +66,10 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualEnvOrderDetailEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualEnvOrderDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualEnvOrderDetailEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<QualEnvOrderDetailEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -88,7 +89,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (qualEnvOrderDetailPagedQuery.PageIndex - 1) * qualEnvOrderDetailPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = qualEnvOrderDetailPagedQuery.PageSize });
@@ -161,6 +162,31 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         }
         #endregion
 
+        #region 
+        /// <summary>
+        /// 根据检验单ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualEnvOrderDetailEntity>> GetByEnvOrderIdAsync(long envOrderId)
+        {
+            using var conn = GetMESDbConnection();  
+            return await conn.QueryAsync<QualEnvOrderDetailEntity>(GetByEnvOrderIdSql, new { EnvOrderId = envOrderId });
+        }
+
+
+        /// <summary>
+        /// 根据ID获取快照明细
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualEnvParameterGroupDetailSnapshootEntity>> GetGroupDetailSnapshootByIdsAsync(long[] ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualEnvParameterGroupDetailSnapshootEntity>(GetGroupDetailSnapshootSql, new { Ids = ids });
+        }
+        #endregion
+
     }
 
     public partial class QualEnvOrderDetailRepository
@@ -187,6 +213,13 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `EnvOrderId`, `GroupDetailSnapshootId`, `StartTime`, `EndTime`, `RealTime`, `InspectionValue`, `IsQualified`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `qual_env_order_detail`  WHERE Id IN @Ids ";
+
+
+        const string GetByEnvOrderIdSql = @"SELECT 
+                               `Id`, `SiteId`, `EnvOrderId`, `GroupDetailSnapshootId`, `StartTime`, `EndTime`, `RealTime`, `InspectionValue`, `IsQualified`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `qual_env_order_detail`  WHERE EnvOrderId = @EnvOrderId ";
+
+        const string GetGroupDetailSnapshootSql = @"SELECT  *  FROM `qual_env_parameter_group_detail_snapshoot`  WHERE Id in @Ids ";
         #endregion
     }
 }

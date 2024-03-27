@@ -56,5 +56,13 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualEnvOrderDetailDto> QueryQualEnvOrderDetailByIdAsync(long id);
+
+
+        /// <summary>
+        /// 根据检验单ID获取数据
+        /// </summary>
+        /// <param name="envOrderId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualEnvOrderDetailExtendDto>> GetQualEnvOrderDetailByEnvOrderIdAsync(long envOrderId);
     }
 }

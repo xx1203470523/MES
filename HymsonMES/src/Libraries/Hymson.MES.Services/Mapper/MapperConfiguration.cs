@@ -1022,6 +1022,7 @@ namespace Hymson.MES.Services.Mapper
 
 
             CreateMap<QualEnvOrderDetailEntity, QualEnvOrderDetailDto>();
+            CreateMap<QualEnvOrderDetailEntity, QualEnvOrderDetailExtendDto>();
             CreateMap<QualEnvOrderDetailCreateDto, QualEnvOrderDetailEntity>();
             CreateMap<QualEnvOrderDetailModifyDto, QualEnvOrderDetailEntity>();
             CreateMap<QualEnvOrderDetailPagedQueryDto, QualEnvOrderDetailPagedQuery>();

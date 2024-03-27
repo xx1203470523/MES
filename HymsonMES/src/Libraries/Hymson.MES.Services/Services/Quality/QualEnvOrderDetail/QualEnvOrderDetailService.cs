@@ -5,6 +5,7 @@
  *builder:  pengxin
  *build datetime: 2024-03-22 05:04:43
  */
+using AutoMapper.Configuration.Annotations;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -13,6 +14,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.QualEnvOrderDetail;
+using Hymson.MES.Core.Domain.QualEnvParameterGroupDetailSnapshoot;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.QualEnvOrderDetail;
 using Hymson.MES.Services.Dtos.QualEnvOrderDetail;
@@ -64,7 +66,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
 
             //DTO转换实体
             var qualEnvOrderDetailEntity = qualEnvOrderDetailCreateDto.ToEntity<QualEnvOrderDetailEntity>();
-            qualEnvOrderDetailEntity.Id= IdGenProvider.Instance.CreateId();
+            qualEnvOrderDetailEntity.Id = IdGenProvider.Instance.CreateId();
             qualEnvOrderDetailEntity.CreatedBy = _currentUser.UserName;
             qualEnvOrderDetailEntity.UpdatedBy = _currentUser.UserName;
             qualEnvOrderDetailEntity.CreatedOn = HymsonClock.Now();
@@ -105,6 +107,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
             var qualEnvOrderDetailPagedQuery = qualEnvOrderDetailPagedQueryDto.ToQuery<QualEnvOrderDetailPagedQuery>();
             var pagedInfo = await _qualEnvOrderDetailRepository.GetPagedInfoAsync(qualEnvOrderDetailPagedQuery);
 
+
             //实体到DTO转换 装载数据
             List<QualEnvOrderDetailDto> qualEnvOrderDetailDtos = PrepareQualEnvOrderDetailDtos(pagedInfo);
             return new PagedInfo<QualEnvOrderDetailDto>(qualEnvOrderDetailDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -115,7 +118,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<QualEnvOrderDetailDto> PrepareQualEnvOrderDetailDtos(PagedInfo<QualEnvOrderDetailEntity>   pagedInfo)
+        private static List<QualEnvOrderDetailDto> PrepareQualEnvOrderDetailDtos(PagedInfo<QualEnvOrderDetailEntity> pagedInfo)
         {
             var qualEnvOrderDetailDtos = new List<QualEnvOrderDetailDto>();
             foreach (var qualEnvOrderDetailEntity in pagedInfo.Data)
@@ -134,13 +137,13 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
         /// <returns></returns>
         public async Task ModifyQualEnvOrderDetailAsync(QualEnvOrderDetailModifyDto qualEnvOrderDetailModifyDto)
         {
-             // 判断是否有获取到站点码 
+            // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
 
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(qualEnvOrderDetailModifyDto);
 
             //DTO转换实体
@@ -156,14 +159,73 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualEnvOrderDetailDto> QueryQualEnvOrderDetailByIdAsync(long id) 
+        public async Task<QualEnvOrderDetailDto> QueryQualEnvOrderDetailByIdAsync(long id)
         {
-           var qualEnvOrderDetailEntity = await _qualEnvOrderDetailRepository.GetByIdAsync(id);
-           if (qualEnvOrderDetailEntity != null) 
-           {
-               return qualEnvOrderDetailEntity.ToModel<QualEnvOrderDetailDto>();
-           }
+            var qualEnvOrderDetailEntity = await _qualEnvOrderDetailRepository.GetByIdAsync(id);
+            if (qualEnvOrderDetailEntity != null)
+            {
+                return qualEnvOrderDetailEntity.ToModel<QualEnvOrderDetailDto>();
+            }
             return null;
         }
+
+
+        #region 
+
+
+        /// <summary>
+        /// 根据检验单ID获取数据
+        /// </summary>
+        /// <param name="envOrderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualEnvOrderDetailExtendDto>> GetQualEnvOrderDetailByEnvOrderIdAsync(long envOrderId)
+        {
+            var qualEnvOrderDetails = await _qualEnvOrderDetailRepository.GetByEnvOrderIdAsync(envOrderId);
+            if (qualEnvOrderDetails == null || !qualEnvOrderDetails.Any())
+            {
+                return null;
+            }
+            //获取快照
+            var groupDetailSnapshootIds = qualEnvOrderDetails.Select(x => x.GroupDetailSnapshootId).ToArray();
+            var GroupDetailSnapshoots = await _qualEnvOrderDetailRepository.GetGroupDetailSnapshootByIdsAsync(groupDetailSnapshootIds);
+            var qualEnvOrderDetailDtos = new List<QualEnvOrderDetailExtendDto>();
+            foreach (var item in qualEnvOrderDetails)
+            {
+                QualEnvOrderDetailExtendDto qualEnvOrderDetailDto;
+                try
+                {
+                    qualEnvOrderDetailDto = item.ToModel<QualEnvOrderDetailExtendDto>();
+
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
+                var groupDetailSnapshoot = GroupDetailSnapshoots.Where(x => x.Id == item.GroupDetailSnapshootId).FirstOrDefault();
+                if (groupDetailSnapshoot == null)
+                {
+                    continue;
+                }
+                qualEnvOrderDetailDto.ParameterCode = groupDetailSnapshoot.ParameterCode;
+                qualEnvOrderDetailDto.ParameterName = groupDetailSnapshoot.ParameterName;
+                qualEnvOrderDetailDto.ParameterUnit = groupDetailSnapshoot.ParameterUnit;
+                qualEnvOrderDetailDto.ParameterDataType = groupDetailSnapshoot.ParameterDataType;
+                qualEnvOrderDetailDto.UpperLimit = groupDetailSnapshoot.UpperLimit;
+                qualEnvOrderDetailDto.ReferenceValue = groupDetailSnapshoot.ReferenceValue;
+                qualEnvOrderDetailDto.LowerLimit = groupDetailSnapshoot.LowerLimit;
+                qualEnvOrderDetailDto.StartTime = item.StartTime.ToString("HH:mm");
+                qualEnvOrderDetailDto.EndTime = item.StartTime.ToString("HH:mm"); ;
+                qualEnvOrderDetailDto.RealTime = item.RealTime == null ? HymsonClock.Now().ToString("HH:mm") : item.StartTime.ToString("HH:mm");
+                qualEnvOrderDetailDtos.Add(qualEnvOrderDetailDto);
+            }
+
+            return qualEnvOrderDetailDtos;
+        }
+
+
+
+
+        #endregion
     }
 }

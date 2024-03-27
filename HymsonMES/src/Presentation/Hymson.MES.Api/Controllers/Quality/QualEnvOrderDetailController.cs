@@ -73,7 +73,7 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrderDetail
         [Route("create")]
         public async Task AddQualEnvOrderDetailAsync([FromBody] QualEnvOrderDetailCreateDto parm)
         {
-             await _qualEnvOrderDetailService.CreateQualEnvOrderDetailAsync(parm);
+            await _qualEnvOrderDetailService.CreateQualEnvOrderDetailAsync(parm);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrderDetail
         [Route("update")]
         public async Task UpdateQualEnvOrderDetailAsync([FromBody] QualEnvOrderDetailModifyDto parm)
         {
-             await _qualEnvOrderDetailService.ModifyQualEnvOrderDetailAsync(parm);
+            await _qualEnvOrderDetailService.ModifyQualEnvOrderDetailAsync(parm);
         }
 
         /// <summary>
@@ -98,6 +98,21 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrderDetail
         public async Task DeleteQualEnvOrderDetailAsync([FromBody] long[] ids)
         {
             await _qualEnvOrderDetailService.DeletesQualEnvOrderDetailAsync(ids);
+        }
+
+        #endregion
+
+        #region
+        /// <summary>
+        /// 根据检验单ID获取数据
+        /// </summary>
+        /// <param name="envOrderId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getDetailByEnvOrderId/{envOrderId}")]
+        public async Task<IEnumerable<QualEnvOrderDetailExtendDto>> GetQualEnvOrderDetailByEnvOrderIdAsync(long envOrderId)
+        {
+            return await _qualEnvOrderDetailService.GetQualEnvOrderDetailByEnvOrderIdAsync(envOrderId);
         }
 
         #endregion

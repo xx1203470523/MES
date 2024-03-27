@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.QualEnvOrderDetail;
+using Hymson.MES.Core.Domain.QualEnvParameterGroupDetailSnapshoot;
 using Hymson.MES.Data.Repositories.Common.Command;
 
 namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
@@ -23,7 +24,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         /// <param name="qualEnvOrderDetailEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(QualEnvOrderDetailEntity qualEnvOrderDetailEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +38,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         /// <param name="qualEnvOrderDetailEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(QualEnvOrderDetailEntity qualEnvOrderDetailEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualEnvOrderDetailEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -80,13 +81,29 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         /// <param name="qualEnvOrderDetailQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<QualEnvOrderDetailEntity>> GetQualEnvOrderDetailEntitiesAsync(QualEnvOrderDetailQuery qualEnvOrderDetailQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="qualEnvOrderDetailPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<QualEnvOrderDetailEntity>> GetPagedInfoAsync(QualEnvOrderDetailPagedQuery qualEnvOrderDetailPagedQuery);
+        #endregion
+
+        #region
+        /// <summary>
+        /// 根据检验单ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualEnvOrderDetailEntity>> GetByEnvOrderIdAsync(long envOrderId);
+
+        /// <summary>
+        /// 根据ID获取快照明细
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualEnvParameterGroupDetailSnapshootEntity>> GetGroupDetailSnapshootByIdsAsync(long[] ids);
         #endregion
     }
 }
