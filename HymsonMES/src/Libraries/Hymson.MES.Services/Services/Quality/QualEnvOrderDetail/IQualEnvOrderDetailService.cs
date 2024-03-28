@@ -37,6 +37,13 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
         Task ModifyQualEnvOrderDetailAsync(QualEnvOrderDetailModifyDto qualEnvOrderDetailModifyDto);
 
         /// <summary>
+        /// 修改
+        /// </summary>
+        /// <param name="qualEnvOrderDetailEntitys"></param> 
+        /// <returns></returns>
+        Task<int> ModifyQualEnvOrderDetailsAsync(List<QualEnvOrderDetailModifyDto> qualEnvOrderDetailEntitys);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>

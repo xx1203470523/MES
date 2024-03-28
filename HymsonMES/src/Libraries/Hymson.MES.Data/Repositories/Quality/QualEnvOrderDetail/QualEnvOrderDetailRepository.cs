@@ -163,6 +163,18 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         #endregion
 
         #region 
+
+
+        /// <summary>
+        /// 批量更新(执行检验)
+        /// </summary>
+        /// <param name="qualEnvOrderDetailEntitys"></param>
+        /// <returns></returns> 
+        public async Task<int> UpdatesExecAsync(List<QualEnvOrderDetailEntity> qualEnvOrderDetailEntitys)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdatesExecSql, qualEnvOrderDetailEntitys);
+        }
         /// <summary>
         /// 根据检验单ID获取数据
         /// </summary>
@@ -170,7 +182,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
         /// <returns></returns>
         public async Task<IEnumerable<QualEnvOrderDetailEntity>> GetByEnvOrderIdAsync(long envOrderId)
         {
-            using var conn = GetMESDbConnection();  
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualEnvOrderDetailEntity>(GetByEnvOrderIdSql, new { EnvOrderId = envOrderId });
         }
 
@@ -203,6 +215,9 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
 
         const string UpdateSql = "UPDATE `qual_env_order_detail` SET   SiteId = @SiteId, EnvOrderId = @EnvOrderId, GroupDetailSnapshootId = @GroupDetailSnapshootId, StartTime = @StartTime, EndTime = @EndTime, RealTime = @RealTime, InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `qual_env_order_detail` SET   SiteId = @SiteId, EnvOrderId = @EnvOrderId, GroupDetailSnapshootId = @GroupDetailSnapshootId, StartTime = @StartTime, EndTime = @EndTime, RealTime = @RealTime, InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+
+        const string UpdatesExecSql = "UPDATE `qual_env_order_detail` SET    RealTime = @RealTime, InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+
 
         const string DeleteSql = "UPDATE `qual_env_order_detail` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `qual_env_order_detail` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

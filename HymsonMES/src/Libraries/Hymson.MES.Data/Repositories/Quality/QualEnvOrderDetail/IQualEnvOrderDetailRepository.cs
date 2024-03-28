@@ -92,6 +92,12 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
 
         #region
         /// <summary>
+        /// 批量更新(执行检验)
+        /// </summary>
+        /// <param name="qualEnvOrderDetailEntitys"></param>
+        /// <returns></returns> 
+        Task<int> UpdatesExecAsync(List<QualEnvOrderDetailEntity> qualEnvOrderDetailEntitys);
+        /// <summary>
         /// 根据检验单ID获取数据
         /// </summary>
         /// <param name="id"></param>

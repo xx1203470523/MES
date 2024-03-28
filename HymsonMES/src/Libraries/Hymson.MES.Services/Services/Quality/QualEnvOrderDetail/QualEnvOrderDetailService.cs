@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.QualEnvOrderDetail;
 using Hymson.MES.Services.Dtos.QualEnvOrderDetail;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.QualEnvOrderDetail
@@ -38,14 +39,16 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
         private readonly IQualEnvOrderDetailRepository _qualEnvOrderDetailRepository;
         private readonly AbstractValidator<QualEnvOrderDetailCreateDto> _validationCreateRules;
         private readonly AbstractValidator<QualEnvOrderDetailModifyDto> _validationModifyRules;
+        private readonly AbstractValidator<List<QualEnvOrderDetailModifyDto>> _validationModifysRules;
 
-        public QualEnvOrderDetailService(ICurrentUser currentUser, ICurrentSite currentSite, IQualEnvOrderDetailRepository qualEnvOrderDetailRepository, AbstractValidator<QualEnvOrderDetailCreateDto> validationCreateRules, AbstractValidator<QualEnvOrderDetailModifyDto> validationModifyRules)
+        public QualEnvOrderDetailService(ICurrentUser currentUser, ICurrentSite currentSite, IQualEnvOrderDetailRepository qualEnvOrderDetailRepository, AbstractValidator<QualEnvOrderDetailCreateDto> validationCreateRules, AbstractValidator<QualEnvOrderDetailModifyDto> validationModifyRules, AbstractValidator<List<QualEnvOrderDetailModifyDto>> validationModifysRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _qualEnvOrderDetailRepository = qualEnvOrderDetailRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _validationModifysRules = validationModifysRules;
         }
 
         /// <summary>
@@ -154,6 +157,43 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
             await _qualEnvOrderDetailRepository.UpdateAsync(qualEnvOrderDetailEntity);
         }
 
+
+        /// <summary>
+        /// 修改
+        /// </summary>
+        /// <param name="qualEnvOrderDetailEntitys"></param> 
+        /// <returns></returns>
+        public async Task<int> ModifyQualEnvOrderDetailsAsync(List<QualEnvOrderDetailModifyDto> qualEnvOrderDetailEntitys)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0)
+            {
+                throw new ValidationException(nameof(ErrorCode.MES10101));
+            }
+
+            //验证参数
+            await _validationModifysRules.ValidateAndThrowAsync(qualEnvOrderDetailEntitys);
+
+            var datas = new List<QualEnvOrderDetailEntity>();
+            foreach (var item in qualEnvOrderDetailEntitys)
+            {
+                var data = new QualEnvOrderDetailEntity()
+                {
+                    Id = item.Id,
+                    RealTime = HymsonClock.Now().ToString($"yyyy-MM-dd {item.RealTime}:ss").ParseToDateTime(),
+                    InspectionValue = item.InspectionValue,
+                    IsQualified = item.IsQualified,
+                    Remark = item.Remark,
+                };
+
+                data.UpdatedBy = _currentUser.UserName;
+                data.UpdatedOn = HymsonClock.Now();
+                datas.Add(data);
+            }
+
+            return await _qualEnvOrderDetailRepository.UpdatesExecAsync(datas);
+        }
+
         /// <summary>
         /// 根据ID查询
         /// </summary>
@@ -215,7 +255,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
                 qualEnvOrderDetailDto.ReferenceValue = groupDetailSnapshoot.ReferenceValue;
                 qualEnvOrderDetailDto.LowerLimit = groupDetailSnapshoot.LowerLimit;
                 qualEnvOrderDetailDto.StartTime = item.StartTime.ToString("HH:mm");
-                qualEnvOrderDetailDto.EndTime = item.StartTime.ToString("HH:mm"); ;
+                qualEnvOrderDetailDto.EndTime = item.StartTime.ToString("HH:mm");
                 qualEnvOrderDetailDto.RealTime = item.RealTime == null ? HymsonClock.Now().ToString("HH:mm") : item.StartTime.ToString("HH:mm");
                 qualEnvOrderDetailDtos.Add(qualEnvOrderDetailDto);
             }

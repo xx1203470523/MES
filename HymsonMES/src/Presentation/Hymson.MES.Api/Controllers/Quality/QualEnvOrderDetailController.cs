@@ -89,6 +89,18 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrderDetail
         }
 
         /// <summary>
+        /// 更新（环境检验单检验明细）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updates")]
+        public async Task ModifyQualEnvOrderDetailsAsync([FromBody] List<QualEnvOrderDetailModifyDto> parm)
+        {
+            await _qualEnvOrderDetailService.ModifyQualEnvOrderDetailsAsync(parm);
+        }
+
+        /// <summary>
         /// 删除（环境检验单检验明细）
         /// </summary>
         /// <param name="ids"></param>

@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 
 namespace Hymson.MES.Services.Dtos.QualEnvOrderDetail
 {
@@ -106,7 +107,7 @@ namespace Hymson.MES.Services.Dtos.QualEnvOrderDetail
         public string ParameterCode { get; set; }
 
         /// <summary>
-        /// 参数编码
+        /// 参数名称
         /// </summary>
         public string ParameterName { get; set; }
 
@@ -247,34 +248,9 @@ namespace Hymson.MES.Services.Dtos.QualEnvOrderDetail
         public long Id { get; set; }
 
         /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-        /// <summary>
-        /// 环境检验单Id
-        /// </summary>
-        public long EnvOrderId { get; set; }
-
-        /// <summary>
-        /// 环境检验参数组明细Id
-        /// </summary>
-        public long GroupDetailSnapshootId { get; set; }
-
-        /// <summary>
-        /// 应检时间
-        /// </summary>
-        public DateTime StartTime { get; set; }
-
-        /// <summary>
-        /// 截止录入时间
-        /// </summary>
-        public DateTime EndTime { get; set; }
-
-        /// <summary>
         /// 实际录入时间
         /// </summary>
-        public DateTime? RealTime { get; set; }
+        public string RealTime { get; set; }
 
         /// <summary>
         /// 检验值
@@ -290,34 +266,6 @@ namespace Hymson.MES.Services.Dtos.QualEnvOrderDetail
         /// 备注
         /// </summary>
         public string Remark { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-        /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-
-
     }
 
     /// <summary>
