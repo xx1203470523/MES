@@ -211,7 +211,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //工单信息
             var planWorkOrders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
             //库存信息
-            var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(
+            var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(
                 new WhMaterialInventoryBarCodesQuery()
                 {
                     SiteId = _currentSite.SiteId ?? 0,

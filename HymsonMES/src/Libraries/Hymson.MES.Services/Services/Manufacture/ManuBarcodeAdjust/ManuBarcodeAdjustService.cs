@@ -421,7 +421,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var materials = await _procMaterialRepository.GetByIdsAsync(manuSfcs.Select(x => x.ProductId).ToList());
 
             //查找库存
-            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryBarCodesQuery
+            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryBarCodesQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 BarCodes = sfcs

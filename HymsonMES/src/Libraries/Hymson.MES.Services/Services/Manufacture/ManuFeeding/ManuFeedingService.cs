@@ -593,7 +593,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var feeds = await _manuFeedingRepository.GetByIdsAsync(idsArr);
 
             // 查询条码
-            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(new WhMaterialInventoryBarCodesQuery
             {
                 BarCodes = feeds.Select(s => s.BarCode),
                 SiteId = _currentSite.SiteId ?? 0

@@ -251,7 +251,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(s => s.Id));
 
             // 读取在制品
-            var sfcProduceEntities = await _manuSfcProduceRepository.GetBySFCIdsAsync(sfcEntities.Select(s => s.Id));
+            var sfcProduceEntities = await _manuSfcProduceRepository.GetBySFCIdsAsync(sfcEntities.Where(w => w.Type == SfcTypeEnum.Produce).Select(s => s.Id));
 
             // 读取产品
             var productEntities = await _procMaterialRepository.GetByIdsAsync(sfcInfoEntities.Select(s => s.ProductId));
@@ -327,7 +327,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ProductId = sfcInfoEntity.ProductId,
                         WorkOrderId = sfcInfoEntity.WorkOrderId ?? 0,
                         SFCInfoId = sfcInfoEntity.Id,
-                        //Qty = sfcProduceEntity.Qty,
+                        Qty = sfcEntity.Qty,
                         SiteId = sfcEntity.SiteId,
                         CreatedBy = updatedBy,
                         CreatedOn = updatedOn,
