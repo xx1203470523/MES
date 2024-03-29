@@ -24,16 +24,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         #region 方法
-        /// <summary>
-        /// 删除（软删除）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
-        }
 
         /// <summary>
         /// 批量删除（软删除）

@@ -23,21 +23,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <summary>
         /// 条码报废
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task QualityScrapAsync(ManuSfScrapDto parm)
+        public async Task QualityScrapAsync(ManuSfScrapDto param)
         {
             #region 验证
 
-            if (parm.Sfcs == null || parm.Sfcs.Length < 1)
+            if (param.Sfcs == null || !param.Sfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
             //条码表
-            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 0 });
+            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = param.Sfcs, SiteId = _currentSite.SiteId ?? 0 });
             //条码信息表
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = param.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
             //在制品信息
             var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
             List<ManuSfcScrapEntity> manuSfcScrapEntities = new();
@@ -45,7 +45,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             List<ScrapManuSfcByIdCommand> scrapByIdCommands = new();
             var updateManuSfcProduceStatusByIdCommands = new List<UpdateManuSfcProduceStatusByIdCommand>();
             var validationFailures = new List<ValidationFailure>();
-            foreach (var sfc in parm.Sfcs)
+            foreach (var sfc in param.Sfcs)
             {
                 var sfcEntity = sfcEntities.FirstOrDefault(x => x.SFC == sfc);
 
@@ -142,7 +142,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.Discard,
                     CurrentStatus = sfcEntity.Status,
-                    Remark = parm.Remark ?? "",
+                    Remark = param.Remark ?? "",
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedOn = HymsonClock.Now(),
                     CreatedBy = _currentUser.UserName,
@@ -157,10 +157,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     SFC = sfc,
                     SfcinfoId = sfcInfoEntity?.Id ?? 0,
                     SfcStepId = stepEntity.Id,
-                    ProcedureId = parm.ProcedureId ?? manuSfcProduceInfoEntity?.ProcedureId,
+                    ProcedureId = param.ProcedureId ?? manuSfcProduceInfoEntity?.ProcedureId,
                     ScrapQty = sfcEntity.Qty,
                     IsCancel = false,
-                    Remark = parm.Remark,
+                    Remark = param.Remark,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedOn = HymsonClock.Now(),
                     CreatedBy = _currentUser.UserName,
@@ -195,7 +195,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 //1.条码信息表
                 rows += await _manuSfcRepository.ManuSfcScrapByIdsAsync(scrapByIdCommands);
 
-                if (rows != parm.Sfcs.Length)
+                if (rows != param.Sfcs.Length)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15419));
                 }
@@ -219,21 +219,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <summary>
         /// 条码取消报废
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task QualityCancelScrapAsync(ManuSfScrapDto parm)
+        public async Task QualityCancelScrapAsync(ManuSfScrapDto param)
         {
             #region 验证
-            if (parm.Sfcs == null || parm.Sfcs.Length < 1)
+            if (param.Sfcs == null || param.Sfcs.Length < 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
 
             //条码表
-            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 0 });
+            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = param.Sfcs, SiteId = _currentSite.SiteId ?? 0 });
             //条码信息表
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
-            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = param.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
             //在制品信息
             var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
 
@@ -245,7 +245,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             List<ManuSfcStepEntity> manuSfcStepEntities = new();
             List<CancelScrapManuSfcByIdCommand> manuSfcCancelScrapByIdCommands = new();
             var updateManuSfcProduceStatusByIdCommands = new List<UpdateManuSfcProduceStatusByIdCommand>();
-            foreach (var sfc in parm.Sfcs)
+            foreach (var sfc in param.Sfcs)
             {
                 var sfcEntity = sfcEntities.FirstOrDefault(x => x.SFC == sfc);
                 if (sfcEntity == null)
@@ -296,7 +296,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 var sfcInfoEntity = sfcInfoEntities.FirstOrDefault(x => x.SfcId == sfcEntity.Id);
 
                 if (sfcInfoEntity == null)
-                {
+                {   
                     throw new CustomerValidationException(nameof(ErrorCode.MES15401));
                 }
 
@@ -345,7 +345,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.CancelDiscard,
                     CurrentStatus = sfcEntity.Status,
-                    Remark = parm.Remark ?? "",
+                    Remark = param.Remark ?? "",
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedOn = HymsonClock.Now(),
                     CreatedBy = _currentUser.UserName,
@@ -379,7 +379,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 //1.条码信息表状态更改
                 rows += await _manuSfcRepository.ManuSfcCancellScrapByIdsAsync(manuSfcCancelScrapByIdCommands);
 
-                if (rows != parm.Sfcs.Length)
+                if (rows != param.Sfcs.Length)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15419));
                 }
@@ -399,6 +399,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 trans.Complete();
             }
         }
-
     }
 }
+    

@@ -253,7 +253,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             _inteVehicleRepository = inteVehicleRepository;
         }
 
-
         /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
@@ -375,7 +374,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
-
         /// <summary>
         /// 创建
         /// </summary>
@@ -466,7 +464,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             }
             return manuSfcProduceEntity.ToModel<ManuSfcProduceDto>();
         }
-
 
         #region 在制品步骤控制
         /// <summary>
@@ -1860,7 +1857,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 
             return activityVehicleViewDtos.OrderByDescending(x => x.StartTime).ToList();
         }
-
 
         /// <summary>
         /// 查询工序下排队中的载具分页信息

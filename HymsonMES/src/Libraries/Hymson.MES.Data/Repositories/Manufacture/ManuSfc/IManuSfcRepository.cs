@@ -47,14 +47,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcEntity>? entities);
 
         /// <summary>
-        /// 删除  
-        /// 最好使用批量删除，可以设置更新人和更新时间
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="command"></param>
