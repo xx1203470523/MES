@@ -58,6 +58,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<ManuSfcProduceEntity> GetBySFCAsync(ManuSfcProduceBySfcQuery sfcQuery);
 
         /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcId"></param>
+        /// <returns></returns>
+        Task<ManuSfcProduceEntity> GetBySFCIdAsync(long sfcId);
+
+        /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceEntity>> GetBySFCIdsAsync(IEnumerable<long> sfcIds);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
@@ -153,7 +167,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        Task<int> DeletePhysicalRangeByIdsSqlAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand);
+        Task<int> DeletePhysicalRangeByIdsAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand);
 
         /// <summary>
         /// 删除

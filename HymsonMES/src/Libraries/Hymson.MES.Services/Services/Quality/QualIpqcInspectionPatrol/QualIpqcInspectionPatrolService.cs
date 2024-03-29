@@ -587,7 +587,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13236)).WithData("SampleCode", query.SampleCode);
             }
-            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);
             if (manuSfcInfoEntity != null && entity.WorkOrderId != manuSfcInfoEntity.WorkOrderId)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13237));

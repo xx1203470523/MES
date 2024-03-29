@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //条码表
             var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = manuProductBadRecordCreateDto.Sfcs, SiteId = _currentSite.SiteId ?? 0 });
             //条码信息表
-            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
+            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcEntities.Select(x => x.Id));
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = manuProductBadRecordCreateDto.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
             //在制品信息
             var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
@@ -892,7 +892,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15416));
             }
 
-            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);
 
             //步骤表-复判
             var manuSfcStepEntity = new ManuSfcStepEntity
@@ -1579,7 +1579,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             //条码信息表
-            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
+            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcEntities.Select(x => x.Id));
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = needHandleSfcs, SiteId = _currentSite.SiteId ?? 00 };
             //在制品信息
             var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
@@ -1803,7 +1803,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             //条码信息表
-            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
+            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcEntities.Select(x => x.Id));
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = needHandleSfcs, SiteId = _currentSite.SiteId ?? 00 };
             //在制品信息
             var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);

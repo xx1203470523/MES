@@ -49,6 +49,11 @@ namespace Hymson.MES.Core.Enums
         /// 条码合并
         /// </summary>
         [Description("条码合并")]
-        Merge = 8
+        Merge = 8,
+        /// <summary>
+        /// 离脱
+        /// </summary>
+        [Description("离脱")]
+        Detachment = 9
     }
 }

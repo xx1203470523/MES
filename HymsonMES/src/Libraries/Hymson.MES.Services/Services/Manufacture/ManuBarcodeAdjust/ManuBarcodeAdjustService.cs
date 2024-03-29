@@ -715,7 +715,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     });
                 else
                     //设置 条码库存为0
-                    await _whMaterialInventoryRepository.UpdateQuantityResidueBySfcsAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Command.UpdateQuantityResidueBySfcsCommand
+                    await _whMaterialInventoryRepository.UpdateQuantityResidueBySFCsAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Command.UpdateQuantityResidueBySfcsCommand
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         Sfcs = sfcs,
@@ -782,7 +782,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var inteVehiceFreightStackEntity = await inteVehiceFreightStackEntityTask;
             var manuProductBadRecordEntities = await manuProductBadRecordEntitiesTask;
 
-            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);
 
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
             if (planWorkOrderEntity != null && planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)

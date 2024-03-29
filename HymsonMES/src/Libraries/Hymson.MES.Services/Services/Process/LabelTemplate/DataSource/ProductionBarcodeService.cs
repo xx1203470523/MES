@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate.DataSource
             var manuSfcEntities = await manuSfcEntitiesTask;
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
 
-            var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcEntities.Select(x => x.Id));
+            var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcEntities.Select(x => x.Id));
 
             var planWorkOrderEntitiesTask = _planWorkOrderRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId ?? 0));
             var procMaterialEntitiesTask = _procMaterialRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.ProductId));

@@ -135,7 +135,7 @@ namespace Hymson.MES.Services.Services.Plan
             var sfcids = manuSfcList.Select(x => x.Id).ToList();
             if (sfcids != null && sfcids.Any())
             {
-                manuSfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcids);
+                manuSfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcids);
             }
 
             foreach (var sfc in planSfcInfoCreateDto.SFCs)
@@ -374,7 +374,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16123)).WithData("sfc", param.SFC);
                 }
-                var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+                var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);
 
                 //if (manuSfcInfoEntity != null && manuSfcInfoEntity.WorkOrderId != param.RelevanceWorkOrderId)
                 //{

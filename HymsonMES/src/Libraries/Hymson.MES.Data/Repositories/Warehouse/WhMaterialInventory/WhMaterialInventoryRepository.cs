@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Options;
@@ -412,7 +413,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             return wsInfo;
         }
 
-
         /// <summary>
         /// 修改外部来源库存
         /// </summary>
@@ -429,7 +429,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> UpdateQuantityResidueBySfcsAsync(UpdateQuantityResidueBySfcsCommand command) 
+        public async Task<int> UpdateQuantityResidueBySFCsAsync(UpdateQuantityResidueBySfcsCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateQuantityResidueBySfcsSql, command);
@@ -449,7 +449,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateSql = "UPDATE `wh_material_inventory` SET SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `wh_material_inventory` SET SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpPointByBarCode = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
-        const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE MaterialBarCode IN @BarCodeList AND SiteId=@SiteId";
+        const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET QuantityResidue = 0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE SiteId = @SiteId AND MaterialBarCode IN @BarCodeList";
         const string UpdateWhMaterialInventoryEmptyByIdSql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id in @ids";
@@ -477,6 +477,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
         const string UpdateOutsideWhMaterilInventorySql = "UPDATE wh_material_inventory SET  MaterialId=@MaterialId, QuantityResidue =@QuantityResidue, Batch=@Batch, SupplierId=@SupplierId,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id; ";
 
-        const string UpdateQuantityResidueBySfcsSql = "UPDATE wh_material_inventory SET QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode IN @Sfcs AND QuantityResidue >0  ";
+        const string UpdateQuantityResidueBySfcsSql = "UPDATE wh_material_inventory SET QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode IN @Sfcs AND QuantityResidue > 0  ";
+
     }
 }

@@ -200,7 +200,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
             }
 
             //获取产品序列码信息
-            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(sfcEntity.Id);
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(sfcEntity.Id);
             if (manuSfcInfoEntity == null) {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19709)).WithData("code", checkDto.Sfc);
             }
@@ -405,7 +405,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
             var manuSfcProduceInfoEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery {Sfc= markingCloseConfirmDto.Sfc,SiteId= _currentSite.SiteId ?? 0 });
 
             //条码信息表
-            var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(sfcEntity.Id);
+            var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(sfcEntity.Id);
 
             //组装步骤表数据
             var manuSfcStepEntity = new ManuSfcStepEntity

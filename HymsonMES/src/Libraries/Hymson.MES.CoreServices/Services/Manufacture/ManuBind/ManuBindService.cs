@@ -513,7 +513,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             {
                 await _manuSfcRepository.ManuSfcUpdateStatuByIdRangeAsync(manuSfcUpdateStatusByIdCommands);
             }
-            await _manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(deletePhysicalByProduceIdsCommand);
+            await _manuSfcProduceRepository.DeletePhysicalRangeByIdsAsync(deletePhysicalByProduceIdsCommand);
             trans.Complete();
         }
 
@@ -930,7 +930,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SFC = param.SFC
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17423)).WithData("SFC", param.SFC);
 
-            var manuSfc = await _manuSfcInfoRepository.GetBySFCAsync(sfc.Id);
+            var manuSfc = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(sfc.Id);
             if (manuSfc == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17423)).WithData("SFC", param.SFC);
