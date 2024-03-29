@@ -4,6 +4,7 @@ using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
@@ -88,17 +89,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
         /// <summary>
-        /// 不允许的类型
-        /// </summary>
-        private static readonly SfcStatusEnum[] _noAllowedStatus = new SfcStatusEnum[] {
-            SfcStatusEnum.Locked,
-            SfcStatusEnum.Scrapping,
-            SfcStatusEnum.Delete,
-            SfcStatusEnum.Invalid,
-            SfcStatusEnum.Detachment
-        };
-
-        /// <summary>
         /// 构造函数（生产异常处理）
         /// </summary>
         /// <param name="logger"></param>
@@ -157,7 +147,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15446)).WithData("barCode", barCode);
 
             // 状态校验
-            if (_noAllowedStatus.Contains(sfcEntity.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES15447))
+            if (ManuSfcStatus.ForbidSfcStatuss.Contains(sfcEntity.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES15447))
                     .WithData("barCode", barCode)
                     .WithData("status", sfcEntity.Status.GetDescription());
 
@@ -226,7 +216,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 状态校验
             var validationFailures = new List<ValidationFailure>();
-            var noMatchSFCEntities = sfcEntities.Where(w => _noAllowedStatus.Contains(w.Status));
+            var noMatchSFCEntities = sfcEntities.Where(w => ManuSfcStatus.ForbidSfcStatuss.Contains(w.Status));
             if (noMatchSFCEntities.Any())
             {
                 foreach (var sfcEntity in noMatchSFCEntities)
@@ -288,7 +278,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         Operatetype = ManuSfcStepTypeEnum.Detachment,
-                        CurrentStatus = sfcProduceEntity.Status,
+                        CurrentStatus = SfcStatusEnum.Detachment,
                         SFC = sfcProduceEntity.SFC,
                         ProductId = sfcProduceEntity.ProductId,
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
@@ -322,7 +312,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         Operatetype = ManuSfcStepTypeEnum.Detachment,
-                        CurrentStatus = SfcStatusEnum.Complete,
+                        CurrentStatus = SfcStatusEnum.Detachment,
                         SFC = sfcEntity.SFC,
                         ProductId = sfcInfoEntity.ProductId,
                         WorkOrderId = sfcInfoEntity.WorkOrderId ?? 0,
@@ -390,13 +380,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             // manu_sfc 更新状态
             rows += await _manuSfcRepository.UpdateRangeWithStatusCheckAsync(updateManuSfcEntities);
 
-            // 删除工单统计条码
-
-
             trans.Complete();
             return rows;
         }
-
 
     }
 }
