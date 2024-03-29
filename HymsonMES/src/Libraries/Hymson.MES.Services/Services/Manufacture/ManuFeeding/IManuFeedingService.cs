@@ -4,7 +4,7 @@ using Hymson.MES.Services.Dtos.Manufacture;
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 {
     /// <summary>
-    /// 服务接口（容器维护）
+    /// 服务接口（物料加载）
     /// </summary>
     public interface IManuFeedingService
     {

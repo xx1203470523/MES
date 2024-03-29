@@ -880,7 +880,9 @@
         public const string MES15442 = "存在不是缺陷的不合格代码[{unqualifiedCode}]";
         public const string MES15443 = "发现工序编码[{foundBadOperationCode}]不存在";
         public const string MES15444 = "拦截工序编码[{interceptProcedureCode}]不存在";
-
+        public const string MES15445 = "产品序列码不能为空！";
+        public const string MES15446 = "产品序列码【{barCode}】不存在！";
+        public const string MES15447 = "产品序列码【{barCode}】状态为【{status}】，不可再执行当前操作！";
         #endregion
 
         #region 物料加载 15500

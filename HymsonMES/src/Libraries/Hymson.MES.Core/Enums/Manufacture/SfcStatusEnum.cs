@@ -52,6 +52,11 @@ namespace Hymson.MES.Core.Enums
         /// 无效
         /// </summary>
         [Description("无效")]
-        Invalid = 8
+        Invalid = 8,
+        /// <summary>
+        /// 离脱
+        /// </summary>
+        [Description("离脱")]
+        Detachment = 9
     }
 }
