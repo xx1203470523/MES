@@ -147,7 +147,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<ManuBarCodeDto> GetBarCodeAsync(string barCode)
         {
-            if (string.IsNullOrEmpty(barCode)) throw new CustomerValidationException(nameof(ErrorCode.MES15445)).WithData("barCode", barCode);
+            if (string.IsNullOrEmpty(barCode)) throw new CustomerValidationException(nameof(ErrorCode.MES15445));
 
             // 查询条码
             var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
@@ -214,7 +214,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<int> SubmitDetachmentAsync(ManuDetachmentDto requestDto)
         {
             if (requestDto == null) return 0;
-            if (requestDto.BarCodes == null || !requestDto.BarCodes.Any()) return 0;
+            if (requestDto.BarCodes == null || !requestDto.BarCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15445));
 
             // 查询条码
             var sfcEntities = await _manuSfcRepository.GetAllBySFCsAsync(new EntityBySFCsQuery
