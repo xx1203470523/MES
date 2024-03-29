@@ -390,6 +390,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             // manu_sfc 更新状态
             rows += await _manuSfcRepository.UpdateRangeWithStatusCheckAsync(updateManuSfcEntities);
 
+            // 删除工单统计条码
+
+
             trans.Complete();
             return rows;
         }

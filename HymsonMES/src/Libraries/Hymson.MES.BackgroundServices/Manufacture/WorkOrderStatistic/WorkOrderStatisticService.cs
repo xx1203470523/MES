@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -74,6 +75,9 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             if (manuSfcStepList == null || !manuSfcStepList.Any()) return;
 
             var user = $"{BusinessKey.WorkOrderStatistic}作业";
+
+            // 排除指定状态的条码（离脱）
+            manuSfcStepList = manuSfcStepList.Where(w => w.Operatetype == ManuSfcStepTypeEnum.Detachment);
 
             // 相同工单和条码的数据只记录一条记录
             var manuSfcStepDic = manuSfcStepList.ToLookup(x => new SingleWorkOrderSFCBo
