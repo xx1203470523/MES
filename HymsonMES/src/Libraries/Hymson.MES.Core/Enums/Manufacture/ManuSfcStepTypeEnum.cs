@@ -229,6 +229,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 离脱
         /// </summary>
         [Description("离脱")]
-        Detachment = 43
+        Detachment = 43,
+        /// <summary>
+        /// 设备误判
+        /// </summary>
+        [Description("设备误判")]
+        Misjudgment = 44
     }
 }

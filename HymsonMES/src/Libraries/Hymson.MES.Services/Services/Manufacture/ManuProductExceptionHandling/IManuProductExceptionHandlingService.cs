@@ -8,11 +8,26 @@ namespace Hymson.MES.Services.Services.Manufacture
     public interface IManuProductExceptionHandlingService
     {
         /// <summary>
-        /// 查询条码（离脱）
+        /// 根据条码查询信息（设备误判）
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        Task<ManuBarCodeDto> GetBarCodeAsync(string barCode);
+        Task<IEnumerable<ManuMisjudgmentBarCodeDto>> GetMisjudgmentByBarCodeAsync(string barCode);
+
+        /// <summary>
+        /// 提交（设备误判）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> SubmitMisjudgmentAsync(ManuMisjudgmentDto requestDto);
+
+
+        /// <summary>
+        /// 根据条码查询信息（离脱）
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        Task<ManuDetachmentBarCodeDto> GetDetachmentByBarCodeAsync(string barCode);
 
         /// <summary>
         /// 提交（离脱）
