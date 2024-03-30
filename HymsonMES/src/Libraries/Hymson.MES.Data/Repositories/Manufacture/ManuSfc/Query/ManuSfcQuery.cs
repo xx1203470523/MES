@@ -1,4 +1,5 @@
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Data.Repositories.Manufacture;
 
@@ -33,6 +34,10 @@ public class ManuSfcQuery : QueryAbstraction
     /// </summary>
     public IEnumerable<long>? SiteIds { get; set; }
 
+    /// <summary>   
+    /// 条码类型 1、生产条码 2、非生产条码
+    /// </summary>
+    public SfcTypeEnum? Type { get; set; }
 
     /// <summary>
     /// 条码

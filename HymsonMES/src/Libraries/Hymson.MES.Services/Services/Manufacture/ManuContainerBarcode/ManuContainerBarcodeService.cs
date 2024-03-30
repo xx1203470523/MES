@@ -267,10 +267,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16712));
                     }
-                    var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+                    var sfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
                     {
                         SiteId = _currentSite.SiteId ?? 0,
-                        SFC = createManuContainerBarcodeDto.BarCode
+                        SFC = createManuContainerBarcodeDto.BarCode,
+                        Type = SfcTypeEnum.Produce
                     });
                     sfcProduceEntity = new ManuSfcProduceEntity
                     {

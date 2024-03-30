@@ -1,6 +1,7 @@
 ﻿using Hymson.Authentication.JwtBearer;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -94,13 +95,18 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate.DataSource
         /// <returns></returns>
         public async Task<string> GetLabelTemplateData(BaseLabelTemplateDataDto param)
         {
-            var manuSfcEntitiesTask = _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SiteId = param.SiteId, SFCs = param.BarCodes });
+            var manuSfcEntitiesTask = _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SiteId = param.SiteId,
+                SFCs = param.BarCodes,
+                Type = SfcTypeEnum.Produce
+            });
             var manuSfcProduceEntitiesTask = _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery { SiteId = param.SiteId, Sfcs = param.BarCodes });
 
             var manuSfcEntities = await manuSfcEntitiesTask;
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
 
-            var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcEntities.Select(x => x.Id));
+            var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcEntities.Select(x => x.Id));
 
             var planWorkOrderEntitiesTask = _planWorkOrderRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId ?? 0));
             var procMaterialEntitiesTask = _procMaterialRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.ProductId));
@@ -141,7 +147,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate.DataSource
                     EquipmentCode = equEquipmentEntity?.EquipmentCode,
                     EquipmentName = equEquipmentEntity?.EquipmentName,
                     Status = ""
-                }); 
+                });
             }
             await Task.CompletedTask;
             return null;

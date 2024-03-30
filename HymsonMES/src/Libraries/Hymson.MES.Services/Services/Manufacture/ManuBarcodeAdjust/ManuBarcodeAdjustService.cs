@@ -715,7 +715,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     });
                 else
                     //设置 条码库存为0
-                    await _whMaterialInventoryRepository.UpdateQuantityResidueBySfcsAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Command.UpdateQuantityResidueBySfcsCommand
+                    await _whMaterialInventoryRepository.UpdateQuantityResidueBySFCsAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Command.UpdateQuantityResidueBySfcsCommand
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         Sfcs = sfcs,
@@ -755,7 +755,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             await _validationManuBarcodeSplitAdjustRules.ValidateAndThrowAsync(param);
 
             #region 数据准备
-            var manuSfcEntityTask = _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery { SFC = param.SFC, SiteId = _currentSite.SiteId ?? 0 });
+            var manuSfcEntityTask = _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
+            {
+                SFC = param.SFC,
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = SfcTypeEnum.Produce
+            });
             var manuSfcProduceEntityTask = _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { SiteId = _currentSite.SiteId ?? 0, Sfc = param.SFC });
             //包装
             var sfcPackEntityTask = _manuContainerPackRepository.GetByLadeBarCodeAsync(new ManuContainerPackQuery { LadeBarCode = param.SFC, SiteId = _currentSite.SiteId ?? 0 });
@@ -782,7 +787,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var inteVehiceFreightStackEntity = await inteVehiceFreightStackEntityTask;
             var manuProductBadRecordEntities = await manuProductBadRecordEntitiesTask;
 
-            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);
 
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
             if (planWorkOrderEntity != null && planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)
@@ -989,7 +994,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 SFC = newSplitSFC,
                 ProductId = manuSfcInfo.ProductId,
-                WorkOrderId = manuSfcInfo.WorkOrderId??0,
+                WorkOrderId = manuSfcInfo.WorkOrderId ?? 0,
                 WorkCenterId = manuSfcProduceEntity?.WorkCenterId,
                 ProductBOMId = manuSfcProduceEntity?.ProductBOMId,
                 ProcedureId = manuSfcProduceEntity?.ProcedureId,
@@ -1525,8 +1530,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuSfcAboutInfoViewDto.MaterialCodeVersion = material == null ? "" : $"{material.MaterialCode}/{material.Version}";
             manuSfcAboutInfoViewDto.ProcessRouteCodeVersion = procProcessRoute == null ? "" : $"{procProcessRoute.Code}/{procProcessRoute.Version}";
             manuSfcAboutInfoViewDto.BomCodeVersion = bom == null ? "" : $"{bom.BomCode}/{bom.Version}";
-            manuSfcAboutInfoViewDto.MaterialCode = material?.MaterialCode??"";
-            manuSfcAboutInfoViewDto.MaterialName = material?.MaterialName ??"";
+            manuSfcAboutInfoViewDto.MaterialCode = material?.MaterialCode ?? "";
+            manuSfcAboutInfoViewDto.MaterialName = material?.MaterialName ?? "";
             manuSfcAboutInfoViewDto.MaterialVersion = material?.Version ?? "";
             return manuSfcAboutInfoViewDto;
         }

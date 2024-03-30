@@ -1,14 +1,14 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
+﻿using FluentValidation.Results;
 using Hymson.Authentication;
-using Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Minio.DataModel;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
 {
@@ -63,15 +63,118 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
         public async Task PartialScrapAsync(ManuSFCPartialScrapDto param)
         {
             //条码表
-            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = param.BarcodeScrapList.Select(x=>x.SFC), SiteId = _currentSite.SiteId ?? 0 });
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SFCs = param.BarcodeScrapList.Select(x => x.SFC),
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = SfcTypeEnum.Produce
+            });
             //条码信息表
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = param.BarcodeScrapList.Select(x => x.SFC), SiteId = _currentSite.SiteId ?? 00 };
             //在制品信息
             var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+            var validationFailures = new List<ValidationFailure>();
             foreach (var barcodeItem in param.BarcodeScrapList)
-            { 
-            
+            {
+                var sfcEntity = sfcEntities.FirstOrDefault(x => x.SFC == barcodeItem.SFC);
+
+                if (sfcEntity == null)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", barcodeItem.SFC}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", barcodeItem.SFC);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15415);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (sfcEntity.Qty < barcodeItem.ScrapQty)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", barcodeItem.SFC}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", barcodeItem.SFC);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15448);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("Qty", sfcEntity.Qty);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("ScrapQty", barcodeItem.ScrapQty);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (sfcEntity.Status == SfcStatusEnum.Scrapping)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", barcodeItem.SFC}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", barcodeItem.SFC);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15401);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+
+                if (sfcEntity.Status == SfcStatusEnum.Locked)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", barcodeItem.SFC}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", barcodeItem.SFC);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15416);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+
+                if (sfcEntity.Status == SfcStatusEnum.Complete)
+                {
+                    //TODO 完成品逻辑不清楚
+                }
+
+                var sfcInfoEntity = sfcInfoEntities.FirstOrDefault(x => x.SfcId == sfcEntity.Id);
+
+                if (sfcInfoEntity == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15401));
+                }
+                var manuSfcProduceInfoEntity = manuSfcProduces.FirstOrDefault(x => x.SFC == barcodeItem.SFC);
+
+                if (manuSfcProduceInfoEntity != null)
+                {
+                    //updateManuSfcProduceStatusByIdCommands.Add(new UpdateManuSfcProduceStatusByIdCommand
+                    //{
+                    //    Id = manuSfcProduceInfoEntity.Id,
+                    //    Status = SfcStatusEnum.Scrapping,
+                    //    CurrentStatus = manuSfcProduceInfoEntity.Status,
+                    //    UpdatedOn = HymsonClock.Now(),
+                    //    UpdatedBy = _currentUser.UserName
+                    //});
+                }
             }
             throw new NotImplementedException("未实现");
         }

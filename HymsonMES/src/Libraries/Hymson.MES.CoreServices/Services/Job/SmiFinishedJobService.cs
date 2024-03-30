@@ -135,7 +135,12 @@ namespace Hymson.MES.CoreServices.Services.Job
             await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
 
             // 判断条码状态是否是"完成"
-            var sfcEntities = await _manuSfcRepository.GetBySFCsAsync(multiSFCBo.SFCs)
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SiteId = param.SiteId,
+                SFCs = multiSFCBo.SFCs,
+                Type = SfcTypeEnum.Produce
+            })
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17104));
 
             if (sfcEntities.Any(a => a.Status == SfcStatusEnum.Complete))
@@ -185,7 +190,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             var cycle = procProcedureEntity.Cycle ?? 1;
 
             // 读取条码信息
-            var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));
+            var manuSFCEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                Ids = sfcProduceEntities.Select(s => s.SFCId)
+            });
 
             // 待执行的命令
             SmiFinisheResponseSummaryBo responseSummaryBo = new();
@@ -366,7 +374,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 _manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities),
 
                 // 删除 manu_sfc_produce
-                _manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(data.PhysicalDeleteSFCProduceByIdsCommand),
+                _manuSfcProduceRepository.DeletePhysicalRangeByIdsAsync(data.PhysicalDeleteSFCProduceByIdsCommand),
 
                 // 删除 manu_sfc_produce_business
                 _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSFCProduceBusinesssByIdsCommand),

@@ -382,10 +382,11 @@ namespace Hymson.MES.CoreServices.Services.Common
         public async Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheckAsync(MultiSFCBo bo)
         {
             // 条码信息
-            var manuSfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery
+            var manuSfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
             {
                 SiteId = bo.SiteId,
-                SFCs = bo.SFCs
+                SFCs = bo.SFCs,
+                Type = SfcTypeEnum.Produce
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17104));
 
             return manuSfcEntities;

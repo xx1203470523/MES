@@ -257,7 +257,10 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<int> DeletesAsync(IEnumerable<long> idsArr)
         {
-            var sfcEntities = await _manuSfcRepository.GetByIdsAsync(idsArr);
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                Ids = idsArr
+            }); ;
             if (sfcEntities.Any(it => it.IsUsed == YesOrNoEnum.Yes)) throw new CustomerValidationException(nameof(ErrorCode.MES16116));
             if (sfcEntities.Any(it => it.Status == SfcStatusEnum.Scrapping)) throw new CustomerValidationException(nameof(ErrorCode.MES16130));
 
@@ -269,7 +272,7 @@ namespace Hymson.MES.Services.Services.Plan
             });
 
             // 条码集合
-            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(s => s.Id));
+            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcEntities.Select(s => s.Id));
 
             var manuSfcUpdateStatusByIdCommands = new List<ManuSfcUpdateStatusByIdCommand>();
 
@@ -365,8 +368,10 @@ namespace Hymson.MES.Services.Services.Plan
             var result = new List<CreateBarcodeByWorkOrderOutputBo>(pendingDatas.Count);
 
             var manuSFCIds = pendingDatas.Select(m => m.ManuSFCId);
-            var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(manuSFCIds);
-
+            var manuSFCEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                Ids = manuSFCIds
+            });
             foreach (var pendingData in pendingDatas)
             {
                 var manuSFCEntity = manuSFCEntities.FirstOrDefault(m => m.Id == pendingData.ManuSFCId);
@@ -453,7 +458,10 @@ namespace Hymson.MES.Services.Services.Plan
             var workOrderDic = workOrderEntities.ToDictionary(x => x.Id, x => x);
 
             // 读取条码
-            var sfcEntities = await _manuSfcRepository.GetByIdsAsync(entities.Select(x => x.SFCId));
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                Ids = entities.Select(x => x.SFCId)
+            });
             var sfcDic = sfcEntities.ToDictionary(x => x.Id, x => x);
 
             // 遍历填充

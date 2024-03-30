@@ -298,6 +298,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcId"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcProduceEntity> GetBySFCIdAsync(long sfcId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceEntity>(GetBySFCIdSql, new { SFCId = sfcId });
+        }
+
+        /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetBySFCIdsAsync(IEnumerable<long> sfcIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcProduceEntity>(GetBySFCIdsSql, new { SFCIds = sfcIds });
+        }
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="manuSfcProduceEntity"></param>
@@ -438,7 +460,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        public async Task<int> DeletePhysicalRangeByIdsSqlAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand)
+        public async Task<int> DeletePhysicalRangeByIdsAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand)
         {
             if (idsCommand == null || idsCommand.Ids == null || !idsCommand.Ids.Any()) return 0;
 
@@ -960,6 +982,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             WHERE SPB.IsDeleted = 0 AND SPB.BusinessType = @BusinessType AND SPB.SiteId=@SiteId AND SFC.SFC IN @Sfcs ";
         const string GetSfcProduceBusinessBySFCIdsSql = "SELECT * FROM manu_sfc_produce_business WHERE SfcProduceId IN @SfcInfoIds  AND IsDeleted=0";
         const string GetBySFCSql = @"SELECT * FROM manu_sfc_produce WHERE SFC = @Sfc and SiteId=@SiteId ";
+        const string GetBySFCIdSql = "SELECT * FROM manu_sfc_produce WHERE IsDeleted = 0 AND SFCId = @SFCId";
+        const string GetBySFCIdsSql = "SELECT * FROM manu_sfc_produce WHERE IsDeleted = 0 AND SFCId IN @SFCIds";
         const string DeletePhysicalSql = "DELETE FROM manu_sfc_produce WHERE SFC = @Sfc and SiteId=@SiteId ";
         const string DeletePhysicalRangeSql = "DELETE FROM manu_sfc_produce WHERE SiteId = @SiteId AND SFC IN @Sfcs ";
         const string DeletePhysicalRangeByIdsSql = "DELETE FROM manu_sfc_produce WHERE SiteId = @SiteId AND Id IN @Ids ";
