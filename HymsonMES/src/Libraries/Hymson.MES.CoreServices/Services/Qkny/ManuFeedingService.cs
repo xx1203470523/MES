@@ -327,11 +327,6 @@ namespace Hymson.MES.CoreServices.Services.Qkny
         {
             IEnumerable<long>? bomMaterialIds = null;
 
-            // 读取资源绑定的产线
-            var workCenterLineEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
-
-            if (workCenterLineEntity == null) return Array.Empty<ManuFeedingMaterialDto>();
-
             // 全部需展示的物料ID
             List<long> materialIds = new();
             var loadSource = 1; // 1:资源;2:上料点
@@ -341,6 +336,11 @@ namespace Hymson.MES.CoreServices.Services.Qkny
 
             if (queryDto.Source == ManuSFCFeedingSourceEnum.BOM)
             {
+                // 读取资源绑定的产线
+                var workCenterLineEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
+
+                if (workCenterLineEntity == null) return Array.Empty<ManuFeedingMaterialDto>();
+
                 // 这句是兼容代码。选择BOM类型时，之前切换上料点的值没有清空，所以这里需要清空
                 queryDto.FeedingPointId = null;
 
@@ -360,14 +360,16 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             else
             {
                 // 通过资源->上料点
-                var loadPoints = await _procLoadPointRepository.GetByResourceIdAsync(queryDto.ResourceId);
-                if (loadPoints != null && loadPoints.Any())
+                //var loadPoints = await _procLoadPointRepository.GetByResourceIdAsync(queryDto.ResourceId);
+                var loadPoint = await _procLoadPointRepository.GetByIdAsync((long)queryDto.FeedingPointId!);
+                if (loadPoint != null && (loadPoint.Status == SysDataStatusEnum.Enable || loadPoint.Status == SysDataStatusEnum.Retain))
                 {
                     // 只显示"启用"和"保留"
-                    loadPoints = loadPoints.Where(w => w.Status == SysDataStatusEnum.Enable || w.Status == SysDataStatusEnum.Retain);
+                    //loadPoints = loadPoints.Where(w => w.Status == SysDataStatusEnum.Enable || w.Status == SysDataStatusEnum.Retain);
 
                     // 通过上料点->物料
-                    var loadPointMaterials = await _procLoadPointLinkMaterialRepository.GetByLoadPointIdAsync(loadPoints.Select(s => s.Id));
+                    List<long> idList = new List<long>() { loadPoint.Id };
+                    var loadPointMaterials = await _procLoadPointLinkMaterialRepository.GetByLoadPointIdAsync(idList);
                     if (loadPointMaterials != null && loadPointMaterials.Any())
                     {
                         if (queryDto.FeedingPointId.HasValue && queryDto.FeedingPointId.Value > 0)
@@ -655,7 +657,7 @@ namespace Hymson.MES.CoreServices.Services.Qkny
         /// </summary>
         /// <param name=""></param>
         /// <returns></returns>
-        public async Task<bool> ManuFeedingTransfer(ManuFeedingTransferSaveDto saveDto)
+        public async Task<bool> ManuFeedingTransferAsync(ManuFeedingTransferSaveDto saveDto)
         {
             if (saveDto.SourceId == saveDto.DestId)
             {
@@ -695,6 +697,10 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             command.Qty = saveDto.Qty ?? manuFeedingEntity.Qty;
             command.UpdatedBy = saveDto.OpeationBy;
             command.UpdatedOn = curDate;
+            if (saveDto.Qty == manuFeedingEntity.Qty)
+            {
+                command.IsDeleted = 1;
+            }
             //新增数据
             manuFeedingEntity.Id = IdGenProvider.Instance.CreateId();
             manuFeedingEntity.CreatedOn = curDate;
@@ -750,5 +756,45 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             return true;
         }
 
+        /// <summary>
+        /// 上料点条码数量更新
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateManuFeedingBarcodeQtyAsync(UpdateFeedingBarcodeQtyCommand command)
+        {
+            return await _manuFeedingRepository.UpdateManuFeedingBarcodeQtyAsync(command);
+        }
+
+        /// <summary>
+        /// 根据资源获取所有的上料信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetAllByResourceIdAsync(EntityByResourceIdQuery query)
+        {
+            var dbList = await _manuFeedingRepository.GetAllByResourceIdAsync(query);
+            if(dbList == null || dbList.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45075));
+            }
+
+            return dbList.ToList();
+        }
+
+        /// <summary>
+        /// 根据条码获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetAllBySfcListAsync(GetManuFeedingSfcListQuery query)
+        {
+            var dbList = await _manuFeedingRepository.GetAllBySfcListAsync(query);
+            if(dbList == null || dbList.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45072));
+            }
+            return dbList;
+        }
     }
 }
