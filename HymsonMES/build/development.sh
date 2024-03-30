@@ -13,7 +13,7 @@ docker service create \
   --name $serviceName \
   --mode global \
   --publish mode=host,published=10323,target=80 \
-  --env ASPNETCORE_ENVIRONMENT=Development \
+  --env ASPNETCORE_ENVIRONMENT=Staging \
   --env TZ="Asia/Shanghai" \
   --env SERVICE_CHECK_HTTP=/health \
   --env SERVICE_NAME={{.Service.Name}} \

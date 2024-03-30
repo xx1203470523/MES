@@ -35,7 +35,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             ISfcBindingService sfcBindingService)
         {
             _manufactureService = manufactureService;
-            _sfcBindingService= sfcBindingService;
+            _sfcBindingService = sfcBindingService;
         }
 
         /// <summary>
@@ -69,8 +69,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("MES-InBound")]
-        [LogDescription("进站", BusinessType.OTHER, "InBound", ReceiverTypeEnum.MES)]
+        [HttpPost("InStation")]
+        [LogDescription("进站", BusinessType.OTHER, "InStation", ReceiverTypeEnum.MES)]
         public async Task InBoundAsync(InBoundDto request)
         {
             await _manufactureService.InBoundAsync(request);
@@ -81,8 +81,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("MES-InBoundMore")]
-        [LogDescription("多个进站", BusinessType.OTHER, "InBoundMore", ReceiverTypeEnum.MES)]
+        [HttpPost("InStationMore")]
+        [LogDescription("多个进站", BusinessType.OTHER, "InStationMore", ReceiverTypeEnum.MES)]
         public async Task InBoundMoreAsync(InBoundMoreDto request)
         {
             await _manufactureService.InBoundMoreAsync(request);
@@ -93,8 +93,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("MES-OutBound")]
-        [LogDescription("出站", BusinessType.OTHER, "OutBound", ReceiverTypeEnum.MES)]
+        [HttpPost("OutStation")]
+        [LogDescription("出站", BusinessType.OTHER, "OutStation", ReceiverTypeEnum.MES)]
         public async Task OutBoundAsync(OutBoundDto request)
         {
             await _manufactureService.OutBoundAsync(request);
@@ -105,8 +105,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("MES-OutBoundMore")]
-        [LogDescription("多个出站", BusinessType.OTHER, "OutBoundMore", ReceiverTypeEnum.MES)]
+        [HttpPost("OutStationMore")]
+        [LogDescription("多个出站", BusinessType.OTHER, "OutStationMore", ReceiverTypeEnum.MES)]
         public async Task OutBoundMoreAsync(OutBoundMoreDto request)
         {
             await _manufactureService.OutBoundMoreAsync(request);
