@@ -21,9 +21,9 @@ namespace Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny.GlueHomogenat
         public FormulaListGetDtoVaildator()
         {
             //设备编码不能为空
-            RuleFor(x => x.EquipmentCode).NotEmpty().Must(list => list.Any()).WithErrorCode(ErrorCode.MES45002);
+            RuleFor(x => x.EquipmentCode).NotEmpty().WithErrorCode(ErrorCode.MES45002);
             //资源编码不能为空
-            RuleFor(x => x.ResourceCode).NotEmpty().Must(list => list.Any()).WithErrorCode(ErrorCode.MES45003);
+            RuleFor(x => x.ResourceCode).NotEmpty().WithErrorCode(ErrorCode.MES45003);
         }
     }
 }

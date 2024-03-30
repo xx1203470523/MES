@@ -12,6 +12,12 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Common
     public record EquipmentProcessParamDto : QknyBaseDto
     {
         /// <summary>
+        /// 位置
+        /// 使用场景：烘烤，一个设备里面分多层的场景
+        /// </summary>
+        public string Location { get; set; } = string.Empty;
+
+        /// <summary>
         /// 参数列表
         /// </summary>
         public List<QknyParamBaseDto> ParamList { get; set; } = new List<QknyParamBaseDto>();

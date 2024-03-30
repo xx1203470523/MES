@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Hymson.MES.Services.Services.EquProductParamRecord
 {
@@ -50,7 +51,7 @@ namespace Hymson.MES.Services.Services.EquProductParamRecord
         /// <summary>
         /// 构造函数
         /// </summary>
-        public EquProductParamRecordService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquProductParamRecordSaveDto> validationSaveRules, 
+        public EquProductParamRecordService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquProductParamRecordSaveDto> validationSaveRules,
             IEquProductParamRecordRepository equProductParamRecordRepository,
             IProcParameterRepository procParameterRepository)
         {
@@ -68,6 +69,10 @@ namespace Hymson.MES.Services.Services.EquProductParamRecord
         /// <returns></returns>
         public async Task<int> AddMultAsync(List<EquProductParamRecordSaveDto> saveDtoList)
         {
+            if (saveDtoList.IsNullOrEmpty() == true)
+            {
+                return 0;
+            }
             //1. 查询参数是否存在，存在则录入id
             var paramList = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
             {

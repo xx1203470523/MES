@@ -434,6 +434,21 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateQuantityResidueBySfcsSql, command);
         }
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据物料条码获取数据
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesNoQtyAsync(WhMaterialInventoryBarCodesQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodesNoQtySql, param);
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -478,5 +493,14 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateOutsideWhMaterilInventorySql = "UPDATE wh_material_inventory SET  MaterialId=@MaterialId, QuantityResidue =@QuantityResidue, Batch=@Batch, SupplierId=@SupplierId,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id; ";
 
         const string UpdateQuantityResidueBySfcsSql = "UPDATE wh_material_inventory SET QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode IN @Sfcs AND QuantityResidue >0  ";
+
+        #region 顷刻
+
+        /// <summary>
+        /// 获取条码不管数量
+        /// </summary>
+        const string GetByBarCodesNoQtySql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes";
+
+        #endregion
     }
 }

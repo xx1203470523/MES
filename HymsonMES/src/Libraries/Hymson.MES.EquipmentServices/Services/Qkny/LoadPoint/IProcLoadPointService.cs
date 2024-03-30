@@ -27,5 +27,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
         /// <param name="query"></param>
         /// <returns></returns>
         Task<List<PointOrEquipmentView>> GetPointOrEquipmmentAsync(ProcLoadPointEquipmentQuery query);
+
+        /// <summary>
+        /// 获取上料点根据编码
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcLoadPointEntity> GetProcLoadPointAsync(ProcLoadPointQuery query);
     }
 }

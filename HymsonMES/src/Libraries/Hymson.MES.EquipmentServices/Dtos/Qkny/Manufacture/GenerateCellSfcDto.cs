@@ -15,5 +15,10 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// 产品型号
         /// </summary>
         public string ProductCode { get; set; } = "";
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int Qty { get; set; } = 10;
     }
 }

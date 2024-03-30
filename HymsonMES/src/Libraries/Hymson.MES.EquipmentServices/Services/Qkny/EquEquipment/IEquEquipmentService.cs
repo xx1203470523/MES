@@ -18,5 +18,19 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
         /// <param name="param"></param>
         /// <returns></returns>
         Task<EquEquipmentResAllView> GetEquResAllAsync(QknyBaseDto param);
+
+        /// <summary>
+        /// 获取设备资源对应的基础信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<EquEquipmentResAllView> GetEquResAsync(QknyBaseDto param);
+
+        /// <summary>
+        ///  获取设备资源对应的基础信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<EquEquipmentResAllView> GetEquResLineAsync(QknyBaseDto param);
     }
 }

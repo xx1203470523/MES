@@ -56,6 +56,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.ProcSortingRule
                 model.Rating = item.Rating;
                 model.Serial = item.Serial;
                 model.ParameterValue = item.ParameterValue;
+                model.Grade = item.Grade;
+                model.ProcedureCode = item.ProcedureCode;
 
                 resultList.Add(model);
             }

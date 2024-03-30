@@ -37,4 +37,20 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// </summary>
         public List<QknyParamBaseDto> ParamList { get; set; } = new List<QknyParamBaseDto>();
     }
+
+    /// <summary>
+    /// 多个条码参数相同
+    /// </summary>
+    public record ProductParamSameMultSfcDto : QknyBaseDto
+    {
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public List<string> SfcList = new List<string>();
+
+        /// <summary>
+        /// 参数列表
+        /// </summary>
+        public List<QknyParamBaseDto> ParamList { get; set; } = new List<QknyParamBaseDto>();
+    }
 }

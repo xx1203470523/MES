@@ -1,4 +1,5 @@
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -151,6 +152,29 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 来源
         /// </summary>
         public ManuSFCFeedingSourceEnum LoadSource { get; set; }
+    }
+
+
+    /// <summary>
+    /// 获取资源下所有的上料
+    /// </summary>
+    public class EntityByResourceIdQuery : EntityBySiteIdQuery
+    {
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long Resourceid { get; set; }
+    }
+
+    /// <summary>
+    /// 查询条码信息
+    /// </summary>
+    public class GetManuFeedingSfcListQuery : EntityBySiteIdQuery
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public List<string> BarCodeList { get; set; } = new List<string>();
     }
 
     #endregion

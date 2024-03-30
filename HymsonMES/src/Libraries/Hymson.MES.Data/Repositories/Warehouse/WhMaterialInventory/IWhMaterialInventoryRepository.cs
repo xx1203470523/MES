@@ -223,5 +223,16 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateQuantityResidueBySfcsAsync(UpdateQuantityResidueBySfcsCommand command);
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据物料条码获取数据
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesNoQtyAsync(WhMaterialInventoryBarCodesQuery param);
+
+        #endregion
     }
 }

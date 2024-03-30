@@ -5,6 +5,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.LoadPoint.View;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,10 +58,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
                 throw new CustomerValidationException(nameof(ErrorCode.MES45074));
             }
             var dbList = await _procLoadPointRepository.GetPointOrEquipmmentAsync(query);
-            if (dbList.IsNullOrEmpty() == true || dbList.Count() != query.CodeList.Count)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45074));
-            }
+            //if (dbList.IsNullOrEmpty() == true || dbList.Count() != query.CodeList.Count)
+            //{
+            //    //上料点会关联多个资源
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES45074));
+            //}
             var dbCode = dbList.Where(m => m.Code == query.CodeList[0]).FirstOrDefault();
             if(dbCode == null)
             {
@@ -73,5 +75,21 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
             }
             return dbList.ToList();
         }
+
+        /// <summary>
+        /// 获取上料点
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcLoadPointEntity> GetProcLoadPointAsync(ProcLoadPointQuery query)
+        {
+            var dbModel = await _procLoadPointRepository.GetProcLoadPointAsync(query);
+            if (dbModel == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45070));
+            }
+            return dbModel;
+        }
+
     }
 }

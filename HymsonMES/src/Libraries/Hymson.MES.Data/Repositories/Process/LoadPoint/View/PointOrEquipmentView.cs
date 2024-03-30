@@ -40,5 +40,10 @@ namespace Hymson.MES.Data.Repositories.Process.LoadPoint.View
         /// 资源名称
         /// </summary>
         public string ResName { get; set; }
+
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

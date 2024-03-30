@@ -631,13 +631,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// 产出米数上报024
+        /// 产出上报024
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("OutboundMetersReport")]
-        [LogDescription("产出米数上报024", BusinessType.OTHER, "OutboundMetersReport024", ReceiverTypeEnum.MES)]
+        [LogDescription("产出上报024", BusinessType.OTHER, "OutboundMetersReport024", ReceiverTypeEnum.MES)]
         public async Task OutboundMetersReportAsync(OutboundMetersReportDto dto)
         {
             if (IS_DEBUG == true)
@@ -859,15 +859,21 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("GenerateCellSfc")]
         [LogDescription("电芯码下发033", BusinessType.OTHER, "GenerateCellSfc033", ReceiverTypeEnum.MES)]
-        public async Task<string> GenerateCellSfcAsync(GenerateCellSfcDto dto)
+        public async Task<List<string>> GenerateCellSfcAsync(GenerateCellSfcDto dto)
         {
             //TODO
             //1. 生成条码进行下发
             //2. 参考现有创建条码 CreateBarcodeBySemiProductIdAsync，CreateBarcodeByWorkOrderIdAsync
 
-            string sfc = "SFC001";
+            List<string> sfcList = new List<string>();
+            for(var i = 0;i < dto.Qty; ++i)
+            {
+                sfcList.Add($"SFC00{i + 1}");
+            }
 
-            return sfc;
+            //string sfc = "SFC001";
+
+            return sfcList;
         }
 
         /// <summary>
@@ -1143,6 +1149,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
                     sortModel.MaxContainingType = Core.Enums.Process.ContainingTypeEnum.LtOrE;
                     sortModel.ParameterCode = $"param{i}";
                     sortModel.ParameterName = $"paramname{i}";
+                    sortModel.Grade = $"grade{i}";
+                    sortModel.ProcedureCode = $"procedurecode{i}";
                     sortList.Add(sortModel);
                 }    
 
@@ -1150,6 +1158,69 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             return await _qknyService.SortingRuleAsync(dto);
+        }
+
+        /// <summary>
+        /// 产品参数上传046
+        /// 多个条码参数相同
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ProductParamSameMultSfc")]
+        [LogDescription("产品参数上传046", BusinessType.OTHER, "ProductParamSameMultSfc046", ReceiverTypeEnum.MES)]
+        public async Task ProductParamSameMultSfcAsync(ProductParamSameMultSfcDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            //await _equCommonService.ProductParamAsync(dto);
+
+            //TODO
+            //1. 参考 ProductCollectionAsync
+        }
+
+        /// <summary>
+        /// 库存接收047
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("MaterialInventory")]
+        [LogDescription("库存接收047", BusinessType.OTHER, "MaterialInventory047", ReceiverTypeEnum.MES)]
+        public async Task MaterialInventoryAsync(MaterialInventoryDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            //TODO
+            //1. 如果是原材料，需要校验格式是否是5锻码
+            //2. 物料型号和数量从条码截取
+        }
+
+        /// <summary>
+        /// 工装条码绑定048
+        /// 用于AGV工装和原材料条码绑定，后面直接扫工装上料
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ToolBindMaterialAsync")]
+        [LogDescription("工装条码绑定048", BusinessType.OTHER, "ToolBindMaterial048", ReceiverTypeEnum.MES)]
+        public async Task ToolBindMaterialAsync(BindContainerDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            //TODO
+            //1. 如果是原材料，需要校验格式是否是5锻码
+            //2. 物料型号和数量从条码截取
         }
     }
 }

@@ -67,6 +67,7 @@ namespace Hymson.MES.EquipmentServices.Mapper
             CreateMap<ManuFeedingNoProductionRecordSaveDto, ManuFeedingNoProductionRecordEntity>();
             CreateMap<ManuFillingDataRecordSaveDto, ManuFillingDataRecordEntity>();
             CreateMap<EquToolLifeRecordSaveDto, EquToolLifeRecordEntity>();
+            CreateMap<ManuFeedingTransferRecordSaveDto, ManuFeedingTransferRecordEntity>();
             #endregion
 
         }

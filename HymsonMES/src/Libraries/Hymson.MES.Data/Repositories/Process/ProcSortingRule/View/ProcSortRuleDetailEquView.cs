@@ -32,5 +32,15 @@ namespace Hymson.MES.Data.Repositories.Process.ProcSortingRule.View
         /// 参数名称
         /// </summary>
         public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public string ProcedureCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 挡位
+        /// </summary>
+        public string Grade { get; set; } = string.Empty;
     }
 }

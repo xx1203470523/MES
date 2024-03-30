@@ -66,5 +66,15 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule
         /// 序号
         /// </summary>
         public int? Serial { get; set; }
+
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public string ProcedureCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 挡位
+        /// </summary>
+        public string Grade { get; set;} = string.Empty;
     }
 }
