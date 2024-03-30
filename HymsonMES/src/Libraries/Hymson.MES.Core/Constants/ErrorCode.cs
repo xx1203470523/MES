@@ -870,8 +870,8 @@
         public const string MES15432 = "条码不能为空";
         public const string MES15433 = "发现工序不能为空";
         public const string MES15434 = "不合格代码不能为空";
-        public const string MES15435 = "传入数据中存在重复的(产品序列码 ,拦截工序,不合格代,发现不良工序)数据！";
-        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现不良工序[{foundBadOperationCode}]，拦截工序[{InterceptOperationCode}],不合格代码[{unqualifiedCode}]！";
+        public const string MES15435 = "传入数据中存在重复的(产品序列码 ，拦截工序，不合格代，发现不良工序)数据！";
+        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现不良工序[{foundBadOperationCode}]，拦截工序[{InterceptOperationCode}]，不合格代码[{unqualifiedCode}]！";
         public const string MES15437 = "存在不是缺陷的不合格代码";
         public const string MES15438 = "条码[{sfc}]是锁定、删除或无效状态，无法使用";
         public const string MES15439 = "条码[{sfc}]不存在";
@@ -883,6 +883,8 @@
         public const string MES15445 = "产品序列码不能为空！";
         public const string MES15446 = "产品序列码【{barCode}】不存在！";
         public const string MES15447 = "产品序列码【{barCode}】状态为【{status}】，不可再执行当前操作！";
+        public const string MES15448 = "产品序列码【{barCode}】不存在未关闭的缺陷，不可再执行当前操作！";
+        public const string MES15449 = "产品序列码【{barCode}】类型为【{type}】，不可再执行当前操作！";
         #endregion
 
         #region 物料加载 15500
