@@ -12,12 +12,12 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
     public record ConsumeEquBeforeCheckDto : QknyBaseDto
     {
         /// <summary>
-        /// 投料至设备-搅拌机
+        /// 投料至设备
         /// </summary>
         public string ConsumeEquipmentCode { get; set; } = "";
 
         /// <summary>
-        /// 投料至资源-搅拌机
+        /// 投料至资源
         /// </summary>
         public string ConsumeResourceCodeCode { get; set; } = "";
 

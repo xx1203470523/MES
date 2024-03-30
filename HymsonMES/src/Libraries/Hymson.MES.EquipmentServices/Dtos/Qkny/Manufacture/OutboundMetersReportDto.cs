@@ -38,6 +38,12 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         public int SplitQty { get; set; }
 
         /// <summary>
+        /// 产出类型
+        /// 1制胶 2匀浆 3涂布 4辊分 5模切
+        /// </summary>
+        public string OutputType { get; set; } = string.Empty;
+
+        /// <summary>
         /// 参数列表
         /// </summary>
         public List<QknyParamBaseDto> ParamList { get; set; } = new List<QknyParamBaseDto>();

@@ -39,6 +39,28 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquEquipmentResAllView>(GetMultEquResAllSql, query);
         }
+
+        /// <summary>
+        /// 根据设备编码+资源编码查询 设备，资源
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<EquEquipmentResAllView> GetEquResAsync(EquResAllQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentResAllView>(GetEquResSql, query);
+        }
+
+        /// <summary>
+        /// 根据设备编码+资源编码查询 设备，资源
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<EquEquipmentResAllView> GetEquResLineAsync(EquResAllQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquEquipmentResAllView>(GetEquResLineSql, query);
+        }
     }
 
     /// <summary>
@@ -90,6 +112,35 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             inner join inte_work_center t9 on t9.Id = t8.WorkCenterId and t8.IsDeleted = 0
             where t1.EquipmentCode in @EquipmentCodeList
             and t3.ResCode in @ResCodeList
+        ";
+
+        /// <summary>
+        /// 根据设备编码+资源编码查询 设备，资源
+        /// </summary>
+        const string GetEquResSql = $@"
+            select  t1.id EquipmentId, t1.EquipmentCode, t1.EquipmentName ,t1.SiteId,
+		            t3.id ResId, t3.ResCode ,t3.ResName
+            from equ_equipment t1
+            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0 and t2.IsMain = 1
+            inner join proc_resource t3 on t3.Id = t2.ResourceId and t3.IsDeleted = 0
+            where t1.EquipmentCode = @EquipmentCode
+            and t3.ResCode = @ResCode
+        ";
+
+        /// <summary>
+        /// 根据设备编码+资源编码查询 设备，资源，线体，车间 基础信息
+        /// </summary>
+        const string GetEquResLineSql = $@"
+            select  t1.id EquipmentId, t1.EquipmentCode, t1.EquipmentName ,t1.SiteId,
+		            t3.id ResId, t3.ResCode ,t3.ResName ,
+		            t7.id LineId, t7.Code LineWorkCenterCode, t7.Name LineWorkCenterName
+            from equ_equipment t1
+            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0 and t2.IsMain = 1
+            inner join proc_resource t3 on t3.Id = t2.ResourceId and t3.IsDeleted = 0
+            inner join inte_work_center_resource_relation t6 on t6.ResourceId = t3.Id and t6.IsDeleted = 0
+            inner join inte_work_center t7 on t7.Id = t6.WorkCenterId and t7.IsDeleted = 0  
+            where t1.EquipmentCode = @EquipmentCode
+            and t3.ResCode = @ResCode
         ";
     }
 }

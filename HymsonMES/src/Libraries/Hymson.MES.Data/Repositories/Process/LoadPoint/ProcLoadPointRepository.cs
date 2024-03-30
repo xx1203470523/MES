@@ -211,6 +211,17 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryAsync<PointOrEquipmentView>(GetPointOrEquipmentSql, query);
         }
 
+        /// <summary>
+        /// 获取List
+        /// </summary>
+        /// <param name="procLoadPointQuery"></param>
+        /// <returns></returns>
+        public async Task<ProcLoadPointEntity> GetProcLoadPointAsync(ProcLoadPointQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcLoadPointEntity>(GetLoadPointSql, query);
+        }
+
         #endregion
 
     }
@@ -251,20 +262,25 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 获取上料或者设备
         /// </summary>
         const string GetPointOrEquipmentSql = @"
-            select '1' as DataType, t1.Id, t1.LoadPoint Code, t3.id ResId, t3.ResCode ,t3.ResName
+            select '1' as DataType, t1.Id, t1.LoadPoint Code, t3.id ResId, t3.ResCode ,t3.ResName, t1.SiteId
             from proc_load_point t1
             inner join proc_load_point_link_resource t2 on t1.Id  = t2.LoadPointId and t2.IsDeleted = 0
             inner join proc_resource t3 on t3.Id = t2.ResourceId and t3.IsDeleted = 0
             where t1.LoadPoint in @CodeList
             and t1.IsDeleted = 0
             union
-            select '2' as DataType, m1.Id, m1.EquipmentCode Code, m3.id ResId, m3.ResCode ,m3.ResName 
+            select '2' as DataType, m1.Id, m1.EquipmentCode Code, m3.id ResId, m3.ResCode ,m3.ResName ,m1.SiteId
             from equ_equipment m1
             inner join proc_resource_equipment_bind m2 on m1.Id = m2.EquipmentId and m2.IsDeleted = 0
             inner join proc_resource m3 on m3.Id = m2.ResourceId and m3.IsDeleted = 0
             where m1.IsDeleted = 0
             and m1.EquipmentCode in @CodeList
         ";
+
+        /// <summary>
+        /// 获取上料点
+        /// </summary>
+        const string GetLoadPointSql = @"select * from proc_load_point where IsDeleted = 0 and LoadPoint = @LoadPoint ";
 
         #endregion
 

@@ -117,6 +117,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<IEnumerable<PointOrEquipmentView>> GetPointOrEquipmmentAsync(ProcLoadPointEquipmentQuery query);
 
+        /// <summary>
+        /// 获取上料点
+        /// </summary>
+        /// <param name="procLoadPointQuery"></param>
+        /// <returns></returns>
+        Task<ProcLoadPointEntity> GetProcLoadPointAsync(ProcLoadPointQuery query);
+
         #endregion
     }
 }

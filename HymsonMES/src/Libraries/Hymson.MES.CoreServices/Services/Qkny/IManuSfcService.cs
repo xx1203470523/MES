@@ -1,4 +1,6 @@
-﻿using Hymson.MES.Data.Repositories.Manufacture;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Manufacture;
 using System;
 using System.Collections.Generic;
 using System.Linq;

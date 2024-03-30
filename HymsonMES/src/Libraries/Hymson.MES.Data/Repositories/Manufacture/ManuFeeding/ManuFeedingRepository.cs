@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -224,6 +225,39 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
             return await conn.ExecuteAsync(UpdateFeedingQtySql, command);
         }
 
+        /// <summary>
+        /// 更新条码数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateManuFeedingBarcodeQtyAsync(UpdateFeedingBarcodeQtyCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateFeedingBarCodeQtySql, command);
+        }
+
+        /// <summary>
+        /// 根据资源获取所有的上料信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetAllByResourceIdAsync(EntityByResourceIdQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuFeedingEntity>(GetAllByResourceIdSql, query);
+        }
+
+        /// <summary>
+        /// 根据条码获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetAllBySfcListAsync(GetManuFeedingSfcListQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuFeedingEntity>(GetAllBySfcListSql, query);
+        }
+
         #endregion
 
     }
@@ -272,9 +306,42 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         const string UpdateFeedingQtySql = @"
             update manu_feeding
-            set Qty = Qty - @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn
+            set Qty = Qty - @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn,IsDeleted = @IsDeleted
             where BarCode = @BarCode
             and ( ResourceId = @ResourceId or FeedingPointId = @FeedingPointId )
+        ";
+
+        /// <summary>
+        /// 更新数量
+        /// </summary>
+        const string UpdateFeedingBarCodeQtySql = @"
+            update manu_feeding
+            set Qty = 0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn
+            where BarCode = @BarCode
+            and SiteId = @SiteId
+        ";
+
+
+        /// <summary>
+        /// 根据资源获取所有的上料信息
+        /// </summary>
+        const string GetAllByResourceIdSql = @"
+            select * from manu_feeding 
+            where ResourceId = @ResourceId
+            and IsDeleted  = 0
+            and SiteId = @SiteId
+            and LoadSource = 1
+            and Qty  > 0
+        ";
+
+        /// <summary>
+        /// 获取条码列表
+        /// </summary>
+        const string GetAllBySfcListSql = @"
+            select * from manu_feeding mf 
+            where BarCode in @BarCodeLisst
+            and IsDeleted  = 0
+            and SiteId =  @SiteId
         ";
 
         #endregion

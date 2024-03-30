@@ -3,6 +3,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,14 +35,14 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<WhMaterialInventoryEntity> GetByBarCodeAsync(WhMaterialInventoryBarCodeQuery query)
+        public async Task<List<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarCodesQuery query)
         {
-            var dbModel = await _whMaterialInventoryRepository.GetByBarCodeAsync(query);
-            if(dbModel == null)
+            var dbList = await _whMaterialInventoryRepository.GetByBarCodesNoQtyAsync(query);
+            if (dbList.IsNullOrEmpty() == true)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45081));
             }
-            return dbModel!;
+            return dbList.ToList();
         }
     }
 }
