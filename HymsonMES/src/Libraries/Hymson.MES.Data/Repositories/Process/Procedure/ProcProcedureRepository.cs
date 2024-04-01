@@ -91,10 +91,23 @@ namespace Hymson.MES.Data.Repositories.Process
                     sqlBuilder.Where("Type=@Type");
                 }
             }
+            
             if (!string.IsNullOrWhiteSpace(procProcedurePagedQuery.ResTypeName))
             {
                 procProcedurePagedQuery.Name = $"%{procProcedurePagedQuery.ResTypeName}%";
                 sqlBuilder.Where("ResTypeName like @ResTypeName");
+            }
+
+            if (!string.IsNullOrWhiteSpace(procProcedurePagedQuery.OrCode))
+            {
+                procProcedurePagedQuery.OrCode = $"%{procProcedurePagedQuery.OrCode}%";
+                sqlBuilder.OrWhere("Code like @OrCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(procProcedurePagedQuery.OrName))
+            {
+                procProcedurePagedQuery.OrName = $"%{procProcedurePagedQuery.OrName}%";
+                sqlBuilder.OrWhere("Name like @OrName");
             }
 
             var offSet = (procProcedurePagedQuery.PageIndex - 1) * procProcedurePagedQuery.PageSize;
