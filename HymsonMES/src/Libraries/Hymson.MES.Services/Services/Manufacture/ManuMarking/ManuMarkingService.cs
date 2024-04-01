@@ -3,7 +3,6 @@ using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
@@ -12,7 +11,6 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
@@ -21,7 +19,6 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
 {
@@ -200,7 +197,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
             }
 
             //获取产品序列码信息
-            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(sfcEntity.Id);
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(sfcEntity.Id);
             if (manuSfcInfoEntity == null) {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19709)).WithData("code", checkDto.Sfc);
             }
@@ -405,7 +402,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
             var manuSfcProduceInfoEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery {Sfc= markingCloseConfirmDto.Sfc,SiteId= _currentSite.SiteId ?? 0 });
 
             //条码信息表
-            var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(sfcEntity.Id);
+            var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(sfcEntity.Id);
 
             //组装步骤表数据
             var manuSfcStepEntity = new ManuSfcStepEntity

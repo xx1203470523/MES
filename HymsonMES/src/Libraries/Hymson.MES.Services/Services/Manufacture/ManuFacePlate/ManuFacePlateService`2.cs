@@ -732,7 +732,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
             if (manuSfcEntities != null && manuSfcEntities.Any())
             {
                 var manuSfcIds = manuSfcEntities.Select(m => m.Id).Distinct();
-                var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcIds);
+                var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcIds);
 
                 #region 产品物料信息
 
@@ -982,7 +982,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
                     });
                     var manuSfcIds = process.ManuSfcEntities.Select(m => m.Id);
 
-                    process.ManuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcIds);
+                    process.ManuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcIds);
 
                     var procIds = process.ManuSfcInfoEntities.Select(m => m.ProductId);
                     var workOrderIds = process.ManuSfcInfoEntities.Select(m => m.WorkOrderId.GetValueOrDefault());
@@ -1016,7 +1016,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
         if (process.ManuSfcEntityByInsertion != null)
         {
-            process.ManuSfcInfoEntityByInsertion = await _manuSfcInfoRepository.GetBySFCAsync(process.ManuSfcEntityByInsertion.Id);
+            process.ManuSfcInfoEntityByInsertion = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(process.ManuSfcEntityByInsertion.Id);
             process.ProcMaterialEntityByInsertion = await _procMaterialRepository.GetByIdAsync(process.ManuSfcInfoEntityByInsertion.ProductId);
             process.PlanWorkOrderEntityByInsertion = await _planWorkOrderRepository.GetByIdAsync(process.ManuSfcInfoEntityByInsertion.WorkOrderId.GetValueOrDefault());
         }
@@ -1060,7 +1060,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
                 {
                     var manuSfcIds = process.ManuSfcEntitiesByPacked.Select(m => m.Id);
 
-                    process.ManuSfcInfoEntitiesByPacked = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcIds);
+                    process.ManuSfcInfoEntitiesByPacked = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcIds);
 
                     if (process.ManuSfcInfoEntitiesByPacked.Any())
                     {
@@ -1530,7 +1530,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
                 SiteId = siteId
             });
 
-            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);
 
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity.ProductId);
 

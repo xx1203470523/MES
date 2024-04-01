@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -40,6 +41,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<IEnumerable<string>> GenerateBarcodeAsync(CodeRuleDto parm)
         {
             return await _manuGenerateBarcodeService.GenerateBarcodeListAsync(parm);
+        }
+        /// <summary>
+        /// 生成通配符列表
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("BarcodeWildcardItems")]
+        public IEnumerable<BarcodeWildcardItemDto> GetGenerateBarcodeWildcardItemDtos()
+        {
+            return _manuGenerateBarcodeService.GetGenerateBarcodeWildcardItemDtos();
         }
     }
 }

@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 
@@ -114,7 +115,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="Command"></param>
         /// <returns></returns>
-         Task<int> UpdateReduceQuantityResidueAsync(UpdateQuantityRangeCommand Command);
+        Task<int> UpdateReduceQuantityResidueAsync(UpdateQuantityRangeCommand Command);
 
         /// <summary>
         /// 更新库存数量(减少库存)
@@ -159,18 +160,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         Task<WhMaterialInventoryEntity> GetByBarCodeAsync(WhMaterialInventoryBarCodeQuery query);
 
         /// <summary>
-        /// 根据物料条码获取数据
-        /// </summary>
-        /// <param name="barCode"></param>
-        /// <returns></returns>
-        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarCodesQuery param);
-
-        /// <summary>
         /// 根据物料条码获取数据（剩余数量大于0的条码）
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
         Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesOfHasQtyAsync(WhMaterialInventoryBarCodesQuery param);
+
+        /// <summary>
+        /// 根据物料条码获取数据
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarCodesQuery param);
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -222,6 +223,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> UpdateQuantityResidueBySfcsAsync(UpdateQuantityResidueBySfcsCommand command);
+        Task<int> UpdateQuantityResidueBySFCsAsync(UpdateQuantityResidueBySfcsCommand command);
     }
 }

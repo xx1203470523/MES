@@ -48,5 +48,12 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("等待判定")]
         WaitingJudge = 7,
+
+        /// <summary>
+        /// 设备误判
+        /// </summary>
+        [Description("设备误判")]
+        Misjudgment = 8
+
     }
 }

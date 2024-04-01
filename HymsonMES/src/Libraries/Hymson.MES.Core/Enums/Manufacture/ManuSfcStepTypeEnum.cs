@@ -224,6 +224,16 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 条码拆分-新增
         /// </summary>
         [Description("条码拆分-新增")]
-        SplitCreate = 42
+        SplitCreate = 42,
+        /// <summary>
+        /// 离脱
+        /// </summary>
+        [Description("离脱")]
+        Detachment = 43,
+        /// <summary>
+        /// 设备误判
+        /// </summary>
+        [Description("设备误判")]
+        Misjudgment = 44
     }
 }

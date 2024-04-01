@@ -4,8 +4,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
-using Hymson.Snowflake;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -257,9 +255,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据ID关闭条码不合格标识和缺陷
         /// </summary>
-        /// <param name="manuSfcInfoEntity"></param>
+        /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> UpdateStatusByIdRangeAsync(List<ManuProductBadRecordUpdateCommand> commands)
+        public async Task<int> UpdateStatusByIdRangeAsync(IEnumerable<ManuProductBadRecordUpdateCommand> commands)
         {
             using var conn = GetMESDbConnection();
             var rows = await conn.ExecuteAsync(UpdateStatusByIdSql, commands);
@@ -507,7 +505,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateStatusSql = @"UPDATE `manu_product_bad_record` SET Remark=@Remark,Status=@Status,ReJudgmentSfcStepId=@ReJudgmentSfcStepId,ReJudgmentResult=@ReJudgmentResult,ReJudgmentRemark=@ReJudgmentRemark,ReJudgmentOn=@ReJudgmentOn,ReJudgmentBy=@ReJudgmentBy,CloseOn=@CloseOn,CloseBy=@CloseBy,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn ,ReJudgmentSfcStepId=@ReJudgmentSfcStepId 
                                                 WHERE SFC=@Sfc  AND UnqualifiedId=@UnqualifiedId  and  Status=@CurrentStatus ";
 
-        const string UpdateStatusByIdSql = "UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,DisposalResult=@DisposalResult,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn WHERE Id=@Id  AND  Status!=@Status ";
+        const string UpdateStatusByIdSql = "UPDATE manu_product_bad_record SET Remark = @Remark, Status = @Status, DisposalResult = @DisposalResult, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id = @Id AND Status != @Status ";
 
         const string GetPagedInfoReportDataSqlTemplate = @"
                     select 

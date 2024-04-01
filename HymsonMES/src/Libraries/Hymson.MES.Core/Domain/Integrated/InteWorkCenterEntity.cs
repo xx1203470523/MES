@@ -58,5 +58,10 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 空值 : true  
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 线体编码，条码生成使用
+        /// </summary>
+        public string? LineCoding { get; set; }
     }
 }
