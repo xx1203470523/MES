@@ -2,6 +2,7 @@
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture

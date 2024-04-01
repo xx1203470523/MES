@@ -310,7 +310,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             sqlBuilder.AddParameters(inteWorkCenterRelationQuery);
 
             //if (inteWorkCenterRelationQuery.SubWorkCenterIds != null && inteWorkCenterRelationQuery.SubWorkCenterIds.Any()) {
-                sqlBuilder.Where("SubWorkCenterId IN @SubWorkCenterIds");
+            sqlBuilder.Where("SubWorkCenterId IN @SubWorkCenterIds");
             //}
 
             using var conn = GetMESDbConnection();
@@ -434,6 +434,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             var inteWorkCenters = await conn.QueryAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
             return inteWorkCenters;
         }
+
+        /// <summary>
+        /// 根据资源组获取关联表数据
+        /// </summary>
+        /// <param name="resourceIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteWorkCenterResourceRelationView>> GetWorkCenterResourceRelationAsync(IEnumerable<long> resourceIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteWorkCenterResourceRelationView>(GetWorkCenterResourceRelationSql, new { ResourceIds = resourceIds });
+        }
     }
 
     /// <summary>
@@ -491,5 +502,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
 
         const string UpdateStatusSql = "UPDATE `inte_work_center` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
         const string GetEntitiesSqlTemplate = "SELECT * FROM `inte_work_center` /**where**/ ";
+
+        const string GetWorkCenterResourceRelationSql = "SELECT * FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND ResourceId IN @ResourceIds";
     }
 }
