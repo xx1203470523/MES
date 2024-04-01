@@ -19,10 +19,10 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
     /// <summary>
     /// 环境检验单仓储
     /// </summary>
-    public partial class QualEnvOrderRepository :BaseRepository, IQualEnvOrderRepository
+    public partial class QualEnvOrderRepository : BaseRepository, IQualEnvOrderRepository
     {
 
-        public QualEnvOrderRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public QualEnvOrderRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
         public async Task<QualEnvOrderEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<QualEnvOrderEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<QualEnvOrderEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +65,10 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualEnvOrderEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualEnvOrderEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualEnvOrderEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<QualEnvOrderEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -85,6 +85,10 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
 
+            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQuery.InspectionOrder))
+            {
+                sqlBuilder.Where("InspectionOrder=@InspectionOrder");
+            }
             if (qualEnvOrderPagedQuery.WorkCenterId.HasValue)
             {
                 sqlBuilder.Where("WorkCenterId=@WorkCenterId");
