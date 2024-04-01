@@ -87,6 +87,7 @@
         public const string MES10238 = "基于时间不合法！";
         public const string MES10239 = "消耗公差需为大于0整数！";
         public const string MES10240 = "消耗系数需大于0！";
+        public const string MES10241 = "物料只能选择一条数据";
         #endregion
 
         #region 资源 10300
@@ -219,6 +220,8 @@
         public const string MES10475 = $"工序节点手动排序号最大长度为18";
 
         public const string MES10476 = $"工序不存在";
+        public const string MES10477 = $"转换系数不能为空";
+        public const string MES10478 = $"工序绑定的物料以存在";
         #endregion
 
         #region 参数 10500
