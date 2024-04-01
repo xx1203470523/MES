@@ -14,7 +14,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(QualFqcOrderSaveDto saveDto);
+        Task<int> CreateAsync(QualFqcOrderCreateDto saveDto);
+
+        /// <summary>
+        /// 创建(测试条码产出时自动生成功能)
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        Task<bool> CreateAsync(QualFqcOrderCreateTestDto saveDto);
 
         /// <summary>
         /// 修改

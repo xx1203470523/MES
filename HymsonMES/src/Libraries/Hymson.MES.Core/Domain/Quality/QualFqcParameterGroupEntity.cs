@@ -5,12 +5,12 @@ using Hymson.MES.Core.Enums.Quality;
 namespace Hymson.MES.Core.Domain.Quality
 {
     /// <summary>
-    /// 数据实体（FQC检验参数组快照）   
-    /// qual_fqc_parameter_group_snapshoot
-    /// @author Jam
-    /// @date 2024-03-27 04:05:59
+    /// 数据实体（FQC检验参数组）   
+    /// qual_fqc_parameter_group
+    /// @author xiaofei
+    /// @date 2024-03-28 08:32:21
     /// </summary>
-    public class QualFqcParameterGroupSnapshootEntity : BaseEntity
+    public class QualFqcParameterGroupEntity : BaseEntity
     {
         /// <summary>
         /// 站点Id
@@ -63,7 +63,7 @@ namespace Hymson.MES.Core.Domain.Quality
         public string Version { get; set; }
 
         /// <summary>
-        /// 状态
+        /// 状态(1-新建 2-激活 3-保留 4-废除)
         /// </summary>
         public SysDataStatusEnum Status { get; set; }
 

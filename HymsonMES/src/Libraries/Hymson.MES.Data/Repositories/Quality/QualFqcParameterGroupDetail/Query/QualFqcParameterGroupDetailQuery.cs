@@ -1,9 +1,9 @@
 namespace Hymson.MES.Data.Repositories.Quality.Query
 {
     /// <summary>
-    /// FQC检验单条码记录 查询参数
+    /// FQC检验参数组明细 查询参数
     /// </summary>
-    public class QualFqcOrderSfcQuery
+    public class QualFqcParameterGroupDetailQuery
     {
         /// <summary>
         /// 排序(默认为 CreatedOn DESC)
@@ -14,5 +14,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// FQC检验参数组Id
+        /// </summary>
+        public long? ParameterGroupId { get; set; }
     }
 }

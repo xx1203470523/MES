@@ -9,22 +9,22 @@ using Microsoft.Extensions.Options;
 namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
-    /// 仓储（FQC检验单条码记录）
+    /// 仓储（成品条码产出记录明细(FQC生成使用)）
     /// </summary>
-    public partial class QualFqcOrderSfcRepository : BaseRepository, IQualFqcOrderSfcRepository
+    public partial class QualFinallyOutputRecordDetailRepository : BaseRepository, IQualFinallyOutputRecordDetailRepository
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public QualFqcOrderSfcRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public QualFinallyOutputRecordDetailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(QualFqcOrderSfcEntity entity)
+        public async Task<int> InsertAsync(QualFinallyOutputRecordDetailEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
@@ -35,7 +35,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<QualFqcOrderSfcEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<QualFinallyOutputRecordDetailEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(QualFqcOrderSfcEntity entity)
+        public async Task<int> UpdateAsync(QualFinallyOutputRecordDetailEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(IEnumerable<QualFqcOrderSfcEntity> entities)
+        public async Task<int> UpdateRangeAsync(IEnumerable<QualFinallyOutputRecordDetailEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, entities);
@@ -90,10 +90,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualFqcOrderSfcEntity> GetByIdAsync(long id)
+        public async Task<QualFinallyOutputRecordDetailEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<QualFqcOrderSfcEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryFirstOrDefaultAsync<QualFinallyOutputRecordDetailEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -101,10 +101,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFqcOrderSfcEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<QualFinallyOutputRecordDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualFqcOrderSfcEntity>(GetByIdsSql, new { Ids = ids });
+            return await conn.QueryAsync<QualFinallyOutputRecordDetailEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<QualFqcOrderSfcEntity> GetEntityAsync(QualFqcOrderSfcQuery query)
+        public async Task<QualFinallyOutputRecordDetailEntity> GetEntityAsync(QualFinallyOutputRecordDetailQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitySqlTemplate);
@@ -122,7 +122,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<QualFqcOrderSfcEntity>(template.RawSql, query);
+            return await conn.QueryFirstOrDefaultAsync<QualFinallyOutputRecordDetailEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -130,17 +130,21 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFqcOrderSfcEntity>> GetEntitiesAsync(QualFqcOrderSfcQuery query)
+        public async Task<IEnumerable<QualFinallyOutputRecordDetailEntity>> GetEntitiesAsync(QualFinallyOutputRecordDetailQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+            if (query.OutputRecordIds != null && query.OutputRecordIds.Any())
+            {
+                sqlBuilder.Where("OutputRecordId IN @OutputRecordIds");
+            }
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualFqcOrderSfcEntity>(template.RawSql, query);
+            return await conn.QueryAsync<QualFinallyOutputRecordDetailEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -148,7 +152,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualFqcOrderSfcEntity>> GetPagedListAsync(QualFqcOrderSfcPagedQuery pagedQuery)
+        public async Task<PagedInfo<QualFinallyOutputRecordDetailEntity>> GetPagedListAsync(QualFinallyOutputRecordDetailPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -164,11 +168,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<QualFqcOrderSfcEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<QualFinallyOutputRecordDetailEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<QualFqcOrderSfcEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<QualFinallyOutputRecordDetailEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -177,24 +181,24 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// <summary>
     /// 
     /// </summary>
-    public partial class QualFqcOrderSfcRepository
+    public partial class QualFinallyOutputRecordDetailRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_fqc_order_sfc T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_fqc_order_sfc T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_fqc_order_sfc /**where**/ /**orderby**/ ";
-        const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_fqc_order_sfc /**where**/ /**orderby**/ LIMIT 1 ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_finally_output_record_detail T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_finally_output_record_detail T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_finally_output_record_detail /**where**/ /**orderby**/ ";
+        const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_finally_output_record_detail /**where**/ /**orderby**/ LIMIT 1 ";
 
-        const string InsertSql = "INSERT INTO qual_fqc_order_sfc(  `Id`, `SiteId`, `FQCOrderId`, `WorkOrderId`, `SFC`, `IsQualified`, `HandMethod`, `ProcessRouteId`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @FQCOrderId, @WorkOrderId, @SFC, @IsQualified, @HandMethod, @ProcessRouteId, @ProcessedBy, @ProcessedOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_fqc_order_sfc(  `Id`, `SiteId`, `FQCOrderId`, `WorkOrderId`, `SFC`, `IsQualified`, `HandMethod`, `ProcessRouteId`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @FQCOrderId, @WorkOrderId, @SFC, @IsQualified, @HandMethod, @ProcessRouteId, @ProcessedBy, @ProcessedOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_finally_output_record_detail(  `Id`, `SiteId`, `OutputRecordId`, `Barcode`, `WorkOrderId`, `WorkCenterId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @OutputRecordId, @Barcode, @WorkOrderId, @WorkCenterId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_finally_output_record_detail(  `Id`, `SiteId`, `OutputRecordId`, `Barcode`, `WorkOrderId`, `WorkCenterId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @OutputRecordId, @Barcode, @WorkOrderId, @WorkCenterId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_fqc_order_sfc SET   SiteId = @SiteId, FQCOrderId = @FQCOrderId, WorkOrderId = @WorkOrderId, SFC = @SFC, IsQualified = @IsQualified, HandMethod = @HandMethod, ProcessRouteId = @ProcessRouteId, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_fqc_order_sfc SET   SiteId = @SiteId, FQCOrderId = @FQCOrderId, WorkOrderId = @WorkOrderId, SFC = @SFC, IsQualified = @IsQualified, HandMethod = @HandMethod, ProcessRouteId = @ProcessRouteId, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_finally_output_record_detail SET   SiteId = @SiteId, OutputRecordId = @OutputRecordId, Barcode = @Barcode, WorkOrderId = @WorkOrderId, WorkCenterId = @WorkCenterId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_finally_output_record_detail SET   SiteId = @SiteId, OutputRecordId = @OutputRecordId, Barcode = @Barcode, WorkOrderId = @WorkOrderId, WorkCenterId = @WorkCenterId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE qual_fqc_order_sfc SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE qual_fqc_order_sfc SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteSql = "UPDATE qual_finally_output_record_detail SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE qual_finally_output_record_detail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM qual_fqc_order_sfc WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM qual_fqc_order_sfc WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM qual_finally_output_record_detail WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM qual_finally_output_record_detail WHERE Id IN @Ids ";
 
     }
 }
