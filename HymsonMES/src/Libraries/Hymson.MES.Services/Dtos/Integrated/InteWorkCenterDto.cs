@@ -52,6 +52,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public bool IsMixLine { get; set; }
 
         /// <summary>
+        /// 线体编码，条码生成使用
+        /// </summary>
+        public string? LineCoding { get; set; }
+        /// <summary>
         /// 说明 
         /// </summary>
         public string Remark { get; set; } = "";
@@ -222,7 +226,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 说明 
         /// </summary>
-        public string Remark { get; set; }= "";
+        public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 线体编码 条码规则生成会使用到
+        /// </summary>
+        public string? LineCoding { get; set; }
 
         /// <summary>
         /// 工作中心
@@ -266,7 +275,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 是否混线 
         /// </summary>
         public bool? IsMixLine { get; set; }
-
+        /// <summary>
+        /// 线体编码 条码规则生成会使用到
+        /// </summary>
+        public string? LineCoding { get; set; }
         /// <summary>
         /// 说明 
         /// </summary>
