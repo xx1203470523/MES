@@ -48,6 +48,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public decimal Qty { get; set; }
 
         /// <summary>
+        /// 报废数量
+        /// </summary>
+        public decimal? ScrapQty { get; set; }
+
+        /// <summary>
         /// 设备id
         /// </summary>
         public long? EquipmentId { get; set; }

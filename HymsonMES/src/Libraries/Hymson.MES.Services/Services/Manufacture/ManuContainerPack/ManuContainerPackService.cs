@@ -451,7 +451,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             return new ManuContainerPackDto();
         }
 
-
         /// <summary>
         /// 执行作业
         /// </summary>

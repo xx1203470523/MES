@@ -194,15 +194,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         Task<PagedInfo<WhMaterialInventoryPageListView>> GetPagedInfoAsync(WhMaterialInventoryPagedQuery whMaterialInventoryPagedQuery);
 
-
-
         /// <summary>
         /// 根据物料编码获取物料数据
         /// </summary>
         /// <param name="materialCode"></param>
         /// <returns></returns>
         Task<ProcMaterialInfoView> GetProcMaterialByMaterialCodeAsync(long materialId);
-
 
         /// <summary>
         /// 根据物料编码获取供应商信息
@@ -224,5 +221,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateQuantityResidueBySFCsAsync(UpdateQuantityResidueBySfcsCommand command);
+
+        /// <summary>
+        /// 部分报废条码修改库存数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> ScrapPartialWhMaterialInventoryByIdAsync(IEnumerable<ScrapPartialWhMaterialInventoryByIdCommand> commands);
     }
 }

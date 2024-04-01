@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -186,6 +187,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateManuSfcQtyAndCurrentQtyVerifyByIdAsync(UpdateManuSfcQtyAndCurrentQtyVerifyByIdCommand command);
+
+        /// <summary>
+        /// 部分报废
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> PartialScrapmanuSFCByIdAsync(IEnumerable<ManuSFCPartialScrapByIdCommand> commands);
+
         Task<ManuSfcEntity> GetSingleAsync(ManuSfcQuery query);
         Task<IEnumerable<ManuSfcEntity>> GetListAsync(ManuSfcQuery query);
         #endregion

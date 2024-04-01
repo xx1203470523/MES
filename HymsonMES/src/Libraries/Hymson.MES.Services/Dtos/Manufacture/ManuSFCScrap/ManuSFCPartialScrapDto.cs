@@ -27,6 +27,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
         public long OutFlowProcedureId { get; set; }
 
         /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
         /// 流出工序
         /// </summary>
         public IEnumerable<BarcodeScrap> BarcodeScrapList { get; set; }

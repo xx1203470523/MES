@@ -5,7 +5,6 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcScrap.Command;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -200,7 +199,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 //1.条码信息表
                 rows += await _manuSfcRepository.ManuSfcScrapByIdsAsync(scrapByIdCommands);
 
-                if (rows != parm.Sfcs.Length)
+                if (rows != parm.Sfcs.Count())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15419));
                 }
