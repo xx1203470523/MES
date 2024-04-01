@@ -228,11 +228,6 @@ namespace Hymson.MES.Services.Dtos.QualEnvOrder
     /// </summary>
     public class QualEnvOrderPagedQueryDto : PagerInfo
     {
-
-        /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
         /// <summary>
         /// 检验单号
         /// </summary>

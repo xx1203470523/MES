@@ -177,17 +177,16 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
             var datas = new List<QualEnvOrderDetailEntity>();
             foreach (var item in qualEnvOrderDetailEntitys)
             {
-                var data = new QualEnvOrderDetailEntity()
+                var data = new QualEnvOrderDetailEntity
                 {
                     Id = item.Id,
                     RealTime = HymsonClock.Now().ToString($"yyyy-MM-dd {item.RealTime}:ss").ParseToDateTime(),
                     InspectionValue = item.InspectionValue,
                     IsQualified = item.IsQualified,
                     Remark = item.Remark,
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now()
                 };
-
-                data.UpdatedBy = _currentUser.UserName;
-                data.UpdatedOn = HymsonClock.Now();
                 datas.Add(data);
             }
 
@@ -232,16 +231,9 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
             foreach (var item in qualEnvOrderDetails)
             {
                 QualEnvOrderDetailExtendDto qualEnvOrderDetailDto;
-                try
-                {
-                    qualEnvOrderDetailDto = item.ToModel<QualEnvOrderDetailExtendDto>();
 
-                }
-                catch (Exception ex)
-                {
+                qualEnvOrderDetailDto = item.ToModel<QualEnvOrderDetailExtendDto>();
 
-                    throw;
-                }
                 var groupDetailSnapshoot = GroupDetailSnapshoots.Where(x => x.Id == item.GroupDetailSnapshootId).FirstOrDefault();
                 if (groupDetailSnapshoot == null)
                 {
@@ -256,7 +248,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
                 qualEnvOrderDetailDto.LowerLimit = groupDetailSnapshoot.LowerLimit;
                 qualEnvOrderDetailDto.StartTime = item.StartTime.ToString("HH:mm");
                 qualEnvOrderDetailDto.EndTime = item.StartTime.ToString("HH:mm");
-                qualEnvOrderDetailDto.RealTime = item.RealTime == null ? HymsonClock.Now().ToString("HH:mm") : item.StartTime.ToString("HH:mm");
+                qualEnvOrderDetailDto.RealTime = item.RealTime == null ? HymsonClock.Now().ToString("HH:mm") : item.RealTime?.ToString("HH:mm");
                 qualEnvOrderDetailDtos.Add(qualEnvOrderDetailDto);
             }
 

@@ -44,17 +44,17 @@ namespace Hymson.MES.Services.Validators.QualEnvOrderDetail
     {
         public QualEnvOrderDetailModifysValidator()
         {
-            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13201));
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13604));
 
-            When(x => x != null && x.Any(), () =>
-            {
-                RuleForEach(x => x).ChildRules(c =>
-                {
-                    c.RuleFor(x => x.IsQualified).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13600));
-                    c.RuleFor(x => x.InspectionValue).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13602));
-                    c.RuleFor(x => x.RealTime).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13602));
-                });
-            });
+            //When(x => x != null && x.Any(), () =>
+            //{
+            //    RuleForEach(x => x).ChildRules(c =>
+            //    {
+            //c.RuleFor(x => x.IsQualified).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13600));
+            //        c.RuleFor(x => x.InspectionValue).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13602));
+            //        c.RuleFor(x => x.RealTime).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13603));
+            //    });
+            //});
 
         }
     }

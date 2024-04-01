@@ -109,8 +109,8 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
         /// <returns></returns>
         public async Task<PagedInfo<QualEnvOrderDto>> GetPagedListAsync(QualEnvOrderPagedQueryDto qualEnvOrderPagedQueryDto)
         {
-            qualEnvOrderPagedQueryDto.SiteId = _currentSite.SiteId ?? 0;
             var qualEnvOrderPagedQuery = qualEnvOrderPagedQueryDto.ToQuery<QualEnvOrderPagedQuery>();
+            qualEnvOrderPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _qualEnvOrderRepository.GetPagedInfoAsync(qualEnvOrderPagedQuery);
             var qualEnvOrderDtos = new List<QualEnvOrderDto>();
 
@@ -120,7 +120,6 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
                 var procedures = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(it => it.ProcedureId).ToArray());
                 foreach (var item in pagedInfo.Data)
                 {
-
                     var workCenter = workCenters.Where(it => it.Id == item.WorkCenterId).FirstOrDefault();
                     var procedure = procedures.Where(it => it.Id == item.ProcedureId).FirstOrDefault();
                     var dot = new QualEnvOrderDto()
@@ -166,7 +165,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="qualEnvOrderDto"></param>
+        /// <param name="qualEnvOrderModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyQualEnvOrderAsync(QualEnvOrderModifyDto qualEnvOrderModifyDto)
         {

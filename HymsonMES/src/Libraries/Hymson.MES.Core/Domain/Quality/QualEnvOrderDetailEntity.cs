@@ -56,7 +56,7 @@ namespace Hymson.MES.Core.Domain.QualEnvOrderDetail
         /// <summary>
         /// 是否合格(0-否 1-是)
         /// </summary>
-        public bool? IsQualified { get; set; }
+        public TrueOrFalseEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 备注
