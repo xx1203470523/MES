@@ -410,7 +410,7 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
         sqlBuilder.Where("T2.IsDisassemble=0 "); //未拆解的， 是否拆解：0
         if (queryParam.TraceDirection)
         {
-            sqlBuilder.Where("T2.SFC=T3.CirculationBarCode "); //正向追溯
+            sqlBuilder.Where("T2.SFC=T3.CirculationBarCode AND T3.CirculationBarCode != ''"); //正向追溯
         }
         else
         {
