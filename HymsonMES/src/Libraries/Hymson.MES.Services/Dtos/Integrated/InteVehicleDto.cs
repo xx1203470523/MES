@@ -425,5 +425,61 @@ namespace Hymson.MES.Services.Dtos.Integrated
         
     }
 
+    /// <summary>
+    /// PDA获取托盘绑定信息视图
+    /// </summary>
+    public class InteVehicleFreightRecordView
+    {
+        /// <summary>
+        /// 二维载具条码明细Id
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
+        /// 位置Id
+        /// </summary>
+        public long? LocationId { get; set; }
+
+        /// <summary>
+        /// 装载条码
+        /// </summary>
+        public string? BarCode { get; set; }
+
+        /// <summary>
+        /// 位置号
+        /// </summary>
+        public string? Position { get; set;}
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string? WorkOrderCode { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int? Qty { get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string? Unit { get; set; }
+    }
+
     #endregion
 }

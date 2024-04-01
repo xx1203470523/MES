@@ -85,6 +85,8 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
             List<ManuWorkOrderSFCEntity> inStationSteps = new();
             List<ManuWorkOrderSFCEntity> outStationSteps = new();
+            List<ManuWorkOrderSFCEntity> completeSteps = new();
+            List<ManuWorkOrderSFCEntity> deductionSteps = new();
             foreach (var item in manuSfcStepDic)
             {
                 var entity = new ManuWorkOrderSFCEntity
@@ -107,6 +109,16 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     inStationSteps.Add(entity);
                 }
 
+                // 活动中（步骤控制可能直接改为活动中）
+                var stepsOfActivity = item.Value.Where(a => a.CurrentStatus == SfcStatusEnum.Activity);
+                if (stepsOfActivity.Any())
+                {
+                    entity.Status = SfcStatusEnum.lineUp;   // 这里为什么是排队中，是因为步骤控制操作的条码有出站，却没有进站。
+                    entity.CreatedOn = stepsOfActivity.Min(m => m.CreatedOn);
+                    entity.UpdatedOn = entity.CreatedOn;
+                    outStationSteps.Add(entity);
+                }
+
                 // 出站
                 var stepsOfComplete = item.Value.Where(a => a.AfterOperationStatus == SfcStatusEnum.Complete);
                 if (stepsOfComplete.Any())
@@ -114,13 +126,25 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     entity.Status = SfcStatusEnum.Complete;
                     entity.CreatedOn = stepsOfComplete.Max(m => m.CreatedOn);
                     entity.UpdatedOn = entity.CreatedOn;
-                    outStationSteps.Add(entity);
+                    completeSteps.Add(entity);
+                }
+
+                // 需要扣减统计的类型
+                var stepsOfDeduction = item.Value.Where(a => ManuSfcStatus.ForbidSfcStatuss.Contains(a.CurrentStatus));
+                if (stepsOfDeduction.Any())
+                {
+                    entity.Status = SfcStatusEnum.Detachment; // 这里的状态其实不重要，因为对应的条码记录均会被删除
+                    entity.CreatedOn = stepsOfDeduction.Max(m => m.CreatedOn);
+                    entity.UpdatedOn = entity.CreatedOn;
+                    deductionSteps.Add(entity);
                 }
             }
 
             // 保存工单条码记录
             await _manuWorkOrderSFCRepository.InsertRangeAsync(inStationSteps);
-            await _manuWorkOrderSFCRepository.RepalceRangeAsync(outStationSteps);
+            await _manuWorkOrderSFCRepository.InsertRangeAsync(outStationSteps);
+            await _manuWorkOrderSFCRepository.RepalceRangeAsync(completeSteps);
+            await _manuWorkOrderSFCRepository.DeleteRangeAsync(deductionSteps);
 
             // 通过工单对条码进行分组，看哪些工单需要更新
             var manuSfcStepForWorkOrderDic = manuSfcStepList.ToLookup(x => x.WorkOrderId).ToDictionary(d => d.Key, d => d);
@@ -162,7 +186,6 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             // 更新水位
             await _waterMarkService.RecordWaterMarkAsync(BusinessKey.WorkOrderStatistic, manuSfcStepList.Max(x => x.Id));
             trans.Complete();
-
         }
 
     }

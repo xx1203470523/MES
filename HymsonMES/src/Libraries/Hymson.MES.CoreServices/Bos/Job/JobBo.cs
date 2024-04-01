@@ -80,6 +80,63 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 请求Bo
     /// </summary>
+    public class InStationBo
+    {
+        /// <summary>
+        /// 工厂Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public IEnumerable<string>? SFCs { get; set; }
+
+        /// <summary>
+        /// 请求源
+        /// </summary>
+        public RequestSourceEnum Source { get; set; } = RequestSourceEnum.EquipmentApi;
+
+        /// <summary>
+        /// 条码类型
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum Type { get; set; } = ManuFacePlateBarcodeTypeEnum.Product;
+
+        /// <summary>
+        /// 说明
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string UserName { get; set; } = "";
+
+        /// <summary>
+        /// 当前时间
+        /// </summary>
+        public DateTime Time { get; set; } = HymsonClock.Now();
+
+    }
+
+    /// <summary>
+    /// 请求Bo
+    /// </summary>
     public class JobRequestBo : JobBaseBo
     {
         /// <summary>

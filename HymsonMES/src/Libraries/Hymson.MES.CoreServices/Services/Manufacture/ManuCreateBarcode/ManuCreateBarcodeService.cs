@@ -166,13 +166,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// <returns></returns>
         public async Task<List<CreateBarcodeByWorkOrderOutputBo>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderBo param, ILocalizationService localizationService)
         {
-            await CreateBarcodeInProductionAsync(new CreateBarcodeInProductionBo
-            {
-                EquipmentId = 0,
-                ResourceId = param.ResourceId,
-                UserName = param.UserName,
-            });
-
             var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
             {
                 WorkOrderId = param.WorkOrderId,
@@ -555,7 +548,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 IsVerifyActivation = false
             });
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.OldSFCs.Select(x => x.SFC));
-            var sfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfclist.Select(x => x.Id));
+            var sfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfclist.Select(x => x.Id));
             var processRouteFirstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
@@ -777,7 +770,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             }
 
             var processRouteDetailNodeEntities = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(planWorkOrderEntity.ProcessRouteId);
-            var processRouteDetailNodeEntity = processRouteDetailNodeEntities.FirstOrDefault(x => x.ProcedureId == param.ProcedureId);
+            var processRouteDetailNodeEntity = processRouteDetailNodeEntities.FirstOrDefault(x => x.ProcedureId == procProcedureEntity.Id);
             if (processRouteDetailNodeEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16509));
@@ -976,11 +969,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         }
 
         /// <summary>
-        /// 半成品条码生成
+        /// 条码生成（半成品）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<List<ManuSfcEntity>> CreateBarcodeBySemiProductIdAsync(CreateBarcodeBySemiProductId param)
+        public async Task<List<ManuSfcEntity>> CreateBarcodeBySemiProductIdAsync(CreateBarcodeByResourceCode param)
         {
             // 查询资源
             var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
@@ -1188,5 +1181,17 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
 
             return manuSfcList;
         }
+
+        /// <summary>
+        /// 条码生成（电芯）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<List<ManuSfcEntity>> CreateCellBarCodeAsync(CreateBarcodeByResourceCode param)
+        {
+            // TODO
+            return await Task.FromResult(new List<ManuSfcEntity> { });
+        }
+
     }
 }

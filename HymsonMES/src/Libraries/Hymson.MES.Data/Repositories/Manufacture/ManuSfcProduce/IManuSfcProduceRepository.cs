@@ -23,6 +23,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<PagedInfo<ManuSfcProduceEntity>> GetPagedListAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery);
 
         /// <summary>
+        /// 分页查询（在制）
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcProduceEntity>> GetPagedListAsync(ManuSfcProduceNewPagedQuery pagedQuery);
+
+        /// <summary>
         /// 质量锁定
         /// </summary>
         /// <param name="command"></param>
@@ -49,6 +56,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="sfcQuery"></param>
         /// <returns></returns>
         Task<ManuSfcProduceEntity> GetBySFCAsync(ManuSfcProduceBySfcQuery sfcQuery);
+
+        /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcId"></param>
+        /// <returns></returns>
+        Task<ManuSfcProduceEntity> GetBySFCIdAsync(long sfcId);
+
+        /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceEntity>> GetBySFCIdsAsync(IEnumerable<long> sfcIds);
 
         /// <summary>
         /// 获取List
@@ -146,7 +167,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        Task<int> DeletePhysicalRangeByIdsSqlAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand);
+        Task<int> DeletePhysicalRangeByIdsAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand);
 
         /// <summary>
         /// 删除

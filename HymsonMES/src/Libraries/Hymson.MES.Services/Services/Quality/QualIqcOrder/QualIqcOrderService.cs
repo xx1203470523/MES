@@ -357,6 +357,7 @@ namespace Hymson.MES.Services.Services.Quality
                     IQCInspectionDetailSnapshotId = item.Id,
                     InspectionValue = item.InspectionValue ?? "",
                     IsQualified = item.IsQualified,
+                    Remark = item.Remark,
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
                     UpdatedBy = updatedBy,
@@ -388,6 +389,7 @@ namespace Hymson.MES.Services.Services.Quality
                             Id = IdGenProvider.Instance.CreateId(),
                             SiteId = entity.SiteId,
                             IQCOrderId = requestDto.IQCOrderId,
+                            IQCOrderSampleDetailId = sampleDetailId,
                             AnnexId = attachmentId,
                             CreatedBy = updatedBy,
                             CreatedOn = updatedOn,
@@ -515,6 +517,7 @@ namespace Hymson.MES.Services.Services.Quality
             */
 
             // 关闭检验单
+            entity.IsExemptInspection = TrueOrFalseEnum.Yes;
             entity.IsQualified = TrueOrFalseEnum.Yes;
             entity.Status = InspectionStatusEnum.Closed;
 
@@ -547,8 +550,8 @@ namespace Hymson.MES.Services.Services.Quality
                     .WithData("After", InspectionStatusEnum.Closed.GetDescription());
             }
 
-            // 不合格处理完成之后直接关闭
-            entity.IsQualified = TrueOrFalseEnum.Yes;
+            // 不合格处理完成之后直接关闭（无需变为合格）
+            //entity.IsQualified = TrueOrFalseEnum.Yes;
             entity.Status = InspectionStatusEnum.Closed;
 
             var rows = 0;
@@ -687,9 +690,6 @@ namespace Hymson.MES.Services.Services.Quality
 
             dto.ReceiptNum = receiptEntity.ReceiptNum;
 
-            // TODO 规格型号
-            dto.Specifications = "-";
-
             // 读取产品
             if (entity.MaterialId.HasValue)
             {
@@ -699,6 +699,7 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.MaterialCode = materialEntity.MaterialCode;
                     dto.MaterialName = materialEntity.MaterialName;
                     dto.MaterialVersion = materialEntity.Version ?? "";
+                    dto.Specifications = materialEntity.Specifications ?? "";
                     dto.Unit = materialEntity.Unit ?? "";
                 }
             }
@@ -764,6 +765,7 @@ namespace Hymson.MES.Services.Services.Quality
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = entity.SiteId,
                         IQCOrderId = entity.IQCOrderId,
+                        IQCOrderSampleDetailId = entity.Id,
                         AnnexId = attachmentId,
                         CreatedBy = updatedBy,
                         CreatedOn = updatedOn,
@@ -1161,7 +1163,7 @@ namespace Hymson.MES.Services.Services.Quality
                 }
 
                 // 检验人
-                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperationType == OrderOperateTypeEnum.Complete);
+                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperationType == OrderOperateTypeEnum.Start);
                 if (inspectionEntity != null)
                 {
                     dto.InspectionBy = inspectionEntity.CreatedBy;
@@ -1177,9 +1179,6 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.HandledOn = handleEntity.CreatedOn;
                 }
 
-                // TODO 规格型号
-                dto.Specifications = "-";
-
                 // 产品
                 if (entity.MaterialId.HasValue)
                 {
@@ -1189,6 +1188,7 @@ namespace Hymson.MES.Services.Services.Quality
                         dto.MaterialCode = materialEntity.MaterialCode;
                         dto.MaterialName = materialEntity.MaterialName;
                         dto.MaterialVersion = materialEntity.Version ?? "";
+                        dto.Specifications = materialEntity.Specifications ?? "";
                         dto.Unit = materialEntity.Unit ?? "";
                     }
                 }
@@ -1265,6 +1265,7 @@ namespace Hymson.MES.Services.Services.Quality
                 dto.InspectionValue = sampleDetailEntity.InspectionValue;
                 dto.IsQualified = sampleDetailEntity.IsQualified;
                 dto.Remark = sampleDetailEntity.Remark;
+                dto.Scale = snapshotDetailEntity.Scale;
 
                 // 填充条码
                 var sampleEntity = sampleEntities.FirstOrDefault(f => f.Id == sampleDetailEntity.IQCOrderSampleId);

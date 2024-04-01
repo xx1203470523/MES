@@ -21,6 +21,12 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         public long? ResourceId { set; get; }
 
         /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long ProcedureId { set; get; }
+
+
+        /// <summary>
         /// 工单Id
         /// </summary>
         public long WorkOrderId { set; get; }

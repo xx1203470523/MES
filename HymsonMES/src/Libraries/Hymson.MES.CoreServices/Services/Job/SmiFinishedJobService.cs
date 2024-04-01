@@ -366,7 +366,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 _manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities),
 
                 // 删除 manu_sfc_produce
-                _manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(data.PhysicalDeleteSFCProduceByIdsCommand),
+                _manuSfcProduceRepository.DeletePhysicalRangeByIdsAsync(data.PhysicalDeleteSFCProduceByIdsCommand),
 
                 // 删除 manu_sfc_produce_business
                 _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSFCProduceBusinesssByIdsCommand),

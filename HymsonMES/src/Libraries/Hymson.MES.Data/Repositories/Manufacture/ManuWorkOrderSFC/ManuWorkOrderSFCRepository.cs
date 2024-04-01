@@ -41,6 +41,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+
+            // AND Status = @Status 不加状态是为了删除对应条码所有记录
+            return await conn.ExecuteAsync(DeletesSql, entities);
+        }
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>
@@ -56,7 +69,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuWorkOrderSFCEntity>(template.RawSql, query);
         }
 
-
     }
 
 
@@ -65,8 +77,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuWorkOrderSFCRepository
     {
-        const string InsertsSql = "INSERT IGNORE manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (  @Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
-        const string ReplacesSql = "REPLACE INTO manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (  @Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+        const string InsertsSql = "INSERT IGNORE manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+        const string ReplacesSql = "REPLACE INTO manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+        const string DeletesSql = "DELETE FROM manu_workorder_sfc WHERE SiteId = @SiteId AND WorkOrderId = @WorkOrderId AND SFC = @SFC";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_workorder_sfc /**where**/  ";
 
     }

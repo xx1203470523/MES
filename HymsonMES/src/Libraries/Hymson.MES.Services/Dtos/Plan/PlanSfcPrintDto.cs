@@ -74,7 +74,12 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 采购类型 
         /// </summary>
-        public MaterialBuyTypeEnum BuyType { get; set; }
+        public MaterialBuyTypeEnum? BuyType { get; set; }
+
+        /// <summary>
+        /// 当前数量
+        /// </summary>
+        public decimal Qty { get; set; }
     }
 
     /// <summary>

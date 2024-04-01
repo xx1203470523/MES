@@ -1,15 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 产品不良录入仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-27 03:49:17
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -126,9 +118,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据ID关闭条码不合格标识和缺陷
         /// </summary>
-        /// <param name="manuSfcInfoEntity"></param>
+        /// <param name="commands"></param>
         /// <returns></returns>
-        Task<int> UpdateStatusByIdRangeAsync(List<ManuProductBadRecordUpdateCommand> commands);
+        Task<int> UpdateStatusByIdRangeAsync(IEnumerable<ManuProductBadRecordUpdateCommand> commands);
 
         /// <summary>
         /// 报表分页查询

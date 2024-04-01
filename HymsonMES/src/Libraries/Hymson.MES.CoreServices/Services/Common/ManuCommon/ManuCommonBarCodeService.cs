@@ -32,7 +32,7 @@ namespace Hymson.MES.CoreServices.Services.Common
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
             var sfcPackList = await sfcPackListTask;
 
-            var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcEntities.Select(x => x.Id));
+            var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcEntities.Select(x => x.Id));
             var planWorkOrderEntities = await _masterDataService.GetWorkOrderEntitiesByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId??0));
 
             List<ManuSfcBo> list = new List<ManuSfcBo>();

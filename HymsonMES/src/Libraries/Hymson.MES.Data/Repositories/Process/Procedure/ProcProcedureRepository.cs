@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -300,6 +301,28 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, procProcedureEntity);
+        }
+
+        /// <summary>
+        /// 批量插入
+        /// </summary>
+        /// <param name="procProcedures"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsAsync(IEnumerable<ProcProcedureEntity> procProcedures)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, procProcedures);
+        }
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="procProcedures"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatesAsync(IEnumerable<ProcProcedureEntity> procProcedures)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSql, procProcedures);
         }
 
         /// <summary>

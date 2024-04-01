@@ -133,6 +133,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public TrueOrFalseEnum IsQualified { get; set; }
 
         /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
         /// 参数附件
         /// </summary>
         public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
@@ -228,6 +233,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 计划发货数量
         /// </summary>
         public string Unit { get; set; }
+
+        /// <summary>
+        /// 是否免检
+        /// </summary>
+        public TrueOrFalseEnum? IsExemptInspection { get; set; }
 
         /// <summary>
         /// 检验等级(1-正常 2-加严 3-放宽)
@@ -350,6 +360,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 内部
         /// </summary>
         public string? InternalBatch { get; set; }
+
+        /// <summary>
+        /// 是否免检
+        /// </summary>
+        public TrueOrFalseEnum? IsExemptInspection { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
@@ -487,7 +502,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 小数位数
         /// </summary>
-        public float Scale { get; set; }
+        public int? Scale { get; set; }
 
         /// <summary>
         /// 规格下限

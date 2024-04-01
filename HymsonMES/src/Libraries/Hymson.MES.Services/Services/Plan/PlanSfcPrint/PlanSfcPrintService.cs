@@ -194,7 +194,7 @@ namespace Hymson.MES.Services.Services.Plan
             PlanWorkOrderEntity work;
             if (createDto.WorkOrderId == 0)
             {
-                work = await _planWorkOrderRepository.GetByCodeAsync(new Data.Repositories.Plan.PlanWorkOrder.Query.PlanWorkOrderQuery()
+                work = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery()
                 {
                     OrderCode = createDto.OrderCode,
                     SiteId = _currentSite.SiteId ?? 0
@@ -269,7 +269,7 @@ namespace Hymson.MES.Services.Services.Plan
             });
 
             // 条码集合
-            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(s => s.Id));
+            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcEntities.Select(s => s.Id));
 
             var manuSfcUpdateStatusByIdCommands = new List<ManuSfcUpdateStatusByIdCommand>();
 
@@ -306,7 +306,7 @@ namespace Hymson.MES.Services.Services.Plan
                     SFC = s.SFC,
                     Qty = s.Qty,
                     ProductId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.ProductId,
-                    WorkOrderId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.WorkOrderId??0 ,
+                    WorkOrderId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.WorkOrderId ?? 0,
                     Operatetype = ManuSfcStepTypeEnum.Delete,
                     CurrentStatus = SfcStatusEnum.Complete,
                     CreatedBy = _currentUser.UserName,
@@ -325,22 +325,26 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<PagedInfo<PlanSfcPrintDto>> GetPagedListAsync(PlanSfcPrintPagedQueryDto pagedQueryDto)
         {
-            var pagedQuery = pagedQueryDto.ToQuery<ManuSfcPassDownPagedQuery>();
+            var pagedQuery = pagedQueryDto.ToQuery<ManuSfcProduceNewPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            var pagedInfo = await _manuSfcRepository.GetPagedListAsync(pagedQuery);
+
+            // 将工单号转换为工单Id
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.OrderCode))
+            {
+                var workOrderEntities = await _planWorkOrderRepository.GetEntitiesAsync(new PlanWorkOrderNewQuery
+                {
+                    OrderCode = pagedQueryDto.OrderCode,
+                    SiteId = pagedQuery.SiteId
+                });
+                if (workOrderEntities != null && workOrderEntities.Any()) pagedQuery.WorkOrderIds = workOrderEntities.Select(s => s.Id);
+                else pagedQuery.WorkOrderIds = Array.Empty<long>();
+            }
+
+            // 查询数据
+            var pagedInfo = await _manuSfcProduceRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => new PlanSfcPrintDto
-            {
-                Id = s.Id,
-                SFC = s.SFC,
-                IsUsed = s.IsUsed,
-                UpdatedOn = s.CreatedOn,    // 这里用创建时间作为条码生成时间更准确
-                OrderCode = s.OrderCode,
-                MaterialCode = s.MaterialCode,
-                MaterialName = s.MaterialName,
-                BuyType = s.BuyType
-            });
+            var dtos = await PrepareDtosAsync(pagedInfo.Data);
             return new PagedInfo<PlanSfcPrintDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -350,11 +354,11 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="planSfcPrintQueryDto"></param>
         /// <returns></returns>
         public async Task<IEnumerable<CreateBarcodeByWorkOrderOutputBo>> GetNewBarCodeOnBarCodeCreatedAsync(PlanSfcPrintQueryDto planSfcPrintQueryDto)
-        {            
-            if(planSfcPrintQueryDto.Datas?.Any() != true)
+        {
+            if (planSfcPrintQueryDto.Datas?.Any() != true)
             {
                 return new List<CreateBarcodeByWorkOrderOutputBo>();
-            }            
+            }
 
             var pendingDatas = planSfcPrintQueryDto.Datas.ToList();
 
@@ -425,5 +429,75 @@ namespace Hymson.MES.Services.Services.Plan
                 });
             }
         }
+
+
+
+
+
+
+        /// <summary>
+        /// 转换为Dto对象
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<PlanSfcPrintDto>> PrepareDtosAsync(IEnumerable<ManuSfcProduceEntity> entities)
+        {
+            List<PlanSfcPrintDto> dtos = new();
+
+            // 读取物料
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Select(x => x.ProductId));
+            var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
+
+            // 读取工单
+            var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(entities.Select(x => x.WorkOrderId));
+            var workOrderDic = workOrderEntities.ToDictionary(x => x.Id, x => x);
+
+            // 读取条码
+            var sfcEntities = await _manuSfcRepository.GetByIdsAsync(entities.Select(x => x.SFCId));
+            var sfcDic = sfcEntities.ToDictionary(x => x.Id, x => x);
+
+            // 遍历填充
+            foreach (var entity in entities)
+            {
+                var dto = entity.ToModel<PlanSfcPrintDto>();
+                if (dto == null) continue;
+
+                dto.UpdatedOn = entity.CreatedOn;    // 这里用创建时间作为条码生成时间更准确
+
+                // 条码信息
+                if (!sfcDic.ContainsKey(entity.SFCId)) continue;
+                var sfcEntity = sfcDic[entity.SFCId];
+                if (sfcEntity != null)
+                {
+                    dto.Id = sfcEntity.Id;
+                    dto.SFC = sfcEntity.SFC;
+                    dto.IsUsed = sfcEntity.IsUsed;
+                }
+
+                // 工单
+                if (!workOrderDic.ContainsKey(entity.WorkOrderId)) continue;
+                var workOrderEntity = workOrderDic[entity.WorkOrderId];
+                if (workOrderEntity != null)
+                {
+                    dto.OrderCode = workOrderEntity.OrderCode;
+                }
+
+                // 产品
+                if (!materialDic.ContainsKey(entity.ProductId)) continue;
+                var materialEntity = materialDic[entity.ProductId];
+                if (materialEntity != null)
+                {
+                    dto.MaterialCode = materialEntity.MaterialCode;
+                    dto.MaterialName = materialEntity.MaterialName;
+                    dto.BuyType = materialEntity.BuyType;
+                }
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+
+
     }
 }
