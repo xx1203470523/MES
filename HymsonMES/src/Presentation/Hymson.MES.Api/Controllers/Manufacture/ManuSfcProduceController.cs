@@ -79,7 +79,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [PermissionDescription("qual:productScrap:scrap")]
         public async Task QualityScrapAsync(ManuSfScrapDto parm)
         {
-            if(parm.OperationType== ScrapOperateTypeEnum.Scrapping)
+            if (parm.OperationType == ScrapOperateTypeEnum.Scrapping)
             {
                 await _manuSfcProduceService.QualityScrapAsync(parm);
             }
@@ -184,6 +184,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 获取条码第一条
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("getManuSfcOne")]
+        public async Task<ManuSfcProduceSelectViewDto> getManuSfcOneAsync([FromQuery] ManuSfcProduceSelectPagedQueryDto parm)
+        {
+            var one = await _manuSfcProduceService.GetManuSfcPagedInfoAsync(parm);
+            return one.Data.FirstOrDefault() ?? new ManuSfcProduceSelectViewDto { };
+        }
+
+        /// <summary>
         /// 根据SFC查询在制品步骤列表
         /// </summary>
         /// <param name="sfcs"></param>
@@ -284,7 +296,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("getActivityListByProcedureIdAndResId")]
-        public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResIdAsync([FromQuery] ManuSfcProduceByProcedureIdAndResourceIdDto query) 
+        public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResIdAsync([FromQuery] ManuSfcProduceByProcedureIdAndResourceIdDto query)
         {
             return await _manuSfcProduceService.GetActivityListByProcedureIdAndResIdAsync(query);
         }
@@ -295,7 +307,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("getVehicleActivityListByProcedureIdAndResId")]
-        public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResIdAsync([FromQuery] ActivityVehicleByProcedureIdAndResourceIdDto query) 
+        public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResIdAsync([FromQuery] ActivityVehicleByProcedureIdAndResourceIdDto query)
         {
             return await _manuSfcProduceService.GetVehicleActivityListByProcedureIdAndResIdAsync(query);
         }
