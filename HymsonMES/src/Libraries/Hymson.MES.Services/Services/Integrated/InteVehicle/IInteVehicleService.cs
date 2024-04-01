@@ -1,5 +1,11 @@
+/*
+ *creator: Karl
+ *
+ *describe: 载具注册表    服务接口 | 代码由框架生成
+ *builder:  Karl
+ *build datetime: 2023-07-14 10:03:53
+ */
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -21,7 +27,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="inteVehicleCreateDto"></param>
         /// <returns></returns>
-        Task<long> CreateInteVehicleAsync(InteVehicleCreateDto inteVehicleCreateDto);
+        Task CreateInteVehicleAsync(InteVehicleCreateDto inteVehicleCreateDto);
 
         /// <summary>
         /// 修改
@@ -29,6 +35,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="inteVehicleModifyDto"></param>
         /// <returns></returns>
         Task ModifyInteVehicleAsync(InteVehicleModifyDto inteVehicleModifyDto);
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task DeleteInteVehicleAsync(long id);
 
         /// <summary>
         /// 批量删除
@@ -69,13 +82,8 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="dto"></param>
         /// <returns></returns>
         Task VehicleOperationAsync(InteVehicleOperationDto dto);
-
-        /// <summary>
-        /// 通过托盘码获取托盘视图信息(装载记录表)（PDA）
-        /// </summary>
-        /// <param name="palletNo"></param>
-        /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
-        Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordBypalletNoAsync(string palletNo);
+        Task VehicleBindOperationAsync(InteVehicleOperationDto dto);
+        Task VehicleUnBindOperationAsync(InteVehicleOperationDto dto);
+        Task VehicleClearOperationAsync(InteVehicleOperationDto dto);
     }
 }
