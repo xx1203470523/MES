@@ -554,6 +554,14 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLoadPointPagedQuery, ProcLoadPointPagedQueryDto>();
             #endregion
 
+            #region ConversionFactor
+            CreateMap<AddConversionFactorDto, ProcConversionFactorEntity>();
+            CreateMap<ProcProcedureView, ProcConversionFactorViewDto>();
+            CreateMap<ProcConversionFactorPagedQueryDto, IProcConversionFactorPagedQuery>();
+            CreateMap<ProcConversionFactorView, ProcConversionFactorViewDto>();
+            CreateMap<ProcConversionFactorModifyDto, ProcConversionFactorEntity>();
+            #endregion
+
             #region LoadPointLink
             CreateMap<ProcLoadPointLinkMaterialCreateDto, ProcLoadPointLinkMaterialEntity>();
             CreateMap<ProcLoadPointLinkMaterialModifyDto, ProcLoadPointLinkMaterialEntity>();
