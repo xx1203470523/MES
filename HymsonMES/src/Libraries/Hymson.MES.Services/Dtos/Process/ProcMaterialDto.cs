@@ -265,6 +265,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MaskCodeId { get; set; }
 
         /// <summary>
+        /// 产品型号 条码规则 生成条码使用
+        /// </summary>
+        public string? ProductModel { get; set; }
+
+        /// <summary>
         /// 数量限制
         /// </summary>
         public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
@@ -423,6 +428,10 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MaskCodeId { get; set; }
 
         /// <summary>
+        /// 产品型号 条码规则 生成条码使用
+        /// </summary>
+        public string? ProductModel { get; set; }
+        /// <summary>
         /// 数量限制
         /// </summary>
         public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
@@ -531,6 +540,14 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? BomVersion { get; set; }
 
+        /// <summary>
+        /// 规格型号
+        /// </summary>
+        public string Specifications { get; set; }
+        /// <summary>
+        /// 产品型号 条码规则 生成条码使用
+        /// </summary>
+        public string? ProductModel { get; set; }
         /// <summary>
         /// 替代料
         /// </summary>
