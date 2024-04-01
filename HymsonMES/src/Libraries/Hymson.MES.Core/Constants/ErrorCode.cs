@@ -1613,6 +1613,7 @@
         public const string MES18626 = "载具编码【{Code}】未绑定任何条码，具体请查看【载具绑定解绑】！";
         public const string MES18627 = "载具类型【{Code}】已禁用，具体请查看【载具类型】！";
         public const string MES18628 = "载具编码【{Code}】装载的产品序列码物料编码/版本不一致，具体请查看【载具绑定解绑】！";
+        public const string MES18629 = "载具编码【{Code}】未找到所属的载具类型！";
 
         // MES18629 - MES18641
 
@@ -1774,6 +1775,8 @@
         public const string MES19935 = "资源【{ResCode}】未绑定启用/保留状态的工序，请检查配置";
         public const string MES19936 = "条码{SFC}所属产品编码{P1}与托盘绑定的产品编码不一致";
         public const string MES19937 = "工单{WorkOrderCode}未激活，无法进行条码接收操作！";
+        public const string MES19938 = "非在库待使用条码，不可解盘";
+
         #endregion
 
 
