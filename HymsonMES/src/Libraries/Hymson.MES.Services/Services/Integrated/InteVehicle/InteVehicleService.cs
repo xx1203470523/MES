@@ -642,7 +642,7 @@ namespace Hymson.MES.Services.Services.Integrated
             else
             {
                 // 根据首条码校验后续的条码是否属于同一个物料编码
-                if (vsr.Count() >= 0)
+                if (vsr.Count() > 0)
                 {
                     var firstobj = vsr.OrderBy(i => i.CreatedOn).FirstOrDefault();
                     long firstmatrialid = 0;
