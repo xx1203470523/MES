@@ -4,12 +4,12 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Core.Domain.Quality
 {
     /// <summary>
-    /// 数据实体（FQC检验参数组明细快照）   
-    /// qual_fqc_parameter_group_detail_snapshoot
-    /// @author User
-    /// @date 2024-03-27 03:38:53
+    /// 数据实体（FQC检验参数组明细）   
+    /// qual_fqc_parameter_group_detail
+    /// @author xiaofei
+    /// @date 2024-03-28 08:32:33
     /// </summary>
-    public class QualFqcParameterGroupDetailSnapshootEntity : BaseEntity
+    public class QualFqcParameterGroupDetailEntity : BaseEntity
     {
         /// <summary>
         /// 站点Id
@@ -25,26 +25,6 @@ namespace Hymson.MES.Core.Domain.Quality
         /// 标准参数Id
         /// </summary>
         public long ParameterId { get; set; }
-
-        /// <summary>
-        /// 参数编码
-        /// </summary>
-        public string ParameterCode { get; set; }
-
-        /// <summary>
-        /// 参数名称
-        /// </summary>
-        public string ParameterName { get; set; }
-
-        /// <summary>
-        /// 参数单位
-        /// </summary>
-        public string ParameterUnit { get; set; }
-
-        /// <summary>
-        /// 参数类型
-        /// </summary>
-        public DataTypeEnum? ParameterDataType { get; set; }
 
         /// <summary>
         /// 规格上限
@@ -77,7 +57,7 @@ namespace Hymson.MES.Core.Domain.Quality
         public TrueOrFalseEnum IsDeviceCollect { get; set; }
 
         /// <summary>
-        /// 显示顺序
+        /// 顺序
         /// </summary>
         public int DisplayOrder { get; set; }
 
@@ -85,7 +65,5 @@ namespace Hymson.MES.Core.Domain.Quality
         /// 备注
         /// </summary>
         public string Remark { get; set; }
-
-        
     }
 }

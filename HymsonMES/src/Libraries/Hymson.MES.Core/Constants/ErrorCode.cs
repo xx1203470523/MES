@@ -432,6 +432,19 @@
         public const string MES11501 = "不能删除启用状态的数据";
         #endregion
 
+        #region FQC检验任务 11700
+
+        public const string MES11700 = "参数错误，条码产出数据不存在！";
+        public const string MES11701 = "条码不属于同一产品！";
+        public const string MES11702 = "条码【{SFC}】已生成过检验单，不允许重复生成！";
+        public const string MES11703 = "条码不属于同一工单！";
+        public const string MES11704 = "条码不属于同一产线！";
+        public const string MES11705 = "FQC检验项目不存在或未启用！产品编码【{MaterialCode}】";
+        public const string MES11706 = "FQC检验项目不存在或未启用，无法判定其是否要做FQC检验！产品编码【{MaterialCode}】";
+        public const string MES11707 = "FQC检验项目【{ParameterGroupCode}】下检验参数不能为空";
+
+        #endregion
+
         #region OQC检验任务 11800
 
         public const string MES11800 = "选中数据不属于同一出货单";

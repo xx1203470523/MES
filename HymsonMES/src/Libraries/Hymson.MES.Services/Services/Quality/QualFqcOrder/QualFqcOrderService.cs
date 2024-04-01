@@ -22,6 +22,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.CoreServices.Services.Quality.QualFqcOrder;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -99,8 +100,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IQualFqcParameterGroupSnapshootRepository _qualFqcParameterGroupSnapshootRepository;
 
-        
-
+        /// <summary>
+        /// FQC检验单创建服务
+        /// </summary>
+        private readonly IFQCOrderCreateService _qualFqcOrderCreateService;
 
 
         /// <summary>
@@ -120,10 +123,11 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="qualFqcOrderOperateRepository"></param>
         /// <param name="qualFqcParameterGroupDetailSnapshootRepository"></param>
         /// <param name="qualFqcParameterGroupSnapshootRepository"></param>
-        public QualFqcOrderService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<QualFqcOrderSaveDto> validationSaveRules, 
+        /// <param name="qualFqcOrderCreateService"></param>
+        public QualFqcOrderService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<QualFqcOrderSaveDto> validationSaveRules,
             IQualFqcOrderRepository qualFqcOrderRepository,
             IQualFqcOrderAttachmentRepository qualFqcOrderAttachmentRepository,
-            IQualFqcOrderSampleRepository qualFqcOrderSampleRepository, 
+            IQualFqcOrderSampleRepository qualFqcOrderSampleRepository,
             IQualFqcOrderSampleDetailRepository qualFqcOrderSampleDetailRepository,
             IQualFqcOrderSampleDetailAttachmentRepository qualFqcOrderSampleDetailAttachmentRepository,
             IInteAttachmentRepository inteAttachmentRepository,
@@ -131,22 +135,24 @@ namespace Hymson.MES.Services.Services.Quality
             IQualFqcOrderUnqualifiedHandleRepository qualFqcOrderUnqualifiedHandleRepository,
             IQualFqcOrderOperateRepository qualFqcOrderOperateRepository,
             IQualFqcParameterGroupDetailSnapshootRepository qualFqcParameterGroupDetailSnapshootRepository,
-            IQualFqcParameterGroupSnapshootRepository qualFqcParameterGroupSnapshootRepository)
+            IQualFqcParameterGroupSnapshootRepository qualFqcParameterGroupSnapshootRepository,
+            IFQCOrderCreateService qualFqcOrderCreateService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _qualFqcOrderRepository = qualFqcOrderRepository;
-            _qualFqcOrderAttachmentRepository= qualFqcOrderAttachmentRepository;
+            _qualFqcOrderAttachmentRepository = qualFqcOrderAttachmentRepository;
             _qualFqcOrderSampleRepository = qualFqcOrderSampleRepository;
-            _qualFqcOrderSampleDetailRepository= qualFqcOrderSampleDetailRepository;
-            _qualFqcOrderSampleDetailAttachmentRepository= qualFqcOrderSampleDetailAttachmentRepository;
+            _qualFqcOrderSampleDetailRepository = qualFqcOrderSampleDetailRepository;
+            _qualFqcOrderSampleDetailAttachmentRepository = qualFqcOrderSampleDetailAttachmentRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
-            _procMaterialRepository= procMaterialRepository;
-            _qualFqcOrderUnqualifiedHandleRepository= qualFqcOrderUnqualifiedHandleRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _qualFqcOrderUnqualifiedHandleRepository = qualFqcOrderUnqualifiedHandleRepository;
             _qualFqcOrderOperateRepository = qualFqcOrderOperateRepository;
             _qualFqcParameterGroupDetailSnapshootRepository = qualFqcParameterGroupDetailSnapshootRepository;
-            _qualFqcParameterGroupSnapshootRepository= qualFqcParameterGroupSnapshootRepository;
+            _qualFqcParameterGroupSnapshootRepository = qualFqcParameterGroupSnapshootRepository;
+            _qualFqcOrderCreateService = qualFqcOrderCreateService;
         }
 
 
@@ -155,29 +161,43 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(QualFqcOrderSaveDto saveDto)
+        public async Task<int> CreateAsync(QualFqcOrderCreateDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            var bo = new FQCOrderManualCreateBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                RecordIds = saveDto.OutputRecordIds
+            };
 
-            // 更新时间
-            var updatedBy = _currentUser.UserName;
-            var updatedOn = HymsonClock.Now();
+            return await _qualFqcOrderCreateService.ManualCreateAsync(bo);
+        }
 
-            // DTO转换实体
-            var entity = saveDto.ToEntity<QualFqcOrderEntity>();
-            entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = updatedBy;
-            entity.CreatedOn = updatedOn;
-            entity.UpdatedBy = updatedBy;
-            entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+        /// <summary>
+        /// 创建(测试条码产出时自动生成功能)
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        public async Task<bool> CreateAsync(QualFqcOrderCreateTestDto saveDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // 保存
-            return await _qualFqcOrderRepository.InsertAsync(entity);
+            var bo = new FQCOrderAutoCreateAutoBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                MaterialId = saveDto.MaterialId,
+                Barcode = saveDto.Barcode,
+                WorkOrderId = saveDto.WorkOrderId,
+                WorkCenterId = saveDto.WorkCenterId,
+                CodeType = saveDto.CodeType,
+            };
+
+            return await _qualFqcOrderCreateService.AutoCreateAsync(bo);
         }
 
         /// <summary>
@@ -190,7 +210,7 @@ namespace Hymson.MES.Services.Services.Quality
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
@@ -235,7 +255,7 @@ namespace Hymson.MES.Services.Services.Quality
         //{
         //   var qualFqcOrderEntity = await _qualFqcOrderRepository.GetByIdAsync(id);
         //   if (qualFqcOrderEntity == null) return null;
-           
+
         //   return qualFqcOrderEntity.ToModel<QualFqcOrderDto>();
         //}
 
@@ -545,7 +565,7 @@ namespace Hymson.MES.Services.Services.Quality
             //}
 
             //有任一不合格，完成
-            if(sampleDetailEntities.Any(X=>X.IsQualified== TrueOrFalseEnum.No))
+            if (sampleDetailEntities.Any(X => X.IsQualified == TrueOrFalseEnum.No))
             {
                 entity.Status = InspectionStatusEnum.Completed;
                 entity.IsQualified = TrueOrFalseEnum.No;

@@ -6,6 +6,48 @@ using Hymson.MES.Services.Dtos.Integrated;
 namespace Hymson.MES.Services.Dtos.Quality
 {
     /// <summary>
+    /// FQC检验单创建Dto
+    /// </summary>
+    public record QualFqcOrderCreateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 成品条码产出记录Ids(qual_finally_output_record)
+        /// </summary>
+        public IEnumerable<long> OutputRecordIds { get; set; }
+    }
+
+    /// <summary>
+    /// FQC检验单创建Dto
+    /// </summary>
+    public record QualFqcOrderCreateTestDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Barcode { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 产线Id
+        /// </summary>
+        public long? WorkCenterId { get; set; }
+
+        /// <summary>
+        /// 条码类型(1-托盘 2-栈板 3-SFC 4-箱)
+        /// </summary>
+        public FQCLotUnitEnum CodeType { get; set; }
+    }
+
+    /// <summary>
     /// FQC检验单新增/更新Dto
     /// </summary>
     public record QualFqcOrderSaveDto : BaseEntityDto

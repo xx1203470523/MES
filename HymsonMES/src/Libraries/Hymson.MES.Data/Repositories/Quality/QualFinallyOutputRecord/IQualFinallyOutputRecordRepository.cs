@@ -6,37 +6,37 @@ using Hymson.MES.Data.Repositories.Quality.Query;
 namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
-    /// 仓储接口（FQC检验单条码记录）
+    /// 仓储接口（成品条码产出记录(FQC生成使用)）
     /// </summary>
-    public interface IQualFqcOrderSfcRepository
+    public interface IQualFinallyOutputRecordRepository
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(QualFqcOrderSfcEntity entity);
-
+        Task<int> InsertAsync(QualFinallyOutputRecordEntity entity);
+        
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<QualFqcOrderSfcEntity> entities);
+        Task<int> InsertRangeAsync(IEnumerable<QualFinallyOutputRecordEntity> entities);
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(QualFqcOrderSfcEntity entity);
-
+        Task<int> UpdateAsync(QualFinallyOutputRecordEntity entity);
+        
         /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<QualFqcOrderSfcEntity> entities);
+        Task<int> UpdateRangeAsync(IEnumerable<QualFinallyOutputRecordEntity> entities);
 
         /// <summary>
         /// 软删除  
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-
+        
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -57,35 +57,35 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<QualFqcOrderSfcEntity> GetByIdAsync(long id);
-
+        Task<QualFinallyOutputRecordEntity> GetByIdAsync(long id);
+    
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualFqcOrderSfcEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<QualFinallyOutputRecordEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 查询单个实体
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<QualFqcOrderSfcEntity> GetEntityAsync(QualFqcOrderSfcQuery query);
+        Task<QualFinallyOutputRecordEntity> GetEntityAsync(QualFinallyOutputRecordQuery query);
 
         /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualFqcOrderSfcEntity>> GetEntitiesAsync(QualFqcOrderSfcQuery query);
-
+        Task<IEnumerable<QualFinallyOutputRecordEntity>> GetEntitiesAsync(QualFinallyOutputRecordQuery query);
+        
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualFqcOrderSfcEntity>> GetPagedListAsync(QualFqcOrderSfcPagedQuery pagedQuery);
+        Task<PagedInfo<QualFinallyOutputRecordEntity>> GetPagedListAsync(QualFinallyOutputRecordPagedQuery pagedQuery);
 
     }
 }

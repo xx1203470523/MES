@@ -46,9 +46,21 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddAsync([FromBody] QualFqcOrderSaveDto saveDto)
+        public async Task<int> AddAsync([FromBody] QualFqcOrderCreateDto saveDto)
         {
-             await _qualFqcOrderService.CreateAsync(saveDto);
+             return await _qualFqcOrderService.CreateAsync(saveDto);
+        }
+
+        /// <summary>
+        /// 测试条码产出时自动生成功能（FQC检验单）
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("createtest")]
+        public async Task<bool> AddAsync([FromBody] QualFqcOrderCreateTestDto saveDto)
+        {
+            return await _qualFqcOrderService.CreateAsync(saveDto);
         }
 
         /// <summary>
