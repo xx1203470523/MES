@@ -291,11 +291,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         {
             IEnumerable<long>? bomMaterialIds = null;
 
-            // 读取资源绑定的产线
-            var workCenterLineEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
-
-            if (workCenterLineEntity == null) return Array.Empty<ManuFeedingMaterialDto>();
-
             // 全部需展示的物料ID
             List<long> materialIds = new();
             var loadSource = 1; // 1:资源;2:上料点
@@ -314,6 +309,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     SiteId = _currentSite.SiteId ?? 0,
                     ResourceId = queryDto.ResourceId
                 });
+
+                // 读取资源绑定的产线
+                var workCenterLineEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
+
+                if (workCenterLineEntity == null) return Array.Empty<ManuFeedingMaterialDto>();
 
                 // 通过产线->工单->BOM->查询物料
                 bomMaterialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenterLineEntity.Id, queryDto.WorkOrderId, procedureEntity?.Id);
@@ -593,7 +593,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var feeds = await _manuFeedingRepository.GetByIdsAsync(idsArr);
 
             // 查询条码
-            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(new WhMaterialInventoryBarCodesQuery
             {
                 BarCodes = feeds.Select(s => s.BarCode),
                 SiteId = _currentSite.SiteId ?? 0

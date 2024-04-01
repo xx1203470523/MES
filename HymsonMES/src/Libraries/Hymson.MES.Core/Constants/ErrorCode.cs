@@ -870,8 +870,8 @@
         public const string MES15432 = "条码不能为空";
         public const string MES15433 = "发现工序不能为空";
         public const string MES15434 = "不合格代码不能为空";
-        public const string MES15435 = "传入数据中存在重复的(产品序列码 ,拦截工序,不合格代,发现不良工序)数据！";
-        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现不良工序[{foundBadOperationCode}]，拦截工序[{InterceptOperationCode}],不合格代码[{unqualifiedCode}]！";
+        public const string MES15435 = "传入数据中存在重复的(产品序列码 ，拦截工序，不合格代，发现不良工序)数据！";
+        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现不良工序[{foundBadOperationCode}]，拦截工序[{InterceptOperationCode}]，不合格代码[{unqualifiedCode}]！";
         public const string MES15437 = "存在不是缺陷的不合格代码";
         public const string MES15438 = "条码[{sfc}]是锁定、删除或无效状态，无法使用";
         public const string MES15439 = "条码[{sfc}]不存在";
@@ -880,7 +880,11 @@
         public const string MES15442 = "存在不是缺陷的不合格代码[{unqualifiedCode}]";
         public const string MES15443 = "发现工序编码[{foundBadOperationCode}]不存在";
         public const string MES15444 = "拦截工序编码[{interceptProcedureCode}]不存在";
-
+        public const string MES15445 = "产品序列码不能为空！";
+        public const string MES15446 = "产品序列码【{barCode}】不存在！";
+        public const string MES15447 = "产品序列码【{barCode}】状态为【{status}】，不可再执行当前操作！";
+        public const string MES15448 = "产品序列码【{barCode}】不存在未关闭的缺陷，不可再执行当前操作！";
+        public const string MES15449 = "产品序列码【{barCode}】类型为【{type}】，不可再执行当前操作！";
         #endregion
 
         #region 物料加载 15500
@@ -1173,7 +1177,7 @@
         public const string MES16414 = "当前资源所对应的工作中心不是线体";
         public const string MES16415 = "工单[{orderCode}]处于暂停中，无法操作！";
         public const string MES16416 = "工单【{Code}】状态为【未激活】，不允许生产，具体请查看【工单激活】！";
-        public const string MES16417 = "当前选择的设备不存在！";        
+        public const string MES16417 = "当前选择的设备不存在！";
         #endregion
 
         #region 条码下达 MES16500
@@ -1350,8 +1354,9 @@
         public const string MES17114 = "获取工序基本信息失败，请检查工序参数【{Procedure}】！";
         public const string MES17115 = "工序【{Procedure}】未设置【标记编码/缺陷编码】参数项，具体请查看【工序维护】！";
         public const string MES17116 = "不合格代码【{Code}】未设置【不合格工艺路线】参数项，具体请查看【不合格代码】！";
-        public const string MES17117 = "条码【{SFC}】对应的不合代码内容存在空字符，请检查！";
+        public const string MES17117 = "条码【{SFC}】对应的不合格代码内容存在空字符，请检查！";
         public const string MES17118 = "当前工序【{Procedure}】类型为【{Type}】，只有【测试】类型工序才允许不合格出站，请检查【工序维护】！";
+        public const string MES17119 = "条码【{SFC}】对应的不合格代码内容有重复，请检查！";
 
         #endregion
 

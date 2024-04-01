@@ -548,7 +548,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 IsVerifyActivation = false
             });
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.OldSFCs.Select(x => x.SFC));
-            var sfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfclist.Select(x => x.Id));
+            var sfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfclist.Select(x => x.Id));
             var processRouteFirstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
