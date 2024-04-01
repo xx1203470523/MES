@@ -76,12 +76,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="palletNo"></param>
         /// <returns></returns>
         Task<InteVehicleStackView> QueryVehicleFreightByPalletNoAsync(string palletNo);
-        /// <summary>
-        /// 载具操作
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task VehicleOperationAsync(InteVehicleOperationDto dto);
+        ///// <summary>
+        ///// 载具操作
+        ///// </summary>
+        ///// <param name="dto"></param>
+        ///// <returns></returns>
+        //Task VehicleOperationAsync(InteVehicleOperationDto dto);
         Task VehicleBindOperationAsync(InteVehicleOperationDto dto);
         Task VehicleUnBindOperationAsync(InteVehicleOperationDto dto);
         Task VehicleClearOperationAsync(InteVehicleOperationDto dto);
