@@ -613,6 +613,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                         MaterialCode = material != null ? material.MaterialCode : "",
                         MaterialName = material != null ? material.MaterialName : "",
                         Version = material != null ? material.Version ?? "" : "",
+                        Unit = material != null ? material.Unit ?? "" : "",
 
                         IsScrap = item.IsScrap,
                         Qty = item.Qty,
