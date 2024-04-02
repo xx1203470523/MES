@@ -225,7 +225,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
             if(IS_DEBUG == true)
             {
                 GetRecipeDetailReturnDto resultList = new GetRecipeDetailReturnDto();
-
+                resultList.Version = "1.0";
+                resultList.LastUpdateOnTime = HymsonClock.Now();
                 List<RecipeParamDto> paramList = new List<RecipeParamDto>();
                 for (var i = 0; i < 3; ++i)
                 {
@@ -338,7 +339,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             agvDto.EquipmentCode = dto.EquipmentCode;
             agvDto.ResourceCode = dto.ResourceCode;
             agvDto.LocalTime = dto.LocalTime;
-            agvDto.Type = "1";
+            agvDto.TaskType = "1";
             agvDto.Content = string.Empty;
             await _qknyService.AgvMaterialAsync(agvDto);
 
@@ -366,7 +367,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             agvDto.EquipmentCode = dto.EquipmentCode;
             agvDto.ResourceCode = dto.ResourceCode;
             agvDto.LocalTime = dto.LocalTime;
-            agvDto.Type = "2";
+            agvDto.TaskType = "2";
             agvDto.Content = string.Empty;
             await _qknyService.AgvMaterialAsync(agvDto);
 

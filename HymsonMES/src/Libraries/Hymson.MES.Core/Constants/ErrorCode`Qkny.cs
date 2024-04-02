@@ -155,6 +155,11 @@ namespace Hymson.MES.Core.Constants
         /// </summary>
         public const string MES45075 = "资源下没有上料数据";
 
+        /// <summary>
+        /// 上料点没有关联物料数据
+        /// </summary>
+        public const string MES45076 = "上料点没有关联物料数据";
+
         #endregion
 
         #region 制胶匀浆

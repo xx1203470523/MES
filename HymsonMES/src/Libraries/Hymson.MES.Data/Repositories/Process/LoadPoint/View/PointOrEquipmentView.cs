@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.MES.Core.Domain.Process;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,5 +46,16 @@ namespace Hymson.MES.Data.Repositories.Process.LoadPoint.View
         /// 站点ID
         /// </summary>
         public long SiteId { get; set; }
+    }
+
+    /// <summary>
+    /// 上料点物料
+    /// </summary>
+    public class ProcLoadPointMaterialView : ProcLoadPointEntity
+    {
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long MaterialID { get; set; }
     }
 }

@@ -53,7 +53,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
         /// <returns></returns>
         public async Task<List<PointOrEquipmentView>> GetPointOrEquipmmentAsync(ProcLoadPointEquipmentQuery query)
         {
-            if(query == null || query.CodeList == null || query.CodeList.Count != 2)
+            if(query == null || query.CodeList == null || query.CodeList.Count != query.CodeList.Count)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45074));
             }
@@ -63,16 +63,24 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
             //    //上料点会关联多个资源
             //    throw new CustomerValidationException(nameof(ErrorCode.MES45074));
             //}
-            var dbCode = dbList.Where(m => m.Code == query.CodeList[0]).FirstOrDefault();
-            if(dbCode == null)
+            foreach(var item in query.CodeList)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45074));
+                var dbCode = dbList.Where(m => m.Code == item).FirstOrDefault();
+                if (dbCode == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45074));
+                }
             }
-            dbCode = dbList.Where(m => m.Code == query.CodeList[1]).FirstOrDefault();
-            if(dbCode == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45074));
-            }
+            //var dbCode = dbList.Where(m => m.Code == query.CodeList[0]).FirstOrDefault();
+            //if(dbCode == null)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES45074));
+            //}
+            //dbCode = dbList.Where(m => m.Code == query.CodeList[1]).FirstOrDefault();
+            //if(dbCode == null)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES45074));
+            //}
             return dbList.ToList();
         }
 
@@ -89,6 +97,21 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
                 throw new CustomerValidationException(nameof(ErrorCode.MES45070));
             }
             return dbModel;
+        }
+
+        /// <summary>
+        /// 获取上料点物料
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<List<ProcLoadPointMaterialView>> GetProcLoadPointMaterialAsync(ProcLoadPointQuery query)
+        {
+            var dbList = await _procLoadPointRepository.GetProcLoadPointMaterialAsync(query);
+            if (dbList.IsNullOrEmpty() == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45076));
+            }
+            return dbList.ToList();
         }
 
     }

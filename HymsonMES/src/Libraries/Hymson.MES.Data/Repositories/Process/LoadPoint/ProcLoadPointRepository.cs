@@ -222,6 +222,17 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryFirstOrDefaultAsync<ProcLoadPointEntity>(GetLoadPointSql, query);
         }
 
+        /// <summary>
+        /// 获取上料点物料
+        /// </summary>
+        /// <param name="procLoadPointQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcLoadPointMaterialView>> GetProcLoadPointMaterialAsync(ProcLoadPointQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcLoadPointMaterialView>(GetProcLoadPointMaterialSql, query);
+        }
+
         #endregion
 
     }
@@ -281,6 +292,17 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 获取上料点
         /// </summary>
         const string GetLoadPointSql = @"select * from proc_load_point where IsDeleted = 0 and LoadPoint = @LoadPoint ";
+
+        /// <summary>
+        /// 获取上料点物料
+        /// </summary>
+        const string GetProcLoadPointMaterialSql = @"
+            select  t1.*,t2.MaterialId  
+            from proc_load_point t1
+            inner join proc_load_point_link_material t2 on t1.id = t2.LoadPointId and t2.IsDeleted = 0
+            where t1.IsDeleted  = 0
+            and t1.LoadPoint = @LoadPoint
+        ";
 
         #endregion
 
