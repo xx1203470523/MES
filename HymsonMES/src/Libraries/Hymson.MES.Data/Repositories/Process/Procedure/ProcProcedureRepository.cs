@@ -357,6 +357,33 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
+
+
+        /// <summary>
+        /// 查询工序单条数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcProcedureEntity> GetEntitieAsync(ProcProcedureQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(query.Code))
+            {
+                sqlBuilder.Where(" Code = @Code ");
+            }
+            if (!string.IsNullOrWhiteSpace(query.Name))
+            {
+                sqlBuilder.Where(" Name = @Name ");
+            }
+            sqlBuilder.AddParameters(query);
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefault(template.RawSql, template.Parameters);
+        }
     }
 
     /// <summary>
@@ -384,5 +411,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string UpdateStatusSql = "UPDATE `proc_procedure` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
+        const string GetEntitiesSqlTemplate = "SELECT * FROM `proc_procedure` /**where**/ ";
     }
 }

@@ -310,7 +310,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             sqlBuilder.AddParameters(inteWorkCenterRelationQuery);
 
             //if (inteWorkCenterRelationQuery.SubWorkCenterIds != null && inteWorkCenterRelationQuery.SubWorkCenterIds.Any()) {
-                sqlBuilder.Where("SubWorkCenterId IN @SubWorkCenterIds");
+            sqlBuilder.Where("SubWorkCenterId IN @SubWorkCenterIds");
             //}
 
             using var conn = GetMESDbConnection();
@@ -432,6 +432,32 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             }
             using var conn = GetMESDbConnection();
             var inteWorkCenters = await conn.QueryAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
+            return inteWorkCenters;
+        }
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="workCenterQuery"></param>
+        /// <returns></returns>
+        public async Task<InteWorkCenterEntity> GetEntitieAsync(InteWorkCenterFirstQuery workCenterQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(workCenterQuery.Code))
+            {
+                sqlBuilder.Where(" Code = @Code ");
+            }
+            if (!string.IsNullOrWhiteSpace(workCenterQuery.Name))
+            {
+                sqlBuilder.Where(" Name = @Name ");
+            }
+            using var conn = GetMESDbConnection();
+            var inteWorkCenters = await conn.QueryFirstOrDefault(template.RawSql, workCenterQuery);
             return inteWorkCenters;
         }
     }

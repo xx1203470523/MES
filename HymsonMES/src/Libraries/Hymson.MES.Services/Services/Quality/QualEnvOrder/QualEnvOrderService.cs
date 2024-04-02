@@ -16,6 +16,7 @@ using Hymson.MES.Core.Domain.QualEnvOrder;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.QualEnvOrder;
 using Hymson.MES.Services.Dtos.QualEnvOrder;
@@ -114,20 +115,24 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             qualEnvOrderPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var qualEnvOrderDtos = new List<QualEnvOrderDto>();
 
-            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterCode))
+            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterCode)|| !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterName))
             {
-                var entityByCodeQuery = new EntityByCodeQuery { Site = _currentSite.SiteId, Code = qualEnvOrderPagedQueryDto.WorkCenterCode };
-                var inteWorkCenter = await _inteWorkCenterRepository.GetByCodeAsync(entityByCodeQuery);
+                var inteWorkCenterQuery = new InteWorkCenterFirstQuery { SiteId = _currentSite.SiteId ?? 0, Code = qualEnvOrderPagedQueryDto.WorkCenterCode, Name = qualEnvOrderPagedQueryDto.WorkCenterName };
+                var inteWorkCenter = await _inteWorkCenterRepository.GetEntitieAsync(inteWorkCenterQuery); 
                 if (inteWorkCenter == null)
                 {
                     return new PagedInfo<QualEnvOrderDto>(qualEnvOrderDtos, qualEnvOrderPagedQueryDto.PageIndex, qualEnvOrderPagedQueryDto.PageSize, 0);
                 }
                 qualEnvOrderPagedQuery.WorkCenterId = inteWorkCenter.Id;
             }
-            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureCode))
+            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureCode) || !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureName))
             {
-                var entityByCodeQuery = new EntityByCodeQuery { Site = _currentSite.SiteId, Code = qualEnvOrderPagedQueryDto.WorkCenterCode };
-                var procProcedure = await _procProcedureRepository.GetByCodeAsync(entityByCodeQuery);
+                //var entityByCodeQuery = new EntityByCodeQuery { Site = _currentSite.SiteId, Code = qualEnvOrderPagedQueryDto.ProcedureCode };
+                //var procProcedure = await _procProcedureRepository.GetByCodeAsync(entityByCodeQuery);
+
+                var procProcedureQuery = new ProcProcedureQuery {  SiteId = _currentSite.SiteId??0, Code = qualEnvOrderPagedQueryDto.ProcedureCode, Name = qualEnvOrderPagedQueryDto.ProcedureName };
+                var procProcedure = await _procProcedureRepository.GetEntitieAsync(procProcedureQuery);
+                
                 if (procProcedure == null)
                 {
                     return new PagedInfo<QualEnvOrderDto>(qualEnvOrderDtos, qualEnvOrderPagedQueryDto.PageIndex, qualEnvOrderPagedQueryDto.PageSize, 0);
