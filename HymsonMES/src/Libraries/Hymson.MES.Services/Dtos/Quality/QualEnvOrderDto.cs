@@ -266,6 +266,6 @@ namespace Hymson.MES.Services.Dtos.QualEnvOrder
         /// <summary>
         /// 检验日期
         /// </summary>
-        public DateTime[]? InspectionDate { get; set; }
+        public DateTime[]? CreatedOn { get; set; }  
     }
 }

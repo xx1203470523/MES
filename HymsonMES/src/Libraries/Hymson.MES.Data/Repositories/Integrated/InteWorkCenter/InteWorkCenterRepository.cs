@@ -456,8 +456,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             {
                 sqlBuilder.Where(" Name = @Name ");
             }
+
             using var conn = GetMESDbConnection();
-            var inteWorkCenters = await conn.QueryFirstOrDefault(template.RawSql, workCenterQuery);
+            var inteWorkCenters = await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
             return inteWorkCenters;
         }
     }

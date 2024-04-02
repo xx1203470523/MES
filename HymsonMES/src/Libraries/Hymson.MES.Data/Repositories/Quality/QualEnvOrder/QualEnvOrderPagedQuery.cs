@@ -57,6 +57,6 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
         /// <summary>
         /// 检验日期
         /// </summary>
-        public DateTime[]? InspectionDate { get; set; }
+        public DateTime[]? CreatedOn { get; set; }
     }
 }

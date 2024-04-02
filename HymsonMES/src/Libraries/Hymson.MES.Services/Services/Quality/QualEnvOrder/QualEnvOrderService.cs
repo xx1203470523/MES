@@ -127,8 +127,6 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             }
             if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureCode) || !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureName))
             {
-                //var entityByCodeQuery = new EntityByCodeQuery { Site = _currentSite.SiteId, Code = qualEnvOrderPagedQueryDto.ProcedureCode };
-                //var procProcedure = await _procProcedureRepository.GetByCodeAsync(entityByCodeQuery);
 
                 var procProcedureQuery = new ProcProcedureQuery {  SiteId = _currentSite.SiteId??0, Code = qualEnvOrderPagedQueryDto.ProcedureCode, Name = qualEnvOrderPagedQueryDto.ProcedureName };
                 var procProcedure = await _procProcedureRepository.GetEntitieAsync(procProcedureQuery);

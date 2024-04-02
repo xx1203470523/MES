@@ -382,7 +382,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefault(template.RawSql, template.Parameters);
+            return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(template.RawSql, template.Parameters);
         }
     }
 
