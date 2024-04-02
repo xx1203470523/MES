@@ -59,31 +59,6 @@ namespace Hymson.MES.Api.Controllers
 
 
         /// <summary>
-        /// 获取工序配置打印信息
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("print/list")]
-        public async Task<PagedInfo<ProcProcedurePrintReleationDto>> GetProcedureBomConfigPrintListAsync([FromQuery] ProcProcedurePrintReleationPagedQueryDto parm)
-        {
-            return await _procConversionFactorService.GetProcedureConfigPrintListAsync(parm);
-        }
-
-        /// <summary>
-        /// 获取工序配置Job信息
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("job/list")]
-        public async Task<PagedInfo<ProcedureJobReleationDto>> GetProcedureBomConfigJobList([FromQuery] InteJobBusinessRelationPagedQueryDto parm)
-        {
-            return await _procConversionFactorService.GetProcedureConfigJobListAsync(parm);
-        }
-
-
-        /// <summary>
         /// 新增（转换系数表）
         /// </summary>
         /// <param name="parm"></param>
@@ -113,18 +88,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// 根据工序读取工序详细信息和资源信息
-        /// </summary>
-        /// <param name="code"></param>
-        /// <returns></returns>
-        [HttpGet("getByCode/{code}")]
-        public async Task<ProcProcedureCodeDto> GetByCodeAsync(string code)
-        {
-            return await _procConversionFactorService.GetByCodeAsync(code);
-        }
-
-        /// <summary>
-        /// 更新（上料点表）
+        /// 更新（转换系数表）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
