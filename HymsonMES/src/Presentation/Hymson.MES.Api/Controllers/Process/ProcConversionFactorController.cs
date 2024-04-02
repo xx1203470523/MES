@@ -52,34 +52,9 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ProcConversionFactorDto> QueryProcLoadPointByIdAsync(long id)
+        public async Task<ProcConversionFactorDto> QueryProcConversionFactorByIdAsync(long id)
         {
-            return await _procConversionFactorService.QueryProcLoadPointByIdAsync(id);
-        }
-
-
-        /// <summary>
-        /// 获取工序配置打印信息
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("print/list")]
-        public async Task<PagedInfo<ProcProcedurePrintReleationDto>> GetProcedureBomConfigPrintListAsync([FromQuery] ProcProcedurePrintReleationPagedQueryDto parm)
-        {
-            return await _procConversionFactorService.GetProcedureConfigPrintListAsync(parm);
-        }
-
-        /// <summary>
-        /// 获取工序配置Job信息
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("job/list")]
-        public async Task<PagedInfo<ProcedureJobReleationDto>> GetProcedureBomConfigJobList([FromQuery] InteJobBusinessRelationPagedQueryDto parm)
-        {
-            return await _procConversionFactorService.GetProcedureConfigJobListAsync(parm);
+            return await _procConversionFactorService.QueryProcConversionFactorByIdAsync(id);
         }
 
 
@@ -92,9 +67,9 @@ namespace Hymson.MES.Api.Controllers
         [Route("create")]
         [LogDescription("工序维护", BusinessType.INSERT)]
         [PermissionDescription("proc:ConversionFactor:insert")]
-        public async Task<long> AddProcProcedureAsync([FromBody] AddConversionFactorDto parm)
+        public async Task<long> AddProcConversionFactorAsync([FromBody] AddConversionFactorDto parm)
         {
-            return await _procConversionFactorService.AddProcProcedureAsync(parm);
+            return await _procConversionFactorService.AddProcConversionFactorAsync(parm);
         }
 
 
@@ -107,24 +82,13 @@ namespace Hymson.MES.Api.Controllers
         [Route("delete")]
         [LogDescription("转换系数维护", BusinessType.DELETE)]
         [PermissionDescription("proc:ConversionFactor:delete")]
-        public async Task DeleteProcLoadPointAsync([FromBody] long[] ids)
+        public async Task DeleteProcConversionFactorAsync([FromBody] long[] ids)
         {
-            await _procConversionFactorService.DeleteProcProcedureAsync(ids);
+            await _procConversionFactorService.DeleteProcConversionFactorAsync(ids);
         }
 
         /// <summary>
-        /// 根据工序读取工序详细信息和资源信息
-        /// </summary>
-        /// <param name="code"></param>
-        /// <returns></returns>
-        [HttpGet("getByCode/{code}")]
-        public async Task<ProcProcedureCodeDto> GetByCodeAsync(string code)
-        {
-            return await _procConversionFactorService.GetByCodeAsync(code);
-        }
-
-        /// <summary>
-        /// 更新（上料点表）
+        /// 更新（转换系数表）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
