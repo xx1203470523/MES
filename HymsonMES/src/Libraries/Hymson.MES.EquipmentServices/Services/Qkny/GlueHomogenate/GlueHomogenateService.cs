@@ -33,6 +33,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -262,22 +263,43 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
             //2. 从缓存罐投料到搅拌机（中间的计量罐不管）
             //3. 设备上传的具体条码不管，即使有多个条码，型号也是一致，直接取缓存罐最后一次上料的
 
-            //1. 获取设备基础信息
-            QknyBaseDto equDto = new QknyBaseDto();
-            equDto.EquipmentCode = dto.ConsumeEquipmentCode;
-            equDto.ResourceCode = dto.ConsumeResourceCodeCode;
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(equDto);
-            //2. 查询设备激活工单
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
-            //3. 查询上料点当前物料
+            //TODO 待优化
+            //1. 如果是是转移到上料点，则校验上料点物料，不校验工单
+            ProcLoadPointEquipmentQuery query = new ProcLoadPointEquipmentQuery();
+            query.CodeList.Add(dto.ConsumeEquipmentCode);
+            var dbList = await _procLoadPointService.GetPointOrEquipmmentAsync(query);
+            var inEqu = dbList.Where(m => m.Code == dto.ConsumeEquipmentCode).FirstOrDefault()!;
+            //2. 条码型号
             WhMaterialInventoryBarCodesQuery whMaterialQuery = new WhMaterialInventoryBarCodesQuery();
-            whMaterialQuery.SiteId = equResModel.SiteId;
+            whMaterialQuery.SiteId = inEqu.SiteId;
             whMaterialQuery.BarCodes = dto.SfcList;
             var sfcMaterialList = await _whMaterialInventoryService.GetByBarCodesAsync(whMaterialQuery);
-            //4. 校验物料是否在激活工单对应的BOM里
-            var sfcMaterialIdList = sfcMaterialList.Select(m => m.MaterialId).Distinct().ToList();
-            var orderMaterialList = await _planWorkOrderService.GetWorkOrderMaterialAsync(planEntity.ProductBOMId);
-            if (sfcMaterialIdList.All(orderMaterialList.Contains) == false)
+            List<long> sfcMaterialIdList = sfcMaterialList.Select(m => m.MaterialId).Distinct().ToList();
+            //3. 数据库物料
+            List<long> materialDbList = new List<long>();
+
+            //3. 物料校验
+            if(inEqu.DataType == "1") //上料点
+            {
+                ProcLoadPointQuery pointQuery = new ProcLoadPointQuery();
+                pointQuery.SiteId = inEqu.SiteId;
+                pointQuery.LoadPoint = dto.ConsumeEquipmentCode;
+                var pointMaterialList = await _procLoadPointService.GetProcLoadPointMaterialAsync(pointQuery);
+                materialDbList = pointMaterialList.Select(m => m.MaterialID).ToList();
+            }
+            else //设备
+            {
+                //1. 获取设备基础信息
+                QknyBaseDto equDto = new QknyBaseDto();
+                equDto.EquipmentCode = dto.ConsumeEquipmentCode;
+                equDto.ResourceCode = dto.ConsumeResourceCode;
+                EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(equDto);
+                //2. 查询设备激活工单
+                PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+                //4. 校验物料是否在激活工单对应的BOM里
+                materialDbList = await _planWorkOrderService.GetWorkOrderMaterialAsync(planEntity.ProductBOMId);
+            }
+            if (sfcMaterialIdList.All(materialDbList.Contains) == false)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45080));
             }
@@ -293,7 +315,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
             //1. 获取设备基础信息
             QknyBaseDto equDto = new QknyBaseDto();
             equDto.EquipmentCode = dto.ConsumeEquipmentCode;
-            equDto.ResourceCode = dto.ConsumeResourceCodeCode;
+            equDto.ResourceCode = dto.ConsumeResourceCode;
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(equDto);
             //2. 查询设备激活工单
             PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
@@ -613,7 +635,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
                 ManuFeedingNoProductionRecordSaveDto model = new ManuFeedingNoProductionRecordSaveDto();
                 model.EquipmentId = equResModel.EquipmentId;
                 model.ConsumeEquipmentCode = dto.ConsumeEquipmentCode;
-                model.ConsumeResourceCodeCode = dto.ConsumeResourceCodeCode;
+                model.ConsumeResourceCodeCode = dto.ConsumeResourceCode;
                 model.Sfc = item.Sfc;
                 model.Qty = item.Qty;
                 model.Category = item.Category;

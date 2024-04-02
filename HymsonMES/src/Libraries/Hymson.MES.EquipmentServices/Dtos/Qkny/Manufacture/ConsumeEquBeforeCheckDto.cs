@@ -19,7 +19,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// <summary>
         /// 投料至资源
         /// </summary>
-        public string ConsumeResourceCodeCode { get; set; } = "";
+        public string ConsumeResourceCode { get; set; } = "";
 
         /// <summary>
         /// 待投料条码集合

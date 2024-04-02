@@ -124,6 +124,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<ProcLoadPointEntity> GetProcLoadPointAsync(ProcLoadPointQuery query);
 
+        /// <summary>
+        /// 获取上料点物料
+        /// </summary>
+        /// <param name="procLoadPointQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcLoadPointMaterialView>> GetProcLoadPointMaterialAsync(ProcLoadPointQuery query);
+
         #endregion
     }
 }

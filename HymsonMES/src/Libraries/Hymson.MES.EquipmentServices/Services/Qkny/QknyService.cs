@@ -459,7 +459,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             saveDto.SiteId = equResModel.SiteId;
             saveDto.EquipmentId = equResModel.EquipmentId;
             saveDto.SendContent = dto.Content;
-            saveDto.TaskType = dto.Type;
+            saveDto.TaskType = dto.TaskType;
             saveDto.ReceiveContent = result;
             saveDto.CreatedOn = HymsonClock.Now();
             saveDto.CreatedBy = dto.EquipmentCode;

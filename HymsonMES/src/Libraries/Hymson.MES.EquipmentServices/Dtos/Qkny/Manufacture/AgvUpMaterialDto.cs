@@ -11,6 +11,10 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
     /// </summary>
     public record AgvUpMaterialDto : QknyBaseDto
     {
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public string TaskType { get; set; } = string.Empty;
     }
 
     /// <summary>
@@ -21,7 +25,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// <summary>
         /// 类型
         /// </summary>
-        public string Type { get; set; } = string.Empty;
+        public string TaskType { get; set; } = string.Empty;
 
         /// <summary>
         /// 内容
