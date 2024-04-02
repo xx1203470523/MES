@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
+using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -162,6 +164,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<IEnumerable<FQCParameterDetailDto>> QueryDetailSampleAsync(FQCParameterDetailQueryDto requestDto);
+
+
+        /// <summary>
+        /// 获取参数项目
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualFqcParameterGroupEntity>> VerificationParametergroupAsync(ParameterGroupQuery requestDto);
 
         /// <summary>
         /// 查询检验单样本数据（分页）

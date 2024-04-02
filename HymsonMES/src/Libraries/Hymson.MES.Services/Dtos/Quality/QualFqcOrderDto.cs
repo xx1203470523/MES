@@ -270,6 +270,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string Unit { get; set; }
 
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string OrderCode { get; set; }
+
     }
 
     /// <summary>

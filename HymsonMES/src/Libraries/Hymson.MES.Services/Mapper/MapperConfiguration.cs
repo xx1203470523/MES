@@ -1035,6 +1035,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualEnvOrderDetailModifyDto, QualEnvOrderDetailEntity>();
             CreateMap<QualEnvOrderDetailPagedQueryDto, QualEnvOrderDetailPagedQuery>();
             #endregion
+            #region FQC检测单
+            CreateMap<QualFqcOrderPagedQueryDto, QualFqcOrderPagedQuery>();
+            CreateMap<QualFqcOrderEntity, QualFqcOrderDto>();
+
+            #endregion
+
         }
 
         /// <summary>

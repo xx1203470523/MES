@@ -67,6 +67,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<IEnumerable<QualFinallyOutputRecordEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 按条码查询
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<QualFinallyOutputRecordEntity> GetBySFCAsync(string sfc);
+
+        /// <summary>
         /// 查询单个实体
         /// </summary>
         /// <param name="query"></param>
