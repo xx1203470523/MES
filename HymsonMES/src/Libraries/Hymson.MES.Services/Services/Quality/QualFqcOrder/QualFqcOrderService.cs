@@ -23,6 +23,8 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.CoreServices.Services.Quality.QualFqcOrder;
+using Hymson.MES.Data.Repositories.Plan;
+using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -107,6 +109,12 @@ namespace Hymson.MES.Services.Services.Quality
 
 
         /// <summary>
+        /// 工单信息表仓储接口
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+
+        /// <summary>
         /// struct
         /// </summary>
         /// <param name="currentUser"></param>
@@ -136,7 +144,8 @@ namespace Hymson.MES.Services.Services.Quality
             IQualFqcOrderOperateRepository qualFqcOrderOperateRepository,
             IQualFqcParameterGroupDetailSnapshootRepository qualFqcParameterGroupDetailSnapshootRepository,
             IQualFqcParameterGroupSnapshootRepository qualFqcParameterGroupSnapshootRepository,
-            IFQCOrderCreateService qualFqcOrderCreateService)
+            IFQCOrderCreateService qualFqcOrderCreateService,
+            IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -153,6 +162,7 @@ namespace Hymson.MES.Services.Services.Quality
             _qualFqcParameterGroupDetailSnapshootRepository = qualFqcParameterGroupDetailSnapshootRepository;
             _qualFqcParameterGroupSnapshootRepository = qualFqcParameterGroupSnapshootRepository;
             _qualFqcOrderCreateService = qualFqcOrderCreateService;
+            _planWorkOrderRepository= planWorkOrderRepository;
         }
 
 
@@ -1074,6 +1084,40 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
+        /// 条码校验FQC，返回FQC参数项目
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualFqcParameterGroupEntity>> VerificationParametergroupAsync(ParameterGroupQuery query)
+        {
+
+            // 转换产品编码/版本变为产品ID
+            if (!string.IsNullOrWhiteSpace(query.SFC))
+            {
+                // 查询检验单下面的所有样本
+                var sampleEntities = await _qualFqcOrderSampleRepository.GetEntitiesAsync(new QualFqcOrderSampleQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Barcode = query.SFC
+                });
+                if (sampleEntities != null && sampleEntities.Any())
+                {
+                    var fqcOrderList = await _qualFqcOrderRepository.GetByIdsAsync(sampleEntities.Select(x => x.FQCOrderId).Distinct().ToArray());
+                    if (fqcOrderList.Any(x => x.Status != InspectionStatusEnum.Closed))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19980)).WithData("sfc", query.SFC).WithData("fqcOrder", fqcOrderList.Where(x => x.Status != InspectionStatusEnum.Closed));
+                    }
+                }
+            }
+
+            //查FQC参数项目
+            IEnumerable<QualFqcParameterGroupEntity> parm = null;
+            return parm;
+
+        }
+
+
+        /// <summary>
         /// 查询检验单样本数据（分页）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
@@ -1241,6 +1285,9 @@ namespace Hymson.MES.Services.Services.Quality
                 FQCOrderIds = entities.Select(s => s.Id)
             });
 
+            var planworkEntitys = await _planWorkOrderRepository.GetByIdsAsync(entities.Where(w => w.WorkOrderId.HasValue).Select(x => x.WorkOrderId!.Value));
+            var planworkDic = planworkEntitys.ToDictionary(x => x.Id, x => x);
+
             foreach (var entity in entities)
             {
                 var dto = entity.ToModel<QualFqcOrderDto>();
@@ -1282,7 +1329,7 @@ namespace Hymson.MES.Services.Services.Quality
                 // 产品
                 if (entity.MaterialId.HasValue)
                 {
-                    var materialEntity = materialDic[entity.MaterialId.Value];
+                    materialDic.TryGetValue(entity.MaterialId.Value, out var materialEntity);
                     if (materialEntity != null)
                     {
                         dto.MaterialCode = materialEntity.MaterialCode;
@@ -1296,6 +1343,13 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.MaterialCode = "-";
                     dto.MaterialName = "-";
                     dto.MaterialVersion = "-";
+                }
+
+                if (entity.WorkOrderId.HasValue)
+                {
+                    planworkDic.TryGetValue(entity.WorkOrderId.Value, out var workorder);
+                    if (workorder != null)
+                        dto.OrderCode = workorder.OrderCode;
                 }
 
                 //// 供应商

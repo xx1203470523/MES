@@ -1,10 +1,12 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
 
 namespace Hymson.MES.Api.Controllers.Quality
 {
@@ -133,7 +135,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 生成IQC检验单
+        /// 生成FQC检验单
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -243,6 +245,17 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualFqcOrderService.QueryDetailSampleAsync(requestDto);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("verfyParametergroup")]
+        public async Task<IEnumerable<QualFqcParameterGroupEntity>> verificationParametergroupAsync([FromQuery] ParameterGroupQuery requestDto)
+        {
+            return await _qualFqcOrderService.VerificationParametergroupAsync(requestDto);
+        }
+ 
         /// <summary>
         /// 查询检验单样本数据（分页）
         /// </summary>
