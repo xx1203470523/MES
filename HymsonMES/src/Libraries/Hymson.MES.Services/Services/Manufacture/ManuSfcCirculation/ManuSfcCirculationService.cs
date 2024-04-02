@@ -447,12 +447,11 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
     /// <returns></returns>
     public async Task UpdateManuSfcCirculationAsync(ManuSfcCirculationBindDto bindDto)
     {
-
         var procedureEntity = await _procProcedureRepository.GetByIdAsync(bindDto.ProcedureId.GetValueOrDefault())
             ?? throw new CustomerValidationException(nameof(ErrorCode.MES17311));
 
         //校验被绑定条码是否存在Ng
-        var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new() { SFCS = new string[] { bindDto.CirculationBarCode } });
+        var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new() { SFCS = new string[] {  bindDto.SFC } });
         var hasNg = manuSfcSummaryEntities.Any(a => a.QualityStatus == 0);
         if (hasNg) throw new CustomerValidationException(nameof(ErrorCode.MES19147)).WithData("SFC", bindDto.CirculationBarCode ?? "");
 
