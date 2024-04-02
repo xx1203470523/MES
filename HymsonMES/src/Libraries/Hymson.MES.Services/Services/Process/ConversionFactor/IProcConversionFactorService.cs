@@ -25,21 +25,21 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcConversionFactorDto> QueryProcLoadPointByIdAsync(long id);
+        Task<ProcConversionFactorDto> QueryProcConversionFactorByIdAsync(long id);
 
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procProcedureCreateDto"></param>
+        /// <param name="procConversionFactorCreateDto"></param>
         /// <returns></returns>
-        Task<long> AddProcProcedureAsync(AddConversionFactorDto procProcedureCreateDto);
+        Task<long> AddProcConversionFactorAsync(AddConversionFactorDto procConversionFactorCreateDto);
 
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeleteProcProcedureAsync(long[] ids);
+        Task<int> DeleteProcConversionFactorAsync(long[] ids);
 
         /// <summary>
         /// 修改

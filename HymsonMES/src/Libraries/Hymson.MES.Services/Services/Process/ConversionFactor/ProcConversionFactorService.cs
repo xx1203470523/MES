@@ -206,7 +206,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcConversionFactorDto> QueryProcLoadPointByIdAsync(long id)
+        public async Task<ProcConversionFactorDto> QueryProcConversionFactorByIdAsync(long id)
         {
             var procConversionFactorEntity = await _procConversionFactorRepository.GetByIdAsync(id);
             if (procConversionFactorEntity == null)
@@ -223,6 +223,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 procedureId= procConversionFactorEntity.ProcedureId,
                 MaterialId=procConversionFactorEntity.MaterialId
             };
+            converdionFactorDto.remark = procConversionFactorEntity.Remark != null ? procConversionFactorEntity.Remark : converdionFactorDto.remark;
             //关连的工序
             var ConversionFactorLinkProcedure = await _procProcedureRepository.GetByIdAsync(procConversionFactorEntity.ProcedureId);
             if (ConversionFactorLinkProcedure!= null) 
@@ -258,7 +259,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         }
     
 
-        public async Task<long> AddProcProcedureAsync(AddConversionFactorDto AddConversionFactorDto)
+        public async Task<long> AddProcConversionFactorAsync(AddConversionFactorDto AddConversionFactorDto)
         {
             if (AddConversionFactorDto == null)
             {
@@ -325,7 +326,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         /// <param name="idsAr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcProcedureAsync(long[] idsAr)
+        public async Task<int> DeleteProcConversionFactorAsync(long[] idsAr)
         {
             if (idsAr.Length < 1)
             {

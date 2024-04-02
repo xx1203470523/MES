@@ -68,6 +68,12 @@ namespace Hymson.MES.Services.Dtos.Process
         public string MaterialName { get; set; }
 
         /// <summary>
+        /// Remark
+        /// 空值 : false  
+        /// </summary>
+        public string remark { get; set; }
+
+        /// <summary>
         /// 物料编码
         /// 空值 : false  
         /// </summary>

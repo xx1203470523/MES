@@ -52,9 +52,9 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ProcConversionFactorDto> QueryProcLoadPointByIdAsync(long id)
+        public async Task<ProcConversionFactorDto> QueryProcConversionFactorByIdAsync(long id)
         {
-            return await _procConversionFactorService.QueryProcLoadPointByIdAsync(id);
+            return await _procConversionFactorService.QueryProcConversionFactorByIdAsync(id);
         }
 
 
@@ -67,9 +67,9 @@ namespace Hymson.MES.Api.Controllers
         [Route("create")]
         [LogDescription("工序维护", BusinessType.INSERT)]
         [PermissionDescription("proc:ConversionFactor:insert")]
-        public async Task<long> AddProcProcedureAsync([FromBody] AddConversionFactorDto parm)
+        public async Task<long> AddProcConversionFactorAsync([FromBody] AddConversionFactorDto parm)
         {
-            return await _procConversionFactorService.AddProcProcedureAsync(parm);
+            return await _procConversionFactorService.AddProcConversionFactorAsync(parm);
         }
 
 
@@ -82,9 +82,9 @@ namespace Hymson.MES.Api.Controllers
         [Route("delete")]
         [LogDescription("转换系数维护", BusinessType.DELETE)]
         [PermissionDescription("proc:ConversionFactor:delete")]
-        public async Task DeleteProcLoadPointAsync([FromBody] long[] ids)
+        public async Task DeleteProcConversionFactorAsync([FromBody] long[] ids)
         {
-            await _procConversionFactorService.DeleteProcProcedureAsync(ids);
+            await _procConversionFactorService.DeleteProcConversionFactorAsync(ids);
         }
 
         /// <summary>
