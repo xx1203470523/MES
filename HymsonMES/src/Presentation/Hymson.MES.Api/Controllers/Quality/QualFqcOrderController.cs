@@ -152,7 +152,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("operation")]
-        public async Task<long> OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
+        public async Task<long> OperationOrderAsync([FromBody] OrderOperationStatusDto requestDto)
         {
             return await _qualFqcOrderService.OperationOrderAsync(requestDto);
         }

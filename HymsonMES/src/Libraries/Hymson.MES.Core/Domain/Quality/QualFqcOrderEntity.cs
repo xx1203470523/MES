@@ -55,7 +55,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 是否为预生成单(0-否 1-是)
         /// </summary>
-        public TrueOrFalseEnum IsPreGenerated { get; set; }
+        public TrueOrFalseEnum? IsPreGenerated { get; set; }
 
         /// <summary>
         /// 备注

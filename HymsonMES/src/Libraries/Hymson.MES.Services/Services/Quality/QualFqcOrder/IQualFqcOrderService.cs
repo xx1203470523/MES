@@ -65,7 +65,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> OperationOrderAsync(QualOrderOperationStatusDto requestDto);
+        Task<int> OperationOrderAsync(OrderOperationStatusDto requestDto);
 
         /// <summary>
         /// 保存样品数据

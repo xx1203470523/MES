@@ -1964,6 +1964,8 @@
 
         #region FQC执行检验
         public const string MES19980 = "条码{sfc}所在检验单{fqcOrder}未关闭";
+        public const string MES19981 = "不存在FQC检验单条码记录表中";
+
         #endregion
 
 
