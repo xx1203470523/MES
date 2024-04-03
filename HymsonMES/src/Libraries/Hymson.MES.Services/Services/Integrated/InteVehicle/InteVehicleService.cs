@@ -746,8 +746,8 @@ namespace Hymson.MES.Services.Services.Integrated
             //}
 
             //获取位置信息
-            var LocationIds = inteVehicleFreightStackEntities.Select(a => a.LocationId).Distinct();
-            var inteVehicleFreightEnities = await _inteVehicleFreightRepository.GetByIdsAsync(LocationIds.ToArray());
+            var locationIds = inteVehicleFreightStackEntities.Select(a => a.LocationId).Distinct();
+            var inteVehicleFreightEnities = await _inteVehicleFreightRepository.GetByIdsAsync(locationIds.ToArray());
             if (inteVehicleFreightEnities == null || !inteVehicleFreightEnities.Any())
             {
                 return result;

@@ -145,6 +145,8 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("PWO.SiteId = @SiteId");
             }
 
+            //sqlBuilder.Where("PWO.OrderCode = 'ORDERCODE1686293975352'");
+
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
