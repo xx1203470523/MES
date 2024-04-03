@@ -70,7 +70,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -86,6 +86,31 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
 
             await _envOrderCreateService.ManualCreateAsync(bo);
         }
+
+
+        /// <summary>
+        /// 创建环境检验(转换ID)
+        /// </summary>
+        /// <param name="createConvertDto"></param>
+        /// <returns></returns>
+        public async Task QualEnvOrderCreateConvert(QualEnvOrderCreateConvertDto createConvertDto)
+        {
+            if (createConvertDto == null || string.IsNullOrWhiteSpace(createConvertDto.ProcedureCode) || string.IsNullOrWhiteSpace(createConvertDto.WorkCenterCode))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13605));
+            }
+            var inteWorkCenter = await _inteWorkCenterRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentSite.SiteId, Code = createConvertDto.WorkCenterCode });
+            var procProcedure = await _procProcedureRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentSite.SiteId, Code = createConvertDto.ProcedureCode });
+            var dto = new QualEnvOrderCreateDto()
+            {
+                WorkCenterId = inteWorkCenter.Id,
+                ProcedureId = procProcedure.Id
+            };
+
+            //创建
+            await CreateQualEnvOrderAsync(dto);
+        }
+
 
         /// <summary>
         /// 删除
@@ -118,10 +143,10 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             qualEnvOrderPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var qualEnvOrderDtos = new List<QualEnvOrderDto>();
 
-            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterCode)|| !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterName))
+            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterCode) || !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterName))
             {
                 var inteWorkCenterQuery = new InteWorkCenterFirstQuery { SiteId = _currentSite.SiteId ?? 0, Code = qualEnvOrderPagedQueryDto.WorkCenterCode, Name = qualEnvOrderPagedQueryDto.WorkCenterName };
-                var inteWorkCenter = await _inteWorkCenterRepository.GetEntitieAsync(inteWorkCenterQuery); 
+                var inteWorkCenter = await _inteWorkCenterRepository.GetEntitieAsync(inteWorkCenterQuery);
                 if (inteWorkCenter == null)
                 {
                     return new PagedInfo<QualEnvOrderDto>(qualEnvOrderDtos, qualEnvOrderPagedQueryDto.PageIndex, qualEnvOrderPagedQueryDto.PageSize, 0);
@@ -131,9 +156,9 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureCode) || !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureName))
             {
 
-                var procProcedureQuery = new ProcProcedureQuery {  SiteId = _currentSite.SiteId??0, Code = qualEnvOrderPagedQueryDto.ProcedureCode, Name = qualEnvOrderPagedQueryDto.ProcedureName };
+                var procProcedureQuery = new ProcProcedureQuery { SiteId = _currentSite.SiteId ?? 0, Code = qualEnvOrderPagedQueryDto.ProcedureCode, Name = qualEnvOrderPagedQueryDto.ProcedureName };
                 var procProcedure = await _procProcedureRepository.GetEntitieAsync(procProcedureQuery);
-                
+
                 if (procProcedure == null)
                 {
                     return new PagedInfo<QualEnvOrderDto>(qualEnvOrderDtos, qualEnvOrderPagedQueryDto.PageIndex, qualEnvOrderPagedQueryDto.PageSize, 0);
@@ -202,7 +227,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
