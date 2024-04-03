@@ -261,6 +261,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 StartNumber = inteCodeRulesEntity.StartNumber,
                 CodeMode = inteCodeRulesEntity.CodeMode,
                 SiteId = param.SiteId,
+                InteWorkCenterId= inteWorkCenterEntity.Id
             });
 
             List<CreateBarcodeByWorkOrderOutputBo> result = new();
