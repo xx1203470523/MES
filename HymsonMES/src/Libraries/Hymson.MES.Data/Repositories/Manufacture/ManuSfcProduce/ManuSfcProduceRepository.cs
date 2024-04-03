@@ -188,7 +188,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.OrderBy("Id DESC");
-            sqlBuilder.Select("Id, SFCId, SFC, ProductId, WorkOrderId, CreatedOn");
+            sqlBuilder.Select("Id, SFCId, SFC, ProductId, WorkOrderId, CreatedOn,Status");
 
             if (pagedQuery.IsUsed.HasValue) sqlBuilder.Where("CreatedOn = UpdatedOn");
             if (pagedQuery.WorkOrderIds != null) sqlBuilder.Where("WorkOrderId IN @WorkOrderIds");
