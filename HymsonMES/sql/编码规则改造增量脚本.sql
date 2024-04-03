@@ -1,6 +1,6 @@
 ALTER TABLE inte_work_center ADD COLUMN LineCoding VARCHAR(50) DEFAULT NULL COMMENT '线体编码，条码生成使用';
 ALTER TABLE proc_material ADD COLUMN ProductModel VARCHAR(50) DEFAULT NULL COMMENT '电池规格查询表-产品型号，条码生成使用';
-
+ALTER TABLE proc_material ADD COLUMN MaterialType tinyint DEFAULT NULL COMMENT '原材料类型，条码生成使用';
 
 INSERT INTO `inte_time_wildcard` (`Id`, `Code`, `Type`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (1, '2011', 1, '1', '2011年', '22025', '2024-04-01 13:52:00', '22025', '2024-04-01 13:52:06', 0, 123456);
 INSERT INTO `inte_time_wildcard` (`Id`, `Code`, `Type`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (2, '2012', 1, '2', '2012年', '22025', '2024-04-01 13:52:00', '22025', '2024-04-01 13:52:06', 0, 123456);

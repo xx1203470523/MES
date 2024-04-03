@@ -383,6 +383,7 @@ namespace Hymson.MES.Services.Services.Process
                     QuantityLimit = procMaterialEntity.QuantityLimit,
                      ProductModel = procMaterialEntity.ProductModel,
                       Specifications= procMaterialEntity.Specifications,
+                       MaterialType = procMaterialEntity.MaterialType,
                 });
 
                 if (response == 0)

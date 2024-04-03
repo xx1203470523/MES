@@ -28,10 +28,15 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         private readonly ISequenceService _sequenceService;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
+
         /// <summary>
         /// 工作中心，为生成条码的线体部分使用
         /// </summary>
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+        /// <summary>
+        /// 条码追溯
+        /// </summary>
+        private readonly ITracingSourceCoreService _tracingSourceCoreService;
         private readonly IInteTimeWildcardRepository _inteTimeWildcardRepository;
         private readonly ILocalizationService _localizationService;
         /// <summary>
@@ -48,7 +53,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             IInteCodeRulesRepository inteCodeRulesRepository,
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
             ISequenceService sequenceService,
-            IInteTimeWildcardRepository inteTimeWildcardRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository,IInteWorkCenterRepository inteWorkCenterRepository)
+            IInteTimeWildcardRepository inteTimeWildcardRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository,IInteWorkCenterRepository inteWorkCenterRepository, 
+            ITracingSourceCoreService tracingSourceCoreService)
         {
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
@@ -57,6 +63,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             _localizationService = localizationService;
             _procMaterialRepository = procMaterialRepository;
             _inteWorkCenterRepository= inteWorkCenterRepository;
+            _tracingSourceCoreService = tracingSourceCoreService;
         }
 
         /// <summary>
@@ -228,6 +235,18 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                         case GenerateBarcodeWildcard.LINETYPE:
                             rules.Add(new List<string> { await GenerateLineAsync(bo) });
                             break;
+                        case GenerateBarcodeWildcard.AnodeMain:
+                            rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.AnodeMain) });
+                            break;
+                        case GenerateBarcodeWildcard.CathodeMain:
+                            rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.CathodeMain) });
+                            break;
+                        case GenerateBarcodeWildcard.Diaphragm:
+                            rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.Diaphragm) });
+                            break;
+                        case GenerateBarcodeWildcard.PositivePlate:
+                            rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.PositivePlate) });
+                            break;
                         default:
                             throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);
                     }
@@ -250,7 +269,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
 
             return list;
         }
-        
+
         ///// <summary>
         ///// 生成流水号
         ///// </summary>
@@ -388,6 +407,55 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         //}
 
         #region 内部方法
+
+        /// <summary>
+        /// 生成条码物料类型相关数据
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="wildcard">通配符</param>
+        /// <returns></returns>
+        private async Task<string> GenerateMaterialTypeAsync(BarCodeSerialNumberBo bo,string wildcard)
+        {
+
+            if (bo.IsTest)
+            {
+                ///因为是动态生成，在前端测试时用XX占位
+                return "ZZ";
+            }
+            else
+            {
+                if (bo.Sfcs==null||!bo.Sfcs.Any())
+                {
+                    return string.Empty;
+                }
+                string productModel = "";
+                bool isFound=false;
+                foreach (var sfc in bo.Sfcs)
+                {
+                    var manuSFCNodeSourceEntities = await _tracingSourceCoreService.OriginalSourceAsync(new Data.Repositories.Common.Query.EntityBySFCQuery
+                    {
+                        SFC = sfc,
+                        SiteId = bo.SiteId,
+                    });
+                    //关联物料信息，查询是什么类型的物料
+                    var productIds = manuSFCNodeSourceEntities.Select(x => x.ProductId);
+                    var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(productIds);
+                    foreach (var procMaterialEntity in procMaterialEntities)
+                    {
+                        if (procMaterialEntity.MaterialType == Core.Enums.Process.MaterialTypeEnum.AnodeMain && wildcard == GenerateBarcodeWildcard.AnodeMain)
+                        {
+                            productModel = procMaterialEntity.ProductModel??string.Empty;
+                            isFound = true;
+                            break;
+                        }
+                    }
+                    if (isFound) break;
+                     
+                }
+               
+               return productModel;
+            }
+        }
         /// <summary>
         /// 生成条码线体相关数据
         /// </summary>
