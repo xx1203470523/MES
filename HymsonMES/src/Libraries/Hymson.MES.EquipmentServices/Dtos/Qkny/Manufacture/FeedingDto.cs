@@ -19,7 +19,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// <summary>
         /// 数量
         /// </summary>
-        public decimal Qty { get; set; }
+        public decimal? Qty { get; set; }
 
         /// <summary>
         /// 是否上料点

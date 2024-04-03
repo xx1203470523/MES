@@ -1223,5 +1223,45 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //1. 如果是原材料，需要校验格式是否是5锻码
             //2. 物料型号和数量从条码截取
         }
+
+        /// <summary>
+        /// 绑定后极组单个条码进站049
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("InboundBindJzSingle")]
+        [LogDescription("绑定后极组单个条码进站049", BusinessType.OTHER, "InboundBindJzSingle049", ReceiverTypeEnum.MES)]
+        public async Task InboundBindJzSingleAsync(InboundDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            //await _qknyService.InboundAsync(dto);
+
+        }
+
+        /// <summary>
+        /// 绑定后极组单个条码出站050
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("OutboundBindJzSingle")]
+        [LogDescription("绑定后极组单个条码出站050", BusinessType.OTHER, "OutboundBindJzSingle050", ReceiverTypeEnum.MES)]
+        public async Task OutboundBindJzSingleAsync(OutboundBindJzSingleDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            //await _qknyService.OutboundAsync(dto);
+
+        }
+
+
     }
 }
