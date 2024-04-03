@@ -757,6 +757,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string Version { get; set; }
 
         /// <summary>
+        /// 描述 :计量单位(字典定义) 
+        /// 空值 : true  
+        /// </summary>
+        public string? Unit { get; set; }
+
+        /// <summary>
         /// 资源编码
         /// </summary>
         public string ResCode { get; set; }

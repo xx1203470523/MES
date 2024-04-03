@@ -190,7 +190,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             bomMaterials.AddRange(initialMaterials.SelectMany(s => s.ReplaceMaterials).Select(s => new MaterialDeductItemBo { MaterialId = s.MaterialId, DataCollectionWay = s.DataCollectionWay }));
 
             // 获取库存数据
-            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(new WhMaterialInventoryBarCodesQuery
             {
                 SiteId = multiSFCBo.SiteId,
                 BarCodes = multiSFCBo.SFCs

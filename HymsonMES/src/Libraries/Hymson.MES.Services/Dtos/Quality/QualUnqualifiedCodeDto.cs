@@ -87,24 +87,9 @@ namespace Hymson.MES.Services.Dtos.Quality
 
     }
 
-    public record QualUnqualifiedCodeResultDto
-    {
-        /// <summary>
-        /// 主键id
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 不合格代码
-        /// </summary>
-        public string ? UnqualifiedCode { get; set; }
-
-        /// <summary>
-        /// 不合格代码名称
-        /// </summary>
-        public string ? UnqualifiedCodeName { get; set; }
-    }
-
+    /// <summary>
+    /// 
+    /// </summary>
     public record UnqualifiedCodeGroupRelationDto
     {
         /// <summary>

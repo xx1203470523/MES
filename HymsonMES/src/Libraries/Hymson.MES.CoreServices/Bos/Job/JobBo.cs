@@ -208,6 +208,10 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 出站对象 / 半成品
         /// </summary>
         public IEnumerable<OutStationRequestBo>? OutStationRequestBos { get; set; }
+        /// <summary>
+        /// 载具操作
+        /// </summary>
+        public VehicleBo? VehicleBo { get; set; }
 
     }
 

@@ -73,10 +73,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcId"></param>
         /// <returns></returns>
-        Task<ManuSfcInfoEntity> GetBySFCAsync(long sfcId);
+        Task<ManuSfcInfoEntity> GetBySFCIdWithIsUseAsync(long sfcId);
+
+        /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcId"></param>
+        /// <returns></returns>
+        Task<ManuSfcInfoEntity> GetBySFCIdAsync(long sfcId);
 
         /// <summary>
         /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcInfoEntity>> GetBySFCIdsWithIsUseAsync(IEnumerable<long> sfcIds);
+
+        /// <summary>
+        /// 根据SFCIds获取数据
         /// </summary>
         /// <param name="sfcIds"></param>
         /// <returns></returns>

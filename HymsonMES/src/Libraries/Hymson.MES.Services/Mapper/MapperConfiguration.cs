@@ -6,6 +6,8 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Qual;
+using Hymson.MES.Core.Domain.QualEnvOrder;
+using Hymson.MES.Core.Domain.QualEnvOrderDetail;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Domain.WHMaterialReceipt;
@@ -48,6 +50,8 @@ using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Process.View;
 using Hymson.MES.Data.Repositories.Qual;
+using Hymson.MES.Data.Repositories.QualEnvOrder;
+using Hymson.MES.Data.Repositories.QualEnvOrderDetail;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspection.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View;
@@ -70,6 +74,8 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Qual;
+using Hymson.MES.Services.Dtos.QualEnvOrder;
+using Hymson.MES.Services.Dtos.QualEnvOrderDetail;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
@@ -554,6 +560,14 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLoadPointPagedQuery, ProcLoadPointPagedQueryDto>();
             #endregion
 
+            #region ConversionFactor
+            CreateMap<AddConversionFactorDto, ProcConversionFactorEntity>();
+            CreateMap<ProcProcedureView, ProcConversionFactorViewDto>();
+            CreateMap<ProcConversionFactorPagedQueryDto, IProcConversionFactorPagedQuery>();
+            CreateMap<ProcConversionFactorView, ProcConversionFactorViewDto>();
+            CreateMap<ProcConversionFactorModifyDto, ProcConversionFactorEntity>();
+            #endregion
+
             #region LoadPointLink
             CreateMap<ProcLoadPointLinkMaterialCreateDto, ProcLoadPointLinkMaterialEntity>();
             CreateMap<ProcLoadPointLinkMaterialModifyDto, ProcLoadPointLinkMaterialEntity>();
@@ -994,7 +1008,7 @@ namespace Hymson.MES.Services.Mapper
             //更新对象
             CreateMap<QualOqcParameterGroupUpdateDto, QualOqcParameterGroupUpdateCommand>();
             CreateMap<QualOqcParameterGroupDetailOutputDto, QualOqcParameterGroupDetailCreateCommand>();
-            
+
 
 
             //实体对象转换为数据传输对象（页面输出)
@@ -1007,6 +1021,27 @@ namespace Hymson.MES.Services.Mapper
 
 
             #endregion
+
+            #region env环境检验单
+            CreateMap<QualEnvOrderEntity, QualEnvOrderDto>();
+            CreateMap<QualEnvOrderCreateDto, QualEnvOrderEntity>();
+            CreateMap<QualEnvOrderModifyDto, QualEnvOrderEntity>();
+            CreateMap<QualEnvOrderPagedQueryDto, QualEnvOrderPagedQuery>();
+
+
+            CreateMap<QualEnvOrderDetailEntity, QualEnvOrderDetailDto>();
+            CreateMap<QualEnvOrderDetailEntity, QualEnvOrderDetailExtendDto>();
+            CreateMap<QualEnvOrderDetailCreateDto, QualEnvOrderDetailEntity>();
+            CreateMap<QualEnvOrderDetailModifyDto, QualEnvOrderDetailEntity>();
+            CreateMap<QualEnvOrderDetailPagedQueryDto, QualEnvOrderDetailPagedQuery>();
+            #endregion
+            #region FQC检测单
+            CreateMap<QualFqcOrderPagedQueryDto, QualFqcOrderPagedQuery>();
+            CreateMap<QualFqcOrderEntity, QualFqcOrderDto>();
+             
+
+            #endregion
+
         }
 
         /// <summary>

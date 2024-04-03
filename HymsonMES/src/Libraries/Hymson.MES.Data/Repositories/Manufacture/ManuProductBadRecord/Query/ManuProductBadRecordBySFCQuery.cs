@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Core.Enums.Manufacture;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 

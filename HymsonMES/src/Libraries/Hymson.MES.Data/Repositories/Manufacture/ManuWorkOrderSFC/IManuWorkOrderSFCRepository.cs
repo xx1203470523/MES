@@ -23,6 +23,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> RepalceRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities);
 
         /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> DeleteRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities);
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>

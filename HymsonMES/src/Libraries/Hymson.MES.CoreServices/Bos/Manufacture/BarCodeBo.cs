@@ -51,7 +51,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
 
 
         /// <summary>
-        /// 
+        /// 取流水号做为主键key
         /// </summary>
         public string CodeRuleKey { get; set; } = "";
 
@@ -95,10 +95,25 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// </summary>
         public CodeRuleCodeModeEnum CodeMode { get; set; }
 
+
+        /// <summary>
+        /// 编码类型;1：过程控制序列码；2：包装序列码；
+        /// </summary>
+        public CodeRuleCodeTypeEnum CodeType { get; set; }
         /// <summary>
         /// 站点
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 产品id
+        /// </summary>
+        public long ProductId { get; set; }
+
+        /// <summary>
+        /// 工作中心Id 为获取线体数据做准备 生成的条码需要线体相关数据进行扩展
+        /// </summary>
+        public long? InteWorkCenterId { get; set; }
     }
 
     /// <summary>

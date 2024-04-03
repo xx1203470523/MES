@@ -66,9 +66,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("create")]
         [LogDescription("载具注册", BusinessType.INSERT)]
         [PermissionDescription("inte:inteVehicle:insert")]
-        public async Task<long> AddInteVehicleAsync([FromBody] InteVehicleCreateDto parm)
+        public async Task AddInteVehicleAsync([FromBody] InteVehicleCreateDto parm)
         {
-             return await _inteVehicleService.CreateInteVehicleAsync(parm);
+            await _inteVehicleService.CreateInteVehicleAsync(parm);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [PermissionDescription("inte:inteVehicle:update")]
         public async Task UpdateInteVehicleAsync([FromBody] InteVehicleModifyDto parm)
         {
-             await _inteVehicleService.ModifyInteVehicleAsync(parm);
+            await _inteVehicleService.ModifyInteVehicleAsync(parm);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("getVehicleVerifyByVehicleId/{id}")]
-        public async Task<InteVehicleVerifyDto> QueryVehicleVerifyByVehicleIdAsync(long id) 
+        public async Task<InteVehicleVerifyDto> QueryVehicleVerifyByVehicleIdAsync(long id)
         {
             return await _inteVehicleService.QueryVehicleVerifyByVehicleIdAsync(id);
         }
@@ -143,12 +143,16 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("载具绑盘", BusinessType.OTHER)]
+        //[PermissionDescription("manu:vehicle:bind")]
         [Route("bindVehicle")]
         public async Task VehicleFreightOperationAsync(InteVehicleBindOperationDto dto)
         {
-            dto.OperationType = Core.Enums.Integrated.VehicleOperationEnum.Bind;
-            await _inteVehicleService.VehicleOperationAsync(dto);
+
+            // await _inteVehicleService.VehicleOperationAsync(dto);
+            await _inteVehicleService.VehicleBindOperationAsync(dto);
         }
+
 
         /// <summary>
         /// 载具操作解盘
@@ -156,12 +160,15 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("载具操作解盘", BusinessType.OTHER)]
+        //[PermissionDescription("manu:vehicle:unbind")]
         [Route("unbindVehicle")]
         public async Task UnbindVehicleAsync(InteVehicleUnbindOperationDto dto)
         {
-            
-            dto.OperationType = Core.Enums.Integrated.VehicleOperationEnum.Unbind;
-            await _inteVehicleService.VehicleOperationAsync(dto);
+
+
+            // await _inteVehicleService.VehicleOperationAsync(dto);
+            await _inteVehicleService.VehicleUnBindOperationAsync(dto);
         }
 
         /// <summary>
@@ -170,24 +177,25 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("载具操作清盘", BusinessType.OTHER)]
+        // [PermissionDescription("manu:vehicle:clear")]
         [Route("clearVehicle")]
         public async Task ClearVehicleAsync(InteVehicleClearOperationDto dto)
         {
-            dto.OperationType = Core.Enums.Integrated.VehicleOperationEnum.Clear;
-            await _inteVehicleService.VehicleOperationAsync(dto);
+
+            await _inteVehicleService.VehicleClearOperationAsync(dto);
         }
 
-
         /// <summary>
-        /// 通过托盘码获取托盘视图信息(装载记录表)（PDA）
+        /// 通过托盘码获取托盘视图信息(PDA)
         /// </summary>
         /// <param name="palletNo"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("getVehicleFreightByPalletNo/pda/{palletNo}")]
-        public async Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordBypalletNoAsync(string palletNo)
+        [Route("getVehicleFreightByPalletNo/{palletNo}")]
+        public async Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordByPalletNoPDAAsync(string palletNo)
         {
-            return await _inteVehicleService.QueryVehicleFreightRecordBypalletNoAsync(palletNo);
+            return await _inteVehicleService.QueryVehicleFreightRecordByPalletNoAsync(palletNo);
         }
     }
 }

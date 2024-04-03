@@ -31,7 +31,6 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Security.Policy;
 using System.Transactions;
 using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
@@ -421,7 +420,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var materials = await _procMaterialRepository.GetByIdsAsync(manuSfcs.Select(x => x.ProductId).ToList());
 
             //查找库存
-            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryBarCodesQuery
+            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryBarCodesQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 BarCodes = sfcs
@@ -715,7 +714,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     });
                 else
                     //设置 条码库存为0
-                    await _whMaterialInventoryRepository.UpdateQuantityResidueBySfcsAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Command.UpdateQuantityResidueBySfcsCommand
+                    await _whMaterialInventoryRepository.UpdateQuantityResidueBySFCsAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Command.UpdateQuantityResidueBySfcsCommand
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         Sfcs = sfcs,
@@ -768,7 +767,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //载具
             var inteVehiceFreightStackEntityTask = _inteVehiceFreightStackRepository.GetBySFCAsync(new InteVehiceFreightStackBySfcQuery { SiteId = _currentSite.SiteId ?? 0, BarCode = param.SFC });
             //不合格
-            var manuProductBadRecordEntitiesTask = _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new Data.Repositories.Manufacture.ManuProductBadRecord.Query.ManuProductBadRecordBySfcQuery
+            var manuProductBadRecordEntitiesTask = _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
             {
                 Status = ProductBadRecordStatusEnum.Open,
                 SFC = param.SFC,
@@ -782,7 +781,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var inteVehiceFreightStackEntity = await inteVehiceFreightStackEntityTask;
             var manuProductBadRecordEntities = await manuProductBadRecordEntitiesTask;
 
-            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);
 
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
             if (planWorkOrderEntity != null && planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)
@@ -1332,7 +1331,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
 
                 //查询是否ng
-                var ngSfcs = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new Data.Repositories.Manufacture.ManuProductBadRecord.Query.ManuProductBadRecordBySfcQuery()
+                var ngSfcs = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery()
                 {
                     SiteId = _currentSite.SiteId ?? 0,
                     Status = Core.Enums.Manufacture.ProductBadRecordStatusEnum.Open,

@@ -613,6 +613,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                         MaterialCode = material != null ? material.MaterialCode : "",
                         MaterialName = material != null ? material.MaterialName : "",
                         Version = material != null ? material.Version ?? "" : "",
+                        Unit = material != null ? material.Unit ?? "" : "",
 
                         IsScrap = item.IsScrap,
                         Qty = item.Qty,
@@ -763,7 +764,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             var manuSfcProduceEntitiesTask = _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = manuSfcs });
             var sfcPackListTask = _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { LadeBarCodes = manuSfcs, SiteId = _currentSite.SiteId ?? 0 });
             // 入库
-            var whMaterialInventoryListTask = _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+            var whMaterialInventoryListTask = _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(new WhMaterialInventoryBarCodesQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 BarCodes = manuSfcs
@@ -775,7 +776,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
             var sfcPackList = await sfcPackListTask;
             var whMaterialInventoryList = await whMaterialInventoryListTask;
-            var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcEntities.Select(x => x.Id));
+            var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcEntities.Select(x => x.Id));
             var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId ?? 0));
             var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkOrderEntities.Select(x => x.ProductId));
             IEnumerable<ManuSfcProduceBusinessEntity>? sfcProduceBusinessEntities = new List<ManuSfcProduceBusinessEntity>();
@@ -1159,7 +1160,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     SiteId = _currentSite.SiteId ?? 0,
                     Ids = deleteIds,
                 };
-                await _manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(physicalDeleteSFCProduceByIdsCommand);
+                await _manuSfcProduceRepository.DeletePhysicalRangeByIdsAsync(physicalDeleteSFCProduceByIdsCommand);
             }
 
             if (manuSfcUpdateRouteByIdCommands != null && manuSfcUpdateRouteByIdCommands.Any())
@@ -1472,7 +1473,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             var newSfcInfos = new List<ManuSfcInfoEntity>();
             var manuSfcs = await _manuSfcRepository.GetBySFCsAsync(manuUpdateSaveDto.Sfcs);
             var sfcIds = manuSfcs.Select(it => it.Id).ToArray();
-            var sfcInfos = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcIds);
+            var sfcInfos = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcIds);
 
             //更改老条码状态 这里不直接改老条码  而是新增新条码  便于追溯
             foreach (var item in sfcInfos)
