@@ -87,6 +87,7 @@
         public const string MES10238 = "基于时间不合法！";
         public const string MES10239 = "消耗公差需为大于0整数！";
         public const string MES10240 = "消耗系数需大于0！";
+        public const string MES10241 = "物料只能选择一条数据";
         #endregion
 
         #region 资源 10300
@@ -219,6 +220,8 @@
         public const string MES10475 = $"工序节点手动排序号最大长度为18";
 
         public const string MES10476 = $"工序不存在";
+        public const string MES10477 = $"转换系数不能为空";
+        public const string MES10478 = $"工序绑定的物料以存在";
         #endregion
 
         #region 参数 10500
@@ -759,6 +762,15 @@
         #region 尾检 13400
 
 
+        #endregion
+
+        #region 环境检验 13600
+
+        public const string MES13600 = "是否不合格不能为空！";
+        public const string MES13601 = "是否不合格类型不存在！";
+        public const string MES13602 = "检验值不能为空！";
+        public const string MES13603 = "实际检验时间不能为空！"; 
+        public const string MES13604 = "没有可保存的数据！";
         #endregion
 
         #region  14000段项目使用 平台请勿使用
@@ -1928,7 +1940,6 @@
         public const string MES19954 = "检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19955 = "检验项目编码重复，数据新增失败";
         public const string MES19956 = "客户{customCode}物料{materialCode}检验项目版本{version}已存在，不允许重复添加！";
-
         #endregion 
 
 
@@ -1951,6 +1962,11 @@
 
         #endregion
 
+        #region FQC执行检验
+        public const string MES19980 = "条码{sfc}所在检验单{fqcOrder}未关闭";
+        public const string MES19981 = "不存在FQC检验单条码记录表中";
+
+        #endregion
 
 
 

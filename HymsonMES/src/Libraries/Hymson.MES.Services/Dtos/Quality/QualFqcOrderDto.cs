@@ -188,7 +188,7 @@ namespace Hymson.MES.Services.Dtos.Quality
        /// <summary>
         /// 是否为预生成单(0-否 1-是)
         /// </summary>
-        public bool IsPreGenerated { get; set; }
+        public TrueOrFalseEnum? IsPreGenerated { get; set; }
 
        /// <summary>
         /// 备注
@@ -269,6 +269,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 单位
         /// </summary>
         public string Unit { get; set; }
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string OrderCode { get; set; }
 
     }
 
@@ -470,6 +475,23 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 项目编码
         /// </summary>
         public string? ParameterCode { get; set; }
+
+    }
+
+    /// <summary>
+    /// 检验单状态Dto
+    /// </summary>
+    public record OrderOperationStatusDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public OrderOperateTypeEnum OperationType { get; set; }
 
     }
 

@@ -31,6 +31,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public string MaterialCode { get; set; }
 
         /// <summary>
+        /// 所属物料Code
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
         /// 版本
         /// </summary>
         public string? Version { get; set; }
