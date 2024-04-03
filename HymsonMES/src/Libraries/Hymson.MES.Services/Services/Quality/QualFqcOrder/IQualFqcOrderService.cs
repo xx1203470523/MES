@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
+using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -14,7 +16,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(QualFqcOrderSaveDto saveDto);
+        Task<int> CreateAsync(QualFqcOrderCreateDto saveDto);
+
+        /// <summary>
+        /// 创建(测试条码产出时自动生成功能)
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        Task<bool> CreateAsync(QualFqcOrderCreateTestDto saveDto);
 
         /// <summary>
         /// 修改
@@ -56,7 +65,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> OperationOrderAsync(QualOrderOperationStatusDto requestDto);
+        Task<int> OperationOrderAsync(OrderOperationStatusDto requestDto);
 
         /// <summary>
         /// 保存样品数据
@@ -155,6 +164,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<IEnumerable<FQCParameterDetailDto>> QueryDetailSampleAsync(FQCParameterDetailQueryDto requestDto);
+
+
+        /// <summary>
+        /// 获取参数项目
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualFqcParameterGroupEntity>> VerificationParametergroupAsync(ParameterGroupQuery requestDto);
 
         /// <summary>
         /// 查询检验单样本数据（分页）

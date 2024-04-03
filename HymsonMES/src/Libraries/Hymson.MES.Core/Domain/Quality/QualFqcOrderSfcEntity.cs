@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
@@ -33,12 +35,12 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 是否合格(0-否 1-是)
         /// </summary>
-        public bool? IsQualified { get; set; }
+        public TrueOrFalseEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 不合格处理方式(1-合格 2-让步 3-降级 4-维修 5-报废)
         /// </summary>
-        public bool? HandMethod { get; set; }
+        public FQCSFCHandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 维修工艺路线Id
@@ -59,7 +61,5 @@ namespace Hymson.MES.Core.Domain.Quality
         /// 备注
         /// </summary>
         public string Remark { get; set; }
-
-        
     }
 }

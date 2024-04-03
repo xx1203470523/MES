@@ -560,6 +560,14 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLoadPointPagedQuery, ProcLoadPointPagedQueryDto>();
             #endregion
 
+            #region ConversionFactor
+            CreateMap<AddConversionFactorDto, ProcConversionFactorEntity>();
+            CreateMap<ProcProcedureView, ProcConversionFactorViewDto>();
+            CreateMap<ProcConversionFactorPagedQueryDto, IProcConversionFactorPagedQuery>();
+            CreateMap<ProcConversionFactorView, ProcConversionFactorViewDto>();
+            CreateMap<ProcConversionFactorModifyDto, ProcConversionFactorEntity>();
+            #endregion
+
             #region LoadPointLink
             CreateMap<ProcLoadPointLinkMaterialCreateDto, ProcLoadPointLinkMaterialEntity>();
             CreateMap<ProcLoadPointLinkMaterialModifyDto, ProcLoadPointLinkMaterialEntity>();
@@ -1027,6 +1035,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualEnvOrderDetailModifyDto, QualEnvOrderDetailEntity>();
             CreateMap<QualEnvOrderDetailPagedQueryDto, QualEnvOrderDetailPagedQuery>();
             #endregion
+            #region FQC检测单
+            CreateMap<QualFqcOrderPagedQueryDto, QualFqcOrderPagedQuery>();
+            CreateMap<QualFqcOrderEntity, QualFqcOrderDto>();
+             
+
+            #endregion
+
         }
 
         /// <summary>

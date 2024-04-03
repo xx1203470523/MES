@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
@@ -43,7 +44,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 参数类型
         /// </summary>
-        public bool? ParameterDataType { get; set; }
+        public DataTypeEnum? ParameterDataType { get; set; }
 
         /// <summary>
         /// 规格上限
@@ -73,7 +74,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 是否设备采集
         /// </summary>
-        public bool IsDeviceCollect { get; set; }
+        public TrueOrFalseEnum IsDeviceCollect { get; set; }
 
         /// <summary>
         /// 显示顺序

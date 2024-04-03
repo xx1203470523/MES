@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(QualFqcOrderSfcEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(QualFqcOrderSfcEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualFqcOrderSfcEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -67,12 +67,19 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<IEnumerable<QualFqcOrderSfcEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<QualFqcOrderSfcEntity> GetEntityAsync(QualFqcOrderSfcQuery query);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<QualFqcOrderSfcEntity>> GetEntitiesAsync(QualFqcOrderSfcQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

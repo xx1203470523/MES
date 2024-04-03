@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,10 +101,37 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFqcOrderSfcEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualFqcOrderSfcEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcOrderSfcEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<QualFqcOrderSfcEntity> GetEntityAsync(QualFqcOrderSfcQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitySqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            if (query.FQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("FQCOrderId = @FQCOrderId");
+            }
+            if (query.BarCode != null)
+            {
+                sqlBuilder.Where("BarCode = @BarCode");
+            }
+            sqlBuilder.AddParameters(query);
+            //排序
+            if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<QualFqcOrderSfcEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -116,6 +143,11 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            //排序
+            if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcOrderSfcEntity>(template.RawSql, query);
         }
@@ -130,10 +162,10 @@ namespace Hymson.MES.Data.Repositories.Quality
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("T.*");
+            sqlBuilder.OrderBy(string.IsNullOrWhiteSpace(pagedQuery.Sorting) ? "T.CreatedOn DESC" : pagedQuery.Sorting);
+            sqlBuilder.Where("T.IsDeleted = 0");
+            sqlBuilder.Where("T.SiteId = @SiteId");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -156,9 +188,10 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualFqcOrderSfcRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_fqc_order_sfc /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_fqc_order_sfc /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_fqc_order_sfc /**where**/  ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_fqc_order_sfc T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_fqc_order_sfc T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_fqc_order_sfc /**where**/ /**orderby**/ ";
+        const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_fqc_order_sfc /**where**/ /**orderby**/ LIMIT 1 ";
 
         const string InsertSql = "INSERT INTO qual_fqc_order_sfc(  `Id`, `SiteId`, `FQCOrderId`, `WorkOrderId`, `SFC`, `IsQualified`, `HandMethod`, `ProcessRouteId`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @FQCOrderId, @WorkOrderId, @SFC, @IsQualified, @HandMethod, @ProcessRouteId, @ProcessedBy, @ProcessedOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO qual_fqc_order_sfc(  `Id`, `SiteId`, `FQCOrderId`, `WorkOrderId`, `SFC`, `IsQualified`, `HandMethod`, `ProcessRouteId`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @FQCOrderId, @WorkOrderId, @SFC, @IsQualified, @HandMethod, @ProcessRouteId, @ProcessedBy, @ProcessedOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";

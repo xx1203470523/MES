@@ -6,6 +6,48 @@ using Hymson.MES.Services.Dtos.Integrated;
 namespace Hymson.MES.Services.Dtos.Quality
 {
     /// <summary>
+    /// FQC检验单创建Dto
+    /// </summary>
+    public record QualFqcOrderCreateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 成品条码产出记录Ids(qual_finally_output_record)
+        /// </summary>
+        public IEnumerable<long> OutputRecordIds { get; set; }
+    }
+
+    /// <summary>
+    /// FQC检验单创建Dto
+    /// </summary>
+    public record QualFqcOrderCreateTestDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Barcode { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 产线Id
+        /// </summary>
+        public long? WorkCenterId { get; set; }
+
+        /// <summary>
+        /// 条码类型(1-托盘 2-栈板 3-SFC 4-箱)
+        /// </summary>
+        public FQCLotUnitEnum CodeType { get; set; }
+    }
+
+    /// <summary>
     /// FQC检验单新增/更新Dto
     /// </summary>
     public record QualFqcOrderSaveDto : BaseEntityDto
@@ -146,7 +188,7 @@ namespace Hymson.MES.Services.Dtos.Quality
        /// <summary>
         /// 是否为预生成单(0-否 1-是)
         /// </summary>
-        public bool IsPreGenerated { get; set; }
+        public TrueOrFalseEnum? IsPreGenerated { get; set; }
 
        /// <summary>
         /// 备注
@@ -227,6 +269,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 单位
         /// </summary>
         public string Unit { get; set; }
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string OrderCode { get; set; }
 
     }
 
@@ -428,6 +475,23 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 项目编码
         /// </summary>
         public string? ParameterCode { get; set; }
+
+    }
+
+    /// <summary>
+    /// 检验单状态Dto
+    /// </summary>
+    public record OrderOperationStatusDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public OrderOperateTypeEnum OperationType { get; set; }
 
     }
 

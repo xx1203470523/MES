@@ -252,10 +252,17 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" Code = @Code ");
             }
+
             if (procProcedureQuery.Codes != null && procProcedureQuery.Codes.Any())
             {
-                sqlBuilder.Where(" Code in @Codes ");
+                sqlBuilder.Where(" Code IN @Codes ");
             }
+
+            if (procProcedureQuery.ResourceTypeIds != null && procProcedureQuery.ResourceTypeIds.Any())
+            {
+                sqlBuilder.Where(" ResourceTypeId IN @ResourceTypeIds");
+            }
+
             sqlBuilder.AddParameters(procProcedureQuery);
 
             using var conn = GetMESDbConnection();

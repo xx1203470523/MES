@@ -130,7 +130,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PlanWorkOrderEntity>> GetActivationWorkOrderDataAsync(PlanWorkOrderPagedQuery query)
+        public async Task<IEnumerable<PlanWorkOrderView>> GetActivationWorkOrderDataAsync(PlanWorkOrderPagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetActivationWorkOrderDataSqlTemplate);
@@ -145,6 +145,11 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("PWO.SiteId = @SiteId");
             }
 
+            if(query.ProcessRouteIds !=null && query.ProcessRouteIds.Any())
+            {
+                sqlBuilder.Where("PWO.ProcessRouteId IN @ProcessRouteIds");
+            }
+
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
@@ -153,7 +158,8 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.OrderBy("PWOA.CreatedOn DESC");
 
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<PlanWorkOrderEntity>(templateData.RawSql, templateData.Parameters);
+
+            return await conn.QueryAsync<PlanWorkOrderView>(templateData.RawSql, templateData.Parameters);
         }
 
         /// <summary>
@@ -161,7 +167,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PlanWorkOrderEntity>> GetWorkOrderDataAsync(PlanWorkOrderPagedQuery query)
+        public async Task<IEnumerable<PlanWorkOrderView>> GetWorkOrderDataAsync(PlanWorkOrderPagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetWorkOrderDataSqlTemplate);
@@ -199,7 +205,8 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.OrderBy("CreatedOn DESC");
 
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<PlanWorkOrderEntity>(templateData.RawSql, templateData.Parameters);
+
+            return await conn.QueryAsync<PlanWorkOrderView>(templateData.RawSql, templateData.Parameters);
         }
 
         /// <summary>
@@ -571,7 +578,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string UpdateRecordRealStartSql = "UPDATE plan_work_order_record SET RealStart = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND RealStart IS NULL AND WorkOrderId IN @WorkOrderIds; ";
         const string UpdateRecordRealEndSql = "UPDATE plan_work_order_record SET RealEnd = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE WorkOrderId IN @WorkOrderIds AND IsDeleted = 0 ";
 
-        const string GetActivationWorkOrderDataSqlTemplate = "SELECT PWO.* FROM plan_work_order_activation PWOA LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
+        const string GetActivationWorkOrderDataSqlTemplate = "SELECT PWO.*,PWOA.LineId,PWOR.PassDownQuantity FROM plan_work_order_activation PWOA LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId LEFT JOIN plan_work_order_record PWOR ON PWO.ID = PWOR.WorkOrderId /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetWorkOrderDataSqlTemplate = "SELECT * FROM plan_work_order /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
     }
 }

@@ -210,5 +210,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// <param name="workCenterQuery"></param>
         /// <returns></returns>
         Task<InteWorkCenterEntity> GetEntitieAsync(InteWorkCenterFirstQuery workCenterQuery);
+        Task<IEnumerable<InteWorkCenterResourceRelationView>> GetWorkCenterResourceRelationAsync(IEnumerable<long> resourceIds);
     }
 }

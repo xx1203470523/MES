@@ -87,6 +87,7 @@
         public const string MES10238 = "基于时间不合法！";
         public const string MES10239 = "消耗公差需为大于0整数！";
         public const string MES10240 = "消耗系数需大于0！";
+        public const string MES10241 = "物料只能选择一条数据";
         #endregion
 
         #region 资源 10300
@@ -219,6 +220,8 @@
         public const string MES10475 = $"工序节点手动排序号最大长度为18";
 
         public const string MES10476 = $"工序不存在";
+        public const string MES10477 = $"转换系数不能为空";
+        public const string MES10478 = $"工序绑定的物料以存在";
         #endregion
 
         #region 参数 10500
@@ -430,6 +433,19 @@
         #region ESOP维护 11500
         public const string MES11500 = "ESOP已存在同一物料、工序、状态数据";
         public const string MES11501 = "不能删除启用状态的数据";
+        #endregion
+
+        #region FQC检验任务 11700
+
+        public const string MES11700 = "参数错误，条码产出数据不存在！";
+        public const string MES11701 = "条码不属于同一产品！";
+        public const string MES11702 = "条码【{SFC}】已生成过检验单，不允许重复生成！";
+        public const string MES11703 = "条码不属于同一工单！";
+        public const string MES11704 = "条码不属于同一产线！";
+        public const string MES11705 = "FQC检验项目不存在或未启用！产品编码【{MaterialCode}】";
+        public const string MES11706 = "FQC检验项目不存在或未启用，无法判定其是否要做FQC检验！产品编码【{MaterialCode}】";
+        public const string MES11707 = "FQC检验项目【{ParameterGroupCode}】下检验参数不能为空";
+
         #endregion
 
         #region OQC检验任务 11800
@@ -1924,7 +1940,6 @@
         public const string MES19954 = "检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19955 = "检验项目编码重复，数据新增失败";
         public const string MES19956 = "客户{customCode}物料{materialCode}检验项目版本{version}已存在，不允许重复添加！";
-
         #endregion 
 
 
@@ -1947,6 +1962,11 @@
 
         #endregion
 
+        #region FQC执行检验
+        public const string MES19980 = "条码{sfc}所在检验单{fqcOrder}未关闭";
+        public const string MES19981 = "不存在FQC检验单条码记录表中";
+
+        #endregion
 
 
 
