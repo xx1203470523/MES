@@ -192,7 +192,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="palletNo"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("getVehicleFreightByPalletNo/{palletNo}")]
+        [Route("getVehicleFreightByPalletNo/pda/{palletNo}")]
         public async Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordByPalletNoPDAAsync(string palletNo)
         {
             return await _inteVehicleService.QueryVehicleFreightRecordByPalletNoAsync(palletNo);
