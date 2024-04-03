@@ -7,7 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.QualEnvOrderDetail;
-using Hymson.MES.Core.Domain.QualEnvParameterGroupDetailSnapshoot;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 
 namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail

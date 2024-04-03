@@ -481,11 +481,11 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             });
             if (codeRules == null || !codeRules.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11991));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11710));
             }
             if (codeRules.Count() > 1)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11992));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11711));
             }
 
             var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new Bos.Manufacture.ManuGenerateBarcode.GenerateBarcodeBo

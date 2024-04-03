@@ -14,7 +14,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.QualEnvOrderDetail;
-using Hymson.MES.Core.Domain.QualEnvParameterGroupDetailSnapshoot;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.QualEnvOrderDetail;
 using Hymson.MES.Services.Dtos.QualEnvOrderDetail;
