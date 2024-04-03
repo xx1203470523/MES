@@ -52,5 +52,15 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 工艺路线id
         /// </summary>
         public long? ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string? OrCode { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string? OrName { get; set; }
     }
 }

@@ -22,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <summary>
         /// 不合格代码组id列表
         /// </summary>
-        public long[] UnqualifiedGroupIds { get; set; }
+        public IEnumerable<long>? UnqualifiedGroupIds { get; set; }
 
         /// <summary>
         /// 状态
