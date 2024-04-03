@@ -36,4 +36,17 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// </summary>
         public List<string> NgList { get; set; } = new List<string>();
     }
+
+    /// <summary>
+    /// 绑定后的极组单个出站
+    /// </summary>
+    public record OutboundBindJzSingleDto : OutboundDto
+    {
+        /// <summary>
+        /// 工序类型
+        /// 1-首次发生 2-中间 3-末尾工序
+        /// </summary>
+        public string OperationType { get; set; } = string.Empty;
+    }
+
 }
