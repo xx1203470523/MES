@@ -81,6 +81,10 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
                     SiteId = _currentSite.SiteId.GetValueOrDefault()
                 });
                 qualUnqualifiedCodePagedQuery.Ids = qualUnqualifiedCodeEntities.Select(m => m.Id);
+                if (!qualUnqualifiedCodePagedQuery.Ids.Any())
+                {
+                    qualUnqualifiedCodePagedQuery.Ids = new List<long>() { 0 };
+                }
             }
 
             var pagedInfo = await _qualUnqualifiedCodeRepository.GetPagedInfoAsync(qualUnqualifiedCodePagedQuery);

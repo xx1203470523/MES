@@ -214,11 +214,19 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetListByGroupIdTemplate);
+
             sqlBuilder.Select("uc.*");
-            sqlBuilder.Where("uc.IsDeleted=0");
-            sqlBuilder.Where($"uc.SiteId =@SiteId");
             sqlBuilder.LeftJoin("qual_unqualified_code_group_relation gr on uc.Id =gr.UnqualifiedCodeId and gr.IsDeleted =0  ");
-            sqlBuilder.Where("gr.UnqualifiedGroupId=@UnqualifiedGroupId");
+
+            sqlBuilder.Where("uc.IsDeleted=0");
+
+            sqlBuilder.Where("uc.SiteId=@SiteId");
+
+            if (query.UnqualifiedGroupId.HasValue)
+            {
+                sqlBuilder.Where("gr.UnqualifiedGroupId=@UnqualifiedGroupId");
+            }
+
             if (query.UnqualifiedGroupId.HasValue)
             {
                 sqlBuilder.Where("gr.UnqualifiedGroupId=@UnqualifiedGroupId");
