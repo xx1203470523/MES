@@ -419,7 +419,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
 
             if (bo.IsTest)
             {
-                ///因为是动态生成，在前端测试时用XX占位
+                ///因为是动态生成，在前端测试时用ZZ占位
                 return "ZZ";
             }
             else
