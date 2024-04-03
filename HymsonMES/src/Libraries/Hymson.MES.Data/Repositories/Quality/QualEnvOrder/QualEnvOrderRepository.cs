@@ -97,10 +97,10 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
             {
                 sqlBuilder.Where("ProcedureId=@ProcedureId");
             }
-            if (qualEnvOrderPagedQuery.InspectionDate != null && qualEnvOrderPagedQuery.InspectionDate.Length >= 2)
+            if (qualEnvOrderPagedQuery.CreatedOn != null && qualEnvOrderPagedQuery.CreatedOn.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { StartTime = qualEnvOrderPagedQuery.InspectionDate[0], EndTime = qualEnvOrderPagedQuery.InspectionDate[1].AddDays(1) });
-                sqlBuilder.Where("T.UpdatedOn >= @StartTime AND T.UpdatedOn < @EndTime");
+                sqlBuilder.AddParameters(new { StartTime = qualEnvOrderPagedQuery.CreatedOn[0], EndTime = qualEnvOrderPagedQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where("CreatedOn >= @StartTime AND CreatedOn < @EndTime");
             }
 
             var offSet = (qualEnvOrderPagedQuery.PageIndex - 1) * qualEnvOrderPagedQuery.PageSize;

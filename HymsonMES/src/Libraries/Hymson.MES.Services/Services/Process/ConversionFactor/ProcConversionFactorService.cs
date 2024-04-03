@@ -334,7 +334,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
 
             var entitys = await _procConversionFactorRepository.GetByIdsAsync(idsAr);
-            if (entitys != null && entitys.Any(a => a.OpenStatus != ManuSfcRepairDetailIsIsCloseEnum.Close))
+            if (entitys != null && entitys.Any(a => a.OpenStatus != DisableOrEnableEnum.Disable))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10135));
             }

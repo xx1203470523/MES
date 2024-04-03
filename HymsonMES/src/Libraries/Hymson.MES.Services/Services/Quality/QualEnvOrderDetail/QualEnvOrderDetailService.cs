@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -136,14 +136,14 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="qualEnvOrderDetailDto"></param>
+        /// <param name="qualEnvOrderDetailModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyQualEnvOrderDetailAsync(QualEnvOrderDetailModifyDto qualEnvOrderDetailModifyDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -168,7 +168,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证参数
@@ -180,7 +180,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
                 var data = new QualEnvOrderDetailEntity
                 {
                     Id = item.Id,
-                    RealTime = HymsonClock.Now().ToString($"yyyy-MM-dd {item.RealTime}:ss").ParseToDateTime(),
+                    RealTime = item.RealTime == null ? null : HymsonClock.Now().ToString($"yyyy-MM-dd {item.RealTime}:ss").ParseToDateTime(),
                     InspectionValue = item.InspectionValue,
                     IsQualified = item.IsQualified,
                     Remark = item.Remark,

@@ -233,39 +233,39 @@ namespace Hymson.MES.Services.Dtos.QualEnvOrder
         /// </summary>
         public string? InspectionOrder { get; set; }
 
-        /// <summary>
-        /// 工作中心Id
-        /// </summary>
-        public long? WorkCenterId { get; set; }
+        ///// <summary>
+        ///// 工作中心Id
+        ///// </summary>
+        //public long? WorkCenterId { get; set; }
 
         /// <summary>
         /// 工作中心Code
         /// </summary>
         public string? WorkCenterCode { get; set; }
 
-        ///// <summary>
-        ///// 工作中心Name
-        ///// </summary>
-        //public string? WorkCenterName { get; set; }
-
         /// <summary>
-        /// 工序Id
+        /// 工作中心Name
         /// </summary>
-        public long? ProcedureId { get; set; }
+        public string? WorkCenterName { get; set; }
+
+        ///// <summary>
+        ///// 工序Id
+        ///// </summary>
+        //public long? ProcedureId { get; set; }
 
         /// <summary>
         /// 工序Code
         /// </summary>
         public string? ProcedureCode { get; set; }
 
-        ///// <summary>
-        ///// 工序Name
-        ///// </summary>
-        //public string? ProcedureName { get; set; }
+        /// <summary>
+        /// 工序Name
+        /// </summary>
+        public string? ProcedureName { get; set; }
 
         /// <summary>
         /// 检验日期
         /// </summary>
-        public DateTime[]? InspectionDate { get; set; }
+        public DateTime[]? CreatedOn { get; set; }  
     }
 }

@@ -89,7 +89,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync( IEnumerable<long>  ids)
+        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualUnqualifiedCodeEntity>(GetByIdsSql, new { ids = ids });
@@ -127,24 +127,18 @@ namespace Hymson.MES.Data.Repositories.Quality
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+
             sqlBuilder.Select("*");
 
-            if (string.IsNullOrEmpty(parm.Sorting))
-            {
-                sqlBuilder.OrderBy("UpdatedOn DESC");
-            }
-            else
-            {
-                sqlBuilder.OrderBy(parm.Sorting);
-            }
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             if (!string.IsNullOrWhiteSpace(parm.UnqualifiedCode))
             {
                 parm.UnqualifiedCode = $"%{parm.UnqualifiedCode}%";
                 sqlBuilder.Where("UnqualifiedCode like @UnqualifiedCode");
             }
+
             if (!string.IsNullOrWhiteSpace(parm.UnqualifiedCodeName))
             {
                 parm.UnqualifiedCodeName = $"%{parm.UnqualifiedCodeName}%";
@@ -159,6 +153,32 @@ namespace Hymson.MES.Data.Repositories.Quality
             if (parm.Type.HasValue)
             {
                 sqlBuilder.Where("Type=@Type");
+            }
+
+            if (parm.Ids != null && parm.Ids.Any())
+            {
+                sqlBuilder.Where("Id IN @Ids");
+            }
+
+            if (!string.IsNullOrWhiteSpace(parm.OrUnqualifiedCode))
+            {
+                parm.OrUnqualifiedCode = $"%{parm.OrUnqualifiedCode}%";
+                sqlBuilder.OrWhere("UnqualifiedCode like @OrUnqualifiedCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(parm.OrUnqualifiedCodeName))
+            {
+                parm.OrUnqualifiedCodeName = $"%{parm.OrUnqualifiedCodeName}%";
+                sqlBuilder.OrWhere("UnqualifiedCodeName like @OrUnqualifiedCodeName");
+            }
+
+            if (string.IsNullOrEmpty(parm.Sorting))
+            {
+                sqlBuilder.OrderBy("UpdatedOn DESC");
+            }
+            else
+            {
+                sqlBuilder.OrderBy(parm.Sorting);
             }
 
             var offSet = (parm.PageIndex - 1) * parm.PageSize;
@@ -194,11 +214,19 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetListByGroupIdTemplate);
+
             sqlBuilder.Select("uc.*");
-            sqlBuilder.Where("uc.IsDeleted=0");
-            sqlBuilder.Where($"uc.SiteId =@SiteId");
             sqlBuilder.LeftJoin("qual_unqualified_code_group_relation gr on uc.Id =gr.UnqualifiedCodeId and gr.IsDeleted =0  ");
-            sqlBuilder.Where("gr.UnqualifiedGroupId=@UnqualifiedGroupId");
+
+            sqlBuilder.Where("uc.IsDeleted=0");
+
+            sqlBuilder.Where("uc.SiteId=@SiteId");
+
+            if (query.UnqualifiedGroupId.HasValue)
+            {
+                sqlBuilder.Where("gr.UnqualifiedGroupId=@UnqualifiedGroupId");
+            }
+
             if (query.UnqualifiedGroupId.HasValue)
             {
                 sqlBuilder.Where("gr.UnqualifiedGroupId=@UnqualifiedGroupId");
