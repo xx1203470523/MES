@@ -1,16 +1,15 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
     /// <summary>
-    /// 数据实体（FQC检验参数组）   
-    /// qual_fqc_parameter_group
+    /// 数据实体（环境检验参数组快照）   
+    /// qual_env_parameter_group_snapshoot
     /// @author xiaofei
-    /// @date 2024-03-28 08:32:21
+    /// @date 2024-04-02 09:21:41
     /// </summary>
-    public class QualFqcParameterGroupEntity : BaseEntity
+    public class QualEnvParameterGroupSnapshootEntity : BaseEntity
     {
         /// <summary>
         /// 站点Id
@@ -28,34 +27,14 @@ namespace Hymson.MES.Core.Domain.Quality
         public string Name { get; set; }
 
         /// <summary>
-        /// 产品Id
+        /// 工作中心Id
         /// </summary>
-        public long MaterialId { get; set; }
+        public long WorkCenterId { get; set; }
 
         /// <summary>
-        /// 样本数量
+        /// 工序Id
         /// </summary>
-        public int SampleQty { get; set; }
-
-        /// <summary>
-        /// 批次数量
-        /// </summary>
-        public int LotSize { get; set; }
-
-        /// <summary>
-        /// 批次单位
-        /// </summary>
-        public FQCLotUnitEnum LotUnit { get; set; }
-
-        /// <summary>
-        /// 是否同工单
-        /// </summary>
-        public TrueOrFalseEnum IsSameWorkOrder { get; set; }
-
-        /// <summary>
-        /// 是否同产线
-        /// </summary>
-        public TrueOrFalseEnum IsSameWorkCenter { get; set; }
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 版本
@@ -63,7 +42,7 @@ namespace Hymson.MES.Core.Domain.Quality
         public string Version { get; set; }
 
         /// <summary>
-        /// 状态(0-新建 1-启用 2-保留 3-废除)
+        /// 状态
         /// </summary>
         public SysDataStatusEnum Status { get; set; }
 

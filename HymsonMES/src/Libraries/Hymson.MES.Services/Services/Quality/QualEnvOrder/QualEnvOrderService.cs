@@ -13,6 +13,8 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.QualEnvOrder;
+using Hymson.MES.CoreServices.Bos.Quality;
+using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -44,7 +46,9 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
         private readonly AbstractValidator<QualEnvOrderCreateDto> _validationCreateRules;
         private readonly AbstractValidator<QualEnvOrderModifyDto> _validationModifyRules;
 
-        public QualEnvOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IQualEnvOrderRepository qualEnvOrderRepository, AbstractValidator<QualEnvOrderCreateDto> validationCreateRules, AbstractValidator<QualEnvOrderModifyDto> validationModifyRules, IProcProcedureRepository procProcedureRepository, IInteWorkCenterRepository inteWorkCenterRepository)
+        private readonly IEnvOrderCreateService _envOrderCreateService;
+
+        public QualEnvOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IQualEnvOrderRepository qualEnvOrderRepository, AbstractValidator<QualEnvOrderCreateDto> validationCreateRules, AbstractValidator<QualEnvOrderModifyDto> validationModifyRules, IProcProcedureRepository procProcedureRepository, IInteWorkCenterRepository inteWorkCenterRepository, IEnvOrderCreateService envOrderCreateService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -53,6 +57,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             _validationModifyRules = validationModifyRules;
             _procProcedureRepository = procProcedureRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _envOrderCreateService = envOrderCreateService;
         }
 
         /// <summary>
@@ -71,17 +76,15 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(qualEnvOrderCreateDto);
 
-            //DTO转换实体
-            var qualEnvOrderEntity = qualEnvOrderCreateDto.ToEntity<QualEnvOrderEntity>();
-            qualEnvOrderEntity.Id = IdGenProvider.Instance.CreateId();
-            qualEnvOrderEntity.CreatedBy = _currentUser.UserName;
-            qualEnvOrderEntity.UpdatedBy = _currentUser.UserName;
-            qualEnvOrderEntity.CreatedOn = HymsonClock.Now();
-            qualEnvOrderEntity.UpdatedOn = HymsonClock.Now();
-            qualEnvOrderEntity.SiteId = _currentSite.SiteId ?? 0;
+            var bo = new EnvOrderManualCreateBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                WorkCenterId = qualEnvOrderCreateDto.WorkCenterId,
+                ProcedureId = qualEnvOrderCreateDto.ProcedureId
+            };
 
-            //入库
-            await _qualEnvOrderRepository.InsertAsync(qualEnvOrderEntity);
+            await _envOrderCreateService.ManualCreateAsync(bo);
         }
 
         /// <summary>

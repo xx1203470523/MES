@@ -445,6 +445,8 @@
         public const string MES11705 = "FQC检验项目不存在或未启用！产品编码【{MaterialCode}】";
         public const string MES11706 = "FQC检验项目不存在或未启用，无法判定其是否要做FQC检验！产品编码【{MaterialCode}】";
         public const string MES11707 = "FQC检验项目【{ParameterGroupCode}】下检验参数不能为空";
+        public const string MES11710 = "检验单号生成失败：FQC类型编码规则未维护！";
+        public const string MES11711 = "检验单号生成失败：编码规则错误，不允许同时存在多条FQC类型编码规则！";
 
         #endregion
 
@@ -771,6 +773,17 @@
         public const string MES13602 = "检验值不能为空！";
         public const string MES13603 = "实际检验时间不能为空！"; 
         public const string MES13604 = "没有可保存的数据！";
+
+        public const string MES13610 = "环境检验项目不存在或未启用！";
+        public const string MES13611 = "环境检验项目【{Code}】下检验参数不能为空！";
+        public const string MES13612 = "环境检验项目【{Code}】下检验参数检验频率不能为空！";
+        public const string MES13613 = "工作日历【{Year}年{Month}月】不存在或未启用！";
+        public const string MES13614 = "当前日期配置为不上班，无需生成检验单！";
+        public const string MES13615 = "当前日期班制信息不存在！";
+        public const string MES13616 = "当前日期班制下班次信息不能为空！";
+        public const string MES13617 = "检验单号生成失败：环境检验类型编码规则未维护！";
+        public const string MES13618 = "检验单号生成失败：编码规则错误，不允许同时存在多条环境检验类型编码规则！";
+
         #endregion
 
         #region  14000段项目使用 平台请勿使用

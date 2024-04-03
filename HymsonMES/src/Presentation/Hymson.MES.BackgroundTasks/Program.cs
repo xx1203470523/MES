@@ -2,6 +2,7 @@
 using Hymson.MES.BackgroundTasks.HostedServices;
 using Hymson.MES.BackgroundTasks.Jobs;
 using Hymson.MES.BackgroundTasks.Manufacture;
+using Hymson.MES.BackgroundTasks.Quality;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Print.Options;
 using Microsoft.Extensions.Configuration;
@@ -56,6 +57,12 @@ Host.CreateDefaultBuilder(args)
            q.AddJobAndTrigger<Productionstatistic>(hostContext.Configuration);
            q.AddJobAndTrigger<TracingSourceSFCJob>(hostContext.Configuration);
            q.AddJobAndTrigger<WorkOrderStatisticJob>(hostContext.Configuration);
+           #endregion
+
+           #region 品质
+
+           q.AddJobAndTrigger<EnvOrderCreateJob>(hostContext.Configuration);
+
            #endregion
 
            q.UsePersistentStore((persistentStoreOptions) =>
