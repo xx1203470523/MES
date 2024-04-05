@@ -15,9 +15,17 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
     {
         /// <summary>
         /// 根据物料条码获取数据
+        /// 不管数量
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         Task<List<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarCodesQuery query);
+
+        /// <summary>
+        /// 根据物料条码获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<WhMaterialInventoryEntity> GetByBarCodeAsync(WhMaterialInventoryBarCodeQuery query);
     }
 }

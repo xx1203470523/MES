@@ -66,7 +66,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
         }
 
         /// <summary>
-        /// 获取设备资源对应的基础信息
+        /// 获取设备资源对应的线体基础信息
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
@@ -76,6 +76,24 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
             query.EquipmentCode = param.EquipmentCode;
             query.ResCode = param.ResourceCode;
             EquEquipmentResAllView equResAllModel = await _equEquipmentRepository.GetEquResLineAsync(query);
+            if (equResAllModel == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+            }
+            return equResAllModel;
+        }
+
+        /// <summary>
+        ///  获取设备资源对应的工序基础信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<EquEquipmentResAllView> GetEquResProcedureAsync(QknyBaseDto param)
+        {
+            EquResAllQuery query = new EquResAllQuery();
+            query.EquipmentCode = param.EquipmentCode;
+            query.ResCode = param.ResourceCode;
+            EquEquipmentResAllView equResAllModel = await _equEquipmentRepository.GetEquResProcedureAsync(query);
             if (equResAllModel == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45001));

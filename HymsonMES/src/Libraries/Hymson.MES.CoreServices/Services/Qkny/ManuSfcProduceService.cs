@@ -65,5 +65,15 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             }
             return dbModel!;
         }
+
+        /// <summary>
+        /// 批量删除（物理删除）条码信息
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        public async Task<int> DeletePhysicalRangeAsync(DeletePhysicalBySfcsCommand sfcsCommand)
+        {
+            return await _manuSfcProduceRepository.DeletePhysicalRangeAsync(sfcsCommand);
+        }
     }
 }

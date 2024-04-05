@@ -7,6 +7,7 @@ using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Services.Qkny;
 using Hymson.MES.EquipmentServices.Services.Qkny.Common;
+using Hymson.MES.EquipmentServices.Services.Qkny.FitTogether;
 using Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
@@ -39,6 +40,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IGlueHomogenateService _glueHomogenateService;
 
         /// <summary>
+        /// 装配
+        /// </summary>
+        private readonly IFitTogetherService _fitTogether;
+
+        /// <summary>
         /// 是否调试
         /// </summary>
         private readonly bool IS_DEBUG = true;
@@ -49,11 +55,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public QknyController(
             IQknyService qknyService,
             IEquCommonService equCommonService,
-            IGlueHomogenateService glueHomogenateService)
+            IGlueHomogenateService glueHomogenateService,
+            IFitTogetherService fitTogether)
         {
             _qknyService = qknyService;
             _equCommonService = equCommonService;
             _glueHomogenateService = glueHomogenateService;
+            _fitTogether = fitTogether;
         }
 
         /// <summary>
@@ -823,18 +831,23 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //3. 校验上工序是否合格
             //4. 考虑系统如何方便追溯
 
-            List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
-            for (var i = 0; i < dto.SfcList.Count; ++i)
+            if(IS_DEBUG == true)
             {
-                OutboundMoreReturnDto model = new OutboundMoreReturnDto();
-                model.Code = 0;
-                model.Msg = "11";
-                model.Sfc = $"sfc00{i + 1}";
+                List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
+                for (var i = 0; i < dto.SfcList.Count; ++i)
+                {
+                    OutboundMoreReturnDto model = new OutboundMoreReturnDto();
+                    model.Code = 0;
+                    model.Msg = "11";
+                    model.Sfc = $"sfc00{i + 1}";
 
-                result.Add(model);
+                    result.Add(model);
+                }
+
+                return result;
             }
 
-            return result;
+            return await _fitTogether.OutboundMultPolarAsync(dto);
         }
 
         /// <summary>
@@ -847,6 +860,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("电芯极组绑定产品出站032", BusinessType.OTHER, "OutboundSfcPolar032", ReceiverTypeEnum.MES)]
         public async Task OutboundSfcPolarAsync(OutboundSfcPolarDto dto)
         {
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _fitTogether.OutboundSfcPolarAsync(dto);
+
             //TODO
             //1. 将极组和电芯进行绑定
             //2. 考虑系统如何追溯
@@ -866,15 +886,20 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //1. 生成条码进行下发
             //2. 参考现有创建条码 CreateBarcodeBySemiProductIdAsync，CreateBarcodeByWorkOrderIdAsync
 
-            List<string> sfcList = new List<string>();
-            for(var i = 0;i < dto.Qty; ++i)
+            if(IS_DEBUG == true)
             {
-                sfcList.Add($"SFC00{i + 1}");
+                List<string> sfcList = new List<string>();
+                for (var i = 0; i < dto.Qty; ++i)
+                {
+                    sfcList.Add($"SFC00{i + 1}");
+                }
+
+                //string sfc = "SFC001";
+
+                return sfcList;
             }
 
-            //string sfc = "SFC001";
-
-            return sfcList;
+            return await _fitTogether.GenerateCellSfcAsync(dto);
         }
 
         /// <summary>
@@ -1232,12 +1257,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("InboundBindJzSingle")]
         [LogDescription("绑定后极组单个条码进站049", BusinessType.OTHER, "InboundBindJzSingle049", ReceiverTypeEnum.MES)]
-        public async Task InboundBindJzSingleAsync(InboundDto dto)
+        public async Task InboundBindJzSingleAsync(InboundBindJzSingleDto dto)
         {
             if (IS_DEBUG == true)
             {
                 return;
             }
+
+            await _fitTogether.InboundBindJzSingleAsync(dto);
 
             //await _qknyService.InboundAsync(dto);
 
@@ -1258,10 +1285,31 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            //await _qknyService.OutboundAsync(dto);
+            await _fitTogether.OutboundBindJzSingleAsync(dto);
 
         }
 
+        /// <summary>
+        /// 获取电芯信息051
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetSfcInfo")]
+        [LogDescription("获取电芯信息051", BusinessType.OTHER, "GetSfcInfo051", ReceiverTypeEnum.MES)]
+        public async Task GetSfcInfoAsync(GetSfcInfoDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            //TODO
+            //1. 用于分选工序，获取电芯是B品，NG品，良品
+
+            //await _qknyService.InboundAsync(dto);
+
+        }
 
     }
 }
