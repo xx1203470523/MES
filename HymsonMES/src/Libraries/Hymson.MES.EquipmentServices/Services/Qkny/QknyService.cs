@@ -1211,6 +1211,21 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
+        /// 库存接收047
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task MaterialInventoryAsync(MaterialInventoryDto dto)
+        {
+            if (dto == null || dto.BarCodeList == null || !dto.BarCodeList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+
+            await _whMaterialInventoryService.MaterialInventoryAsync(dto);
+        }
+
+        /// <summary>
         /// 获取设备资源对应的基础信息
         /// </summary>
         /// <param name="param"></param>

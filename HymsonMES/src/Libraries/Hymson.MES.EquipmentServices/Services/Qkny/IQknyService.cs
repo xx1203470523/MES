@@ -169,5 +169,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<List<ProcSortRuleDetailEquDto>> SortingRuleAsync(SortingRuleDto dto);
+
+        /// <summary>
+        /// 库存接收
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task MaterialInventoryAsync(MaterialInventoryDto dto);
     }
 }

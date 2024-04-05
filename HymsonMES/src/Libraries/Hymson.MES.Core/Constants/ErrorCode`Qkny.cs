@@ -326,12 +326,19 @@ namespace Hymson.MES.Core.Constants
 
         #endregion
 
-        #region 库存
+        #region 库存接收
 
         /// <summary>
         /// 条码已经在库存中存在
         /// </summary>
         public const string MES45230 = "条码已经在库存中存在";
+
+        /// <summary>
+        /// 物料条码格式错误
+        /// </summary>
+        public const string MES45231 = "物料条码【{BarCode}】格式错误，必须为英文逗号分隔的五段码";
+        public const string MES45232 = "物料条码【{BarCode}】格式错误，第4段内容必须是数字且大于0";
+        public const string MES45233 = "物料【{MaterialCode}】基础信息不存在";
 
         #endregion
 
