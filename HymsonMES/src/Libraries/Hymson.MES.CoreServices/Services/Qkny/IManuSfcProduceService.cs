@@ -33,5 +33,12 @@ namespace Hymson.MES.CoreServices.Services.Qkny
         /// <param name="sfcQuery"></param>
         /// <returns></returns>
         Task<ManuSfcProduceEntity> GetBySFCAsync(ManuSfcProduceBySfcQuery sfcQuery);
+
+        /// <summary>
+        /// 批量删除（物理删除）条码信息
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task<int> DeletePhysicalRangeAsync(DeletePhysicalBySfcsCommand sfcsCommand);
     }
 }

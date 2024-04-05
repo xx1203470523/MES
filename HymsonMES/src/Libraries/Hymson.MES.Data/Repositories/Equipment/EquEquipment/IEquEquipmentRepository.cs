@@ -148,6 +148,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         Task<EquEquipmentResAllView> GetEquResLineAsync(EquResAllQuery query);
 
+        /// <summary>
+        /// 根据设备编码+资源编码查询 设备，资源，工序
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<EquEquipmentResAllView> GetEquResProcedureAsync(EquResAllQuery param);
+
         #endregion
     }
 }

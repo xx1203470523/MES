@@ -384,7 +384,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             {
                 //1. 获取设备基础信息
                 //EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
-                EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
+                EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
                 //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
 
                 saveDto.Source = ManuSFCFeedingSourceEnum.BOM;
@@ -499,7 +499,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             var sfcObjList = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(query, null);
             List<string> sfcList = sfcObjList.Select(m => m.SFC).ToList();
             inBo.SFCs = sfcList.ToArray();
-            //var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
+            var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
             trans.Complete();
 
             return sfcList;
@@ -805,7 +805,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
-        /// 出站多个
+        /// 出站多个030
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -1169,7 +1169,26 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task CollingPolarAsync(CollingPolarDto dto)
         {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //2. 查询极组条码是否已经存在
+            WhMaterialInventoryBarCodeQuery whQuery = new WhMaterialInventoryBarCodeQuery();
+            whQuery.SiteId = equResModel.SiteId;
+            whQuery.BarCode = dto.Sfc;
+            var whInfo = await _whMaterialInventoryService.GetByBarCodeAsync(whQuery);
+            if(whInfo != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45230));
+            }
 
+            //条码接收的动作
+            long materialId = planEntity.ProductId;
+            string sfc = dto.Sfc;
+            int qty = 1;
+
+            //车间库存接收
+            //走库存接收逻辑
         }
 
         /// <summary>

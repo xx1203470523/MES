@@ -325,5 +325,28 @@ namespace Hymson.MES.Core.Constants
         public const string MES45220 = "产品过程参数不能为空";
 
         #endregion
+
+        #region 库存
+
+        /// <summary>
+        /// 条码已经在库存中存在
+        /// </summary>
+        public const string MES45230 = "条码已经在库存中存在";
+
+        #endregion
+
+        #region 极组
+
+        /// <summary>
+        /// 极组条码不存在绑定记录
+        /// </summary>
+        public const string MES45270 = "极组条码不存在绑定记录";
+
+        /// <summary>
+        /// 极组条码没有绑定的电芯
+        /// </summary>
+        public const string MES45271 = "极组条码没有绑定的电芯";
+
+        #endregion
     }
 }

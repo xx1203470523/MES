@@ -14,6 +14,8 @@ using Hymson.MES.Core.Domain.ManuFeedingCompletedZjyjRecord;
 using Hymson.MES.Core.Domain.ManuFeedingNoProductionRecord;
 using Hymson.MES.Core.Domain.ManuFeedingTransferRecord;
 using Hymson.MES.Core.Domain.ManuFillingDataRecord;
+using Hymson.MES.Core.Domain.ManuJzBind;
+using Hymson.MES.Core.Domain.ManuJzBindRecord;
 using Hymson.MES.Services.Dtos.AgvTaskRecord;
 using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
@@ -28,6 +30,8 @@ using Hymson.MES.Services.Dtos.ManuFeedingCompletedZjyjRecord;
 using Hymson.MES.Services.Dtos.ManuFeedingNoProductionRecord;
 using Hymson.MES.Services.Dtos.ManuFeedingTransferRecord;
 using Hymson.MES.Services.Dtos.ManuFillingDataRecord;
+using Hymson.MES.Services.Dtos.ManuJzBind;
+using Hymson.MES.Services.Dtos.ManuJzBindRecord;
 
 namespace Hymson.MES.EquipmentServices.Mapper
 {
@@ -68,6 +72,8 @@ namespace Hymson.MES.EquipmentServices.Mapper
             CreateMap<ManuFillingDataRecordSaveDto, ManuFillingDataRecordEntity>();
             CreateMap<EquToolLifeRecordSaveDto, EquToolLifeRecordEntity>();
             CreateMap<ManuFeedingTransferRecordSaveDto, ManuFeedingTransferRecordEntity>();
+            CreateMap<ManuJzBindSaveDto, ManuJzBindEntity>();
+            CreateMap<ManuJzBindRecordSaveDto, ManuJzBindRecordEntity>();
             #endregion
 
         }

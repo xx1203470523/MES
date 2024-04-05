@@ -44,5 +44,24 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
             }
             return dbList.ToList();
         }
+
+        /// <summary>
+        /// 根据物料条码获取数据
+        /// 不抛异常
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<WhMaterialInventoryEntity> GetByBarCodeAsync(WhMaterialInventoryBarCodeQuery query)
+        {
+            WhMaterialInventoryBarCodesQuery listQuery = new WhMaterialInventoryBarCodesQuery();
+            listQuery.SiteId = (long)query.SiteId;
+            listQuery.BarCodes = new List<string>() { query.BarCode };
+            var dbList = await _whMaterialInventoryRepository.GetByBarCodesNoQtyAsync(listQuery);
+            if (dbList.IsNullOrEmpty() == true)
+            {
+                return null;
+            }
+            return dbList.First();
+        }
     }
 }
