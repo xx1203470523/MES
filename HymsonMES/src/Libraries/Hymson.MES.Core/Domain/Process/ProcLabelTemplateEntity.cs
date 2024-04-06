@@ -48,6 +48,9 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public long SiteId { get; set; }
 
-       
+        /// <summary>
+        /// 数据源
+        /// </summary>
+        public string? PrintDataModel { get; set; }
     }
 }
