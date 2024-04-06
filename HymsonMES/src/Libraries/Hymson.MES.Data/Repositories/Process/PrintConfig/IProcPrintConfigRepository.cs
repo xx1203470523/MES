@@ -55,6 +55,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcPrinterEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcPrinterEntity>> GetListAsync(ProcPrinterPagedQuery query);

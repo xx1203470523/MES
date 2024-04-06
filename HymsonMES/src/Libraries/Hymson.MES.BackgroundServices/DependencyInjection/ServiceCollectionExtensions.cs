@@ -1,6 +1,8 @@
 ﻿using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.MES.BackgroundServices.EventHandling;
+using Hymson.MES.BackgroundServices.EventHandling.ProcessEventHandling.PrintEventHandling;
+using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Configuration;
@@ -55,6 +57,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IIntegrationEventHandler<MessageHandleUpgradeIntegrationEvent>, MessageHandleUpgradeIntegrationEventHandler>();
             services.AddSingleton<IIntegrationEventHandler<MessageReceiveUpgradeIntegrationEvent>, MessageReceiveUpgradeIntegrationEventHandler>();
             services.AddSingleton<IIntegrationEventHandler<MessageTriggerUpgradeIntegrationEvent>, MessageTriggerUpgradeIntegrationEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<PrintEvent>, ExecPrintHander>();
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
             foreach (var keyValuePair in keyValuePairs)
             {
-                services.TryAddSingleton(keyValuePair.Value,keyValuePair.Key);
+                services.TryAddSingleton(keyValuePair.Value, keyValuePair.Key);
             }
         }
 

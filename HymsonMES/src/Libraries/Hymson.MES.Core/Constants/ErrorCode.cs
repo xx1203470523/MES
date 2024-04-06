@@ -153,7 +153,7 @@
         public const string MES10378 = "打印数据源{DataSourceName}不存在,无法打印,请查看标签模板";
 
         public const string MES10379 = "IP设定不符合规范!";
-
+        public const string MES10390 = "资源【{ResourceCode}】未找到打印机!";
 
         #endregion
 

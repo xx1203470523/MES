@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.BackgroundServices.Dtos.Manufacture.LabelTemplate
+namespace Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility
 {
     /// <summary>
     /// 

@@ -2,8 +2,10 @@ using Dapper;
 using Force.Crc32;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Parameter;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -220,6 +222,41 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetInOutStepBySFCsSql, tableName), query);
         }
 
+
+        /// <summary>
+        /// 根据条码获取参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetProductParameterBySFCEntitiesAsync(EntityBySFCsQuery param)
+        {
+            var list = new List<ManuSfcStepEntity>();
+            var dic = new Dictionary<string, List<string>>();
+
+            foreach (var sfc in param.SFCs)
+            {
+                var tableNameBySFC = PrepareTableName(param.SiteId, sfc);
+                if (!dic.ContainsKey(tableNameBySFC))
+                {
+                    dic[tableNameBySFC] = new List<string>();
+                }
+                dic[tableNameBySFC].Add(sfc);
+            }
+
+            List<Task<IEnumerable<ManuSfcStepEntity>>> tasks = new();
+            using var conn = GetMESParamterDbConnection();
+            foreach (var dicItem in dic)
+            {
+                tasks.Add(conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetStepBySFCsSql, dicItem.Key), new EntityBySFCsQuery { SiteId = param.SiteId, SFCs = dicItem.Value }));
+            }
+            var result = await Task.WhenAll(tasks);
+            foreach (var item in result)
+            {
+                list.AddRange(item);
+            }
+            return list;
+        }
+
         /// <summary>
         /// 插入步骤业务表
         /// </summary>
@@ -294,7 +331,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ManuSfcStepEntity> GetSfcMergeOrSplitAddStepAsync(SfcMergeOrSplitAddStepQuery query) 
+        public async Task<ManuSfcStepEntity> GetSfcMergeOrSplitAddStepAsync(SfcMergeOrSplitAddStepQuery query)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcStepEntity>(GetSfcsMergeOrSliptAddStepSql, query);
@@ -407,6 +444,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetOutStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype = 4 AND SFC = @SFC ORDER BY Id ASC ";
         const string GetInOutStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype IN (3, 4) AND SFC = @SFC ORDER BY Id ASC ";
         const string GetInOutStepBySFCsSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype IN (3, 4) AND SFC IN @SFCs ORDER BY Id ASC ";
+        const string GetStepBySFCsSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND  SFC IN @SFCs ORDER BY Id DESC ";
         const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY Id desc LIMIT @Offset, @Rows ";
         const string GetBySFCPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
 

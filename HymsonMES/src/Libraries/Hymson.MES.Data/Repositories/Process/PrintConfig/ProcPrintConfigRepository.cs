@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -74,6 +75,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcPrinterEntity>(GetByIdSql, new { id });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcPrinterEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcPrinterEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -212,6 +224,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetEntitiesSqlTemplate = "";
         const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_printer /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_printer /**where**/";
-
+        const string GetByIdsSql = "SELECT * FROM `proc_printer` WHERE `Id` IN @Ids;";
     }
 }

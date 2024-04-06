@@ -23,6 +23,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// </summary>
         private readonly IPlanSfcPrintService _planSfcPrintService;
 
+
         /// <summary>
         /// 构造函数（条码打印）
         /// </summary>

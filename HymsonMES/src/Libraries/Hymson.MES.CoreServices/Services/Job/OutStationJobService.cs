@@ -158,7 +158,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             _localizationService = localizationService;
         }
 
-
         /// <summary>
         /// 参数校验
         /// </summary>
@@ -710,6 +709,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         Batch = "",//自制品 没有
                         MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                         QuantityResidue = sfcProduceEntity.Qty,
+                        ScrapQty = sfcProduceEntity.ScrapQty,
                         Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                         Source = MaterialInventorySourceEnum.ManuComplete,
                         SiteId = commonBo.SiteId,

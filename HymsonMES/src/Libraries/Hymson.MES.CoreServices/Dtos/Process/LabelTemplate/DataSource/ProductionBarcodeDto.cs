@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Dtos.Process.LabelTemplate.DataSource
+namespace Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.DataSource
 {
     /// <summary>
     ///生产条码数据源

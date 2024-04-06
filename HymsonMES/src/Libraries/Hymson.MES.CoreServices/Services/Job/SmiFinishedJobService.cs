@@ -290,6 +290,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
                         MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                         QuantityResidue = sfcProduceEntity.Qty,
+                        ScrapQty = sfcProduceEntity.ScrapQty,
                         Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                         Source = MaterialInventorySourceEnum.ManuComplete,
                         SiteId = commonBo.SiteId,
