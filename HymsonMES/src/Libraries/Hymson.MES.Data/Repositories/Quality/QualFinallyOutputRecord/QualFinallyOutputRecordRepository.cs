@@ -210,10 +210,8 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<QualFinallyOutputRecordEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var entities = await entitiesTask;
-            var totalCount = await totalCountTask;
+            var entities = await conn.QueryAsync<QualFinallyOutputRecordEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             return new PagedInfo<QualFinallyOutputRecordEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 

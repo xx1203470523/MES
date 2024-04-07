@@ -277,7 +277,7 @@ namespace Hymson.MES.Services.Services.Quality
                 var fqcOrders = await _qualFqcOrderSampleRepository.GetEntitiesByDetailBacodeAsync(resultbarcodes);
 
                 //条码信息
-                var sfcs = await _manuSfcRepository.GetBySFCsAsync(resultbarcodes);
+                var sfcs = await _manuSfcRepository.GetListAsync(new ManuSfcQuery { SFCs = resultbarcodes });
 
                 try
                 {
