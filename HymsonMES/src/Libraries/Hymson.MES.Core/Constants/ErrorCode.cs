@@ -771,8 +771,11 @@
         public const string MES13600 = "是否不合格不能为空！";
         public const string MES13601 = "是否不合格类型不存在！";
         public const string MES13602 = "检验值不能为空！";
-        public const string MES13603 = "实际检验时间不能为空！"; 
+        public const string MES13603 = "实际检验时间不能为空！";
         public const string MES13604 = "没有可保存的数据！";
+        public const string MES13605 = "请选择工作中心/工序！";
+        public const string MES13606 = "不存在编码为【{Code}】的工作中心！";
+        public const string MES13607 = "不存在编码为【{Code}】的工序！";
 
         public const string MES13610 = "环境检验项目不存在或未启用！";
         public const string MES13611 = "环境检验项目【{Code}】下检验参数不能为空！";

@@ -82,9 +82,9 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrder
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddQualEnvOrderAsync([FromBody] QualEnvOrderCreateDto parm)
+        public async Task AddQualEnvOrderAsync([FromBody] QualEnvOrderCreateConvertDto parm)
         {
-            await _qualEnvOrderService.CreateQualEnvOrderAsync(parm);
+            await _qualEnvOrderService.QualEnvOrderCreateConvert(parm);
         }
 
         /// <summary>
