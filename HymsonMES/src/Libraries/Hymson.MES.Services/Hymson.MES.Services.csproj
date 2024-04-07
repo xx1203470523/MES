@@ -28,6 +28,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Dtos\Process\LabelTemplate\DataSource\BaseLabelTemplateDataDto.cs" />
+    <Compile Remove="Dtos\Process\LabelTemplate\Utility\LabelTemplateSourceDto.cs" />
+    <Compile Remove="Services\Process\LabelTemplate\DataSource\IBarcodeDataSourceService.cs" />
+    <Compile Remove="Services\Process\LabelTemplate\Utility\Execute\ExecuteLabelTemplateDataSourceService.cs" />
+    <Compile Remove="Services\Process\LabelTemplate\Utility\Execute\IExecuteLabelTemplateDataSourceService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EPPlus" Version="6.2.2" />
     <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.147" />
     <PackageReference Include="Hymson.Elasticsearch" Version="2.1.147" />
@@ -50,6 +58,7 @@
 
   <ItemGroup>
     <Folder Include="Dtos\Process\LabelTemplate\Utility\" />
+    <Folder Include="Services\Process\LabelTemplate\Utility\Execute\" />
   </ItemGroup>
 
 </Project>

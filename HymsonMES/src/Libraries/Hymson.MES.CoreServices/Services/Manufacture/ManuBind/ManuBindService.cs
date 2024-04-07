@@ -924,10 +924,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             var validationFailures = new List<ValidationFailure>();
             List<ManuSfcStepEntity> manuSfcStepList = new();
             List<WhMaterialInventoryEntity> whMaterialInventoryEntities = new();
-            var sfc = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+            var sfc = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
             {
                 SiteId = param.SiteId,
-                SFC = param.SFC
+                SFC = param.SFC,
+                Type = SfcTypeEnum.Produce
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17423)).WithData("SFC", param.SFC);
 
             var manuSfc = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(sfc.Id);

@@ -53,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcLabelTemplateEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ProcLabelTemplateEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcLabelTemplateEntity>(GetByIdsSql, new { ids = ids });

@@ -26,5 +26,12 @@ namespace Hymson.MES.Core.Constants.Manufacture
             SfcStatusEnum.Locked,
             SfcStatusEnum.Detachment
         };
+
+        /// <summary>
+        /// 禁止报废状态 报废 删除 无效 锁定
+        /// </summary>
+        public static readonly IEnumerable<SfcStatusEnum> ForbidScrapSfcStatuss = new List<SfcStatusEnum>() {
+                 SfcStatusEnum.Scrapping, SfcStatusEnum.Delete, SfcStatusEnum.Invalid,SfcStatusEnum.Locked
+        };
     }
 }

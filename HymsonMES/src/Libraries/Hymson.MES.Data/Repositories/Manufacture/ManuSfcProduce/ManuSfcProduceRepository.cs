@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -943,6 +944,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
         }
+
+        /// <summary>
+        /// 部分报废 修改数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> PartialScrapManuSfcProduceByIdAsync(IEnumerable<ManuSfcProducePartialScrapByIdCommand> commands)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(PartialScrapManuSfcProduceByIdSql, commands);
+        }
     }
 
     /// <summary>
@@ -1020,5 +1032,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateStatusAndQtyBySfcsSql = @"UPDATE `manu_sfc_produce` SET Status = @Status, Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND SFC IN @SFCs ";
         const string UpdateQtyByIdSql = @"UPDATE `manu_sfc_produce` SET  Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
+        const string PartialScrapManuSfcProduceByIdSql = @"UPDATE `manu_sfc_produce` SET  Qty = @Qty , ScrapQty = @ScrapQty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
     }
 }

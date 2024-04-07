@@ -726,7 +726,8 @@ public partial class ManuFacePlateService : IManuFacePlateService
             new ManuSfcQuery
             {
                 SFCs = manuSfcs,
-                SiteId = siteId
+                SiteId = siteId,
+                Type = SfcTypeEnum.Produce
             });
 
             if (manuSfcEntities != null && manuSfcEntities.Any())
@@ -1008,10 +1009,11 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
         #region 填充生产条码信息
 
-        process.ManuSfcEntityByInsertion = await _manuSfcRepository.GetOneAsync(new ManuSfcQuery
+        process.ManuSfcEntityByInsertion = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
         {
             SFC = sfc,
-            SiteId = siteId
+            SiteId = siteId,
+            Type = SfcTypeEnum.Produce
         });
 
         if (process.ManuSfcEntityByInsertion != null)
@@ -1053,7 +1055,8 @@ public partial class ManuFacePlateService : IManuFacePlateService
                 process.ManuSfcEntitiesByPacked = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
                 {
                     SFCs = containerPackSfcs,
-                    SiteId = siteId
+                    SiteId = siteId,
+                    Type = SfcTypeEnum.Produce
                 });
 
                 if (process.ManuSfcEntitiesByPacked.Any())
@@ -1524,10 +1527,11 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
         if (firstManuContainerPackEntity.PackType == ManuContainerBarcodePackTypeEnum.ManuSfc)
         {
-            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+            var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
             {
                 SFC = firstManuContainerPackEntity.LadeBarCode,
-                SiteId = siteId
+                SiteId = siteId,
+                Type = SfcTypeEnum.Produce
             });
 
             var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);

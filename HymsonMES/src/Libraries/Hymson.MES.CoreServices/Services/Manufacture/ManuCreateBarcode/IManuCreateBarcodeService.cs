@@ -51,6 +51,5 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// <param name="param"></param>
         /// <returns></returns>
         Task<List<ManuSfcEntity>> CreateCellBarCodeAsync(CreateBarcodeByResourceCode param);
-
     }
 }

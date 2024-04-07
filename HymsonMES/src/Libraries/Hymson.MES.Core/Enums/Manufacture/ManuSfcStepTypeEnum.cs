@@ -230,10 +230,17 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("离脱")]
         Detachment = 43,
+
         /// <summary>
         /// 设备误判
         /// </summary>
         [Description("设备误判")]
-        Misjudgment = 44
+        Misjudgment = 44,
+
+        /// <summary>
+        /// 部分报废
+        /// </summary>
+        [Description("部分报废")]
+        PartialDiscard = 45
     }
 }

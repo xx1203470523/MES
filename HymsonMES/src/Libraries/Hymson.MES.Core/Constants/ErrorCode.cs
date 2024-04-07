@@ -154,7 +154,7 @@
         public const string MES10378 = "打印数据源{DataSourceName}不存在,无法打印,请查看标签模板";
 
         public const string MES10379 = "IP设定不符合规范!";
-
+        public const string MES10390 = "资源【{ResourceCode}】未找到打印机!";
 
         #endregion
 
@@ -921,8 +921,12 @@
         public const string MES15445 = "产品序列码不能为空！";
         public const string MES15446 = "产品序列码【{barCode}】不存在！";
         public const string MES15447 = "产品序列码【{barCode}】状态为【{status}】，不可再执行当前操作！";
-        public const string MES15448 = "产品序列码【{barCode}】不存在未关闭的缺陷，不可再执行当前操作！";
-        public const string MES15449 = "产品序列码【{barCode}】类型为【{type}】，不可再执行当前操作！";
+        public const string MES15448 = "可用数量为【{Qty}】,无法报废【{ScrapQty}】";
+        public const string MES15449 = "条码数据已发生变化，请刷新后再操作";
+        public const string MES15450 = "产品序列码状态为【{Status}】，不允许报废操作。";
+
+        public const string MES15451 = "产品序列码【{barCode}】不存在未关闭的缺陷，不可再执行当前操作！";
+        public const string MES15452 = "产品序列码【{barCode}】类型为【{type}】，不可再执行当前操作！";
         #endregion
 
         #region 物料加载 15500

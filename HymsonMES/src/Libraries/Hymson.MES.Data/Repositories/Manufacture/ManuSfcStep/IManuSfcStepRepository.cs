@@ -131,6 +131,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<IEnumerable<ManuSfcStepEntity>> GetInOutStationStepsBySFCsAsync(string tableName, EntityBySFCsQuery query);
 
+        /// <summary>
+        /// 根据条码获取参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetProductParameterBySFCEntitiesAsync(EntityBySFCsQuery param);
 
         /// <summary>
         /// 获取一个条码的合并新增或拆分新增步骤记录
