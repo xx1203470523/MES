@@ -769,7 +769,7 @@
         public const string MES13600 = "是否不合格不能为空！";
         public const string MES13601 = "是否不合格类型不存在！";
         public const string MES13602 = "检验值不能为空！";
-        public const string MES13603 = "实际检验时间不能为空！"; 
+        public const string MES13603 = "实际检验时间不能为空！";
         public const string MES13604 = "没有可保存的数据！";
         #endregion
 
@@ -1979,6 +1979,11 @@
         public const string MES11605 = "使用状态不能为空！";
         public const string MES11606 = "导入的数据中资源编码重复！";
         public const string MES11607 = "导入的数据中工序编码重复！";
+        #endregion
+
+
+        #region 设备点检 15800
+        public const string MES15801 = "此设备点检项目{code}在系统中已经存在!";
         #endregion
     }
 }
