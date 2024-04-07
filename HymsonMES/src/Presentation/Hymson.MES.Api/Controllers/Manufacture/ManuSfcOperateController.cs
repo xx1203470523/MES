@@ -1,4 +1,7 @@
-﻿using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperate;
+﻿using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperate;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
+using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -53,7 +56,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 出站 HY-MES-EQU-017
+        /// 出站
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -98,6 +101,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task OutBoundCarrierAsync(OutBoundCarrierDto request)
         {
             await _manuSfcOperateService.OutBoundCarrierAsync(request);
+        }
+
+        /// <summary>
+        /// 分页查询列表（PDA条码出站）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("page")]
+        public async Task<PagedInfo<ManuSfcInstationPagedQueryOutputDto>> GetPagedListAsync([FromQuery] ManuSfcInstationPagedQueryDto pagedQueryDto)
+        {
+            return await _manuSfcOperateService.GetPagedListAsync(pagedQueryDto);
         }
     }
 }
