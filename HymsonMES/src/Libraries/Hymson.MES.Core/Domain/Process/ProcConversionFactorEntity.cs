@@ -38,7 +38,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 转换系数
         /// 空值 : false  
         /// </summary>
-        public string ConversionFactor { get; set; }
+        public decimal ConversionFactor { get; set; }
 
         /// <summary>
         /// 转换系数状态
