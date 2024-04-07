@@ -103,6 +103,22 @@ namespace Hymson.MES.Services.Dtos.QualEnvOrder
     }
 
     /// <summary>
+    /// 环境检验单新增Dto
+    /// </summary>
+    public record QualEnvOrderCreateConvertDto : BaseEntityDto
+    {
+        /// <summary> 
+        /// 工作中心Code
+        /// </summary>
+        public string WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 工序Code
+        /// </summary>
+        public string ProcedureCode { get; set; }
+    }
+
+    /// <summary>
     /// 环境检验单更新Dto
     /// </summary>
     public record QualEnvOrderModifyDto : BaseEntityDto
@@ -214,6 +230,6 @@ namespace Hymson.MES.Services.Dtos.QualEnvOrder
         /// <summary>
         /// 检验日期
         /// </summary>
-        public DateTime[]? CreatedOn { get; set; }  
+        public DateTime[]? CreatedOn { get; set; }
     }
 }

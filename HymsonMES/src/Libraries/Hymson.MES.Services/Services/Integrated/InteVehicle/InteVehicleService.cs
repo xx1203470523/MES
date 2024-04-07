@@ -666,7 +666,8 @@ namespace Hymson.MES.Services.Services.Integrated
                     }
                     if (manuSfcProduceEntity.ProductId != firstmatrialid)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES18628)).WithData("Code", manuSfcProduceEntity.SFC);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES18630))
+                            .WithData("curCode", manuSfcProduceEntity.ProductId).WithData("provCode", firstmatrialid);
                     }
 
                 }

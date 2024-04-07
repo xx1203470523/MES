@@ -771,8 +771,11 @@
         public const string MES13600 = "是否不合格不能为空！";
         public const string MES13601 = "是否不合格类型不存在！";
         public const string MES13602 = "检验值不能为空！";
-        public const string MES13603 = "实际检验时间不能为空！"; 
+        public const string MES13603 = "实际检验时间不能为空！";
         public const string MES13604 = "没有可保存的数据！";
+        public const string MES13605 = "请选择工作中心/工序！";
+        public const string MES13606 = "不存在编码为【{Code}】的工作中心！";
+        public const string MES13607 = "不存在编码为【{Code}】的工序！";
 
         public const string MES13610 = "环境检验项目不存在或未启用！";
         public const string MES13611 = "环境检验项目【{Code}】下检验参数不能为空！";
@@ -1656,6 +1659,7 @@
         public const string MES18627 = "载具类型【{Code}】已禁用，具体请查看【载具类型】！";
         public const string MES18628 = "载具编码【{Code}】装载的产品序列码物料编码/版本不一致，具体请查看【载具绑定解绑】！";
         public const string MES18629 = "载具编码【{Code}】未找到所属的载具类型！";
+        public const string MES18630 = "当前物料条码的物料Id【{curCode}】与已装载的条码的物料Id{provCode}不一致！";
 
         // MES18629 - MES18641
 

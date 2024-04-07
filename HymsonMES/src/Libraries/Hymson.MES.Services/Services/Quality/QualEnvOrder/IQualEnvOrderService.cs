@@ -30,6 +30,13 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
         Task CreateQualEnvOrderAsync(QualEnvOrderCreateDto qualEnvOrderCreateDto);
 
         /// <summary>
+        /// 创建环境检验中转
+        /// </summary>
+        /// <param name="createConvertDto"></param>
+        /// <returns></returns>
+        Task QualEnvOrderCreateConvert(QualEnvOrderCreateConvertDto createConvertDto);
+
+        /// <summary>
         /// 修改
         /// </summary>
         /// <param name="qualEnvOrderModifyDto"></param>
