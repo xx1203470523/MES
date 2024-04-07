@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
+﻿using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,5 +40,13 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
         /// <param name="param"></param>
         /// <returns></returns>
         Task<EquEquipmentResAllView> GetEquResProcedureAsync(QknyBaseDto param);
+
+        /// <summary>
+        /// 获取设备资源对应的基础信息
+        /// 用于化成NG电芯上报，此时实际发生不良的工序是可能是上面的多个工序出现的
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<List<EquEquipmentResAllView>> GetMultEquResAllAsync(MultEquResAllQuery query);
     }
 }

@@ -8,6 +8,7 @@ using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Services.Qkny;
 using Hymson.MES.EquipmentServices.Services.Qkny.Common;
 using Hymson.MES.EquipmentServices.Services.Qkny.FitTogether;
+using Hymson.MES.EquipmentServices.Services.Qkny.Formation;
 using Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
@@ -45,6 +46,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IFitTogetherService _fitTogether;
 
         /// <summary>
+        /// 化成
+        /// </summary>
+        private readonly IFormationService _formationService;
+
+        /// <summary>
         /// 是否调试
         /// </summary>
         private readonly bool IS_DEBUG = true;
@@ -56,12 +62,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
             IQknyService qknyService,
             IEquCommonService equCommonService,
             IGlueHomogenateService glueHomogenateService,
-            IFitTogetherService fitTogether)
+            IFitTogetherService fitTogether,
+            IFormationService formationService)
         {
             _qknyService = qknyService;
             _equCommonService = equCommonService;
             _glueHomogenateService = glueHomogenateService;
             _fitTogether = fitTogether;
+            _formationService = formationService;
         }
 
         /// <summary>
@@ -917,7 +925,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.FillingDataAsync(dto);
+            await _formationService.FillingDataAsync(dto);
 
             //TODO
             //1. 新增表进行记录
@@ -938,7 +946,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.EmptyContainerCheckAsync(dto);
+            await _formationService.EmptyContainerCheckAsync(dto);
 
             //TODO
             //2. 校验托盘是否存在系统中（待确认）
@@ -960,7 +968,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.ContainerSfcCheckAsync(dto);
+            await _formationService.ContainerSfcCheckAsync(dto);
 
             //TODO
             //1. 校验电芯是否合格
@@ -988,7 +996,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //绑盘拆盘作为单独工序，需要做进出站
 
-            await _qknyService.BindContainerAsync(dto);
+            await _formationService.BindContainerAsync(dto);
 
             //TODO
             //1. 校验托盘数量
@@ -1016,7 +1024,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //绑盘拆盘作为单独工序，需要做进出站
 
-            await _qknyService.UnBindContainerAsync(dto);
+            await _formationService.UnBindContainerAsync(dto);
 
             //TODO
             //1. 校验电芯是否在托盘中
@@ -1041,7 +1049,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.ContainerNgReportAsync(dto);
+            await _formationService.ContainerNgReportAsync(dto);
 
             //TODO
             //1. inte_vehicle_freight_stack 删除绑定数据
@@ -1065,7 +1073,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.InboundInContainerAsync(dto);
+            await _formationService.InboundInContainerAsync(dto);
 
             //TODO
             //1. 参考 InBoundCarrierAsync 进站
@@ -1086,7 +1094,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.OutboundInContainerAsync(dto);
+            await _formationService.OutboundInContainerAsync(dto);
 
             //TODO
             //1. 托盘如果存在参数，在记录数据时，需要在额外记录托盘当时的条码
@@ -1150,7 +1158,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            await _qknyService.CollingPolarAsync(dto);
+            await _fitTogether.CollingPolarAsync(dto);
         }
 
         /// <summary>
@@ -1183,7 +1191,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return sortList;
             }
 
-            return await _qknyService.SortingRuleAsync(dto);
+            return await _formationService.SortingRuleAsync(dto);
         }
 
         /// <summary>

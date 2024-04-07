@@ -100,5 +100,21 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
             }
             return equResAllModel;
         }
+
+        /// <summary>
+        /// 获取设备资源对应的基础信息
+        /// 用于化成NG电芯上报，此时实际发生不良的工序是可能是上面的多个工序出现的
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<List<EquEquipmentResAllView>> GetMultEquResAllAsync(MultEquResAllQuery query)
+        {
+            var list = await _equEquipmentRepository.GetMultEquResAllAsync(query);
+            if (list == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+            }
+            return list.ToList(); ;
+        }
     }
 }

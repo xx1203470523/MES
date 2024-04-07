@@ -32,6 +32,8 @@ using Hymson.MES.Services.Services.ManuJzBindRecord;
 using Hymson.MES.Services.Dtos.ManuJzBindRecord;
 using Hymson.MES.CoreServices.Services.Qkny;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
 {
@@ -81,6 +83,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         private readonly IManuSfcProduceService _manuSfcProduceService;
 
         /// <summary>
+        /// 物料库存
+        /// </summary>
+        private readonly IWhMaterialInventoryService _whMaterialInventoryService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public FitTogetherService(IEquEquipmentService equEquipmentService,
@@ -90,7 +97,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             IManuCreateBarcodeService manuCreateBarcodeService,
             IPlanWorkOrderService planWorkOrderService,
             IManuJzBindRecordService manuJzBindRecordService,
-            IManuSfcProduceService manuSfcProduceService)
+            IManuSfcProduceService manuSfcProduceService,
+            IWhMaterialInventoryService whMaterialInventoryService)
         {
             _equEquipmentService = equEquipmentService;
             _manuPassStationService = manuPassStationService;
@@ -100,6 +108,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             _planWorkOrderService = planWorkOrderService;
             _manuJzBindRecordService = manuJzBindRecordService;
             _manuSfcProduceService = manuSfcProduceService;
+            _whMaterialInventoryService = whMaterialInventoryService;
         }
 
         /// <summary>
@@ -468,5 +477,35 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             //清除极组在制
             trans.Complete();
         }
+
+        /// <summary>
+        /// 卷绕极组产出上报
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task CollingPolarAsync(CollingPolarDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //2. 查询极组条码是否已经存在
+            WhMaterialInventoryBarCodeQuery whQuery = new WhMaterialInventoryBarCodeQuery();
+            whQuery.SiteId = equResModel.SiteId;
+            whQuery.BarCode = dto.Sfc;
+            var whInfo = await _whMaterialInventoryService.GetByBarCodeAsync(whQuery);
+            if (whInfo != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45230));
+            }
+
+            //条码接收的动作
+            long materialId = planEntity.ProductId;
+            string sfc = dto.Sfc;
+            int qty = 1;
+
+            //车间库存接收
+            //走库存接收逻辑
+        }
+
     }
 }
