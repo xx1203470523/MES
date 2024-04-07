@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public long? MaterialId { get; set; }
 
         /// <summary>
-        /// 状态(1-新建 2-激活 3-保留 4-废除)
+        /// 状态(0-新建 1-启用 2-保留 3-废除)
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
     }

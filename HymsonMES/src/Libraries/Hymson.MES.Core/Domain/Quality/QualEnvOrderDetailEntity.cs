@@ -51,7 +51,7 @@ namespace Hymson.MES.Core.Domain.QualEnvOrderDetail
         /// <summary>
         /// 检验值
         /// </summary>
-        public string InspectionValue { get; set; }
+        public string? InspectionValue { get; set; }
 
         /// <summary>
         /// 是否合格(0-否 1-是)
@@ -61,7 +61,7 @@ namespace Hymson.MES.Core.Domain.QualEnvOrderDetail
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
 
     }

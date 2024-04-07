@@ -13,9 +13,12 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.QualEnvOrder;
+using Hymson.MES.CoreServices.Bos.Quality;
+using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.QualEnvOrder;
 using Hymson.MES.Services.Dtos.QualEnvOrder;
@@ -43,7 +46,9 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
         private readonly AbstractValidator<QualEnvOrderCreateDto> _validationCreateRules;
         private readonly AbstractValidator<QualEnvOrderModifyDto> _validationModifyRules;
 
-        public QualEnvOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IQualEnvOrderRepository qualEnvOrderRepository, AbstractValidator<QualEnvOrderCreateDto> validationCreateRules, AbstractValidator<QualEnvOrderModifyDto> validationModifyRules, IProcProcedureRepository procProcedureRepository, IInteWorkCenterRepository inteWorkCenterRepository)
+        private readonly IEnvOrderCreateService _envOrderCreateService;
+
+        public QualEnvOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IQualEnvOrderRepository qualEnvOrderRepository, AbstractValidator<QualEnvOrderCreateDto> validationCreateRules, AbstractValidator<QualEnvOrderModifyDto> validationModifyRules, IProcProcedureRepository procProcedureRepository, IInteWorkCenterRepository inteWorkCenterRepository, IEnvOrderCreateService envOrderCreateService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -52,6 +57,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             _validationModifyRules = validationModifyRules;
             _procProcedureRepository = procProcedureRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _envOrderCreateService = envOrderCreateService;
         }
 
         /// <summary>
@@ -70,17 +76,15 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(qualEnvOrderCreateDto);
 
-            //DTO转换实体
-            var qualEnvOrderEntity = qualEnvOrderCreateDto.ToEntity<QualEnvOrderEntity>();
-            qualEnvOrderEntity.Id = IdGenProvider.Instance.CreateId();
-            qualEnvOrderEntity.CreatedBy = _currentUser.UserName;
-            qualEnvOrderEntity.UpdatedBy = _currentUser.UserName;
-            qualEnvOrderEntity.CreatedOn = HymsonClock.Now();
-            qualEnvOrderEntity.UpdatedOn = HymsonClock.Now();
-            qualEnvOrderEntity.SiteId = _currentSite.SiteId ?? 0;
+            var bo = new EnvOrderManualCreateBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                WorkCenterId = qualEnvOrderCreateDto.WorkCenterId,
+                ProcedureId = qualEnvOrderCreateDto.ProcedureId
+            };
 
-            //入库
-            await _qualEnvOrderRepository.InsertAsync(qualEnvOrderEntity);
+            await _envOrderCreateService.ManualCreateAsync(bo);
         }
 
         /// <summary>
@@ -114,20 +118,22 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             qualEnvOrderPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var qualEnvOrderDtos = new List<QualEnvOrderDto>();
 
-            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterCode))
+            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterCode)|| !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterName))
             {
-                var entityByCodeQuery = new EntityByCodeQuery { Site = _currentSite.SiteId, Code = qualEnvOrderPagedQueryDto.WorkCenterCode };
-                var inteWorkCenter = await _inteWorkCenterRepository.GetByCodeAsync(entityByCodeQuery);
+                var inteWorkCenterQuery = new InteWorkCenterFirstQuery { SiteId = _currentSite.SiteId ?? 0, Code = qualEnvOrderPagedQueryDto.WorkCenterCode, Name = qualEnvOrderPagedQueryDto.WorkCenterName };
+                var inteWorkCenter = await _inteWorkCenterRepository.GetEntitieAsync(inteWorkCenterQuery); 
                 if (inteWorkCenter == null)
                 {
                     return new PagedInfo<QualEnvOrderDto>(qualEnvOrderDtos, qualEnvOrderPagedQueryDto.PageIndex, qualEnvOrderPagedQueryDto.PageSize, 0);
                 }
                 qualEnvOrderPagedQuery.WorkCenterId = inteWorkCenter.Id;
             }
-            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureCode))
+            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureCode) || !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureName))
             {
-                var entityByCodeQuery = new EntityByCodeQuery { Site = _currentSite.SiteId, Code = qualEnvOrderPagedQueryDto.WorkCenterCode };
-                var procProcedure = await _procProcedureRepository.GetByCodeAsync(entityByCodeQuery);
+
+                var procProcedureQuery = new ProcProcedureQuery {  SiteId = _currentSite.SiteId??0, Code = qualEnvOrderPagedQueryDto.ProcedureCode, Name = qualEnvOrderPagedQueryDto.ProcedureName };
+                var procProcedure = await _procProcedureRepository.GetEntitieAsync(procProcedureQuery);
+                
                 if (procProcedure == null)
                 {
                     return new PagedInfo<QualEnvOrderDto>(qualEnvOrderDtos, qualEnvOrderPagedQueryDto.PageIndex, qualEnvOrderPagedQueryDto.PageSize, 0);
