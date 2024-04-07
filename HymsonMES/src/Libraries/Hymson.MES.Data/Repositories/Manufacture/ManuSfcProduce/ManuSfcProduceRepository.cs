@@ -953,7 +953,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> PartialScrapManuSfcProduceByIdAsync(IEnumerable<ManuSfcProducePartialScrapByIdCommand> commands)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
+            return await conn.ExecuteAsync(PartialScrapManuSfcProduceByIdSql, commands);
         }
     }
 

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
-    /// 控制器（条码档位表）
+    /// 部分报废
     /// </summary>
     [Authorize]
     [ApiController]
@@ -44,7 +44,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="param"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("BarcodeScanning")]
+        [Route("PartialScrap")]
         public async Task PartialScrapAsync(ManuSFCPartialScrapDto param)
         {
             await _manuSFCPartialScrapService.PartialScrapAsync(param);

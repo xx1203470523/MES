@@ -95,7 +95,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcScrapRepository"></param>
-        public ManuSFCPartialScrapService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcRepository manuSfcRepository, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcProduceRepository manuSfcProduceRepository, ILocalizationService localizationService, IWhMaterialInventoryRepository whMaterialInventoryRepository, IManuSfcStepRepository manuSfcStepRepository, IManuSfcScrapRepository manuSfcScrapRepository)
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        public ManuSFCPartialScrapService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcRepository manuSfcRepository, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcProduceRepository manuSfcProduceRepository, ILocalizationService localizationService, IWhMaterialInventoryRepository whMaterialInventoryRepository, IManuSfcStepRepository manuSfcStepRepository, IManuSfcScrapRepository manuSfcScrapRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -106,6 +108,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcScrapRepository = manuSfcScrapRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
+            _procMaterialRepository = procMaterialRepository;
         }
 
         /// <summary>
@@ -278,7 +282,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                         {
                             manuSfcProducePartialScrapByIdCommandList.Add(new ManuSfcProducePartialScrapByIdCommand
                             {
-                                Id = sfcEntity.Id,
+                                Id = manuSfcProduceInfoEntity.Id,
                                 ScrapQty = (manuSfcProduceInfoEntity.ScrapQty ?? 0) + barcodeItem.ScrapQty,
                                 Qty = manuSfcProduceInfoEntity.Qty - barcodeItem.ScrapQty,
                                 UpdatedOn = HymsonClock.Now(),
@@ -322,7 +326,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     ProcedureId = param.FindProcedureId,
                     UnqualifiedId = param.UnqualifiedId,
                     OutFlowProcedureId = param.OutFlowProcedureId,
-                    ScrapQty = sfcEntity.Qty,
+                    ScrapQty = barcodeItem.ScrapQty,
                     IsCancel = false,
                     Remark = param.Remark,
                     SiteId = _currentSite.SiteId ?? 0,
@@ -390,6 +394,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                 {
                     await _manuSfcScrapRepository.InsertRangeAsync(manuSfcScrapEntities);
                 }
+
+                trans.Complete();
             }
         }
 
