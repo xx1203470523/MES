@@ -1039,7 +1039,13 @@ namespace Hymson.MES.Services.Mapper
             #region FQC检测单
             CreateMap<QualFqcOrderPagedQueryDto, QualFqcOrderPagedQuery>();
             CreateMap<QualFqcOrderEntity, QualFqcOrderDto>();
-             
+
+            CreateMap<QualFinallyOutputRecordEntity, QualFinallyOutputRecordView>();
+            CreateMap<QualFqcParameterGroupDetailSnapshootEntity, FQCParameterDetailDto>();
+            CreateMap<QualFqcOrderSampleSaveDto, QualFqcOrderSampleQuery>();
+            CreateMap<FQCParameterDetailPagedQueryDto, QualFqcOrderSampleDetailPagedQuery>();
+
+
 
             #endregion
 

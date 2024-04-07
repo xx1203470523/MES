@@ -445,8 +445,10 @@
         public const string MES11705 = "FQC检验项目不存在或未启用！产品编码【{MaterialCode}】";
         public const string MES11706 = "FQC检验项目不存在或未启用，无法判定其是否要做FQC检验！产品编码【{MaterialCode}】";
         public const string MES11707 = "FQC检验项目【{ParameterGroupCode}】下检验参数不能为空";
+        public const string MES11708 = "样本条码【{Code}】已检验;";
         public const string MES11710 = "检验单号生成失败：FQC类型编码规则未维护！";
         public const string MES11711 = "检验单号生成失败：编码规则错误，不允许同时存在多条FQC类型编码规则！";
+
 
         #endregion
 

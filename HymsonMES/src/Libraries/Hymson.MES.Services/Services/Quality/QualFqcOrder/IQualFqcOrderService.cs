@@ -72,14 +72,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> SaveOrderAsync(QualIqcOrderSaveDto requestDto);
+        Task<int> SaveOrderAsync(QualFqcOrderSampleSaveDto requestDto);
 
         /// <summary>
         /// 完成检验单
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto);
+        Task<int> CompleteOrderAsync(QualFqcOrderCompleteDto requestDto);
 
         /// <summary>
         /// 免检
@@ -128,7 +128,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> UpdateOrderAsync(OrderParameterDetailSaveDto requestDto);
+        Task<int> UpdateOrderAsync(FQCParameterDetailSaveDto requestDto);
 
         /// <summary>
         /// 获取分页List

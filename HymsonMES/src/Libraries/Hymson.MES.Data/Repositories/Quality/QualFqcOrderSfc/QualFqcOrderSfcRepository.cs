@@ -125,7 +125,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             }
             if (query.BarCode != null)
             {
-                sqlBuilder.Where("BarCode = @BarCode");
+                sqlBuilder.Where("SFC = @BarCode");
             }
             sqlBuilder.AddParameters(query);
             //排序
