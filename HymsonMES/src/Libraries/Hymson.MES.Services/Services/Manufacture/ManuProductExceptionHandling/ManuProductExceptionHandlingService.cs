@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -17,6 +18,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
@@ -24,6 +26,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -58,17 +61,22 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
-        ///  仓储（条码）
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
+
+        /// <summary>
+        ///  仓储接口（条码）
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
 
         /// <summary>
-        ///  仓储（条码信息）
+        ///  仓储接口（条码信息）
         /// </summary>
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
-        ///  仓储（条码在制）
+        ///  仓储接口（条码在制）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
@@ -83,7 +91,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
         /// <summary>
-        ///  仓储（物料）
+        /// 仓储接口（产品NG记录）
+        /// </summary>
+        private readonly IManuProductNgRecordRepository _manuProductNgRecordRepository;
+
+        /// <summary>
+        ///  仓储接口（物料）
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
 
@@ -93,17 +106,22 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IProcProcedureRepository _procProcedureRepository;
 
         /// <summary>
-        ///  仓储（工单）
+        ///  仓储接口（工单）
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
-        ///  仓储（物料库存）
+        /// 仓储接口（不合格代码）
+        /// </summary>
+        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+
+        /// <summary>
+        ///  仓储接口（物料库存）
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
         /// <summary>
-        ///  仓储（物料台账）
+        ///  仓储接口（物料台账）
         /// </summary>
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
@@ -115,27 +133,33 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="excelService"></param>
         /// <param name="manuCommonService"></param>
+        /// <param name="masterDataService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuProductBadRecordRepository"></param>
+        /// <param name="manuProductNgRecordRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="qualUnqualifiedCodeRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
         public ManuProductExceptionHandlingService(ILogger<ManuProductExceptionHandlingService> logger,
             ICurrentUser currentUser, ICurrentSite currentSite, IExcelService excelService,
             IManuCommonService manuCommonService,
+            IMasterDataService masterDataService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
+            IManuProductNgRecordRepository manuProductNgRecordRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcProcedureRepository procProcedureRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
         {
@@ -144,14 +168,17 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentSite = currentSite;
             _excelService = excelService;
             _manuCommonService = manuCommonService;
+            _masterDataService = masterDataService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
+            _manuProductNgRecordRepository = manuProductNgRecordRepository;
             _procMaterialRepository = procMaterialRepository;
             _procProcedureRepository = procProcedureRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
         }
@@ -423,7 +450,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var productEntity = productEntities.FirstOrDefault(f => f.Id == sfcInfoEntity.ProductId);
                     if (productEntity == null) continue;
 
-                    // 添加步骤；
+                    // 添加步骤
                     sfcStepEntities.AddRange(badRecordEntities.Select(s => new ManuSfcStepEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
@@ -515,22 +542,25 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (requestDto == null) return 0;
             if (requestDto.BarCodes == null || !requestDto.BarCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15445));
 
-            // 更新时间
-            var siteId = _currentSite.SiteId ?? 0;
-            var updatedBy = _currentUser.UserName;
-            var updatedOn = HymsonClock.Now();
+            // 初始化请求参数
+            var dataBo = new ReworkRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
 
             // 查询条码
-            var sfcEntities = await _manuSfcRepository.GetAllBySFCsAsync(new EntityBySFCsQuery
+            dataBo.SFCEntities = await _manuSfcRepository.GetAllBySFCsAsync(new EntityBySFCsQuery
             {
-                SiteId = siteId,
+                SiteId = dataBo.SiteId,
                 SFCs = requestDto.BarCodes
             });
-            if (sfcEntities == null || !sfcEntities.Any()) return 0;
+            if (dataBo.SFCEntities == null || !dataBo.SFCEntities.Any()) return 0;
 
             // 状态校验
             var validationFailures = new List<ValidationFailure>();
-            var noMatchSFCEntities = sfcEntities.Where(w => ManuSfcStatus.ForbidSfcStatuss.Contains(w.Status));
+            var noMatchSFCEntities = dataBo.SFCEntities.Where(w => ManuSfcStatus.ForbidSfcStatuss.Contains(w.Status));
             if (noMatchSFCEntities.Any())
             {
                 foreach (var sfcEntity in noMatchSFCEntities)
@@ -547,185 +577,71 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             // 查询条码信息
-            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(s => s.Id));
+            dataBo.SFCInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(dataBo.SFCEntities.Select(s => s.Id));
+
+            // 查询工单信息
+            dataBo.WorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(dataBo.SFCInfoEntities.Where(w => w.WorkOrderId.HasValue).Select(s => s.WorkOrderId!.Value));
 
             // 读取在制品
-            var sfcProduceEntities = await _manuSfcProduceRepository.GetBySFCIdsAsync(sfcEntities.Where(w => w.Type == SfcTypeEnum.Produce).Select(s => s.Id));
+            dataBo.SFCProduceEntities = await _manuSfcProduceRepository.GetBySFCIdsAsync(dataBo.SFCEntities.Where(w => w.Type == SfcTypeEnum.Produce).Select(s => s.Id));
 
             // 读取产品
-            var productEntities = await _procMaterialRepository.GetByIdsAsync(sfcInfoEntities.Select(s => s.ProductId));
+            dataBo.ProductEntities = await _procMaterialRepository.GetByIdsAsync(dataBo.SFCInfoEntities.Select(s => s.ProductId));
 
-            // 查询不合格记录
-            var allBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
+            // 查询不合格记录（开启的状态）
+            dataBo.BadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
             {
-                SiteId = siteId,
+                SiteId = dataBo.SiteId,
                 Status = ProductBadRecordStatusEnum.Open,
                 SFCs = requestDto.BarCodes
             });
-            if (allBadRecordEntities == null || !allBadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15448)).WithData("barCode", string.Join(',', requestDto.BarCodes));
-            var allBadRecordEntitiesDict = allBadRecordEntities.ToLookup(x => x.SFC).ToDictionary(d => d.Key, d => d);
+            if (dataBo.BadRecordEntities == null || !dataBo.BadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15448)).WithData("barCode", string.Join(',', requestDto.BarCodes));
 
-            // 遍历所有条码
-            List<ManuSfcStepEntity> sfcStepEntities = new();
-            List<ManuProductBadRecordUpdateCommand> badRecordUpdateCommands = new();
-            List<WhMaterialInventoryEntity> materialInventoryEntities = new();
-            List<WhMaterialStandingbookEntity> materialStandingbookEntities = new();
-
-            List<long> sfcProduceIds = new();
-            foreach (var sfcEntity in sfcEntities)
+            // 根据返工类型处理
+            ReworkResponseBo? responseBo = null;
+            switch (requestDto.Type)
             {
-                // 每个条码的不合格记录
-                if (!allBadRecordEntitiesDict.TryGetValue(sfcEntity.SFC, out var badRecordEntities)) continue;
-
-                // 关闭不合格
-                badRecordUpdateCommands.AddRange(badRecordEntities.Select(s => new ManuProductBadRecordUpdateCommand
-                {
-                    Id = s.Id,
-                    Status = ProductBadRecordStatusEnum.Close,
-                    DisposalResult = ProductBadDisposalResultEnum.Rework,
-                    UpdatedOn = updatedOn,
-                    UserId = updatedBy,
-                    Remark = requestDto.Remark ?? ""
-                }));
-
-                if (sfcEntity.Type == SfcTypeEnum.Produce)
-                {
-                    // 在制品
-                    var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(f => f.SFCId == sfcEntity.Id);
-                    if (sfcProduceEntity == null) continue;
-
-                    // 初始化步骤数据
-                    var stepEntity = new ManuSfcStepEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        Operatetype = ManuSfcStepTypeEnum.Misjudgment,
-                        CurrentStatus = sfcProduceEntity.Status,
-                        SFC = sfcProduceEntity.SFC,
-                        ProductId = sfcProduceEntity.ProductId,
-                        WorkOrderId = sfcProduceEntity.WorkOrderId,
-                        WorkCenterId = sfcProduceEntity.WorkCenterId,
-                        ProductBOMId = sfcProduceEntity.ProductBOMId,
-                        SFCInfoId = sfcProduceEntity.BarCodeInfoId,
-                        Qty = sfcProduceEntity.Qty,
-                        VehicleCode = "", // 这里要赋值？
-                        ProcedureId = sfcProduceEntity.ProcedureId,
-                        ResourceId = sfcProduceEntity.ResourceId,
-                        EquipmentId = sfcProduceEntity.EquipmentId,
-                        Remark = requestDto.Remark,
-                        SiteId = sfcEntity.SiteId,
-                        CreatedBy = updatedBy,
-                        CreatedOn = updatedOn,
-                        UpdatedBy = updatedBy,
-                        UpdatedOn = updatedOn
-                    };
-                    sfcStepEntities.Add(stepEntity);
-
-                    // 如果是在制完成，改为完成（默认就处于合格工艺路线里面）
-                    if (sfcProduceEntity.Status == SfcStatusEnum.InProductionComplete)
-                    {
-                        // 产品信息
-                        var productEntity = productEntities.FirstOrDefault(f => f.Id == sfcProduceEntity.ProductId);
-                        if (productEntity == null) continue;
-
-                        stepEntity.Id = IdGenProvider.Instance.CreateId();
-                        stepEntity.Operatetype = ManuSfcStepTypeEnum.OutStock;
-                        stepEntity.AfterOperationStatus = SfcStatusEnum.Complete;
-
-                        // 再次添加步骤
-                        sfcStepEntities.Add(stepEntity);
-
-                        // 删除在制
-                        sfcProduceIds.Add(sfcProduceEntity.Id);
-
-                        // 新增 wh_material_inventory
-                        materialInventoryEntities.Add(new WhMaterialInventoryEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SupplierId = 0,//自制品 没有
-                            MaterialId = sfcProduceEntity.ProductId,
-                            MaterialBarCode = sfcProduceEntity.SFC,
-                            Batch = "",//自制品 没有
-                            MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
-                            QuantityResidue = sfcProduceEntity.Qty,
-                            Status = WhMaterialInventoryStatusEnum.ToBeUsed,
-                            Source = MaterialInventorySourceEnum.ManuComplete,
-                            SiteId = sfcEntity.SiteId,
-                            CreatedBy = updatedBy,
-                            CreatedOn = updatedOn,
-                            UpdatedBy = updatedBy,
-                            UpdatedOn = updatedOn
-                        });
-
-                        // 新增 wh_material_standingbook
-                        materialStandingbookEntities.Add(new WhMaterialStandingbookEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            MaterialCode = productEntity.MaterialCode,
-                            MaterialName = productEntity.MaterialName,
-                            MaterialVersion = productEntity.Version ?? "",
-                            MaterialBarCode = sfcProduceEntity.SFC,
-                            Batch = "",//自制品 没有
-                            Quantity = sfcProduceEntity.Qty,
-                            Unit = productEntity.Unit ?? "",
-                            Type = WhMaterialInventoryTypeEnum.ManuComplete,
-                            Source = MaterialInventorySourceEnum.ManuComplete,
-                            SiteId = sfcEntity.SiteId,
-                            CreatedBy = updatedBy,
-                            CreatedOn = updatedOn,
-                            UpdatedBy = updatedBy,
-                            UpdatedOn = updatedOn
-                        });
-                    }
-                }
-                else if (sfcEntity.Type == SfcTypeEnum.NoProduce)
-                {
-                    // 条码信息
-                    var sfcInfoEntity = sfcInfoEntities.FirstOrDefault(f => f.SfcId == sfcEntity.Id);
-                    if (sfcInfoEntity == null) continue;
-
-                    // 产品信息
-                    var productEntity = productEntities.FirstOrDefault(f => f.Id == sfcInfoEntity.ProductId);
-                    if (productEntity == null) continue;
-
-                    // 新增在制表
-
-                    // 添加步骤；
-                    sfcStepEntities.AddRange(badRecordEntities.Select(s => new ManuSfcStepEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        Operatetype = ManuSfcStepTypeEnum.Rework,
-                        CurrentStatus = SfcStatusEnum.Complete,
-                        SFC = sfcEntity.SFC,
-                        ProductId = sfcInfoEntity.ProductId,
-                        WorkOrderId = sfcInfoEntity.WorkOrderId ?? 0,
-                        SFCInfoId = sfcInfoEntity.Id,
-                        Qty = sfcEntity.Qty,
-                        Remark = requestDto.Remark,
-                        SiteId = sfcEntity.SiteId,
-                        CreatedBy = updatedBy,
-                        CreatedOn = updatedOn,
-                        UpdatedBy = updatedBy,
-                        UpdatedOn = updatedOn
-                    }));
-                }
-                else continue;
+                case ManuReworkTypeEnum.OriginalOrder:
+                    responseBo = await ReWorkForOriginalOrderAsync(requestDto, dataBo);
+                    break;
+                case ManuReworkTypeEnum.NewOrder:
+                    responseBo = await ReWorkForNewOrderAsync(requestDto, dataBo);
+                    break;
+                case ManuReworkTypeEnum.NewOrderCell:
+                    responseBo = await ReWorkForNewOrderCellAsync(requestDto, dataBo);
+                    break;
+                default:
+                    break;
             }
 
-            // TODO 新记一条不良记录
-
             var rows = 0;
+            if (responseBo == null) return rows;
+
             using var trans = TransactionHelper.GetTransactionScope();
+            List<Task<int>> tasks = new()
+            {
+                // 关闭不合格记录
+               _manuProductBadRecordRepository.UpdateStatusByIdRangeAsync(responseBo.BadRecordUpdateCommands),
 
-            // 关闭不合格记录
-            rows += await _manuProductBadRecordRepository.UpdateStatusByIdRangeAsync(badRecordUpdateCommands);
+                // 插入 manu_sfc_produce
+                _manuSfcProduceRepository.InsertRangeAsync(responseBo.InsertSFCProduceEntities),
 
-            // 新增在制
+                // 更新 manu_sfc_produce
+                _manuSfcProduceRepository.UpdateRangeAsync(responseBo.UpdateSFCProduceEntities),
 
-            // 插入 manu_sfc_step
-            rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepEntities);
+                // 插入 manu_sfc_step
+                _manuSfcStepRepository.InsertRangeAsync(responseBo.SFCStepEntities),
 
+                // 插入不良记录
+                _manuProductBadRecordRepository.InsertRangeAsync(responseBo.ProductBadRecordEntities),
+
+                // 插入NG记录
+                _manuProductNgRecordRepository.InsertRangeAsync(responseBo.ProductNgRecordEntities)
+            };
+
+            var rowArray = await Task.WhenAll(tasks);
             trans.Complete();
-            return rows;
+            return rowArray.Sum();
         }
 
         /// <summary>
@@ -916,7 +832,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     // 删除在制；
                     sfcProduceIds.Add(sfcProduceEntity.Id);
 
-                    // 添加步骤；
+                    // 添加步骤
                     sfcStepEntities.Add(new ManuSfcStepEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
@@ -951,7 +867,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var productEntity = productEntities.FirstOrDefault(f => f.Id == sfcInfoEntity.ProductId);
                     if (productEntity == null) continue;
 
-                    // 添加步骤；
+                    // 添加步骤
                     sfcStepEntities.Add(new ManuSfcStepEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
@@ -1122,6 +1038,490 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             return dtos;
+        }
+
+        /// <summary>
+        /// 原工单返工
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <param name="dataBo"></param>
+        /// <returns></returns>
+        public async Task<ReworkResponseBo> ReWorkForOriginalOrderAsync(ManuReworkDto requestDto, ReworkRequestBo dataBo)
+        {
+            var responseBo = new ReworkResponseBo();
+
+            if (!requestDto.UnqualifiedCode.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19702));
+            if (!requestDto.FoundProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15433));
+            if (!requestDto.OutProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15450));
+            if (!requestDto.ReworkProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15451));
+
+            // 查询传入的不合格代码
+            var unqualifiedCodeEntity = await _qualUnqualifiedCodeRepository.GetByIdAsync(requestDto.UnqualifiedCode.Value);
+
+            // 不良记录分组
+            var badRecordEntitiesDict = dataBo.BadRecordEntities.ToLookup(x => x.SFC).ToDictionary(d => d.Key, d => d);
+
+            // 遍历所有条码
+            foreach (var sfcEntity in dataBo.SFCEntities)
+            {
+                // 条码信息
+                var sfcInfoEntity = dataBo.SFCInfoEntities.FirstOrDefault(f => f.SfcId == sfcEntity.Id);
+                if (sfcInfoEntity == null) continue;
+
+                // 关闭不合格记录（如果有的话）
+                if (badRecordEntitiesDict.TryGetValue(sfcEntity.SFC, out var badRecordEntities))
+                {
+                    responseBo.BadRecordUpdateCommands.AddRange(badRecordEntities.Select(s => new ManuProductBadRecordUpdateCommand
+                    {
+                        Id = s.Id,
+                        Status = ProductBadRecordStatusEnum.Close,
+                        DisposalResult = ProductBadDisposalResultEnum.Rework,
+                        UpdatedOn = dataBo.UpdatedOn,
+                        UserId = dataBo.UpdatedBy,
+                        Remark = requestDto.Remark ?? ""
+                    }));
+                }
+
+                // 初始化步骤数据
+                var sfcStepEntity = new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    Operatetype = ManuSfcStepTypeEnum.Rework,
+                    SFC = sfcEntity.SFC,
+                    ProductId = sfcInfoEntity.ProductId,
+                    SFCInfoId = sfcInfoEntity.Id,
+                    Qty = sfcEntity.Qty,
+                    VehicleCode = "", // 这里要赋值？
+                    Remark = requestDto.Remark,
+                    SiteId = sfcEntity.SiteId,
+                    CreatedBy = dataBo.UpdatedBy,
+                    CreatedOn = dataBo.UpdatedOn,
+                    UpdatedBy = dataBo.UpdatedBy,
+                    UpdatedOn = dataBo.UpdatedOn
+                };
+
+                ManuSfcProduceEntity? sfcProduceEntity = null;
+                if (sfcEntity.Type == SfcTypeEnum.Produce)
+                {
+                    // 在制品
+                    sfcProduceEntity = dataBo.SFCProduceEntities.FirstOrDefault(f => f.SFCId == sfcEntity.Id);
+                    if (sfcProduceEntity == null) continue;
+
+                    // 修改在制信息
+                    sfcProduceEntity.ProcedureId = requestDto.ReworkProcedure ?? 0;
+                    sfcProduceEntity.ResourceId = null;
+                    sfcProduceEntity.EquipmentId = null;
+                    sfcProduceEntity.Status = SfcStatusEnum.lineUp;
+                    responseBo.UpdateSFCProduceEntities.Add(sfcProduceEntity);
+                }
+                else if (sfcEntity.Type == SfcTypeEnum.NoProduce)
+                {
+                    // 产品信息
+                    var productEntity = dataBo.ProductEntities.FirstOrDefault(f => f.Id == sfcInfoEntity.ProductId);
+                    if (productEntity == null) continue;
+
+                    // 工单信息
+                    var workOrderEntity = dataBo.WorkOrderEntities.FirstOrDefault(f => f.Id == sfcInfoEntity.WorkOrderId);
+                    if (workOrderEntity == null) continue;
+
+                    // 新增在制品
+                    sfcProduceEntity = new ManuSfcProduceEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SFC = sfcEntity.SFC,
+                        SFCId = sfcEntity.Id,
+                        ProductId = sfcInfoEntity.ProductId,
+                        WorkOrderId = sfcInfoEntity.WorkOrderId ?? 0,
+                        BarCodeInfoId = sfcInfoEntity.Id,
+                        ProcessRouteId = workOrderEntity.ProcessRouteId,
+                        WorkCenterId = workOrderEntity.WorkCenterId ?? 0,
+                        ProductBOMId = workOrderEntity.ProductBOMId,
+                        Qty = productEntity.Batch,
+                        ProcedureId = requestDto.ReworkProcedure ?? 0,
+                        Status = SfcStatusEnum.lineUp,
+                        RepeatedCount = 0,
+                        IsScrap = TrueOrFalseEnum.No,
+                        SiteId = sfcEntity.SiteId,
+                        CreatedBy = dataBo.UpdatedBy,
+                        CreatedOn = dataBo.UpdatedOn,
+                        UpdatedBy = dataBo.UpdatedBy,
+                        UpdatedOn = dataBo.UpdatedOn
+                    };
+                    responseBo.InsertSFCProduceEntities.Add(sfcProduceEntity);
+                }
+                else continue;
+
+                // 添加步骤
+                sfcStepEntity.WorkOrderId = sfcProduceEntity.WorkOrderId;
+                sfcStepEntity.WorkCenterId = sfcProduceEntity.WorkCenterId;
+                sfcStepEntity.ProductBOMId = sfcProduceEntity.ProductBOMId;
+                sfcStepEntity.ProcedureId = sfcProduceEntity.ProcedureId;
+                sfcStepEntity.ResourceId = sfcProduceEntity.ResourceId;
+                sfcStepEntity.EquipmentId = sfcProduceEntity.EquipmentId;
+                sfcStepEntity.CurrentStatus = sfcProduceEntity.Status;
+                responseBo.SFCStepEntities.Add(sfcStepEntity);
+
+                // 添加不良记录
+                var badRecordId = IdGenProvider.Instance.CreateId();
+                responseBo.ProductBadRecordEntities.Add(new ManuProductBadRecordEntity
+                {
+                    Id = badRecordId,
+                    SiteId = sfcEntity.SiteId,
+                    FoundBadOperationId = requestDto.FoundProcedure.Value,
+                    FoundBadResourceId = null,
+                    OutflowOperationId = requestDto.OutProcedure.Value,
+                    UnqualifiedId = unqualifiedCodeEntity.Id,
+                    SfcStepId = sfcStepEntity.Id,
+                    SFC = sfcEntity.SFC,
+                    SfcInfoId = sfcInfoEntity.Id,
+                    Qty = sfcEntity.Qty,
+                    Status = ProductBadRecordStatusEnum.Close,
+                    Source = ProductBadRecordSourceEnum.BadManualEntry,
+                    Remark = "",
+                    DisposalResult = ProductBadDisposalResultEnum.Rework,
+                    CreatedBy = dataBo.UpdatedBy,
+                    CreatedOn = dataBo.UpdatedOn,
+                    UpdatedBy = dataBo.UpdatedBy,
+                    UpdatedOn = dataBo.UpdatedOn
+                });
+
+                // 添加NG记录
+                responseBo.ProductNgRecordEntities.Add(new ManuProductNgRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = sfcEntity.SiteId,
+                    BadRecordId = badRecordId,
+                    UnqualifiedId = unqualifiedCodeEntity.Id,
+                    NGCode = unqualifiedCodeEntity.UnqualifiedCode,
+                    Remark = "",
+                    CreatedBy = dataBo.UpdatedBy,
+                    CreatedOn = dataBo.UpdatedOn,
+                    UpdatedBy = dataBo.UpdatedBy,
+                    UpdatedOn = dataBo.UpdatedOn
+                });
+            }
+
+            return responseBo;
+        }
+
+        /// <summary>
+        /// 新工单返工
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <param name="dataBo"></param>
+        /// <returns></returns>
+        public async Task<ReworkResponseBo> ReWorkForNewOrderAsync(ManuReworkDto requestDto, ReworkRequestBo dataBo)
+        {
+            var responseBo = new ReworkResponseBo();
+
+            if (!requestDto.UnqualifiedCode.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19702));
+            if (!requestDto.FoundProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15433));
+            if (!requestDto.OutProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15450));
+            if (!requestDto.ReworkWorkOrder.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15452));
+
+            // 查询条码（库存中）
+            var inventorySFCEntities = dataBo.SFCEntities.Where(w => w.Type == SfcTypeEnum.NoProduce);
+            if (inventorySFCEntities != null && inventorySFCEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15453)).WithData("barCode", inventorySFCEntities.Select(s => s.SFC));
+            }
+
+            // 查询传入的不合格代码
+            var unqualifiedCodeEntity = await _qualUnqualifiedCodeRepository.GetByIdAsync(requestDto.UnqualifiedCode.Value);
+
+            // 查询传入的工单
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.ReworkWorkOrder.Value)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+
+            // 检验工单
+            await CheckWorkOrderAsync(dataBo, workOrderEntity);
+
+            // 读取工单的工艺路线的首工序
+            var routeProcedureDto = await _masterDataService.GetFirstProcedureAsync(workOrderEntity.ProcessRouteId);
+
+            // 不良记录分组
+            var badRecordEntitiesDict = dataBo.BadRecordEntities.ToLookup(x => x.SFC).ToDictionary(d => d.Key, d => d);
+
+            // 遍历所有条码
+            foreach (var sfcEntity in dataBo.SFCEntities)
+            {
+                // 条码信息
+                var sfcInfoEntity = dataBo.SFCInfoEntities.FirstOrDefault(f => f.SfcId == sfcEntity.Id);
+                if (sfcInfoEntity == null) continue;
+
+                // 关闭不合格记录（如果有的话）
+                if (badRecordEntitiesDict.TryGetValue(sfcEntity.SFC, out var badRecordEntities))
+                {
+                    responseBo.BadRecordUpdateCommands.AddRange(badRecordEntities.Select(s => new ManuProductBadRecordUpdateCommand
+                    {
+                        Id = s.Id,
+                        Status = ProductBadRecordStatusEnum.Close,
+                        DisposalResult = ProductBadDisposalResultEnum.Rework,
+                        UpdatedOn = dataBo.UpdatedOn,
+                        UserId = dataBo.UpdatedBy,
+                        Remark = requestDto.Remark ?? ""
+                    }));
+                }
+
+                // 在制品
+                var sfcProduceEntity = dataBo.SFCProduceEntities.FirstOrDefault(f => f.SFCId == sfcEntity.Id);
+                if (sfcProduceEntity == null) continue;
+
+                // 修改在制信息
+                sfcProduceEntity.WorkOrderId = workOrderEntity.Id;
+                sfcProduceEntity.WorkCenterId = workOrderEntity.WorkCenterId ?? 0;
+                sfcProduceEntity.ProcessRouteId = workOrderEntity.ProcessRouteId;
+                sfcProduceEntity.ProductBOMId = workOrderEntity.ProductBOMId;
+                sfcProduceEntity.ProcedureId = routeProcedureDto.ProcedureId;
+                sfcProduceEntity.ResourceId = null;
+                sfcProduceEntity.EquipmentId = null;
+                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
+                responseBo.UpdateSFCProduceEntities.Add(sfcProduceEntity);
+
+                // 添加步骤
+                var sfcStepId = IdGenProvider.Instance.CreateId();
+                responseBo.SFCStepEntities.Add(new ManuSfcStepEntity
+                {
+                    Id = sfcStepId,
+                    Operatetype = ManuSfcStepTypeEnum.Rework,
+                    SFC = sfcEntity.SFC,
+                    ProductId = sfcInfoEntity.ProductId,
+                    SFCInfoId = sfcInfoEntity.Id,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    WorkCenterId = sfcProduceEntity.WorkCenterId,
+                    ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    EquipmentId = sfcProduceEntity.EquipmentId,
+                    CurrentStatus = sfcProduceEntity.Status,
+                    Qty = sfcEntity.Qty,
+                    VehicleCode = "", // 这里要赋值？
+                    Remark = requestDto.Remark,
+                    SiteId = sfcEntity.SiteId,
+                    CreatedBy = dataBo.UpdatedBy,
+                    CreatedOn = dataBo.UpdatedOn,
+                    UpdatedBy = dataBo.UpdatedBy,
+                    UpdatedOn = dataBo.UpdatedOn
+                });
+
+                // 添加不良记录
+                var badRecordId = IdGenProvider.Instance.CreateId();
+                responseBo.ProductBadRecordEntities.Add(new ManuProductBadRecordEntity
+                {
+                    Id = badRecordId,
+                    SiteId = sfcEntity.SiteId,
+                    FoundBadOperationId = requestDto.FoundProcedure.Value,
+                    FoundBadResourceId = null,
+                    OutflowOperationId = requestDto.OutProcedure.Value,
+                    UnqualifiedId = unqualifiedCodeEntity.Id,
+                    SfcStepId = sfcStepId,
+                    SFC = sfcEntity.SFC,
+                    SfcInfoId = sfcInfoEntity.Id,
+                    Qty = sfcEntity.Qty,
+                    Status = ProductBadRecordStatusEnum.Close,
+                    Source = ProductBadRecordSourceEnum.BadManualEntry,
+                    Remark = "",
+                    DisposalResult = ProductBadDisposalResultEnum.Rework,
+                    CreatedBy = dataBo.UpdatedBy,
+                    CreatedOn = dataBo.UpdatedOn,
+                    UpdatedBy = dataBo.UpdatedBy,
+                    UpdatedOn = dataBo.UpdatedOn
+                });
+
+                // 添加NG记录
+                responseBo.ProductNgRecordEntities.Add(new ManuProductNgRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = sfcEntity.SiteId,
+                    BadRecordId = badRecordId,
+                    UnqualifiedId = unqualifiedCodeEntity.Id,
+                    NGCode = unqualifiedCodeEntity.UnqualifiedCode,
+                    Remark = "",
+                    CreatedBy = dataBo.UpdatedBy,
+                    CreatedOn = dataBo.UpdatedOn,
+                    UpdatedBy = dataBo.UpdatedBy,
+                    UpdatedOn = dataBo.UpdatedOn
+                });
+            }
+
+            return responseBo;
+        }
+
+        /// <summary>
+        /// 新工单返工（成品电芯）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <param name="dataBo"></param>
+        /// <returns></returns>
+        public async Task<ReworkResponseBo> ReWorkForNewOrderCellAsync(ManuReworkDto requestDto, ReworkRequestBo dataBo)
+        {
+            var responseBo = new ReworkResponseBo();
+
+            if (!requestDto.UnqualifiedCode.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19702));
+            if (!requestDto.ReworkWorkOrder.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15452));
+
+            // 查询在制条码
+            var produceSFCEntities = dataBo.SFCEntities.Where(w => w.Type == SfcTypeEnum.Produce);
+            if (produceSFCEntities != null && produceSFCEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15454)).WithData("barCode", produceSFCEntities.Select(s => s.SFC));
+            }
+
+            // 查询传入的不合格代码
+            var unqualifiedCodeEntity = await _qualUnqualifiedCodeRepository.GetByIdAsync(requestDto.UnqualifiedCode.Value);
+
+            // 查询传入的工单
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.ReworkWorkOrder.Value)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+
+            // 检验工单
+            await CheckWorkOrderAsync(dataBo, workOrderEntity);
+
+            // 读取工单的工艺路线的首工序
+            var routeProcedureDto = await _masterDataService.GetFirstProcedureAsync(workOrderEntity.ProcessRouteId);
+
+            // 不良记录分组
+            var badRecordEntitiesDict = dataBo.BadRecordEntities.ToLookup(x => x.SFC).ToDictionary(d => d.Key, d => d);
+
+            // 遍历所有条码
+            foreach (var sfcEntity in dataBo.SFCEntities)
+            {
+                // 条码信息
+                var sfcInfoEntity = dataBo.SFCInfoEntities.FirstOrDefault(f => f.SfcId == sfcEntity.Id);
+                if (sfcInfoEntity == null) continue;
+
+                // 关闭不合格记录（如果有的话）
+                if (badRecordEntitiesDict.TryGetValue(sfcEntity.SFC, out var badRecordEntities))
+                {
+                    responseBo.BadRecordUpdateCommands.AddRange(badRecordEntities.Select(s => new ManuProductBadRecordUpdateCommand
+                    {
+                        Id = s.Id,
+                        Status = ProductBadRecordStatusEnum.Close,
+                        DisposalResult = ProductBadDisposalResultEnum.Rework,
+                        UpdatedOn = dataBo.UpdatedOn,
+                        UserId = dataBo.UpdatedBy,
+                        Remark = requestDto.Remark ?? ""
+                    }));
+                }
+
+                // 产品信息
+                var productEntity = dataBo.ProductEntities.FirstOrDefault(f => f.Id == sfcInfoEntity.ProductId);
+                if (productEntity == null) continue;
+
+                // 新增在制品
+                var sfcProduceEntity = new ManuSfcProduceEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SFC = sfcEntity.SFC,
+                    SFCId = sfcEntity.Id,
+                    ProductId = sfcInfoEntity.ProductId,
+                    BarCodeInfoId = sfcInfoEntity.Id,
+                    WorkOrderId = workOrderEntity.Id,
+                    WorkCenterId = workOrderEntity.WorkCenterId ?? 0,
+                    ProcessRouteId = workOrderEntity.ProcessRouteId,
+                    ProductBOMId = workOrderEntity.ProductBOMId,
+                    Qty = productEntity.Batch,
+                    ProcedureId = routeProcedureDto.ProcedureId,
+                    Status = SfcStatusEnum.lineUp,
+                    RepeatedCount = 0,
+                    IsScrap = TrueOrFalseEnum.No,
+                    SiteId = sfcEntity.SiteId,
+                    CreatedBy = dataBo.UpdatedBy,
+                    CreatedOn = dataBo.UpdatedOn,
+                    UpdatedBy = dataBo.UpdatedBy,
+                    UpdatedOn = dataBo.UpdatedOn
+                };
+                responseBo.InsertSFCProduceEntities.Add(sfcProduceEntity);
+
+                // 添加步骤
+                var sfcStepId = IdGenProvider.Instance.CreateId();
+                responseBo.SFCStepEntities.Add(new ManuSfcStepEntity
+                {
+                    Id = sfcStepId,
+                    Operatetype = ManuSfcStepTypeEnum.Rework,
+                    SFC = sfcEntity.SFC,
+                    ProductId = sfcInfoEntity.ProductId,
+                    SFCInfoId = sfcInfoEntity.Id,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    WorkCenterId = sfcProduceEntity.WorkCenterId,
+                    ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    EquipmentId = sfcProduceEntity.EquipmentId,
+                    CurrentStatus = sfcProduceEntity.Status,
+                    Qty = sfcEntity.Qty,
+                    VehicleCode = "", // 这里要赋值？
+                    Remark = requestDto.Remark,
+                    SiteId = sfcEntity.SiteId,
+                    CreatedBy = dataBo.UpdatedBy,
+                    CreatedOn = dataBo.UpdatedOn,
+                    UpdatedBy = dataBo.UpdatedBy,
+                    UpdatedOn = dataBo.UpdatedOn
+                });
+
+                // 添加不良记录
+                var badRecordId = IdGenProvider.Instance.CreateId();
+                responseBo.ProductBadRecordEntities.Add(new ManuProductBadRecordEntity
+                {
+                    Id = badRecordId,
+                    SiteId = sfcEntity.SiteId,
+                    FoundBadOperationId = 0,
+                    FoundBadResourceId = null,
+                    OutflowOperationId = 0,
+                    UnqualifiedId = unqualifiedCodeEntity.Id,
+                    SfcStepId = sfcStepId,
+                    SFC = sfcEntity.SFC,
+                    SfcInfoId = sfcInfoEntity.Id,
+                    Qty = sfcEntity.Qty,
+                    Status = ProductBadRecordStatusEnum.Close,
+                    Source = ProductBadRecordSourceEnum.BadManualEntry,
+                    Remark = "",
+                    DisposalResult = ProductBadDisposalResultEnum.Rework,
+                    CreatedBy = dataBo.UpdatedBy,
+                    CreatedOn = dataBo.UpdatedOn,
+                    UpdatedBy = dataBo.UpdatedBy,
+                    UpdatedOn = dataBo.UpdatedOn
+                });
+
+                // 添加NG记录
+                responseBo.ProductNgRecordEntities.Add(new ManuProductNgRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = sfcEntity.SiteId,
+                    BadRecordId = badRecordId,
+                    UnqualifiedId = unqualifiedCodeEntity.Id,
+                    NGCode = unqualifiedCodeEntity.UnqualifiedCode,
+                    Remark = "",
+                    CreatedBy = dataBo.UpdatedBy,
+                    CreatedOn = dataBo.UpdatedOn,
+                    UpdatedBy = dataBo.UpdatedBy,
+                    UpdatedOn = dataBo.UpdatedOn
+                });
+            }
+
+            return responseBo;
+        }
+
+        /// <summary>
+        /// 检验工单
+        /// </summary>
+        /// <param name="dataBo"></param>
+        /// <param name="workOrderEntity"></param>
+        /// <returns></returns>
+        private async Task CheckWorkOrderAsync(ReworkRequestBo dataBo, PlanWorkOrderEntity workOrderEntity)
+        {
+            // 校验条码对应的产品与工单产品是否一致
+            var noSameProductSFCInfoEntities = dataBo.SFCInfoEntities.Where(w => w.ProductId != workOrderEntity.ProductId);
+            if (noSameProductSFCInfoEntities == null || !noSameProductSFCInfoEntities.Any()) return;
+
+            // 读取工单BOM
+            var productBOMEntities = await _masterDataService.GetBomDetailEntitiesByBomIdAsync(workOrderEntity.ProductBOMId);
+            if (productBOMEntities != null && productBOMEntities.Any())
+            {
+                // 如果选择的是新工单返工/新工单返工（成品电芯），校验条码对应的产品与工单产品是否一致，产品是否包含在新工单BOM中，若二者条件都不满足
+                var ids = noSameProductSFCInfoEntities.Select(w => w.ProductId).Intersect(productBOMEntities.Select(s => s.MaterialId));
+                if (ids == null || !ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15455));
+            }
         }
 
         #endregion

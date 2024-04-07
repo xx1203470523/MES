@@ -644,10 +644,11 @@ namespace Hymson.MES.CoreServices.Services.Common
             {
                 ProcessRouteId = processRouteId,
                 SerialNo = procProcessRouteDetailNodeEntity.SerialNo,
-                ProcedureId = procProcessRouteDetailNodeEntity.ProcedureId,
+                //ProcedureId = procProcessRouteDetailNodeEntity.ProcedureId,
                 CheckType = procProcessRouteDetailNodeEntity.CheckType,
                 CheckRate = procProcessRouteDetailNodeEntity.CheckRate,
                 IsWorkReport = procProcessRouteDetailNodeEntity.IsWorkReport,
+                ProcedureId = procProcedureEntity.Id,
                 ProcedureCode = procProcedureEntity.Code,
                 ProcedureName = procProcedureEntity.Name,
                 Type = procProcedureEntity.Type,
