@@ -44,11 +44,11 @@ namespace Hymson.MES.Services.Services.Quality
         Task<QualFinallyOutputRecordDto?> QueryByIdAsync(long id);
 
         /// <summary>
-        /// 条码查询最终找出记录
+        /// 查询详情（成品条码产出记录(FQC生成使用)）
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="queryDto"></param>
         /// <returns></returns>
-        Task<QualFinallyOutputRecordDto?> QueryBySFCAsync(string sfc);
+        Task<PagedInfo<QualFinallyOutputRecordView>> QueryBySFCAsync(FQCInspectionSFCQueryDto queryDto);
 
         /// <summary>
         /// 获取分页List

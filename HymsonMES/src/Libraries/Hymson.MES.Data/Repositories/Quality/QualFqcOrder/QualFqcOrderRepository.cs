@@ -135,6 +135,17 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder)) sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
+            if (pagedQuery.FQCOrderIds != null) sqlBuilder.Where(" Id IN @IQCOrderIds ");
+            if (pagedQuery.MaterialIds != null) sqlBuilder.Where(" MaterialId IN @MaterialIds ");
+            if (pagedQuery.WorkOrderId != null) sqlBuilder.Where(" WorkOrderId = @WorkOrderId ");
+            //if (pagedQuery.MaterialReceiptDetailIds != null) sqlBuilder.Where(" MaterialReceiptDetailId IN @MaterialReceiptDetailIds ");
+            if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
+            //if (pagedQuery.IsExemptInspection.HasValue) sqlBuilder.Where("IsExemptInspection = @IsExemptInspection");
+            if (pagedQuery.IsQualified.HasValue) sqlBuilder.Where("IsQualified = @IsQualified");
+
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
