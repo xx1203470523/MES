@@ -12,21 +12,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
     public class ManuSFCPartialScrapDto
     {
         /// <summary>
-        /// 发现不合格代码
-        /// </summary>
-        public long FindProcedureId { get; set; }
-
-        /// <summary>
-        /// 不合格代码
-        /// </summary>
-        public long UnqualifiedId { get; set; }
-
-        /// <summary>
-        /// 流出工序
-        /// </summary>
-        public long OutFlowProcedureId { get; set; }
-
-        /// <summary>
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
@@ -43,9 +28,25 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
     public class BarcodeScrap
     {
         /// <summary>
+        /// 发现不合格代码
+        /// </summary>
+        public long FindProcedureId { get; set; }
+
+
+        /// <summary>
+        /// 流出工序
+        /// </summary>
+        public long OutFlowProcedureId { get; set; }
+
+        /// <summary>
         /// 报废条码
         /// </summary>
         public string SFC { get; set; }
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public long UnqualifiedId { get; set; }
 
         /// <summary>
         /// 报废数量
