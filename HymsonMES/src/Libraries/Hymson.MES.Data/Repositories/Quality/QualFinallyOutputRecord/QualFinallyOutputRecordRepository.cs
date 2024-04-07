@@ -96,6 +96,12 @@ namespace Hymson.MES.Data.Repositories.Quality
             return await conn.QueryFirstOrDefaultAsync<QualFinallyOutputRecordEntity>(GetByIdSql, new { Id = id });
         }
 
+        public async Task<QualFinallyOutputRecordEntity> GetBySFCAsync(string barcode)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<QualFinallyOutputRecordEntity>(GetByBarcodeSql, new { Barcode = barcode });
+        }
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -209,6 +215,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string DeleteSql = "UPDATE qual_finally_output_record SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_finally_output_record SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
+        const string GetByBarcodeSql = @"SELECT * FROM qual_finally_output_record WHERE Barcode = @Barcode ";
         const string GetByIdSql = @"SELECT * FROM qual_finally_output_record WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_finally_output_record WHERE Id IN @Ids ";
 

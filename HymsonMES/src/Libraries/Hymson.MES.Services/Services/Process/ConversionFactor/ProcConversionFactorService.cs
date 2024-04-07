@@ -182,44 +182,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
 
         }
-
-        /// <summary>
-        /// 分页查询工艺路线的工序列表
-        /// </summary>
-        /// <param name="procProcedurePagedQueryDto"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<ProcProcedureDto>> GetPagedInfoByProcessRouteIdAsync(ProcProcedurePagedQueryDto procProcedurePagedQueryDto)
-        {
-            var procProcedurePagedQuery = procProcedurePagedQueryDto.ToQuery<ProcProcedurePagedQuery>();
-            procProcedurePagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _procProcedureRepository.GetPagedInfoByProcessRouteIdAsync(procProcedurePagedQuery);
-
-            //实体到DTO转换 装载数据
-            var procProcedureDtos = new List<ProcProcedureDto>();
-            foreach (var procProcedureEntity in pagedInfo.Data)
-            {
-                var procProcedureDto = procProcedureEntity.ToModel<ProcProcedureDto>();
-                procProcedureDtos.Add(procProcedureDto);
-            }
-            return new PagedInfo<ProcProcedureDto>(procProcedureDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 分页实体转换
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<ProcProcedureViewDto> PrepareProcProcedureDtos(PagedInfo<ProcProcedureView> pagedInfo)
-        {
-            var procProcedureDtos = new List<ProcProcedureViewDto>();
-            foreach (var procProcedureEntity in pagedInfo.Data)
-            {
-                var procProcedureDto = procProcedureEntity.ToModel<ProcProcedureViewDto>();
-                procProcedureDtos.Add(procProcedureDto);
-            }
-
-            return procProcedureDtos;
-        }
+      
 
         /// <summary>
         /// 分页实体转换
@@ -237,30 +200,13 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             return procProcedureDtos;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sources"></param>
-        /// <returns></returns>
-        private static List<ToT> PrepareEntityToDto<SourceT, ToT>(IEnumerable<SourceT> sources) where SourceT : BaseEntity
-            where ToT : BaseEntityDto
-        {
-            var toTs = new List<ToT>();
-            foreach (var source in sources)
-            {
-                var toT = source.ToModel<ToT>();
-                toTs.Add(toT);
-            }
-
-            return toTs;
-        }
 
         /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcConversionFactorDto> QueryProcLoadPointByIdAsync(long id)
+        public async Task<ProcConversionFactorDto> QueryProcConversionFactorByIdAsync(long id)
         {
             var procConversionFactorEntity = await _procConversionFactorRepository.GetByIdAsync(id);
             if (procConversionFactorEntity == null)
@@ -277,6 +223,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 procedureId= procConversionFactorEntity.ProcedureId,
                 MaterialId=procConversionFactorEntity.MaterialId
             };
+            converdionFactorDto.remark = procConversionFactorEntity.Remark != null ? procConversionFactorEntity.Remark : converdionFactorDto.remark;
             //关连的工序
             var ConversionFactorLinkProcedure = await _procProcedureRepository.GetByIdAsync(procConversionFactorEntity.ProcedureId);
             if (ConversionFactorLinkProcedure!= null) 
@@ -310,151 +257,9 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             return converdionFactorDto;
         }
-
-        /// <summary>
-        /// 获取工序配置打印信息
-        /// </summary>
-        /// <param name="queryDto"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<ProcProcedurePrintReleationDto>> GetProcedureConfigPrintListAsync(ProcProcedurePrintReleationPagedQueryDto queryDto)
-        {
-            var query = new ProcProcedurePrintReleationPagedQuery()
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                ProcedureId = queryDto.ProcedureId,
-                PageIndex = queryDto.PageIndex,
-                PageSize = queryDto.PageSize,
-                Sorting = queryDto.Sorting,
-            };
-            var pagedInfo = await _procedurePrintRelationRepository.GetPagedInfoAsync(query);
-
-            //实体到DTO转换 装载数据
-            var dtos = new List<ProcProcedurePrintReleationDto>();
-            if (pagedInfo.Data != null && pagedInfo.Data.Any())
-            {
-                var materialIds = pagedInfo.Data.Select(a => a.MaterialId).ToArray();
-                var materialLsit = await _procMaterialRepository.GetByIdsAsync(materialIds);
-
-                var templateIds = pagedInfo.Data.Select(a => a.TemplateId).ToArray();
-                var templateLsit = await _procLabelTemplateRepository.GetByIdsAsync(templateIds);
-                foreach (var entity in pagedInfo.Data)
-                {
-                    var printReleationDto = entity.ToModel<ProcProcedurePrintRelationDto>();
-                    var material = materialLsit.FirstOrDefault(a => a.Id == printReleationDto.MaterialId)?.ToModel<ProcMaterialDto>();
-                    var template = templateLsit.FirstOrDefault(a => a.Id == printReleationDto.TemplateId)?.ToModel<ProcLabelTemplateDto>();
-                    var queryEntity = new ProcProcedurePrintReleationDto
-                    {
-                        TemplateId = entity.TemplateId,
-                        Copy = entity.Copy,
-                        MaterialId = entity.MaterialId,
-                        Version = entity.Version,
-                        MaterialCode = material?.MaterialCode ?? "",
-                        MaterialName = material?.MaterialName ?? "",
-                        Name = template?.Name ?? ""
-                    };
-                    dtos.Add(queryEntity);
-                }
-            }
-
-            return new PagedInfo<ProcProcedurePrintReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 获取工序配置Job信息
-        /// </summary>
-        /// <param name="queryDto"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<ProcedureJobReleationDto>> GetProcedureConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto)
-        {
-            var query = new InteJobBusinessRelationPagedQuery()
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                BusinessId = queryDto.BusinessId,
-                BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
-                PageIndex = queryDto.PageIndex,
-                PageSize = queryDto.PageSize,
-                Sorting = queryDto.Sorting
-            };
-            var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(query);
-
-            //实体到DTO转换 装载数据
-            var dtos = new List<ProcedureJobReleationDto>();
-            if (pagedInfo.Data != null && pagedInfo.Data.Any())
-            {
-                var jobIds = pagedInfo.Data.Select(a => a.JobId).ToArray();
-                var jobList = await _inteJobRepository.GetByIdsAsync(jobIds);
-
-                foreach (var entity in pagedInfo.Data)
-                {
-                    var job = jobList.FirstOrDefault(a => a.Id == entity.JobId);
-                    dtos.Add(new ProcedureJobReleationDto()
-                    {
-                        LinkPoint = entity.LinkPoint,
-                        Parameter = entity.Parameter,
-                        JobId = entity.JobId,
-                        BusinessId = entity.BusinessId,
-                        IsUse = entity.IsUse,
-                        Code = job?.Code ?? "",
-                        Name = job?.Name ?? "",
-                        Remark = job?.Remark ?? ""
-                    });
-                }
-            }
-            return new PagedInfo<ProcedureJobReleationDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 获取工序产出设置
-        /// </summary>
-        /// <param name="queryDto"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ProcProductSetDto>> GetProcedureProductSetListAsync(ProcProductSetQueryDto queryDto)
-        {
-            var query = new ProcProductSetQuery()
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                SetPointId = queryDto.SetPointId
-            };
-            var procProductSetEntities = await _procProductSetRepository.GetProcProductSetEntitiesAsync(query);
-
-            //实体到DTO转换 装载数据
-            List<ProcProductSetDto> procProductSetDtos = new List<ProcProductSetDto>();
-            if (procProductSetEntities != null && procProductSetEntities.Any())
-            {
-                var materialIds = new List<long> { };
-                IEnumerable<ProcMaterialEntity> procMaterialList = new List<ProcMaterialEntity>();
-                materialIds.AddRange(procProductSetEntities.Select(a => a.ProductId).ToArray());
-                materialIds.AddRange(procProductSetEntities.Select(a => a.SemiProductId).ToArray());
-                var materialIdList = materialIds.Distinct();
-                if (materialIdList.Any())
-                {
-                    procMaterialList = await _procMaterialRepository.GetByIdsAsync(materialIdList);
-                }
-
-                foreach (var entity in procProductSetEntities)
-                {
-                    var product = procMaterialList.FirstOrDefault(x => x.Id == entity.ProductId);
-                    var semiProduct = procMaterialList.FirstOrDefault(x => x.Id == entity.SemiProductId);
-                    procProductSetDtos.Add(new ProcProductSetDto()
-                    {
-                        ProductId = entity.ProductId,
-                        ProductCode = product?.MaterialCode ?? "",
-                        MaterialName = product?.MaterialName ?? "",
-                        Version = product?.Version ?? "",
-                        SetPointId = entity.SetPointId,
-                        SemiProductId = entity.SemiProductId,
-                        SemiMaterialCode = semiProduct?.MaterialCode ?? "",
-                        SemiMaterialName = semiProduct?.MaterialName ?? "",
-                        SemiVersion = semiProduct?.Version ?? "",
-                    });
-                }
-            }
-
-            return procProductSetDtos;
-        }
     
 
-        public async Task<long> AddProcProcedureAsync(AddConversionFactorDto AddConversionFactorDto)
+        public async Task<long> AddProcConversionFactorAsync(AddConversionFactorDto AddConversionFactorDto)
         {
             if (AddConversionFactorDto == null)
             {
@@ -494,7 +299,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             })).Any();
             if (isExists)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10477)).WithData("ProcedureId", procConversionFactorEntity.ProcedureId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10478)).WithData("ProcedureId", procConversionFactorEntity.ProcedureId);
             }
             #endregion
 
@@ -521,7 +326,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         /// <param name="idsAr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcProcedureAsync(long[] idsAr)
+        public async Task<int> DeleteProcConversionFactorAsync(long[] idsAr)
         {
             if (idsAr.Length < 1)
             {
@@ -529,7 +334,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
 
             var entitys = await _procConversionFactorRepository.GetByIdsAsync(idsAr);
-            if (entitys != null && entitys.Any(a => a.OpenStatus != ManuSfcRepairDetailIsIsCloseEnum.Close))
+            if (entitys != null && entitys.Any(a => a.OpenStatus != DisableOrEnableEnum.Disable))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10135));
             }
@@ -550,32 +355,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             return rows;
         }
 
-        /// <summary>
-        /// 根据工序编码获取工序信息
-        /// </summary>
-        /// <param name="code"></param>
-        /// <returns></returns>
-        public async Task<ProcProcedureCodeDto> GetByCodeAsync(string code)
-        {
-            var entitys = await _procProcedureRepository.GetProcProcedureEntitiesAsync(new ProcProcedureQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                Code = code
-            });
-            if (entitys == null || !entitys.Any())
-            {
-                return new ProcProcedureCodeDto();
-            }
-
-            var model = entitys.ToList()[0];
-            return new ProcProcedureCodeDto
-            {
-                Id = model.Id,
-                Code = model.Code,
-                Name = model.Name
-            };
-        }
-
+       
         /// <summary>
         /// 修改
         /// </summary>

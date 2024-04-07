@@ -436,6 +436,33 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         }
 
         /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="workCenterQuery"></param>
+        /// <returns></returns>
+        public async Task<InteWorkCenterEntity> GetEntitieAsync(InteWorkCenterFirstQuery workCenterQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(workCenterQuery.Code))
+            {
+                sqlBuilder.Where(" Code = @Code ");
+            }
+            if (!string.IsNullOrWhiteSpace(workCenterQuery.Name))
+            {
+                sqlBuilder.Where(" Name = @Name ");
+            }
+
+            using var conn = GetMESDbConnection();
+            var inteWorkCenters = await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
+            return inteWorkCenters;
+        }
+
+        /// <summary>
         /// 根据资源组获取关联表数据
         /// </summary>
         /// <param name="resourceIds"></param>

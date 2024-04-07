@@ -113,9 +113,22 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="query"></param>
         /// <returns></returns>
         public async Task<IEnumerable<QualFqcOrderUnqualifiedHandleEntity>> GetEntitiesAsync(QualFqcOrderUnqualifiedHandleQuery query)
-        {
+        { 
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.FQCOrderIds != null && query.FQCOrderIds.Any())
+            {
+                sqlBuilder.Where("FQCOrderId IN @FQCOrderIds");
+            }
+
+            if (query.HandMethod != null)
+            {
+                sqlBuilder.Where("HandMethod = @HandMethod");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcOrderUnqualifiedHandleEntity>(template.RawSql, query);
         }

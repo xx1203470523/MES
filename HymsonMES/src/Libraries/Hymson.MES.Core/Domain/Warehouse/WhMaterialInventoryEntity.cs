@@ -40,9 +40,14 @@ namespace Hymson.MES.Core.Domain.Warehouse
         public string Batch { get; set; }
 
         /// <summary>
-        /// 数量（剩余）
+        /// 数量（剩余 不包含报废数量）
         /// </summary>
         public decimal QuantityResidue { get; set; }
+
+        /// <summary>
+        /// 报废数量
+        /// </summary>
+        public decimal? ScrapQty { get; set; }
 
         /// <summary>
         /// 接收数量 (一开始的数量)

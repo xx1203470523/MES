@@ -6,6 +6,7 @@
  *build datetime: 2024-03-22 05:04:53
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.QualEnvOrder;
 
 namespace Hymson.MES.Services.Validators.QualEnvOrder
@@ -17,8 +18,8 @@ namespace Hymson.MES.Services.Validators.QualEnvOrder
     {
         public QualEnvOrderCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            RuleFor(x => x.WorkCenterId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10517));
+            RuleFor(x => x.ProcedureId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10519));
         }
     }
 

@@ -17,6 +17,5 @@ namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
         /// 级别;1、第一等级2、第二等级3、第三等级
         /// </summary>
         public UpgradeLevelEnum Level { get; set; }
-
     }
 }

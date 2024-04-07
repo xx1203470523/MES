@@ -193,7 +193,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
             //条码表
-            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = manuProductBadRecordCreateDto.Sfcs, SiteId = _currentSite.SiteId ?? 0 });
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SFCs = manuProductBadRecordCreateDto.Sfcs,
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = SfcTypeEnum.Produce
+            });
             //条码信息表
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcEntities.Select(x => x.Id));
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = manuProductBadRecordCreateDto.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
@@ -842,10 +847,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (string.IsNullOrWhiteSpace(badReJudgmentDto.Sfc)) throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             //if (!badReJudgmentDto.UnqualifiedLists.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15405));
 
-            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+            var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
             {
                 SFC = badReJudgmentDto.Sfc,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = SfcTypeEnum.Produce
             }
             );
 
@@ -1270,7 +1276,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Status = ProductBadRecordStatusEnum.Close,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
-                    CurrentStatus= ProductBadRecordStatusEnum.Open
+                    CurrentStatus = ProductBadRecordStatusEnum.Open
                 });
             }
             #endregion
@@ -1556,7 +1562,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //检测条码是否是符合要求的
-            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = needHandleSfcs, SiteId = _currentSite.SiteId ?? 0 });
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SFCs = needHandleSfcs,
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = SfcTypeEnum.Produce
+            });
 
             //检测条码状态
             var notAllowStatus = new[] { SfcStatusEnum.Locked, SfcStatusEnum.Delete, SfcStatusEnum.Invalid };
@@ -1715,7 +1726,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //检测 传入的数据 是否正确
             //检测条码是否是符合要求的
-            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = needHandleSfcs, SiteId = _currentSite.SiteId ?? 0 });
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery { SFCs = needHandleSfcs, SiteId = _currentSite.SiteId ?? 0, Type = SfcTypeEnum.Produce });
 
             var notAllowStatus = new[] { SfcStatusEnum.Locked, SfcStatusEnum.Delete, SfcStatusEnum.Invalid };//检测条码状态
             var notAllowSfcs = sfcEntities.Where(x => notAllowStatus.Contains(x.Status)).Select(x => x.SFC);

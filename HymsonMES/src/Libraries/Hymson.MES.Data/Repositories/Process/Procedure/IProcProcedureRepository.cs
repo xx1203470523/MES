@@ -129,5 +129,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
 
+        /// <summary>
+        /// 查询工序单条数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity> GetEntitieAsync(ProcProcedureQuery query);
+
     }
 }

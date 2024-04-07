@@ -165,8 +165,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("unbindVehicle")]
         public async Task UnbindVehicleAsync(InteVehicleUnbindOperationDto dto)
         {
-
-
             // await _inteVehicleService.VehicleOperationAsync(dto);
             await _inteVehicleService.VehicleUnBindOperationAsync(dto);
         }
@@ -186,5 +184,16 @@ namespace Hymson.MES.Api.Controllers.Integrated
             await _inteVehicleService.VehicleClearOperationAsync(dto);
         }
 
+        /// <summary>
+        /// 通过托盘码获取托盘视图信息(PDA)
+        /// </summary>
+        /// <param name="palletNo"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getVehicleFreightByPalletNo/pda/{palletNo}")]
+        public async Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordByPalletNoPDAAsync(string palletNo)
+        {
+            return await _inteVehicleService.QueryVehicleFreightRecordByPalletNoAsync(palletNo);
+        }
     }
 }

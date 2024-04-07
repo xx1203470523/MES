@@ -3,8 +3,10 @@ using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Enums;
 using Hymson.MES.BackgroundServices.EventHandling;
 using Hymson.MES.BackgroundServices.EventHandling.ManufactureHandling.ManuSfcStepHandling;
+using Hymson.MES.BackgroundServices.EventHandling.ProcessEventHandling.PrintEventHandling;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
+using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -63,7 +65,7 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
                 _eventBus.Subscribe<MessageTriggerUpgradeIntegrationEvent, MessageTriggerUpgradeIntegrationEventHandler>();
                 _eventBus.Subscribe<MessageReceiveUpgradeIntegrationEvent, MessageReceiveUpgradeIntegrationEventHandler>();
                 _eventBus.Subscribe<MessageHandleUpgradeIntegrationEvent, MessageHandleUpgradeIntegrationEventHandler>();
-
+                _eventBus.Subscribe<PrintEvent, ExecPrintHander>();
                 SubscribeManufactureServices();
 
             }

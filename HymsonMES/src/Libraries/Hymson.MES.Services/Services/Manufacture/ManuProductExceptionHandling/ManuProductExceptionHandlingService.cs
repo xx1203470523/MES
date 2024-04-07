@@ -195,10 +195,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (string.IsNullOrEmpty(barCode)) throw new CustomerValidationException(nameof(ErrorCode.MES15445));
 
             // 查询条码
-            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+            var sfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                SFC = barCode
+                SFC = barCode,
+                Type = SfcTypeEnum.Produce
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15446)).WithData("barCode", barCode);
 
             // 状态校验
@@ -208,7 +209,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             /*
             // 非生产条码
-            if (sfcEntity.Type == SfcTypeEnum.NoProduce) throw new CustomerValidationException(nameof(ErrorCode.MES15449))
+            if (sfcEntity.Type == SfcTypeEnum.NoProduce) throw new CustomerValidationException(nameof(ErrorCode.MES15452))
                     .WithData("barCode", barCode)
                     .WithData("type", sfcEntity.Type.GetDescription());
             */
@@ -220,7 +221,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Status = ProductBadRecordStatusEnum.Open,
                 SFC = barCode
             });
-            if (badRecordEntities == null || !badRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15448)).WithData("barCode", barCode);
+            if (badRecordEntities == null || !badRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15451)).WithData("barCode", barCode);
 
             // 查询条码信息
             var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdAsync(sfcEntity.Id)
@@ -300,7 +301,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var updatedOn = HymsonClock.Now();
 
             // 查询条码
-            var sfcEntities = await _manuSfcRepository.GetAllBySFCsAsync(new EntityBySFCsQuery
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
             {
                 SiteId = siteId,
                 SFCs = requestDto.BarCodes
@@ -323,7 +324,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Status = ProductBadRecordStatusEnum.Open,
                 SFCs = requestDto.BarCodes
             });
-            if (allBadRecordEntities == null || !allBadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15448)).WithData("barCode", string.Join(',', requestDto.BarCodes));
+            if (allBadRecordEntities == null || !allBadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15451)).WithData("barCode", string.Join(',', requestDto.BarCodes));
             var allBadRecordEntitiesDict = allBadRecordEntities.ToLookup(x => x.SFC).ToDictionary(d => d.Key, d => d);
 
             // 遍历所有条码
@@ -699,7 +700,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (string.IsNullOrEmpty(barCode)) throw new CustomerValidationException(nameof(ErrorCode.MES15445));
 
             // 查询条码
-            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+            var sfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 SFC = barCode
@@ -771,7 +772,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var updatedOn = HymsonClock.Now();
 
             // 查询条码
-            var sfcEntities = await _manuSfcRepository.GetAllBySFCsAsync(new EntityBySFCsQuery
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
             {
                 SiteId = siteId,
                 SFCs = requestDto.BarCodes

@@ -81,5 +81,32 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// </summary>
         [GenerateBarcodeWildcardDescriptionAttribute("当前时间的天映射通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One }  )]
         public const string SingleDayMapping = "%SINGLEDAYMAPPING%";
+
+        /// <summary>
+        /// 正极主料通配符
+        /// </summary>
+        [GenerateBarcodeWildcardDescriptionAttribute("正极主料通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        public const string AnodeMain = "%ANODEMAIN%";
+
+
+        /// <summary>
+        /// 负极主料通配符
+        /// </summary>
+        [GenerateBarcodeWildcardDescriptionAttribute("负极主料通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        public const string CathodeMain = "%CATHODEMAIN%";
+
+
+        /// <summary>
+        /// 隔膜通配符
+        /// </summary>
+        [GenerateBarcodeWildcardDescriptionAttribute("隔膜通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        public const string Diaphragm = "%DIAPHRAGM%";
+
+
+        /// <summary>
+        /// 正极极片通配符
+        /// </summary>
+        [GenerateBarcodeWildcardDescriptionAttribute("正极极片通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        public const string PositivePlate = "%POSITIVEPLATE%";
     }
 }

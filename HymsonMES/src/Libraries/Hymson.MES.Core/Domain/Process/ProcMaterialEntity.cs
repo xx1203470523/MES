@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Process;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -154,5 +155,9 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public string? ProductModel { get; set; }
 
+        /// <summary>
+        /// 原材料类型
+        /// </summary>
+        public MaterialTypeEnum? MaterialType { get; set;}
     }
 }

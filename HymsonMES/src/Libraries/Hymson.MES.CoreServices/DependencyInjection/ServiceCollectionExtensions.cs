@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
@@ -48,8 +49,11 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<ScopedServiceFactory>();
             services.AddTransient<IJobContextProxy, JobContextProxy>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
+            //services.AddSingleton<IJobService, VehicleBindJobService>();
+            //services.AddSingleton<IJobService, VehicleUnBindJobService>();
             var typeFinder = Singleton<ITypeFinder>.Instance;
             var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
+          
             foreach (var keyValuePair in keyValuePairs)
             {
                 services.AddSingleton(keyValuePair.Value, keyValuePair.Key);

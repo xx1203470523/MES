@@ -14,26 +14,21 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using IdGen;
-using Minio.DataModel;
-using System.Transactions;
-using System.Drawing.Drawing2D;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.Utils.Tools;
-using System.Reflection.Metadata;
-
-using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.CoreServices.Services.Common;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -68,6 +63,7 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
         private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         public InteVehicleService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleRepository inteVehicleRepository, AbstractValidator<InteVehicleCreateDto> validationCreateRules, AbstractValidator<InteVehicleModifyDto> validationModifyRules, IInteVehicleTypeRepository inteVehicleTypeRepository,
             IInteVehicleVerifyRepository inteVehicleVerifyRepository,
@@ -82,7 +78,7 @@ namespace Hymson.MES.Services.Services.Integrated
             IInteVehicleFreightRepository inteVehicleFreightRepository,
             IProcMaterialGroupRepository procMaterialGroupRepository,
             IProcMaterialRepository proMaterialRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository)
+            IWhMaterialInventoryRepository whMaterialInventoryRepository, IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _currentUser = currentUser;
@@ -103,6 +99,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _manuSfcStepRepository = manuSfcStepRepository;
             _procMaterialGroupRepository = procMaterialGroupRepository;
             _procMaterialRepository = proMaterialRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
@@ -435,14 +432,14 @@ namespace Hymson.MES.Services.Services.Integrated
                     inteVehicleFreightDtos.Add(item.ToModel<InteVehicleFreightDto>());
                 }
                 //获取托盘所有条码记录
-                var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
+                var inteVehiceFreightStackEntities = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
                 {
                     VehicleId = inteVehicle.Id,
                     SiteId = _currentSite.SiteId ?? 0
                 });
                 foreach (var item in inteVehicleFreightDtos)
                 {
-                    var lst = vehicleFreightStackEntities.Where(i => i.LocationId == item.Id).ToList();
+                    var lst = inteVehiceFreightStackEntities.Where(i => i.LocationId == item.Id).ToList();
                     item.Stacks = lst;
                 }
             }
@@ -450,23 +447,79 @@ namespace Hymson.MES.Services.Services.Integrated
             return view;
         }
 
-        
+        /// <summary>
+        /// 载具操作
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task VehicleOperationAsync(InteVehicleOperationDto dto)
+        {
+            var inteVehicleEntity = await VehicleIsEnabled(dto);
+
+            switch (dto.OperationType)
+            {
+                case Core.Enums.Integrated.VehicleOperationEnum.Bind: { await VehicleBindOperationAsync(dto); } break;
+                case Core.Enums.Integrated.VehicleOperationEnum.Unbind: { await VehicleUnBindOperationAsync(dto); } break;
+                case Core.Enums.Integrated.VehicleOperationEnum.Clear: { await VehicleClearOperationAsync(dto); } break;
+            }
+            ThreadPool.QueueUserWorkItem(async o =>
+            {
+                var inteVehicleFreightRecordEntity = new InteVehicleFreightRecordEntity()
+                {
+                    CreatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    VehicleId = inteVehicleEntity.Id
+                };
+                switch (dto.OperationType)
+                {
+                    case Core.Enums.Integrated.VehicleOperationEnum.Bind:
+                        {
+                            var bind = dto as InteVehicleBindOperationDto;
+                            inteVehicleFreightRecordEntity.BarCode = bind!.SFC ?? "";
+                            inteVehicleFreightRecordEntity.LocationId = bind.LocationId;
+                            inteVehicleFreightRecordEntity.OperateType = (int)Core.Enums.Integrated.VehicleOperationEnum.Bind;
+
+                        }
+                        break;
+                    case Core.Enums.Integrated.VehicleOperationEnum.Unbind:
+                        {
+                            var bind = dto as InteVehicleUnbindOperationDto;
+                            inteVehicleFreightRecordEntity.BarCode = string.Join(",", bind!.StackIds);
+                            inteVehicleFreightRecordEntity.LocationId = bind.LocationId;
+                            inteVehicleFreightRecordEntity.OperateType = (int)Core.Enums.Integrated.VehicleOperationEnum.Unbind;
+                        }
+                        break;
+                    case Core.Enums.Integrated.VehicleOperationEnum.Clear:
+                        {
+                            var bind = dto as InteVehicleClearOperationDto;
+                            inteVehicleFreightRecordEntity.OperateType = (int)Core.Enums.Integrated.VehicleOperationEnum.Clear;
+                        }
+                        break;
+                }
+
+                await _inteVehicleFreightRecordRepository.InsertAsync(inteVehicleFreightRecordEntity);
+
+            });
+        }
 
         private async Task<InteVehicleEntity> VehicleIsEnabled(InteVehicleOperationDto dto)
         {
             //校验托盘是否可用
-            var vehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
+            var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
                 Code = dto.PalletNo,
                 SiteId = _currentSite.SiteId ?? 0
             });
 
-            if (vehicleEntity == null || vehicleEntity.Status == DisableOrEnableEnum.Disable)
+            if (inteVehicleEntity == null || inteVehicleEntity.Status == DisableOrEnableEnum.Disable)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18617));
             }
 
-            return vehicleEntity;
+            return inteVehicleEntity;
         }
 
         /// <summary>
@@ -486,10 +539,10 @@ namespace Hymson.MES.Services.Services.Integrated
             //验证DTO
             await _validateBindOperationRules.ValidateAndThrowAsync(dto);
 
-            var vehicleTypeEntity = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId)
+            var inteVehicleTypeEntity = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18629)).WithData("Code", inteVehicleEntity.Code);
 
-            var vehicleTypeVerifyEntities = await _inteVehicleTypeVerifyRepository.GetInteVehicleTypeVerifyEntitiesByVehicleTyleIdAsync(new long[] { vehicleTypeEntity.Id });
+            var inteVehicleTypeVerifyEntities = await _inteVehicleTypeVerifyRepository.GetInteVehicleTypeVerifyEntitiesByVehicleTyleIdAsync(new long[] { inteVehicleTypeEntity.Id });
             //托盘目前可用于绑定非在制，查询下在制表，判定当前要绑定的是原料还是在制
             var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
@@ -527,10 +580,10 @@ namespace Hymson.MES.Services.Services.Integrated
                     SiteId = _currentSite.SiteId ?? 0
                 });
             }
-            if (vehicleTypeVerifyEntities != null && vehicleTypeVerifyEntities.Any())
+            if (inteVehicleTypeVerifyEntities != null && inteVehicleTypeVerifyEntities.Any())
             {
                 bool materialcheck = false;
-                var bar = vehicleTypeVerifyEntities.Where(v => v.Type == Core.Enums.Integrated.VehicleTypeVerifyTypeEnum.Material).ToList();
+                var bar = inteVehicleTypeVerifyEntities.Where(v => v.Type == Core.Enums.Integrated.VehicleTypeVerifyTypeEnum.Material).ToList();
                 if (!bar.Any(v => v.VerifyId == manuSfcProduceEntity.ProductId))
                 {
                     materialcheck = false;
@@ -540,7 +593,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     materialcheck = true;
                 }
                 bool materialgroupcheck = false;
-                var bargroup = vehicleTypeVerifyEntities.Where(v => v.Type == Core.Enums.Integrated.VehicleTypeVerifyTypeEnum.MaterialGroup).ToList();
+                var bargroup = inteVehicleTypeVerifyEntities.Where(v => v.Type == Core.Enums.Integrated.VehicleTypeVerifyTypeEnum.MaterialGroup).ToList();
                 var material = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId);
                 if (!bargroup.Any(v => v.VerifyId == material.GroupId))
                 {
@@ -559,41 +612,41 @@ namespace Hymson.MES.Services.Services.Integrated
 
 
             //绑盘前校验 该条码是否已绑盘
-            var vehicleFreightStackEntityCheck = await _inteVehiceFreightStackRepository.GetBySFCAsync(new InteVehiceFreightStackBySfcQuery { SiteId = _currentSite.SiteId ?? 0, BarCode = dto.SFC });
-            if (vehicleFreightStackEntityCheck != null)
+            var inteVehiceFreightStackEntity = await _inteVehiceFreightStackRepository.GetBySFCAsync(new InteVehiceFreightStackBySfcQuery { SiteId = _currentSite.SiteId ?? 0, BarCode = dto.SFC });
+            if (inteVehiceFreightStackEntity != null)
             {
-                var errorVehicleEntity = await _inteVehicleRepository.GetByIdAsync(vehicleFreightStackEntityCheck.VehicleId);
-                throw new CustomerValidationException(nameof(ErrorCode.MES18616)).WithData("sfc", dto.SFC).WithData("palletNo", errorVehicleEntity.Code);
+                var inteVehicleInfo = await _inteVehicleRepository.GetByIdAsync(inteVehiceFreightStackEntity.VehicleId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18616)).WithData("sfc", dto.SFC).WithData("palletNo", inteVehicleInfo.Code);
             }
 
 
 
             //获取托盘所有条码记录
-            var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
+            var inteVehiceFreightStackEntities = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
             {
                 VehicleId = inteVehicleEntity.Id,
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 123456
             });
 
 
-            var vehicleFreightEntities = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
-            var count = vehicleFreightEntities.Where(i => i.Status == true).ToList().Count();
+            var foo = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
+            var count = foo.Where(i => i.Status == true).ToList().Count();
             InteVehicleFreightStackEntity stackentity = null;
-            if (vehicleFreightStackEntities.Count() >= count * vehicleTypeEntity.CellQty)
+            if (inteVehiceFreightStackEntities.Count() >= count * inteVehicleTypeEntity.CellQty)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18613));
             }
             else
             {
                 // 根据首条码校验后续的条码是否属于同一个物料编码
-                if (vehicleFreightStackEntities.Count() > 0)
+                if (inteVehiceFreightStackEntities.Count() > 0)
                 {
-                    var firstobj = vehicleFreightStackEntities.OrderBy(i => i.CreatedOn).FirstOrDefault();
+                    var firstobj = inteVehiceFreightStackEntities.OrderBy(i => i.CreatedOn).FirstOrDefault();
                     long firstmatrialid = 0;
                     //获取首条码的物料ID
                     var firstmanuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
                     {
-                        Sfc = firstobj.BarCode,
+                        Sfc = firstobj?.BarCode??"",
                         SiteId = _currentSite.SiteId ?? 0
                     });
 
@@ -602,7 +655,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
                         var whMaterialInventoryInfo = await _whMaterialInventoryRepository.GetByBarCodeAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryBarCodeQuery
                         {
-                            BarCode = firstobj.BarCode,
+                            BarCode = firstobj?.BarCode ?? "",
                             SiteId = _currentSite.SiteId ?? 0
                         });
                         firstmatrialid = whMaterialInventoryInfo?.MaterialId ?? 0;
@@ -613,17 +666,18 @@ namespace Hymson.MES.Services.Services.Integrated
                     }
                     if (manuSfcProduceEntity.ProductId != firstmatrialid)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES18628)).WithData("Code", manuSfcProduceEntity.SFC);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES18630))
+                            .WithData("curCode", manuSfcProduceEntity.ProductId).WithData("provCode", firstmatrialid);
                     }
 
                 }
                 //获取指定位置信息
-                var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
+                var inteVehiceFreightStackList = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
                 {
                     LocationId = dto.LocationId,
                     SiteId = _currentSite.SiteId ?? 0
                 });
-                if (stack.Count() >= vehicleTypeEntity.CellQty)
+                if (inteVehiceFreightStackList.Count() >= inteVehicleTypeEntity.CellQty)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES18614));
                 }
@@ -646,10 +700,10 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
             }
 
-            var vehicleFreightEntityCurrent = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
+            var inteVehicleFreightEntity = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
 
-            vehicleFreightEntityCurrent.UpdatedBy = _currentUser.UserName;
-            vehicleFreightEntityCurrent.UpdatedOn = HymsonClock.Now();
+            inteVehicleFreightEntity.UpdatedBy = _currentUser.UserName;
+            inteVehicleFreightEntity.UpdatedOn = HymsonClock.Now();
 
 
             ////操作记录
@@ -684,11 +738,11 @@ namespace Hymson.MES.Services.Services.Integrated
                 if (stackentity != null)
                 {
                     await _inteVehiceFreightStackRepository.InsertAsync(stackentity);
-                    vehicleFreightEntityCurrent.Qty += 1;
-                    await _inteVehicleFreightRepository.UpdateAsync(vehicleFreightEntityCurrent);
+                    inteVehicleFreightEntity.Qty += 1;
+                    await _inteVehicleFreightRepository.UpdateAsync(inteVehicleFreightEntity);
                     if (isSFCProduceEntity)
                     {
-                        var manuSfcStepEntity = new ManuSfcStepEntity
+                        var msse = new ManuSfcStepEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
                             SiteId = _currentSite.SiteId ?? 0,
@@ -708,7 +762,7 @@ namespace Hymson.MES.Services.Services.Integrated
                             UpdatedBy = _currentUser.UserName,
                         };
 
-                        await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
+                        await _manuSfcStepRepository.InsertAsync(msse);
 
                     }
                     if (inteVehicleFreightRecordEntity != null)
@@ -734,11 +788,11 @@ namespace Hymson.MES.Services.Services.Integrated
                 Code = dto!.PalletNo ?? "",
                 SiteId = _currentSite.SiteId ?? 0
             });
-            var vehicleTypeEntity = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
+            var inteVehicleTypeEntity = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
 
             //获取指定位置信息
-            var vehicleFreightEntity = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
-            var stack = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
+            var inteVehicleFreightEntity = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
+            var inteVehiceFreightStackEntities = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
             {
                 LocationId = dto.LocationId,
                 SiteId = _currentSite.SiteId ?? 0
@@ -748,26 +802,26 @@ namespace Hymson.MES.Services.Services.Integrated
             if (dto.StackIds.Any())
             {
                 //校验条码是否在指定格子中
-                var exceptlist = dto.StackIds.Except(stack.Select(s => s.Id));
-                if (exceptlist.Any()) { throw new CustomerValidationException(nameof(ErrorCode.MES18642)); }
+                var checkSFC = dto.StackIds.Except(inteVehiceFreightStackEntities.Select(s => s.Id));
+                if (checkSFC.Any()) { throw new CustomerValidationException(nameof(ErrorCode.MES18642)); }
 
                 using var trans = TransactionHelper.GetTransactionScope();
                 await _inteVehiceFreightStackRepository.DeletesAsync(dto.StackIds.ToArray());
 
-                var count = stack.Count(s => dto.StackIds.Contains(s.Id));
-                vehicleFreightEntity.Qty -= count;//stack.Count(s=>dto.StackIds.Contains(s.Id));
-                vehicleFreightEntity.UpdatedBy = _currentUser.UserName;
-                vehicleFreightEntity.UpdatedOn = HymsonClock.Now();
-                await _inteVehicleFreightRepository.UpdateAsync(vehicleFreightEntity);
-                List<ManuSfcStepEntity> manuSfcStepEntities = new();
+                var count = inteVehiceFreightStackEntities.Count(s => dto.StackIds.Contains(s.Id));
+                inteVehicleFreightEntity.Qty -= count;//stack.Count(s=>dto.StackIds.Contains(s.Id));
+                inteVehicleFreightEntity.UpdatedBy = _currentUser.UserName;
+                inteVehicleFreightEntity.UpdatedOn = HymsonClock.Now();
+                await _inteVehicleFreightRepository.UpdateAsync(inteVehicleFreightEntity);
+                var manuSfcStepList = new List<ManuSfcStepEntity>();
                 foreach (var item in dto.StackIds)
                 {
-                    var first = stack.FirstOrDefault(i => i.Id == item);
-                    if (first != null)
+                    var inteVehiceFreightStackEntity = inteVehiceFreightStackEntities.FirstOrDefault(i => i.Id == item);
+                    if (inteVehiceFreightStackEntity != null)
                     {
                         var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
                         {
-                            Sfc = first.BarCode,
+                            Sfc = inteVehiceFreightStackEntity.BarCode,
                             SiteId = _currentSite.SiteId ?? 0
                         });
                         //查询是否在制条码
@@ -775,12 +829,12 @@ namespace Hymson.MES.Services.Services.Integrated
                         {
                             var whMaterialInventoryInfo = await _whMaterialInventoryRepository.GetByBarCodeAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryBarCodeQuery
                             {
-                                BarCode = first.BarCode,
+                                BarCode = inteVehiceFreightStackEntity.BarCode,
                                 SiteId = _currentSite.SiteId ?? 0
                             });
                             if (whMaterialInventoryInfo == null || whMaterialInventoryInfo?.Status != WhMaterialInventoryStatusEnum.ToBeUsed)
                             {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES19937));
+                                throw new CustomerValidationException(nameof(ErrorCode.MES19938));
                             }
                             //非在制解盘记录不记录
                             //manuSfcProduceEntity = new ManuSfcProduceEntity();
@@ -814,7 +868,7 @@ namespace Hymson.MES.Services.Services.Integrated
                             {
                                 Id = IdGenProvider.Instance.CreateId(),
                                 SiteId = _currentSite.SiteId ?? 0,
-                                SFC = first.BarCode,
+                                SFC = inteVehiceFreightStackEntity.BarCode,
                                 ProductId = manuSfcProduceEntity.ProductId,
                                 WorkOrderId = manuSfcProduceEntity.WorkOrderId,
                                 ProductBOMId = manuSfcProduceEntity.ProductBOMId,
@@ -828,7 +882,7 @@ namespace Hymson.MES.Services.Services.Integrated
                                 CreatedBy = _currentUser.UserName,
                                 UpdatedBy = _currentUser.UserName,
                             };
-                            manuSfcStepEntities.Add(manuSfcStepEntity);
+                            manuSfcStepList.Add(manuSfcStepEntity);
 
                             var inteVehicleFreightRecordEntity = new InteVehicleFreightRecordEntity()
                             {
@@ -845,7 +899,7 @@ namespace Hymson.MES.Services.Services.Integrated
                                 VehicleId = v.Id
                             };
 
-                            inteVehicleFreightRecordEntity.BarCode = first.BarCode;
+                            inteVehicleFreightRecordEntity.BarCode = inteVehiceFreightStackEntity.BarCode;
                             inteVehicleFreightRecordEntity.LocationId = dto.LocationId;
                             inteVehicleFreightRecordEntity.OperateType = (int)Core.Enums.Integrated.VehicleOperationEnum.Unbind;
                             await _inteVehicleFreightRecordRepository.InsertAsync(inteVehicleFreightRecordEntity);
@@ -854,8 +908,8 @@ namespace Hymson.MES.Services.Services.Integrated
 
                 }
 
-                if (manuSfcStepEntities.Any())
-                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntities);
+                if (manuSfcStepList.Any())
+                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
                 trans.Complete();
             }
 
@@ -868,17 +922,17 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task VehicleClearOperationAsync(InteVehicleOperationDto ivo)
         {
-            InteVehicleEntity vehicleEntity = await VehicleIsEnabled(ivo);
+            var inteVehicleInfo = await VehicleIsEnabled(ivo);
             var dto = ivo as InteVehicleClearOperationDto;
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
                 Code = dto!.PalletNo ?? "",
                 SiteId = _currentSite.SiteId ?? 123456
             });
-            var vehicleTypeEntity = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
+            var inteVehicleTypeEntity = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
 
 
-            var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
+            var inteVehiceFreightStackEntities = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
             {
                 VehicleId = inteVehicleEntity.Id,
                 SiteId = _currentSite.SiteId ?? 123456
@@ -890,31 +944,129 @@ namespace Hymson.MES.Services.Services.Integrated
                 CreatedOn = HymsonClock.Now(),
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
-                VehicleId = vehicleEntity.Id,
+                VehicleId = inteVehicleInfo.Id,
                 OperateType = (int)Core.Enums.Integrated.VehicleOperationEnum.Clear
             };
             using var tran = TransactionHelper.GetTransactionScope();
             await _inteVehicleFreightRecordRepository.InsertAsync(inteVehicleFreightRecordEntity);
-            if (vehicleFreightStackEntities != null && vehicleFreightStackEntities.Any())
+            if (inteVehiceFreightStackEntities != null && inteVehiceFreightStackEntities.Any())
             {
-                await _inteVehiceFreightStackRepository.DeletesAsync(vehicleFreightStackEntities.Select(v => v.Id).ToArray());
+                await _inteVehiceFreightStackRepository.DeletesAsync(inteVehiceFreightStackEntities.Select(v => v.Id).ToArray());
             }
 
-            var vehicleFreightEntitiesResult = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
-            if (vehicleFreightEntitiesResult != null && vehicleFreightEntitiesResult.Any())
+            var inteVehicleFreightEntities = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
+            if (inteVehicleFreightEntities != null && inteVehicleFreightEntities.Any())
             {
-                var list = vehicleFreightEntitiesResult.ToList();
-                list.ForEach(i =>
+                var inteVehicleFreightList = inteVehicleFreightEntities.ToList();
+                inteVehicleFreightList.ForEach(i =>
                 {
                     i.Qty = 0;
                     i.UpdatedBy = _currentUser.UserName;
                     i.UpdatedOn = HymsonClock.Now();
                 });
-                await _inteVehicleFreightRepository.UpdatesAsync((list));
+                await _inteVehicleFreightRepository.UpdatesAsync((inteVehicleFreightList));
             }
             tran.Complete();
         }
 
+        /// <summary>
+        /// 通过托盘码获取托盘视图信息(装载记录表)（PDA）
+        /// </summary>
+        /// <param name="palletNo"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordByPalletNoAsync(string palletNo)
+        {
+            var result = new List<InteVehicleFreightRecordView>();
 
+            //获取托盘信息
+            var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
+            {
+                Code = palletNo,
+                SiteId = _currentSite.SiteId ?? 0
+            });
+            if (inteVehicleEntity == null || inteVehicleEntity.Status != DisableOrEnableEnum.Enable)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18619));
+            }
+
+            //获取载具条码明细
+            var inteVehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery { ParentIds = new List<long> { inteVehicleEntity.Id }, SiteId = _currentSite.SiteId ?? 0 });
+            if (inteVehicleFreightStackEntities == null || !inteVehicleFreightStackEntities.Any())
+            {
+                return result;
+            }
+
+            ////获取托盘装载记录
+            //var inteVehicleRecordEntities = await _inteVehicleFreightRecordRepository.GetInteVehicleFreightRecordEntitiesAsync(new InteVehicleFreightRecordQuery {
+            //    VehicleId= inteVehicleEntity.Id,SiteId= _currentSite.SiteId ?? 0,OperateType=0
+            //});
+            //if (inteVehicleRecordEntities == null || !inteVehicleRecordEntities.Any()) {
+            //    return result;
+            //}
+
+            //获取位置信息
+            var locationIds = inteVehicleFreightStackEntities.Select(a => a.LocationId).Distinct();
+            var inteVehicleFreightEnities = await _inteVehicleFreightRepository.GetByIdsAsync(locationIds.ToArray());
+            if (inteVehicleFreightEnities == null || !inteVehicleFreightEnities.Any())
+            {
+                return result;
+            }
+
+            //获取条码生成信息
+            var sfcs = inteVehicleFreightStackEntities.Select(a => a.BarCode).Distinct();
+            var manuSfcProduceEntities = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery { Sfcs = sfcs, SiteId = _currentSite.SiteId ?? 0 });
+            if (manuSfcProduceEntities == null || !manuSfcProduceEntities.Any())
+            {
+                return result;
+            }
+
+            //获取物料信息
+            var materialIds = manuSfcProduceEntities.Select(a => a.ProductId).Distinct();
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
+
+            //获取工单信息
+            var workOrderIds = manuSfcProduceEntities.Select(a => a.WorkOrderId).Distinct();
+            var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+
+            foreach (var entity in inteVehicleFreightStackEntities)
+            {
+                var model = new InteVehicleFreightRecordView();
+                model.BarCode = entity.BarCode;
+                model.Id = entity.Id;
+                model.LocationId = entity.LocationId;
+                //var inteVehicleRecordEntity = inteVehicleRecordEntities.FirstOrDefault(a => a.BarCode == entity.BarCode);
+                //if (inteVehicleRecordEntity != null) {
+                //    return result;
+                //}
+
+                var inteVehicleFreightEnity = inteVehicleFreightEnities.FirstOrDefault(a => a.Id == entity.LocationId);
+                if (inteVehicleFreightEnity == null)
+                {
+                    return result;
+                }
+                model.Position = $"{inteVehicleFreightEnity.Row}-{inteVehicleFreightEnity.Column}";
+                model.Qty = inteVehicleFreightEnity.Qty;
+
+                var manuSfcProduceEntity = manuSfcProduceEntities.FirstOrDefault(a => a.SFC == entity.BarCode);
+                if (manuSfcProduceEntity == null)
+                {
+                    return result;
+                }
+
+                var materialEntity = materialEntities.FirstOrDefault(a => a.Id == manuSfcProduceEntity.ProductId);
+                model.MaterialCode = materialEntity?.MaterialCode;
+                model.MaterialName = materialEntity?.MaterialName;
+                model.MaterialVersion = materialEntity?.Version;
+                model.Unit = materialEntity?.Unit;
+
+                var workOrderEntity = workOrderEntities.FirstOrDefault(a => a.Id == manuSfcProduceEntity.WorkOrderId);
+                model.WorkOrderCode = workOrderEntity?.OrderCode;
+
+                result.Add(model);
+            }
+
+            return result;
+        }
     }
 }

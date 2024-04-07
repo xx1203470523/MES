@@ -1,6 +1,8 @@
+using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -12,6 +14,8 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
+using Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility;
+using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -23,6 +27,7 @@ using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBa
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
+using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -91,10 +96,14 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
+
+        /// <summary>
         /// 工序-物料-打印模板
         /// </summary>
         private readonly IProcProcedurePrintRelationRepository _procProcedurePrintRelationRepository;
-
 
         /// <summary>
         /// 构造函数
@@ -135,7 +144,8 @@ namespace Hymson.MES.Services.Services.Plan
             ILabelPrintRequest labelPrintRequest,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuCreateBarcodeService manuCreateBarcodeService,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IEventBus<EventBusInstance1> eventBus)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -156,8 +166,8 @@ namespace Hymson.MES.Services.Services.Plan
             _labelPrintRequest = labelPrintRequest;
             _manuCreateBarcodeService = manuCreateBarcodeService;
             _localizationService = localizationService;
+            _eventBus = eventBus;
         }
-
 
         /// <summary>
         /// 创建
@@ -171,7 +181,7 @@ namespace Hymson.MES.Services.Services.Plan
         }
 
         /// <summary>
-        /// 创建
+        /// 打印
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
@@ -204,50 +214,21 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 work = await _planWorkOrderRepository.GetByIdAsync(createDto.WorkOrderId);
             }
-            var material = await _procMaterialRepository.GetByIdAsync(work.ProductId);
-            var ppr = await _procProcedurePrintRelationRepository.GetProcProcedurePrintReleationEntitiesAsync(new ProcProcedurePrintReleationQuery()
+            _eventBus.PublishDelay(new PrintEvent
             {
-                MaterialId = material.Id,
-                ProcedureId = createDto.ProcedureId,
-                Version = material?.Version ?? "",
-                SiteId = _currentSite.SiteId ?? 0
-
-            });
-            PrintRequest printEntity = new PrintRequest();
-
-            foreach (var pprp in ppr)
-            {
-                var tl = await _procLabelTemplateRepository.GetByIdAsync(pprp.TemplateId);
-                if (tl != null)
+                SiteId = _currentSite.SiteId ?? 0,
+                PrintId = createDto.PrintId,
+                ResourceId = createDto.ResourceId,
+                BarCodes = new List<LabelTemplateBarCodeDto>
                 {
-                    var body = new PrintBody()
+                    new LabelTemplateBarCodeDto
                     {
-                        TemplatePath = tl.Path,
-                        PrinterName = print.PrintName,
-                        PrintCount = pprp.Copy ?? 1,
-                        Params = new List<PrintBody.ParamEntity>()
-                        {
-                            new PrintBody.ParamEntity()
-                            {
-                                ParamName = "SFC",
-                                ParamValue = createDto.SFC !
-                            },
-                            new PrintBody.ParamEntity()
-                            {
-                                ParamName = "SiteId",
-                                ParamValue = (_currentSite.SiteId??123456).ToString()
-                            }
-                        }
-
-                    };
-                    printEntity.Bodies.Add(body);
-                }
-                else
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17001));
-            }
-            var result = await _labelPrintRequest.PrintAsync(printEntity);
-            if (!result.result)
-                throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
+                    BarCode=createDto.SFC??"",
+                    MateriaId=work.ProductId
+                    }
+                },
+                UserName = _currentUser.UserName
+            }, 1);
         }
 
         /// <summary>
@@ -257,7 +238,10 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<int> DeletesAsync(IEnumerable<long> idsArr)
         {
-            var sfcEntities = await _manuSfcRepository.GetByIdsAsync(idsArr);
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                Ids = idsArr
+            }); ;
             if (sfcEntities.Any(it => it.IsUsed == YesOrNoEnum.Yes)) throw new CustomerValidationException(nameof(ErrorCode.MES16116));
             if (sfcEntities.Any(it => it.Status == SfcStatusEnum.Scrapping)) throw new CustomerValidationException(nameof(ErrorCode.MES16130));
 
@@ -365,8 +349,10 @@ namespace Hymson.MES.Services.Services.Plan
             var result = new List<CreateBarcodeByWorkOrderOutputBo>(pendingDatas.Count);
 
             var manuSFCIds = pendingDatas.Select(m => m.ManuSFCId);
-            var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(manuSFCIds);
-
+            var manuSFCEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                Ids = manuSFCIds
+            });
             foreach (var pendingData in pendingDatas)
             {
                 var manuSFCEntity = manuSFCEntities.FirstOrDefault(m => m.Id == pendingData.ManuSFCId);
@@ -417,23 +403,26 @@ namespace Hymson.MES.Services.Services.Plan
                 ResourceId = parm.ResourceId,
                 Qty = parm.Qty
             }, _localizationService);
-
+            var barCodes = new List<LabelTemplateBarCodeDto>();
+            var work = await _planWorkOrderRepository.GetByIdAsync(parm.WorkOrderId);
             foreach (var item in list)
             {
-                await CreatePrintAsync(new Dtos.Plan.PlanSfcPrintCreatePrintDto()
+                barCodes.Add(new LabelTemplateBarCodeDto
                 {
-                    PrintId = parm.PrintId,
-                    ProcedureId = parm.ProcedureId,
-                    SFC = item.SFC,
-                    WorkOrderId = parm.WorkOrderId
+                    BarCode = item.SFC,
+                    MateriaId = work.ProductId
                 });
             }
+
+            _eventBus.PublishDelay(new PrintEvent
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                PrintId = parm.PrintId,
+                ResourceId = parm.ResourceId,
+                BarCodes = barCodes,
+                UserName = _currentUser.UserName
+            }, 1);
         }
-
-
-
-
-
 
         /// <summary>
         /// 转换为Dto对象
@@ -453,7 +442,10 @@ namespace Hymson.MES.Services.Services.Plan
             var workOrderDic = workOrderEntities.ToDictionary(x => x.Id, x => x);
 
             // 读取条码
-            var sfcEntities = await _manuSfcRepository.GetByIdsAsync(entities.Select(x => x.SFCId));
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                Ids = entities.Select(x => x.SFCId)
+            });
             var sfcDic = sfcEntities.ToDictionary(x => x.Id, x => x);
 
             // 遍历填充
@@ -497,7 +489,5 @@ namespace Hymson.MES.Services.Services.Plan
 
             return dtos;
         }
-
-
     }
 }
