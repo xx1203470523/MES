@@ -930,6 +930,13 @@
 
         public const string MES15451 = "产品序列码【{barCode}】不存在未关闭的缺陷，不可再执行当前操作！";
         public const string MES15452 = "产品序列码【{barCode}】类型为【{type}】，不可再执行当前操作！";
+        public const string MES15453 = "条码【{barCode}】处于库存中，不允许选择该返工类型！";
+        public const string MES15454 = "条码【{barCode}】处于在制中，不允许选择该返工类型！";
+        public const string MES15455 = "工单产品与条码产品不一致，或产品不在该返工工单BOM中！！";
+        public const string MES15456 = "返工工单不能为空！";
+        public const string MES15457 = "流出工序不能为空！";
+        public const string MES15458 = "返工工序不能为空！";
+
         #endregion
 
         #region 物料加载 15500

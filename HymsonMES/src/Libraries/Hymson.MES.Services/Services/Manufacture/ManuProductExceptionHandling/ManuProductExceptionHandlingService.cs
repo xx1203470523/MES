@@ -14,7 +14,6 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -209,7 +208,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             /*
             // 非生产条码
-            if (sfcEntity.Type == SfcTypeEnum.NoProduce) throw new CustomerValidationException(nameof(ErrorCode.MES15452))
+            if (sfcEntity.Type == SfcTypeEnum.NoProduce) throw new CustomerValidationException(nameof(ErrorCode.MES15456))
                     .WithData("barCode", barCode)
                     .WithData("type", sfcEntity.Type.GetDescription());
             */
@@ -552,7 +551,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
 
             // 查询条码
-            dataBo.SFCEntities = await _manuSfcRepository.GetAllBySFCsAsync(new EntityBySFCsQuery
+            dataBo.SFCEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
             {
                 SiteId = dataBo.SiteId,
                 SFCs = requestDto.BarCodes
@@ -596,7 +595,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Status = ProductBadRecordStatusEnum.Open,
                 SFCs = requestDto.BarCodes
             });
-            if (dataBo.BadRecordEntities == null || !dataBo.BadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15448)).WithData("barCode", string.Join(',', requestDto.BarCodes));
+            if (dataBo.BadRecordEntities == null || !dataBo.BadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15451)).WithData("barCode", string.Join(',', requestDto.BarCodes));
 
             // 根据返工类型处理
             ReworkResponseBo? responseBo = null;
@@ -965,7 +964,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             List<ManuReworkBarCodeDto> dtos = new();
 
             // 查询条码
-            var sfcEntities = await _manuSfcRepository.GetAllBySFCsAsync(new EntityBySFCsQuery
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
             {
                 SiteId = siteId,
                 SFCs = barCodes
@@ -1053,8 +1052,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (!requestDto.UnqualifiedCode.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19702));
             if (!requestDto.FoundProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15433));
-            if (!requestDto.OutProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15450));
-            if (!requestDto.ReworkProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15451));
+            if (!requestDto.OutProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15457));
+            if (!requestDto.ReworkProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15458));
 
             // 查询传入的不合格代码
             var unqualifiedCodeEntity = await _qualUnqualifiedCodeRepository.GetByIdAsync(requestDto.UnqualifiedCode.Value);
@@ -1217,8 +1216,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (!requestDto.UnqualifiedCode.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19702));
             if (!requestDto.FoundProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15433));
-            if (!requestDto.OutProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15450));
-            if (!requestDto.ReworkWorkOrder.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15452));
+            if (!requestDto.OutProcedure.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15457));
+            if (!requestDto.ReworkWorkOrder.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15456));
 
             // 查询条码（库存中）
             var inventorySFCEntities = dataBo.SFCEntities.Where(w => w.Type == SfcTypeEnum.NoProduce);
@@ -1359,7 +1358,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var responseBo = new ReworkResponseBo();
 
             if (!requestDto.UnqualifiedCode.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19702));
-            if (!requestDto.ReworkWorkOrder.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15452));
+            if (!requestDto.ReworkWorkOrder.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15456));
 
             // 查询在制条码
             var produceSFCEntities = dataBo.SFCEntities.Where(w => w.Type == SfcTypeEnum.Produce);
