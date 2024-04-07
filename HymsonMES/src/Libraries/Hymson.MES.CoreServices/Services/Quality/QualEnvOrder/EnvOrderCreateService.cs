@@ -108,7 +108,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13610));
             }
 
-            var parameterGroupEntity = parameterGroupEntities.First();
+            var parameterGroupEntity = parameterGroupEntities.First();    
 
             //获取检验项目明细
             var parameterGroupDetails = await _qualEnvParameterGroupDetailRepository.GetEntitiesAsync(new QualEnvParameterGroupDetailQuery

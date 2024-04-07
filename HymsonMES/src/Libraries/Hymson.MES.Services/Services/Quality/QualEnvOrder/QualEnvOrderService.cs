@@ -99,8 +99,11 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13605));
             }
-            var inteWorkCenter = await _inteWorkCenterRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentSite.SiteId, Code = createConvertDto.WorkCenterCode });
-            var procProcedure = await _procProcedureRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentSite.SiteId, Code = createConvertDto.ProcedureCode });
+            var inteWorkCenter = await _inteWorkCenterRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentSite.SiteId, Code = createConvertDto.WorkCenterCode })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES13606));
+
+            var procProcedure = await _procProcedureRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentSite.SiteId, Code = createConvertDto.ProcedureCode })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES13607));
             var dto = new QualEnvOrderCreateDto()
             {
                 WorkCenterId = inteWorkCenter.Id,
