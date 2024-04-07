@@ -1,10 +1,12 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
 
 namespace Hymson.MES.Api.Controllers.Quality
 {
@@ -46,9 +48,21 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddAsync([FromBody] QualFqcOrderSaveDto saveDto)
+        public async Task<int> AddAsync([FromBody] QualFqcOrderCreateDto saveDto)
         {
-             await _qualFqcOrderService.CreateAsync(saveDto);
+             return await _qualFqcOrderService.CreateAsync(saveDto);
+        }
+
+        /// <summary>
+        /// 测试条码产出时自动生成功能（FQC检验单）
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("createtest")]
+        public async Task<bool> AddAsync([FromBody] QualFqcOrderCreateTestDto saveDto)
+        {
+            return await _qualFqcOrderService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -121,7 +135,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 生成IQC检验单
+        /// 生成FQC检验单
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -138,7 +152,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("operation")]
-        public async Task<long> OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
+        public async Task<long> OperationOrderAsync([FromBody] OrderOperationStatusDto requestDto)
         {
             return await _qualFqcOrderService.OperationOrderAsync(requestDto);
         }
@@ -231,6 +245,17 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualFqcOrderService.QueryDetailSampleAsync(requestDto);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("verfyParametergroup")]
+        public async Task<IEnumerable<QualFqcParameterGroupEntity>> verificationParametergroupAsync([FromQuery] ParameterGroupQuery requestDto)
+        {
+            return await _qualFqcOrderService.VerificationParametergroupAsync(requestDto);
+        }
+ 
         /// <summary>
         /// 查询检验单样本数据（分页）
         /// </summary>

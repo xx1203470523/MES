@@ -11,31 +11,31 @@ namespace Hymson.MES.Core.Enums
         /// 班次
         /// </summary>
         [Description("班次")]
-        Classes = 1,
+        Classes = 12,
         /// <summary>
         /// 天
         /// </summary>
         [Description("天")]
-        Day = 2,
+        Day = 24,
         /// <summary>
         /// 1小时
         /// </summary>
         [Description("1小时")]
-        HoutOne = 3,
+        HourOne = 1,
         /// <summary>
         /// 2小时
         /// </summary>
         [Description("2小时")]
-        HoutTwo = 4,
+        HourTwo = 2,
         /// <summary>
         /// 4小时
         /// </summary>
         [Description("4小时")]
-        HoutFour = 5,
+        HourFour = 4,
         /// <summary>
         /// 8小时
         /// </summary>
         [Description("8小时")]
-        HourEight = 6
+        HourEight = 8
     }
 }

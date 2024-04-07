@@ -42,8 +42,25 @@ namespace Hymson.MES.CoreServices.Services
             _manuSFCNodeSourceRepository = manuSFCNodeSourceRepository;
             _manuSFCNodeDestinationRepository = manuSFCNodeDestinationRepository;
         }
+        /// <summary>
+        /// 条码追溯（反向）  原始数据 平铺数据 没经过加工的树
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSFCNodeEntity>> OriginalSourceAsync(EntityBySFCQuery query)
+        {
+            var rootNodeEntity = await _manuSFCNodeRepository.GetBySFCAsync(query)
+              ?? throw new CustomerValidationException(nameof(ErrorCode.MES12802)).WithData("sfc", query.SFC);
 
+            // 取得该根节点下面的所有树节点
+            var sourceEntities = await _manuSFCNodeSourceRepository.GetTreeEntitiesAsync(rootNodeEntity.Id);
+            //var sourceDict = sourceEntities.ToLookup(x => x.NodeId).ToDictionary(d => d.Key, d => d);
 
+            // 取得整个树的基础信息方便下文填充数据
+            var nodeIds = sourceEntities.Select(s => s.NodeId).Union(sourceEntities.Select(s => s.SourceId)).Distinct();
+            var nodeEntities = await _manuSFCNodeRepository.GetByIdsAsync(nodeIds);
+            return nodeEntities;
+        }
         /// <summary>
         /// 条码追溯（反向）
         /// </summary>

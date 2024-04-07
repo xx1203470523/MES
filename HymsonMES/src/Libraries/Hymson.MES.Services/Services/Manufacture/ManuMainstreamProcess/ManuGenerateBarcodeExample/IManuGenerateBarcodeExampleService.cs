@@ -24,5 +24,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// <param name="param"></param>
         /// <returns></returns>
         Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleDto param);
+
+
+        /// <summary>
+        /// 生成通配符列表供前端渲染下拉使用
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<BarcodeWildcardItemDto> GetGenerateBarcodeWildcardItemDtos();
     }
 }

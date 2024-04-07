@@ -33,15 +33,41 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
 
+        #region 设备误判
         /// <summary>
-        /// 查询条码（离脱）
+        /// 根据条码查询信息（设备误判）
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        [HttpGet("barCode/{barCode}")]
-        public async Task<ManuBarCodeDto> GetBarCodeAsync(string barCode)
+        [HttpGet("misjudgment/{barCode}")]
+        public async Task<IEnumerable<ManuMisjudgmentBarCodeDto>> GetMisjudgmentByBarCodeAsync(string barCode)
         {
-            return await _manuProductExceptionHandlingService.GetBarCodeAsync(barCode);
+            return await _manuProductExceptionHandlingService.GetMisjudgmentByBarCodeAsync(barCode);
+        }
+
+        /// <summary>
+        /// 提交（设备误判）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("misjudgment/submit")]
+        public async Task<int> SubmitMisjudgmentAsync(ManuMisjudgmentDto requestDto)
+        {
+            return await _manuProductExceptionHandlingService.SubmitMisjudgmentAsync(requestDto);
+        }
+        #endregion
+
+
+        #region 离脱
+        /// <summary>
+        /// 根据条码查询信息（离脱）
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        [HttpGet("detachment/{barCode}")]
+        public async Task<ManuDetachmentBarCodeDto> GetDetachmentByBarCodeAsync(string barCode)
+        {
+            return await _manuProductExceptionHandlingService.GetDetachmentByBarCodeAsync(barCode);
         }
 
         /// <summary>
@@ -54,6 +80,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuProductExceptionHandlingService.SubmitDetachmentAsync(requestDto);
         }
+        #endregion
+
 
     }
 }

@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
@@ -36,14 +38,24 @@ namespace Hymson.MES.Core.Domain.Quality
         public int SampleQty { get; set; }
 
         /// <summary>
-        /// 生成条件
+        /// 批次数量
         /// </summary>
-        public int GenerateCondition { get; set; }
+        public int LotSize { get; set; }
 
         /// <summary>
-        /// 生成条件单位
+        /// 批次单位
         /// </summary>
-        public bool GenerateConditionUnit { get; set; }
+        public FQCLotUnitEnum LotUnit { get; set; }
+
+        /// <summary>
+        /// 是否同工单
+        /// </summary>
+        public TrueOrFalseEnum IsSameWorkOrder { get; set; }
+
+        /// <summary>
+        /// 是否同产线
+        /// </summary>
+        public TrueOrFalseEnum IsSameWorkCenter { get; set; }
 
         /// <summary>
         /// 版本
@@ -53,13 +65,11 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
-
-        
     }
 }

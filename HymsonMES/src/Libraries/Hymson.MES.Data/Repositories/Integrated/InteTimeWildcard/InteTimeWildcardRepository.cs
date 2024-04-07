@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -21,9 +22,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public partial class InteTimeWildcardRepository :BaseRepository, IInteTimeWildcardRepository
     {
+        private readonly IMemoryCache _memoryCache;
 
-        public InteTimeWildcardRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public InteTimeWildcardRepository(IOptions<ConnectionOptions> connectionOptions,IMemoryCache memoryCache): base(connectionOptions)
         {
+            _memoryCache = memoryCache;
         }
 
         #region 方法
@@ -171,10 +174,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="siteId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteTimeWildcardEntity>> GetAllAsync(long siteId) 
+        public async Task<IEnumerable<InteTimeWildcardEntity>> GetAllAsync(long siteId)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteTimeWildcardEntity>(GetAllSql, new { SiteId=siteId});
+            var cachedKey = "inte_time_wildcard_All";
+            return await _memoryCache.GetOrCreateLazyAsync(cachedKey, async (ICacheEntry cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<InteTimeWildcardEntity>(GetAllSql, new { SiteId = siteId });
+            });
         }
         #endregion
 

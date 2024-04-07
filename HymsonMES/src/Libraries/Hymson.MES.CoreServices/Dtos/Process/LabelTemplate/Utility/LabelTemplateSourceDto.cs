@@ -27,6 +27,11 @@ namespace Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility
         public long ResourceId { get; set; }
 
         /// <summary>
+        /// 打印机
+        /// </summary>
+        public long? PrintId { get; set; }
+
+        /// <summary>
         /// 条码
         /// </summary>
         public IEnumerable<LabelTemplateBarCodeDto> BarCodes { get; set; }

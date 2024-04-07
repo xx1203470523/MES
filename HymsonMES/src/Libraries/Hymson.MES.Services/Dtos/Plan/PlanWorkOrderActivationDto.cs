@@ -263,14 +263,19 @@ namespace Hymson.MES.Services.Dtos.Plan
         public DateTime[]? PlanStartTime { get; set; }
 
     }
-    
+
     /// <summary>
     /// 激活工单分页
     /// </summary>
     public class ActivationWorkOrderPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 产线ids
+        /// 工序
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 产线组
         /// </summary>
         public IEnumerable<long>? WirebodyIds { get; set; }
     }
@@ -471,17 +476,17 @@ namespace Hymson.MES.Services.Dtos.Plan
     public record EquipmentActivityWorkOrderOutputDto : BaseEntityDto
     {
         /// <summary>
-        /// 工序id
+        /// 工艺路线id
         /// </summary>
         public long? ProcessId { get; set; }
 
         /// <summary>
-        /// 工序名称
+        /// 工艺路线名称
         /// </summary>
         public string? ProcessName { get; set; }
 
         /// <summary>
-        /// 工序编码
+        /// 工艺路线编码
         /// </summary>
         public string? ProcessCode { get; set; }
 
@@ -496,6 +501,21 @@ namespace Hymson.MES.Services.Dtos.Plan
         public string? WorkCenterCode { get; set; }
 
         /// <summary>
+        /// 产线id
+        /// </summary>
+        public long? LineId { get; set; }
+
+        /// <summary>
+        /// 产线编码
+        /// </summary>
+        public string? LineCode { get; set; }
+
+        /// <summary>
+        /// 产线名称
+        /// </summary>
+        public string? LineName { get; set; }
+
+        /// <summary>
         /// 工单id
         /// </summary>
         public long? WorkOrderId { get; set; }
@@ -506,9 +526,19 @@ namespace Hymson.MES.Services.Dtos.Plan
         public string? WorkOrderCode { get; set; }
 
         /// <summary>
+        /// 工单创建时间
+        /// </summary>
+        public DateTime WorkOrderCreateOn { get; set; }
+
+        /// <summary>
         /// 工单计划数量
         /// </summary>
         public decimal? WorkOrderPlannedQuantity { get; set; }
+
+        /// <summary>
+        /// 工单下达数量
+        /// </summary>
+        public decimal? WorkOrderPassDownQuantity {  get; set; }
 
         /// <summary>
         /// 产品id
@@ -544,7 +574,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 产线ID
         /// </summary>
-        public long Id {  get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// 产线编码
@@ -554,7 +584,59 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 产线名称
         /// </summary>
-        public string Name {  get; set; }
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+    }
+
+    /// <summary>
+    /// 设备资源
+    /// </summary>
+    public record EquipmentResourceOutputDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long Id { set; get; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string Name { get; set; }
+    }
+
+    /// <summary>
+    /// 设备工序
+    /// </summary>
+    public record EquipmentProcedureOutputDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long Id { set; get; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long ResourceId { set; get; }
     }
 
     /// <summary>
@@ -576,6 +658,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 设备名称
         /// </summary>
         public string EquipmentName { get; set; }
+
+        /// <summary>
+        /// 设备资源
+        /// </summary>
+        public IEnumerable<EquipmentResourceOutputDto> EquipmentResources { get; set; }
+
+        /// <summary>
+        /// 设备工序
+        /// </summary>
+        public IEnumerable<EquipmentProcedureOutputDto> EquipmentProcedure { get; set; }
 
         /// <summary>
         /// 设备产线

@@ -62,5 +62,10 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         /// 不包含的id组
         /// </summary>
         public IEnumerable<long>? NotInIds { get; set; }
+
+        /// <summary>
+        /// 工艺路线组
+        /// </summary>
+        public IEnumerable<long>? ProcessRouteIds { get; set; }
     }
 }

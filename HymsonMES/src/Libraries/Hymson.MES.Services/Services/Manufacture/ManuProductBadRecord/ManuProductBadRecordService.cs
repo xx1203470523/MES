@@ -216,7 +216,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //工单信息
             var planWorkOrders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
             //库存信息
-            var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(
+            var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(
                 new WhMaterialInventoryBarCodesQuery()
                 {
                     SiteId = _currentSite.SiteId ?? 0,
@@ -1536,7 +1536,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var reaps = productBadRecordMarkSaveDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId, x.InterceptProcedureId }).Where(group => group.Count() > 1);
             if (reaps != null && reaps.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15435));
 
-            var sfcsBadRecords = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new Data.Repositories.Manufacture.ManuProductBadRecord.Query.ManuProductBadRecordBySfcQuery { SiteId = _currentSite.SiteId ?? 0, SFCs = needHandleSfcs, Status = ProductBadRecordStatusEnum.Open });
+            var sfcsBadRecords = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery { SiteId = _currentSite.SiteId ?? 0, SFCs = needHandleSfcs, Status = ProductBadRecordStatusEnum.Open });
 
             var addGroupKeys = productBadRecordMarkSaveDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId, x.InterceptProcedureId });
             var groups = sfcsBadRecords.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId, x.InterceptOperationId });
@@ -1768,7 +1768,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //检测是否与数据库中的重复
-            var sfcsBadRecords = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new Data.Repositories.Manufacture.ManuProductBadRecord.Query.ManuProductBadRecordBySfcQuery { SiteId = _currentSite.SiteId ?? 0, SFCs = needHandleSfcs, Status = ProductBadRecordStatusEnum.Open });
+            var sfcsBadRecords = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery { SiteId = _currentSite.SiteId ?? 0, SFCs = needHandleSfcs, Status = ProductBadRecordStatusEnum.Open });
 
 
 

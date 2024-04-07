@@ -192,7 +192,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
 
             // 获取库存数据
-            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(new WhMaterialInventoryBarCodesQuery
             {
                 SiteId = multiSFCBo.SiteId,
                 BarCodes = multiSFCBo.SFCs

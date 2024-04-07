@@ -87,6 +87,7 @@
         public const string MES10238 = "基于时间不合法！";
         public const string MES10239 = "消耗公差需为大于0整数！";
         public const string MES10240 = "消耗系数需大于0！";
+        public const string MES10241 = "物料只能选择一条数据";
         #endregion
 
         #region 资源 10300
@@ -219,6 +220,8 @@
         public const string MES10475 = $"工序节点手动排序号最大长度为18";
 
         public const string MES10476 = $"工序不存在";
+        public const string MES10477 = $"转换系数不能为空";
+        public const string MES10478 = $"工序绑定的物料以存在";
         #endregion
 
         #region 参数 10500
@@ -430,6 +433,21 @@
         #region ESOP维护 11500
         public const string MES11500 = "ESOP已存在同一物料、工序、状态数据";
         public const string MES11501 = "不能删除启用状态的数据";
+        #endregion
+
+        #region FQC检验任务 11700
+
+        public const string MES11700 = "参数错误，条码产出数据不存在！";
+        public const string MES11701 = "条码不属于同一产品！";
+        public const string MES11702 = "条码【{SFC}】已生成过检验单，不允许重复生成！";
+        public const string MES11703 = "条码不属于同一工单！";
+        public const string MES11704 = "条码不属于同一产线！";
+        public const string MES11705 = "FQC检验项目不存在或未启用！产品编码【{MaterialCode}】";
+        public const string MES11706 = "FQC检验项目不存在或未启用，无法判定其是否要做FQC检验！产品编码【{MaterialCode}】";
+        public const string MES11707 = "FQC检验项目【{ParameterGroupCode}】下检验参数不能为空";
+        public const string MES11710 = "检验单号生成失败：FQC类型编码规则未维护！";
+        public const string MES11711 = "检验单号生成失败：编码规则错误，不允许同时存在多条FQC类型编码规则！";
+
         #endregion
 
         #region OQC检验任务 11800
@@ -748,6 +766,26 @@
 
         #endregion
 
+        #region 环境检验 13600
+
+        public const string MES13600 = "是否不合格不能为空！";
+        public const string MES13601 = "是否不合格类型不存在！";
+        public const string MES13602 = "检验值不能为空！";
+        public const string MES13603 = "实际检验时间不能为空！"; 
+        public const string MES13604 = "没有可保存的数据！";
+
+        public const string MES13610 = "环境检验项目不存在或未启用！";
+        public const string MES13611 = "环境检验项目【{Code}】下检验参数不能为空！";
+        public const string MES13612 = "环境检验项目【{Code}】下检验参数检验频率不能为空！";
+        public const string MES13613 = "工作日历【{Year}年{Month}月】不存在或未启用！";
+        public const string MES13614 = "当前日期配置为不上班，无需生成检验单！";
+        public const string MES13615 = "当前日期班制信息不存在！";
+        public const string MES13616 = "当前日期班制下班次信息不能为空！";
+        public const string MES13617 = "检验单号生成失败：环境检验类型编码规则未维护！";
+        public const string MES13618 = "检验单号生成失败：编码规则错误，不允许同时存在多条环境检验类型编码规则！";
+
+        #endregion
+
         #region  14000段项目使用 平台请勿使用
 
         #endregion
@@ -870,8 +908,8 @@
         public const string MES15432 = "条码不能为空";
         public const string MES15433 = "发现工序不能为空";
         public const string MES15434 = "不合格代码不能为空";
-        public const string MES15435 = "传入数据中存在重复的(产品序列码 ,拦截工序,不合格代,发现不良工序)数据！";
-        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现不良工序[{foundBadOperationCode}]，拦截工序[{InterceptOperationCode}],不合格代码[{unqualifiedCode}]！";
+        public const string MES15435 = "传入数据中存在重复的(产品序列码 ，拦截工序，不合格代，发现不良工序)数据！";
+        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现不良工序[{foundBadOperationCode}]，拦截工序[{InterceptOperationCode}]，不合格代码[{unqualifiedCode}]！";
         public const string MES15437 = "存在不是缺陷的不合格代码";
         public const string MES15438 = "条码[{sfc}]是锁定、删除或无效状态，无法使用";
         public const string MES15439 = "条码[{sfc}]不存在";
@@ -880,12 +918,15 @@
         public const string MES15442 = "存在不是缺陷的不合格代码[{unqualifiedCode}]";
         public const string MES15443 = "发现工序编码[{foundBadOperationCode}]不存在";
         public const string MES15444 = "拦截工序编码[{interceptProcedureCode}]不存在";
-        public const string MES15445 = "产品序列码【{barCode}】不能为空！";
+        public const string MES15445 = "产品序列码不能为空！";
         public const string MES15446 = "产品序列码【{barCode}】不存在！";
         public const string MES15447 = "产品序列码【{barCode}】状态为【{status}】，不可再执行当前操作！";
         public const string MES15448 = "可用数量为【{Qty}】,无法报废【{ScrapQty}】";
         public const string MES15449 = "条码数据已发生变化，请刷新后再操作";
         public const string MES15450 = "产品序列码状态为【{Status}】，不允许报废操作。";
+
+        public const string MES15451 = "产品序列码【{barCode}】不存在未关闭的缺陷，不可再执行当前操作！";
+        public const string MES15452 = "产品序列码【{barCode}】类型为【{type}】，不可再执行当前操作！";
         #endregion
 
         #region 物料加载 15500
@@ -1614,6 +1655,7 @@
         public const string MES18626 = "载具编码【{Code}】未绑定任何条码，具体请查看【载具绑定解绑】！";
         public const string MES18627 = "载具类型【{Code}】已禁用，具体请查看【载具类型】！";
         public const string MES18628 = "载具编码【{Code}】装载的产品序列码物料编码/版本不一致，具体请查看【载具绑定解绑】！";
+        public const string MES18629 = "载具编码【{Code}】未找到所属的载具类型！";
 
         // MES18629 - MES18641
 
@@ -1775,6 +1817,8 @@
         public const string MES19935 = "资源【{ResCode}】未绑定启用/保留状态的工序，请检查配置";
         public const string MES19936 = "条码{SFC}所属产品编码{P1}与托盘绑定的产品编码不一致";
         public const string MES19937 = "工单{WorkOrderCode}未激活，无法进行条码接收操作！";
+        public const string MES19938 = "非在库待使用条码，不可解盘";
+
         #endregion
 
 
@@ -1913,7 +1957,6 @@
         public const string MES19954 = "检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19955 = "检验项目编码重复，数据新增失败";
         public const string MES19956 = "客户{customCode}物料{materialCode}检验项目版本{version}已存在，不允许重复添加！";
-
         #endregion 
 
 
@@ -1936,6 +1979,11 @@
 
         #endregion
 
+        #region FQC执行检验
+        public const string MES19980 = "条码{sfc}所在检验单{fqcOrder}未关闭";
+        public const string MES19981 = "不存在FQC检验单条码记录表中";
+
+        #endregion
 
 
 

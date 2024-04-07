@@ -2,7 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Options;
@@ -68,6 +68,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 根据物料条码获取数据（剩余数量大于0的条码）
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesOfHasQtyAsync(WhMaterialInventoryBarCodesQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodesOfHasQtySql, param);
+        }
+
+        /// <summary>
         /// 根据物料条码获取数据
         /// </summary>
         /// <param name="barCode"></param>
@@ -76,17 +87,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodesSql, param);
-        }
-
-        /// <summary>
-        /// 根据物料条码获取数据（剩余数量大于0的条码）
-        /// </summary>
-        /// <param name="barCode"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesOfHasQtyAsync(WhMaterialInventoryBarCodesQuery param)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodesOfHasQty, param);
         }
 
         /// <summary>
@@ -466,8 +466,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string GetByIdSql = @"SELECT * FROM `wh_material_inventory`  WHERE Id = @Id ";
 
         const string GetByBarCodeSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode = @BarCode";
-        const string GetByBarCodesSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes AND QuantityResidue > 0";
-        const string GetByBarCodesOfHasQty = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes AND QuantityResidue > 0";
+        const string GetByBarCodesSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes";
+        const string GetByBarCodesOfHasQtySql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes AND QuantityResidue > 0";
         const string GetByIdsSql = @"SELECT * FROM `wh_material_inventory` WHERE Id IN @ids ";
 
 

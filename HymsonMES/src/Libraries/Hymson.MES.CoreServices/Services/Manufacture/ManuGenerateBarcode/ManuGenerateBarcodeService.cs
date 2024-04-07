@@ -8,6 +8,8 @@ using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.Sequences;
 using Hymson.Utils;
 using NETCore.Encrypt;
@@ -27,8 +29,20 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
 
+        /// <summary>
+        /// 工作中心，为生成条码的线体部分使用
+        /// </summary>
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+        /// <summary>
+        /// 条码追溯
+        /// </summary>
+        private readonly ITracingSourceCoreService _tracingSourceCoreService;
         private readonly IInteTimeWildcardRepository _inteTimeWildcardRepository;
         private readonly ILocalizationService _localizationService;
+        /// <summary>
+        /// 物料
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
         /// 构造函数
@@ -39,13 +53,17 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             IInteCodeRulesRepository inteCodeRulesRepository,
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
             ISequenceService sequenceService,
-            IInteTimeWildcardRepository inteTimeWildcardRepository, ILocalizationService localizationService)
+            IInteTimeWildcardRepository inteTimeWildcardRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IInteWorkCenterRepository inteWorkCenterRepository,
+            ITracingSourceCoreService tracingSourceCoreService)
         {
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
             _sequenceService = sequenceService;
             _inteTimeWildcardRepository = inteTimeWildcardRepository;
             _localizationService = localizationService;
+            _procMaterialRepository = procMaterialRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
+            _tracingSourceCoreService = tracingSourceCoreService;
         }
 
         /// <summary>
@@ -114,6 +132,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 }),
 
                 CodeRuleKey = $"{param.ProductId}",
+                ProductId = param.ProductId,
                 Count = param.Count,
                 Base = param.Base,
                 IgnoreChar = param.IgnoreChar ?? "",
@@ -122,6 +141,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 ResetType = param.ResetType,
                 StartNumber = param.StartNumber,
                 CodeMode = param.CodeMode,
+                CodeType = param.CodeType,
                 SiteId = param.SiteId,
             });
             var list = new List<string>();
@@ -148,42 +168,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16203));
             }
-
-            var ymdWildcard = "";
-            #region 查询年月日的通配
-            if (bo.CodeRulesMakeBos.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue == GenerateBarcodeWildcard.YMDWildcard))
-            {
-
-                var currentTime = HymsonClock.Now();
-                var timeWildcards = await _inteTimeWildcardRepository.GetAllAsync(bo.SiteId);
-
-                var yearWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Year + "" && x.Type == TimeWildcardTypeEnum.Year);
-                if (yearWildcard == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Year + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Year)}"));
-                }
-                else
-                    ymdWildcard += yearWildcard.Value;
-
-                var monthWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Month + "" && x.Type == TimeWildcardTypeEnum.Month);
-                if (monthWildcard == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Month + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Month)}"));
-                }
-                else
-                    ymdWildcard += monthWildcard.Value;
-
-                var dayWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Day + "" && x.Type == TimeWildcardTypeEnum.Day);
-                if (dayWildcard == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Day + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Day)}"));
-                }
-                else
-                    ymdWildcard += dayWildcard.Value;
-            }
-            #endregion
-
-
+            var now = HymsonClock.Now();
             #region 组合数据生成条码
             foreach (var serialStr in serialStrings)
             {
@@ -202,7 +187,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                             rules.Add(new List<string> { serialStr });
                             break;
                         case GenerateBarcodeWildcard.Yymmdd:
-                            rules.Add(new List<string> { HymsonClock.Now().ToString("yyMMdd") });
+                            rules.Add(new List<string> { now.ToString("yyMMdd") });
                             break;
                         case GenerateBarcodeWildcard.MultipleVariable:
                             //模式是多个时，生成多个条码
@@ -217,7 +202,50 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                             }
                             break;
                         case GenerateBarcodeWildcard.YMDWildcard:
-                            rules.Add(new List<string> { ymdWildcard });
+                            var year = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Year);
+                            var month = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Month);
+                            var day = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Day);
+                            rules.Add(new List<string> { $"{year}{month}{day}" });
+                            break;
+                        case GenerateBarcodeWildcard.SingleYearMapping:
+
+                            rules.Add(new List<string> { await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Year) });
+                            break;
+
+                        case GenerateBarcodeWildcard.SingleMonthMapping:
+                            rules.Add(new List<string> { await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Month) });
+                            break;
+                        case GenerateBarcodeWildcard.SingleDayMapping:
+                            rules.Add(new List<string> { await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Day) });
+                            break;
+                        case GenerateBarcodeWildcard.SingleYearDirect:
+
+                            rules.Add(new List<string> { now.ToString("yy") });
+                            break;
+
+                        case GenerateBarcodeWildcard.SingleMonthDirect:
+                            rules.Add(new List<string> { now.ToString("MM") });
+                            break;
+                        case GenerateBarcodeWildcard.SingleDayDirect:
+                            rules.Add(new List<string> { now.ToString("dd") });
+                            break;
+                        case GenerateBarcodeWildcard.BatterySpecifications:
+                            rules.Add(new List<string> { await GenerateBatterySpecificationsAsync(bo) });
+                            break;
+                        case GenerateBarcodeWildcard.LINETYPE:
+                            rules.Add(new List<string> { await GenerateLineAsync(bo) });
+                            break;
+                        case GenerateBarcodeWildcard.AnodeMain:
+                            rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.AnodeMain) });
+                            break;
+                        case GenerateBarcodeWildcard.CathodeMain:
+                            rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.CathodeMain) });
+                            break;
+                        case GenerateBarcodeWildcard.Diaphragm:
+                            rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.Diaphragm) });
+                            break;
+                        case GenerateBarcodeWildcard.PositivePlate:
+                            rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.PositivePlate) });
                             break;
                         default:
                             throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);
@@ -240,150 +268,319 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             #endregion
 
             return list;
+        }
+
+        ///// <summary>
+        ///// 生成流水号
+        ///// </summary>
+        ///// <returns></returns>
+        //public async Task<IEnumerable<BarCodeInfo>> GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(BarCodeSerialNumberBo bo, BarCodeExtendBo? barCodeExtendBo = null)
+        //{
+        //    bo.CodeRulesMakeBos = bo.CodeRulesMakeBos.OrderBy(x => x.Seq);
+
+        //    List<BarCodeInfo> list = new();
+
+        //    var serialStrings = await GetSerialNumbersAsync(bo);
+
+        //    if (serialStrings == null || !serialStrings.Any())
+        //    {
+        //        throw new CustomerValidationException(nameof(ErrorCode.MES16203));
+        //    }
+        //    var now = HymsonClock.Now();
+
+        //    #region 组合数据生成条码
+        //    foreach (var serialStr in serialStrings)
+        //    {
+        //        var rules = new List<List<string>>();
+        //        foreach (var item in bo.CodeRulesMakeBos)
+        //        {
+        //            if (item.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
+        //            {
+        //                rules.Add(new List<string> { item.SegmentedValue! });
+        //                continue;
+        //            }
+
+        //            switch (item.SegmentedValue)
+        //            {
+        //                case GenerateBarcodeWildcard.Activity:
+        //                    rules.Add(new List<string> { serialStr });
+        //                    break;
+        //                case GenerateBarcodeWildcard.Yymmdd:
+        //                    rules.Add(new List<string> { now.ToString("yyMMdd") });
+        //                    break;
+        //                case GenerateBarcodeWildcard.MultipleVariable:
+        //                    //模式是多个时，生成多个条码
+        //                    if (bo.CodeMode == CodeRuleCodeModeEnum.More)
+        //                    {
+        //                        if (string.IsNullOrEmpty(item.CustomValue))
+        //                        {
+        //                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue);
+        //                        }
+        //                        var customValueArray = item.CustomValue.Split(';');
+        //                        rules.Add(customValueArray.ToList());
+        //                    }
+        //                    break;
+        //                case GenerateBarcodeWildcard.YMDWildcard:
+        //                    var year = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Year);
+        //                    var month = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Month);
+        //                    var day = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Day);
+        //                    rules.Add(new List<string> { $"{year}{month}{day}" });
+        //                    break;
+        //                case GenerateBarcodeWildcard.SingleYearMapping:
+
+        //                    rules.Add(new List<string> { await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Year) });
+        //                    break;
+
+        //                case GenerateBarcodeWildcard.SingleMonthMapping:
+        //                    rules.Add(new List<string> { await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Month) });
+        //                    break;
+        //                case GenerateBarcodeWildcard.SingleDayMapping:
+        //                    rules.Add(new List<string> { await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Day) });
+        //                    break;
+        //                case GenerateBarcodeWildcard.SingleYearDirect:
+
+        //                    rules.Add(new List<string> { now.ToString("yy") });
+        //                    break;
+
+        //                case GenerateBarcodeWildcard.SingleMonthDirect:
+        //                    rules.Add(new List<string> { now.ToString("MM") });
+        //                    break;
+        //                case GenerateBarcodeWildcard.SingleDayDirect:
+        //                    rules.Add(new List<string> { now.ToString("dd") });
+        //                    break;
+        //                case GenerateBarcodeWildcard.BatterySpecifications:
+        //                    rules.Add(new List<string> { await GenerateBatterySpecificationsAsync(bo) });
+        //                    break;
+
+        //                case GenerateBarcodeWildcard.LINETYPE:
+        //                    if (barCodeExtendBo == null)
+        //                    {
+        //                        throw new CustomerValidationException(nameof(ErrorCode.MES16211));
+        //                    }
+        //                    if (string.IsNullOrEmpty(item.CustomValue))
+        //                    {
+        //                        throw new CustomerValidationException(nameof(ErrorCode.MES16205));
+        //                    }
+        //                    else
+        //                    {
+        //                        var customValues = item.CustomValue.Split(";").ToList<string>();
+        //                        var barCodeExtendValue = customValues.FirstOrDefault(x => x.Contains(barCodeExtendBo?.LineCode ?? ""));
+        //                        if (string.IsNullOrEmpty(barCodeExtendValue))
+        //                        {
+        //                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue);
+        //                        }
+        //                        else
+        //                        {
+        //                            var barCodeExtendValueArray = barCodeExtendValue.Split(":");
+        //                            if (barCodeExtendValueArray.Length != 2)
+        //                            {
+        //                                throw new CustomerValidationException(nameof(ErrorCode.MES16210)).WithData("Value", barCodeExtendValue);
+        //                            }
+        //                            else
+        //                            {
+        //                                rules.Add(new List<string> { barCodeExtendValueArray[1] });
+        //                            }
+        //                        }
+        //                    }
+        //                    break;
+        //                default:
+        //                    throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);
+        //            }
+        //        }
+
+        //        var combinations = GenerateCombination1s(rules);
+        //        var barCodes = new List<string>();
+        //        foreach (var combination in combinations)
+        //        {
+        //            barCodes.Add(string.Join("", combination));
+        //        }
+        //        list.Add(new BarCodeInfo
+        //        {
+        //            SerialNumber = serialStr,
+        //            BarCodes = barCodes
+        //        });
+        //    }
+
+        //    #endregion
+
+        //    return list;
+        //}
+
+        #region 内部方法
+
+        /// <summary>
+        /// 生成条码物料类型相关数据
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="wildcard">通配符</param>
+        /// <returns></returns>
+        private async Task<string> GenerateMaterialTypeAsync(BarCodeSerialNumberBo bo, string wildcard)
+        {
+
+            if (bo.IsTest)
+            {
+                ///因为是动态生成，在前端测试时用ZZ占位
+                return "ZZ";
+            }
+            else
+            {
+
+                string productModel = await PrepareProductModelAsync(bo, wildcard);
+
+                return productModel;
+            }
+        }
+        /// <summary>
+        /// 获取产品型号
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="wildcard"></param>
+        /// <returns></returns>
+        private async Task<string> PrepareProductModelAsync(BarCodeSerialNumberBo bo, string wildcard)
+        {
+            if (bo.Sfcs == null || !bo.Sfcs.Any())
+            {
+                return string.Empty;
+            }
+            string productModel = "";
+            bool isFound = false;
+            foreach (var sfc in bo.Sfcs)
+            {
+                var manuSFCNodeSourceEntities = await _tracingSourceCoreService.OriginalSourceAsync(new Data.Repositories.Common.Query.EntityBySFCQuery
+                {
+                    SFC = sfc,
+                    SiteId = bo.SiteId,
+                });
+                //关联物料信息，查询是什么类型的物料
+                var productIds = manuSFCNodeSourceEntities.Select(x => x.ProductId);
+                var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(productIds);
+                foreach (var procMaterialEntity in procMaterialEntities)
+                {
+                    var  materialTypeEnum= SelectMaterialType(wildcard);
+                    if (materialTypeEnum==null)
+                    {
+                        throw new Exception("找不到对应的物料类型");
+                    }
+                    if (procMaterialEntity.MaterialType == materialTypeEnum)
+                    {
+                        productModel = procMaterialEntity.ProductModel ?? string.Empty;
+                        isFound = true;
+                        break;
+                    }
+                }
+                if (isFound) break;
+
+            }
+
+            return productModel;
+        }
+        /// <summary>
+        /// 通配符映射物料类型
+        /// </summary>
+        /// <param name="wildcard"></param>
+        /// <returns></returns>
+        private static Core.Enums.Process.MaterialTypeEnum? SelectMaterialType(string wildcard)
+        {
+            switch (wildcard)
+            {
+                case GenerateBarcodeWildcard.AnodeMain: return Core.Enums.Process.MaterialTypeEnum.AnodeMain;
+                case GenerateBarcodeWildcard.CathodeMain: return Core.Enums.Process.MaterialTypeEnum.CathodeMain;
+                case GenerateBarcodeWildcard.Diaphragm: return Core.Enums.Process.MaterialTypeEnum.Diaphragm;
+                case GenerateBarcodeWildcard.PositivePlate: return Core.Enums.Process.MaterialTypeEnum.PositivePlate;
+            }
+            return null;
         }
 
         /// <summary>
-        /// 生成流水号
+        /// 生成条码线体相关数据
         /// </summary>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<BarCodeInfo>> GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(BarCodeSerialNumberBo bo, BarCodeExtendBo? barCodeExtendBo = null)
+        private async Task<string> GenerateLineAsync(BarCodeSerialNumberBo bo)
         {
-            bo.CodeRulesMakeBos = bo.CodeRulesMakeBos.OrderBy(x => x.Seq);
 
-            List<BarCodeInfo> list = new();
-
-            var serialStrings = await GetSerialNumbersAsync(bo);
-
-            if (serialStrings == null || !serialStrings.Any())
+            if (bo.IsTest)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16203));
+                ///因为是动态生成，在前端测试时用XX占位
+                return "XX";
             }
-
-            var ymdWildcard = "";
-            #region 查询年月日的通配
-            if (bo.CodeRulesMakeBos.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue == GenerateBarcodeWildcard.YMDWildcard))
+            else
             {
-
-                var currentTime = HymsonClock.Now();
-                var timeWildcards = await _inteTimeWildcardRepository.GetAllAsync(bo.SiteId);
-
-                var yearWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Year + "" && x.Type == TimeWildcardTypeEnum.Year);
+                if (!bo.InteWorkCenterId.HasValue)
+                {
+                    return string.Empty;
+                }
+                var inteWorkCenterEntity = await _inteWorkCenterRepository.GetByIdAsync(bo.InteWorkCenterId.Value);
+                if (inteWorkCenterEntity == null)
+                    return string.Empty;
+                return inteWorkCenterEntity.LineCoding ?? string.Empty;
+            }
+        }
+        /// <summary>
+        /// 获取产品型号
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        private async Task<string> GenerateBatterySpecificationsAsync(BarCodeSerialNumberBo bo)
+        {
+            if (bo.CodeType != CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                return string.Empty;
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(bo.ProductId);
+            if (procMaterialEntity == null)
+                return string.Empty;
+            return procMaterialEntity.ProductModel ?? string.Empty;
+        }
+        /// <summary>
+        /// 生成单个的年 ，月，日 映射字符 为组合提供自由度
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="timeWildcardTypeEnum"></param>
+        /// <returns></returns>
+        private async Task<string> GenerateSingleDateAsync(BarCodeSerialNumberBo bo, TimeWildcardTypeEnum timeWildcardTypeEnum)
+        {
+            var result = string.Empty;
+            #region 查询年月日的通配
+            var currentTime = HymsonClock.Now();
+            var timeWildcards = await _inteTimeWildcardRepository.GetAllAsync(bo.SiteId);
+            if (timeWildcardTypeEnum == TimeWildcardTypeEnum.Year)
+            {
+                var yearWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Year + "" && x.Type == timeWildcardTypeEnum);
                 if (yearWildcard == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Year + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Year)}"));
                 }
                 else
-                    ymdWildcard += yearWildcard.Value;
-
-                var monthWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Month + "" && x.Type == TimeWildcardTypeEnum.Month);
+                    result += yearWildcard.Value;
+                return result;
+            }
+            if (timeWildcardTypeEnum == TimeWildcardTypeEnum.Month)
+            {
+                var monthWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Month + "" && x.Type == timeWildcardTypeEnum);
                 if (monthWildcard == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Month + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Month)}"));
                 }
                 else
-                    ymdWildcard += monthWildcard.Value;
-
-                var dayWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Day + "" && x.Type == TimeWildcardTypeEnum.Day);
+                    result += monthWildcard.Value;
+                return result;
+            }
+            if (timeWildcardTypeEnum == TimeWildcardTypeEnum.Day)
+            {
+                var dayWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Day + "" && x.Type == timeWildcardTypeEnum);
                 if (dayWildcard == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Day + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Day)}"));
                 }
                 else
-                    ymdWildcard += dayWildcard.Value;
-            }
-            #endregion
-
-
-            #region 组合数据生成条码
-            foreach (var serialStr in serialStrings)
-            {
-                var rules = new List<List<string>>();
-                foreach (var item in bo.CodeRulesMakeBos)
-                {
-                    if (item.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
-                    {
-                        rules.Add(new List<string> { item.SegmentedValue! });
-                        continue;
-                    }
-
-                    switch (item.SegmentedValue)
-                    {
-                        case GenerateBarcodeWildcard.Activity:
-                            rules.Add(new List<string> { serialStr });
-                            break;
-                        case GenerateBarcodeWildcard.Yymmdd:
-                            rules.Add(new List<string> { HymsonClock.Now().ToString("yyMMdd") });
-                            break;
-                        case GenerateBarcodeWildcard.MultipleVariable:
-                            //模式是多个时，生成多个条码
-                            if (bo.CodeMode == CodeRuleCodeModeEnum.More)
-                            {
-                                if (string.IsNullOrEmpty(item.CustomValue))
-                                {
-                                    throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue);
-                                }
-                                var customValueArray = item.CustomValue.Split(';');
-                                rules.Add(customValueArray.ToList());
-                            }
-                            break;
-                        case GenerateBarcodeWildcard.YMDWildcard:
-                            rules.Add(new List<string> { ymdWildcard });
-                            break;
-                        case GenerateBarcodeWildcard.LINETYPE:
-                            if (barCodeExtendBo == null)
-                            {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES16211));
-                            }
-                            if (string.IsNullOrEmpty(item.CustomValue))
-                            {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES16205));
-                            }
-                            else
-                            {
-                                var customValues = item.CustomValue.Split(";").ToList<string>();
-                                var barCodeExtendValue = customValues.FirstOrDefault(x => x.Contains(barCodeExtendBo?.LineCode ?? ""));
-                                if (string.IsNullOrEmpty(barCodeExtendValue))
-                                {
-                                    throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue);
-                                }
-                                else
-                                {
-                                    var barCodeExtendValueArray = barCodeExtendValue.Split(":");
-                                    if (barCodeExtendValueArray.Length != 2)
-                                    {
-                                        throw new CustomerValidationException(nameof(ErrorCode.MES16210)).WithData("Value", barCodeExtendValue);
-                                    }
-                                    else
-                                    {
-                                        rules.Add(new List<string> { barCodeExtendValueArray[1] });
-                                    }
-                                }
-                            }
-                            break;
-                        default:
-                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);
-                    }
-                }
-
-                var combinations = GenerateCombination1s(rules);
-                var barCodes = new List<string>();
-                foreach (var combination in combinations)
-                {
-                    barCodes.Add(string.Join("", combination));
-                }
-                list.Add(new BarCodeInfo
-                {
-                    SerialNumber = serialStr,
-                    BarCodes = barCodes
-                });
+                    result += dayWildcard.Value;
+                return result;
             }
 
-            #endregion
 
-            return list;
+            #endregion
+            return result;
         }
 
-        #region 内部方法
         /// <summary>
         /// 获取流水号
         /// </summary>

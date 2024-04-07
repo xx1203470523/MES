@@ -124,7 +124,7 @@ namespace Hymson.MES.Services.Services.Plan
                     LadeBarCodes = planSfcInfoCreateDto.SFCs,
                 });
             }
-            var whMaterialInventoryList = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+            var whMaterialInventoryList = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(new WhMaterialInventoryBarCodesQuery
             {
                 BarCodes = planSfcInfoCreateDto.SFCs,
                 SiteId = _currentSite.SiteId ?? 0
