@@ -845,7 +845,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("msp.SiteId = @SiteId");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            sqlBuilder.Select(@"msp.Id,msp.SFC,msp.WorkOrderId,msp.ProcedureId,msp.ResourceId,msp.Status,msp.ProductId,msp.ProcessRouteId,msp.ProductBOMId,vfs.VehicleId");
+            sqlBuilder.Select(@"msp.Id,msp.SFC,msp.WorkOrderId,msp.ProcedureId,msp.ResourceId,msp.Status,msp.ProductId,msp.ProcessRouteId,msp.ProductBOMId,vfs.VehicleId,msp.Qty");
 
             sqlBuilder.LeftJoin("inte_vehicle_freight_stack vfs on msp.SFC =vfs.BarCode");
 

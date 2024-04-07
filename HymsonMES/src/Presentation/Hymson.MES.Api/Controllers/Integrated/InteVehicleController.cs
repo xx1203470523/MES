@@ -165,8 +165,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("unbindVehicle")]
         public async Task UnbindVehicleAsync(InteVehicleUnbindOperationDto dto)
         {
-
-
             // await _inteVehicleService.VehicleOperationAsync(dto);
             await _inteVehicleService.VehicleUnBindOperationAsync(dto);
         }

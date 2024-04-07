@@ -1,4 +1,6 @@
-﻿using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperate;
+﻿using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperate;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -63,6 +65,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         Task OutBoundCarrierAsync(OutBoundCarrierDto request);
 
-
+        /// <summary>
+        /// 分页查询列表（PDA条码出站）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcInstationPagedQueryOutputDto>> GetPagedListAsync(ManuSfcInstationPagedQueryDto pagedQueryDto);
     }
 }
