@@ -1,5 +1,6 @@
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -54,6 +55,68 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<int> SubmitMisjudgmentAsync(ManuMisjudgmentDto requestDto)
         {
             return await _manuProductExceptionHandlingService.SubmitMisjudgmentAsync(requestDto);
+        }
+        #endregion
+
+
+        #region 返工
+        /// <summary>
+        /// 根据条码查询信息（返工）
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        [HttpGet("rework/{barCode}")]
+        public async Task<IEnumerable<ManuReworkBarCodeDto>> GetReworkByBarCodeAsync(string barCode)
+        {
+            return await _manuProductExceptionHandlingService.GetReworkByBarCodeAsync(barCode);
+        }
+
+        /// <summary>
+        /// 根据托盘码条码查询信息（返工）
+        /// </summary>
+        /// <param name="palletCode"></param>
+        /// <returns></returns>
+        [HttpGet("rework/palletCode/{palletCode}")]
+        public async Task<IEnumerable<ManuReworkBarCodeDto>> GetReworkByPalletCodeAsync(string palletCode)
+        {
+            return await _manuProductExceptionHandlingService.GetReworkByPalletCodeAsync(palletCode);
+        }
+
+        /// <summary>
+        /// 提交（返工）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("rework/submit")]
+        public async Task<int> SubmitReworkAsync(ManuReworkDto requestDto)
+        {
+            return await _manuProductExceptionHandlingService.SubmitReworkAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("rework/download")]
+        //[PermissionDescription("manufacture:manuProductExceptionHandling:download")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new();
+            var worksheetName = await _manuProductExceptionHandlingService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{worksheetName}导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost("rework/import")]
+        //[PermissionDescription("manufacture:manuProductExceptionHandling:import")]
+        public async Task ImportAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _manuProductExceptionHandlingService.ImportAsync(formFile);
         }
         #endregion
 

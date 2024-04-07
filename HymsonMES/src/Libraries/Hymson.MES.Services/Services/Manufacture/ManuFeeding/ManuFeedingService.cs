@@ -440,7 +440,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15508))
                     .WithData("BarCode", saveDto.BarCode)
-                    .WithData("DueDate", inventory.DueDate.Value.ToShortDateString());
+                    .WithData("DueDate", inventory.DueDate.Value);
             }
 
             // 当是上料点类型时，一定要选择具体挂载的上料点

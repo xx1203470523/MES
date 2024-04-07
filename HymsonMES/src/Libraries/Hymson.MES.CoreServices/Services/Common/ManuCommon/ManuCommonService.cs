@@ -307,7 +307,7 @@ namespace Hymson.MES.CoreServices.Services.Common
             if (!vehicleFreightStackEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18626))
-                    .WithData("Code", string.Join(',', disabledVehicles.Select(s => s.Code)));
+                    .WithData("Code", string.Join(',', requestBo.VehicleCodes));
             }
 
             // 查询载具里面所有的条码
