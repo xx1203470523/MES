@@ -1223,9 +1223,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            //TODO
-            //1. 如果是原材料，需要校验格式是否是5锻码
-            //2. 物料型号和数量从条码截取
+            await _qknyService.MaterialInventoryAsync(dto);
         }
 
         /// <summary>
