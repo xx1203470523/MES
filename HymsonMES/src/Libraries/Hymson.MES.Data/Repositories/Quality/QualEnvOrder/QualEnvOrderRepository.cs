@@ -84,6 +84,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
+            sqlBuilder.OrderBy(" CreatedOn DESC");
 
             if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQuery.InspectionOrder))
             {
@@ -180,7 +181,7 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
     public partial class QualEnvOrderRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_env_order` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_env_order` /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `qual_env_order` /**where**/ ";
         const string GetQualEnvOrderEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
