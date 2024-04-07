@@ -595,7 +595,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Status = ProductBadRecordStatusEnum.Open,
                 SFCs = requestDto.BarCodes
             });
-            if (dataBo.BadRecordEntities == null || !dataBo.BadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15451)).WithData("barCode", string.Join(',', requestDto.BarCodes));
 
             // 根据返工类型处理
             ReworkResponseBo? responseBo = null;
