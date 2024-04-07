@@ -87,12 +87,12 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 查询详情（成品条码产出记录(FQC生成使用)）
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        [HttpGet("{sfc}")]
-        public async Task<QualFinallyOutputRecordDto?> QueryBySFCAsync(string sfc)
+        [HttpGet("finallyRecord")]
+        public async Task<PagedInfo<QualFinallyOutputRecordView>?> QueryBySFCAsync([FromQuery] FQCInspectionSFCQueryDto query)
         {
-            return await _qualFinallyOutputRecordService.QueryBySFCAsync(sfc);
+            return await _qualFinallyOutputRecordService.QueryBySFCAsync(query);
         }
 
         /// <summary>

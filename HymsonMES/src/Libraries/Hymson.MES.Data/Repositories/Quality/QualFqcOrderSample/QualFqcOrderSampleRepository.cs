@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Quality.QualFqcOrderSample.View;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Microsoft.Extensions.Options;
 
@@ -116,8 +117,31 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.FQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("FQCOrderId = @FQCOrderId");
+            }
+            if (!string.IsNullOrWhiteSpace(query.Barcode))
+            {
+                sqlBuilder.Where("Barcode = @Barcode");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcOrderSampleEntity>(template.RawSql, query);
+        }
+
+        /// <summary>
+        /// 样品表查询检测单
+        /// </summary>
+        /// <param name="barcode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SampleFqcOrderView>> GetEntitiesByDetailBacodeAsync(IEnumerable<string> Barcodes)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<SampleFqcOrderView>(GetFqcOrder, new { Barcodes = Barcodes });
         }
 
         /// <summary>
@@ -171,6 +195,10 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string GetByIdSql = @"SELECT * FROM qual_fqc_order_sample WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_fqc_order_sample WHERE Id IN @Ids ";
+
+        const string GetFqcOrder = @"select qfo.*,sa.Barcode from qual_fqc_order_sample sa
+                                            right join qual_fqc_order qfo on sa.FQCOrderId =qfo.Id 
+                                            where Barcode in @Barcodes ";
 
     }
 }

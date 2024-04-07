@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -107,12 +107,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFinallyOutputRecordEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualFinallyOutputRecordEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFinallyOutputRecordEntity>(GetByIdsSql, new { Ids = ids });
         }
-        
+
         /// <summary>
         /// 查询单个实体
         /// </summary>
@@ -179,6 +179,30 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.OrderBy(string.IsNullOrWhiteSpace(pagedQuery.Sorting) ? "T.CreatedOn DESC" : pagedQuery.Sorting);
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Barcode))
+            {
+                sqlBuilder.Where("T.Barcode = @Barcode");
+            }
+
+            if (pagedQuery.MaterialId != 0)
+            {
+                sqlBuilder.Where("T.MaterialId = @MaterialId");
+            }
+
+            if (pagedQuery.WorkOrderId != 0)
+            {
+                sqlBuilder.Where("T.WorkOrderId = @WorkOrderId");
+            }
+
+            if (pagedQuery.WorkCenterId != 0)
+            {
+                sqlBuilder.Where("T.WorkCenterId = @WorkCenterId");
+            }
+            if (pagedQuery.IsGenerated.HasValue)
+            {
+                sqlBuilder.Where("T.IsGenerated = @IsGenerated");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
