@@ -54,6 +54,16 @@ namespace Hymson.MES.Core.Enums
         /// 离脱
         /// </summary>
         [Description("离脱")]
-        Detachment = 9
+        Detachment = 9,
+        // <summary>
+        /// 物料报废
+        /// </summary>
+        [Description("物料报废")]
+        MaterialScrapping = 10,
+        /// <summary>
+        /// 取消报废
+        /// </summary>
+        [Description("取消报废")]
+        CancelScrapping = 11
     }
 }
