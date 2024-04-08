@@ -45,7 +45,7 @@ namespace Hymson.MES.CoreServices.Bos.Quality
     {
         public List<QualFinallyOutputRecordEntity> QualFinallyOutputRecords { get; set; }
         public List<QualFinallyOutputRecordDetailEntity>  QualFinallyOutputRecordDetailEntities { get; set; }
-        public bool isNeedFQC { get; set; }
+        public List<FQCOrderAutoCreateIntegrationEvent> FQCOrderAutoCreateIntegrationEvents { get; set; }
     }
 
     public class RecordDetailInfo
