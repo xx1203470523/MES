@@ -165,6 +165,8 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             //检验项目明细快照
             var parameterGroupDetailSnapshootList = new List<QualFqcParameterGroupDetailSnapshootEntity>();
             var parameters = await _procParameterRepository.GetByIdsAsync(parameterGroupDetails.Select(x => x.ParameterId).Distinct());
+            if(!parameters.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES11709)).WithData("Id", parameterGroupDetails.Select(x => x.ParameterId).Distinct());
+           
             foreach (var parameterGroupDetail in parameterGroupDetails)
             {
                 var parameterEntity = parameters.First(x => x.Id == parameterGroupDetail.ParameterId);

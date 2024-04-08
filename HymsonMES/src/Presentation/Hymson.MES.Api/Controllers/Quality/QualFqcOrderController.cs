@@ -131,7 +131,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("attachment/save")]
-        public async Task SaveAttachmentAsync([FromBody] QualIqcOrderSaveAttachmentDto requestDto)
+        public async Task SaveAttachmentAsync([FromBody] QualFqcOrderSaveAttachmentDto requestDto)
         {
             await _qualFqcOrderService.SaveAttachmentAsync(requestDto);
         }
