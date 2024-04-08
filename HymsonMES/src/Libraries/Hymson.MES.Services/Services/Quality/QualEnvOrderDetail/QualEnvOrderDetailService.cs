@@ -181,12 +181,13 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
                 {
                     Id = item.Id,
                     RealTime = item.RealTime == null ? null : HymsonClock.Now().ToString($"yyyy-MM-dd {item.RealTime}:ss").ParseToDateTime(),
-                    InspectionValue = item.InspectionValue,
+                    InspectionValue = item.InspectionValue.Trim() == "null" ? "" : item.InspectionValue.Trim(),
                     IsQualified = item.IsQualified,
                     Remark = item.Remark,
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 };
+
                 datas.Add(data);
             }
 
