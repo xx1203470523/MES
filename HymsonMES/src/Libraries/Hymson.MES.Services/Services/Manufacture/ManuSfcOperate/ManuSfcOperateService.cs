@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Authentication;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
@@ -11,6 +13,13 @@ using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperate;
 using Hymson.Web.Framework.WorkContext;
+using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Services.Dtos.Plan;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
+using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -19,10 +28,8 @@ namespace Hymson.MES.Services.Services.Manufacture
     /// </summary>
     public class ManuSfcOperateService : IManuSfcOperateService
     {
-        /// <summary>
-        /// 当前设备对象
-        /// </summary>
-        private readonly ICurrentEquipment _currentEquipment;
+        private readonly ICurrentUser _currentUser;
+        private readonly ICurrentSite _currentSite;
 
         /// <summary>
         /// 验证器
@@ -46,11 +53,15 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 业务接口（创建条码服务）
         /// </summary>
         private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentEquipment"></param>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
         /// <param name="validationInBoundDtoRules"></param>
         /// <param name="validationInBoundMoreDtoRules"></param>
         /// <param name="validationOutBoundDtoRules"></param>
@@ -58,16 +69,23 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuCommonService"></param>
         /// <param name="manuPassStationService"></param>
         /// <param name="manuCreateBarcodeService"></param>
-        public ManuSfcOperateService(ICurrentEquipment currentEquipment,
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        public ManuSfcOperateService(
             AbstractValidator<InBoundDto> validationInBoundDtoRules,
             AbstractValidator<InBoundMoreDto> validationInBoundMoreDtoRules,
             AbstractValidator<OutBoundDto> validationOutBoundDtoRules,
             AbstractValidator<OutBoundMoreDto> validationOutBoundMoreDtoRules,
             IManuCommonService manuCommonService,
             IManuPassStationService manuPassStationService,
-            IManuCreateBarcodeService manuCreateBarcodeService)
+            IManuCreateBarcodeService manuCreateBarcodeService,
+            ICurrentUser currentUser,
+            ICurrentSite currentSite,
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository)
         {
-            _currentEquipment = currentEquipment;
             _validationInBoundDtoRules = validationInBoundDtoRules;
             _validationInBoundMoreDtoRules = validationInBoundMoreDtoRules;
             _validationOutBoundDtoRules = validationOutBoundDtoRules;
@@ -75,6 +93,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuCommonService = manuCommonService;
             _manuPassStationService = manuPassStationService;
             _manuCreateBarcodeService = manuCreateBarcodeService;
+            _currentUser = currentUser;
+            _currentSite = currentSite;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
@@ -86,8 +109,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var manuSFCEntities = await _manuCreateBarcodeService.CreateBarcodeBySemiProductIdAsync(new CreateBarcodeByResourceCode
             {
-                SiteId = _currentEquipment.SiteId,
-                UserName = _currentEquipment.Name,
+                SiteId = _currentSite.SiteId??0,
+                UserName = _currentUser.UserName,
                 ResourceCode = baseDto.ResourceCode
             });
 
@@ -104,8 +127,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var manuSFCEntities = await _manuCreateBarcodeService.CreateCellBarCodeAsync(new CreateBarcodeByResourceCode
             {
-                SiteId = _currentEquipment.SiteId,
-                UserName = _currentEquipment.Name,
+                SiteId =  _currentSite.SiteId??0,
+                UserName = _currentUser.UserName,
                 ResourceCode = baseDto.ResourceCode
             });
 
@@ -125,16 +148,16 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
-                SiteId = _currentEquipment.SiteId,
+                SiteId =  _currentSite.SiteId??0,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = _currentEquipment.Code
+                EquipmentCode = request.EquipmentCode
             });
             if (manuBo == null) return;
 
             _ = await _manuPassStationService.InStationRangeBySFCAsync(new SFCInStationBo
             {
-                SiteId = _currentEquipment.SiteId,
-                UserName = _currentEquipment.Name,
+                SiteId =  _currentSite.SiteId??0,
+                UserName = _currentUser.UserName,
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
@@ -155,16 +178,16 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
-                SiteId = _currentEquipment.SiteId,
+                SiteId =  _currentSite.SiteId??0,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = _currentEquipment.Code
+                EquipmentCode = request.EquipmentCode
             });
             if (manuBo == null) return;
 
             _ = await _manuPassStationService.InStationRangeBySFCAsync(new SFCInStationBo
             {
-                SiteId = _currentEquipment.SiteId,
-                UserName = _currentEquipment.Name,
+                SiteId =  _currentSite.SiteId??0,
+                UserName = _currentUser.UserName,
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
@@ -184,9 +207,9 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
-                SiteId = _currentEquipment.SiteId,
+                SiteId =  _currentSite.SiteId??0,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = _currentEquipment.Code
+                EquipmentCode = request.EquipmentCode
             });
             if (manuBo == null) return;
 
@@ -210,8 +233,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
             {
-                SiteId = _currentEquipment.SiteId,
-                UserName = _currentEquipment.Name,
+                SiteId =  _currentSite.SiteId??0,
+                UserName = _currentUser.UserName,
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
@@ -232,9 +255,9 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
-                SiteId = _currentEquipment.SiteId,
+                SiteId =  _currentSite.SiteId??0,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = _currentEquipment.Code
+                EquipmentCode = request.EquipmentCode
             });
             if (manuBo == null) return;
 
@@ -264,8 +287,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
             {
-                SiteId = _currentEquipment.SiteId,
-                UserName = _currentEquipment.Name,
+                SiteId =  _currentSite.SiteId??0,
+                UserName = _currentUser.UserName,
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
@@ -285,16 +308,16 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
-                SiteId = _currentEquipment.SiteId,
+                SiteId =  _currentSite.SiteId??0,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = _currentEquipment.Code
+                EquipmentCode = request.EquipmentCode
             });
             if (manuBo == null) return;
 
             _ = await _manuPassStationService.InStationRangeByVehicleAsync(new VehicleInStationBo
             {
-                SiteId = _currentEquipment.SiteId,
-                UserName = _currentEquipment.Name,
+                SiteId =  _currentSite.SiteId??0,
+                UserName = _currentUser.UserName,
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
@@ -314,9 +337,9 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
-                SiteId = _currentEquipment.SiteId,
+                SiteId =  _currentSite.SiteId??0,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = _currentEquipment.Code
+                EquipmentCode = request.EquipmentCode
             });
             if (manuBo == null) return;
 
@@ -340,8 +363,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             _ = await _manuPassStationService.OutStationRangeByVehicleAsync(new VehicleOutStationBo
             {
-                SiteId = _currentEquipment.SiteId,
-                UserName = _currentEquipment.Name,
+                SiteId =  _currentSite.SiteId??0,
+                UserName = _currentUser.UserName,
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
@@ -349,5 +372,50 @@ namespace Hymson.MES.Services.Services.Manufacture
             }, RequestSourceEnum.EquipmentApi);
         }
 
+
+        /// <summary>
+        /// 分页查询列表（PDA条码出站）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcInstationPagedQueryOutputDto>> GetPagedListAsync(ManuSfcInstationPagedQueryDto pagedQueryDto)
+        {
+            var defaultResult = new PagedInfo<ManuSfcInstationPagedQueryOutputDto>(Enumerable.Empty<ManuSfcInstationPagedQueryOutputDto>(), 0, 0, 0);
+
+            var queryData = pagedQueryDto.ToQuery<ManuSfcProduceVehiclePagedQuery>();
+            queryData.SiteId= _currentSite.SiteId??0;
+            queryData.Status = SfcStatusEnum.lineUp;
+            var pageInfo = await _manuSfcProduceRepository.GetManuSfcPageListAsync(queryData);
+            if (pageInfo.Data == null || !pageInfo.Data.Any()) { 
+                return defaultResult;
+            }
+
+            //获取物料信息
+            var materialIds = pageInfo.Data.Select(a => a.ProductId).Distinct();
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
+
+            //获取工单信息
+            var workOrderIds = pageInfo.Data.Select(a => a.WorkOrderId).Distinct();
+            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+
+            var result = new List<ManuSfcInstationPagedQueryOutputDto>();
+
+            foreach (var item in pageInfo.Data) {
+                var model = new ManuSfcInstationPagedQueryOutputDto();
+                model.SFC = item.Sfc;
+                model.Status = item.Status;
+                model.Qty = item.Qty;
+
+                var materialEntity = materialEntities.FirstOrDefault(a => a.Id == item.ProcedureId);
+                model.MaterialCode = materialEntity?.MaterialCode??"";
+
+                var planWorkOrderEntity= planWorkOrderEntities.FirstOrDefault(a=>a.Id== item.WorkOrderId);
+                model.OrderCode = planWorkOrderEntity?.OrderCode ?? "";
+
+                result.Add(model);
+            }
+
+            return new PagedInfo<ManuSfcInstationPagedQueryOutputDto>(result, pageInfo.PageIndex, pageInfo.PageSize, pageInfo.TotalCount);
+        }
     }
 }

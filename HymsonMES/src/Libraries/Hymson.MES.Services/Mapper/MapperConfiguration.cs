@@ -71,6 +71,7 @@ using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Inte;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Qual;
@@ -1038,7 +1039,13 @@ namespace Hymson.MES.Services.Mapper
             #region FQC检测单
             CreateMap<QualFqcOrderPagedQueryDto, QualFqcOrderPagedQuery>();
             CreateMap<QualFqcOrderEntity, QualFqcOrderDto>();
-             
+
+            CreateMap<QualFinallyOutputRecordEntity, QualFinallyOutputRecordView>();
+            CreateMap<QualFqcParameterGroupDetailSnapshootEntity, FQCParameterDetailDto>();
+            CreateMap<QualFqcOrderSampleSaveDto, QualFqcOrderSampleQuery>();
+            CreateMap<FQCParameterDetailPagedQueryDto, QualFqcOrderSampleDetailPagedQuery>();
+
+
 
             #endregion
 
@@ -1149,6 +1156,12 @@ namespace Hymson.MES.Services.Mapper
             #region ManuSfc
             CreateMap<ManuSfcAboutInfoPagedQueryDto, ManuSfcAboutInfoPagedQuery>();
             CreateMap<ManuSfcAboutInfoView, ManuSfcAboutInfoViewDto>();
+            #endregion
+
+            #region ManuSfcOperate
+
+            CreateMap<ManuSfcInstationPagedQueryDto, ManuSfcProduceVehiclePagedQuery>();
+
             #endregion
         }
 

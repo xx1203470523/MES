@@ -51,7 +51,7 @@
 		<PackageReference Include="Hymson.EventBus.RabbitMQ" Version="2.1.147" />
 
 		<PackageReference Include="Hymson.ClearCache" Version="2.1.147" />
-		
+    <PackageReference Include="Hymson.Print" Version="2.1.147" />
 		<PackageReference Include="Hymson.NLog.Console" Version="2.1.147" />
 		<PackageReference Include="Hymson.Print.Background" Version="2.1.147" />
 		

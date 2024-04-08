@@ -4,26 +4,50 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Dtos.Process.LabelTemplate.Utility
+namespace Hymson.MES.BackgroundServices.Dtos.Manufacture.LabelTemplate
 {
     /// <summary>
-    /// 获取数据源
+    /// 
     /// </summary>
     public class LabelTemplateSourceDto
     {
-        /// <summary>
-        /// 数据源名
-        /// </summary>
-        public string DataSourceName { get; set; }
-
         /// <summary>
         /// 工厂
         /// </summary>
         public long SiteId { get; set; }
 
         /// <summary>
+        /// 工序
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
         /// 条码
         /// </summary>
-        public  IEnumerable<string>  BarCodes { get; set; }
+        public IEnumerable<LabelTemplateBarCodeDto> BarCodes { get; set; }
+
+        /// <summary>
+        /// 用户
+        /// </summary>
+        public string UserName { get; set; }
+    }
+
+    public class LabelTemplateBarCodeDto
+    {
+
+        /// <summary>
+        /// 物料
+        /// </summary>
+        public long MateriaId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string BarCode { get; set; }
     }
 }

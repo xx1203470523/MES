@@ -105,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcOrderSampleDetailEntity>(GetByIdsSql, new { Ids = ids });
-        }
+        }        
 
         /// <summary>
         /// 查询List
@@ -116,6 +116,15 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.FQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("FQCOrderId = @FQCOrderId");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcOrderSampleDetailEntity>(template.RawSql, query);
         }
@@ -134,6 +143,14 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+
+            if (pagedQuery.FQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("FQCOrderId = @FQCOrderId");
+            }
+            //
+            if (pagedQuery.FQCOrderSampleIds != null) sqlBuilder.Where(" FQCOrderSampleId IN @FQCOrderSampleIds ");
+            if (pagedQuery.FQCParameterGroupDetailSnapshootIds != null) sqlBuilder.Where(" GroupDetailSnapshootId IN @FQCParameterGroupDetailSnapshootIds ");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -171,6 +188,5 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string GetByIdSql = @"SELECT * FROM qual_fqc_order_sample_detail WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_fqc_order_sample_detail WHERE Id IN @Ids ";
-
     }
 }

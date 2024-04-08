@@ -15,6 +15,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public long SiteId { get; set; }
 
         /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
         /// 检验单号
         /// </summary>
         public string? InspectionOrder { get; set; }

@@ -31,6 +31,8 @@
         /// SFC
         /// </summary>
         public IEnumerable<InBoundItemDto> SFCs { get; set; }
+
+        
     }
 
     /// <summary>
