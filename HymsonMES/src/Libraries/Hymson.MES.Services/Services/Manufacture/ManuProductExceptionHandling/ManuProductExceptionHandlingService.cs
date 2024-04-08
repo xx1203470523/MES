@@ -1518,8 +1518,13 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (productBOMEntities != null && productBOMEntities.Any())
             {
                 // 如果选择的是新工单返工/新工单返工（成品电芯），校验条码对应的产品与工单产品是否一致，产品是否包含在新工单BOM中，若二者条件都不满足
+                var ids = noSameProductSFCInfoEntities.Select(w => w.ProductId).Where(w => !productBOMEntities.Select(s => s.MaterialId).Contains(w));
+                if (ids != null && ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15455));
+
+                /*
                 var ids = noSameProductSFCInfoEntities.Select(w => w.ProductId).Intersect(productBOMEntities.Select(s => s.MaterialId));
                 if (ids == null || !ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15455));
+                */
             }
         }
 
