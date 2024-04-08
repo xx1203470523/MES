@@ -406,8 +406,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 model.Status = item.Status;
                 model.Qty = item.Qty;
 
-                var materialEntity = materialEntities.FirstOrDefault(a => a.Id == item.ProcedureId);
+                var materialEntity = materialEntities.FirstOrDefault(a => a.Id == item.ProductId);
                 model.MaterialCode = materialEntity?.MaterialCode??"";
+                model.MaterialName = materialEntity?.MaterialName ?? "";
 
                 var planWorkOrderEntity= planWorkOrderEntities.FirstOrDefault(a=>a.Id== item.WorkOrderId);
                 model.OrderCode = planWorkOrderEntity?.OrderCode ?? "";
