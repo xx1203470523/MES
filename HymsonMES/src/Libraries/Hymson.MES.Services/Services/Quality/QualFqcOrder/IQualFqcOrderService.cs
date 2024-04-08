@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> SaveAttachmentAsync(QualIqcOrderSaveAttachmentDto requestDto);
+        Task<int> SaveAttachmentAsync(QualFqcOrderSaveAttachmentDto requestDto);
 
         /// <summary>
         /// 删除检验单附件

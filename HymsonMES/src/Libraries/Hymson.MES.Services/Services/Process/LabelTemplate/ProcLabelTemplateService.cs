@@ -6,7 +6,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Requests.Print;
@@ -19,7 +18,6 @@ using Hymson.Utils.Tools;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Reflection;
-using System.Xml.Linq;
 
 namespace Hymson.MES.Services.Services.Process.LabelTemplate
 {

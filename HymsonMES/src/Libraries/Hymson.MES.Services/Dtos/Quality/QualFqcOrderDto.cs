@@ -629,4 +629,21 @@ namespace Hymson.MES.Services.Dtos.Quality
 
     }
 
+    /// <summary>
+    /// 附件保存dto
+    /// </summary>
+    public record QualFqcOrderSaveAttachmentDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long FQCOrderId { get; set; }
+
+        /// <summary>
+        /// 检验单（附件）
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+
+    }
+
 }

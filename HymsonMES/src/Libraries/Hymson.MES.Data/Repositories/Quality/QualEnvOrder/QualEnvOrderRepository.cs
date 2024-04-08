@@ -88,7 +88,8 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
 
             if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQuery.InspectionOrder))
             {
-                sqlBuilder.Where("InspectionOrder=@InspectionOrder");
+                qualEnvOrderPagedQuery.InspectionOrder = $"%{qualEnvOrderPagedQuery.InspectionOrder}%";
+                sqlBuilder.Where("InspectionOrder LIKE @InspectionOrder");
             }
             if (qualEnvOrderPagedQuery.WorkCenterId.HasValue)
             {
