@@ -29,11 +29,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-
         [HttpGet]
         [Route("BarcodeScanning")]
-
-        public async Task<PartialScrapBarCodeDto> BarcodeScanningAsync(PartialScrapScanningDto param)
+        public async Task<PartialScrapBarCodeDto> BarcodeScanningAsync([FromQuery] PartialScrapScanningDto param)
         {
             return await _manuSFCPartialScrapService.BarcodeScanningAsync(param);
         }
