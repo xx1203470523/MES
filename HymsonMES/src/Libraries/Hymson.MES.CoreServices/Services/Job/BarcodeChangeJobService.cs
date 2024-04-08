@@ -100,8 +100,8 @@ namespace Hymson.MES.CoreServices.Services.Job
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             if (param is not JobRequestBo commonBo) return default;
-            var bcb = commonBo.BarcodeChangeBos;
-            if (bcb == null||!bcb.Items.Any())
+            var barcodeChangeBo = commonBo.BarcodeChangeBos;
+            if (barcodeChangeBo == null||!barcodeChangeBo.Items.Any())
             {
                 return default;
             }
@@ -121,68 +121,68 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseBo.PhysicalDeleteSFCProduceByIdsCommands = PhysicalDeleteSFCProduceByIdsCommands;
             responseBo.MultiSFCUpdateStatusCommands = MultiSFCUpdateStatusCommands;
             responseBo.manuSfcCirculationEntitys = manuSfcCirculationEntitys;
-            foreach (var bo in bcb.Items)
+            foreach (var bo in barcodeChangeBo.Items)
             {
                 BomMaterial? material = null;
                 decimal qty = 0;
 
-                var mr = await _procMaterialRepository.GetByIdAsync(bcb.WO.ProductId);
-                qty = mr.Batch;
+                var materialEntity = await _procMaterialRepository.GetByIdAsync(barcodeChangeBo.WO.ProductId);
+                qty = materialEntity.Batch;
                 var now = HymsonClock.Now();
                 //如果在制已经生成 跳过该条码的数据组装
-                var sprtarget =  await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
+                var sfcProduceEntity =  await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
                 {
                     Sfc = bo.TargetSFC,
                     SiteId = commonBo.SiteId
                 });
-                if (sprtarget != null)
+                if (sfcProduceEntity != null)
                     continue;
                  
                 //生成在制记录
                 
                 (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo, ManuSfcProduceEntity sfcproduce, ManuSfcStepEntity? sfcstep) cellsfc = new();
-                cellsfc = CreateSFCProduceInfoFromCellSFC(bcb.WO, bo.TargetSFC, commonBo.ProcedureId, commonBo, qty,bo.Status);
+                cellsfc = CreateSFCProduceInfoFromCellSFC(barcodeChangeBo.WO, bo.TargetSFC, commonBo.ProcedureId, commonBo, qty,bo.Status);
                 manusfcs.Add(cellsfc.manusfc);
                 sfcinfos.Add(cellsfc.sfcinfo);
                 sfcproduces.Add(cellsfc.sfcproduce);
                 
                 if (!string.IsNullOrEmpty(bo.SourceSFC))
                 {
-                    var spr = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
+                    var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
                     {
                         Sfc = bo.SourceSFC,
                         SiteId = commonBo.SiteId
                     }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16600));
                     //继承旧在制条码的复投次数
-                    cellsfc.sfcproduce.RepeatedCount = spr.RepeatedCount;
+                    cellsfc.sfcproduce.RepeatedCount = manuSfcProduceEntity.RepeatedCount;
                     //旧条码 状态变更为 转换
-                    var msse = new ManuSfcStepEntity
+                    var sfcStepEntity = new ManuSfcStepEntity
                     {
                         Operatetype = bo.SourceStepType,
                         Id = IdGenProvider.Instance.CreateId(),
                         SFC = bo.SourceSFC,
-                        ProductId = spr.ProductId,
-                        WorkOrderId = spr.WorkOrderId,
-                        WorkCenterId = spr.WorkCenterId,
-                        ProductBOMId = spr.ProductBOMId,
-                        ProcedureId = spr.ProcedureId,
-                        Qty = spr.Qty,
+                        ProductId = manuSfcProduceEntity.ProductId,
+                        WorkOrderId = manuSfcProduceEntity.WorkOrderId,
+                        WorkCenterId = manuSfcProduceEntity.WorkCenterId,
+                        ProductBOMId = manuSfcProduceEntity.ProductBOMId,
+                        ProcedureId = manuSfcProduceEntity.ProcedureId,
+                        Qty = manuSfcProduceEntity.Qty,
 
-                        EquipmentId = spr.EquipmentId,
-                        ResourceId = spr.ResourceId,
+                        EquipmentId = manuSfcProduceEntity.EquipmentId,
+                        ResourceId = manuSfcProduceEntity.ResourceId,
                         SiteId = commonBo.SiteId,
                         CreatedBy = commonBo.UserName,
                         CreatedOn = now,
                         UpdatedBy = commonBo.UserName,
                         UpdatedOn = now
                     };
-                    manuSfcStepEntities.Add(msse);
+                    manuSfcStepEntities.Add(sfcStepEntity);
                     // 删除 manu_sfc_produce
 
                     PhysicalDeleteSFCProduceByIdsCommands.Add( new PhysicalDeleteSFCProduceByIdsCommand
                     {
                         SiteId = commonBo.SiteId,
-                        Ids = new long[] { spr.Id }
+                        Ids = new long[] { manuSfcProduceEntity.Id }
                     });
 
                     // manu_sfc_info 修改为完成 且入库
@@ -201,11 +201,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                         ProcedureId = commonBo.ProcedureId,
                         ResourceId = commonBo.ResourceId,
                         SFC = bo.SourceSFC,
-                        WorkOrderId = bcb.WO.Id,
+                        WorkOrderId = barcodeChangeBo.WO.Id,
                         ProductId = 0,//克明说留空
                         CirculationBarCode = bo.TargetSFC,
-                        CirculationProductId = bcb.WO.ProductId,
-                        CirculationMainProductId = bcb.WO.ProductId,
+                        CirculationProductId = barcodeChangeBo.WO.ProductId,
+                        CirculationMainProductId = barcodeChangeBo.WO.ProductId,
                         CirculationQty = qty, //TODO: 新工单 产品的标包大小
                         CirculationType = bo.CirculationType,
                         CreatedBy = commonBo.UserName,
@@ -214,22 +214,22 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
                 else
                 {
-                    responseBo.WorkCode = bcb.WO.OrderCode;
-                    responseBo.WorkOrderId = bcb.WO.Id;
-                    responseBo.PlanQuantity = bcb.WO.Qty * (1 + bcb.WO.OverScale / 100);
+                    responseBo.WorkCode = barcodeChangeBo.WO.OrderCode;
+                    responseBo.WorkOrderId = barcodeChangeBo.WO.Id;
+                    responseBo.PlanQuantity = barcodeChangeBo.WO.Qty * (1 + barcodeChangeBo.WO.OverScale / 100);
                     responseBo.PassDownQuantity = responseBo.sfcproduces.Sum(x => x.Qty);
                     responseBo.UserName = commonBo.UserName;
                 }
                 //新条码 状态变更为开始
-                var msse1 = new ManuSfcStepEntity
+                var manuSfcStepEntity = new ManuSfcStepEntity
                 {
                     Operatetype = ManuSfcStepTypeEnum.Create,
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = bo.TargetSFC,
-                    ProductId = bcb.WO.ProductId,
-                    WorkOrderId = bcb.WO.Id,
-                    WorkCenterId = bcb.WO.WorkCenterId,
-                    ProductBOMId = bcb.WO.ProductBOMId,
+                    ProductId = barcodeChangeBo.WO.ProductId,
+                    WorkOrderId = barcodeChangeBo.WO.Id,
+                    WorkCenterId = barcodeChangeBo.WO.WorkCenterId,
+                    ProductBOMId = barcodeChangeBo.WO.ProductBOMId,
                     ProcedureId = commonBo.ProcedureId,
                     Qty = qty, //TODO:
 
@@ -241,7 +241,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     UpdatedBy = commonBo.UserName,
                     UpdatedOn = HymsonClock.Now()
                 };
-                manuSfcStepEntities.Add(msse1);
+                manuSfcStepEntities.Add(manuSfcStepEntity);
             }
             return responseBo;
 
@@ -270,7 +270,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             };
 
 
-            var msie = new ManuSfcInfoEntity
+            var manuSfcInfoEntity = new ManuSfcInfoEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = bo.SiteId,
@@ -282,7 +282,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 UpdatedBy = bo.UserName,
             };
 
-            var mspe = new ManuSfcProduceEntity
+            var manuSfcProduceEntity = new ManuSfcProduceEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = bo.SiteId,
@@ -304,7 +304,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 UpdatedBy = bo.UserName
             };
 
-            var msse = new ManuSfcStepEntity
+            var manuSfcStepEntity = new ManuSfcStepEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = bo.SiteId,
@@ -320,7 +320,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 CreatedBy = bo.UserName,
                 UpdatedBy = bo.UserName
             };
-            return (manuSfcEntity, msie, mspe, msse);
+            return (manuSfcEntity, manuSfcInfoEntity, manuSfcProduceEntity, manuSfcStepEntity);
         }
 
 
@@ -380,34 +380,34 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 return;
             }
-            var bcb = foo.BarcodeChangeBos;
-            if (bcb == null||!bcb.Items.Any())
+            var barcodeChangeBo = foo.BarcodeChangeBos;
+            if (barcodeChangeBo == null||!barcodeChangeBo.Items.Any())
             {
                 return;
             }
-            var psr1 = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new Data.Repositories.Process.ProductSet.Query.GetByProcedureIdAndProductIdQuery()
+            var productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new Data.Repositories.Process.ProductSet.Query.GetByProcedureIdAndProductIdQuery()
             {
-                ProductId = bcb.WO.ProductId,
+                ProductId = barcodeChangeBo.WO.ProductId,
                 SetPointId = foo.ResourceId,
                 SiteId = param.SiteId,
             });
-            if (psr1 == null)
+            if (productSetEntity == null)
             {
-                psr1 = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new Data.Repositories.Process.ProductSet.Query.GetByProcedureIdAndProductIdQuery()
+                productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new Data.Repositories.Process.ProductSet.Query.GetByProcedureIdAndProductIdQuery()
                 {
-                    ProductId = bcb.WO.ProductId,
+                    ProductId = barcodeChangeBo.WO.ProductId,
                     SetPointId = foo.ProcedureId,
                     SiteId = param.SiteId,
                 });
                 //if (psr1 == null)
                 //    throw new CustomerValidationException(nameof(ErrorCode.MES19605));
             }
-            foreach (var bo in bcb.Items)
+            foreach (var bo in barcodeChangeBo.Items)
             {
-                if(psr1 == null)
+                if(productSetEntity == null)
                 {
                     //验证掩码规则
-                    var isCodeRule = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(bo.TargetSFC, bcb.WO.ProductId);
+                    var isCodeRule = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(bo.TargetSFC, barcodeChangeBo.WO.ProductId);
                     if (!isCodeRule)
                     {
                         
@@ -416,7 +416,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
                 else
                 {
-                    var isCodeRule = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(bo.TargetSFC, psr1.SemiProductId);
+                    var isCodeRule = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(bo.TargetSFC, productSetEntity.SemiProductId);
                     if (!isCodeRule)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES19916)).WithData("SFC", bo.TargetSFC);
@@ -427,12 +427,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                 //SourceSFC 为空 说明走的条码接收逻辑，没有在制信息
                 if (!string.IsNullOrEmpty(bo.SourceSFC))
                 {
-                    var spr = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
+                    var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
                     {
                         Sfc = bo.TargetSFC,
                         SiteId = foo.SiteId
                     });
-                    if (spr != null)
+                    if (sfcProduceEntity != null)
                         throw new CustomerValidationException(nameof(ErrorCode.MES14035)).WithData("sfc", bo.TargetSFC);
 
                 }
