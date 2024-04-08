@@ -19,5 +19,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// FQC检验参数组Id
         /// </summary>
         public long? ParameterGroupId { get; set; }
+
+        /// <summary>
+        /// FQC检验参数组Ids
+        /// </summary>
+        public IEnumerable<long>? ParameterGroupIds { get; set; }
+
     }
 }

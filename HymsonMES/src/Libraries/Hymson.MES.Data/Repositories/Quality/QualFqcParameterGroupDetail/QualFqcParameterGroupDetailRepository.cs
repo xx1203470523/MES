@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,12 +101,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFqcParameterGroupDetailEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualFqcParameterGroupDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcParameterGroupDetailEntity>(GetByIdsSql, new { Ids = ids });
         }
-        
+
         /// <summary>
         /// 查询单个实体
         /// </summary>
@@ -141,6 +141,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("ParameterGroupId = @ParameterGroupId");
             }
+            if (query.ParameterGroupIds != null)
+            {
+                sqlBuilder.Where("ParameterGroupId IN @ParameterGroupIds");
+            }
+
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
