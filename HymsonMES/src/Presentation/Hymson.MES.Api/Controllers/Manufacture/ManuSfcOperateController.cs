@@ -1,7 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperate;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
-using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;

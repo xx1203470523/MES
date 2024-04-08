@@ -12,6 +12,6 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
     /// </summary>
     public interface IExecPrintService
     {
-        Task PrintAsync(PrintEvent @event);
+        Task PrintAsync(PrintIntegrationEvent @event);
     }
 }

@@ -97,7 +97,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 });
             }
 
-            return new PrintEvent
+            return new PrintIntegrationEvent
             {
                 SiteId = commonBo.SiteId,
                 ResourceId = commonBo.ResourceId,
@@ -114,7 +114,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
-            if (obj is not PrintEvent data) return null;
+            if (obj is not PrintIntegrationEvent data) return null;
             _eventBus.PublishDelay(data, 1);
             return null;
         }

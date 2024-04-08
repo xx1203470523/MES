@@ -6,7 +6,7 @@ namespace Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents
     /// <summary>
     /// 打印事件
     /// </summary>
-    public record PrintEvent : IntegrationEvent
+    public record PrintIntegrationEvent : IntegrationEvent
     {
         /// </summary>
         public long SiteId { get; set; }

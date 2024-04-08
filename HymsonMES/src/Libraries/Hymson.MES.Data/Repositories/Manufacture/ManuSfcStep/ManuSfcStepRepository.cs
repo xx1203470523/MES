@@ -235,7 +235,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             foreach (var sfc in param.SFCs)
             {
-                var tableNameBySFC = PrepareTableName(param.SiteId, sfc);
+                var tableNameBySFC = PrepareTableName(param.SiteId, sfc,false);
                 if (!dic.ContainsKey(tableNameBySFC))
                 {
                     dic[tableNameBySFC] = new List<string>();
@@ -244,7 +244,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
 
             List<Task<IEnumerable<ManuSfcStepEntity>>> tasks = new();
-            using var conn = GetMESParamterDbConnection();
+            using var conn = GetMESDbConnection();
             foreach (var dicItem in dic)
             {
                 tasks.Add(conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetStepBySFCsSql, dicItem.Key), new EntityBySFCsQuery { SiteId = param.SiteId, SFCs = dicItem.Value }));

@@ -98,7 +98,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 事件总线
         /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
+        private readonly IEventBus<EventBusInstance2> _eventBus;
 
         /// <summary>
         /// 工序-物料-打印模板
@@ -145,7 +145,7 @@ namespace Hymson.MES.Services.Services.Plan
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuCreateBarcodeService manuCreateBarcodeService,
             ILocalizationService localizationService,
-            IEventBus<EventBusInstance1> eventBus)
+            IEventBus<EventBusInstance2> eventBus)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -214,7 +214,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 work = await _planWorkOrderRepository.GetByIdAsync(createDto.WorkOrderId);
             }
-            _eventBus.PublishDelay(new PrintEvent
+            _eventBus.PublishDelay(new PrintIntegrationEvent
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 PrintId = createDto.PrintId,
@@ -228,7 +228,7 @@ namespace Hymson.MES.Services.Services.Plan
                     }
                 },
                 UserName = _currentUser.UserName
-            }, 1);
+            },10);
         }
 
         /// <summary>
@@ -414,7 +414,7 @@ namespace Hymson.MES.Services.Services.Plan
                 });
             }
 
-            _eventBus.PublishDelay(new PrintEvent
+            _eventBus.PublishDelay(new PrintIntegrationEvent
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 PrintId = parm.PrintId,

@@ -42,10 +42,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto
         /// 工单号
         /// </summary>
         public string OrderCode { get; set; }
+
         /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
 
         /// <summary>
         /// 当前数量

@@ -679,15 +679,15 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<int> SaveAttachmentAsync(QualIqcOrderSaveAttachmentDto requestDto)
+        public async Task<int> SaveAttachmentAsync(QualFqcOrderSaveAttachmentDto requestDto)
         {
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
             // FQC检验单
-            var entity = await _qualFqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            var entity = await _qualFqcOrderRepository.GetByIdAsync(requestDto.FQCOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES11714));
 
             if (!requestDto.Attachments.Any()) return 0;
 
@@ -712,7 +712,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = entity.SiteId,
-                    FQCOrderId = requestDto.IQCOrderId,
+                    FQCOrderId = requestDto.FQCOrderId,
                     AttachmentId = attachmentId,
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
@@ -1024,7 +1024,7 @@ namespace Hymson.MES.Services.Services.Quality
             var orderSFCEntity = await _qualFqcOrderSfcRepository.GetEntityAsync(new QualFqcOrderSfcQuery { BarCode = query.Barcode, FQCOrderId = query.FQCOrderId, SiteId = site });
             if (orderSFCEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19981));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11712)).WithData("SFC", query.Barcode);
             }
             //FQCOrder
             var entity = await _qualFqcOrderRepository.GetByIdAsync(query.FQCOrderId);
@@ -1086,7 +1086,7 @@ namespace Hymson.MES.Services.Services.Quality
                     var fqcOrderList = await _qualFqcOrderRepository.GetByIdsAsync(sampleEntities.Select(x => x.FQCOrderId).Distinct().ToArray());
                     if (fqcOrderList.Any(x => x.Status != InspectionStatusEnum.Closed))
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19980)).WithData("sfc", query.SFC).WithData("fqcOrder", fqcOrderList.Where(x => x.Status != InspectionStatusEnum.Closed));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES11713)).WithData("sfc", query.SFC).WithData("fqcOrder", fqcOrderList.Where(x => x.Status != InspectionStatusEnum.Closed));
                     }
                 }
             }
