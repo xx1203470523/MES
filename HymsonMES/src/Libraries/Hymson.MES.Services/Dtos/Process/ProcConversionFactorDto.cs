@@ -80,6 +80,16 @@ namespace Hymson.MES.Services.Dtos.Process
         public string MaterialCode { get; set; }
 
         /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string Unit { get; set; }
+
+        /// <summary>
         /// 转换系数状态
         /// </summary>
         public DisableOrEnableEnum OpenStatus { get; set; }
@@ -199,7 +209,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 转换系数状态
         /// </summary>
         public DisableOrEnableEnum  OpenStatus { get; set; }
-        public List<ProcLoadPointLinkMaterialDto> LinkMaterials { get; set; }
+        /// <summary>
+        /// 所属物料ID
+        /// </summary>
+        public long MaterialId { get; set; }
 
         public List<ProcLoadPointLinkResourceDto>? LinkResources { get; set; }
 
