@@ -968,7 +968,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = siteId,
                 SFCs = barCodes
             });
-            if (sfcEntities == null || !sfcEntities.Any()) return dtos;
+
+            if (sfcEntities == null || !sfcEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15459)); //return dtos;
 
             // 状态校验
             var validationFailures = new List<ValidationFailure>();

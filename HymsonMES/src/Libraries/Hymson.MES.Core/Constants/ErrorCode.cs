@@ -938,7 +938,7 @@
         public const string MES15456 = "返工工单不能为空！";
         public const string MES15457 = "流出工序不能为空！";
         public const string MES15458 = "返工工序不能为空！";
-
+        public const string MES15459 = "产品序列码不存在，请检查参数！";
         #endregion
 
         #region 物料加载 15500
