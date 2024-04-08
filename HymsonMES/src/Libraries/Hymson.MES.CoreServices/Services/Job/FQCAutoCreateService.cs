@@ -14,6 +14,7 @@ using Hymson.MES.CoreServices.Bos.Quality;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility;
 using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
+using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.Services.Common;
 
 using Hymson.MES.Data.Repositories.Integrated;
@@ -25,6 +26,7 @@ using Hymson.Utils;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -45,11 +47,16 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IQualFinallyOutputRecordDetailRepository _qualFinallyOutputRecordDetailRepository;
         private readonly IQualFqcParameterGroupDetailRepository _qualFqcParameterGroupDetailRepository;
         private readonly IQualFqcParameterGroupRepository _qualFqcParameterGroupRepository;
+        /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance2> _eventBus;
 
         public FQCAutoCreateService(IQualFinallyOutputRecordRepository qualFinallyOutputRecordRepository
             , IQualFinallyOutputRecordDetailRepository qualFinallyOutputRecordDetailRepository
             , IQualFqcParameterGroupDetailRepository qualFqcParameterGroupDetailRepository
             , IQualFqcParameterGroupRepository qualFqcParameterGroupRepository
+            , IEventBus<EventBusInstance2> eventBus
             , IMasterDataService masterDataService)
         {
             _qualFinallyOutputRecordDetailRepository = qualFinallyOutputRecordDetailRepository;
@@ -57,6 +64,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             _masterDataService = masterDataService; 
             _qualFqcParameterGroupDetailRepository = qualFqcParameterGroupDetailRepository;
             _qualFqcParameterGroupRepository = qualFqcParameterGroupRepository;
+            _eventBus = eventBus;
         }
 
         public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
@@ -72,7 +80,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-       
+
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
             if (commonBo.OutStationRequestBos == null || !commonBo.OutStationRequestBos.Any()) return default;
@@ -92,50 +100,89 @@ namespace Hymson.MES.CoreServices.Services.Job
             FQCOrderAutoCreateAutoResponse responseBo = new();
             responseBo.QualFinallyOutputRecordDetailEntities = new List<QualFinallyOutputRecordDetailEntity>();
             responseBo.QualFinallyOutputRecords = new List<QualFinallyOutputRecordEntity>();
+            responseBo.FQCOrderAutoCreateIntegrationEvent = new FQCOrderAutoCreateIntegrationEvent();
             #region 先写入成品条码产出记录表
-           
-            foreach (var group in commonBo.OutStationRequestBos.GroupBy(g=>g.VehicleCode))
+
+            foreach (var group in commonBo.OutStationRequestBos.GroupBy(g => g.VehicleCode))
             {
                 var first = group.FirstOrDefault();
-                if(first == null) continue;
+                if (first == null) continue;
                 var sfcproduce = sfcProduceEntities.FirstOrDefault(s => s.SFC == first.SFC)
-                      ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", first.SFC); ;
-                var recordEntity = new QualFinallyOutputRecordEntity
+                      ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", first.SFC);
+                if(string.IsNullOrEmpty(group.Key)) //电芯出站
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = commonBo.SiteId,
-                    MaterialId = sfcproduce.ProductId,
-                    WorkOrderId = sfcproduce.WorkOrderId,
-                    WorkCenterId = sfcproduce.WorkCenterId,
-                    Barcode = group.Key??string.Empty,
-                    CodeType = commonBo.Type switch
+                    var recordEntitys = group.Select(g=> new QualFinallyOutputRecordEntity
                     {
-                        ManuFacePlateBarcodeTypeEnum.Vehicle => FQCLotUnitEnum.Tray,
-                        ManuFacePlateBarcodeTypeEnum.Product => FQCLotUnitEnum.EA
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = commonBo.SiteId,
+                        MaterialId = sfcproduce.ProductId,
+                        WorkOrderId = sfcproduce.WorkOrderId,
+                        WorkCenterId = sfcproduce.WorkCenterId,
+                        Barcode = g.SFC,
+                        CodeType = FQCLotUnitEnum.EA,
+                        IsGenerated = TrueOrFalseEnum.No,
+                        CreatedBy = commonBo.UserName,
+                        CreatedOn = commonBo.Time,
+                        UpdatedBy = commonBo.UserName,
+                        UpdatedOn = commonBo.Time
+                    });
 
-                    },
-
-                    IsGenerated = TrueOrFalseEnum.No,
-                    CreatedBy = commonBo.UserName,
-                    CreatedOn = commonBo.Time,
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = commonBo.Time
-                };
-                responseBo.QualFinallyOutputRecords.Add(recordEntity);
-                var recordDetailEntities = group.Select(x => new QualFinallyOutputRecordDetailEntity
+                    responseBo.QualFinallyOutputRecords.AddRange(recordEntitys);
+                }
+                else //包装出站
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
+                    var recordEntity = new QualFinallyOutputRecordEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = commonBo.SiteId,
+                        MaterialId = sfcproduce.ProductId,
+                        WorkOrderId = sfcproduce.WorkOrderId,
+                        WorkCenterId = sfcproduce.WorkCenterId,
+                        Barcode = group.Key ?? string.Empty,
+                        CodeType = FQCLotUnitEnum.Tray,
+                        IsGenerated = TrueOrFalseEnum.No,
+                        CreatedBy = commonBo.UserName,
+                        CreatedOn = commonBo.Time,
+                        UpdatedBy = commonBo.UserName,
+                        UpdatedOn = commonBo.Time
+                    };
+
+                    responseBo.QualFinallyOutputRecords.Add(recordEntity);
+                    var recordDetailEntities = group.Select(x => new QualFinallyOutputRecordDetailEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = commonBo.SiteId,
+                        OutputRecordId = recordEntity.Id,
+                        Barcode = x.SFC,
+                        WorkOrderId = sfcproduce.WorkOrderId,
+                        WorkCenterId = sfcproduce.WorkCenterId,
+                        CreatedBy = commonBo.UserName,
+                        CreatedOn = commonBo.Time,
+                        UpdatedBy = commonBo.UserName,
+                        UpdatedOn = commonBo.Time
+                    }).ToList();
+                    responseBo.QualFinallyOutputRecordDetailEntities.AddRange(recordDetailEntities);
+
+                }
+
+            }
+            if (responseBo.QualFinallyOutputRecords != null && responseBo.QualFinallyOutputRecords.Any())
+            {
+                responseBo.FQCOrderAutoCreateIntegrationEvent = new FQCOrderAutoCreateIntegrationEvent
+                {
                     SiteId = commonBo.SiteId,
-                    OutputRecordId = recordEntity.Id,
-                    Barcode = x.SFC,
-                    WorkOrderId = sfcproduce.WorkOrderId,
-                    WorkCenterId = sfcproduce.WorkCenterId,
-                    CreatedBy = commonBo.UserName,
-                    CreatedOn = commonBo.Time,
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = commonBo.Time
-                }).ToList();
-                responseBo.QualFinallyOutputRecordDetailEntities.AddRange(recordDetailEntities);
+                    UserName = commonBo.UserName,
+                    RecordDetails = responseBo.QualFinallyOutputRecords.Select(q=>new FQCOrderAutoCreateIntegration
+                    {
+                        Barcode = q.Barcode,
+                        CodeType = q.CodeType,
+                        Id = q.Id,
+                        MaterialId = q.MaterialId,
+                        Remark = q.Remark,
+                        WorkCenterId= q.WorkCenterId,
+                        WorkOrderId= q.WorkOrderId,
+                    })
+                };
             }
 
 
@@ -153,21 +200,17 @@ namespace Hymson.MES.CoreServices.Services.Job
             
             responseBo.Rows += await _qualFinallyOutputRecordRepository.InsertRangeAsync(data.QualFinallyOutputRecords);
             responseBo.Rows +=await _qualFinallyOutputRecordDetailRepository.InsertRangeAsync(data.QualFinallyOutputRecordDetailEntities);
-
+            if(data.FQCOrderAutoCreateIntegrationEvent != null&&data.FQCOrderAutoCreateIntegrationEvent.RecordDetails.Any())
+            {
+                _eventBus.PublishDelay(data.FQCOrderAutoCreateIntegrationEvent, 10);
+            }
 
             return responseBo;
         }
 
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            var jobRequestBo = param as JobRequestBo;
-            if (jobRequestBo == null)
-            {
-                return;
-            }
-            var fQCOrderAutoCreateAutoBo = jobRequestBo.FQCOrderAutoCreateAutoBo;
-            if (fQCOrderAutoCreateAutoBo == null) return;
-
+            
         }
     }
 }
