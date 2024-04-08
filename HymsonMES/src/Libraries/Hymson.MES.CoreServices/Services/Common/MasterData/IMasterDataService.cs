@@ -19,7 +19,7 @@ using Hymson.MES.Data.Repositories.Quality;
 namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
-    /// 
+    /// 服务接口（主数据）
     /// </summary>
     public partial interface IMasterDataService
     {

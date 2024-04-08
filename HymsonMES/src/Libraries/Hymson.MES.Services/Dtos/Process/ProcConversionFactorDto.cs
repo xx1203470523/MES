@@ -34,7 +34,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :转换系数
         /// 空值 : false  
         /// </summary>
-        public string conversionFactor { get; set; }
+        public decimal conversionFactor { get; set; }
 
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :转换系数
         /// 空值 : false  
         /// </summary>
-        public string ConversionFactor { get; set; }
+        public decimal ConversionFactor { get; set; }
 
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :转换系数
         /// 空值 : false  
         /// </summary>
-        public string conversionFactor { get; set; }
+        public decimal conversionFactor { get; set; }
 
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :转换系数
         /// 空值 : false  
         /// </summary>
-        public string conversionFactor { get; set; }
+        public decimal conversionFactor { get; set; }
 
 
         /// <summary>

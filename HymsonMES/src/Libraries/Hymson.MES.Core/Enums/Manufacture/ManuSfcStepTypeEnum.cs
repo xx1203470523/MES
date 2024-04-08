@@ -241,6 +241,13 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 部分报废
         /// </summary>
         [Description("部分报废")]
-        PartialDiscard = 45
+        PartialDiscard = 45,
+
+        /// <summary>
+        /// 返工
+        /// </summary>
+        [Description("返工")]
+        Rework = 46
+
     }
 }

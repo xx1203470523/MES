@@ -24,7 +24,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command
 
 
         /// <summary>
-        ///报废数量
+        ///合格数量
         /// </summary>
         public decimal CurrentQuantityResidue { get; set; }
 
