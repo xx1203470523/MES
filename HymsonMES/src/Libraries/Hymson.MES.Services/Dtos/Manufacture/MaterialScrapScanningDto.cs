@@ -21,10 +21,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
         /// </summary>
         public string BarCode { set; get; }
 
-        /// <summary>
-        /// 工单号
-        /// </summary>
-        public string WorkOrderCode { set; get; }
+        ///// <summary>
+        ///// 工单号
+        ///// </summary>
+        //public string WorkOrderCode { set; get; }
 
         /// <summary>
         /// 产品信息编码

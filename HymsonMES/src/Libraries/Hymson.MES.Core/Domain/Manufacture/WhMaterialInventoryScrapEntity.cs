@@ -76,5 +76,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 报废类型
         /// </summary>
         public InventoryScrapTypeEnum? ScrapType { get; set; }
+        /// <summary>
+        /// 报废不合格代码id
+        /// </summary>
+        public long? UnqualifiedId { get; set; }
     }
 }

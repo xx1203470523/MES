@@ -30,7 +30,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="param"></param>
         /// <returns></returns>
 
-        [HttpGet]
+        [HttpPost]
         [Route("BarcodeScanning")]
 
         public async Task<MaterialScrapBarCodeDto> BarcodeScanningAsync(MaterialScrapScanningDto param)

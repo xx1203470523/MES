@@ -7,11 +7,13 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.MES.Data.Repositories.Manufacture.WhMaterialInventoryScrap;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
@@ -20,6 +22,7 @@ using Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
 {
@@ -82,7 +85,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
         /// 物料表仓储
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
-
+        private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
+        private readonly IWhMaterialInventoryScrapRepository _whMaterialInventoryScrapRepository;
         /// <summary>
         /// 
         /// </summary>
@@ -95,7 +99,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcScrapRepository"></param>
-        public ManuMaterialScrapService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcRepository manuSfcRepository, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcProduceRepository manuSfcProduceRepository, ILocalizationService localizationService, IWhMaterialInventoryRepository whMaterialInventoryRepository, IManuSfcStepRepository manuSfcStepRepository, IManuSfcScrapRepository manuSfcScrapRepository)
+        public ManuMaterialScrapService(ICurrentUser currentUser, ICurrentSite currentSite, 
+            IManuSfcRepository manuSfcRepository, IManuSfcInfoRepository manuSfcInfoRepository, 
+            IManuSfcProduceRepository manuSfcProduceRepository, ILocalizationService localizationService, 
+            IWhMaterialInventoryRepository whMaterialInventoryRepository, IManuSfcStepRepository manuSfcStepRepository,
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+            IWhMaterialInventoryScrapRepository whMaterialInventoryScrapRepository,
+            IManuSfcScrapRepository manuSfcScrapRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -106,6 +116,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcScrapRepository = manuSfcScrapRepository;
+            _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
+            _whMaterialInventoryScrapRepository = whMaterialInventoryScrapRepository;
         }
 
         /// <summary>
@@ -120,7 +132,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
             {
                 SFCs = param.BarcodeScrapList.Select(x => x.SFC),
                 SiteId = _currentSite.SiteId ?? 0,
-                Type = SfcTypeEnum.Produce
+                Type = SfcTypeEnum.NoProduce
             });
             //条码信息表
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
@@ -134,14 +146,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                 SiteId = _currentSite.SiteId ?? 0,
                 BarCodes = param.BarcodeScrapList.Select(x => x.SFC)
             });
-
+            var materialList = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryList.Select(x => x.MaterialId));
             var validationFailures = new List<ValidationFailure>();
-            List<ManuSfcScrapEntity> manuSfcScrapEntities = new();
-            List<ManuMaterialScrapByIdCommand> manuMaterialScrapByIdCommandList = new();
-            List<ManuSfcProducePartialScrapByIdCommand> manuSfcProducePartialScrapByIdCommandList = new();
-            List<ManuSfcStepEntity> manuSfcStepEntities = new();
+            List<WhMaterialInventoryScrapEntity> manuSfcScrapEntities = new();
+            List<ManuSFCPartialScrapByIdCommand> manuSFCPartialScrapByIdCommandList = new();
+           
+            List<WhMaterialStandingbookEntity> whMaterialStandingbookEntities = new();
             List<ScrapPartialWhMaterialInventoryByIdCommand> scrapPartialWhMaterialInventoryEmptyByIdCommandList = new();
-            List<long> deleteSFCProduceIds = new();
+            List<WhMaterialInventoryScrapNgRelationEntity> whMaterialInventoryScrapNgRelationEntitiesList = new List<WhMaterialInventoryScrapNgRelationEntity>();
             foreach (var barcodeItem in param.BarcodeScrapList)
             {
                 var sfcEntity = sfcEntities.FirstOrDefault(x => x.SFC == barcodeItem.SFC);
@@ -182,26 +194,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                if (ManuSfcStatus.ForbidSfcStatuss.Contains(sfcEntity.Status))
-                {
-                    var validationFailure = new ValidationFailure();
-                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", barcodeItem.SFC}
-                        };
-                    }
-                    else
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", barcodeItem.SFC);
-                    }
-                    validationFailure.FormattedMessagePlaceholderValues.Add("Status", _localizationService.GetResource($"Hymson.MES.Core.Enums.manu.SfcStatusEnum.{SfcStatusEnum.GetName(sfcEntity.Status)}"));
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES15450);
-                    validationFailures.Add(validationFailure);
-                    continue;
-                }
-
-               
+              
 
                 var manuSFCPartialScrapByIdCommand = new ManuSFCPartialScrapByIdCommand
                 {
@@ -230,92 +223,71 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15401));
                 }
-                ManuSfcProduceEntity? manuSfcProduceInfoEntity = new();
-                if (sfcEntity.Status == SfcStatusEnum.Complete)
+               
+                var whMaterialInventoryEntity = whMaterialInventoryList.FirstOrDefault(x => x.MaterialBarCode == barcodeItem.SFC);
+                if (whMaterialInventoryEntity == null)
                 {
-                    var whMaterialInventoryEntity = whMaterialInventoryList.FirstOrDefault(x => x.MaterialBarCode == barcodeItem.SFC);
-                    if (whMaterialInventoryEntity != null)
-                    {
-                        scrapPartialWhMaterialInventoryEmptyByIdCommandList.Add(new ScrapPartialWhMaterialInventoryByIdCommand
-                        {
-                            Id = whMaterialInventoryEntity.Id,
-                            ScrapQty = (whMaterialInventoryEntity.ScrapQty ?? 0) + barcodeItem.ScrapQty,
-                            Qty = whMaterialInventoryEntity.QuantityResidue - barcodeItem.ScrapQty,
-                            CurrentQuantityResidue = whMaterialInventoryEntity.QuantityResidue,
-                            UpdatedOn = HymsonClock.Now(),
-                            UpdatedBy = _currentUser.UserName
-                        });
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15401));
                 }
-                else
+               
+                scrapPartialWhMaterialInventoryEmptyByIdCommandList.Add(new ScrapPartialWhMaterialInventoryByIdCommand
                 {
-                    manuSfcProduceInfoEntity = manuSfcProduces.FirstOrDefault(x => x.SFC == barcodeItem.SFC);
-
-                    if (manuSfcProduceInfoEntity != null)
-                    {
-                        if (manuSfcProduceInfoEntity.Qty == barcodeItem.ScrapQty)
-                        {
-                            // 部分不做取消报废 故物理删除在制品
-                            deleteSFCProduceIds.Add(manuSfcProduceInfoEntity.Id);
-                        }
-                        else
-                        {
-                            manuSfcProducePartialScrapByIdCommandList.Add(new ManuSfcProducePartialScrapByIdCommand
-                            {
-                                Id = sfcEntity.Id,
-                                ScrapQty = (manuSfcProduceInfoEntity.ScrapQty ?? 0) + barcodeItem.ScrapQty,
-                                Qty = manuSfcProduceInfoEntity.Qty - barcodeItem.ScrapQty,
-                                UpdatedOn = HymsonClock.Now(),
-                                UpdatedBy = _currentUser.UserName
-                            });
-                        }
-                    }
-                }
-                //记录步骤表
-                var stepEntity = new ManuSfcStepEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SFC = barcodeItem.SFC,
-                    ProductId = sfcInfoEntity.ProductId,
-                    WorkOrderId = sfcInfoEntity.WorkOrderId ?? 0,
-                    WorkCenterId = manuSfcProduceInfoEntity?.WorkCenterId,
-                    ProductBOMId = manuSfcProduceInfoEntity?.ProductBOMId,
-                    Qty = sfcEntity.Qty,
-                    ScrapQty = sfcEntity.ScrapQty,
-                    EquipmentId = manuSfcProduceInfoEntity?.EquipmentId,
-                    ResourceId = manuSfcProduceInfoEntity?.ResourceId,
-                    ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.PartialDiscard,
-                    CurrentStatus = sfcEntity.Status,
-                    Remark = param.Remark ?? "",
-                    SiteId = _currentSite.SiteId ?? 0,
-                    CreatedOn = HymsonClock.Now(),
-                    CreatedBy = _currentUser.UserName,
+                    Id = whMaterialInventoryEntity.Id,
+                    ScrapQty = (whMaterialInventoryEntity.ScrapQty ?? 0) + barcodeItem.ScrapQty,
+                    Qty = whMaterialInventoryEntity.QuantityResidue - barcodeItem.ScrapQty,
+                    CurrentQuantityResidue = whMaterialInventoryEntity.QuantityResidue,
                     UpdatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentUser.UserName
-                };
-                manuSfcStepEntities.Add(stepEntity);
+                });
+                
+                var materialEntity = materialList.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
 
+                // 新增 wh_material_standingbook
+                WhMaterialStandingbookEntity whMaterialStandingbookEntity = new WhMaterialStandingbookEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    MaterialCode = materialEntity.MaterialCode ?? "",
+                    MaterialName = materialEntity.MaterialName,
+                    MaterialVersion = materialEntity.Version,
+                    MaterialBarCode = barcodeItem.SFC ?? "",
+                    Batch = materialEntity.Batch.ToString(),
+                    Quantity = barcodeItem.ScrapQty,
+                    //ScrapQty=item.ScrapQuantity,
+                    Unit = materialEntity.Unit ?? "",
+                    Type = WhMaterialInventoryTypeEnum.MaterialScrapping,
+                    Source = MaterialInventorySourceEnum.ManualEntry,
+                    SiteId = _currentSite.SiteId ?? 123456,
+                    CreatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = DateTime.UtcNow,
+                };
+
+                whMaterialStandingbookEntities.Add(whMaterialStandingbookEntity);
                 //记录报废信息
-                var manuSfcScrapEntity = new ManuSfcScrapEntity()
+                // 新增 wh_material_inventory_scrap
+                WhMaterialInventoryScrapEntity whMaterialInventoryScrap = new WhMaterialInventoryScrapEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SFC = barcodeItem.SFC,
-                    SfcinfoId = sfcInfoEntity?.Id ?? 0,
-                    SfcStepId = stepEntity.Id,
-                    ProcedureId = param.FindProcedureId,
-                    UnqualifiedId = param.UnqualifiedId,
-                    OutFlowProcedureId = param.OutFlowProcedureId,
-                    ScrapQty = sfcEntity.Qty,
-                    IsCancel = false,
-                    Remark = param.Remark,
-                    SiteId = _currentSite.SiteId ?? 0,
-                    CreatedOn = HymsonClock.Now(),
+                    SupplierId = whMaterialInventoryEntity.SupplierId,
+                    MaterialId = materialEntity.Id,
+                    MaterialBarCode = whMaterialInventoryEntity.MaterialBarCode ?? "",
+                    Batch = whMaterialInventoryEntity.Batch,
+                    ScrapQty = barcodeItem.ScrapQty,
+                    MaterialStandingbookId = whMaterialStandingbookEntity.Id,
+                    ScrapType = barcodeItem.ScrapType,
+                    IsCancellation = TrueOrFalseEnum.No,
+                    ProcedureId = barcodeItem.ProcedureId,
+                    SiteId = _currentSite.SiteId ?? 123456,
+                    WorkOrderId = whMaterialInventoryEntity.WorkOrderId??0,
+                    Remark = barcodeItem.Remark ?? "",
                     CreatedBy = _currentUser.UserName,
-                    UpdatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentUser.UserName
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = DateTime.UtcNow,
+                    UnqualifiedId = barcodeItem.UnqualifiedId
                 };
-                manuSfcScrapEntities.Add(manuSfcScrapEntity);
+                manuSfcScrapEntities.Add(whMaterialInventoryScrap);
             }
 
             if (validationFailures.Any())
@@ -336,27 +308,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     }
                 }
 
-                //2、修改在制品表可用数量、报废数量
-                if (manuSfcProducePartialScrapByIdCommandList != null && manuSfcProducePartialScrapByIdCommandList.Any())
+                //4.插入台账记录
+                if (whMaterialStandingbookEntities != null && whMaterialStandingbookEntities.Any())
                 {
-                    await _manuSfcProduceRepository.PartialScrapManuSfcProduceByIdAsync(manuSfcProducePartialScrapByIdCommandList);
-                }
-
-                //3、删除全报废的在制品数据
-                if (deleteSFCProduceIds != null && deleteSFCProduceIds.Any())
-                {
-                    var physicalDeleteSFCProduceByIdsCommand = new PhysicalDeleteSFCProduceByIdsCommand
-                    {
-                        SiteId = _currentSite.SiteId ?? 0,
-                        Ids = deleteSFCProduceIds
-                    };
-                    await _manuSfcProduceRepository.DeletePhysicalRangeByIdsAsync(physicalDeleteSFCProduceByIdsCommand);
-                }
-
-                //4.插入数据操作类型为报废
-                if (manuSfcStepEntities != null && manuSfcStepEntities.Any())
-                {
-                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntities);
+                    await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
                 }
 
                 //5.修改库存数据
@@ -372,7 +327,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                 //6.插入报废表
                 if (manuSfcScrapEntities != null && manuSfcScrapEntities.Any())
                 {
-                    await _manuSfcScrapRepository.InsertRangeAsync(manuSfcScrapEntities);
+                    await _whMaterialInventoryScrapRepository.InsertAsync(manuSfcScrapEntities);
                 }
             }
         }
@@ -404,12 +359,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
             }
 
             var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdAsync(manuSfcEntity.Id);
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
+           // var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity.ProductId);
-            PartialScrapBarCodeDto partialScrapBarCodeDto = new PartialScrapBarCodeDto()
+            MaterialScrapBarCodeDto partialScrapBarCodeDto = new MaterialScrapBarCodeDto()
             {
                 BarCode = manuSfcEntity.SFC,
-                WorkOrderCode = planWorkOrderEntity.OrderCode,
+               // WorkOrderCode = planWorkOrderEntity.OrderCode,
                 ProductCode = procMaterialEntity.MaterialCode,
                 ProductName = procMaterialEntity.MaterialName,
                 Qty = manuSfcEntity.Qty

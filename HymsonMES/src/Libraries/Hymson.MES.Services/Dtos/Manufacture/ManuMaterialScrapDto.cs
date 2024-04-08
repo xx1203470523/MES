@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.MES.Core.Enums.Manufacture;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,16 +15,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
         /// <summary>
         /// 流出工序
         /// </summary>
-        public long ProcedureId { get; set; }
-
-        /// <summary>
-        /// 备注
-        /// </summary>
-        public string? Remark { get; set; }
-
-        /// <summary>
-        /// 流出工序
-        /// </summary>
         public IEnumerable<MaterialBarcodeScrap> BarcodeScrapList { get; set; }
     }
 
@@ -32,6 +23,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
     /// </summary>
     public class MaterialBarcodeScrap
     {
+        /// <summary>
+        /// 流出工序
+        /// </summary>
+        public long ProcedureId { get; set; }
         /// <summary>
         /// 不合格代码
         /// </summary>
@@ -45,5 +40,13 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
         /// 报废数量
         /// </summary>
         public decimal ScrapQty { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+        /// <summary>
+        /// 报废类型
+        /// </summary>
+        public InventoryScrapTypeEnum? ScrapType { get; set; }
     }
 }

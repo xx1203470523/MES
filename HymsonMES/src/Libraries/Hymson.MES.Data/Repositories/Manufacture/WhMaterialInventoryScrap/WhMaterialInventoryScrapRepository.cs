@@ -153,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.WhMaterialInventoryScrap
     public partial class WhMaterialInventoryScrapRepository
     {
         #region 
-        const string InsertSql = "INSERT INTO `wh_material_inventory_scrap`(  `Id`, `SiteId`,`SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `MaterialStandingbookId`, `ScrapQty`, `IsCancellation`, `ProcedureId`, `WorkOrderId`, `ScrapType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SupplierId, @MaterialId, @MaterialBarCode, @Batch, @MaterialStandingbookId, @ScrapQty, @IsCancellation, @ProcedureId, @WorkOrderId,@ScrapType,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted)  ";
+        const string InsertSql = "INSERT INTO `wh_material_inventory_scrap`(  `Id`, `SiteId`,`SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `MaterialStandingbookId`, `ScrapQty`, `IsCancellation`, `ProcedureId`, `WorkOrderId`, `ScrapType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,`UnqualifiedId`) VALUES (   @Id, @SiteId, @SupplierId, @MaterialId, @MaterialBarCode, @Batch, @MaterialStandingbookId, @ScrapQty, @IsCancellation, @ProcedureId, @WorkOrderId,@ScrapType,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted,@UnqualifiedId)  ";
         const string GetByMaterialCodeSql = @"SELECT /**select**/ FROM wh_material_inventory_scrap wmis /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string UpdateInventoryScrapCancellationSql = "UPDATE wh_material_inventory_scrap SET IsCancellation=@IsCancellation,CancelMaterialStandingbookId=@CancelMaterialStandingbookId WHERE id = @InventoryScrapId; ";
 
