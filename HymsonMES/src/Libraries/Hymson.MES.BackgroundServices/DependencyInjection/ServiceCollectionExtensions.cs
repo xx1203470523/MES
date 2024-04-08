@@ -57,7 +57,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IIntegrationEventHandler<MessageHandleUpgradeIntegrationEvent>, MessageHandleUpgradeIntegrationEventHandler>();
             services.AddSingleton<IIntegrationEventHandler<MessageReceiveUpgradeIntegrationEvent>, MessageReceiveUpgradeIntegrationEventHandler>();
             services.AddSingleton<IIntegrationEventHandler<MessageTriggerUpgradeIntegrationEvent>, MessageTriggerUpgradeIntegrationEventHandler>();
-            services.AddSingleton<IIntegrationEventHandler<PrintEvent>, ExecPrintHander>();
+            services.AddSingleton<IIntegrationEventHandler<PrintIntegrationEvent>, ExecPrintIntegrationEventHandler>();
         }
 
         /// <summary>

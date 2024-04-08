@@ -65,7 +65,7 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
                 _eventBus.Subscribe<MessageTriggerUpgradeIntegrationEvent, MessageTriggerUpgradeIntegrationEventHandler>();
                 _eventBus.Subscribe<MessageReceiveUpgradeIntegrationEvent, MessageReceiveUpgradeIntegrationEventHandler>();
                 _eventBus.Subscribe<MessageHandleUpgradeIntegrationEvent, MessageHandleUpgradeIntegrationEventHandler>();
-                _eventBus.Subscribe<PrintEvent, ExecPrintHander>();
+                _eventBus.Subscribe<PrintIntegrationEvent, ExecPrintIntegrationEventHandler>();
                 SubscribeManufactureServices();
 
             }

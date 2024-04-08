@@ -7,7 +7,7 @@ namespace Hymson.MES.BackgroundServices.EventHandling.ProcessEventHandling.Print
     /// <summary>
     /// 执行打印
     /// </summary>
-    public class ExecPrintHander : IIntegrationEventHandler<PrintEvent>
+    public class ExecPrintIntegrationEventHandler : IIntegrationEventHandler<PrintIntegrationEvent>
     {
         /// <summary>
         /// 消息服务
@@ -18,7 +18,7 @@ namespace Hymson.MES.BackgroundServices.EventHandling.ProcessEventHandling.Print
         /// 构造函数
         /// </summary>
         /// <param name="execPrintService"></param>
-        public ExecPrintHander(IExecPrintService execPrintService)
+        public ExecPrintIntegrationEventHandler(IExecPrintService execPrintService)
         {
             _execPrintService = execPrintService;
         }
@@ -28,7 +28,7 @@ namespace Hymson.MES.BackgroundServices.EventHandling.ProcessEventHandling.Print
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        public async Task Handle(PrintEvent @event)
+        public async Task Handle(PrintIntegrationEvent @event)
         {
             await _execPrintService.PrintAsync(@event);
         }
