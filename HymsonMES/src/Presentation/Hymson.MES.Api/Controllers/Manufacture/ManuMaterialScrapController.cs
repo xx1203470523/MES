@@ -8,20 +8,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
-    /// 部分报废
+    /// 物料报废控制器
     /// </summary>
     [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class ManuSFCPartialScrapController : ControllerBase
+    public class ManuMaterialScrapController : ControllerBase
     {
         /// <summary>
-        /// 物料表仓储
+        /// 物料报废表
         /// </summary>
-        private readonly IManuSFCPartialScrapService _manuSFCPartialScrapService;
-        public ManuSFCPartialScrapController(IManuSFCPartialScrapService manuSFCPartialScrapService)
+        private readonly IManuMaterialScrapService _manuMaterialScrapService;
+        public ManuMaterialScrapController(IManuMaterialScrapService manuMaterialScrapService)
         {
-            _manuSFCPartialScrapService = manuSFCPartialScrapService;
+            _manuMaterialScrapService = manuMaterialScrapService;
         }
 
         /// <summary>
@@ -29,11 +29,13 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        [HttpGet]
+
+        [HttpPost]
         [Route("BarcodeScanning")]
-        public async Task<PartialScrapBarCodeDto> BarcodeScanningAsync([FromQuery] PartialScrapScanningDto param)
+
+        public async Task<MaterialScrapBarCodeDto> BarcodeScanningAsync(MaterialScrapScanningDto param)
         {
-            return await _manuSFCPartialScrapService.BarcodeScanningAsync(param);
+            return await _manuMaterialScrapService.BarcodeScanningAsync(param);
         }
 
         /// <summary>
@@ -42,10 +44,10 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="param"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("PartialScrap")]
-        public async Task PartialScrapAsync(ManuSFCPartialScrapDto param)
+        [Route("BarcodeScrap")]
+        public async Task PartialScrapAsync(ManuMaterialScrapDto param)
         {
-            await _manuSFCPartialScrapService.PartialScrapAsync(param);
+            await _manuMaterialScrapService.ScrapAsync(param);
         }
     }
 }

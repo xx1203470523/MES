@@ -20,7 +20,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
     /// <summary>
     /// 打印
     /// </summary>
-    public class ExecPrintService
+    public class ExecPrintService: IExecPrintService
     {
         /// <summary>
         /// 消息服务
@@ -167,7 +167,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        public async Task PrintAsync(PrintEvent @event)
+        public async Task PrintAsync(PrintIntegrationEvent @event)
         {
             long? printId = null;
             //一般情况下是单台打印机
@@ -241,7 +241,6 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                         default:
                             throw new CustomerValidationException(nameof(ErrorCode.MES10390));
                     }
-
 
                 }
             }
