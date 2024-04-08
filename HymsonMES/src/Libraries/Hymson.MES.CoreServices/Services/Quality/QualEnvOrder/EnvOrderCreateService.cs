@@ -455,7 +455,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
             {
                 SiteId = siteId,
                 Year = date.Year,
-                Month = date.Month - 1,
+                Month = date.Month,
                 Status = Core.Enums.YesOrNoEnum.Yes
             });
             if (calendarEntity == null)
