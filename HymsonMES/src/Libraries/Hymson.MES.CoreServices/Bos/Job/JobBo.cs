@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Quality;
 using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Job
@@ -216,7 +217,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 条码转换BO
         /// </summary>
         public BarcodeChangeBo? BarcodeChangeBos { get; set; }
-
+      
     }
 
     /// <summary>
