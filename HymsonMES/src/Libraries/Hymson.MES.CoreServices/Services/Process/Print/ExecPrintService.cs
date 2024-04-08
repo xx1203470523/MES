@@ -20,7 +20,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
     /// <summary>
     /// 打印
     /// </summary>
-    public class ExecPrintService: IExecPrintService
+    public class ExecPrintService : IExecPrintService
     {
         /// <summary>
         /// 消息服务
@@ -107,6 +107,11 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
         private readonly IPrintService _printService;
 
         /// <summary>
+        /// 标签关联表
+        /// </summary>
+        private readonly IProcLabelTemplateRelationRepository _procLabelTemplateRelationRepository;
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="productionBarcodeService"></param>
@@ -141,6 +146,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
             IProcLabelTemplateRepository procLabelTemplateRepository,
             IProcPrintConfigRepository printConfigRepository,
             IManuSfcStepRepository manuSfcStepRepository,
+            IProcLabelTemplateRelationRepository procLabelTemplateRelationRepository
             IPrintService printService)
         {
             _productionBarcodeService = productionBarcodeService;
@@ -160,6 +166,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
             _printConfigRepository = printConfigRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _printService = printService;
+            _procLabelTemplateRelationRepository = procLabelTemplateRelationRepository;
         }
 
         /// <summary>
@@ -210,7 +217,8 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                 foreach (var procProcedurePrintReleation in procProcedurePrintReleationByMaterialIdEnties)
                 {
                     var rocLabelTemplateEntity = procLabelTemplateEnties.FirstOrDefault(x => x.Id == procProcedurePrintReleation.TemplateId);
-                    switch (rocLabelTemplateEntity?.PrintDataModel)
+                    var procLabelTemplateRelationEntity = await _procLabelTemplateRelationRepository.GetByLabelTemplateIdAsync(rocLabelTemplateEntity?.Id??0);
+                    switch (procLabelTemplateRelationEntity?.PrintDataModel)
                     {
                         case "Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.DataSource.BatchBarcodeDto":
                             var batchBarcodeDataList = await _batchBarcodeService.GetLabelTemplateDataAsync(labelTemplateSourceDto);
