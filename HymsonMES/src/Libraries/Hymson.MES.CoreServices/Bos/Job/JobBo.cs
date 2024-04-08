@@ -212,6 +212,10 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 载具操作
         /// </summary>
         public VehicleBo? VehicleBo { get; set; }
+        /// <summary>
+        /// 条码转换BO
+        /// </summary>
+        public BarcodeChangeBo? BarcodeChangeBos { get; set; }
 
     }
 
