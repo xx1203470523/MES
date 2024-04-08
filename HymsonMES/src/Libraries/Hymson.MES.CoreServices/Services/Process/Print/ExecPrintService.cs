@@ -146,7 +146,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
             IProcLabelTemplateRepository procLabelTemplateRepository,
             IProcPrintConfigRepository printConfigRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IProcLabelTemplateRelationRepository procLabelTemplateRelationRepository
+            IProcLabelTemplateRelationRepository procLabelTemplateRelationRepository,
             IPrintService printService)
         {
             _productionBarcodeService = productionBarcodeService;
