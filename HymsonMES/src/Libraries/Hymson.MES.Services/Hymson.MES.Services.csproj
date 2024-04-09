@@ -57,7 +57,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Dtos\Process\LabelTemplate\DataSource\" />
     <Folder Include="Dtos\Process\LabelTemplate\Utility\" />
+    <Folder Include="Services\Process\LabelTemplate\DataSource\ProductionBarcod\" />
     <Folder Include="Services\Process\LabelTemplate\Utility\Execute\" />
   </ItemGroup>
 
