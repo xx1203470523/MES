@@ -293,10 +293,8 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         public async Task<IEnumerable<PrintClassOptionDto>> GetPrintClassListAsync()
         {
             var printClassList = new List<PrintClassOptionDto>();
-
-            IEnumerable<Type> printClasses = await Task.FromResult(
-                Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsClass && !type.IsAbstract && typeof(BasePrintData).IsAssignableFrom(type))
-           );
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var printClasses = typeFinder.FindClassesOfType(typeof(BasePrintData)).ToList();
 
             foreach (var item in printClasses)
             {
