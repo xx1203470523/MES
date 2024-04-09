@@ -253,8 +253,14 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
                 // 将新的物料对象添加到 LinkMaterials 列表中
                 converdionFactorDto.LinkMaterials.Add(materialDto);
+                converdionFactorDto.MaterialCode = ConversionFactorLinkMaterials.MaterialCode;
+                converdionFactorDto.MaterialName = ConversionFactorLinkMaterials.MaterialName;
+                converdionFactorDto.Version = ConversionFactorLinkMaterials.Version;
+                if (ConversionFactorLinkMaterials.Unit != null)
+                {
+                    converdionFactorDto.Unit = ConversionFactorLinkMaterials.Unit;
+                }
             }
-
             return converdionFactorDto;
         }
     
@@ -269,18 +275,18 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10401));
             }
-            if (AddConversionFactorDto.LinkMaterials.Count == 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10214));
-             }
-            if (AddConversionFactorDto.LinkMaterials.Count > 1)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10241));
-            }
+            //if (AddConversionFactorDto.MaterialId == null)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10214));
+            // }
+            //if (AddConversionFactorDto.LinkMaterials.Count > 1)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10241));
+            //}
 
 
             var procConversionFactorEntity = AddConversionFactorDto.ToEntity<ProcConversionFactorEntity>();
-            procConversionFactorEntity.MaterialId = AddConversionFactorDto.LinkMaterials[0].MaterialId;
+            procConversionFactorEntity.MaterialId = AddConversionFactorDto.MaterialId;
             procConversionFactorEntity.Id = IdGenProvider.Instance.CreateId();
             procConversionFactorEntity.CreatedBy = _currentUser.UserName;
             procConversionFactorEntity.UpdatedBy = _currentUser.UserName;

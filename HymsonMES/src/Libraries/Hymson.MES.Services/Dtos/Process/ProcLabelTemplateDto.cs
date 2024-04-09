@@ -109,11 +109,6 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? Content { get; set; }
 
         /// <summary>
-        /// 数据源
-        /// </summary>
-        public string? printDataModel { get; set; }
-
-        /// <summary>
         /// 模板打印配置信息
         /// </summary>
         public ProcLabelTemplateRelationCreateDto ProcLabelTemplateRelationCreateDto { get; set; }
