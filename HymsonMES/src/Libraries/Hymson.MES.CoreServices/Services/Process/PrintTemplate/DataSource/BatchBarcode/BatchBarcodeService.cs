@@ -181,9 +181,17 @@ namespace Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.Batc
         private void BarcodeParsing(BatchBarcodeDto param)
         {
             var strArray = param.SFC.Split(',');
-            param.ProductionBatch = strArray[1];
-            param.ProductionShift = strArray[2];
-            param.SerialNumber = strArray[4];
+            if (strArray.Length > 2) {
+                param.ProductionBatch = strArray[1];
+            }
+            if (strArray.Length > 3)
+            {
+                param.ProductionShift = strArray[2];
+            }
+            if (strArray.Length > 5)
+            {
+                param.SerialNumber = strArray[4];
+            }
         }
     }
 }
