@@ -76,7 +76,7 @@ namespace Hymson.MES.Core.Domain.Quality
        /// <summary>
         /// 录入次数
         /// </summary>
-        public int EnterNumber { get; set; }
+        public int EntryCount { get; set; }
 
        /// <summary>
         /// 频率
