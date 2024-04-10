@@ -8,6 +8,36 @@ namespace Hymson.MES.Services.Services.Manufacture
     /// </summary>
     public interface IManuProductExceptionHandlingService
     {
+        #region 让步接收
+        /// <summary>
+        /// 根据条码查询信息（让步接收）
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuCompromiseBarCodeDto>> GetCompromiseByBarCodeAsync(string barCode);
+
+        /// <summary>
+        /// 提交（让步接收）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> SubmitCompromiseAsync(ManuCompromiseDto requestDto);
+
+        /// <summary>
+        /// 下载导入模板（让步接收）
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task<string> DownloadCompromiseImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 导入（让步接收）
+        /// </summary>
+        /// <returns></returns>
+        Task ImportCompromiseAsync(IFormFile formFile);
+        #endregion
+
+
         #region 设备误判
         /// <summary>
         /// 根据条码查询信息（设备误判）
@@ -52,13 +82,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        Task<string> DownloadImportTemplateAsync(Stream stream);
+        Task<string> DownloadImportReworkTemplateAsync(Stream stream);
 
         /// <summary>
         /// 导入（返工）
         /// </summary>
         /// <returns></returns>
-        Task ImportAsync(IFormFile formFile);
+        Task ImportReworkAsync(IFormFile formFile);
         #endregion
 
 

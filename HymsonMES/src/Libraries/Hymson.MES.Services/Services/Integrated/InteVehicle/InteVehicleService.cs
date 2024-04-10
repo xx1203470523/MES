@@ -560,7 +560,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 });
                 if (whMaterialInventoryInfo == null || whMaterialInventoryInfo?.Status != WhMaterialInventoryStatusEnum.ToBeUsed)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19937));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19939));
                 }
                 manuSfcProduceEntity = new ManuSfcProduceEntity();
                 manuSfcProduceEntity.SFC = dto.SFC;
