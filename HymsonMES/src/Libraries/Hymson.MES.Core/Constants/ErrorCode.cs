@@ -1839,6 +1839,7 @@
         public const string MES19936 = "条码{SFC}所属产品编码{P1}与托盘绑定的产品编码不一致";
         public const string MES19937 = "工单{WorkOrderCode}未激活，无法进行条码接收操作！";
         public const string MES19938 = "非在库待使用条码，不可解盘";
+        public const string MES19939 = "非在库待使用条码，不可绑盘";
 
         #endregion
 
