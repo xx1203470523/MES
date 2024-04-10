@@ -248,7 +248,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
                 qualEnvOrderDetailDto.ReferenceValue = groupDetailSnapshoot.ReferenceValue;
                 qualEnvOrderDetailDto.LowerLimit = groupDetailSnapshoot.LowerLimit;
                 qualEnvOrderDetailDto.StartTime = item.StartTime.ToString("HH:mm");
-                qualEnvOrderDetailDto.EndTime = item.StartTime.ToString("HH:mm");
+                qualEnvOrderDetailDto.EndTime = item.EndTime.ToString("HH:mm");
                 qualEnvOrderDetailDto.RealTime = item.RealTime == null ? HymsonClock.Now().ToString("HH:mm") : item.RealTime?.ToString("HH:mm");
                 qualEnvOrderDetailDtos.Add(qualEnvOrderDetailDto);
             }
