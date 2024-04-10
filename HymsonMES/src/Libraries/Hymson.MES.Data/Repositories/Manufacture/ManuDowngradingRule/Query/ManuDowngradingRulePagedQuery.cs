@@ -25,5 +25,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 名称
         /// </summary>
         public string? Name { get; set; }
+
+        /// <summary>
+        /// 或编码
+        /// </summary>
+        public string? OrCode { get; set; }
+
+        /// <summary>
+        /// 或名称
+        /// </summary>
+        public string? OrName { get; set; }
     }
 }
