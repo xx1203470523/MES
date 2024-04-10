@@ -103,6 +103,19 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 中止
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("StopStation")]
+        [LogDescription("中止", BusinessType.OTHER, "StopStation", ReceiverTypeEnum.MES)]
+        public async Task StopBoundAsync(StopBoundDto request)
+        {
+            await _manuSfcOperateService.StopBoundAsync(request);
+        }
+
+
+        /// <summary>
         /// 分页查询列表（PDA条码出站）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
