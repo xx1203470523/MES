@@ -6,6 +6,57 @@ using OfficeOpenXml.Attributes;
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
     /// <summary>
+    /// 含有不良记录的条码信息（公用）
+    /// </summary>
+    public record ManuProductNGBarCodeDto : BaseDto
+    {
+        /// <summary>
+        /// ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string BarCode { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 发现工序
+        /// </summary>
+        public string FoundProcedure { get; set; } = "-";
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string WorkOrderCode { get; set; } = "-";
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; } = "-";
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; } = "-";
+
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string ProductCode { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string ProductName { get; set; }
+    }
+
+    /// <summary>
     /// 条码信息（公用）
     /// </summary>
     public record ManuProductBarCodeDto : BaseDto
@@ -171,7 +222,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// <summary>
     /// 条码信息（设备误判）
     /// </summary>
-    public class ManuMisjudgmentBarCodeDto
+    public record ManuMisjudgmentBarCodeDto : BaseDto
     {
         /// <summary>
         /// ID
