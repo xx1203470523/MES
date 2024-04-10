@@ -958,6 +958,7 @@
         public const string MES15506 = "该条码与选定的物料不匹配！";
         public const string MES15507 = "条码【{BarCode}】已存在于当前上料点！";
         public const string MES15508 = "条码【{BarCode}】已过期，有效期为【{DueDate}】，无法加载！";
+        public const string MES15509 = "上料完整性校验：这些物料编码{code}未上料!";
         #endregion
 
         #region 自定义字段 15600
@@ -1807,6 +1808,7 @@
         public const string MES19606 = "参数{ParameterCodes}不存在";
         public const string MES19607 = "通过资源【{Code}】未找到相应的上料数据！";
         public const string MES19608 = "通过资源【{Code}】找到的上料数据未包含工单信息！";
+  
         #endregion
 
         #region 设备对接错误
