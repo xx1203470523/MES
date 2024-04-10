@@ -1210,10 +1210,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
-            //await _equCommonService.ProductParamAsync(dto);
-
-            //TODO
-            //1. 参考 ProductCollectionAsync
+            await _equCommonService.ProductParamSameMultSfcAsync(dto);
         }
 
         /// <summary>

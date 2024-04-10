@@ -585,6 +585,28 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             await _equProductParamRecordService.AddMultAsync(saveDtoList);
         }
 
+        /// <summary>
+        /// 产品参数上传046
+        /// 多个条码参数相同
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ProductParamSameMultSfcAsync(ProductParamSameMultSfcDto dto)
+        {
+            await ProductParamAsync(new ProductParamDto
+            {
+                EquipmentCode = dto.EquipmentCode,
+                ResourceCode = dto.ResourceCode,
+                LocalTime = dto.LocalTime,
+                SfcList = dto.SfcList.Select(item => new ProductParamSfcDto
+                {
+                    Sfc = item,
+                    ParamList = dto.ParamList,
+                }).ToList()
+            });
+
+        }
+
 
     }
 }
