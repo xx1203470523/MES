@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Manufacture;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture
@@ -24,6 +25,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 修改人
         /// </summary>
         public DateTime UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
 
         /// <summary>
         /// 条码
@@ -51,9 +57,19 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public IEnumerable<ProcMaterialEntity> ProductEntities { get; set; }
 
         /// <summary>
-        /// 不合格记录
+        /// 工序
         /// </summary>
-        public IEnumerable<ManuProductBadRecordEntity> BadRecordEntities { get; set; }
+        public IEnumerable<ProcProcedureEntity> ProcedureEntities { get; set; }
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public IEnumerable<QualUnqualifiedCodeEntity> UnqualifiedCodeEntities { get; set; }
+
+        /// <summary>
+        /// 不合格记录（分组）
+        /// </summary>
+        public Dictionary<string, IGrouping<string, ManuProductBadRecordEntity>> BadRecordEntitiesDict { get; set; }
     }
 
     /// <summary>
@@ -92,4 +108,43 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public List<ManuProductBadRecordUpdateCommand> BadRecordUpdateCommands { get; set; } = new();
 
     }
+
+    /// <summary>
+    /// 响应（返工）
+    /// </summary>
+    public class ReworkResponseSummaryBo
+    {
+        /// <summary>
+        /// 在制品（新增）
+        /// </summary>
+        public IEnumerable<ManuSfcProduceEntity> InsertSFCProduceEntities { get; set; }
+
+        /// <summary>
+        /// 在制品（修改）
+        /// </summary>
+        public IEnumerable<ManuSfcProduceEntity> UpdateSFCProduceEntities { get; set; }
+
+        /// <summary>
+        /// 步骤
+        /// </summary>
+        public IEnumerable<ManuSfcStepEntity> SFCStepEntities { get; set; }
+
+        /// <summary>
+        /// 不良记录
+        /// </summary>
+        public IEnumerable<ManuProductBadRecordEntity> ProductBadRecordEntities { get; set; }
+
+        /// <summary>
+        /// NG记录
+        /// </summary>
+        public IEnumerable<ManuProductNgRecordEntity> ProductNgRecordEntities { get; set; }
+
+        /// <summary>
+        /// 不良记录更新命令
+        /// </summary>
+        public IEnumerable<ManuProductBadRecordUpdateCommand> BadRecordUpdateCommands { get; set; }
+
+    }
+
+
 }

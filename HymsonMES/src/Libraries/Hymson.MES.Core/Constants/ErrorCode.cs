@@ -961,6 +961,7 @@
         public const string MES15506 = "该条码与选定的物料不匹配！";
         public const string MES15507 = "条码【{BarCode}】已存在于当前上料点！";
         public const string MES15508 = "条码【{BarCode}】已过期，有效期为【{DueDate}】，无法加载！";
+        public const string MES15509 = "上料完整性校验：这些物料编码{code}未上料!";
         #endregion
 
         #region 自定义字段 15600
@@ -1810,6 +1811,7 @@
         public const string MES19606 = "参数{ParameterCodes}不存在";
         public const string MES19607 = "通过资源【{Code}】未找到相应的上料数据！";
         public const string MES19608 = "通过资源【{Code}】找到的上料数据未包含工单信息！";
+  
         #endregion
 
         #region 设备对接错误
@@ -1842,6 +1844,7 @@
         public const string MES19936 = "条码{SFC}所属产品编码{P1}与托盘绑定的产品编码不一致";
         public const string MES19937 = "工单{WorkOrderCode}未激活，无法进行条码接收操作！";
         public const string MES19938 = "非在库待使用条码，不可解盘";
+        public const string MES19939 = "非在库待使用条码，不可绑盘";
 
         #endregion
 
