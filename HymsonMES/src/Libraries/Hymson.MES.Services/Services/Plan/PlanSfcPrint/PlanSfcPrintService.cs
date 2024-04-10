@@ -198,7 +198,7 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new CustomerValidationException(nameof(ErrorCode.MES16507));
             }
 
-            var print = await _procPrintConfigRepository.GetByIdAsync(createDto.PrintId);
+            var print = await _procPrintConfigRepository.GetByIdAsync(createDto.PrintId??0);
             if (print == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17002));
             PlanWorkOrderEntity work;

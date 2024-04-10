@@ -127,7 +127,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 打印机id
         /// </summary>
-        public long PrintId { get; set; }
+        public long? PrintId { get; set; }
 
         /// <summary>
         /// 工单ID

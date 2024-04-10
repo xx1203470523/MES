@@ -1,10 +1,6 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
 {
@@ -27,5 +23,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
         Task<PartialScrapBarCodeDto> BarcodeScanningAsync(PartialScrapScanningDto param);
+
+        /// <summary>
+        /// 模版下载
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task<string> DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        Task ImportAsync(IFormFile formFile);
     }
 }
