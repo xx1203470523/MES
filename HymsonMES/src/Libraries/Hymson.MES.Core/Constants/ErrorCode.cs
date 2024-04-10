@@ -1278,6 +1278,7 @@
         public const string MES16802 = "有工单没有被激活，无法绑定";
         public const string MES16803 = "没有找到该资源对应的工作中心";
         public const string MES16804 = "有工单ID重复";
+        public const string MES16805 = "工单站点与当前站点不同，无法绑定，请切换站点";
         #endregion
 
         #region 面板操作-生产过站面板 MES16900
