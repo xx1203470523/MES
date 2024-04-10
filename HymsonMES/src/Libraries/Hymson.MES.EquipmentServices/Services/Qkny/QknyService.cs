@@ -686,7 +686,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
-        /// 出站027
+        /// 进站027
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>

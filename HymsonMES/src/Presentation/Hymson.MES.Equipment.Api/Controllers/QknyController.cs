@@ -744,7 +744,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Outbound")]
-        [LogDescription("产品进站028", BusinessType.OTHER, "Outbound028", ReceiverTypeEnum.MES)]
+        [LogDescription("产品出站028", BusinessType.OTHER, "Outbound028", ReceiverTypeEnum.MES)]
         public async Task OutboundAsync(OutboundDto dto)
         {
             if (IS_DEBUG == true)
