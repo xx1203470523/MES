@@ -14,12 +14,12 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// FQC检验参数组Id
         /// </summary>
-        public long ParameterGroupId { get; set; }
+        public long? ParameterGroupId { get; set; }
 
         /// <summary>
         /// 标准参数Id
@@ -44,12 +44,12 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 参考值
         /// </summary>
-        public string ReferenceValue { get; set; }
+        public decimal? ReferenceValue { get; set; }
 
         /// <summary>
         /// 录入次数
         /// </summary>
-        public int EnterNumber { get; set; }
+        public int? EnterNumber { get; set; }
 
         /// <summary>
         /// 是否设备采集
@@ -59,11 +59,11 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 顺序
         /// </summary>
-        public int DisplayOrder { get; set; }
+        public int? DisplayOrder { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
     }
 }

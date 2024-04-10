@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualFqcParameterGroupEntity> GetByIdAsync(long id)
+        public async Task<QualFqcParameterGroupEntity> GetByIdAsync(long? id)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<QualFqcParameterGroupEntity>(GetByIdSql, new { Id = id });
