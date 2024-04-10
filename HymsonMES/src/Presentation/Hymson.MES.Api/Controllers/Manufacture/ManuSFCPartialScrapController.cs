@@ -1,7 +1,6 @@
-﻿using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap;
+﻿using Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,9 +42,37 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("PartialScrap")]
+        [PermissionDescription("manufacture:manuSFCPartialScrap:PartialScrap")]
+        [LogDescription("部分报废", BusinessType.INSERT, IsSaveRequestData = false, IsSaveResponseData = false)]
         public async Task PartialScrapAsync(ManuSFCPartialScrapDto param)
         {
             await _manuSFCPartialScrapService.PartialScrapAsync(param);
+        }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("download")]
+        //[PermissionDescription("manufacture:manuSFCPartialScrap:download")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new();
+            var worksheetName = await _manuSFCPartialScrapService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{worksheetName}导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost("import")]
+        //[PermissionDescription("manufacture:manuSFCPartialScrap:import")]
+        public async Task ImportAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _manuSFCPartialScrapService.ImportAsync(formFile);
         }
     }
 }

@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Process
                     sqlBuilder.Where("Type=@Type");
                 }
             }
-            
+
             if (!string.IsNullOrWhiteSpace(procProcedurePagedQuery.ResTypeName))
             {
                 procProcedurePagedQuery.Name = $"%{procProcedurePagedQuery.ResTypeName}%";
@@ -305,6 +305,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 query.Name = $"%{query.Name}%";
                 sqlBuilder.Where(" Name LIKE @Name ");
+            }
+            if (query.Codes != null && query.Codes.Any())
+            {
+                sqlBuilder.Where("Code IN @Codes");
             }
             sqlBuilder.AddParameters(query);
 

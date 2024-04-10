@@ -947,6 +947,13 @@
         public const string MES15457 = "流出工序不能为空！";
         public const string MES15458 = "返工工序不能为空！";
         public const string MES15459 = "产品序列码不存在，请检查参数！";
+        public const string MES15460 = "发现工序在系统中不存在！";
+        public const string MES15461 = "流出工序不存在！";
+        public const string MES15462 = "不合格代码不存在！";
+        public const string MES15463 = "发现工序不能为空！";
+        public const string MES15464 = "不合格代码不能为空！";
+        public const string MES15465 = "返工类型不能为空！";
+        public const string MES15466 = "产品序列码不能为空！";
         #endregion
 
         #region 物料加载 15500
@@ -958,6 +965,7 @@
         public const string MES15506 = "该条码与选定的物料不匹配！";
         public const string MES15507 = "条码【{BarCode}】已存在于当前上料点！";
         public const string MES15508 = "条码【{BarCode}】已过期，有效期为【{DueDate}】，无法加载！";
+        public const string MES15509 = "上料完整性校验：这些物料编码{code}未上料!";
         #endregion
 
         #region 自定义字段 15600
@@ -1370,6 +1378,7 @@
         public const string MES16802 = "有工单没有被激活，无法绑定";
         public const string MES16803 = "没有找到该资源对应的工作中心";
         public const string MES16804 = "有工单ID重复";
+        public const string MES16805 = "工单站点与当前站点不同，无法绑定，请切换站点";
         #endregion
 
         #region 面板操作-生产过站面板 MES16900
@@ -1807,6 +1816,7 @@
         public const string MES19606 = "参数{ParameterCodes}不存在";
         public const string MES19607 = "通过资源【{Code}】未找到相应的上料数据！";
         public const string MES19608 = "通过资源【{Code}】找到的上料数据未包含工单信息！";
+
         #endregion
 
         #region 设备对接错误
@@ -1839,6 +1849,7 @@
         public const string MES19936 = "条码{SFC}所属产品编码{P1}与托盘绑定的产品编码不一致";
         public const string MES19937 = "工单{WorkOrderCode}未激活，无法进行条码接收操作！";
         public const string MES19938 = "非在库待使用条码，不可解盘";
+        public const string MES19939 = "非在库待使用条码，不可绑盘";
 
         #endregion
 

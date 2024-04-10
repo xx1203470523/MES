@@ -364,6 +364,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
             var orderDetails = new List<QualEnvOrderDetailEntity>();
             foreach (var item in dto.ParameterGroupDetails)
             {
+                item.EntryCount = item.EntryCount <= 0 ? 1 : item.EntryCount;
                 //班次
                 if (item.Frequency == Core.Enums.FrequencyEnum.Classes)
                 {
@@ -371,6 +372,31 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     {
                         var startTime = (dto.OperateTime.ToString("yyyy-MM-dd ") + shift.StartTime).ParseToDateTime();
 
+                        for (var i = 0; i < item.EntryCount; i++)
+                        {
+                            orderDetails.Add(new QualEnvOrderDetailEntity
+                            {
+                                Id = IdGenProvider.Instance.CreateId(),
+                                SiteId = dto.SiteId,
+                                EnvOrderId = orderEntity.Id,
+                                GroupDetailSnapshootId = parameterGroupDetailSnapshoots.Where(x => x.ParameterId == item.ParameterId).Select(x => x.Id).FirstOrDefault(),
+                                StartTime = startTime,
+                                EndTime = startTime.AddMinutes(30),
+                                CreatedBy = dto.UserName,
+                                CreatedOn = dto.OperateTime,
+                                UpdatedBy = dto.UserName,
+                                UpdatedOn = dto.OperateTime
+                            });
+                        }
+                    }
+                }
+                //天
+                else if (item.Frequency == Core.Enums.FrequencyEnum.Day)
+                {
+                    var startTime = (dto.OperateTime.ToString("yyyy-MM-dd ") + dto.ShiftDetails.Select(x => x.StartTime).Min()).ParseToDateTime();
+
+                    for (var i = 0; i < item.EntryCount; i++)
+                    {
                         orderDetails.Add(new QualEnvOrderDetailEntity
                         {
                             Id = IdGenProvider.Instance.CreateId(),
@@ -386,25 +412,6 @@ namespace Hymson.MES.CoreServices.Services.Quality
                         });
                     }
                 }
-                //天
-                else if (item.Frequency == Core.Enums.FrequencyEnum.Day)
-                {
-                    var startTime = (dto.OperateTime.ToString("yyyy-MM-dd ") + dto.ShiftDetails.Select(x => x.StartTime).Min()).ParseToDateTime();
-
-                    orderDetails.Add(new QualEnvOrderDetailEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = dto.SiteId,
-                        EnvOrderId = orderEntity.Id,
-                        GroupDetailSnapshootId = parameterGroupDetailSnapshoots.Where(x => x.ParameterId == item.ParameterId).Select(x => x.Id).FirstOrDefault(),
-                        StartTime = startTime,
-                        EndTime = startTime.AddMinutes(30),
-                        CreatedBy = dto.UserName,
-                        CreatedOn = dto.OperateTime,
-                        UpdatedBy = dto.UserName,
-                        UpdatedOn = dto.OperateTime
-                    });
-                }
                 //小时
                 else
                 {
@@ -413,20 +420,22 @@ namespace Hymson.MES.CoreServices.Services.Quality
                     var startTime = (dto.OperateTime.ToString("yyyy-MM-dd ") + dto.ShiftDetails.Select(x => x.StartTime).Min()).ParseToDateTime();
                     for (int i = 0; i < count; i++)
                     {
-                        orderDetails.Add(new QualEnvOrderDetailEntity
+                        for (var j = 0; j < item.EntryCount; j++)
                         {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SiteId = dto.SiteId,
-                            EnvOrderId = orderEntity.Id,
-                            GroupDetailSnapshootId = parameterGroupDetailSnapshoots.Where(x => x.ParameterId == item.ParameterId).Select(x => x.Id).FirstOrDefault(),
-                            StartTime = startTime,
-                            EndTime = startTime.AddMinutes(30),
-                            CreatedBy = dto.UserName,
-                            CreatedOn = dto.OperateTime,
-                            UpdatedBy = dto.UserName,
-                            UpdatedOn = dto.OperateTime
-                        });
-
+                            orderDetails.Add(new QualEnvOrderDetailEntity
+                            {
+                                Id = IdGenProvider.Instance.CreateId(),
+                                SiteId = dto.SiteId,
+                                EnvOrderId = orderEntity.Id,
+                                GroupDetailSnapshootId = parameterGroupDetailSnapshoots.Where(x => x.ParameterId == item.ParameterId).Select(x => x.Id).FirstOrDefault(),
+                                StartTime = startTime,
+                                EndTime = startTime.AddMinutes(30),
+                                CreatedBy = dto.UserName,
+                                CreatedOn = dto.OperateTime,
+                                UpdatedBy = dto.UserName,
+                                UpdatedOn = dto.OperateTime
+                            });
+                        }
                         startTime = startTime.AddHours(interval);
                     }
                 }

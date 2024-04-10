@@ -164,8 +164,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(string.Format(UpdateSql, PrepareTableName(manuSfcStepEntity)), manuSfcStepEntity);
         }
 
-
-
         #region 业务表
         /// <summary>
         /// 根据实体列表对数据进行按表名分组
@@ -336,7 +334,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcStepEntity>(GetSfcsMergeOrSliptAddStepSql, query);
         }
-
 
         #region private
         /// <summary>

@@ -250,7 +250,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     SegmentedValue = s.SegmentedValue,
                     CustomValue = s.CustomValue,
                 }),
-
+                ProductId= procMaterialEntity.Id,
                 CodeRuleKey = $"{inteCodeRulesEntity.Id}",
                 Count = discuss,
                 Base = inteCodeRulesEntity.Base,

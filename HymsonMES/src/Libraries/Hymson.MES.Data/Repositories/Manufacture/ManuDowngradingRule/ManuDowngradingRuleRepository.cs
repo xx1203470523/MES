@@ -98,6 +98,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("Name LIKE @Name");
             }
 
+            if (!string.IsNullOrWhiteSpace(manuDowngradingRulePagedQuery.OrCode))
+            {
+                manuDowngradingRulePagedQuery.OrCode = $"%{manuDowngradingRulePagedQuery.OrCode}%";
+                sqlBuilder.OrWhere("Code LIKE @OrCode");
+            }
+            if (!string.IsNullOrWhiteSpace(manuDowngradingRulePagedQuery.OrName))
+            {
+                manuDowngradingRulePagedQuery.OrName = $"%{manuDowngradingRulePagedQuery.OrName}%";
+                sqlBuilder.OrWhere("Name LIKE @OrName");
+            }
+
             var offSet = (manuDowngradingRulePagedQuery.PageIndex - 1) * manuDowngradingRulePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuDowngradingRulePagedQuery.PageSize });
