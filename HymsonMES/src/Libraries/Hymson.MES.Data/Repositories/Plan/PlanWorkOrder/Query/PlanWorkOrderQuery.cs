@@ -43,6 +43,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         public string? OrderCode { get; set; }
 
+        // <summary>
+        /// 集合（工单号）
+        /// </summary>
+        public IEnumerable<string>? Codes { get; set; }
 
     }
 }

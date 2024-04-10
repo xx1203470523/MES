@@ -34,6 +34,57 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
 
+        #region 让步接收
+        /// <summary>
+        /// 根据条码查询信息（让步接收）
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        [HttpGet("compromise/{barCode}")]
+        public async Task<IEnumerable<ManuCompromiseBarCodeDto>> GetCompromiseByBarCodeAsync(string barCode)
+        {
+            return await _manuProductExceptionHandlingService.GetCompromiseByBarCodeAsync(barCode);
+        }
+
+        /// <summary>
+        /// 提交（让步接收）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("compromise/submit")]
+        public async Task<int> SubmitCompromiseAsync(ManuCompromiseDto requestDto)
+        {
+            return await _manuProductExceptionHandlingService.SubmitCompromiseAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 下载导入模板（让步接收）
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("compromise/download")]
+        //[PermissionDescription("manufacture:manuProductExceptionHandling:download")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadCompromiseImportTemplateAsync()
+        {
+            using MemoryStream stream = new();
+            var worksheetName = await _manuProductExceptionHandlingService.DownloadCompromiseImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{worksheetName}导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导入（让步接收）
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost("compromise/import")]
+        //[PermissionDescription("manufacture:manuProductExceptionHandling:import")]
+        public async Task ImportCompromiseAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _manuProductExceptionHandlingService.ImportCompromiseAsync(formFile);
+        }
+        #endregion
+
+
         #region 设备误判
         /// <summary>
         /// 根据条码查询信息（设备误判）
@@ -94,29 +145,29 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 下载导入模板
+        /// 下载导入模板（返工）
         /// </summary>
         /// <returns></returns>
         [HttpGet("rework/download")]
         //[PermissionDescription("manufacture:manuProductExceptionHandling:download")]
         [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
-        public async Task<IActionResult> DownloadTemplateExcel()
+        public async Task<IActionResult> DownloadImportReworkTemplateAsync()
         {
             using MemoryStream stream = new();
-            var worksheetName = await _manuProductExceptionHandlingService.DownloadImportTemplateAsync(stream);
+            var worksheetName = await _manuProductExceptionHandlingService.DownloadImportReworkTemplateAsync(stream);
             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{worksheetName}导入模板.xlsx");
         }
 
         /// <summary>
-        /// 导入
+        /// 导入（返工）
         /// </summary>
         /// <param name="formFile"></param>
         /// <returns></returns>
         [HttpPost("rework/import")]
         //[PermissionDescription("manufacture:manuProductExceptionHandling:import")]
-        public async Task ImportAsync([FromForm(Name = "file")] IFormFile formFile)
+        public async Task ImportReworkAsync([FromForm(Name = "file")] IFormFile formFile)
         {
-            await _manuProductExceptionHandlingService.ImportAsync(formFile);
+            await _manuProductExceptionHandlingService.ImportReworkAsync(formFile);
         }
         #endregion
 

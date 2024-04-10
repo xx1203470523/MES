@@ -59,6 +59,18 @@ namespace Hymson.MES.Services
         }
 
         /// <summary>
+        /// 转换Dto对象
+        /// </summary>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public static TDto ToDto<TDto>(this BaseDto bo) where TDto : BaseDto
+        {
+            if (bo == null) throw new ArgumentNullException(nameof(bo));
+            return AutoMapperConfiguration.Mapper.Map<TDto>(bo);
+        }
+
+        /// <summary>
         /// 转换到查询对象
         /// </summary>
         /// <typeparam name="TQuery"></typeparam>
