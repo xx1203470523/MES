@@ -34,6 +34,12 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// FQC
         /// </summary>
        [Description("FQC")]
-        FQC = 5
+        FQC = 5,
+
+        /// <summary>
+        /// FQC
+        /// </summary>
+        [Description("环境检测")]
+        Environment = 6
     }
 }
