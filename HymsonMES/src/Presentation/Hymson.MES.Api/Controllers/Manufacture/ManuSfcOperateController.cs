@@ -107,11 +107,21 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("page")]
+        [HttpGet("page")]
         public async Task<PagedInfo<ManuSfcInstationPagedQueryOutputDto>> GetPagedListAsync([FromQuery] ManuSfcInstationPagedQueryDto pagedQueryDto)
         {
             return await _manuSfcOperateService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// PDA条码出站确认获取条码信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet("pda/getsfcinfo/{sfc}")]
+        public async Task<ManuSfcOutstationConfirmSfcInfoOutputDto> GetSfcInfoToPdaAsync(string sfc)
+        {
+            return await _manuSfcOperateService.GetSfcInfoToPdaAsync(sfc);
         }
     }
 }
