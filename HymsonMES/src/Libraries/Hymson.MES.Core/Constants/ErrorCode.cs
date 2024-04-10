@@ -950,6 +950,10 @@
         public const string MES15460 = "发现工序在系统中不存在！";
         public const string MES15461 = "流出工序不存在！";
         public const string MES15462 = "不合格代码不存在！";
+        public const string MES15463 = "发现工序不能为空！";
+        public const string MES15464 = "不合格代码不能为空！";
+        public const string MES15465 = "返工类型不能为空！";
+        public const string MES15466 = "产品序列码不能为空！";
         #endregion
 
         #region 物料加载 15500
@@ -1811,7 +1815,7 @@
         public const string MES19606 = "参数{ParameterCodes}不存在";
         public const string MES19607 = "通过资源【{Code}】未找到相应的上料数据！";
         public const string MES19608 = "通过资源【{Code}】找到的上料数据未包含工单信息！";
-  
+
         #endregion
 
         #region 设备对接错误
