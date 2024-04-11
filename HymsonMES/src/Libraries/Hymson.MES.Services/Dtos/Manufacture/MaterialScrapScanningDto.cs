@@ -27,14 +27,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
         //public string WorkOrderCode { set; get; }
 
         /// <summary>
-        /// 产品信息编码
+        /// 物料编码
         /// </summary>
-        public string ProductCode { set; get; }
+        public string materialCode { set; get; }
 
         /// <summary>
-        /// 产品信息名称
+        /// 物料名称
         /// </summary>
-        public string ProductName { set; get; }
+        public string materialName { set; get; }
 
         /// <summary>
         /// 产品信息数量
