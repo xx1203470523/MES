@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
-using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
@@ -11,15 +13,11 @@ using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
-using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperate;
-using Hymson.Web.Framework.WorkContext;
-using Hymson.Infrastructure;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Services.Dtos.Plan;
-using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
-using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperate;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -162,7 +160,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 SFCs = new string[] { request.SFC }
-            }, RequestSourceEnum.EquipmentApi);
+            }, RequestSourceEnum.PDA);
         }
 
         /// <summary>
@@ -192,7 +190,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 SFCs = request.SFCs.Select(s => s.SFC)
-            }, RequestSourceEnum.EquipmentApi);
+            }, RequestSourceEnum.PDA);
         }
 
         /// <summary>
@@ -239,7 +237,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
-            }, RequestSourceEnum.EquipmentApi);
+            }, RequestSourceEnum.PDA);
         }
 
         /// <summary>
@@ -293,7 +291,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 OutStationRequestBos = outStationRequestBos
-            }, RequestSourceEnum.EquipmentApi);
+            }, RequestSourceEnum.PDA);
         }
 
         /// <summary>
@@ -322,7 +320,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 VehicleCodes = new string[] { request.CarrierNo }
-            }, RequestSourceEnum.EquipmentApi);
+            }, RequestSourceEnum.PDA);
         }
 
         /// <summary>
@@ -369,19 +367,37 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
-            }, RequestSourceEnum.EquipmentApi);
+            }, RequestSourceEnum.PDA);
         }
 
 
         /// <summary>
-        /// 进站
+        /// 中止（多个）
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task StopBoundAsync(StopBoundDto request)
+        public async Task StopStationMoreAsync(StopBoundDto request)
         {
-            // TODO 待实现
-            await Task.CompletedTask;
+            if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            if (!request.SFCs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES19101));
+
+            var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ResourceCode = request.ResourceCode,
+                EquipmentCode = request.EquipmentCode
+            });
+            if (manuBo == null) return;
+
+            _ = await _manuPassStationService.StopStationRangeBySFCAsync(new SFCStopStationBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                ProcedureId = manuBo.ProcedureId,
+                ResourceId = manuBo.ResourceId,
+                EquipmentId = manuBo.EquipmentId,
+                SFCs = request.SFCs
+            }, RequestSourceEnum.PDA);
         }
 
         /// <summary>

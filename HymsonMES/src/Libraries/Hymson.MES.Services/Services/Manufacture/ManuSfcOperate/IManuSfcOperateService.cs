@@ -70,7 +70,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task StopBoundAsync(StopBoundDto request);
+        Task StopStationMoreAsync(StopBoundDto request);
 
         /// <summary>
         /// 分页查询列表（PDA条码出站）

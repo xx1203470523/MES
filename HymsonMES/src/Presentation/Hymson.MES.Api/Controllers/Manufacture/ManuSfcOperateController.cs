@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InStationMore")]
-        [LogDescription("多个进站", BusinessType.OTHER, "InStationMore", ReceiverTypeEnum.MES)]
+        [LogDescription("进站（多个）", BusinessType.OTHER, "InStationMore", ReceiverTypeEnum.MES)]
         public async Task InBoundMoreAsync(InBoundMoreDto request)
         {
             await _manuSfcOperateService.InBoundMoreAsync(request);
@@ -72,7 +72,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OutStationMore")]
-        [LogDescription("多个出站", BusinessType.OTHER, "OutStationMore", ReceiverTypeEnum.MES)]
+        [LogDescription("出站（多个）", BusinessType.OTHER, "OutStationMore", ReceiverTypeEnum.MES)]
         public async Task OutBoundMoreAsync(OutBoundMoreDto request)
         {
             await _manuSfcOperateService.OutBoundMoreAsync(request);
@@ -103,15 +103,15 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 中止
+        /// 中止（多个）
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("StopStation")]
-        [LogDescription("中止", BusinessType.OTHER, "StopStation", ReceiverTypeEnum.MES)]
-        public async Task StopBoundAsync(StopBoundDto request)
+        [HttpPost("StopStationMore")]
+        [LogDescription("中止（多个）", BusinessType.OTHER, "StopStationMore", ReceiverTypeEnum.MES)]
+        public async Task StopStationMoreAsync(StopBoundDto request)
         {
-            await _manuSfcOperateService.StopBoundAsync(request);
+            await _manuSfcOperateService.StopStationMoreAsync(request);
         }
 
 
