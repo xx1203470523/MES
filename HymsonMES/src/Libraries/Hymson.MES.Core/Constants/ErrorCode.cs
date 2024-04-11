@@ -1984,6 +1984,8 @@
 
         #region 设备点检 15800
         public const string MES15801 = "此设备点检项目{code}在系统中已经存在!";
+        public const string MES15802 = "此设备点检任务{code}在系统中已经存在!";
+        public const string MES15803 = "设备点检任务不存在！";
         #endregion
     }
 }

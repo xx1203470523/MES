@@ -43,6 +43,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [Route("create")]
         [LogDescription("设备点检保养项目", BusinessType.INSERT)]
         [PermissionDescription("equ:equInspectionItem:insert")]
         public async Task AddAsync([FromBody] EquInspectionItemSaveDto saveDto)
@@ -56,6 +57,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [Route("update")]
         [LogDescription("设备点检保养项目", BusinessType.UPDATE)]
         [PermissionDescription("equ:equInspectionItem:update")]
         public async Task UpdateAsync([FromBody] EquInspectionItemSaveDto saveDto)
@@ -69,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [Route("delete")]
         [LogDescription("设备点检保养项目", BusinessType.DELETE)]
         [PermissionDescription("equ:equInspectionItem:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)

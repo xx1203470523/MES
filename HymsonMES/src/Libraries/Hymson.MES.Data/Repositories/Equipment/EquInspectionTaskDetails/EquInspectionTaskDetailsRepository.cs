@@ -86,6 +86,28 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
+        /// 根据任务Id删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByTaskIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByTaskIdSql, new { InspectionTaskId = id });
+        }
+
+        /// <summary>
+        /// 删除（软删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByTaskIdRangeAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByTaskIdsSql, new { InspectionTaskIds = ids });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -116,6 +138,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted=0");
+            if (query.InspectionTaskId.HasValue&&query.InspectionTaskId>0)
+            {
+                sqlBuilder.Where("InspectionTaskId=@InspectionTaskId");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquInspectionTaskDetailsEntity>(template.RawSql, query);
         }
@@ -147,7 +176,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var totalCount = await totalCountTask;
             return new PagedInfo<EquInspectionTaskDetailsEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
     }
 
 
@@ -171,6 +199,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string GetByIdSql = @"SELECT * FROM equ_inspection_task_details WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM equ_inspection_task_details WHERE Id IN @Ids ";
+        const string DeleteByTaskIdSql = "delete from `equ_inspection_task_details` WHERE InspectionTaskId=@InspectionTaskId ";
+        const string DeleteByTaskIdsSql = "delete from `equ_inspection_task_details` WHERE InspectionTaskId in @InspectionTaskIds ";
 
     }
 }

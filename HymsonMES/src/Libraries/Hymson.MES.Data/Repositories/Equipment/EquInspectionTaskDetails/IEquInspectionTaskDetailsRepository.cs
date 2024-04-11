@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(EquInspectionTaskDetailsEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquInspectionTaskDetailsEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -53,12 +53,26 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 根据任务Id删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByTaskIdAsync(long id);
+
+        /// <summary>
+        /// 删除（软删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByTaskIdRangeAsync(IEnumerable<long> ids);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquInspectionTaskDetailsEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -72,7 +86,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<EquInspectionTaskDetailsEntity>> GetEntitiesAsync(EquInspectionTaskDetailsQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -11,9 +12,14 @@ namespace Hymson.MES.Core.Domain.Equipment
     public class EquInspectionTaskEntity : BaseEntity
     {
         /// <summary>
+        /// 编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
         /// 点检类型 1、日点检 2、周点检
         /// </summary>
-        public bool InspectionType { get; set; }
+        public EquInspectionTypeEnum InspectionType { get; set; }
 
         /// <summary>
         /// 工作中心
@@ -28,12 +34,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 执行月1-12
         /// </summary>
-        public bool? Month { get; set; }
+        public EquInspectionTaskMonthEnum? Month { get; set; }
 
         /// <summary>
         /// 执行日 1、周一，2、周二，3、周三，4、周四，5、周五，6、周六，7、周日
         /// </summary>
-        public bool? Day { get; set; }
+        public EquInspectionTaskDayEnum? Day { get; set; }
 
         /// <summary>
         /// 执行开始时间
@@ -43,22 +49,22 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 完成时长（分钟）
         /// </summary>
-        public bool? CompleteTime { get; set; }
+        public int? CompleteTime { get; set; }
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; } = "";
 
         /// <summary>
         /// 状态 1、新建2、启用3、保留4、废除
         /// </summary>
-        public bool? Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类别 1、白班2、晚班3、巡检
         /// </summary>
-        public string Type { get; set; }
+        public EquInspectionTaskTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 备注
@@ -68,8 +74,6 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 站点ID
         /// </summary>
-        public long SiteId { get; set; }
-
-        
+        public long SiteId { get; set; } 
     }
 }
