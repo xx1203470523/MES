@@ -218,6 +218,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var outStationRequestBo = new OutStationRequestBo
             {
                 SFC = request.SFC,
+                VehicleCode = request.VehicleCode,
                 IsQualified = request.IsQualified == 1
             };
 
@@ -230,7 +231,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 不合格代码
             if (request.FailInfo != null && request.FailInfo.Any())
             {
-                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode });
+                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode,UnqualifiedQty= s.UnqualifiedQty });
             }
 
             _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
@@ -269,6 +270,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var outStationRequestBo = new OutStationRequestBo
                 {
                     SFC = item.SFC,
+                    VehicleCode = item.VehicleCode,
                     IsQualified = item.IsQualified == 1
                 };
 
@@ -281,7 +283,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 // 不合格代码
                 if (item.FailInfo != null && item.FailInfo.Any())
                 {
-                    outStationRequestBo.OutStationUnqualifiedList = item.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode });
+                    outStationRequestBo.OutStationUnqualifiedList = item.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode,UnqualifiedQty = s.UnqualifiedQty });
                 }
 
                 outStationRequestBos.Add(outStationRequestBo);

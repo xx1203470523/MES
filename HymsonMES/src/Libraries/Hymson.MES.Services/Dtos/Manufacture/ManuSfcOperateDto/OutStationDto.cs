@@ -9,6 +9,11 @@
         /// 条码
         /// </summary>
         public string SFC { get; set; } = string.Empty;
+        /// <summary>
+        /// 载具条码
+        /// </summary>
+        public string? VehicleCode { get; set; }
+
 
         /// <summary>
         /// 是否合格
@@ -88,7 +93,7 @@
         /// <summary>
         /// 产品条码集合
         /// </summary>
-        public OutBoundItemDto[] SFCs { get; set; }
+        public OutBoundDto[] SFCs { get; set; }
     }
 
     /// <summary>
@@ -157,6 +162,7 @@
         /// NG代码
         /// </summary>
         public string NCCode { get; set; } = string.Empty;
+        public decimal? UnqualifiedQty { get; set; }
     }
 
 }
