@@ -22,6 +22,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto
         /// 工序id
         /// </summary>
         public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum Status { get; set; }
     }
 
     /// <summary>
@@ -63,5 +68,47 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto
         /// </summary>
         public SfcStatusEnum Status { get; set; }
         
+    }
+
+    /// <summary>
+    /// PDA条码出站确认条码信息OutputDto
+    /// </summary>
+    public record ManuSfcOutstationConfirmSfcInfoOutputDto
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 计划产出数量
+        /// </summary>
+        public decimal PlanOutputQty { get; set; }
+
+        /// <summary>
+        /// 不良数量
+        /// </summary>
+        public decimal UnqualifiedQty { get; set; }
+
+        /// <summary>
+        /// 良品数量
+        /// </summary>
+        public decimal QualifiedQty { get; set; }
+
     }
 }

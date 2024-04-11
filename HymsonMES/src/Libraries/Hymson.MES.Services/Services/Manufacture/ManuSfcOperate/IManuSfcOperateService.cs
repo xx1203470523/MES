@@ -78,5 +78,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcInstationPagedQueryOutputDto>> GetPagedListAsync(ManuSfcInstationPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 获取条码信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<ManuSfcOutstationConfirmSfcInfoOutputDto> GetSfcInfoToPdaAsync(string sfc);
     }
 }
