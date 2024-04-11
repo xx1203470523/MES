@@ -54,6 +54,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
 
         /// <summary>
         /// 构造函数
@@ -70,6 +71,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="manuSfcSummaryRepository"></param>
         public ManuSfcOperateService(
             AbstractValidator<InBoundDto> validationInBoundDtoRules,
             AbstractValidator<InBoundMoreDto> validationInBoundMoreDtoRules,
@@ -82,7 +84,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             ICurrentSite currentSite,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IProcMaterialRepository procMaterialRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IManuSfcSummaryRepository manuSfcSummaryRepository)
         {
             _validationInBoundDtoRules = validationInBoundDtoRules;
             _validationInBoundMoreDtoRules = validationInBoundMoreDtoRules;
@@ -96,6 +99,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procMaterialRepository = procMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _manuSfcSummaryRepository = manuSfcSummaryRepository;
         }
 
         /// <summary>
@@ -446,6 +450,50 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             return new PagedInfo<ManuSfcInstationPagedQueryOutputDto>(result, pageInfo.PageIndex, pageInfo.PageSize, pageInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 获取条码信息,生产信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcOutstationConfirmSfcInfoOutputDto> GetSfcInfoToPdaAsync(string sfc)
+        {
+            var result = new ManuSfcOutstationConfirmSfcInfoOutputDto();
+
+            //获取条码生成信息
+            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = sfc, SiteId = _currentSite.SiteId ?? 0 });
+            if (sfcProduceEntity == null)
+            {
+                return result;
+            }
+
+            //获取工单信息
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(sfcProduceEntity.WorkOrderId);
+
+            //获取物料信息
+            var materialEntity = await _procMaterialRepository.GetByIdAsync(sfcProduceEntity.ProductId);
+
+            result.Id = sfcProduceEntity.Id;
+            result.SFC = sfcProduceEntity.SFC;
+            result.MaterialCode = materialEntity?.MaterialCode ?? "";
+            result.OrderCode = planWorkOrderEntity?.OrderCode ?? "";
+            result.PlanOutputQty = planWorkOrderEntity?.Qty ?? 0;
+
+            //获取条码工序生产汇总
+            var sfcSummaryEntities = await _manuSfcSummaryRepository.GetEntitiesAsync(new ManuSfcSummaryQuery { SFC = sfc, SiteId = _currentSite.SiteId ?? 0 });
+            if (sfcSummaryEntities == null || !sfcSummaryEntities.Any())
+            {
+                return result;
+            }
+            //计算不良数量和良品数量
+            var unqualifiedQty = sfcSummaryEntities.Sum(a => a.UnqualifiedQty);
+            var outputQty = sfcSummaryEntities.Sum(a => a.OutputQty);
+            var qualifiedQty = (outputQty ?? 0) - unqualifiedQty ?? 0;
+            result.UnqualifiedQty = unqualifiedQty ?? 0;
+            result.QualifiedQty = qualifiedQty;
+
+            return result;
         }
     }
 }
