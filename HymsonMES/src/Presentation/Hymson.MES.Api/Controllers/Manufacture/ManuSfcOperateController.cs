@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperate;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -72,8 +73,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OutStationMore")]
-        [LogDescription("出站（多个）", BusinessType.OTHER, "OutStationMore", ReceiverTypeEnum.MES)]
-        public async Task OutBoundMoreAsync(OutBoundMoreDto request)
+        [LogDescription("多个出站", BusinessType.OTHER, "OutStationMore", ReceiverTypeEnum.MES)]
+        public async Task OutBoundMoreAsync(ManuSFCPartialScrapDto request)
         {
             await _manuSfcOperateService.OutBoundMoreAsync(request);
         }
