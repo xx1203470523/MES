@@ -74,7 +74,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost("OutStationMore")]
         [LogDescription("多个出站", BusinessType.OTHER, "OutStationMore", ReceiverTypeEnum.MES)]
-        public async Task OutBoundMoreAsync(ManuSFCPartialScrapDto request)
+        public async Task OutBoundMoreAsync(OutBoundMoreDto request)
         {
             await _manuSfcOperateService.OutBoundMoreAsync(request);
         }
