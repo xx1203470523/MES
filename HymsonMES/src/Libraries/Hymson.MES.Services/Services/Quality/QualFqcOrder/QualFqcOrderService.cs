@@ -1269,7 +1269,8 @@ namespace Hymson.MES.Services.Services.Quality
                 FQCOrderIds = entities.Select(s => s.Id)
             });
 
-            var planworkEntitys = await _planWorkOrderRepository.GetByIdsAsync(entities.Where(w => w.WorkOrderId.HasValue).Select(x => x.WorkOrderId!.Value));
+            var workids = entities.Where(w => w.WorkOrderId.HasValue).Select(x => x.WorkOrderId!.Value).Distinct();
+            var planworkEntitys = await _planWorkOrderRepository.GetByIdsAsync(workids);
             var planworkDic = planworkEntitys.ToDictionary(x => x.Id, x => x);
 
             foreach (var entity in entities)
