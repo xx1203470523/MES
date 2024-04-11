@@ -405,7 +405,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
-        /// 分页查询列表（PDA条码出站）
+        /// PDA分页查询列表
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
@@ -415,7 +415,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var queryData = pagedQueryDto.ToQuery<ManuSfcProduceVehiclePagedQuery>();
             queryData.SiteId = _currentSite.SiteId ?? 0;
-            queryData.Status = SfcStatusEnum.lineUp;
+            queryData.Status = pagedQueryDto.Status;
             var pageInfo = await _manuSfcProduceRepository.GetManuSfcPageListAsync(queryData);
             if (pageInfo.Data == null || !pageInfo.Data.Any())
             {
@@ -480,18 +480,18 @@ namespace Hymson.MES.Services.Services.Manufacture
             result.OrderCode = planWorkOrderEntity?.OrderCode ?? "";
             result.PlanOutputQty = planWorkOrderEntity?.Qty ?? 0;
 
-            //获取条码工序生产汇总
-            var sfcSummaryEntities = await _manuSfcSummaryRepository.GetEntitiesAsync(new ManuSfcSummaryQuery { SFC = sfc, SiteId = _currentSite.SiteId ?? 0 });
-            if (sfcSummaryEntities == null || !sfcSummaryEntities.Any())
-            {
-                return result;
-            }
+            ////获取条码工序生产汇总
+            //var sfcSummaryEntities = await _manuSfcSummaryRepository.GetEntitiesAsync(new ManuSfcSummaryQuery { SFC = sfc, SiteId = _currentSite.SiteId ?? 0 });
+            //if (sfcSummaryEntities == null || !sfcSummaryEntities.Any())
+            //{
+            //    return result;
+            //}
             //计算不良数量和良品数量
-            var unqualifiedQty = sfcSummaryEntities.Sum(a => a.UnqualifiedQty);
-            var outputQty = sfcSummaryEntities.Sum(a => a.OutputQty);
-            var qualifiedQty = (outputQty ?? 0) - unqualifiedQty ?? 0;
-            result.UnqualifiedQty = unqualifiedQty ?? 0;
-            result.QualifiedQty = qualifiedQty;
+            //var unqualifiedQty = sfcSummaryEntities.Sum(a => a.UnqualifiedQty);
+            //var outputQty = sfcSummaryEntities.Sum(a => a.OutputQty);
+            //var qualifiedQty = (outputQty ?? 0) - unqualifiedQty ?? 0;
+            //result.UnqualifiedQty = unqualifiedQty ?? 0;
+            //result.QualifiedQty = qualifiedQty;
 
             return result;
         }
