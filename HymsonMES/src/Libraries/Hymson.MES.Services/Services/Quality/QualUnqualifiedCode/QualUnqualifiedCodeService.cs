@@ -58,40 +58,38 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
-        /// <param name="qualUnqualifiedCodePagedQueryDto"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualUnqualifiedCodeDto>> GetPageListAsync(QualUnqualifiedCodePagedQueryDto qualUnqualifiedCodePagedQueryDto)
+        public async Task<PagedInfo<QualUnqualifiedCodeDto>> GetPageListAsync(QualUnqualifiedCodePagedQueryDto pagedQueryDto)
         {
-            var qualUnqualifiedCodePagedQuery = qualUnqualifiedCodePagedQueryDto.ToQuery<QualUnqualifiedCodePagedQuery>();
+            var pagedQuery = pagedQueryDto.ToQuery<QualUnqualifiedCodePagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId.GetValueOrDefault();
 
-            qualUnqualifiedCodePagedQuery.SiteId = _currentSite.SiteId.GetValueOrDefault();
-
-            if (qualUnqualifiedCodePagedQueryDto.ProcedureId.HasValue)
+            if (pagedQueryDto.ProcedureId.HasValue)
             {
+                var defaultReturn = new PagedInfo<QualUnqualifiedCodeDto>(new List<QualUnqualifiedCodeDto>(), pagedQuery.PageIndex, pagedQuery.PageSize, 0);
                 var qualUnqualifiedGroupEntities = await _qualUnqualifiedGroupRepository.GetListByProcedureIdAsync(new QualUnqualifiedGroupQuery
                 {
-                    ProcedureId = qualUnqualifiedCodePagedQueryDto.ProcedureId.GetValueOrDefault(),
+                    ProcedureId = pagedQueryDto.ProcedureId.GetValueOrDefault(),
                     SiteId = _currentSite.SiteId.GetValueOrDefault()
                 });
                 var qualUnqualifiedGroupIds = qualUnqualifiedGroupEntities.Select(m => m.Id);
+                if (qualUnqualifiedGroupIds == null || !qualUnqualifiedGroupIds.Any()) return defaultReturn;
 
                 var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetListByGroupIdAsync(new QualUnqualifiedCodeQuery
                 {
                     UnqualifiedGroupIds = qualUnqualifiedGroupIds,
                     SiteId = _currentSite.SiteId.GetValueOrDefault()
                 });
-                qualUnqualifiedCodePagedQuery.Ids = qualUnqualifiedCodeEntities.Select(m => m.Id);
-                if (!qualUnqualifiedCodePagedQuery.Ids.Any())
-                {
-                    qualUnqualifiedCodePagedQuery.Ids = new List<long>() { 0 };
-                }
+                pagedQuery.Ids = qualUnqualifiedCodeEntities.Select(m => m.Id);
+                if (!pagedQuery.Ids.Any()) return defaultReturn;
             }
 
-            var pagedInfo = await _qualUnqualifiedCodeRepository.GetPagedInfoAsync(qualUnqualifiedCodePagedQuery);
+            var pagedInfo = await _qualUnqualifiedCodeRepository.GetPagedInfoAsync(pagedQuery);
 
-            //实体到DTO转换 装载数据
-            List<QualUnqualifiedCodeDto> qualUnqualifiedCodeDtos = PrepareQualUnqualifiedCodeDtos(pagedInfo);
-            return new PagedInfo<QualUnqualifiedCodeDto>(qualUnqualifiedCodeDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            // 实体到DTO转换 装载数据
+            var dtos = PrepareQualUnqualifiedCodeDtos(pagedInfo);
+            return new PagedInfo<QualUnqualifiedCodeDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
