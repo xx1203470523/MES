@@ -31,6 +31,12 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("OQC")]
         OQC = 9,
+
+        /// <summary>
+        /// fqc
+        /// </summary>
+        [Description("FQC")]
+        FQC = 16,
     }
 
 
