@@ -102,6 +102,11 @@ namespace Hymson.MES.Core.Domain.Plan
         public string? Remark { get; set; }
 
         /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
+
+        /// <summary>
         /// 锁定状态时锁定前的工单状态
         /// </summary>
         public PlanWorkOrderStatusEnum? LockedStatus { get; set; }

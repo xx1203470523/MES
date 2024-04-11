@@ -163,6 +163,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MaskCodeId { get; set; }
 
         /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
+
+        /// <summary>
         /// 数量限制
         /// </summary>
         public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
@@ -270,6 +275,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 掩码规则ID
         /// </summary>
         public long? MaskCodeId { get; set; }
+
+        /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
 
         /// <summary>
         /// 数量限制
@@ -421,6 +431,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MaskCodeId { get; set; }
 
         /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
+
+        /// <summary>
         /// 数量限制
         /// </summary>
         public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
@@ -480,6 +495,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 物料组编码
         /// </summary>
         public string? MaterialGroupCode {  get; set; }
+
+        /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
     }
 
     /// <summary>
