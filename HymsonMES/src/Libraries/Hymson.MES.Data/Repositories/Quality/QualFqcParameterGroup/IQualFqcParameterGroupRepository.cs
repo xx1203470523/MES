@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<QualFqcParameterGroupEntity> GetByIdAsync(long id);
+        Task<QualFqcParameterGroupEntity> GetByIdAsync(long? id);
     
         /// <summary>
         /// 根据IDs获取数据（批量）

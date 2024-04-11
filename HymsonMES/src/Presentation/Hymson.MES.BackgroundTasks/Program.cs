@@ -1,4 +1,6 @@
-﻿using Hymson.MES.BackgroundTasks;
+﻿using Hymson.Infrastructure.Mapper;
+using Hymson.Infrastructure;
+using Hymson.MES.BackgroundTasks;
 using Hymson.MES.BackgroundTasks.HostedServices;
 using Hymson.MES.BackgroundTasks.Jobs;
 using Hymson.MES.BackgroundTasks.Manufacture;
@@ -11,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using NLog;
 using Quartz;
 using System.Reflection;
+using AutoMapper;
 
 try
 {
@@ -34,6 +37,7 @@ Host.CreateDefaultBuilder(args)
    {
        services.Configure<PrintOptions>(hostContext.Configuration.GetSection(nameof(PrintOptions)));
        services.AddLocalization();
+      
        services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
@@ -85,6 +89,31 @@ Host.CreateDefaultBuilder(args)
        services.AddSqlExecuteTaskService(hostContext.Configuration);
        services.AddNLog(hostContext.Configuration);
        services.AddEventBusRabbitMQService(hostContext.Configuration);
+       AddAutoMapper();
 
    });
+
+         static void AddAutoMapper()
+        {
+            //find mapper configurations provided by other assemblies
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var mapperConfigurations = typeFinder.FindClassesOfType<IOrderedMapperProfile>();
+
+            //create and sort instances of mapper configurations
+            var instances = mapperConfigurations
+                .Select(mapperConfiguration => (IOrderedMapperProfile)Activator.CreateInstance(mapperConfiguration))
+                .OrderBy(mapperConfiguration => mapperConfiguration.Order);
+
+            //create AutoMapper configuration
+            var config = new MapperConfiguration(cfg =>
+            {
+                foreach (var instance in instances)
+                {
+                    cfg.AddProfile(instance.GetType());
+                }
+            });
+
+            //register
+            AutoMapperConfiguration.Init(config);
+        }
 

@@ -20,6 +20,10 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
     }
 
     /// <summary>

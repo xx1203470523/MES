@@ -131,7 +131,22 @@
 
     }
 
+    /// <summary>
+    /// 中止
+    /// </summary>
+    public record StopBoundDto : BaseDto
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; } = "";
 
+        /// <summary>
+        /// 产品条码集合
+        /// </summary>
+        public string[] SFCs { get; set; }
+
+    }
 
     /// <summary>
     /// 

@@ -202,7 +202,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseBo.Rows +=await _qualFinallyOutputRecordDetailRepository.InsertRangeAsync(data.QualFinallyOutputRecordDetailEntities);
             if(data.FQCOrderAutoCreateIntegrationEvent != null&&data.FQCOrderAutoCreateIntegrationEvent.RecordDetails.Any())
             {
-                _eventBus.PublishDelay(data.FQCOrderAutoCreateIntegrationEvent, 10);
+                _eventBus.PublishDelay(data.FQCOrderAutoCreateIntegrationEvent,3);
             }
 
             return responseBo;
