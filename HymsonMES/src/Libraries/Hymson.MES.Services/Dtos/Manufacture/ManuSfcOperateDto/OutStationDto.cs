@@ -13,6 +13,15 @@
         /// 载具条码
         /// </summary>
         public string? VehicleCode { get; set; }
+        /// <summary>
+        /// 合格数量
+        /// </summary>
+        public decimal QualifiedQty { get; set; } = 1;
+
+        /// <summary>
+        /// 不合格数量
+        /// </summary>
+        public decimal UnQualifiedQty { get; set; }= 0;
 
 
         /// <summary>
@@ -60,6 +69,15 @@
         /// 0不合格,1合格
         /// </summary>
         public int? IsQualified { get; set; }
+        /// <summary>
+        /// 合格数量
+        /// </summary>
+        public decimal QualifiedQty { get; set; }
+
+        /// <summary>
+        /// 不合格数量
+        /// </summary>
+        public decimal UnQualifiedQty { get; set; }
 
         /*
         /// <summary>
