@@ -59,7 +59,13 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 返工
         /// </summary>
         [Description("返工")]
-        Rework = 9
+        Rework = 9,
+
+        /// <summary>
+        /// 让步接收
+        /// </summary>
+        [Description("让步接收")]
+        Compromise = 10
 
     }
 }

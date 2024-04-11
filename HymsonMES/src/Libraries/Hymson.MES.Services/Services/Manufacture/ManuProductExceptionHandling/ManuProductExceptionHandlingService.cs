@@ -282,7 +282,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Status = ProductBadRecordStatusEnum.Open,
                 SFCs = barCodes
             });
-            if (allBadRecordEntities == null || !allBadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15451)).WithData("barCode", string.Join(',', barCodes));
+            //if (allBadRecordEntities == null || !allBadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15451)).WithData("barCode", string.Join(',', barCodes));
             var allBadRecordEntitiesDict = allBadRecordEntities.ToLookup(x => x.SFC).ToDictionary(d => d.Key, d => d);
 
             // 遍历所有条码
@@ -332,19 +332,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var unqualifiedCodeEntity = dataBo.UnqualifiedCodeEntities.FirstOrDefault(f => f.Id == dto.UnqualifiedCodeId);
                 if (unqualifiedCodeEntity == null) continue;
 
-                // 每个条码的不合格记录
-                if (!allBadRecordEntitiesDict.TryGetValue(sfcEntity.SFC, out var badRecordEntities)) continue;
-
-                // 关闭不合格
-                badRecordUpdateCommands.AddRange(badRecordEntities.Select(s => new ManuProductBadRecordUpdateCommand
+                // 关闭不合格记录（如果有的话）
+                if (dataBo.BadRecordEntitiesDict.TryGetValue(sfcEntity.SFC, out var badRecordEntities))
                 {
-                    Id = s.Id,
-                    Status = ProductBadRecordStatusEnum.Close,
-                    DisposalResult = ProductBadDisposalResultEnum.Misjudgment,
-                    UpdatedOn = dataBo.UpdatedOn,
-                    UserId = dataBo.UpdatedBy,
-                    Remark = dataBo.Remark
-                }));
+                    badRecordUpdateCommands.AddRange(badRecordEntities.Select(s => new ManuProductBadRecordUpdateCommand
+                    {
+                        Id = s.Id,
+                        Status = ProductBadRecordStatusEnum.Close,
+                        DisposalResult = ProductBadDisposalResultEnum.Compromise,
+                        UpdatedOn = dataBo.UpdatedOn,
+                        UserId = dataBo.UpdatedBy,
+                        Remark = dataBo.Remark
+                    }));
+                }
 
                 var sfcStepId = 0L;
                 if (sfcEntity.Type == SfcTypeEnum.Produce)

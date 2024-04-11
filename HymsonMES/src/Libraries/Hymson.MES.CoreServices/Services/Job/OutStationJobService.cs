@@ -1542,7 +1542,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             foreach (var item in outStationRequestBos)
             {
                 if (item.OutStationUnqualifiedList == null || !item.OutStationUnqualifiedList.Any()) continue;
-                unqualifiedCodes.AddRange((IEnumerable<string>)item.OutStationUnqualifiedList.SelectMany(s => s.UnqualifiedCode));
+                unqualifiedCodes.AddRange(item.OutStationUnqualifiedList.Select(s => s.UnqualifiedCode));
             }
 
             // 如果有传不合格代码，读取能跟数据库对应上的不合格代码

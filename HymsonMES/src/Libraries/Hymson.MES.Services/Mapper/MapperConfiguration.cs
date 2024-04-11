@@ -1171,6 +1171,7 @@ namespace Hymson.MES.Services.Mapper
 
             #region ManuProductExceptionHandling
             CreateMap<ManuProductNGBarCodeDto, ManuCompromiseBarCodeDto>();
+            CreateMap<ManuProductBarCodeDto, ManuCompromiseBarCodeDto>();
             CreateMap<ManuProductNGBarCodeDto, ManuMisjudgmentBarCodeDto>();
             CreateMap<ManuProductBarCodeDto, ManuReworkBarCodeDto>();
             #endregion
