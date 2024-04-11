@@ -483,6 +483,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             var updatedOn = HymsonClock.Now();
             string inspectionOrder = await GenerateFQCOrderCodeAsync(bo.SiteId, bo.UserName);
             var materialId = bo.RecordDetails.Select(x => x.MaterialId).FirstOrDefault();
+            var workOrderId = bo.RecordDetails.Select(x => x.WorkOrderId).FirstOrDefault();
             //获取所有检验项目
             var parameterGroupEntity = await _qualFqcParameterGroupRepository.GetEntityAsync(new QualFqcParameterGroupQuery
             {
@@ -563,7 +564,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
                 SiteId = bo.SiteId,
                 InspectionOrder = inspectionOrder,
                 GroupSnapshootId = parameterGroupSnapshoot.Id,
-                WorkOrderId = materialId,
+                WorkOrderId = workOrderId,
                 MaterialId = parameterGroupEntity.MaterialId,
                 SampleQty = parameterGroupEntity.SampleQty,
                 Status = InspectionStatusEnum.WaitInspect,

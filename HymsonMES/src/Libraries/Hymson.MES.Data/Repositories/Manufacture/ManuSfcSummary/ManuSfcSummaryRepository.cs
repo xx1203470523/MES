@@ -194,6 +194,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Where("IsDeleted=0");
+
+            if (!string.IsNullOrWhiteSpace(query.SFC)) {
+                sqlBuilder.Where("SFC=@SFC");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcSummaryEntity>(template.RawSql, query);
         }

@@ -4,6 +4,7 @@ using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -53,6 +54,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 服务接口（Excel）
         /// </summary>
         private readonly IExcelService _excelService;
+
+        /// <summary>
+        /// 服务接口（多语言）
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 服务接口（生产通用）
@@ -131,6 +137,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="excelService"></param>
+        /// <param name="localizationService"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcRepository"></param>
@@ -146,7 +153,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
         public ManuProductExceptionHandlingService(ILogger<ManuProductExceptionHandlingService> logger,
-            ICurrentUser currentUser, ICurrentSite currentSite, IExcelService excelService,
+            ICurrentUser currentUser, ICurrentSite currentSite, IExcelService excelService, ILocalizationService localizationService,
             IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IManuSfcRepository manuSfcRepository,
@@ -166,6 +173,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentUser = currentUser;
             _currentSite = currentSite;
             _excelService = excelService;
+            _localizationService = localizationService;
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuSfcRepository = manuSfcRepository;
@@ -196,7 +204,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 站点
             var siteId = _currentSite.SiteId ?? 0;
-            var dtos = await GetNgInfoByBarCodesAsync(siteId, new List<string> { barCode });
+            var dtos = await GetInfoByBarCodesAsync(siteId, new List<string> { barCode });
             return dtos.Select(s => s.ToDto<ManuCompromiseBarCodeDto>());
         }
 
@@ -274,8 +282,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Status = ProductBadRecordStatusEnum.Open,
                 SFCs = barCodes
             });
-            if (allBadRecordEntities == null || !allBadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15451)).WithData("barCode", string.Join(',', barCodes));
-            var allBadRecordEntitiesDict = allBadRecordEntities.ToLookup(x => x.SFC).ToDictionary(d => d.Key, d => d);
+            //if (allBadRecordEntities == null || !allBadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15451)).WithData("barCode", string.Join(',', barCodes));
+            dataBo.BadRecordEntitiesDict = allBadRecordEntities.ToLookup(x => x.SFC).ToDictionary(d => d.Key, d => d);
 
             // 遍历所有条码
             List<ManuSfcStepEntity> sfcStepEntities = new();
@@ -290,9 +298,27 @@ namespace Hymson.MES.Services.Services.Manufacture
             List<long> sfcProduceIds = new();
             foreach (var dto in requestDto.Compromises)
             {
-                if (!dto.UnqualifiedCodeId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19702));
-                if (!dto.FoundProcedureId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15433));
-                if (!dto.OutProcedureId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15457));
+                var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", dto.BarCode);
+
+                if (!dto.UnqualifiedCodeId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES19702);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (!dto.FoundProcedureId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15433);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (!dto.OutProcedureId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15457);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
 
                 // 条码
                 var sfcEntity = dataBo.SFCEntities.FirstOrDefault(f => f.SFC == dto.BarCode);
@@ -306,19 +332,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var unqualifiedCodeEntity = dataBo.UnqualifiedCodeEntities.FirstOrDefault(f => f.Id == dto.UnqualifiedCodeId);
                 if (unqualifiedCodeEntity == null) continue;
 
-                // 每个条码的不合格记录
-                if (!allBadRecordEntitiesDict.TryGetValue(sfcEntity.SFC, out var badRecordEntities)) continue;
-
-                // 关闭不合格
-                badRecordUpdateCommands.AddRange(badRecordEntities.Select(s => new ManuProductBadRecordUpdateCommand
+                // 关闭不合格记录（如果有的话）
+                if (dataBo.BadRecordEntitiesDict.TryGetValue(sfcEntity.SFC, out var badRecordEntities))
                 {
-                    Id = s.Id,
-                    Status = ProductBadRecordStatusEnum.Close,
-                    DisposalResult = ProductBadDisposalResultEnum.Misjudgment,
-                    UpdatedOn = dataBo.UpdatedOn,
-                    UserId = dataBo.UpdatedBy,
-                    Remark = dataBo.Remark
-                }));
+                    badRecordUpdateCommands.AddRange(badRecordEntities.Select(s => new ManuProductBadRecordUpdateCommand
+                    {
+                        Id = s.Id,
+                        Status = ProductBadRecordStatusEnum.Close,
+                        DisposalResult = ProductBadDisposalResultEnum.Compromise,
+                        UpdatedOn = dataBo.UpdatedOn,
+                        UserId = dataBo.UpdatedBy,
+                        Remark = dataBo.Remark
+                    }));
+                }
 
                 var sfcStepId = 0L;
                 if (sfcEntity.Type == SfcTypeEnum.Produce)
@@ -482,6 +508,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 });
             }
 
+            if (validationFailures.Any()) throw new ValidationException("", validationFailures);
+
             // 需要删除的条码ID
             physicalDeleteSFCProduceByIdsCommand.Ids = sfcProduceIds;
 
@@ -537,6 +565,48 @@ namespace Hymson.MES.Services.Services.Manufacture
             var stream = formFile.OpenReadStream();
             var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
             */
+
+            var validationFailures = new List<ValidationFailure>();
+            var index = 0;
+            foreach (var item in dtos)
+            {
+                index++;
+
+                // 校验产品序列码
+                if (string.IsNullOrEmpty(item.BarCode))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15466);
+                    validationFailures.Add(validationFailure);
+                }
+                // 校验发现工序
+                if (string.IsNullOrEmpty(item.FoundProcedure))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15463);
+                    validationFailures.Add(validationFailure);
+                }
+                // 校验不合格代码
+                if (string.IsNullOrEmpty(item.UnqualifiedCode))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15464);
+                    validationFailures.Add(validationFailure);
+                }
+                // 校验流出工序
+                if (string.IsNullOrEmpty(item.OutProcedure))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15457);
+                    validationFailures.Add(validationFailure);
+                }
+            }
+
+            if (validationFailures.Any()) throw new ValidationException(_localizationService.GetResource("ExcelRowError"), validationFailures);
 
             ManuCompromiseDto requestDto = await GetCompromiseDtosFromExcelAsync(dtos);
             if (requestDto == null || requestDto.Compromises == null || !requestDto.Compromises.Any()) return;
@@ -986,6 +1056,75 @@ namespace Hymson.MES.Services.Services.Manufacture
             var stream = formFile.OpenReadStream();
             var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
             */
+
+            var validationFailures = new List<ValidationFailure>();
+            var index = 0;
+            foreach (var item in dtos)
+            {
+                index++;
+
+                // 校验产品序列码
+                if (string.IsNullOrEmpty(item.BarCode))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15466);
+                    validationFailures.Add(validationFailure);
+                }
+                // 校验返工类型
+                if (!Enum.IsDefined(typeof(ManuReworkTypeEnum), item.Type))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15465);
+                    validationFailures.Add(validationFailure);
+                }
+                // 校验返工工单
+                if ((item.Type == ManuReworkTypeEnum.NewOrder || item.Type == ManuReworkTypeEnum.NewOrderCell)
+                    && string.IsNullOrEmpty(item.ReworkWorkOrder))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15456);
+                    validationFailures.Add(validationFailure);
+                }
+                // 校验返工工序
+                if (item.Type == ManuReworkTypeEnum.OriginalOrder && string.IsNullOrEmpty(item.ReworkProcedure))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15458);
+                    validationFailures.Add(validationFailure);
+                }
+                // 校验发现工序
+                if ((item.Type == ManuReworkTypeEnum.OriginalOrder || item.Type == ManuReworkTypeEnum.NewOrder)
+                    && string.IsNullOrEmpty(item.FoundProcedure))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15463);
+                    validationFailures.Add(validationFailure);
+                }
+                // 校验不合格代码
+                if (string.IsNullOrEmpty(item.UnqualifiedCode))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15464);
+                    validationFailures.Add(validationFailure);
+                }
+                // 校验流出工序
+                if ((item.Type == ManuReworkTypeEnum.OriginalOrder || item.Type == ManuReworkTypeEnum.NewOrder)
+                    && string.IsNullOrEmpty(item.OutProcedure))
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15457);
+                    validationFailures.Add(validationFailure);
+                }
+            }
+
+            if (validationFailures.Any()) throw new ValidationException(_localizationService.GetResource("ExcelRowError"), validationFailures);
 
             ManuReworkDto requestDto = await GetReworkDtosFromExcelAsync(dtos);
             if (requestDto == null || requestDto.Reworks == null || !requestDto.Reworks.Any()) return;
@@ -1487,8 +1626,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             var siteId = _currentSite.SiteId ?? 0;
 
             // 工序信息
-            var procedureCodes = excelDtos.Select(s => s.FoundProcedure);
-            procedureCodes = procedureCodes.Union(excelDtos.Select(s => s.OutProcedure));
+            var procedureCodes = excelDtos.Where(w => w.FoundProcedure != null).Select(s => s.FoundProcedure);
+            procedureCodes = procedureCodes.Union(excelDtos.Where(w => w.OutProcedure != null).Select(s => s.OutProcedure));
 
             var procedureEntities = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery
             {
@@ -1500,7 +1639,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var unqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByCodesAsync(new QualUnqualifiedCodeByCodesQuery
             {
                 SiteId = siteId,
-                Codes = excelDtos.Select(s => s.UnqualifiedCode).Distinct()
+                Codes = excelDtos.Where(w => w.UnqualifiedCode != null).Select(s => s.UnqualifiedCode).Distinct()
             });
 
             foreach (var item in excelDtos)
@@ -1548,13 +1687,13 @@ namespace Hymson.MES.Services.Services.Manufacture
             var workOrderEntities = await _planWorkOrderRepository.GetEntitiesAsync(new PlanWorkOrderNewQuery
             {
                 SiteId = siteId,
-                Codes = excelDtos.Select(s => s.ReworkWorkOrder).Distinct()
+                Codes = excelDtos.Where(w => w.ReworkWorkOrder != null).Select(s => s.ReworkWorkOrder).Distinct()
             });
 
             // 工序信息
-            var procedureCodes = excelDtos.Select(s => s.FoundProcedure);
-            procedureCodes = procedureCodes.Union(excelDtos.Select(s => s.OutProcedure));
-            procedureCodes = procedureCodes.Union(excelDtos.Select(s => s.ReworkProcedure));
+            var procedureCodes = excelDtos.Where(w => w.FoundProcedure != null).Select(s => s.FoundProcedure);
+            procedureCodes = procedureCodes.Union(excelDtos.Where(w => w.OutProcedure != null).Select(s => s.OutProcedure));
+            procedureCodes = procedureCodes.Union(excelDtos.Where(w => w.ReworkProcedure != null).Select(s => s.ReworkProcedure));
 
             var procedureEntities = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery
             {
@@ -1566,7 +1705,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var unqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByCodesAsync(new QualUnqualifiedCodeByCodesQuery
             {
                 SiteId = siteId,
-                Codes = excelDtos.Select(s => s.UnqualifiedCode).Distinct()
+                Codes = excelDtos.Where(w => w.UnqualifiedCode != null).Select(s => s.UnqualifiedCode).Distinct()
             });
 
             foreach (var item in excelDtos)
@@ -1615,12 +1754,36 @@ namespace Hymson.MES.Services.Services.Manufacture
             var responseBo = new ReworkResponseBo();
 
             // 遍历所有条码
+            var validationFailures = new List<ValidationFailure>();
             foreach (var dto in reworkIemDtos)
             {
-                if (!dto.UnqualifiedCodeId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19702));
-                if (!dto.FoundProcedureId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15433));
-                if (!dto.OutProcedureId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15457));
-                if (!dto.ReworkProcedureId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15458));
+                var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", dto.BarCode);
+
+                if (!dto.UnqualifiedCodeId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES19702);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (!dto.FoundProcedureId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15433);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (!dto.OutProcedureId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15457);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (!dto.ReworkProcedureId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15458);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
 
                 // 条码
                 var sfcEntity = dataBo.SFCEntities.FirstOrDefault(f => f.SFC == dto.BarCode);
@@ -1769,6 +1932,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 });
             }
 
+            if (validationFailures.Any()) throw new ValidationException("", validationFailures);
+
             return await Task.FromResult(responseBo);
         }
 
@@ -1790,12 +1955,36 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             // 遍历所有条码
+            var validationFailures = new List<ValidationFailure>();
             foreach (var dto in reworkIemDtos)
             {
-                if (!dto.UnqualifiedCodeId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19702));
-                if (!dto.FoundProcedureId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15433));
-                if (!dto.OutProcedureId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15457));
-                if (!dto.ReworkWorkOrderId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15456));
+                var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", dto.BarCode);
+
+                if (!dto.UnqualifiedCodeId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES19702);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (!dto.FoundProcedureId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15433);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (!dto.OutProcedureId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15457);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (!dto.ReworkWorkOrderId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15456);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
 
                 // 条码
                 var sfcEntity = dataBo.SFCEntities.FirstOrDefault(f => f.SFC == dto.BarCode);
@@ -1916,6 +2105,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 });
             }
 
+            if (validationFailures.Any()) throw new ValidationException("", validationFailures);
+
             return responseBo;
         }
 
@@ -1937,10 +2128,24 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             // 遍历所有条码
+            var validationFailures = new List<ValidationFailure>();
             foreach (var dto in reworkIemDtos)
             {
-                if (!dto.UnqualifiedCodeId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES19702));
-                if (!dto.ReworkWorkOrderId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15456));
+                var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", dto.BarCode);
+
+                if (!dto.UnqualifiedCodeId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES19702);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                if (!dto.ReworkWorkOrderId.HasValue)
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15456);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
 
                 // 条码
                 var sfcEntity = dataBo.SFCEntities.FirstOrDefault(f => f.SFC == dto.BarCode);
@@ -2072,6 +2277,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     UpdatedOn = dataBo.UpdatedOn
                 });
             }
+
+            if (validationFailures.Any()) throw new ValidationException("", validationFailures);
 
             return responseBo;
         }

@@ -950,6 +950,10 @@
         public const string MES15460 = "发现工序在系统中不存在！";
         public const string MES15461 = "流出工序不存在！";
         public const string MES15462 = "不合格代码不存在！";
+        public const string MES15463 = "发现工序不能为空！";
+        public const string MES15464 = "不合格代码不能为空！";
+        public const string MES15465 = "返工类型不能为空！";
+        public const string MES15466 = "产品序列码不能为空！";
         #endregion
 
         #region 物料加载 15500
@@ -1374,6 +1378,7 @@
         public const string MES16802 = "有工单没有被激活，无法绑定";
         public const string MES16803 = "没有找到该资源对应的工作中心";
         public const string MES16804 = "有工单ID重复";
+        public const string MES16805 = "工单站点与当前站点不同，无法绑定，请切换站点";
         #endregion
 
         #region 面板操作-生产过站面板 MES16900
@@ -1811,7 +1816,7 @@
         public const string MES19606 = "参数{ParameterCodes}不存在";
         public const string MES19607 = "通过资源【{Code}】未找到相应的上料数据！";
         public const string MES19608 = "通过资源【{Code}】找到的上料数据未包含工单信息！";
-  
+
         #endregion
 
         #region 设备对接错误
@@ -2007,7 +2012,9 @@
         #endregion
 
 
-
+        #region FQC检验项目 19982
+        public const string MES19982 = "物料{materialCode}检验项目版本{version}已存在，不允许重复添加！"; 
+        #endregion
 
 
         #region 基础数据导入 11600

@@ -66,10 +66,24 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task OutBoundCarrierAsync(OutBoundCarrierDto request);
 
         /// <summary>
+        /// 中止
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task StopStationMoreAsync(StopBoundDto request);
+
+        /// <summary>
         /// 分页查询列表（PDA条码出站）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcInstationPagedQueryOutputDto>> GetPagedListAsync(ManuSfcInstationPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 获取条码信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<ManuSfcOutstationConfirmSfcInfoOutputDto> GetSfcInfoToPdaAsync(string sfc);
     }
 }

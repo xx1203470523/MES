@@ -76,9 +76,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             if (!ids.Any()) return new List<PlanWorkOrderEntity>();
-
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<PlanWorkOrderEntity>(GetByIdsSql, new { ids = ids });
+            return await conn.QueryAsync<PlanWorkOrderEntity>(GetByIdsSql, new { ids});
         }
 
         /// <summary>

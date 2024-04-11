@@ -1044,6 +1044,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualFqcParameterGroupDetailSnapshootEntity, FQCParameterDetailDto>();
             CreateMap<QualFqcOrderSampleSaveDto, QualFqcOrderSampleQuery>();
             CreateMap<FQCParameterDetailPagedQueryDto, QualFqcOrderSampleDetailPagedQuery>();
+            CreateMap<QualFqcParameterGroupEntity, QualFqcParameterGroupOutputDto>();
+            CreateMap<QualFqcParameterGroupDetailEntity, QualFqcParameterGroupDetailOutputDto>();
+            CreateMap<QualFqcParameterGroupDetailQueryDto, QualFqcParameterGroupDetailQuery>();
+            CreateMap<QualFqcParameterGroupUpdateDto, QualFqcParameterGroupUpdateCommand>();
 
 
 
@@ -1167,6 +1171,7 @@ namespace Hymson.MES.Services.Mapper
 
             #region ManuProductExceptionHandling
             CreateMap<ManuProductNGBarCodeDto, ManuCompromiseBarCodeDto>();
+            CreateMap<ManuProductBarCodeDto, ManuCompromiseBarCodeDto>();
             CreateMap<ManuProductNGBarCodeDto, ManuMisjudgmentBarCodeDto>();
             CreateMap<ManuProductBarCodeDto, ManuReworkBarCodeDto>();
             #endregion

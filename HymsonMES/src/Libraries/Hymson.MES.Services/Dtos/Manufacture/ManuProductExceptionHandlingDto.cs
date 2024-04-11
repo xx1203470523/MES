@@ -198,19 +198,19 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 发现不良工序
         /// </summary>
-        [EpplusTableColumn(Header = "发现不良工序", Order = 6)]
+        [EpplusTableColumn(Header = "发现不良工序", Order = 2)]
         public string FoundProcedure { get; set; }
 
         /// <summary>
         /// 不合格代码
         /// </summary>
-        [EpplusTableColumn(Header = "不合格代码(必填)", Order = 5)]
+        [EpplusTableColumn(Header = "不合格代码(必填)", Order = 3)]
         public string UnqualifiedCode { get; set; }
 
         /// <summary>
         /// 流出不良工序
         /// </summary>
-        [EpplusTableColumn(Header = "流出不良工序", Order = 7)]
+        [EpplusTableColumn(Header = "流出不良工序", Order = 4)]
         public string OutProcedure { get; set; }
 
     }
@@ -429,13 +429,13 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 发现不良工序
         /// </summary>
-        [EpplusTableColumn(Header = "发现不良工序", Order = 6)]
+        [EpplusTableColumn(Header = "发现不良工序", Order = 5)]
         public string FoundProcedure { get; set; }
 
         /// <summary>
         /// 不合格代码
         /// </summary>
-        [EpplusTableColumn(Header = "不合格代码(必填)", Order = 5)]
+        [EpplusTableColumn(Header = "不合格代码(必填)", Order = 6)]
         public string UnqualifiedCode { get; set; }
 
         /// <summary>

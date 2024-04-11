@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InStationMore")]
-        [LogDescription("多个进站", BusinessType.OTHER, "InStationMore", ReceiverTypeEnum.MES)]
+        [LogDescription("进站（多个）", BusinessType.OTHER, "InStationMore", ReceiverTypeEnum.MES)]
         public async Task InBoundMoreAsync(InBoundMoreDto request)
         {
             await _manuSfcOperateService.InBoundMoreAsync(request);
@@ -72,7 +72,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OutStationMore")]
-        [LogDescription("多个出站", BusinessType.OTHER, "OutStationMore", ReceiverTypeEnum.MES)]
+        [LogDescription("出站（多个）", BusinessType.OTHER, "OutStationMore", ReceiverTypeEnum.MES)]
         public async Task OutBoundMoreAsync(OutBoundMoreDto request)
         {
             await _manuSfcOperateService.OutBoundMoreAsync(request);
@@ -103,15 +103,38 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 中止（多个）
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("StopStationMore")]
+        [LogDescription("中止（多个）", BusinessType.OTHER, "StopStationMore", ReceiverTypeEnum.MES)]
+        public async Task StopStationMoreAsync(StopBoundDto request)
+        {
+            await _manuSfcOperateService.StopStationMoreAsync(request);
+        }
+
+
+        /// <summary>
         /// 分页查询列表（PDA条码出站）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("page")]
+        [HttpGet("page")]
         public async Task<PagedInfo<ManuSfcInstationPagedQueryOutputDto>> GetPagedListAsync([FromQuery] ManuSfcInstationPagedQueryDto pagedQueryDto)
         {
             return await _manuSfcOperateService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// PDA条码出站确认获取条码信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet("pda/getsfcinfo/{sfc}")]
+        public async Task<ManuSfcOutstationConfirmSfcInfoOutputDto> GetSfcInfoToPdaAsync(string sfc)
+        {
+            return await _manuSfcOperateService.GetSfcInfoToPdaAsync(sfc);
         }
     }
 }
