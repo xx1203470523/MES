@@ -283,7 +283,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SFCs = barCodes
             });
             //if (allBadRecordEntities == null || !allBadRecordEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15451)).WithData("barCode", string.Join(',', barCodes));
-            var allBadRecordEntitiesDict = allBadRecordEntities.ToLookup(x => x.SFC).ToDictionary(d => d.Key, d => d);
+            dataBo.BadRecordEntitiesDict = allBadRecordEntities.ToLookup(x => x.SFC).ToDictionary(d => d.Key, d => d);
 
             // 遍历所有条码
             List<ManuSfcStepEntity> sfcStepEntities = new();
