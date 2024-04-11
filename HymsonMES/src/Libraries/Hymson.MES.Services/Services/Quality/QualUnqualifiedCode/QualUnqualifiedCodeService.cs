@@ -62,16 +62,19 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// <returns></returns>
         public async Task<PagedInfo<QualUnqualifiedCodeDto>> GetPageListAsync(QualUnqualifiedCodePagedQueryDto pagedQueryDto)
         {
+            // 站点
+            var siteId = _currentSite.SiteId.GetValueOrDefault();
+
             var pagedQuery = pagedQueryDto.ToQuery<QualUnqualifiedCodePagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId.GetValueOrDefault();
+            pagedQuery.SiteId = siteId;
 
             if (pagedQueryDto.ProcedureId.HasValue)
             {
                 var defaultReturn = new PagedInfo<QualUnqualifiedCodeDto>(new List<QualUnqualifiedCodeDto>(), pagedQuery.PageIndex, pagedQuery.PageSize, 0);
                 var qualUnqualifiedGroupEntities = await _qualUnqualifiedGroupRepository.GetListByProcedureIdAsync(new QualUnqualifiedGroupQuery
                 {
-                    ProcedureId = pagedQueryDto.ProcedureId.GetValueOrDefault(),
-                    SiteId = _currentSite.SiteId.GetValueOrDefault()
+                    ProcedureId = pagedQueryDto.ProcedureId.Value,
+                    SiteId = siteId
                 });
                 var qualUnqualifiedGroupIds = qualUnqualifiedGroupEntities.Select(m => m.Id);
                 if (qualUnqualifiedGroupIds == null || !qualUnqualifiedGroupIds.Any()) return defaultReturn;
@@ -79,7 +82,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
                 var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetListByGroupIdAsync(new QualUnqualifiedCodeQuery
                 {
                     UnqualifiedGroupIds = qualUnqualifiedGroupIds,
-                    SiteId = _currentSite.SiteId.GetValueOrDefault()
+                    SiteId = siteId
                 });
                 pagedQuery.Ids = qualUnqualifiedCodeEntities.Select(m => m.Id);
                 if (!pagedQuery.Ids.Any()) return defaultReturn;

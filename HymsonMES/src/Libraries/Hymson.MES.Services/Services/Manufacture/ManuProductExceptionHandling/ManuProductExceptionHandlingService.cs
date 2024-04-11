@@ -21,13 +21,11 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Data;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -206,7 +204,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 站点
             var siteId = _currentSite.SiteId ?? 0;
-            var dtos = await GetNgInfoByBarCodesAsync(siteId, new List<string> { barCode });
+            var dtos = await GetInfoByBarCodesAsync(siteId, new List<string> { barCode });
             return dtos.Select(s => s.ToDto<ManuCompromiseBarCodeDto>());
         }
 
