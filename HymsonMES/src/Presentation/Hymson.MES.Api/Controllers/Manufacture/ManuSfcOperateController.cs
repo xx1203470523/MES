@@ -42,6 +42,20 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             await _manuSfcOperateService.InBoundAsync(request);
         }
 
+
+        /// <summary>
+        /// 生成条码
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("GenerateBarcodeAndInBound")]
+        [LogDescription("生成条码并进站", BusinessType.OTHER, "GenerateBarcodeAndInBound", ReceiverTypeEnum.MES)]
+        public async Task GenerateBarcodeAndInBoundAsync(BaseDto request)
+        {
+            await _manuSfcOperateService.GenerateBarcodeAndInBoundAsync(request);
+        }
+
+
         /// <summary>
         /// 进站（多个）
         /// </summary>

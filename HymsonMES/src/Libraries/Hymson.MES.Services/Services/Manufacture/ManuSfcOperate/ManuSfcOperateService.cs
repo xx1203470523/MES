@@ -168,6 +168,35 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
+        /// 生成条码并进站
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task GenerateBarcodeAndInBoundAsync(BaseDto request)
+        {
+            if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ResourceCode = request.ResourceCode,
+                EquipmentCode = request.EquipmentCode
+            });
+            if (manuBo == null) return;
+
+            _ = await _manuPassStationService.InStationRangeBySFCAsync(new SFCInStationBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                ProcedureId = manuBo.ProcedureId,
+                ResourceId = manuBo.ResourceId,
+                EquipmentId = manuBo.EquipmentId,
+                SFCs = new string[] { }
+            }, RequestSourceEnum.PDA);
+        }
+
+        /// <summary>
         /// 进站（多个）
         /// </summary>
         /// <param name="request"></param>
