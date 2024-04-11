@@ -87,6 +87,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
         private readonly IWhMaterialInventoryScrapRepository _whMaterialInventoryScrapRepository;
+
         /// <summary>
         /// 
         /// </summary>
@@ -99,13 +100,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcScrapRepository"></param>
-        public ManuMaterialScrapService(ICurrentUser currentUser, ICurrentSite currentSite, 
-            IManuSfcRepository manuSfcRepository, IManuSfcInfoRepository manuSfcInfoRepository, 
-            IManuSfcProduceRepository manuSfcProduceRepository, ILocalizationService localizationService, 
-            IWhMaterialInventoryRepository whMaterialInventoryRepository, IManuSfcStepRepository manuSfcStepRepository,
-            IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            IWhMaterialInventoryScrapRepository whMaterialInventoryScrapRepository,
-            IManuSfcScrapRepository manuSfcScrapRepository)
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="whMaterialStandingbookRepository"></param>
+        /// <param name="whMaterialInventoryScrapRepository"></param>
+        public ManuMaterialScrapService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcRepository manuSfcRepository, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcProduceRepository manuSfcProduceRepository, ILocalizationService localizationService, IWhMaterialInventoryRepository whMaterialInventoryRepository, IManuSfcStepRepository manuSfcStepRepository, IManuSfcScrapRepository manuSfcScrapRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IWhMaterialStandingbookRepository whMaterialStandingbookRepository, IWhMaterialInventoryScrapRepository whMaterialInventoryScrapRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -116,6 +115,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcScrapRepository = manuSfcScrapRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
+            _procMaterialRepository = procMaterialRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _whMaterialInventoryScrapRepository = whMaterialInventoryScrapRepository;
         }
@@ -364,9 +365,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
             MaterialScrapBarCodeDto partialScrapBarCodeDto = new MaterialScrapBarCodeDto()
             {
                 BarCode = manuSfcEntity.SFC,
-               // WorkOrderCode = planWorkOrderEntity.OrderCode,
-                ProductCode = procMaterialEntity.MaterialCode,
-                ProductName = procMaterialEntity.MaterialName,
+                // WorkOrderCode = planWorkOrderEntity.OrderCode,
+                materialCode = procMaterialEntity.MaterialCode,
+                materialName = procMaterialEntity.MaterialName,
                 Qty = manuSfcEntity.Qty
             };
             return partialScrapBarCodeDto;
