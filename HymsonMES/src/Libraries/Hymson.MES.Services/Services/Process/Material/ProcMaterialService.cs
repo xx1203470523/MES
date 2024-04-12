@@ -258,6 +258,7 @@ namespace Hymson.MES.Services.Services.Process
             saveDto.Version = saveDto.Version.Trim();
             saveDto.Remark = saveDto?.Remark ?? "".Trim();
             saveDto!.Unit = saveDto?.Unit ?? "".Trim();
+            saveDto!.ValidTime = saveDto?.ValidTime ??null;
 
             // DTO转换实体
             var procMaterialEntity = saveDto!.ToEntity<ProcMaterialEntity>();
@@ -384,6 +385,7 @@ namespace Hymson.MES.Services.Services.Process
                      ProductModel = procMaterialEntity.ProductModel,
                       Specifications= procMaterialEntity.Specifications,
                        MaterialType = procMaterialEntity.MaterialType,
+                       ValidTime=procMaterialEntity.ValidTime,
                 });
 
                 if (response == 0)

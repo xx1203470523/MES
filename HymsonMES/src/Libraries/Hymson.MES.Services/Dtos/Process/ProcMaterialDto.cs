@@ -152,6 +152,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MaskCodeId { get; set; }
 
         /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
+
+        /// <summary>
         /// 数量限制
         /// </summary>
         public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
@@ -451,7 +456,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public MaterialTypeEnum? MaterialType { get; set; }
 
-       /// 有效时间
+        /// <summary>
+        /// 有效时间
         /// </summary>
         public int? ValidTime { get; set; }
 
