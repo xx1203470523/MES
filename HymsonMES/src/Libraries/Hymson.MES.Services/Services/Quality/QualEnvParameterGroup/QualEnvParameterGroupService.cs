@@ -397,7 +397,8 @@ namespace Hymson.MES.Services.Services.Quality
             if (entity.Status == SysDataStatusEnum.Enable && checkUniqueWorkCenterProcedureEntities.Any(a => a.WorkCenterId == entity.WorkCenterId
             && a.ProcedureId == entity.ProcedureId
             && a.Status == entity.Status
-            && a.Id != entity.Id))
+            && a.Id != entity.Id 
+            && a.Version != entity.Version))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10524))
                     .WithData("WorkCenterCode", workCenterEntity.Code)

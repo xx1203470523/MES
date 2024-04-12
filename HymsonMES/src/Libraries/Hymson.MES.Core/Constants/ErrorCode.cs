@@ -454,6 +454,7 @@
         public const string MES11713 = "条码{sfc}所在检验单{fqcOrder}未关闭";
         public const string MES11714 = "保存检验单附件时，查找FQC检验单数据不存在";
         public const string MES11715 = "检验单状态为检验中、待审核、已关闭的单据，删除失败！";
+        public const string MES11716 = "实际已检数量【{CheckedQty}】少于应检数量【{SampleQty}】！";
 
 
 

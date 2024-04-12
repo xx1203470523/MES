@@ -146,6 +146,21 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.FQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("FQCOrderId = @FQCOrderId");
+            }
+            if (query.BarCode != null)
+            {
+                sqlBuilder.Where("SFC = @BarCode");
+            }
+            if (query.FQCOrderIds != null)
+            {
+                sqlBuilder.Where("FQCOrderId IN @FQCOrderIds");
+            }
+            sqlBuilder.AddParameters(query);
+
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();

@@ -646,4 +646,26 @@ namespace Hymson.MES.Services.Dtos.Quality
 
     }
 
+    /// <summary>
+    /// FQC检验参数组快照输出
+    /// 执行检验查询
+    /// </summary>
+    public record QualFqcParameterGroupSnapshootOut
+    {
+        /// <summary>
+        /// 参数集编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 样本数量
+        /// </summary>
+        public int SampleQty { get; set; }
+    }
+
 }

@@ -114,7 +114,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeleteOrdersAsync(long[] ids);
+        //Task<int> DeleteOrdersAsync(long[] ids);
 
         /// <summary>
         /// 生成IQC检验单
@@ -138,11 +138,11 @@ namespace Hymson.MES.Services.Services.Quality
         //Task<PagedInfo<QualFqcOrderDto>> GetPagedListAsync(QualIqcOrderPagedQueryDto pagedQueryDto);
 
         /// <summary>
-        /// 根据ID查询类型
+        /// 查询检验项目组,样本数量
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        //Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryOrderTypeListByIdAsync(long orderId);
+        Task<QualFqcParameterGroupSnapshootOut> QuerySnapshootByIdAsync(long orderId);
 
         /// <summary>
         /// 根据ID查询附件
