@@ -214,6 +214,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 PrintId = createDto.PrintId,
+                ProcedureId= createDto.ProcedureId,
                 ResourceId = createDto.ResourceId,
                 BarCodes = new List<LabelTemplateBarCodeDto>
                 {
@@ -414,6 +415,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 PrintId = parm.PrintId,
+                ProcedureId= parm.ProcedureId,
                 ResourceId = parm.ResourceId,
                 BarCodes = barCodes,
                 UserName = _currentUser.UserName

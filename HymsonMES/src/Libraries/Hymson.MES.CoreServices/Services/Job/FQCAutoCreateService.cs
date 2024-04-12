@@ -1,36 +1,17 @@
-﻿using FluentValidation;
-using Hymson.EventBus.Abstractions;
+﻿using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Quality;
-using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility;
-using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
 using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.Services.Common;
-
-using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Quality;
-using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.Snowflake;
-using Hymson.Utils;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {

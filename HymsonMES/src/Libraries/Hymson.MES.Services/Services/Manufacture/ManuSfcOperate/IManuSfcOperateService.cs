@@ -31,6 +31,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task InBoundAsync(InBoundDto request);
 
         /// <summary>
+        /// 生成条码并进站
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task GenerateBarcodeAndInBoundAsync(BaseDto request);
+
+        /// <summary>
         /// 进站（多个）
         /// </summary>
         /// <param name="request"></param>

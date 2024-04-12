@@ -1,24 +1,13 @@
 ﻿using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility;
 using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
 using Hymson.MES.CoreServices.Services.Common;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
