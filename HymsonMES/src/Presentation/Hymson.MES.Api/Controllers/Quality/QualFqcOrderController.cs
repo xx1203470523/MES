@@ -216,15 +216,15 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 查询检验类型
+        /// 查询检验项目组,样本数量
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        //[HttpGet("type/{orderId}")]
-        //public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long orderId)
-        //{
-        //    return await _qualFqcOrderService.QueryOrderTypeListByIdAsync(orderId);
-        //}
+        [HttpGet("parametergroupsnapshoot/{orderId}")]
+        public async Task<QualFqcParameterGroupSnapshootOut> QuerySnapshootByIdAsync(long orderId)
+        {
+            return await _qualFqcOrderService.QuerySnapshootByIdAsync(orderId);
+        }
 
         /// <summary>
         /// 查询附件
@@ -260,7 +260,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 
+        /// 参数为验证 暂时不用
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>

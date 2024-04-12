@@ -245,7 +245,15 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             }
 
             #endregion
-
+            //样本数量
+            var sfccout = orderSfcList.Count;
+            if (sfccout > 0)
+            {
+                if (sfccout < parameterGroupEntity.SampleQty)
+                {
+                    orderEntity.SampleQty = sfccout;
+                }
+            }
             // 保存
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
@@ -629,6 +637,15 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             //    record.UpdatedOn = updatedOn;
             //}
 
+            //样本数量
+            var sfccout = orderSfcList.Count;
+            if (sfccout > 0)
+            {
+                if (sfccout < parameterGroupEntity.SampleQty)
+                {
+                    orderEntity.SampleQty = sfccout;
+                }
+            }
 
             // 保存
             var rows = 0;
