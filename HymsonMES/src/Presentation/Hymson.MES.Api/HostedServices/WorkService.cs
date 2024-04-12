@@ -64,10 +64,10 @@ namespace Hymson.MES.Api
                 await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
                 await InitExcelDtoAsync();
                 await _resourceService.HotLoadingAsync();
+
             }
             catch (Exception e)
             {
-
                 _logger.LogError(e, "初始化失败");
             }
         }

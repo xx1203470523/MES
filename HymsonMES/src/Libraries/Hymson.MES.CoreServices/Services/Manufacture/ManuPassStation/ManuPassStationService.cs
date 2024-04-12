@@ -185,5 +185,30 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         }
         #endregion
 
+        #region 中止
+        /// <summary>
+        /// 批量中止
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, JobResponseBo>> StopStationRangeBySFCAsync(SFCStopStationBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi)
+        {
+            // 作业请求参数（TODO 后面需要把这个改为使用JobRequestBo对象）
+            var requestBo = new StopRequestBo
+            {
+                SiteId = bo.SiteId,
+                UserName = bo.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId,
+                SFCs = bo.SFCs
+            };
+
+            var jobBos = new List<JobBo> { new() { Name = "StopJobService" } };
+            return await _executeJobService.ExecuteAsync(jobBos, requestBo);
+        }
+        #endregion
+
     }
 }

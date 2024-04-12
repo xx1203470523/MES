@@ -107,13 +107,13 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         /// <summary>
         /// Bom版本
         /// </summary>
-        public string? BomVersion { get; set;}
+        public string? BomVersion { get; set; }
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public class CreateBarcodeBySemiProductId : CoreBaseBo
+    public class CreateBarcodeByResourceCode : CoreBaseBo
     {
         /// <summary>
         /// 资源Id

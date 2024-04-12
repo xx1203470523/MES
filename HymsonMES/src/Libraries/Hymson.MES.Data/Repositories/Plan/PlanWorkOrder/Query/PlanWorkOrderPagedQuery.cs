@@ -52,5 +52,20 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         /// 物料版本
         /// </summary>
         public string? MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 产线id
+        /// </summary>
+        public IEnumerable<long>? WorkCenterIds { get; set; }
+
+        /// <summary>
+        /// 不包含的id组
+        /// </summary>
+        public IEnumerable<long>? NotInIds { get; set; }
+
+        /// <summary>
+        /// 工艺路线组
+        /// </summary>
+        public IEnumerable<long>? ProcessRouteIds { get; set; }
     }
 }

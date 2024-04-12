@@ -39,6 +39,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<int> UpdateRangeAsync(IEnumerable<QualOqcOrderSampleDetailEntity> entities);
 
         /// <summary>
+        /// 更新样品明细
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateSampleDetailAsync(QualOqcOrderSampleDetailEntity entity);
+
+        /// <summary>
         /// 软删除  
         /// </summary>
         /// <param name="id"></param>

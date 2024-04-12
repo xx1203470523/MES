@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.MES.BackgroundServices.Dtos.Manufacture.LabelTemplate;
 
-namespace Hymson.MES.Services.Services.Process.LabelTemplate.Utility.Execute
+namespace Hymson.MES.BackgroundServices.Manufacture.PrintTemplate.Utility.Execute
 {
     public interface IExecuteLabelTemplateDataSourceService
     {
+        /// <summary>
+        /// 执行查询
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task Execute(LabelTemplateSourceDto param);
     }
 }

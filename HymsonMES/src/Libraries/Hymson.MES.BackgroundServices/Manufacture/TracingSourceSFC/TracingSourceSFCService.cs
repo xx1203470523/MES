@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
@@ -115,10 +116,11 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 var barCodes = item.Value.Select(s => s.SFC).Union(item.Value.Select(s => s.CirculationBarCode)).Distinct();
 
                 // 根据流转条码批量查询条码（注意：经过这步之后，仅在库存，而不在条码表的数据会被过滤掉）
-                sfcEntities.AddRange(await _manuSfcRepository.GetAllBySFCsAsync(new EntityBySFCsQuery
+                sfcEntities.AddRange(await _manuSfcRepository.GetListAsync(new ManuSfcQuery
                 {
                     SiteId = item.Key,
-                    SFCs = barCodes
+                    SFCs = barCodes,
+                    Type = SfcTypeEnum.Produce
                 }));
             }
 
@@ -135,7 +137,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             nodeDestinationEntities.AddRange(await _manuSFCNodeDestinationRepository.GetEntitiesAsync(sfcIds));
 
             // 根据条码批量查询条码信息
-            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcIds);
+            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcIds);
             var sfcInfoDict = sfcInfoEntities.ToDictionary(node => node.SfcId);
 
             // 根据条码信息批量查询产品信息

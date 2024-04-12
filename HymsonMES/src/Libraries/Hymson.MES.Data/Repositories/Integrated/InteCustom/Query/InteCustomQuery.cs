@@ -8,7 +8,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 所属站点id
         /// </summary>
-        public long SiteId { get; set; } = 0;
+        public long? SiteId { get; set; } = 0;
 
         /// <summary>
         /// 客户编码列表

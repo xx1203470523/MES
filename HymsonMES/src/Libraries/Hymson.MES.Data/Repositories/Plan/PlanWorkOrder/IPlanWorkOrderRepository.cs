@@ -103,14 +103,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<IEnumerable<PlanWorkOrderEntity>> GetByWorkLineIdAsync(long workLineId);
 
         /// <summary>
-        /// 获取List 
-        /// 条件模糊
-        /// </summary>
-        /// <param name="planWorkOrderQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<PlanWorkOrderEntity>> GetPlanWorkOrderEntitiesAsync(PlanWorkOrderQuery planWorkOrderQuery);
-
-        /// <summary>
         /// 获取List   
         /// 条件具体
         /// </summary>
@@ -124,6 +116,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="pageQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoAsync(PlanWorkOrderPagedQuery pageQuery);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetEntitiesAsync(PlanWorkOrderNewQuery query);
 
         /// <summary>
         /// 修改工单状态
@@ -202,5 +201,18 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         Task<int> UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command);
 
+        /// <summary>
+        /// 获取激活工单列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderView>> GetActivationWorkOrderDataAsync(PlanWorkOrderPagedQuery query);
+
+        /// <summary>
+        /// 获取工单列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderView>> GetWorkOrderDataAsync(PlanWorkOrderPagedQuery query);
     }
 }

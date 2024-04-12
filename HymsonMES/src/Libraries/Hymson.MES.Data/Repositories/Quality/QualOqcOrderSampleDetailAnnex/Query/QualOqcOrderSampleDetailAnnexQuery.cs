@@ -5,6 +5,14 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualOqcOrderSampleDetailAnnexQuery
     {
+        /// <summary>
+        /// SiteId
+        /// </summary>
+        public long SiteId { get; set; }
 
+        /// <summary>
+        /// OQCOrderId
+        /// </summary>
+        public long? OQCOrderId { get; set; }
     }
 }

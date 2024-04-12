@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Quality
@@ -25,6 +26,26 @@ namespace Hymson.MES.Core.Domain.Quality
         /// 标准参数Id
         /// </summary>
         public long ParameterId { get; set; }
+
+        /// <summary>
+        /// 参数编码
+        /// </summary>
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数单位
+        /// </summary>
+        public string ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 参数数据类型
+        /// </summary>
+        public DataTypeEnum ParameterDataType { get; set; }
 
         /// <summary>
         /// 规格上限

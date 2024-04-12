@@ -1,24 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: 物料维护    Dto | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-08 04:47:44
- */
-
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using MimeKit;
-using Mysqlx.Crud;
+using Hymson.MES.Core.Enums.Process;
 using OfficeOpenXml.Attributes;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -51,6 +35,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 物料名称
         /// </summary>
         public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 规格型号
+        /// </summary>
+        public string Specifications { get; set; }
 
         /// <summary>
         /// 状态
@@ -163,11 +152,6 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MaskCodeId { get; set; }
 
         /// <summary>
-        /// 有效时间
-        /// </summary>
-        public int? ValidTime { get; set; }
-
-        /// <summary>
         /// 数量限制
         /// </summary>
         public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
@@ -205,6 +189,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 版本
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 规格型号
+        /// </summary>
+        public string? Specifications { get; set; }
 
         /// <summary>
         /// 备注
@@ -277,9 +266,22 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MaskCodeId { get; set; }
 
         /// <summary>
+        /// 产品型号 条码规则 生成条码使用
+        /// </summary>
+        public string? ProductModel { get; set; }
+
+        /// <summary>
+        /// 原材料类型
+        /// </summary>
+        public MaterialTypeEnum? MaterialType { get; set; }
+
+
         /// 有效时间
         /// </summary>
         public int? ValidTime { get; set; }
+
+        /// <summary>
+
 
         /// <summary>
         /// 数量限制
@@ -291,7 +293,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcMaterialReplaceDto>? DynamicList { get; set; } = new List<ProcMaterialReplaceDto>();
 
+        /// <summary>
+        /// 
+        /// </summary>
         public List<ProcMaterialSupplierRelationCreateDto>? MaterialSupplierList { get; set; } = new List<ProcMaterialSupplierRelationCreateDto>();
+
     }
 
     /// <summary>
@@ -359,6 +365,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 版本
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 规格型号
+        /// </summary>
+        public string? Specifications { get; set; }
 
         /// <summary>
         /// 是否默认版本
@@ -431,7 +442,16 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MaskCodeId { get; set; }
 
         /// <summary>
-        /// 有效时间
+        /// 产品型号 条码规则 生成条码使用
+        /// </summary>
+        public string? ProductModel { get; set; }
+
+        /// <summary>
+        /// 原材料类型
+        /// </summary>
+        public MaterialTypeEnum? MaterialType { get; set; }
+
+       /// 有效时间
         /// </summary>
         public int? ValidTime { get; set; }
 
@@ -495,7 +515,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 物料组编码
         /// </summary>
         public string? MaterialGroupCode {  get; set; }
-
         /// <summary>
         /// 有效时间
         /// </summary>
@@ -549,7 +568,24 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? BomVersion { get; set; }
 
+        /// <summary>
+        /// 规格型号
+        /// </summary>
+        public string Specifications { get; set; }
+        /// <summary>
+        /// 产品型号 条码规则 生成条码使用
+        /// </summary>
+        public string? ProductModel { get; set; }
+
+        /// <summary>
+        /// 原材料类型
+        /// </summary>
+        public MaterialTypeEnum? MaterialType { get; set; }
+        /// <summary>
+        /// 替代料
+        /// </summary>
         public List<ProcMaterialReplaceViewDto> ReplaceMaterialList { get; set; } = new List<ProcMaterialReplaceViewDto>();
+
     }
 
     /// <summary>

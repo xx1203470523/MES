@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
@@ -13,38 +14,38 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// IQC检验单Id
         /// </summary>
-        public long? IQCOrderId { get; set; }
+        public long IQCOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 来源系统;1、本系统 2、OA
         /// </summary>
-        public bool? SourceSystem { get; set; }
+        public int? SourceSystem { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 不合格处理方式;1-让步；2-挑选；3-返工；4-报废；
         /// </summary>
-        public bool? HandMethod { get; set; }
+        public HandMethodEnum? HandMethod { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 处理人
         /// </summary>
         public string ProcessedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 处理时间
         /// </summary>
         public DateTime? ProcessedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 }

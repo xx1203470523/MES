@@ -318,7 +318,7 @@ namespace Hymson.MES.Services.Services.Integrated
             // 验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
 
-            var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
+             var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES12111));
 
             //验证某些状态是不能编辑的
@@ -374,7 +374,10 @@ namespace Hymson.MES.Services.Services.Integrated
                     var inteWorkCenterByLineEntities = await _inteWorkCenterRepository.GetInteWorkCenterRelationEntityAsync(new InteWorkCenterRelationQuery { SubWorkCenterIds = param.WorkCenterIds });
                     if (inteWorkCenterByLineEntities != null && inteWorkCenterByLineEntities.Any())
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES12126));
+                        if (inteWorkCenterByLineEntities.First().WorkCenterId != param.Id)
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES12126));
+                        }
                     }
 
                     break;

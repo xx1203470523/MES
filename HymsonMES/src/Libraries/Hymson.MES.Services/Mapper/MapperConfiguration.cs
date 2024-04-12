@@ -6,6 +6,8 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Qual;
+using Hymson.MES.Core.Domain.QualEnvOrder;
+using Hymson.MES.Core.Domain.QualEnvOrderDetail;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Domain.WHMaterialReceipt;
@@ -48,6 +50,8 @@ using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Process.View;
 using Hymson.MES.Data.Repositories.Qual;
+using Hymson.MES.Data.Repositories.QualEnvOrder;
+using Hymson.MES.Data.Repositories.QualEnvOrderDetail;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspection.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View;
@@ -55,9 +59,9 @@ using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionPatrol.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionTail.View;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
+using Hymson.MES.Data.Repositories.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.MES.Data.Repositories.WHMaterialReceipt.Query;
 using Hymson.MES.Data.Repositories.WhShipment.Query;
 using Hymson.MES.Data.Repositories.WhWareHouse.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
@@ -67,9 +71,12 @@ using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Inte;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Qual;
+using Hymson.MES.Services.Dtos.QualEnvOrder;
+using Hymson.MES.Services.Dtos.QualEnvOrderDetail;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
@@ -926,6 +933,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIqcOrderSampleDetailEntity, OrderParameterDetailDto>();
             CreateMap<QualIqcOrderSaveDto, QualIqcOrderSampleQuery>();
             CreateMap<OrderParameterDetailQueryDto, QualIqcOrderSampleQuery>();
+            CreateMap<OrderParameterDetailDto, QualIqcOrderSampleDetailEntity>();
+            CreateMap<OrderParameterDetailPagedQueryDto, QualIqcOrderSampleDetailPagedQuery>();
 
             #region QualIqcInspectionItem
 
@@ -978,6 +987,72 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #endregion
+
+            #region QualOqcInspection OQC检验单
+
+            CreateMap<QualOqcOrderPagedQueryDto, QualOqcOrderPagedQuery>();
+            CreateMap<QualOqcOrderEntity, QualOqcOrderDto>();
+            CreateMap<QualOqcParameterGroupDetailSnapshootEntity, CheckBarCodeOutDto>();
+            CreateMap<QualOqcOrderExecSaveDto, QualOqcOrderSampleQuery>();
+            CreateMap<QualOqcParameterGroupDetailSnapshootEntity, OqcOrderParameterDetailDto>();
+            CreateMap<OqcOrderParameterDetailPagedQueryDto, QualOqcOrderSampleDetailPagedQuery>();
+            CreateMap<QualOqcOrderTypeEntity, QualOqcOrderTypeDto>();
+            CreateMap<QualOqcOrderTypeEntity, SampleQtyAndCheckedQtyQueryOutDto>();
+
+            #region OQC检验项目
+            //查询对象
+            CreateMap<QualOqcParameterGroupQueryDto, QualOqcParameterGroupToQuery>();
+            CreateMap<QualOqcParameterGroupDetailQueryDto, QualOqcParameterGroupDetailQuery>();
+            //创建对象
+            CreateMap<QualOqcParameterGroupDto, QualOqcParameterGroupCreateCommand>();
+            CreateMap<QualOqcParameterGroupDetailDto, QualOqcParameterGroupDetailCreateCommand>();
+            //更新对象
+            CreateMap<QualOqcParameterGroupUpdateDto, QualOqcParameterGroupUpdateCommand>();
+            CreateMap<QualOqcParameterGroupDetailOutputDto, QualOqcParameterGroupDetailCreateCommand>();
+
+
+
+            //实体对象转换为数据传输对象（页面输出)
+
+            CreateMap<QualOqcParameterGroupEntity, QualOqcParameterGroupOutputDto>();
+            CreateMap<QualOqcParameterGroupDetailEntity, QualOqcParameterGroupDetailOutputDto>();
+            #endregion
+
+
+
+
+            #endregion
+
+            #region env环境检验单
+            CreateMap<QualEnvOrderEntity, QualEnvOrderDto>();
+            CreateMap<QualEnvOrderCreateDto, QualEnvOrderEntity>();
+            CreateMap<QualEnvOrderModifyDto, QualEnvOrderEntity>();
+            CreateMap<QualEnvOrderPagedQueryDto, QualEnvOrderPagedQuery>();
+
+
+            CreateMap<QualEnvOrderDetailEntity, QualEnvOrderDetailDto>();
+            CreateMap<QualEnvOrderDetailEntity, QualEnvOrderDetailExtendDto>();
+            CreateMap<QualEnvOrderDetailCreateDto, QualEnvOrderDetailEntity>();
+            CreateMap<QualEnvOrderDetailModifyDto, QualEnvOrderDetailEntity>();
+            CreateMap<QualEnvOrderDetailPagedQueryDto, QualEnvOrderDetailPagedQuery>();
+            #endregion
+            #region FQC检测单
+            CreateMap<QualFqcOrderPagedQueryDto, QualFqcOrderPagedQuery>();
+            CreateMap<QualFqcOrderEntity, QualFqcOrderDto>();
+
+            CreateMap<QualFinallyOutputRecordEntity, QualFinallyOutputRecordView>();
+            CreateMap<QualFqcParameterGroupDetailSnapshootEntity, FQCParameterDetailDto>();
+            CreateMap<QualFqcOrderSampleSaveDto, QualFqcOrderSampleQuery>();
+            CreateMap<FQCParameterDetailPagedQueryDto, QualFqcOrderSampleDetailPagedQuery>();
+            CreateMap<QualFqcParameterGroupEntity, QualFqcParameterGroupOutputDto>();
+            CreateMap<QualFqcParameterGroupDetailEntity, QualFqcParameterGroupDetailOutputDto>();
+            CreateMap<QualFqcParameterGroupDetailQueryDto, QualFqcParameterGroupDetailQuery>();
+            CreateMap<QualFqcParameterGroupUpdateDto, QualFqcParameterGroupUpdateCommand>();
+
+
+
+            #endregion
+
         }
 
         /// <summary>
@@ -1056,6 +1131,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuContainerPackRecordPagedQueryDto, ManuContainerPackRecordPagedQuery>();
             CreateMap<ManuContainerPackRecordEntity, ManuContainerPackRecordDto>();
             #endregion
+
             #region Baking
             CreateMap<ManuBakingCreateDto, ManuBakingEntity>();
             CreateMap<ManuBakingPagedQueryDto, ManuBakingPagedQuery>();
@@ -1085,6 +1161,19 @@ namespace Hymson.MES.Services.Mapper
             #region ManuSfc
             CreateMap<ManuSfcAboutInfoPagedQueryDto, ManuSfcAboutInfoPagedQuery>();
             CreateMap<ManuSfcAboutInfoView, ManuSfcAboutInfoViewDto>();
+            #endregion
+
+            #region ManuSfcOperate
+
+            CreateMap<ManuSfcInstationPagedQueryDto, ManuSfcProduceVehiclePagedQuery>();
+
+            #endregion
+
+            #region ManuProductExceptionHandling
+            CreateMap<ManuProductNGBarCodeDto, ManuCompromiseBarCodeDto>();
+            CreateMap<ManuProductBarCodeDto, ManuCompromiseBarCodeDto>();
+            CreateMap<ManuProductNGBarCodeDto, ManuMisjudgmentBarCodeDto>();
+            CreateMap<ManuProductBarCodeDto, ManuReworkBarCodeDto>();
             #endregion
         }
 
@@ -1126,7 +1215,9 @@ namespace Hymson.MES.Services.Mapper
 
             #region PlanSfcPrint
             CreateMap<PlanSfcPrintPagedQueryDto, ManuSfcPassDownPagedQuery>();
+            CreateMap<PlanSfcPrintPagedQueryDto, ManuSfcProduceNewPagedQuery>();
             CreateMap<ManuSfcPassDownView, PlanSfcPrintDto>();
+            CreateMap<ManuSfcProduceEntity, PlanSfcPrintDto>();
             #endregion
 
             #region PlanCalendar

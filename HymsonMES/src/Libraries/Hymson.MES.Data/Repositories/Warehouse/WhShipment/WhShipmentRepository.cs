@@ -148,7 +148,7 @@ namespace Hymson.MES.Data.Repositories.WhShipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhShipmentEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<WhShipmentEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhShipmentEntity>(GetByIdsSql, new { Ids = ids });
@@ -212,6 +212,11 @@ namespace Hymson.MES.Data.Repositories.WhShipment
                 query.ShipmentNum = $"%{query.ShipmentNum}%";
                 sqlBuilder.Where("T.ShipmentNum LIKE @ShipmentNum");
             }
+
+            if (query.Ids != null && query.Ids.Any()) {
+                sqlBuilder.Where("T.Id IN @Ids");
+            }
+
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
@@ -231,7 +236,7 @@ namespace Hymson.MES.Data.Repositories.WhShipment
             sqlBuilder.Select("*");
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
-            //sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             if (pagedQuery.ShipmentNum != null)
             {
@@ -242,6 +247,20 @@ namespace Hymson.MES.Data.Repositories.WhShipment
             { 
                 sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.TimeStamp[0], CreatedOnEnd = pagedQuery.TimeStamp[1].AddDays(1) });
                 sqlBuilder.Where("CreatedOn >= @CreatedOnStart and CreatedOn < @CreatedOnEnd");
+            }
+
+            if (pagedQuery.PlanShipmentTimeStart.HasValue)
+            {
+                sqlBuilder.Where("PlanShipmentTime >= @PlanShipmentTimeStart");
+            }
+
+            if (pagedQuery.PlanShipmentTimeEnd.HasValue)
+            {
+                sqlBuilder.Where("PlanShipmentTime <= @PlanShipmentTimeEnd");
+            }
+
+            if (pagedQuery.NotInIds != null && pagedQuery.NotInIds.Any()) {
+                sqlBuilder.Where("Id NOT IN @NotInIds");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;

@@ -161,8 +161,13 @@ namespace Hymson.MES.Services.Services.Manufacture
             IEnumerable<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
             {
-                manuSfclist = await _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
-                var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfclist.Select(x => x.Id));
+                manuSfclist = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+                {
+                    SiteId = _currentSite.SiteId,
+                    SFCs = manuContainerPackList.Select(x => x.LadeBarCode),
+                    Type = SfcTypeEnum.Produce
+                });
+                var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfclist.Select(x => x.Id));
                 var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
                 {
                     Sfcs = manuContainerPackList.Select(x => x.LadeBarCode),
@@ -245,8 +250,13 @@ namespace Hymson.MES.Services.Services.Manufacture
             IEnumerable<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
             {
-                manuSfclist = await _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
-                var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfclist.Select(x => x.Id));
+                manuSfclist = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+                {
+                    SiteId = _currentSite.SiteId,
+                    SFCs = manuContainerPackList.Select(x => x.LadeBarCode),
+                    Type = SfcTypeEnum.Produce
+                });
+                var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfclist.Select(x => x.Id));
                 var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
                 {
                     Sfcs = manuContainerPackList.Select(x => x.LadeBarCode),
@@ -440,7 +450,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             return new ManuContainerPackDto();
         }
-
 
         /// <summary>
         /// 执行作业

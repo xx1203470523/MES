@@ -726,13 +726,14 @@ public partial class ManuFacePlateService : IManuFacePlateService
             new ManuSfcQuery
             {
                 SFCs = manuSfcs,
-                SiteId = siteId
+                SiteId = siteId,
+                Type = SfcTypeEnum.Produce
             });
 
             if (manuSfcEntities != null && manuSfcEntities.Any())
             {
                 var manuSfcIds = manuSfcEntities.Select(m => m.Id).Distinct();
-                var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcIds);
+                var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcIds);
 
                 #region 产品物料信息
 
@@ -982,7 +983,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
                     });
                     var manuSfcIds = process.ManuSfcEntities.Select(m => m.Id);
 
-                    process.ManuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcIds);
+                    process.ManuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcIds);
 
                     var procIds = process.ManuSfcInfoEntities.Select(m => m.ProductId);
                     var workOrderIds = process.ManuSfcInfoEntities.Select(m => m.WorkOrderId.GetValueOrDefault());
@@ -1008,15 +1009,16 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
         #region 填充生产条码信息
 
-        process.ManuSfcEntityByInsertion = await _manuSfcRepository.GetOneAsync(new ManuSfcQuery
+        process.ManuSfcEntityByInsertion = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
         {
             SFC = sfc,
-            SiteId = siteId
+            SiteId = siteId,
+            Type = SfcTypeEnum.Produce
         });
 
         if (process.ManuSfcEntityByInsertion != null)
         {
-            process.ManuSfcInfoEntityByInsertion = await _manuSfcInfoRepository.GetBySFCAsync(process.ManuSfcEntityByInsertion.Id);
+            process.ManuSfcInfoEntityByInsertion = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(process.ManuSfcEntityByInsertion.Id);
             process.ProcMaterialEntityByInsertion = await _procMaterialRepository.GetByIdAsync(process.ManuSfcInfoEntityByInsertion.ProductId);
             process.PlanWorkOrderEntityByInsertion = await _planWorkOrderRepository.GetByIdAsync(process.ManuSfcInfoEntityByInsertion.WorkOrderId.GetValueOrDefault());
         }
@@ -1053,14 +1055,15 @@ public partial class ManuFacePlateService : IManuFacePlateService
                 process.ManuSfcEntitiesByPacked = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
                 {
                     SFCs = containerPackSfcs,
-                    SiteId = siteId
+                    SiteId = siteId,
+                    Type = SfcTypeEnum.Produce
                 });
 
                 if (process.ManuSfcEntitiesByPacked.Any())
                 {
                     var manuSfcIds = process.ManuSfcEntitiesByPacked.Select(m => m.Id);
 
-                    process.ManuSfcInfoEntitiesByPacked = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcIds);
+                    process.ManuSfcInfoEntitiesByPacked = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcIds);
 
                     if (process.ManuSfcInfoEntitiesByPacked.Any())
                     {
@@ -1524,13 +1527,14 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
         if (firstManuContainerPackEntity.PackType == ManuContainerBarcodePackTypeEnum.ManuSfc)
         {
-            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+            var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
             {
                 SFC = firstManuContainerPackEntity.LadeBarCode,
-                SiteId = siteId
+                SiteId = siteId,
+                Type = SfcTypeEnum.Produce
             });
 
-            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);
 
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity.ProductId);
 

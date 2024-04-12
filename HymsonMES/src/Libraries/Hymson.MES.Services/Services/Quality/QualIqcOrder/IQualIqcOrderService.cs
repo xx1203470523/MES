@@ -10,7 +10,7 @@ namespace Hymson.MES.Services.Services.Quality
     public interface IQualIqcOrderService
     {
         /// <summary>
-        /// 更改检验单状态
+        /// 更改检验单状态（点击执行检验）
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -29,6 +29,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<int> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto);
+
+        /// <summary>
+        /// 免检
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> FreeOrderAsync(QualIqcOrderFreeDto requestDto);
 
         /// <summary>
         /// 关闭检验单
@@ -56,7 +63,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] ids);
+        Task<int> DeleteOrdersAsync(long[] ids);
+
+        /// <summary>
+        /// 生成IQC检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<long> GeneratedOrderAsync(GenerateInspectionDto requestDto);
 
         /// <summary>
         /// 根据ID查询
@@ -64,6 +78,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualIqcOrderDto?> QueryByIdAsync(long id);
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> UpdateOrderAsync(OrderParameterDetailSaveDto requestDto);
 
         /// <summary>
         /// 获取分页List
@@ -99,6 +120,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSampleAsync(OrderParameterDetailQueryDto requestDto);
+
+        /// <summary>
+        /// 查询检验单样本数据（分页）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<OrderParameterDetailDto>> QueryDetailSamplePagedListAsync(OrderParameterDetailPagedQueryDto pagedQueryDto);
 
     }
 }

@@ -14,7 +14,6 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -171,6 +170,9 @@ namespace Hymson.MES.Services.Services.Quality
             }
             #endregion
 
+            // 检验类型必须填写
+            if (saveDto.Details == null || !saveDto.Details.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES19423));
+
             List<QualOqcLevelDetailEntity> details = new();
             foreach (var item in saveDto.Details)
             {
@@ -280,6 +282,9 @@ namespace Hymson.MES.Services.Services.Quality
                     break;
             }
             #endregion
+
+            // 检验类型必须填写
+            if (saveDto.Details == null || !saveDto.Details.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES19423));
 
             List<QualOqcLevelDetailEntity> details = new();
             foreach (var item in saveDto.Details)

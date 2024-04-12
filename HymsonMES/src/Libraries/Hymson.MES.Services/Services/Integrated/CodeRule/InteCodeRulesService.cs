@@ -24,6 +24,7 @@ using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Reflection.Emit;
 using System.Security.Policy;
 using System.Transactions;
 
@@ -83,6 +84,19 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             await _validationCreateRules.ValidateAndThrowAsync(inteCodeRulesCreateDto);
+
+            //校验OQC与IQC只能创建一个
+            if (inteCodeRulesCreateDto.CodeType != null)
+            {
+                if(inteCodeRulesCreateDto.CodeType== CodeRuleCodeTypeEnum.OQC|| inteCodeRulesCreateDto.CodeType== CodeRuleCodeTypeEnum.IQC)
+                {
+                    var Entities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId = _currentSite.SiteId ?? 0, CodeType = inteCodeRulesCreateDto.CodeType });
+                    if (Entities.Any())
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12451)).WithData("type", inteCodeRulesCreateDto.CodeType.GetDescription());
+                    }
+                }
+            }
 
             if (inteCodeRulesCreateDto.CodeRulesMakes == null)
             {
@@ -168,7 +182,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId.GetValueOrDefault());
-                    }                        
+                    }
                     else
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesCreateDto.ProductId.GetValueOrDefault());
@@ -382,15 +396,18 @@ namespace Hymson.MES.Services.Services.Integrated
             List<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys = new List<InteCodeRulesMakeEntity>();
             if (inteCodeRulesModifyDto.CodeRulesMakes != null)
             {
+                int initSeq = 0;
                 //转换物料组成
                 foreach (var item in inteCodeRulesModifyDto.CodeRulesMakes)
                 {
+                    initSeq = initSeq + 10;
                     var inteCodeRulesMakeEntity = item.ToEntity<InteCodeRulesMakeEntity>();
                     inteCodeRulesMakeEntity.Id = IdGenProvider.Instance.CreateId();
                     inteCodeRulesMakeEntity.CodeRulesId = inteCodeRulesEntity.Id;
                     inteCodeRulesMakeEntity.CreatedBy = _currentUser.UserName;
                     inteCodeRulesMakeEntity.CreatedOn = HymsonClock.Now();
                     inteCodeRulesMakeEntity.SiteId = _currentSite.SiteId ?? 0;
+                    inteCodeRulesMakeEntity.Seq = initSeq;
 
                     inteCodeRulesMakeEntitys.Add(inteCodeRulesMakeEntity);
                 }
@@ -461,7 +478,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
                 inteCodeRulesDetailViewDto.CodeRulesMakes = inteCodeRulesDtos;
 
-                if(inteCodeRulesDetailViewDto.CodeType == CodeRuleCodeTypeEnum.PackagingSeqCode)
+                if (inteCodeRulesDetailViewDto.CodeType == CodeRuleCodeTypeEnum.PackagingSeqCode)
                 {
                     var containerInfoEntity = await _inteContainerInfoRepository.GetOneAsync(new InteContainerInfoQuery { Id = inteCodeRulesEntity.ContainerInfoId });
                     if (containerInfoEntity != null)

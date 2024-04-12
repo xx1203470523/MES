@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -47,57 +48,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcEntity>? entities);
 
         /// <summary>
-        /// 删除  
-        /// 最好使用批量删除，可以设置更新人和更新时间
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
-
-        /// <summary>
-        /// 批量删除
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        Task<int> DeletesAsync(DeleteCommand command);
-
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<ManuSfcEntity> GetByIdAsync(long id);
-
-        /// <summary>
-        /// 根据IDs批量获取数据
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcEntity>> GetByIdsAsync(IEnumerable<long> ids);
-
-        /// <summary>
-        /// 获取List
-        /// </summary>
-        /// <param name="manuSfcQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcEntity>> GetManuSfcEntitiesAsync(EntityBySFCsQuery manuSfcQuery);
-
-
-        /// <summary>
-        /// 查询List
-        /// </summary>
-        /// <param name="manuSfcQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcEntity>> GetAllManuSfcEntitiesAsync(EntityBySFCsQuery manuSfcQuery);
-
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="pagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<ManuSfcPassDownView>> GetPagedListAsync(ManuSfcPassDownPagedQuery pagedQuery);
-
-        /// <summary>
         /// 查询条码信息
         /// </summary>
         /// <param name="param"></param>
@@ -125,35 +75,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> MultiUpdateSfcStatusAsync(MultiSFCUpdateStatusCommand command);
 
-        /// <summary>
-        /// 获取SFC
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        Task<ManuSfcEntity> GetBySFCAsync(EntityBySFCQuery query);
-
-        /// <summary>
-        /// 获取SFC（批量）
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcEntity>> GetAllBySFCsAsync(EntityBySFCsQuery query);
-
-        /// <summary>
-        /// 获取在制SFC（批量）
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcEntity>> GetProduceBySFCsAsync(EntityBySFCsQuery query);
-
-        /// <summary>
-        /// 更具sfc 获取条码信息
-        /// </summary>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcEntity>> GetBySFCsAsync(IEnumerable<string> sfcs);
-
-
+ 
         /// <summary>
         /// 分页查询（查询所有条码信息）
         /// </summary>
@@ -265,7 +187,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateManuSfcQtyAndCurrentQtyVerifyByIdAsync(UpdateManuSfcQtyAndCurrentQtyVerifyByIdCommand command);
-        Task<ManuSfcEntity> GetOneAsync(ManuSfcQuery query);
+
+        /// <summary>
+        /// 部分报废
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> PartialScrapmanuSFCByIdAsync(IEnumerable<ManuSFCPartialScrapByIdCommand> commands);
+
+        Task<ManuSfcEntity> GetSingleAsync(ManuSfcQuery query);
         Task<IEnumerable<ManuSfcEntity>> GetListAsync(ManuSfcQuery query);
         #endregion
     }

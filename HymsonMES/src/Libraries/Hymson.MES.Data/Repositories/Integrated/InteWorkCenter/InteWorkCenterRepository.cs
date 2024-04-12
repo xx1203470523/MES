@@ -1,13 +1,16 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.View;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -51,7 +54,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             {
                 sqlBuilder.OrderBy(param.Sorting);
             }
-            sqlBuilder.Select("Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted");
+            sqlBuilder.Select("Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted,LineCoding");
 
             if (param.SiteId.HasValue) { sqlBuilder.Where("SiteId = @SiteId"); }
             if (param.Type.HasValue) { sqlBuilder.Where("Type = @Type"); }
@@ -106,7 +109,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteWorkCenterEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<InteWorkCenterEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteWorkCenterEntity>(GetByIdsSql, new { ids });
@@ -307,7 +310,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             sqlBuilder.AddParameters(inteWorkCenterRelationQuery);
 
             //if (inteWorkCenterRelationQuery.SubWorkCenterIds != null && inteWorkCenterRelationQuery.SubWorkCenterIds.Any()) {
-                sqlBuilder.Where("SubWorkCenterId IN @SubWorkCenterIds");
+            sqlBuilder.Where("SubWorkCenterId IN @SubWorkCenterIds");
             //}
 
             using var conn = GetMESDbConnection();
@@ -324,6 +327,18 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetHigherInteWorkCenterSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据下级工作中心Id获取上级工作中心
+        /// (只获取一级)
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteWorkCenterEntity>> GetHigherInteWorkCenterAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteWorkCenterEntity>(GetHigherInteWorkCentersSql, new { Ids = ids });
         }
         #endregion
 
@@ -397,6 +412,66 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="workCenterQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteWorkCenterEntity>> GetEntitiesAsync(InteWorkCenterQuery workCenterQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (workCenterQuery.Codes != null && workCenterQuery.Codes.Any())
+            {
+                sqlBuilder.Where(" Code in @Codes ");
+            }
+            using var conn = GetMESDbConnection();
+            var inteWorkCenters = await conn.QueryAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
+            return inteWorkCenters;
+        }
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="workCenterQuery"></param>
+        /// <returns></returns>
+        public async Task<InteWorkCenterEntity> GetEntitieAsync(InteWorkCenterFirstQuery workCenterQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(workCenterQuery.Code))
+            {
+                sqlBuilder.Where(" Code = @Code ");
+            }
+            if (!string.IsNullOrWhiteSpace(workCenterQuery.Name))
+            {
+                sqlBuilder.Where(" Name = @Name ");
+            }
+
+            using var conn = GetMESDbConnection();
+            var inteWorkCenters = await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
+            return inteWorkCenters;
+        }
+
+        /// <summary>
+        /// 根据资源组获取关联表数据
+        /// </summary>
+        /// <param name="resourceIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteWorkCenterResourceRelationView>> GetWorkCenterResourceRelationAsync(IEnumerable<long> resourceIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteWorkCenterResourceRelationView>(GetWorkCenterResourceRelationSql, new { ResourceIds = resourceIds });
+        }
     }
 
     /// <summary>
@@ -407,8 +482,8 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_work_center` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_work_center` /**where**/ ";
-        const string InsertSql = "INSERT INTO  `inte_work_center` ( Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted) VALUES ( @Id,@SiteId,@Code,@Name,@Type,@Source,@Status,@IsMixLine,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted) ";
-        const string UpdateSql = "UPDATE `inte_work_center` SET  Name=@Name,Type=@Type,Source=@Source,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
+        const string InsertSql = "INSERT INTO  `inte_work_center` ( Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted,LineCoding) VALUES ( @Id,@SiteId,@Code,@Name,@Type,@Source,@Status,@IsMixLine,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted,@LineCoding) ";
+        const string UpdateSql = "UPDATE `inte_work_center` SET  Name=@Name,Type=@Type,Source=@Source,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn,LineCoding=@LineCoding WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string UpdateRangSql = "UPDATE `inte_work_center` SET Name=@Name,Type=@Type,Source=@Source,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string DeleteRangSql = "UPDATE `inte_work_center` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
         const string GetByIdSql = @"SELECT * FROM `inte_work_center` WHERE Id = @Id AND IsDeleted = 0  ";
@@ -442,9 +517,19 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                                                 From  inte_work_center_relation  wcr 
                                                 left join inte_work_center wc on wc.Id=wcr.WorkCenterId
                                                 Where wcr.SubWorkCenterId = @Id ";
+
+        const string GetHigherInteWorkCentersSql = @"select wc.*
+                                                From  inte_work_center_relation  wcr 
+                                                left join inte_work_center wc on wc.Id=wcr.WorkCenterId
+                                                Where wcr.SubWorkCenterId IN @Ids ";
+
         const string GetWorkCenterIdByResourceIdSql = "SELECT WorkCenterId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND ResourceId IN @resourceIds";
-        const string GetResourceIdsByWorkCenterIdSql = "SELECT ResourceId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND WorkCenterId IN @workCenterIds ";
+
+        const string GetResourceIdsByWorkCenterIdSql = "SELECT ResourceId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND WorkCenterId IN @workCenterIds";
 
         const string UpdateStatusSql = "UPDATE `inte_work_center` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+        const string GetEntitiesSqlTemplate = "SELECT * FROM `inte_work_center` /**where**/ ";
+
+        const string GetWorkCenterResourceRelationSql = "SELECT * FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND ResourceId IN @ResourceIds";
     }
 }

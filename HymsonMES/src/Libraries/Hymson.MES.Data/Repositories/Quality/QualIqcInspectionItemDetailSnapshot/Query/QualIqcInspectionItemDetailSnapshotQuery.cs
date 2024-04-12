@@ -22,5 +22,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// </summary>
         public IQCInspectionTypeEnum? InspectionType { get; set; }
 
+        /// <summary>
+        /// 项目编码
+        /// </summary>
+        public string? ParameterCode { get; set; }
+
     }
 }

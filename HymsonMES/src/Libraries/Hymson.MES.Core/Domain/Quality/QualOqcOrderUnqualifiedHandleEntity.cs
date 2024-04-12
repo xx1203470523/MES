@@ -17,9 +17,9 @@ namespace Hymson.MES.Core.Domain.Quality
         public long SiteId { get; set; }
 
         /// <summary>
-        /// FQC检验单Id
+        /// OQC检验单Id
         /// </summary>
-        public long FQCOrderId { get; set; }
+        public long OQCOrderId { get; set; }
 
         /// <summary>
         /// 来源系统(1-MES 2-OA)

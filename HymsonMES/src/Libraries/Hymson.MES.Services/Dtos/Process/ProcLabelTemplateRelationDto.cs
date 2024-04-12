@@ -90,7 +90,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? PrintTemplatePath { get; set; }
 
-       
+        /// <summary>
+        /// 数据源
+        /// </summary>
+        public string? printDataModel { get; set; }
     }
 
     /// <summary>

@@ -242,10 +242,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
             // manu_sfc_info 修改为完成 且入库
             // 条码信息
-            var sfcInfo = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+            var sfcInfo = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                SFC = sfcProduceEntity.SFC
+                SFC = sfcProduceEntity.SFC,
+                Type = SfcTypeEnum.Produce
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", sfcProduceEntity.SFC);
 
             // 读取产品基础信息

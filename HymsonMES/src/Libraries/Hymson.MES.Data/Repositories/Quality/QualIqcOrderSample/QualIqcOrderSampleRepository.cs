@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderSampleEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<QualIqcOrderSampleEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderSampleEntity>(GetByIdsSql, new { Ids = ids });

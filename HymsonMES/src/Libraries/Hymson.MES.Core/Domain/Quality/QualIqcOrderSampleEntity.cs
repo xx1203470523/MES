@@ -32,7 +32,7 @@ namespace Hymson.MES.Core.Domain.Quality
         public string Barcode { get; set; }
 
         /// <summary>
-        /// 是否合格;0、不合格 1、合格
+        /// 是否合格;0、不合格 1、合格（这个字段暂未实际用到）
         /// </summary>
         public TrueOrFalseEnum IsQualified { get; set; }
 

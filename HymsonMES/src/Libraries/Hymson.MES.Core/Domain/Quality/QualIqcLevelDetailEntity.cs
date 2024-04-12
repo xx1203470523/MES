@@ -19,7 +19,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 检验类型
         /// </summary>
-        public InspectionTypeEnum Type { get; set; }
+        public IQCInspectionTypeEnum Type { get; set; }
 
         /// <summary>
         /// 检验水准

@@ -23,7 +23,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 工序编码列表
         /// </summary>
-        public string[]? Codes { get; set; }
+      public IEnumerable<string>? Codes { get; set; }
+
+        /// <summary>
+        /// 资源类型组
+        /// </summary>
+        public IEnumerable<long>? ResourceTypeIds {  get; set; }
     }
 
 

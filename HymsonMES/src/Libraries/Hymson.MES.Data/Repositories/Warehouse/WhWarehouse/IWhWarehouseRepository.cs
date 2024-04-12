@@ -105,6 +105,13 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
         /// <returns></returns>
         Task<PagedInfo<WhWarehouseEntity>> GetPagedListAsync(WhWarehousePagedQuery pagedQuery);
 
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<WhWarehouseEntity>> GetPagedListCopyAsync(WhWarehousePagedQuery pagedQuery);
+
         #endregion
 
     }

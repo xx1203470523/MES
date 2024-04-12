@@ -53,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcLabelTemplateEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ProcLabelTemplateEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcLabelTemplateEntity>(GetByIdsSql, new { ids = ids });
@@ -166,10 +166,10 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_label_template` /**where**/ ";
         const string GetProcLabelTemplateEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `proc_label_template` /**where**/  ";
+                                           FROM `proc_label_template` /**where**/  "; 
 
-        const string InsertSql = "INSERT INTO `proc_label_template`(  `Id`, `Name`, `Path`, `Content`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Name, @Path, @Content, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `proc_label_template`(  `Id`, `Name`, `Path`, `Content`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Name, @Path, @Content, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `proc_label_template`(  `Id`, `Name`, `Path`, `Content`,  `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Name, @Path, @Content,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertsSql = "INSERT INTO `proc_label_template`(  `Id`, `Name`, `Path`, `Content`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Name, @Path, @Content,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string UpdateSql = "UPDATE `proc_label_template` SET   Name = @Name, Path = @Path, Content = @Content, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_label_template` SET   Name = @Name, Path = @Path, Content = @Content, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_label_template` SET IsDeleted = Id WHERE Id = @Id ";

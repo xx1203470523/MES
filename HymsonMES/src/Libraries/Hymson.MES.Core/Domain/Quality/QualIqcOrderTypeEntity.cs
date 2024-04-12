@@ -24,7 +24,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 验证水准 R,I, II, III, IV, V, VI, VII，T
         /// </summary>
-        public bool VerificationLevel { get; set; }
+        public VerificationLevelEnum VerificationLevel { get; set; }
 
         /// <summary>
         /// 接收水准
@@ -39,7 +39,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 检验数量
         /// </summary>
-        public int? CheckedQty { get; set; }
+        public int CheckedQty { get; set; }
 
         /// <summary>
         /// 备注

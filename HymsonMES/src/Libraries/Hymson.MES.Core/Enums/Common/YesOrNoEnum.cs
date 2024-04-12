@@ -13,7 +13,7 @@ namespace Hymson.MES.Core.Enums
         [Description("是")]
         Yes = 1,
         /// <summary>
-        /// 否
+        /// 否 
         /// </summary>
         [Description("否")]
         No = 2,

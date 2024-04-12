@@ -144,6 +144,13 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
+            if (pagedQuery.IQCOrderId.HasValue)
+            {
+                sqlBuilder.Where("IQCOrderId = @IQCOrderId");
+            }
+            if (pagedQuery.IQCOrderSampleIds != null) sqlBuilder.Where(" IQCOrderSampleId IN @IQCOrderSampleIds ");
+            if (pagedQuery.IQCInspectionDetailSnapshotIds != null) sqlBuilder.Where(" IQCInspectionDetailSnapshotId IN @IQCInspectionDetailSnapshotIds ");
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -172,8 +179,8 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string InsertSql = "INSERT INTO qual_iqc_order_sample_detail(  `Id`, `SiteId`, `IQCOrderId`, `IQCOrderSampleId`, `IQCInspectionDetailSnapshotId`, `InspectionValue`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IQCOrderId, @IQCOrderSampleId, @IQCInspectionDetailSnapshotId, @InspectionValue, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO qual_iqc_order_sample_detail(  `Id`, `SiteId`, `IQCOrderId`, `IQCOrderSampleId`, `IQCInspectionDetailSnapshotId`, `InspectionValue`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IQCOrderId, @IQCOrderSampleId, @IQCInspectionDetailSnapshotId, @InspectionValue, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_iqc_order_sample_detail SET   SiteId = @SiteId, IQCOrderSampleId = @IQCOrderSampleId, IQCInspectionParameterCopyId = @IQCInspectionParameterCopyId, InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_iqc_order_sample_detail SET   SiteId = @SiteId, IQCOrderSampleId = @IQCOrderSampleId, IQCInspectionParameterCopyId = @IQCInspectionParameterCopyId, InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_iqc_order_sample_detail SET InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_iqc_order_sample_detail SET InspectionValue = @InspectionValue, IsQualified = @IsQualified, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_iqc_order_sample_detail SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_iqc_order_sample_detail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -182,4 +189,5 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetByIdsSql = @"SELECT * FROM qual_iqc_order_sample_detail WHERE Id IN @Ids ";
 
     }
+
 }

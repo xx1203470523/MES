@@ -1,11 +1,10 @@
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.WHMaterialReceipt;
 using Hymson.MES.Core.Domain.WHMaterialReceiptDetail;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.WHMaterialReceipt.Query;
+using Hymson.MES.Data.Repositories.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
@@ -162,10 +161,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
                 sqlBuilder.Where(" ReceiptNum = @ReceiptNum ");
             }
 
-            if (pagedQuery.SupplierId != null)
-            {
-                sqlBuilder.Where(" SupplierId = @SupplierId ");
-            }
+            if (pagedQuery.SupplierIds != null) sqlBuilder.Where(" SupplierId IN @SupplierIds ");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -179,54 +175,6 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
             var totalCount = await totalCountTask;
             return new PagedInfo<WhMaterialReceiptEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
-        #region 明细
-        /// <summary>
-        /// 根据receiptId获取明细数据
-        /// </summary>
-        /// <param name="receiptId"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetDetailsByReceiptIdAsync(long receiptId)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<WHMaterialReceiptDetailEntity>(GetDetailsByReceiptIdSql, new { MaterialReceiptId = receiptId });
-        }
-
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<WHMaterialReceiptDetailEntity> GetDetailByIdAsync(long id)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<WHMaterialReceiptDetailEntity>(GetDetailByIdSql, new { Id = id });
-        }
-
-        /// <summary>
-        /// 根据IDs获取数据（批量）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetDetailsByIdsAsync(IEnumerable<long> ids)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<WHMaterialReceiptDetailEntity>(GetDetailsByIdsSql, new { Ids = ids });
-        }
-
-        /// <summary>
-        /// 根据收货主表Id明细
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetDetailsByReceiptIdsAsync(IEnumerable<long> ids)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<WHMaterialReceiptDetailEntity>(GetDetailsByReceiptIdsSql, new { Ids = ids });
-        }
-
-        
-        #endregion
 
     }
 
@@ -254,14 +202,6 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
 
         const string GetByIdSql = @"SELECT * FROM wh_material_receipt WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM wh_material_receipt WHERE Id IN @Ids ";
-
-
-
-        const string GetDetailsByReceiptIdSql = @"SELECT * FROM wh_material_receipt_detail WHERE MaterialReceiptId = @MaterialReceiptId ";
-        const string GetDetailByIdSql = @"SELECT * FROM wh_material_receipt_detail WHERE Id = @Id ";
-        const string GetDetailsByIdsSql = @"SELECT * FROM wh_material_receipt_detail WHERE Id IN @Ids ";
-        const string GetDetailsByReceiptIdsSql = @"SELECT * FROM wh_material_receipt_detail WHERE MaterialReceiptId IN @Ids "; 
-
 
     }
 }

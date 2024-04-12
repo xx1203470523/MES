@@ -27,47 +27,47 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public long WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 线体Id
         /// </summary>
         public long LineId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
+
     }
 
 
@@ -81,47 +81,47 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public long WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 线体Id
         /// </summary>
         public long LineId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -134,47 +134,47 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public long WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 线体Id
         /// </summary>
         public long LineId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
+
 
     }
 
@@ -264,17 +264,32 @@ namespace Hymson.MES.Services.Dtos.Plan
 
     }
 
+    /// <summary>
+    /// 激活工单分页
+    /// </summary>
+    public class ActivationWorkOrderPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 产线组
+        /// </summary>
+        public IEnumerable<long>? WirebodyIds { get; set; }
+    }
 
     /// <summary>
     /// 激活/取消激活 工单
     /// </summary>
-    public class ActivationWorkOrderDto 
+    public class ActivationWorkOrderDto
     {
         /// <summary>
         /// 工单ID
         /// </summary>
         public long Id { get; set; }
-        
+
         /// <summary>
         /// 是否需要激活   true 需要激活  false 需要取消激活
         /// </summary>
@@ -455,4 +470,208 @@ namespace Hymson.MES.Services.Dtos.Plan
         public bool IsActivation { get; set; }
     }
 
+    /// <summary>
+    /// 设备激活工单
+    /// </summary>
+    public record EquipmentActivityWorkOrderOutputDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 工艺路线id
+        /// </summary>
+        public long? ProcessId { get; set; }
+
+        /// <summary>
+        /// 工艺路线名称
+        /// </summary>
+        public string? ProcessName { get; set; }
+
+        /// <summary>
+        /// 工艺路线编码
+        /// </summary>
+        public string? ProcessCode { get; set; }
+
+        /// <summary>
+        /// 工作中心id
+        /// </summary>
+        public long? WorkCenterId { get; set; }
+
+        /// <summary>
+        /// 工作中心编码
+        /// </summary>
+        public string? WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 产线id
+        /// </summary>
+        public long? LineId { get; set; }
+
+        /// <summary>
+        /// 产线编码
+        /// </summary>
+        public string? LineCode { get; set; }
+
+        /// <summary>
+        /// 产线名称
+        /// </summary>
+        public string? LineName { get; set; }
+
+        /// <summary>
+        /// 工单id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 工单编号
+        /// </summary>
+        public string? WorkOrderCode { get; set; }
+
+        /// <summary>
+        /// 工单创建时间
+        /// </summary>
+        public DateTime WorkOrderCreateOn { get; set; }
+
+        /// <summary>
+        /// 工单计划数量
+        /// </summary>
+        public decimal? WorkOrderPlannedQuantity { get; set; }
+
+        /// <summary>
+        /// 工单下达数量
+        /// </summary>
+        public decimal? WorkOrderPassDownQuantity {  get; set; }
+
+        /// <summary>
+        /// 产品id
+        /// </summary>
+        public long? ProductId { get; set; }
+
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string? ProductCode { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string? ProductName { get; set; }
+
+        /// <summary>
+        /// 产品版本
+        /// </summary>
+        public string? ProductVersion { get; set; }
+
+        /// <summary>
+        /// 产品单位
+        /// </summary>
+        public string? ProductUnit { get; set; }
+    }
+
+    /// <summary>
+    /// 设备产线
+    /// </summary>
+    public record EquipmentLineOutputDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 产线ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 产线编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 产线名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+    }
+
+    /// <summary>
+    /// 设备资源
+    /// </summary>
+    public record EquipmentResourceOutputDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long Id { set; get; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string Name { get; set; }
+    }
+
+    /// <summary>
+    /// 设备工序
+    /// </summary>
+    public record EquipmentProcedureOutputDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long Id { set; get; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long ResourceId { set; get; }
+    }
+
+    /// <summary>
+    /// 设备编码扫描结果
+    /// </summary>
+    public record EquipmentCodeScanOutputDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string EquipmentName { get; set; }
+
+        /// <summary>
+        /// 设备资源
+        /// </summary>
+        public IEnumerable<EquipmentResourceOutputDto> EquipmentResources { get; set; }
+
+        /// <summary>
+        /// 设备工序
+        /// </summary>
+        public IEnumerable<EquipmentProcedureOutputDto> EquipmentProcedure { get; set; }
+
+        /// <summary>
+        /// 设备产线
+        /// </summary>
+        public IEnumerable<EquipmentLineOutputDto> EquipmentLines { get; set; }
+    }
 }

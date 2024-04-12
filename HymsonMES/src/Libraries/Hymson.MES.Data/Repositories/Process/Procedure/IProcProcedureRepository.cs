@@ -95,6 +95,20 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> InsertAsync(ProcProcedureEntity procProcedureEntity);
 
         /// <summary>
+        /// 批量插入
+        /// </summary>
+        /// <param name="procProcedures"></param>
+        /// <returns></returns>
+        Task<int> InsertsAsync(IEnumerable<ProcProcedureEntity> procProcedures);
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="procProcedures"></param>
+        /// <returns></returns>
+        Task<int> UpdatesAsync(IEnumerable<ProcProcedureEntity> procProcedures);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="procProcedureEntity"></param>
@@ -114,6 +128,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialEntitys"></param>
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
+        /// <summary>
+        /// 查询工序单条数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity> GetEntitieAsync(ProcProcedureQuery query);
 
     }
 }

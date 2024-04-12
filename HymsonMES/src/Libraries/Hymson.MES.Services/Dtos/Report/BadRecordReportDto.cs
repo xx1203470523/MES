@@ -53,7 +53,8 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 汇总数量
         /// </summary>
-        public decimal Num { get; set; }
+        //public decimal Num { get; set; }
+        public int Num { get; set; }
 
         /// <summary>
         /// 描述 :不合格代码 

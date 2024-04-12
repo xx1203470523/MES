@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="manuDowngradingSaveDto"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost]        
         [Route("saveManuDowngrading")]
         [PermissionDescription("manu:downgrading:save")]
         public async Task SaveManuDowngradingAsync([FromBody] ManuDowngradingSaveDto manuDowngradingSaveDto)

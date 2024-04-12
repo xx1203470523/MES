@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Dtos.Process.LabelTemplate.DataSource
+namespace Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.DataSource
 {
     /// <summary>
     ///生产条码数据源
@@ -45,6 +45,18 @@ namespace Hymson.MES.Services.Dtos.Process.LabelTemplate.DataSource
         public decimal Qty { get; set; }
 
         /// <summary>
+        /// 合格数量
+        /// </summary>
+        [Description("合格数量")]
+        public decimal QualifiedQty { get; set; }
+
+        /// <summary>
+        /// 不良数量
+        /// </summary>
+        [Description("不良数量")]
+        public decimal UnQualifiedQty { get; set; }
+
+        /// <summary>
         /// 所在线体编码
         /// </summary>
         [Description("线体编码")]
@@ -59,37 +71,37 @@ namespace Hymson.MES.Services.Dtos.Process.LabelTemplate.DataSource
         /// <summary>
         /// 所在工序编码
         /// </summary>
-        [Description("工序编码")]
+        [Description("产出工序编码")]
         public string? ProcedureCode { get; set; }
 
         /// <summary>
         /// 所在工序名称
         /// </summary>
-        [Description("工序名称")]
+        [Description("产出工序名称")]
         public string? ProcedureName { get; set; }
 
         /// <summary>
         /// 所在资源编码
         /// </summary>
-        [Description("资源编码")]
+        [Description("产出资源编码")]
         public string? ResourceCode { get; set; }
 
         /// <summary>
         /// 所在资源名称
         /// </summary>
-        [Description("资源名称")]
+        [Description("产出资源名称")]
         public string? ResourceName { get; set; }
 
         /// <summary>
         /// 所在设备编码
         /// </summary>
-        [Description("设备编码")]
+        [Description("产出设备编码")]
         public string? EquipmentCode { get; set; }
 
         /// <summary>
         /// 所在设备名称
         /// </summary>
-        [Description("设备名称")]
+        [Description("产出设备名称")]
         public string? EquipmentName { get; set; }
 
         /// <summary>
@@ -99,9 +111,9 @@ namespace Hymson.MES.Services.Dtos.Process.LabelTemplate.DataSource
         public string Status { get; set; }
 
         /// <summary>
-        /// 最后产出时间
+        ///生产日期
         /// </summary>
-        [Description("最后产出时间")]
+        [Description("生产日期")]
         public string? LasttOutputTime { get; set; }
 
         /// <summary>
@@ -109,5 +121,18 @@ namespace Hymson.MES.Services.Dtos.Process.LabelTemplate.DataSource
         /// </summary>
         [Description("打印时间")]
         public string? PrintTime { get; set; }
+
+        /// <summary>
+        /// 有效时间
+        /// </summary>
+        [Description("有效时间")]
+        public string? ExpirationDate { get; set; }
+
+
+        /// <summary>
+        /// 物料批次 取产品条码生成时的日期
+        /// </summary>
+        [Description("物料批次")]
+        public string? ProductionBatch { get; set; }
     }
 }

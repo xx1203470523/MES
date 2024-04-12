@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Process;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -147,5 +148,21 @@ namespace Hymson.MES.Core.Domain.Process
         /// 保质期（天）
         /// </summary>
         public int? ShelfLife { get; set; }
+
+        /// <summary>
+        /// 规格型号
+        /// </summary>
+        public string? Specifications { get; set; }
+
+
+        /// <summary>
+        /// 产品型号 条码规则 生成条码使用
+        /// </summary>
+        public string? ProductModel { get; set; }
+
+        /// <summary>
+        /// 原材料类型
+        /// </summary>
+        public MaterialTypeEnum? MaterialType { get; set;}
     }
 }

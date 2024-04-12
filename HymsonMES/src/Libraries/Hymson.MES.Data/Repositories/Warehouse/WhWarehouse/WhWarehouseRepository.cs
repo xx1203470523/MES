@@ -228,6 +228,52 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
             return new PagedInfo<WhWarehouseEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<WhWarehouseEntity>> GetPagedListCopyAsync(WhWarehousePagedQuery pagedQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("Status != 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
+            {
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("Code like @Code");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
+            {
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("Name like @Name");
+            }
+
+            if (pagedQuery.Status != null)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
+
+            using var conn = GetMESDbConnection();
+            var entitiesTask = conn.QueryAsync<WhWarehouseEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var entities = await entitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<WhWarehouseEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+        }
+
         #endregion
 
     }

@@ -116,6 +116,22 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            if (!string.IsNullOrWhiteSpace(query.ParameterCode)) {
+                sqlBuilder.Where("ParameterCode=@ParameterCode");
+            }
+
+            if (query.ParameterGroupId != null)
+            {
+                sqlBuilder.Where("ParameterGroupId=@ParameterGroupId");
+            }
+
+            if (query.InspectionType != null) {
+                sqlBuilder.Where("InspectionType=@InspectionType");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualOqcParameterGroupDetailSnapshootEntity>(template.RawSql, query);
         }
@@ -160,11 +176,11 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_oqc_parameter_group_detail_snapshoot /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_oqc_parameter_group_detail_snapshoot /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_oqc_parameter_group_detail_snapshoot(  `Id`, `SiteId`, `ParameterGroupId`, `ParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `ReferenceValue`, `InspectionType`, `EnterNumber`, `DisplayOrder`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ParameterGroupId, @ParameterId, @UpperLimit, @CenterValue, @LowerLimit, @ReferenceValue, @InspectionType, @EnterNumber, @DisplayOrder, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_oqc_parameter_group_detail_snapshoot(  `Id`, `SiteId`, `ParameterGroupId`, `ParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `ReferenceValue`, `InspectionType`, `EnterNumber`, `DisplayOrder`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ParameterGroupId, @ParameterId, @UpperLimit, @CenterValue, @LowerLimit, @ReferenceValue, @InspectionType, @EnterNumber, @DisplayOrder, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_oqc_parameter_group_detail_snapshoot(  `Id`, `SiteId`, `ParameterGroupId`, `ParameterId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `ParameterDataType`, `UpperLimit`, `CenterValue`, `LowerLimit`, `ReferenceValue`, `InspectionType`, `EnterNumber`, `DisplayOrder`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ParameterGroupId, @ParameterId, @ParameterCode, @ParameterName, @ParameterUnit, @ParameterDataType, @UpperLimit, @CenterValue, @LowerLimit, @ReferenceValue, @InspectionType, @EnterNumber, @DisplayOrder, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_oqc_parameter_group_detail_snapshoot(  `Id`, `SiteId`, `ParameterGroupId`, `ParameterId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, `ParameterDataType`, `UpperLimit`, `CenterValue`, `LowerLimit`, `ReferenceValue`, `InspectionType`, `EnterNumber`, `DisplayOrder`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ParameterGroupId, @ParameterId, @ParameterCode, @ParameterName, @ParameterUnit, @ParameterDataType, @UpperLimit, @CenterValue, @LowerLimit, @ReferenceValue, @InspectionType, @EnterNumber, @DisplayOrder, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_oqc_parameter_group_detail_snapshoot SET   SiteId = @SiteId, ParameterGroupId = @ParameterGroupId, ParameterId = @ParameterId, UpperLimit = @UpperLimit, CenterValue = @CenterValue, LowerLimit = @LowerLimit, ReferenceValue = @ReferenceValue, InspectionType = @InspectionType, EnterNumber = @EnterNumber, DisplayOrder = @DisplayOrder, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_oqc_parameter_group_detail_snapshoot SET   SiteId = @SiteId, ParameterGroupId = @ParameterGroupId, ParameterId = @ParameterId, UpperLimit = @UpperLimit, CenterValue = @CenterValue, LowerLimit = @LowerLimit, ReferenceValue = @ReferenceValue, InspectionType = @InspectionType, EnterNumber = @EnterNumber, DisplayOrder = @DisplayOrder, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_oqc_parameter_group_detail_snapshoot SET   SiteId = @SiteId, ParameterGroupId = @ParameterGroupId, ParameterId = @ParameterId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterUnit = @ParameterUnit, ParameterDataType = @ParameterDataType, UpperLimit = @UpperLimit, CenterValue = @CenterValue, LowerLimit = @LowerLimit, ReferenceValue = @ReferenceValue, InspectionType = @InspectionType, EnterNumber = @EnterNumber, DisplayOrder = @DisplayOrder, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_oqc_parameter_group_detail_snapshoot SET   SiteId = @SiteId, ParameterGroupId = @ParameterGroupId, ParameterId = @ParameterId, ParameterCode = @ParameterCode, ParameterName = @ParameterName, ParameterUnit = @ParameterUnit, ParameterDataType = @ParameterDataType, UpperLimit = @UpperLimit, CenterValue = @CenterValue, LowerLimit = @LowerLimit, ReferenceValue = @ReferenceValue, InspectionType = @InspectionType, EnterNumber = @EnterNumber, DisplayOrder = @DisplayOrder, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_oqc_parameter_group_detail_snapshoot SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_oqc_parameter_group_detail_snapshoot SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
