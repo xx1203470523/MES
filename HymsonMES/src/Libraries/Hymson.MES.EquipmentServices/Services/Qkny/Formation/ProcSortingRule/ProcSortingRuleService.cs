@@ -48,7 +48,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.ProcSortingRule
                 ProcSortRuleDetailEquDto model = new ProcSortRuleDetailEquDto();
                 model.SortRuleCode = item.Code;
                 model.SortRuleName = item.Name;
-                model.ParameterValue = item.ParameterValue;
+                model.ParameterCode = item.ParameterCode;
+                model.ParameterName = item.ParameterName;
                 model.MinValue = item.MinValue;
                 model.MinContainingType = item.MinContainingType;
                 model.MaxValue = item.MaxValue;

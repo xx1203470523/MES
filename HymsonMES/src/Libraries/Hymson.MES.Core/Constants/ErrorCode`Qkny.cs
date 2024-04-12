@@ -355,5 +355,12 @@ namespace Hymson.MES.Core.Constants
         public const string MES45271 = "极组条码没有绑定的电芯";
 
         #endregion
+
+        #region 工装绑定
+
+        public const string MES45280 = "条码已绑定工装，不允许重复绑定！【{Barcode}】";
+        public const string MES45281 = "条码库存不存在，不允许绑定！【{Barcode}】";
+
+        #endregion
     }
 }

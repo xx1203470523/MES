@@ -35,6 +35,7 @@ using Hymson.MES.EquipmentServices.Dtos.Manufacture.ProductionProcess;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.ToolBindMaterial;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment;
 using Hymson.MES.EquipmentServices.Services.Qkny.Formula;
@@ -283,6 +284,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
+        /// 工装条码绑定仓储
+        /// </summary>
+        private readonly IManuToolingBindRepository _manuToolingBindRepository;
+
+        /// <summary>
         /// 设备服务
         /// </summary>
         private readonly IEquEquipmentService _equEquipmentService;
@@ -326,6 +332,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuSfcRepository manuSfcRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IManuToolingBindRepository manuToolingBindRepository,
             IEquEquipmentService equEquipmentService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
@@ -339,7 +346,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _ccdFileUploadCompleteRecordService = ccdFileUploadCompleteRecordService;
             _procEquipmentGroupParamService = procEquipmentGroupParamService;
             _planWorkOrderService = planWorkOrderService;
-            _whMaterialInventoryRepository = whMaterialInventoryRepository; 
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _manuFeedingService = manuFeedingService;
             _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
             _agvTaskRecordService = agvTaskRecordService;
@@ -365,6 +372,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuSfcRepository = manuSfcRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _manuToolingBindRepository = manuToolingBindRepository;
             _equEquipmentService = equEquipmentService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
@@ -554,16 +562,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             });
             //上料条码
             List<OutStationConsumeBo> consumeSfcList = new List<OutStationConsumeBo>();
-            if(dto.OutputType == "1" || dto.OutputType == "2")
+            if (dto.OutputType == "1" || dto.OutputType == "2")
             {
                 //查询当前设备的上料
                 EntityByResourceIdQuery loadQuery = new EntityByResourceIdQuery();
                 loadQuery.SiteId = equResModel.SiteId;
                 loadQuery.Resourceid = equResModel.ResId;
                 var loadList = await _manuFeedingService.GetAllByResourceIdAsync(loadQuery);
-                foreach(var item in loadList)
+                foreach (var item in loadList)
                 {
-                    OutStationConsumeBo consumeSfc  = new OutStationConsumeBo();
+                    OutStationConsumeBo consumeSfc = new OutStationConsumeBo();
                     consumeSfc.BarCode = item.BarCode;
                     consumeSfc.MaterialId = item.MaterialId;
                     consumeSfc.ConsumeQty = item.Qty;
@@ -727,19 +735,19 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             OutStationRequestBo outReqBo = new OutStationRequestBo();
             outReqBo.SFC = dto.Sfc;
             outReqBo.IsQualified = dto.Passed == 1;
-            if(dto.BindFeedingCodeList.IsNullOrEmpty() == false)
+            if (dto.BindFeedingCodeList.IsNullOrEmpty() == false)
             {
                 List<OutStationConsumeBo> conList = new List<OutStationConsumeBo>();
-                foreach(var item in  dto.BindFeedingCodeList)
+                foreach (var item in dto.BindFeedingCodeList)
                 {
                     conList.Add(new OutStationConsumeBo() { BarCode = item });
                 }
                 outReqBo.ConsumeList = conList;
             }
-            if(dto.NgList.IsNullOrEmpty() == false)
+            if (dto.NgList.IsNullOrEmpty() == false)
             {
                 List<OutStationUnqualifiedBo> unCodeList = new List<OutStationUnqualifiedBo>();
-                foreach(var item in dto.NgList)
+                foreach (var item in dto.NgList)
                 {
                     unCodeList.Add(new OutStationUnqualifiedBo() { UnqualifiedCode = item });
                 }
@@ -794,7 +802,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             var inResult = await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
             //4. 返回
             List<InboundMoreReturnDto> resultList = new List<InboundMoreReturnDto>();
-            foreach(var item in dto.SfcList)
+            foreach (var item in dto.SfcList)
             {
                 InboundMoreReturnDto model = new InboundMoreReturnDto();
                 model.Sfc = item;
@@ -933,6 +941,56 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             }
 
             await _whMaterialInventoryService.MaterialInventoryAsync(dto);
+        }
+
+        /// <summary>
+        /// 工装条码绑定048
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ToolBindMaterialAsync(ToolBindMaterialDto dto)
+        {
+            //获取设备基础信息
+            var equResModel = await _equEquipmentService.GetEquResAsync(dto);
+            //校验条码是否已绑定工装
+            var bindSfcs = await _manuToolingBindRepository.GetEntitiesAsync(new Data.Repositories.Manufacture.Query.ManuToolingBindQuery
+            {
+                SiteId = equResModel.SiteId,
+                Barcodes = dto.ContainerSfcList,
+                Status = Core.Enums.Common.BindStatusEnum.Bind
+            });
+            if (bindSfcs != null && bindSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45280)).WithData("Barcode", string.Join('|', bindSfcs.Select(x => x.Barcode)));
+            }
+            //校验条码是否在库存中
+            var existBarcodeEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+            {
+                SiteId = equResModel.SiteId,
+                BarCodes = dto.ContainerSfcList
+            });
+            if (existBarcodeEntities == null || !existBarcodeEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45281)).WithData("Barcode", string.Join('|', dto.ContainerSfcList));
+            }
+            var exceptBarcodes = dto.ContainerSfcList.Except(existBarcodeEntities.Select(x => x.MaterialBarCode));
+            if (exceptBarcodes != null && exceptBarcodes.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45281)).WithData("Barcode", string.Join('|', exceptBarcodes));
+            }
+            //入库
+            var entities = dto.ContainerSfcList.Select(item => new ManuToolingBindEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = equResModel.SiteId,
+                ToolingCode = dto.ContainerCode,
+                Barcode = item,
+                Status = Core.Enums.Common.BindStatusEnum.Bind,
+                CreatedBy = dto.EquipmentCode,
+                UpdatedBy = dto.EquipmentCode
+            });
+
+            await _manuToolingBindRepository.InsertRangeAsync(entities);
         }
 
         /// <summary>

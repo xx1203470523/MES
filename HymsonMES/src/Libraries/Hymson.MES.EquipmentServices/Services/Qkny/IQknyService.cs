@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.ToolBindMaterial;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -106,5 +107,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task MaterialInventoryAsync(MaterialInventoryDto dto);
+
+        /// <summary>
+        /// 工装条码绑定048
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task ToolBindMaterialAsync(ToolBindMaterialDto dto);
     }
 }

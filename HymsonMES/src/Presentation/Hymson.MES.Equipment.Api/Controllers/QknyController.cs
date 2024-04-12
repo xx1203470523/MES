@@ -5,6 +5,7 @@ using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.ToolBindMaterial;
 using Hymson.MES.EquipmentServices.Services.Qkny;
 using Hymson.MES.EquipmentServices.Services.Qkny.Common;
 using Hymson.MES.EquipmentServices.Services.Qkny.FitTogether;
@@ -82,7 +83,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("操作员登录001", BusinessType.OTHER, "OperatorLoginMes001", ReceiverTypeEnum.MES)]
         public async Task OperatorLoginAsync(OperationLoginDto dto)
         {
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 return;
             }
@@ -205,7 +206,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             if (IS_DEBUG == true)
             {
                 List<GetRecipeListReturnDto> resultList = new List<GetRecipeListReturnDto>();
-                for (int i = 0;i < 5; ++i)
+                for (int i = 0; i < 5; ++i)
                 {
                     GetRecipeListReturnDto model = new GetRecipeListReturnDto();
                     model.RecipeCode = $"recipe{i}";
@@ -238,7 +239,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //1. 获取proc_equipment_group_param_detail开机参数明细，并转成相应格式
 
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 GetRecipeDetailReturnDto resultList = new GetRecipeDetailReturnDto();
                 resultList.Version = "1.0";
@@ -406,7 +407,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //1. 针对制胶匀浆设备时，在开机进行启动时，从MES获取配方列表
             //2. 获取 proc_formula 表数据，并进行字段转换
 
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 List<FormulaListGetReturnDto> list = new List<FormulaListGetReturnDto>();
                 for (var i = 0; i < 3; ++i)
@@ -631,7 +632,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //2. 用的时候生成(需要的时候在生成条码)或从XX表里面取(提前生成就是下发，生成两个或者3个，)
             //3. 考虑提前生成条码如何标记是否使用
 
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 List<string> sfcList = new List<string>();
                 for (var i = 0; i < dto.Qty + 1; ++i)
@@ -679,7 +680,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("获取下发条码(用于CCD面密度)025", BusinessType.OTHER, "CcdGetBarcode025", ReceiverTypeEnum.MES)]
         public async Task<CcdGetBarcodeReturnDto> CcdGetBarcodeAsync(CCDFileUploadCompleteDto dto)
         {
-            if(IS_DEBUG ==true)
+            if (IS_DEBUG == true)
             {
                 CcdGetBarcodeReturnDto model = new CcdGetBarcodeReturnDto();
                 return model;
@@ -727,7 +728,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             {
                 return;
             }
-            
+
             await _qknyService.InboundAsync(dto);
 
             //TODO
@@ -804,7 +805,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             //TODO
             //1. 参考现有出站
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
                 for (var i = 0; i < dto.SfcList.Count; ++i)
@@ -839,7 +840,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //3. 校验上工序是否合格
             //4. 考虑系统如何方便追溯
 
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
                 for (var i = 0; i < dto.SfcList.Count; ++i)
@@ -868,7 +869,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("电芯极组绑定产品出站032", BusinessType.OTHER, "OutboundSfcPolar032", ReceiverTypeEnum.MES)]
         public async Task OutboundSfcPolarAsync(OutboundSfcPolarDto dto)
         {
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 return;
             }
@@ -894,7 +895,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //1. 生成条码进行下发
             //2. 参考现有创建条码 CreateBarcodeBySemiProductIdAsync，CreateBarcodeByWorkOrderIdAsync
 
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 List<string> sfcList = new List<string>();
                 for (var i = 0; i < dto.Qty; ++i)
@@ -920,7 +921,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("补液数据上报034", BusinessType.OTHER, "FillingData034", ReceiverTypeEnum.MES)]
         public async Task FillingDataAsync(FillingDataDto dto)
         {
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 return;
             }
@@ -941,7 +942,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("空托盘校验035", BusinessType.OTHER, "EmptyContainerCheck035", ReceiverTypeEnum.MES)]
         public async Task EmptyContainerCheckAsync(EmptyContainerCheckDto dto)
         {
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 return;
             }
@@ -1067,7 +1068,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("InboundInContainer")]
         [LogDescription("托盘进站(容器进站)040", BusinessType.OTHER, "InboundInContainer040", ReceiverTypeEnum.MES)]
         public async Task InboundInContainerAsync(InboundInContainerDto dto)
-        { 
+        {
             if (IS_DEBUG == true)
             {
                 return;
@@ -1089,7 +1090,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘出站(容器出站)041", BusinessType.OTHER, "OutboundInContainer041", ReceiverTypeEnum.MES)]
         public async Task OutboundInContainerAsync(OutboundInContainerDto dto)
         {
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 return;
             }
@@ -1111,7 +1112,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("工装寿命上报042", BusinessType.OTHER, "ToolLife042", ReceiverTypeEnum.MES)]
         public async Task ToolLifeAsync(ToolLifeDto dto)
         {
-            if(IS_DEBUG == true)
+            if (IS_DEBUG == true)
             {
                 return;
             }
@@ -1174,7 +1175,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             if (IS_DEBUG == true)
             {
                 List<ProcSortRuleDetailEquDto> sortList = new List<ProcSortRuleDetailEquDto>();
-                for(var i = 0;i < 3; ++i)
+                for (var i = 0; i < 3; ++i)
                 {
                     ProcSortRuleDetailEquDto sortModel = new ProcSortRuleDetailEquDto();
                     sortModel.MinValue = i;
@@ -1186,7 +1187,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                     sortModel.Grade = $"grade{i}";
                     sortModel.ProcedureCode = $"procedurecode{i}";
                     sortList.Add(sortModel);
-                }    
+                }
 
                 return sortList;
             }
@@ -1228,6 +1229,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
 
+            //1. 如果是原材料，需要校验格式是否是5锻码
+            //2. 物料型号和数量从条码截取
+
             await _qknyService.MaterialInventoryAsync(dto);
         }
 
@@ -1240,16 +1244,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("ToolBindMaterialAsync")]
         [LogDescription("工装条码绑定048", BusinessType.OTHER, "ToolBindMaterial048", ReceiverTypeEnum.MES)]
-        public async Task ToolBindMaterialAsync(BindContainerDto dto)
+        public async Task ToolBindMaterialAsync(ToolBindMaterialDto dto)
         {
             if (IS_DEBUG == true)
             {
                 return;
             }
 
-            //TODO
-            //1. 如果是原材料，需要校验格式是否是5锻码
-            //2. 物料型号和数量从条码截取
+            await _qknyService.ToolBindMaterialAsync(dto);
         }
 
         /// <summary>
