@@ -523,8 +523,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// <returns></returns>
         private async Task<string> GenerateBatterySpecificationsAsync(BarCodeSerialNumberBo bo)
         {
-            if (bo.CodeType != CodeRuleCodeTypeEnum.ProcessControlSeqCode)
-                return string.Empty;
+            //if (bo.CodeType != CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+            //    return string.Empty;
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(bo.ProductId);
             if (procMaterialEntity == null)
                 return string.Empty;
