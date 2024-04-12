@@ -219,6 +219,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 SFC = request.SFC,
                 VehicleCode = request.VehicleCode,
+                UnQualifiedQty = request.UnQualifiedQty,
+                QualifiedQty = request.QualifiedQty,
                 IsQualified = request.IsQualified == 1
             };
 
