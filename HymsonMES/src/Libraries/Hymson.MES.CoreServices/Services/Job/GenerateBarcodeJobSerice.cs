@@ -1,8 +1,10 @@
 ﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
@@ -24,6 +26,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
+    [Job("条码生成", JobTypeEnum.Standard)]
     public class GenerateBarcodeJobSerice : IJobService
     {
         /// <summary>
