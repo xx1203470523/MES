@@ -9,13 +9,11 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Sequences;
 using Hymson.Utils;
-using NETCore.Encrypt;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
@@ -37,6 +35,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// 条码追溯
         /// </summary>
         private readonly ITracingSourceCoreService _tracingSourceCoreService;
+        /// <summary>
+        /// 工单
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly IInteTimeWildcardRepository _inteTimeWildcardRepository;
         private readonly ILocalizationService _localizationService;
         /// <summary>
@@ -54,7 +56,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
             ISequenceService sequenceService,
             IInteTimeWildcardRepository inteTimeWildcardRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IInteWorkCenterRepository inteWorkCenterRepository,
-            ITracingSourceCoreService tracingSourceCoreService)
+            ITracingSourceCoreService tracingSourceCoreService,
+            IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
@@ -64,6 +67,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             _procMaterialRepository = procMaterialRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _tracingSourceCoreService = tracingSourceCoreService;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
@@ -246,6 +250,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                             break;
                         case GenerateBarcodeWildcard.PositivePlate:
                             rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.PositivePlate) });
+                            break;
+                        case GenerateBarcodeWildcard.ElectrodeState:
+                            rules.Add(new List<string> { await GenerateElectrodeStateAsync(bo) });
                             break;
                         default:
                             throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);
@@ -515,6 +522,48 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                     return string.Empty;
                 return inteWorkCenterEntity.LineCoding ?? string.Empty;
             }
+        }
+
+        /// <summary>
+        /// 极片状态 通过工单类型映射相关数据
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        private async Task<string> GenerateElectrodeStateAsync(BarCodeSerialNumberBo bo)
+        {
+
+            if (bo.IsTest)
+            {
+                ///因为是动态生成，在前端测试时用YY占位
+                return "YY";
+            }
+            else
+            {
+                if (!bo.WorkOrderId.HasValue)
+                {
+                    return string.Empty;
+                }
+                var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(bo.WorkOrderId.Value);
+                if (planWorkOrderEntity == null)
+                    return string.Empty;
+                return MappingElectrodeState(planWorkOrderEntity.Type);
+            }
+        }
+        /// <summary>
+        /// 通过工单类型映射出极片状态
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static string MappingElectrodeState(PlanWorkOrderTypeEnum type)
+        {
+            return type switch
+            {
+                PlanWorkOrderTypeEnum.Production => "C",
+                PlanWorkOrderTypeEnum.TrialProduction => "G",
+                PlanWorkOrderTypeEnum.Rework => "R",
+                PlanWorkOrderTypeEnum.Experiment => "D",
+                _ => string.Empty,
+            };
         }
         /// <summary>
         /// 获取产品型号

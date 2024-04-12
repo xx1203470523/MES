@@ -32,5 +32,12 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("返工工单")]
         Rework = 3,
+
+
+        /// <summary>
+        /// 实验工单
+        /// </summary>
+        [Description("实验工单")]
+        Experiment = 4
     }
 }
