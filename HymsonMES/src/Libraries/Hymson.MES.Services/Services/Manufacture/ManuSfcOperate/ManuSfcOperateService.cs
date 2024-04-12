@@ -440,6 +440,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 model.SFC = item.Sfc;
                 model.Status = item.Status;
                 model.Qty = item.Qty;
+                model.Id = item.Id;
 
                 var materialEntity = materialEntities.FirstOrDefault(a => a.Id == item.ProductId);
                 model.MaterialCode = materialEntity?.MaterialCode ?? "";
