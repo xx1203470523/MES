@@ -240,7 +240,7 @@ namespace Hymson.MES.Services.Services.Quality
 
             var queryRsp = new QualFinallyOutputRecordPagedQuery
             {
-                Barcode = queryDto.Barcode,
+                Barcode = queryDto.Barcode?.Trim(),
                 MaterialId = materialId,
                 WorkOrderId = workOrderId,
                 WorkCenterId = workCenterId,
