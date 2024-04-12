@@ -178,7 +178,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
         {
             long? printId = null;
             //一般情况下是单台打印机
-            if (@event.PrintId.HasValue)
+            if (@event.PrintId.HasValue )
             {
                 printId = @event.PrintId.Value;
             }
@@ -226,7 +226,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                             {
                                 batchBarcodeList.Add(new PrintStructDto<BatchBarcodeDto>
                                 {
-                                    TemplateName = rocLabelTemplateEntity.Name,
+                                    TemplateName = rocLabelTemplateEntity.Id.ToString(),
                                     PrintCount = Convert.ToInt16(procProcedurePrintReleation.Copy ?? 0),
                                     PrintName = printConfigEntiy.PrintName,
                                     PrintData = batchBarcodeItem
@@ -239,7 +239,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                             {
                                 productionBarcodeList.Add(new PrintStructDto<ProductionBarcodeDto>
                                 {
-                                    TemplateName = rocLabelTemplateEntity.Name,
+                                    TemplateName = rocLabelTemplateEntity.Id.ToString(),
                                     PrintCount = Convert.ToInt16(procProcedurePrintReleation.Copy ?? 0),
                                     PrintName = printConfigEntiy.PrintName,
                                     PrintData = productionBarcodeItem
