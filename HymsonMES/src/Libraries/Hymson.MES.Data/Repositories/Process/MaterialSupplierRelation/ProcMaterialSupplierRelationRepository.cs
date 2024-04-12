@@ -161,6 +161,7 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteTrueByMaterialIdsSql, new { materialIds = materialIds });
+            
         }
 
         /// <summary>
@@ -218,7 +219,7 @@ namespace Hymson.MES.Data.Repositories.Process
           `Id`, `MaterialId`, `SupplierId`, `CreatedBy`, `CreatedOn`
         FROM `proc_material_supplier_relation`  WHERE Id IN @ids ";
 
-        const string DeleteTrueByMaterialIdsSql = "DELETE From `proc_material_supplier_relation` WHERE  MaterialId=@materialIds";
+        const string DeleteTrueByMaterialIdsSql = "DELETE From `proc_material_supplier_relation` WHERE  MaterialId IN @materialIds";
         const string GetByMaterialIdSql = @"Select 
                                     msr.`Id`, msr.`MaterialId`, msr.`SupplierId`, msr.`CreatedBy`, msr.`CreatedOn`,
                                     s.code, s.name
