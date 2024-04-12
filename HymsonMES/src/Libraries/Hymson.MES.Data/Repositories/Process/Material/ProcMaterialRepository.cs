@@ -327,7 +327,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> InsertAsync(ProcMaterialEntity procMaterialEntity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, procMaterialEntity);
+            return await conn.ExecuteAsync(InsertSql, procMaterialEntity);  
         }
 
         /// <summary>
@@ -421,7 +421,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcMaterialEntitiesSqlTemplate = @"SELECT /**select**/ FROM `proc_material` /**where**/  ";
         const string GetByCodeAndVersionSql = "SELECT * FROM proc_material WHERE `IsDeleted` = 0 AND SiteId = @SiteId AND MaterialCode= @MaterialCode AND Version =@Version LIMIT 1";
         const string GetByCodeSql = "SELECT * FROM proc_material WHERE `IsDeleted` = 0 AND SiteId = @Site AND MaterialCode = @Code LIMIT 1";
-
         const string InsertSql = "INSERT INTO `proc_material`(`Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `ConsumeRatio`,`MaskCodeId`, QuantityLimit, Specifications,ProductModel,MaterialType) VALUES (   @Id, @SiteId, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @BomId, @Batch, @PackageNum, @Unit, @SerialNumber, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @ConsumeRatio, @MaskCodeId, @QuantityLimit, @Specifications,@ProductModel,@MaterialType)";
         const string UpdateSql = "UPDATE `proc_material` SET  GroupId = @GroupId, MaterialName = @MaterialName, Origin = @Origin, Version = @Version, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, BomId = @BomId, Batch = @Batch, PackageNum = @PackageNum, Unit = @Unit, SerialNumber = @SerialNumber, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, IsDefaultVersion=@IsDefaultVersion, MaskCodeId=@MaskCodeId, QuantityLimit=@QuantityLimit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , ConsumeRatio=@ConsumeRatio,Specifications=@Specifications,ProductModel=@ProductModel,MaterialType=@MaterialType  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_material` SET IsDeleted = Id WHERE Id = @Id ";
@@ -459,7 +458,8 @@ namespace Hymson.MES.Data.Repositories.Process
                                         g.UpdatedOn,
                                         g.ConsumeRatio,
                                         g.MaskCodeId,
-                                        g.QuantityLimit
+                                        g.QuantityLimit,
+                                        g.ValidTime
                             FROM `proc_material` g 
                             LEFT JOIN proc_material_group o on o.Id=g.GroupId
                             LEFT JOIN proc_process_route p on g.ProcessRouteId = p.Id

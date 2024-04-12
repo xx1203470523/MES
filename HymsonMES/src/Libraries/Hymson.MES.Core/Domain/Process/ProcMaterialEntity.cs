@@ -90,6 +90,11 @@ namespace Hymson.MES.Core.Domain.Process
         public int Batch { get; set; }
 
         /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
+
+        /// <summary>
         /// 描述 :数量限制
         /// </summary>
         public MaterialQuantityLimitEnum? QuantityLimit { get; set; }

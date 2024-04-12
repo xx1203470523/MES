@@ -275,6 +275,14 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public MaterialTypeEnum? MaterialType { get; set; }
 
+
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
+
+        /// <summary>
+
+
         /// <summary>
         /// 数量限制
         /// </summary>
@@ -442,6 +450,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 原材料类型
         /// </summary>
         public MaterialTypeEnum? MaterialType { get; set; }
+
+       /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
+
         /// <summary>
         /// 数量限制
         /// </summary>
@@ -501,7 +514,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 物料组编码
         /// </summary>
-        public string? MaterialGroupCode { get; set; }
+        public string? MaterialGroupCode {  get; set; }
+        /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
     }
 
     /// <summary>
