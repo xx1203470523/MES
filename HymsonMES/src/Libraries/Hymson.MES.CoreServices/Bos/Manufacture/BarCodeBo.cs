@@ -119,6 +119,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 极组条码
         /// </summary>
         public IEnumerable<string>? Sfcs { get; set; }
+
+        /// <summary>
+        /// 工单id 为生成极片状态创建而设置
+        /// </summary>
+        public long? WorkOrderId { get; set; }
     }
 
     /// <summary>

@@ -12,7 +12,7 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// <summary>
         /// 流水
         /// </summary>
-        [GenerateBarcodeWildcardDescriptionAttribute("序号", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC },new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        [GenerateBarcodeWildcardDescriptionAttribute("序号", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
         public const string Activity = "%ACTIVITY%";
 
         /// <summary>
@@ -30,13 +30,13 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// <summary>
         /// 年月日通配符
         /// </summary>
-        [GenerateBarcodeWildcardDescriptionAttribute("年月日通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })] 
+        [GenerateBarcodeWildcardDescriptionAttribute("年月日通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
         public const string YMDWildcard = "%YMD_WILDCARD%";
 
         /// <summary>
         /// 线别通配符
         /// </summary>
-        [GenerateBarcodeWildcardDescriptionAttribute("线别通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })] 
+        [GenerateBarcodeWildcardDescriptionAttribute("线别通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
         public const string LINETYPE = "%LINE_TYPE%";
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// <summary>
         /// 当前时间的年份通配符
         /// </summary>
-        [GenerateBarcodeWildcardDescriptionAttribute    ("当前时间的年份通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        [GenerateBarcodeWildcardDescriptionAttribute("当前时间的年份通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
         public const string SingleYearDirect = "%SINGLEYEARDIRECT%";
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// <summary>
         /// 当前时间的天映射通配符
         /// </summary>
-        [GenerateBarcodeWildcardDescriptionAttribute("当前时间的天映射通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One }  )]
+        [GenerateBarcodeWildcardDescriptionAttribute("当前时间的天映射通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
         public const string SingleDayMapping = "%SINGLEDAYMAPPING%";
 
         /// <summary>
@@ -108,5 +108,11 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// </summary>
         [GenerateBarcodeWildcardDescriptionAttribute("正极极片通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
         public const string PositivePlate = "%POSITIVEPLATE%";
+
+        /// <summary>
+        /// 极片状态通配符
+        /// </summary>
+        [GenerateBarcodeWildcardDescriptionAttribute("极片状态通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        public const string ElectrodeState = "%ELECTRODESTATE%";
     }
 }
