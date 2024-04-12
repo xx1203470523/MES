@@ -27,6 +27,11 @@ public class QualFqcParameterGroupCreateCommand : CreateCommandAbstraction
     public long? CustomerId { get; set; }
 
     /// <summary>
+    /// 抽检数量
+    /// </summary>
+    public int SamplingCount { get; set; }
+
+    /// <summary>
     /// 状态(0-新建 1-启用 2-保留 3-废除)
     /// </summary>
     public SysDataStatusEnum? Status { get; set; }
@@ -74,6 +79,10 @@ public class QualFqcParameterGroupUpdateCommand : UpdateCommandAbstraction
     /// </summary>
     public string? CodeLike { get; set; }
 
+    /// <summary>
+    /// 抽检数量
+    /// </summary>
+    public int SamplingCount { get; set; }
 
     /// <summary>
     /// 名称

@@ -38,6 +38,11 @@ namespace Hymson.MES.Core.Domain.Quality
         public int SampleQty { get; set; }
 
         /// <summary>
+        /// 抽检数量
+        /// </summary>
+        public int SamplingCount { get; set; }
+
+        /// <summary>
         /// 批次数量
         /// </summary>
         public int LotSize { get; set; }

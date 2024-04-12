@@ -23,6 +23,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public long? MaterialId { get; set; }
 
         /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+
+        /// <summary>
         /// 状态(0-新建 1-启用 2-保留 3-废除)
         /// 多个产品
         /// </summary>
