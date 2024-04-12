@@ -449,13 +449,13 @@
         public const string MES11709 = "FQC检验项目，没有配置标准参数，qual_fqc_parameter_group_detail=>ParameterId={Id}";
         public const string MES11710 = "检验单号生成失败：FQC类型编码规则未维护！";
         public const string MES11711 = "检验单号生成失败：编码规则错误，不允许同时存在多条FQC类型编码规则！";
-
-        #region FQC执行检验       
+    
         public const string MES11712 = "{SFC}，条码不正确，不存在FQC检验单条码记录表中";
         public const string MES11713 = "条码{sfc}所在检验单{fqcOrder}未关闭";
         public const string MES11714 = "保存检验单附件时，查找FQC检验单数据不存在";
+        public const string MES11715 = "检验单状态为检验中、待审核、已关闭的单据，删除失败！";
 
-        #endregion
+
 
 
         #endregion
