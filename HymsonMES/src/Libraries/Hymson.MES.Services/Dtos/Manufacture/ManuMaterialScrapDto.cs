@@ -39,7 +39,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
         /// <summary>
         /// 报废数量
         /// </summary>
-        public decimal ScrapQty { get; set; }
+        public decimal Qty { get; set; }
         /// <summary>
         /// 备注
         /// </summary>
