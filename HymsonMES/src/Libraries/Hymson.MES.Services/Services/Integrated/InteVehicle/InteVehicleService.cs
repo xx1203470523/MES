@@ -580,6 +580,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     SiteId = _currentSite.SiteId ?? 0
                 });
             }
+            var material = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId);
             if (inteVehicleTypeVerifyEntities != null && inteVehicleTypeVerifyEntities.Any())
             {
                 bool materialcheck = false;
@@ -594,7 +595,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
                 bool materialgroupcheck = false;
                 var bargroup = inteVehicleTypeVerifyEntities.Where(v => v.Type == Core.Enums.Integrated.VehicleTypeVerifyTypeEnum.MaterialGroup).ToList();
-                var material = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId);
+              
                 if (!bargroup.Any(v => v.VerifyId == material.GroupId))
                 {
                     materialgroupcheck = false;
@@ -666,8 +667,9 @@ namespace Hymson.MES.Services.Services.Integrated
                     }
                     if (manuSfcProduceEntity.ProductId != firstmatrialid)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES18630))
-                            .WithData("curCode", manuSfcProduceEntity.ProductId).WithData("provCode", firstmatrialid);
+                        var provmaterial = await _procMaterialRepository.GetByIdAsync(firstmatrialid);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES18631))
+                            .WithData("curCode", material.MaterialCode).WithData("provCode", provmaterial.MaterialCode);
                     }
 
                 }
