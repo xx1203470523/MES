@@ -27,6 +27,7 @@ using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Data;
+using System.Linq;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -2124,7 +2125,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var produceSFCEntities = dataBo.SFCEntities.Where(w => reworkIemDtos.Select(s => s.BarCode).Contains(w.SFC) && w.Type == SfcTypeEnum.Produce);
             if (produceSFCEntities != null && produceSFCEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15454)).WithData("barCode", produceSFCEntities.Select(s => s.SFC));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15454)).WithData("barCode", string.Join(",", produceSFCEntities.Select(s => s.SFC)));
             }
 
             // 遍历所有条码

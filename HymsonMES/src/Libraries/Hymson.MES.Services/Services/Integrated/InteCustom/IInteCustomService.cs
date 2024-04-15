@@ -1,13 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 客户维护    服务接口 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-07-11 09:33:26
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.Process;
 using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Integrated
