@@ -160,7 +160,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_inspection_task_snapshoot /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_inspection_task_snapshoot /**where**/  ";
 
-        const string InsertSql = "INSERT INTO equ_inspection_task_snapshoot(`Id`,  Code,`InspectionType`, `WorkCenterId`, `EquipmentId`, `Month`, `Day`, `Time`, `CompleteTime`, `Version`, `Status`, `Type`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (@Id,@Code,@InspectionType,@WorkCenterId,@EquipmentId,@Month @Day,@Time,@CompleteTime,@Version,@Status,@Type,@Remark,@CreatedOn,@CreatedBy,@UpdatedBy,@UpdatedOn,@SiteId,@IsDeleted)";
+        const string InsertSql = "INSERT INTO equ_inspection_task_snapshoot(`Id`,  Code,`InspectionType`, `WorkCenterId`, `EquipmentId`, `Month`, `Day`, `Time`, `CompleteTime`, `Version`, `Status`, `Type`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (@Id,@Code,@InspectionType,@WorkCenterId,@EquipmentId,@Month,@Day,@Time,@CompleteTime,@Version,@Status,@Type,@Remark,@CreatedOn,@CreatedBy,@UpdatedBy,@UpdatedOn,@SiteId,@IsDeleted)";
         const string UpdateSql = "UPDATE equ_inspection_task_snapshoot SET InspectionType=@InspectionType,WorkCenterId=@WorkCenterId,EquipmentId=@EquipmentId,Month=@Month,Day=@Day,Time=@Time,CompleteTime=@CompleteTime,Version=@Version,Status=@Status,Type=@Type,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id=@Id ";
 
         const string DeleteSql = "UPDATE equ_inspection_task_snapshoot SET IsDeleted = Id WHERE Id = @Id ";

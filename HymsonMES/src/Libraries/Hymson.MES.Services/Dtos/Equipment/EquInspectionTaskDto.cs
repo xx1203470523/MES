@@ -223,6 +223,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public EquInspectionTaskDayEnum? Day { get; set; }
 
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string Unit { get; set; }
+
        /// <summary>
         /// 执行开始时间
         /// </summary>

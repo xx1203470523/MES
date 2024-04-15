@@ -29,6 +29,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Minio.DataModel;
 using System;
+using System.Globalization;
 using System.Net.NetworkInformation;
 using System.Reactive;
 using System.Reflection.Emit;
@@ -491,11 +492,13 @@ namespace Hymson.MES.Services.Services.Equipment
             #endregion
 
             //日点检,当前日期+执行时间
-            var execuTime = DateTime.Now;
+            var execuTime = DateTime.Now.ToString("yyyy-MM-dd") +" "+ taskEntity.Time; 
             //周点检
             if (taskEntity.InspectionType == EquInspectionTypeEnum.WeeklyInspection)
             {
                 //获取当前周拼成时间,当前年+当前周的执行日+执行时间
+                // var time = DateTime.Now.ToString("yyyy-MM-dd")+taskEntity.Time;
+                var day = CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
             }
 
             //读取详情
@@ -520,18 +523,19 @@ namespace Hymson.MES.Services.Services.Equipment
                 Version = taskEntity.Version,
                 Status = taskEntity.Status,
                 Type = taskEntity.Type,
-                Remark = taskEntity.Remark,
+                Remark = taskEntity.Remark??"",
                 CreatedBy = updatedBy,
-                UpdatedBy = taskEntity.UpdatedBy,
+                UpdatedBy = updatedBy,
                 SiteId = siteId
             };
 
+            var startExecuTime = DateTime.Parse(execuTime);
             var recordEntity = new EquInspectionRecordEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 OrderCode = snapshootEntity.Code,
                 InspectionTaskSnapshootId = snapshootEntity.Id,
-                StartExecuTime = execuTime,
+                StartExecuTime = startExecuTime,
                 Status = EquInspectionRecordStatusEnum.WaitInspect,
                 CreatedBy = updatedBy,
                 UpdatedBy = updatedBy,
