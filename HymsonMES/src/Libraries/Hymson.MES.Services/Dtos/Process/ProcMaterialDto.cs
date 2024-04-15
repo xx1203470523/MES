@@ -783,6 +783,12 @@ namespace Hymson.MES.Services.Dtos.Process
         [EpplusTableColumn(Header = "验证掩码组", Order = 16)]
         public string? MaskCode { get; set; }
 
+        /// <summary>
+        /// 有效天数
+        /// </summary>
+        [EpplusTableColumn(Header = "有效天数", Order = 17)]
+        public string? ValidTime { get; set; }
+
     }
 
     /// <summary>
