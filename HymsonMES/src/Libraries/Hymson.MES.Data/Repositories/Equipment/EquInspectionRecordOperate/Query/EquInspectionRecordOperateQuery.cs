@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
     /// </summary>
     public class EquInspectionRecordOperateQuery
     {
-    
+        /// <summary>
+        /// 点检记录Id
+        /// </summary>
+        public long? InspectionRecordId { get; set; }
     }
 }

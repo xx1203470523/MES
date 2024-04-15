@@ -116,6 +116,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted=0");
+            if (query.InspectionRecordId.HasValue && query.InspectionRecordId > 0)
+            {
+                sqlBuilder.Where("InspectionRecordId=@InspectionRecordId");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquInspectionRecordDetailsEntity>(template.RawSql, query);
         }
@@ -147,7 +154,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var totalCount = await totalCountTask;
             return new PagedInfo<EquInspectionRecordDetailsEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
     }
 
 
@@ -163,8 +169,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string InsertSql = "INSERT INTO equ_inspection_record_details(  `Id`, `InspectionTaskDetailSnapshootId`, `InspectionResult`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @InspectionTaskDetailSnapshootId, @InspectionResult, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO equ_inspection_record_details(  `Id`, `InspectionTaskDetailSnapshootId`, `InspectionResult`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @InspectionTaskDetailSnapshootId, @InspectionResult, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE equ_inspection_record_details SET   InspectionTaskDetailSnapshootId = @InspectionTaskDetailSnapshootId, InspectionResult = @InspectionResult, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE equ_inspection_record_details SET   InspectionTaskDetailSnapshootId = @InspectionTaskDetailSnapshootId, InspectionResult = @InspectionResult, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE equ_inspection_record_details SET  InspectionTaskDetailSnapshootId = @InspectionTaskDetailSnapshootId, InspectionResult = @InspectionResult, IsQualified = @IsQualified, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql= "UPDATE equ_inspection_record_details SET InspectionResult=@InspectionResult,IsQualified=@IsQualified,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id=@Id ";
 
         const string DeleteSql = "UPDATE equ_inspection_record_details SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE equ_inspection_record_details SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

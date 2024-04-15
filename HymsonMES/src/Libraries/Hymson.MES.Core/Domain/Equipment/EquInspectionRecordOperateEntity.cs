@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -18,7 +19,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 操作类型(1-开始检验 2-完成检验 3-关闭检验)
         /// </summary>
-        public bool OperateType { get; set; }
+        public OrderOperateTypeEnum OperateType { get; set; }
 
         /// <summary>
         /// 操作人

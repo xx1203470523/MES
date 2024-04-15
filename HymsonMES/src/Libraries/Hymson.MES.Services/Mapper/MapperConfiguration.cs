@@ -143,6 +143,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquInspectionTaskPagedQueryDto, EquInspectionTaskPagedQuery>();
             CreateMap<EquInspectionTaskView, EquInspectionTaskDto>();
             CreateMap<EquInspectionTaskSaveDto, EquInspectionTaskEntity>();
+            CreateMap<EquInspectionTaskEntity, EquInspectionTaskDto>();
+
+            CreateMap<EquInspectionRecordPagedQueryDto, EquInspectionRecordPagedQuery>();
+            CreateMap<EquInspectionRecordView, EquInspectionRecordDto>();
             #endregion
 
             #region EquEquipmentGroup

@@ -217,7 +217,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_inspection_task /**where**/  ";
 
         const string InsertSql = "INSERT INTO equ_inspection_task(  `Id`, Code,`InspectionType`, `WorkCenterId`, `EquipmentId`, `Month`, `Day`, `Time`, `CompleteTime`, `Version`, `Status`, `Type`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id,@Code, @InspectionType, @WorkCenterId, @EquipmentId, @Month, @Day, @Time, @CompleteTime, @Version, @Status, @Type, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
-        const string UpdateSql = "UPDATE equ_inspection_task SET InspectionType = @InspectionType, WorkCenterId = @WorkCenterId, EquipmentId = @EquipmentId, Month = @Month, Day = @Day, Time = @Time, CompleteTime = @CompleteTime, Version = @Version, Status = @Status, Type = @Type, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE equ_inspection_task SET InspectionType = @InspectionType, WorkCenterId = @WorkCenterId, EquipmentId = @EquipmentId, Month = @Month, Day = @Day, Time = @Time, CompleteTime = @CompleteTime, Version = @Version, Status = @Status, Type = @Type, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE equ_inspection_task SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE equ_inspection_task SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

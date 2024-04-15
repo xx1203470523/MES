@@ -1,28 +1,26 @@
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
     /// <summary>
-    /// 服务接口（点检任务）
+    /// 服务接口（点检记录表）
     /// </summary>
-    public interface IEquInspectionTaskService
+    public interface IEquInspectionRecordService
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<long> CreateAsync(EquInspectionTaskSaveDto saveDto);
+        Task<int> CreateAsync(EquInspectionRecordSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<long> ModifyAsync(EquInspectionTaskSaveDto saveDto);
+        Task<int> ModifyAsync(EquInspectionRecordSaveDto saveDto);
 
         /// <summary>
         /// 删除
@@ -43,35 +41,41 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquInspectionTaskDto?> QueryByIdAsync(long id);
+        Task<EquInspectionRecordDto?> QueryByIdAsync(long id);
 
         /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquInspectionTaskDto>> GetPagedListAsync(EquInspectionTaskPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<EquInspectionRecordDto>> GetPagedListAsync(EquInspectionRecordPagedQueryDto pagedQueryDto);
 
         /// <summary>
-        /// 查询点检任务详情
+        /// 根据ID查询
         /// </summary>
-        /// <param name="taskId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquInspectionTaskDetailDto>> QueryItemsByTaskIdAsync(long taskId);
+        Task<EquInspectionOperateDto?> QueryByRecordIdAsync(long id);
 
         /// <summary>
-        /// 状态变更
+        /// 开始校验
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task UpdateStatusAsync(ChangeStatusDto param);
+        Task<int> StartVerificationAsync(EquInspectionSaveDto saveDto);
 
         /// <summary>
-        /// 生成录入任务
+        /// 保存校验
         /// </summary>
-        /// <param name="recordDto"></param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
-        Task<long> GeneratedTaskRecordAsync(GenerateInspectionRecordDto recordDto);
+        Task<int> SaveVerificationnAsync(EquInspectionSaveDto saveDto);
+
+        /// <summary>
+        /// 完成检验单
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        Task<int> CompleteVerificationAsync(EquInspectionCompleteDto saveDto);
+
     }
 }

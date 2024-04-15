@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -79,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquInspectionRecordEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquInspectionRecordEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquInspectionRecordEntity>(GetByIdsSql, new { Ids = ids });
@@ -125,15 +126,47 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquInspectionRecordEntity>> GetPagedListAsync(EquInspectionRecordPagedQuery pagedQuery)
+        public async Task<PagedInfo<EquInspectionRecordView>> GetPagedListAsync(EquInspectionRecordPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
+
+            sqlBuilder.Select(@"eir.Id,eir.StartExecuTime,eir.InspectionTaskSnapshootId,eit.Code as OrderCode,,ee.EquipmentCode,ee.EquipmentName,eit.WorkCenterId,eit.InspectionType,eit.Type,eir.UpdatedBy,eir.UpdatedOn");
+
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+
+            sqlBuilder.InnerJoin("equ_inspection_task_snapshoot eit on eit.Id=eir.InspectionTaskSnapshootId");
+            sqlBuilder.LeftJoin("equ_equipment ee on ee.Id=eit.EquipmentId");
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
+            {
+                pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
+                sqlBuilder.Where(" ee.EquipmentCode like @EquipmentCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentName))
+            {
+                pagedQuery.EquipmentName = $"%{pagedQuery.EquipmentName}%";
+                sqlBuilder.Where(" ee.EquipmentCode like @EquipmentCode ");
+            }
+            if (pagedQuery.WorkCenterId.HasValue)
+            {
+                sqlBuilder.Where(" eit.WorkCenterId=@WorkCenterId ");
+            }
+            if (pagedQuery.InspectionType.HasValue)
+            {
+                sqlBuilder.Where(" eit.InspectionType=@InspectionType ");
+            }
+            if (pagedQuery.Type.HasValue)
+            {
+                sqlBuilder.Where(" eit.Type=@Type ");
+            }
+            if (pagedQuery.StartExecuTime.HasValue)
+            {
+                sqlBuilder.Where("eir.StartExecuTime>=@StartExecuTime");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -141,11 +174,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<EquInspectionRecordEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<EquInspectionRecordView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<EquInspectionRecordEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<EquInspectionRecordView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -156,8 +189,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>
     public partial class EquInspectionRecordRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_inspection_record /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_inspection_record /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_inspection_record eir /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_inspection_record  eir /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_inspection_record /**where**/  ";
 
         const string InsertSql = "INSERT INTO equ_inspection_record(  `Id`, `OrderCode`, `InspectionTaskSnapshootId`, `StartExecuTime`, `Status`, `IsQualified`, `IsNoticeRepair`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @OrderCode, @InspectionTaskSnapshootId, @StartExecuTime, @Status, @IsQualified, @IsNoticeRepair, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";

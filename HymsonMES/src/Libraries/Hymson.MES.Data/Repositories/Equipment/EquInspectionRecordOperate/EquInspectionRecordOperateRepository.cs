@@ -116,6 +116,14 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted=0");
+            if (query.InspectionRecordId.HasValue && query.InspectionRecordId > 0)
+            {
+                sqlBuilder.Where("InspectionRecordId=@InspectionRecordId");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquInspectionRecordOperateEntity>(template.RawSql, query);
         }

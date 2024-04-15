@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -18,7 +19,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检任务Id
         /// </summary>
-        public long? InspectionTaskSnapshootId { get; set; }
+        public long InspectionTaskSnapshootId { get; set; }
 
         /// <summary>
         /// 开始时间
@@ -28,28 +29,26 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 1、待检验2、检验中3、已完成
         /// </summary>
-        public string Status { get; set; }
+        public EquInspectionRecordStatusEnum Status { get; set; }
 
         /// <summary>
         /// 是否合格
         /// </summary>
-        public string IsQualified { get; set; }
+        public YesOrNoEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 是否通知维修
         /// </summary>
-        public string IsNoticeRepair { get; set; }
+        public YesOrNoEnum? IsNoticeRepair { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 站点ID
         /// </summary>
-        public long SiteId { get; set; }
-
-        
+        public long SiteId { get; set; }       
     }
 }

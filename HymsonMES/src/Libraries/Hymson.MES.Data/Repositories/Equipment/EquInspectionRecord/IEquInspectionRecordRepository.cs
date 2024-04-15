@@ -78,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquInspectionRecordEntity>> GetPagedListAsync(EquInspectionRecordPagedQuery pagedQuery);
+        Task<PagedInfo<EquInspectionRecordView>> GetPagedListAsync(EquInspectionRecordPagedQuery pagedQuery);
 
     }
 }

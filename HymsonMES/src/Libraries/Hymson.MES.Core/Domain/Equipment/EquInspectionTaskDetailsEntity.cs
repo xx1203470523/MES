@@ -13,12 +13,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检任务Id
         /// </summary>
-        public long? InspectionTaskId { get; set; }
+        public long InspectionTaskId { get; set; }
 
         /// <summary>
         /// 点检项目Id
         /// </summary>
-        public long? InspectionItemId { get; set; }
+        public long InspectionItemId { get; set; }
 
         /// <summary>
         /// 基准值
@@ -48,8 +48,6 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 站点ID
         /// </summary>
-        public long SiteId { get; set; }
-
-        
+        public long SiteId { get; set; }   
     }
 }

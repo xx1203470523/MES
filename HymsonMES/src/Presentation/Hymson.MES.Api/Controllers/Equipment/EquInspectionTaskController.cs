@@ -1,7 +1,9 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Equipment;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -93,6 +95,18 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
+        /// 查询点检任务详情
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("detail/{taskId}")]
+        public async Task<IEnumerable<EquInspectionTaskDetailDto>> QueryItemsByTaskIdAsync(long taskId)
+        {
+            return await _equInspectionTaskService.QueryItemsByTaskIdAsync(taskId);
+        }
+
+        /// <summary>
         /// 分页查询列表（点检任务）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
@@ -102,18 +116,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
         public async Task<PagedInfo<EquInspectionTaskDto>> QueryPagedListAsync([FromQuery] EquInspectionTaskPagedQueryDto pagedQueryDto)
         {
             return await _equInspectionTaskService.GetPagedListAsync(pagedQueryDto);
-        }
-
-        /// <summary>
-        /// 查询点检任务详情
-        /// </summary>
-        /// <param name="taskId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("detail/{taskId}")]
-        public async Task<IEnumerable<EquInspectionTaskDetailDto>> QueryEquipmentsByResourceIdAsync(long taskId)
-        {
-            return await _equInspectionTaskService.QueryEquipmentsByResourceIdAsync(taskId);
         }
 
         #region 状态变更
@@ -159,6 +161,17 @@ namespace Hymson.MES.Api.Controllers.Equipment
             await _equInspectionTaskService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
         }
 
+        /// <summary>
+        /// 生成录入任务
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("generated")]
+        public async Task<long> GeneratedTaskRecordAsync([FromBody] GenerateInspectionRecordDto requestDto)
+        {
+            return await _equInspectionTaskService.GeneratedTaskRecordAsync(requestDto);
+        }
         #endregion
     }
 }

@@ -67,12 +67,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 关联项目
         /// </summary>
-        public IEnumerable<EquInspectionTaskDetailsSaveDto> TaskDetailsSaveDtos { get; set; }
+        public IEnumerable<EquInspectionTaskDetailsSaveDto>? TaskDetailsSaveDtos { get; set; }
     }
 
     public record EquInspectionTaskDetailsSaveDto : BaseEntityDto
@@ -115,7 +115,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 备注
         /// </summary>
-        public string? Remark { get; set; } = "";
+        public string Remark { get; set; } = "";
     }
 
     public record EquInspectionTaskDetailDto : BaseEntityDto
@@ -134,6 +134,8 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 点检项目编码
         /// </summary>
         public string InspectionItemCode { get; set; }
+
+        public string Code { get; set; }
 
         /// <summary>
         /// 点检项目名称
@@ -296,6 +298,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 状态
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
+    }
+
+    /// <summary>
+    /// 生成点检录入任务
+    /// </summary>
+    public class GenerateInspectionRecordDto
+    {
+        /// <summary>
+        /// 任务Id
+        /// </summary>
+        public long Id { get; set; }
     }
 
 }

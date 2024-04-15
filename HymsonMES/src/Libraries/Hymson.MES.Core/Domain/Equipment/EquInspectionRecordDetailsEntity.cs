@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -13,7 +14,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 详情id
         /// </summary>
-        public long? InspectionTaskDetailSnapshootId { get; set; }
+        public long InspectionRecordId { get; set; }
+
+        /// <summary>
+        /// 详情id
+        /// </summary>
+        public long InspectionTaskDetailSnapshootId { get; set; }
 
         /// <summary>
         /// 点检结果
@@ -23,12 +29,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 是否合格
         /// </summary>
-        public bool? IsQualified { get; set; }
+        public TrueOrFalseEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 站点ID
