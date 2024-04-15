@@ -343,26 +343,12 @@ namespace Hymson.MES.Services.Services.Quality
                     Version = command.Version,
                     Status = command.Status,
                 };
-                //校验项目编码
-                var qualFqcInspectionItemEntity = await _qualFqcParameterGroupRepository.GetEntityAsync(projectCode);
-                if (qualFqcInspectionItemEntity != null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19955));
-                }
-            }
-
-            if (command.MaterialId != null && command.Version != null)
-            {
-                var projectCode = new QualFqcParameterGroupQuery
-                {
-                    MaterialId = command.MaterialId,
-                };
-                //相同的客户 + 物料 + 检验项目版本
+                //相同的物料版本 + 物料 + 检验项目版本
                 var Entity = await _qualFqcParameterGroupRepository.GetEntityAsync(projectCode);
                 if (Entity != null && Entity.Version == command.Version)
                 {
                     var materialEntity = await _procMaterialRepository.GetByIdAsync(Entity.MaterialId);
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19982)).WithData("materialCode", materialEntity.MaterialCode).WithData("version", command.Version);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19982)).WithData("materialCode", materialEntity.MaterialCode).WithData("materialversion", materialEntity.Version).WithData("version", command.Version);
                 }
             }
 
@@ -418,7 +404,6 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 SiteId = updateDto.SiteId,
                 MaterialId = updateDto.MaterialId,
-                Status = updateDto.Status,
             };
             var entity = await _qualFqcParameterGroupRepository.GetEntityAsync(query);
             if (entity == null)
@@ -479,10 +464,17 @@ namespace Hymson.MES.Services.Services.Quality
             await _qualFqcParameterGroupRepository.UpdateAsync(command);
             foreach (var item in detailCommands)
             {
-                await _qualFqcParameterGroupDetailRepository.UpdateAsync(item);
+                var Isexist = _qualFqcParameterGroupDetailRepository.GetByIdAsync(item.Id);
+                if (Isexist.Result!=null)
+                {
+                    await _qualFqcParameterGroupDetailRepository.UpdateAsync(item); 
+                }
+                else
+                {
+                    await _qualFqcParameterGroupDetailRepository.InsertAsync(item);
+                }
             }
             scope.Complete();
-
         }
     }
 }
