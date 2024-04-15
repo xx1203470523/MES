@@ -39,6 +39,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<int> UpdateRangeAsync(IEnumerable<QualFinallyOutputRecordEntity> entities);
 
         /// <summary>
+        /// 更新IsGenerated（批量）
+        /// </summary>
+        /// <param name="barcode"></param>
+        /// <returns></returns>
+        Task<int> UpdateGeneratedRangeAsync(IEnumerable<string> barcode);
+
+        /// <summary>
         /// 软删除  
         /// </summary>
         /// <param name="id"></param>

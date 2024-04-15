@@ -128,6 +128,10 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("Status = @Status");
             }
+            if (query.Version!=null)
+            {
+                sqlBuilder.Where("Version = @Version");
+            }
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
@@ -210,10 +214,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_fqc_parameter_group /**where**/ /**orderby**/ ";
         const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_fqc_parameter_group /**where**/ /**orderby**/ LIMIT 1 ";
 
-        const string InsertSql = "INSERT INTO qual_fqc_parameter_group(  `Id`, `SiteId`, `Code`, `Name`, `MaterialId`, `SampleQty`, `LotSize`, `LotUnit`, `IsSameWorkOrder`, `IsSameWorkCenter`, `Version`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @MaterialId, @SampleQty, @LotSize, @LotUnit, @IsSameWorkOrder, @IsSameWorkCenter, @Version, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_fqc_parameter_group(  `Id`, `SiteId`, `Code`, `Name`, `MaterialId`, `SampleQty`,`SamplingCount`, `LotSize`, `LotUnit`, `IsSameWorkOrder`, `IsSameWorkCenter`, `Version`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @MaterialId, @SampleQty,@SamplingCount, @LotSize, @LotUnit, @IsSameWorkOrder, @IsSameWorkCenter, @Version, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO qual_fqc_parameter_group(  `Id`, `SiteId`, `Code`, `Name`, `MaterialId`, `SampleQty`, `LotSize`, `LotUnit`, `IsSameWorkOrder`, `IsSameWorkCenter`, `Version`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @MaterialId, @SampleQty, @LotSize, @LotUnit, @IsSameWorkOrder, @IsSameWorkCenter, @Version, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_fqc_parameter_group SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaterialId = @MaterialId, SampleQty = @SampleQty, LotSize = @LotSize, LotUnit = @LotUnit, IsSameWorkOrder = @IsSameWorkOrder, IsSameWorkCenter = @IsSameWorkCenter, Version = @Version, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_fqc_parameter_group SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaterialId = @MaterialId, SampleQty = @SampleQty,SamplingCount=@SamplingCount, LotSize = @LotSize, LotUnit = @LotUnit, IsSameWorkOrder = @IsSameWorkOrder, IsSameWorkCenter = @IsSameWorkCenter, Version = @Version, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_fqc_parameter_group SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaterialId = @MaterialId, SampleQty = @SampleQty, LotSize = @LotSize, LotUnit = @LotUnit, IsSameWorkOrder = @IsSameWorkOrder, IsSameWorkCenter = @IsSameWorkCenter, Version = @Version, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_fqc_parameter_group SET IsDeleted = Id WHERE Id = @Id ";

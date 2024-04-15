@@ -25,6 +25,9 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.CoreServices.Services.Quality.QualFqcOrder;
 using Hymson.MES.Data.Repositories.Plan;
 using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
+using Elastic.Clients.Elasticsearch.QueryDsl;
+using System.Security.Policy;
+using System.Linq;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -118,6 +121,11 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IQualFqcOrderSfcRepository _qualFqcOrderSfcRepository;
 
+        /// <summary>
+        /// 仓储接口（成品条码产出记录(FQC生成使用)）
+        /// </summary>
+        private readonly IQualFinallyOutputRecordRepository _qualFinallyOutputRecordRepository;
+
 
         /// <summary>
         /// struct
@@ -150,7 +158,8 @@ namespace Hymson.MES.Services.Services.Quality
             IQualFqcParameterGroupDetailSnapshootRepository qualFqcParameterGroupDetailSnapshootRepository,
             IQualFqcParameterGroupSnapshootRepository qualFqcParameterGroupSnapshootRepository,
             IFQCOrderCreateService qualFqcOrderCreateService,
-            IPlanWorkOrderRepository planWorkOrderRepository, IQualFqcOrderSfcRepository qualFqcOrderSfcRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IQualFqcOrderSfcRepository qualFqcOrderSfcRepository, IQualFinallyOutputRecordRepository qualFinallyOutputRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -169,6 +178,7 @@ namespace Hymson.MES.Services.Services.Quality
             _qualFqcOrderCreateService = qualFqcOrderCreateService;
             _planWorkOrderRepository = planWorkOrderRepository;
             _qualFqcOrderSfcRepository = qualFqcOrderSfcRepository;
+            _qualFinallyOutputRecordRepository = qualFinallyOutputRecordRepository;
         }
 
 
@@ -263,12 +273,46 @@ namespace Hymson.MES.Services.Services.Quality
                 }
             }
 
-            return await _qualFqcOrderRepository.DeletesAsync(new DeleteCommand
+            //还原条码生成状态
+            //OrderSFC 查询
+            var recordEntitys = Enumerable.Empty<QualFinallyOutputRecordEntity>();
+            var fqcid = entitys?.Select(x => x.Id);
+            var site = entitys?.Select(x => x.SiteId).FirstOrDefault() ?? 0;
+            if (fqcid != null)
+            {
+                var orderSFCEntitys = await _qualFqcOrderSfcRepository.GetEntitiesAsync(new QualFqcOrderSfcQuery { FQCOrderIds = fqcid, SiteId = site });
+                var sfcs = orderSFCEntitys.Select(x => x.SFC);
+                if (sfcs != null)
+                {
+                    recordEntitys = await _qualFinallyOutputRecordRepository.GetEntitiesAsync(new QualFinallyOutputRecordQuery { Barcodes = sfcs, SiteId = site });
+                }
+            }
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            if (recordEntitys != null)
+            {
+                //更新qual_fqc_order
+                foreach (var item in recordEntitys)
+                {
+                    item.IsGenerated = TrueOrFalseEnum.No;
+                    item.UpdatedOn = DateTime.Now;
+                    item.Remark = "检验单删除回滚";
+                }
+                await _qualFinallyOutputRecordRepository.UpdateRangeAsync(recordEntitys);
+
+            }
+            rows = await _qualFqcOrderRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
                 DeleteOn = HymsonClock.Now(),
                 UserId = _currentUser.UserName
             });
+
+            trans.Complete();
+            return rows;
+
         }
 
         /// <summary>
@@ -505,18 +549,18 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedOn = HymsonClock.Now();
 
             // 检查每种类型是否已经录入足够
-            //var orderTypeEntities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(entity.Id);
+            var sampleEntities = await _qualFqcOrderSampleRepository.GetEntitiesAsync(new QualFqcOrderSampleQuery
+            {
+                SiteId = entity.SiteId,
+                FQCOrderId = entity.Id
+            });
 
-            //// 读取一个未录入完整的类型
-            //var orderTypeEntity = orderTypeEntities.FirstOrDefault(f => f.SampleQty > f.CheckedQty);
-            //if (orderTypeEntity != null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES11911))
-            //        .WithData("Type", orderTypeEntity.Type.GetDescription())
-            //        .WithData("CheckedQty", orderTypeEntity.CheckedQty)
-            //        .WithData("SampleQty", orderTypeEntity.SampleQty);
-            //}
+            //校验已检数量
 
+            if (sampleEntities.Count() < entity.SampleQty)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11716)).WithData("CheckedQty", sampleEntities.Count()).WithData("SampleQty", entity.SampleQty);
+            }
             // 读取所有明细参数
             var sampleDetailEntities = await _qualFqcOrderSampleDetailRepository.GetEntitiesAsync(new QualFqcOrderSampleDetailQuery
             {
@@ -674,23 +718,23 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeleteOrdersAsync(long[] ids)
-        {
-            if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
+        //public async Task<int> DeleteOrdersAsync(long[] ids)
+        //{
+        //    if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
+        //    //只能删除待检验
+        //    var entities = await _qualFqcOrderRepository.GetByIdsAsync(ids);
+        //    if (entities != null && entities.Any(a => a.Status != InspectionStatusEnum.WaitInspect))
+        //    {
+        //        throw new CustomerValidationException(nameof(ErrorCode.MES10137));
+        //    }        
 
-            var entities = await _qualFqcOrderRepository.GetByIdsAsync(ids);
-            if (entities != null && entities.Any(a => a.Status != InspectionStatusEnum.WaitInspect))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10137));
-            }
-
-            return await _qualFqcOrderRepository.DeletesAsync(new DeleteCommand
-            {
-                Ids = ids,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
-        }
+        //    return await _qualFqcOrderRepository.DeletesAsync(new DeleteCommand
+        //    {
+        //        Ids = ids,
+        //        DeleteOn = HymsonClock.Now(),
+        //        UserId = _currentUser.UserName
+        //    });
+        //}
 
         /// <summary>
         /// 根据ID查询
@@ -723,6 +767,7 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.MaterialName = materialEntity.MaterialName;
                     dto.MaterialVersion = materialEntity.Version ?? "";
                     dto.Unit = materialEntity.Unit ?? "";
+                    dto.Specifications = materialEntity.ProductModel ?? "-";
                 }
             }
 
@@ -1154,9 +1199,15 @@ namespace Hymson.MES.Services.Services.Quality
                 FQCOrderIds = entities.Select(s => s.Id)
             });
 
+            //工单
             var workids = entities.Where(w => w.WorkOrderId.HasValue).Select(x => x.WorkOrderId!.Value).Distinct();
             var planworkEntitys = await _planWorkOrderRepository.GetByIdsAsync(workids);
             var planworkDic = planworkEntitys.ToDictionary(x => x.Id, x => x);
+
+            //参数快照
+            var parashoots = entities.Select(s => s.GroupSnapshootId).Distinct().ToArray();
+            var snapshotEntitys = await _qualFqcParameterGroupSnapshootRepository.GetByIdsAsync(parashoots);
+            var snapshotDic = snapshotEntitys.ToDictionary(x => x.Id, x => x);
 
             foreach (var entity in entities)
             {
@@ -1202,18 +1253,55 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.MaterialVersion = "-";
                 }
 
-                if (entity.WorkOrderId.HasValue)
+                //参数快照表
+                snapshotDic.TryGetValue(entity.GroupSnapshootId, out var snaphot);
+                if (snaphot != null)
                 {
-                    planworkDic.TryGetValue(entity.WorkOrderId.Value, out var workorder);
-                    if (workorder != null)
-                        dto.OrderCode = workorder.OrderCode;
+                    //允许混线，列表不显示工单
+                    if (snaphot.IsSameWorkOrder == TrueOrFalseEnum.No)
+                    {
+                        dto.OrderCode = "-";
+                    }
+                    else
+                    {
+                        //否则取工单号
+                        if (entity.WorkOrderId.HasValue)
+                        {
+                            planworkDic.TryGetValue(entity.WorkOrderId.Value, out var workorder);
+                            if (workorder != null)
+                                dto.OrderCode = workorder.OrderCode;
+                        }
+                    }
                 }
-
 
                 dtos.Add(dto);
             }
 
             return dtos;
+        }
+
+        /// <summary>
+        /// 根据ID查询类型
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<QualFqcParameterGroupSnapshootOut> QuerySnapshootByIdAsync(long orderId)
+        {
+            var rsp = new QualFqcParameterGroupSnapshootOut();
+            //FQCOrder
+            var entity = await _qualFqcOrderRepository.GetByIdAsync(orderId);
+            if (entity == null) return rsp;
+            //SnapShoot
+            //var snapshotEntity = await _qualFqcParameterGroupSnapshootRepository.GetByIdAsync(entity.GroupSnapshootId);
+            //if (snapshotEntity == null) return rsp;
+
+            rsp = new QualFqcParameterGroupSnapshootOut
+            {
+                Code = entity.InspectionOrder,
+                MaterialId = entity.MaterialId ?? 0,
+                SampleQty = entity.SampleQty
+            };
+            return rsp;
         }
 
         /// <summary>

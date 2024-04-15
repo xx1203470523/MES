@@ -331,7 +331,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式
         /// </summary>
-        public IQCHandMethodEnum? HandMethod { get; set; }
+        public FQCHandMethodEnum? HandMethod { get; set; }
     }
 
 
@@ -644,6 +644,28 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
 
+    }
+
+    /// <summary>
+    /// FQC检验参数组快照输出
+    /// 执行检验查询
+    /// </summary>
+    public record QualFqcParameterGroupSnapshootOut
+    {
+        /// <summary>
+        /// 参数集编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 样本数量
+        /// </summary>
+        public int SampleQty { get; set; }
     }
 
 }

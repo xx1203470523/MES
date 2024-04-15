@@ -36,6 +36,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public int SampleQty { get; set; }
 
         /// <summary>
+        /// 抽检数量
+        /// </summary>
+        public int SamplingCount { get; set; }
+
+        /// <summary>
         /// 检验容量
         /// </summary>
         public int Inspectcapacity { get; set; }
@@ -97,6 +102,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public int SampleQty { get; set; }
 
         /// <summary>
+        /// 抽检数量
+        /// </summary>
+        public int SamplingCount { get; set; }
+
+        /// <summary>
         /// 批次数量
         /// </summary>
         public int LotSize { get; set; }
@@ -146,6 +156,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 物料名称
         /// </summary>
         public string? MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
 
         /// <summary>
         /// 状态(0-新建 1-启用 2-保留 3-废除)

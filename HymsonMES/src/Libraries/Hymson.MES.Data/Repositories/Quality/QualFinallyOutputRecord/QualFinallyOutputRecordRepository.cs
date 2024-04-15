@@ -64,6 +64,18 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 更新IsGenerated（批量）
+        /// </summary>
+        /// <param name="barcode"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateGeneratedRangeAsync(IEnumerable<string> barcode)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdatesIsGeneratedSql, new { barcode });
+        }
+
+
+        /// <summary>
         /// 软删除
         /// </summary>
         /// <param name="id"></param>
@@ -159,6 +171,12 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("IsGenerated = @IsGenerated");
             }
+
+            if (query.Barcodes != null)
+            {
+                sqlBuilder.Where("Barcode IN @Barcodes");
+            }
+            sqlBuilder.AddParameters(query);
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
@@ -233,6 +251,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string UpdateSql = "UPDATE qual_finally_output_record SET   SiteId = @SiteId, Barcode = @Barcode, MaterialId = @MaterialId, WorkOrderId = @WorkOrderId, WorkCenterId = @WorkCenterId, CodeType = @CodeType, IsGenerated = @IsGenerated, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_finally_output_record SET   SiteId = @SiteId, Barcode = @Barcode, MaterialId = @MaterialId, WorkOrderId = @WorkOrderId, WorkCenterId = @WorkCenterId, CodeType = @CodeType, IsGenerated = @IsGenerated, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesIsGeneratedSql = "UPDATE qual_finally_output_record SET   IsGenerated = @IsGenerated,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Barcode IN @barcode ";
 
         const string DeleteSql = "UPDATE qual_finally_output_record SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_finally_output_record SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

@@ -454,6 +454,7 @@
         public const string MES11713 = "条码{sfc}所在检验单{fqcOrder}未关闭";
         public const string MES11714 = "保存检验单附件时，查找FQC检验单数据不存在";
         public const string MES11715 = "检验单状态为检验中、待审核、已关闭的单据，删除失败！";
+        public const string MES11716 = "实际已检数量【{CheckedQty}】少于应检数量【{SampleQty}】！";
 
 
 
@@ -2013,7 +2014,8 @@
 
 
         #region FQC检验项目 19982
-        public const string MES19982 = "物料{materialCode}检验项目版本{version}已存在，不允许重复添加！"; 
+        public const string MES19982 = "物料{materialCode}检验项目版本{version}已存在，不允许重复添加！";
+        public const string MES19983 = "已启用状态的检验单不允许被删除！";
         #endregion
 
 

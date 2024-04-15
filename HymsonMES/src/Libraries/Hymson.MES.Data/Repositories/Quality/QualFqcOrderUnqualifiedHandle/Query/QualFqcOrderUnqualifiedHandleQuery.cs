@@ -20,6 +20,6 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// <summary>
         /// 不合格处理方式
         /// </summary>
-        public IQCHandMethodEnum? HandMethod { get; set; }
+        public FQCHandMethodEnum? HandMethod { get; set; }
     }
 }

@@ -176,7 +176,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                if (sfcEntity.Qty < barcodeItem.ScrapQty)
+                if (sfcEntity.Qty < barcodeItem.Qty)
                 {
                     var validationFailure = new ValidationFailure();
                     if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -191,23 +191,42 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     }
                     validationFailure.ErrorCode = nameof(ErrorCode.MES15448);
                     validationFailure.FormattedMessagePlaceholderValues.Add("Qty", sfcEntity.Qty);
-                    validationFailure.FormattedMessagePlaceholderValues.Add("ScrapQty", barcodeItem.ScrapQty);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("ScrapQty", barcodeItem.Qty);
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-              
+                if (barcodeItem.Qty == 0)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", barcodeItem.SFC}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", barcodeItem.SFC);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15448);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("Qty", sfcEntity.Qty);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("ScrapQty", barcodeItem.Qty);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+
 
                 var manuSFCPartialScrapByIdCommand = new ManuSFCPartialScrapByIdCommand
                 {
                     Id = sfcEntity.Id,
-                    ScrapQty = (sfcEntity.ScrapQty ?? 0) + barcodeItem.ScrapQty,
-                    Qty = sfcEntity.Qty - barcodeItem.ScrapQty,
+                    ScrapQty = (sfcEntity.ScrapQty ?? 0) + barcodeItem.Qty,
+                    Qty = sfcEntity.Qty - barcodeItem.Qty,
                     UpdatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentUser.UserName,
                     CurrentQty = sfcEntity.Qty,
                     CurrentStatus = sfcEntity.Status,
                 };
-                if (sfcEntity.Qty == barcodeItem.ScrapQty)
+                if (sfcEntity.Qty == barcodeItem.Qty)
                 {
                     manuSFCPartialScrapByIdCommand.Status = SfcStatusEnum.Scrapping;
                 }
@@ -222,20 +241,50 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
 
                 if (sfcInfoEntity == null)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15401));
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", barcodeItem.SFC}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", barcodeItem.SFC);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16701);
+
+                    validationFailures.Add(validationFailure);
+                    continue;
+
                 }
-               
+
                 var whMaterialInventoryEntity = whMaterialInventoryList.FirstOrDefault(x => x.MaterialBarCode == barcodeItem.SFC);
                 if (whMaterialInventoryEntity == null)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15401));
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", barcodeItem.SFC}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", barcodeItem.SFC);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16120);
+                    validationFailures.Add(validationFailure);
+                    continue;
+
                 }
-               
+
+
                 scrapPartialWhMaterialInventoryEmptyByIdCommandList.Add(new ScrapPartialWhMaterialInventoryByIdCommand
                 {
                     Id = whMaterialInventoryEntity.Id,
-                    ScrapQty = (whMaterialInventoryEntity.ScrapQty ?? 0) + barcodeItem.ScrapQty,
-                    Qty = whMaterialInventoryEntity.QuantityResidue - barcodeItem.ScrapQty,
+                    ScrapQty = (whMaterialInventoryEntity.ScrapQty ?? 0) + barcodeItem.Qty,
+                    Qty = whMaterialInventoryEntity.QuantityResidue - barcodeItem.Qty,
                     CurrentQuantityResidue = whMaterialInventoryEntity.QuantityResidue,
                     UpdatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentUser.UserName
@@ -252,7 +301,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     MaterialVersion = materialEntity.Version,
                     MaterialBarCode = barcodeItem.SFC ?? "",
                     Batch = materialEntity.Batch.ToString(),
-                    Quantity = barcodeItem.ScrapQty,
+                    Quantity = barcodeItem.Qty,
                     //ScrapQty=item.ScrapQuantity,
                     Unit = materialEntity.Unit ?? "",
                     Type = WhMaterialInventoryTypeEnum.MaterialScrapping,
@@ -274,7 +323,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     MaterialId = materialEntity.Id,
                     MaterialBarCode = whMaterialInventoryEntity.MaterialBarCode ?? "",
                     Batch = whMaterialInventoryEntity.Batch,
-                    ScrapQty = barcodeItem.ScrapQty,
+                    ScrapQty = barcodeItem.Qty,
                     MaterialStandingbookId = whMaterialStandingbookEntity.Id,
                     ScrapType = barcodeItem.ScrapType,
                     IsCancellation = TrueOrFalseEnum.No,

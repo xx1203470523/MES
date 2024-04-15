@@ -137,7 +137,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder)) sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
-            if (pagedQuery.FQCOrderIds != null) sqlBuilder.Where(" Id IN @IQCOrderIds ");
+            if (pagedQuery.FQCOrderIds != null) sqlBuilder.Where(" Id IN @FQCOrderIds ");
             if (pagedQuery.MaterialIds != null) sqlBuilder.Where(" MaterialId IN @MaterialIds ");
             if (pagedQuery.WorkOrderId != null) sqlBuilder.Where(" WorkOrderId = @WorkOrderId ");
             //if (pagedQuery.MaterialReceiptDetailIds != null) sqlBuilder.Where(" MaterialReceiptDetailId IN @MaterialReceiptDetailIds ");

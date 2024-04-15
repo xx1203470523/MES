@@ -126,5 +126,10 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("设备+产品+环境+质量")]
         Equ_Pro_Env_IQC = 15,
+        /// <summary>
+        /// FQC
+        /// </summary>
+        [Description("FQC")]
+        Equ_Pro_Env_FQC = 16,
     }
 }

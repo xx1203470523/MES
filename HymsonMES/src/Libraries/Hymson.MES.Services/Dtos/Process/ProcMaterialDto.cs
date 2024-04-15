@@ -152,6 +152,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MaskCodeId { get; set; }
 
         /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
+
+        /// <summary>
         /// 数量限制
         /// </summary>
         public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
@@ -274,6 +279,14 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 原材料类型
         /// </summary>
         public MaterialTypeEnum? MaterialType { get; set; }
+
+
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
+
+        /// <summary>
+
 
         /// <summary>
         /// 数量限制
@@ -442,6 +455,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 原材料类型
         /// </summary>
         public MaterialTypeEnum? MaterialType { get; set; }
+
+        /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
+
         /// <summary>
         /// 数量限制
         /// </summary>
@@ -501,7 +520,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 物料组编码
         /// </summary>
-        public string? MaterialGroupCode { get; set; }
+        public string? MaterialGroupCode {  get; set; }
+        /// <summary>
+        /// 有效时间
+        /// </summary>
+        public int? ValidTime { get; set; }
     }
 
     /// <summary>
@@ -759,6 +782,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         [EpplusTableColumn(Header = "验证掩码组", Order = 16)]
         public string? MaskCode { get; set; }
+
+        /// <summary>
+        /// 有效天数
+        /// </summary>
+        [EpplusTableColumn(Header = "有效天数", Order = 17)]
+        public string? ValidTime { get; set; }
 
     }
 

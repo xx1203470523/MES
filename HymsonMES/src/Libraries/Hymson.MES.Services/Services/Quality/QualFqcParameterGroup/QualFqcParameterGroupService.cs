@@ -24,6 +24,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using MySqlX.XDevAPI.Relational;
 using OfficeOpenXml;
 using System.Reflection;
 using System.Security.Policy;
@@ -101,176 +102,6 @@ namespace Hymson.MES.Services.Services.Quality
             _inteCustomRepository = inteCustomRepository;
             _qualFqcParameterGroupDetailRepository = qualFqcParameterGroupDetailRepository;
         }
-
-        ///// <summary>
-        ///// 获取单个
-        ///// </summary>
-        ///// <param name="queryDto"></param>
-        ///// <returns></returns>
-        ///// <exception cref="CustomerValidationException"></exception>
-        //public async Task<QualFqcParameterGroupOutputDto> GetOneAsync(QualFqcParameterGroupQueryDto queryDto)
-        //{
-        //    var query = queryDto.ToQuery<QualFqcParameterGroupToQuery>();
-        //    query.SiteId = _currentSite.SiteId;
-
-        //    var qualIqcInspectionItemEntity = await _qualFqcParameterGroupRepository.GetOneAsync(query);
-        //    if (qualIqcInspectionItemEntity == null)
-        //    {
-        //        throw new CustomerValidationException(nameof(ErrorCode.MES10104));
-        //    }
-
-        //    var result = qualIqcInspectionItemEntity.ToModel<QualOqcParameterGroupOutputDto>();
-        //    if (result == null)
-        //    {
-        //        throw new CustomerValidationException(nameof(ErrorCode.MES10104));
-        //    }
-
-        //    var materialEntity = await _procMaterialRepository.GetByIdAsync(result.MaterialId.GetValueOrDefault());
-        //    if (materialEntity != null)
-        //    {
-        //        result.MaterialName = materialEntity.MaterialName;
-        //        result.MaterialCode = materialEntity.MaterialCode;
-        //        result.MaterialUnit = materialEntity.Unit;
-        //        result.MaterialVersion = materialEntity.Version;
-        //    }
-
-        //    var customerEntity = await _inteCustomRepository.GetByIdAsync(result.CustomerId.GetValueOrDefault());
-        //    if (customerEntity != null)
-        //    {
-        //        result.CustomerCode = customerEntity.Code;
-        //        result.CustomerName = customerEntity.Name;
-        //    }
-
-        //    return result;
-        //}
-
-        ///// <summary>
-        ///// 创建
-        ///// </summary>
-        ///// <param name="createDto"></param>
-        ///// <returns></returns>
-        //public async Task CreateAsync(QualFqcParameterGroupDto createDto)
-        //{
-        //    await _validationSaveRules.ValidateAndThrowAsync(createDto);
-
-        //    var command = createDto.ToCommand<QualFqcParameterGroupEntity>();
-        //    command.Init();
-        //    command.CreatedBy = _currentUser.UserName;
-        //    command.UpdatedBy = _currentUser.UserName;
-        //    command.SiteId = _currentSite.SiteId;
-
-        //    if (command.Code != null || command.Name != null)
-        //    {
-        //        var projectCode = new QualFqcParameterGroupQuery
-        //        {
-        //            SiteId = command.SiteId,
-        //            MaterialId = command.MaterialId,
-        //        };
-        //        //校验项目编码
-        //        var qualIqcInspectionItemEntity = await _qualFqcParameterGroupRepository.GetEntitiesAsync(projectCode);
-        //        if (qualIqcInspectionItemEntity != null)
-        //        {
-        //            throw new CustomerValidationException(nameof(ErrorCode.MES19955));
-        //        }
-        //    }
-
-        //    if (command.MaterialId != null && command.CustomerId != null && command.Version != null)
-        //    {
-        //        var projectCode = new QualFqcParameterGroupQuery
-        //        {
-        //            MaterialId = command.MaterialId,
-        //        };
-        //        //相同的客户 + 物料 + 检验项目版本
-        //        var Entity = await _qualFqcParameterGroupRepository.GetEntitiesAsync(projectCode);
-        //        if (Entity != null)
-        //        {
-        //            var materialEntity = await _procMaterialRepository.GetByIdAsync(Entity.MaterialId);
-        //            var customerEntity = await _inteCustomRepository.GetByIdAsync(Entity.CustomerId);
-        //            throw new CustomerValidationException(nameof(ErrorCode.MES19956)).WithData("materialCode", materialEntity.MaterialCode).WithData("customCode", customerEntity.Code).WithData("version", command.Version);
-        //        }
-        //    }
-
-        //    var detailCommands = Enumerable.Empty<QualOqcParameterGroupDetailCreateCommand>();
-        //    if (createDto.qualFqcParameterGroupDetailDtos != null && createDto.qualFqcParameterGroupDetailDtos.Any())
-        //    {
-        //        detailCommands = createDto.qualFqcParameterGroupDetailDtos.Select(m =>
-        //        {
-        //            var detailCommand = m.ToCommand<QualfqcParameterGroupDetailCreateCommand>();
-        //            detailCommand.Init();
-        //            detailCommand.ParameterGroupId = command.Id;
-        //            detailCommand.CreatedBy = command.CreatedBy;
-        //            detailCommand.UpdatedBy = command.UpdatedBy;
-        //            detailCommand.SiteId = command.SiteId;
-
-        //            return detailCommand;
-        //        });
-        //    }
-
-
-        //    using var scope = TransactionHelper.GetTransactionScope();
-
-        //    var affectedRow = await _qualFqcParameterGroupRepository.InsertAsync(command);
-        //    if (affectedRow == 0)
-        //    {
-        //        throw new CustomerValidationException(nameof(ErrorCode.MES19950));
-        //    }
-
-        //    await _qualFqcParameterGroupDetailRepository.InsertAsync(detailCommands);
-
-        //    scope.Complete();
-
-
-        //}
-
-        ///// <summary>
-        ///// 修改
-        ///// </summary>
-        ///// <param name="updateDto"></param>
-        ///// <returns></returns>
-        //public async Task ModifyAsync(QualFqcParameterGroupUpdateDto updateDto)
-        //{
-        //    await _validationUpdateRules.ValidateAndThrowAsync(updateDto);
-
-        //    var entity = await _qualFqcParameterGroupRepository.GetEntitiesAsync(new QualFqcParameterGroupToQuery { Id = updateDto.Id });
-        //    if (entity == null)
-        //    {
-        //        throw new CustomerValidationException(nameof(ErrorCode.MES19954));
-        //    }
-
-        //    var command = updateDto.ToCommand<QualOqcParameterGroupUpdateCommand>();
-        //    command.Init();
-        //    command.SiteId = _currentSite.SiteId;
-        //    command.UpdatedBy = _currentUser.UserName;
-
-        //    var detailCommands = Enumerable.Empty<QualOqcParameterGroupDetailCreateCommand>();
-        //    if (updateDto.qualFqcParameterGroupDetailDtos != null && updateDto.qualFqcParameterGroupDetailDtos.Any())
-        //    {
-        //        detailCommands = updateDto.qualFqcParameterGroupDetailDtos.Select(m =>
-        //        {
-        //            var detailCommand = m.ToCommand<QualOqcParameterGroupDetailCreateCommand>();
-        //            detailCommand.Init();
-        //            detailCommand.ParameterGroupId = command.Id;
-        //            detailCommand.CreatedOn = entity.CreatedOn;
-        //            detailCommand.CreatedBy = entity.CreatedBy;
-        //            detailCommand.UpdatedBy = command.UpdatedBy;
-        //            detailCommand.UpdatedOn = command.UpdatedOn;
-        //            detailCommand.SiteId = command.SiteId;
-
-        //            return detailCommand;
-        //        });
-        //    }
-
-        //    using var scope = TransactionHelper.GetTransactionScope();
-
-        //    await _qualFqcParameterGroupDetailRepository.DeletesAsync(entity.Id);
-
-        //    await _qualFqcParameterGroupRepository.UpdateAsync(command);
-
-        //    await _qualFqcParameterGroupDetailRepository.InsertAsync(detailCommands);
-
-        //    scope.Complete();
-
-        //}
 
         /// <summary>
         /// 删除
@@ -361,7 +192,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
-                SiteId = _siteId
+                SiteId = _siteId,
             };
             query.Sorting = "Id Desc";
 
@@ -370,7 +201,7 @@ namespace Hymson.MES.Services.Services.Quality
             var pageResult = await _qualFqcParameterGroupRepository.GetPagedListAsync(query);
             if (pageResult.Data != null && pageResult.Data.Any())
             {
-                result.Data = pageResult.Data.Select(m => m.ToModel<QualFqcParameterGroupOutputDto>());
+                result.Data = pageResult.Data.Where(x => queryDto.Status==null || x.Status == queryDto.Status).Select(m => m.ToModel<QualFqcParameterGroupOutputDto>());
                 result.TotalCount = pageResult.TotalCount;
 
                 var resultMaterialIds = result.Data.Select(m => m.MaterialId);
@@ -378,19 +209,39 @@ namespace Hymson.MES.Services.Services.Quality
                 try
                 {
                     var materialEntities = await _procMaterialRepository.GetByIdsAsync(resultMaterialIds);
-                    result.Data = result.Data.Select(m =>
+                    if (queryDto.MaterialCode != null || queryDto.MaterialName != null || queryDto.MaterialVersion != null)
                     {
-                        var materialEntity = materialEntities.FirstOrDefault(e => e.Id == m.MaterialId);
-                        if (materialEntity != default)
-                        {
-                            m.MaterialCode = materialEntity.MaterialCode;
-                            m.MaterialName = materialEntity.MaterialName;
-                            m.MaterialUnit = materialEntity.Unit;
-                            m.MaterialVersion = materialEntity.Version;
-                        }
-                        return m;
-                    });
-
+                        result.Data = result.Data.Join(materialEntities,
+                                                    dataItem => dataItem.MaterialId,
+                                                    materialEntity => materialEntity.Id,
+                                                    (dataItem, materialEntity) =>
+                                                    {
+                                                        dataItem.MaterialCode = materialEntity.MaterialCode;
+                                                        dataItem.MaterialName = materialEntity.MaterialName;
+                                                        dataItem.MaterialUnit = materialEntity.Unit;
+                                                        dataItem.MaterialVersion = materialEntity.Version;
+                                                        return dataItem;
+                                                    }).ToList();
+                        result.Data = result.Data.Where(dataItem =>
+                            (queryDto.MaterialCode == null || dataItem.MaterialCode == queryDto.MaterialCode) &&
+                            (queryDto.MaterialName == null || dataItem.MaterialName == queryDto.MaterialName) &&
+                            (queryDto.MaterialVersion == null || dataItem.MaterialVersion == queryDto.MaterialVersion)
+                        ).ToList();
+                    }
+                    else
+                    {
+                        result.Data = result.Data.Join(materialEntities,
+                                                dataItem => dataItem.MaterialId,
+                                                materialEntity => materialEntity.Id,
+                                                (dataItem, materialEntity) =>
+                                                {
+                                                    dataItem.MaterialCode = materialEntity.MaterialCode;
+                                                    dataItem.MaterialName = materialEntity.MaterialName;
+                                                    dataItem.MaterialUnit = materialEntity.Unit;
+                                                    dataItem.MaterialVersion = materialEntity.Version;
+                                                    return dataItem;
+                                                }).ToList();
+                    }
                 }
                 catch (Exception ex) { }
             }
@@ -407,6 +258,8 @@ namespace Hymson.MES.Services.Services.Quality
         public async Task DeleteAsync(QualFqcParameterGroupDeleteDto deleteDto)
         {
             if (!deleteDto.Ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
+
+            if (deleteDto.Status== (SysDataStatusEnum)1 ) throw new CustomerValidationException(nameof(ErrorCode.MES19983));
 
             var entities = await _qualFqcParameterGroupRepository.GetByIdsAsync(deleteDto.Ids);
 
@@ -428,7 +281,7 @@ namespace Hymson.MES.Services.Services.Quality
             var queryentity = new QualFqcParameterGroupQuery()
             {
                 SiteId = query.Result.SiteId,
-                MaterialId =query.Result.MaterialId,
+                MaterialId = query.Result.MaterialId,
                 Status = query.Result.Status,
             };
             var qualFqcInspectionItemEntity = await _qualFqcParameterGroupRepository.GetEntityAsync(queryentity);
@@ -472,12 +325,13 @@ namespace Hymson.MES.Services.Services.Quality
                 MaterialId = createDto.MaterialId,
                 SiteId = _currentSite.SiteId,
                 SampleQty = createDto.SampleQty,
+                SamplingCount = createDto.SamplingCount,
                 IsSameWorkCenter = createDto.IsSameWorkCenter,
                 IsSameWorkOrder = createDto.IsSameWorkOrder,
                 Version = createDto.Version,
                 LotSize = createDto.LotSize,
                 LotUnit = createDto.LotUnit,
-                Status = createDto.Status,
+                Status = 0,
             };
 
             if (command.Code != null || command.Name != null)
@@ -486,6 +340,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     SiteId = command.SiteId,
                     MaterialId = command.MaterialId,
+                    Version = command.Version,
                     Status = command.Status,
                 };
                 //校验项目编码
@@ -504,7 +359,7 @@ namespace Hymson.MES.Services.Services.Quality
                 };
                 //相同的客户 + 物料 + 检验项目版本
                 var Entity = await _qualFqcParameterGroupRepository.GetEntityAsync(projectCode);
-                if (Entity != null&&Entity.Version==command.Version)
+                if (Entity != null && Entity.Version == command.Version)
                 {
                     var materialEntity = await _procMaterialRepository.GetByIdAsync(Entity.MaterialId);
                     throw new CustomerValidationException(nameof(ErrorCode.MES19982)).WithData("materialCode", materialEntity.MaterialCode).WithData("version", command.Version);
@@ -533,7 +388,7 @@ namespace Hymson.MES.Services.Services.Quality
                         Remark = m.Remark,
                         CreatedBy = command.CreatedBy,
                         UpdatedBy = command.UpdatedBy,
-                        SiteId = command.SiteId,       
+                        SiteId = command.SiteId,
                     };
                     return detailCommand;
                 });
@@ -570,22 +425,6 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19954));
             }
-
-            //var command = updateDto.ToCommand<QualFqcParameterGroupUpdateCommand>();
-            //command.Init();
-            //command.SiteId = _currentSite.SiteId;
-            //command.UpdatedBy = _currentUser.UserName;
-
-            //QualFqcParameterGroupEntity commandInstance = new QualFqcParameterGroupEntity();
-
-            //foreach (var item in typeof(QualFqcParameterGroupEntity).GetProperties())
-            //{
-            //    PropertyInfo Property = typeof(QualFqcParameterGroupUpdateCommand).GetProperty(item.Name);
-            //    if (Property != null && Property.PropertyType == Property.PropertyType)
-            //    {
-            //        Property.SetValue(commandInstance, Property.GetValue(command));
-            //    }
-            //}
             var command = new QualFqcParameterGroupEntity()
             {
                 Id = (long)updateDto.Id,
@@ -594,11 +433,12 @@ namespace Hymson.MES.Services.Services.Quality
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName,
                 IsDeleted = 0,
-                Code = updateDto.MaterialId+"_"+updateDto.Version,
+                Code = updateDto.MaterialId + "_" + updateDto.Version,
                 Name = updateDto.MaterialId + "_" + updateDto.Version,
                 MaterialId = updateDto.MaterialId,
                 SiteId = _currentSite.SiteId,
                 SampleQty = updateDto.SampleQty,
+                SamplingCount = updateDto.SamplingCount,
                 IsSameWorkCenter = updateDto.IsSameWorkCenter,
                 IsSameWorkOrder = updateDto.IsSameWorkOrder,
                 Version = updateDto.Version,
@@ -606,24 +446,6 @@ namespace Hymson.MES.Services.Services.Quality
                 LotUnit = updateDto.LotUnit,
                 Status = updateDto.Status,
             };
-
-            //var detailCommands = Enumerable.Empty<QualFqcParameterGroupDetailCreateCommand>();
-            //if (updateDto.qualFqcParameterGroupDetailDtos != null && updateDto.qualFqcParameterGroupDetailDtos.Any())
-            //{
-            //    detailCommands = updateDto.qualFqcParameterGroupDetailDtos.Select(m =>
-            //    {
-            //        var detailCommand = m.ToCommand<QualFqcParameterGroupDetailCreateCommand>();
-            //        detailCommand.Init();
-            //        detailCommand.ParameterGroupId = command.Id;
-            //        detailCommand.CreatedOn = entity.CreatedOn;
-            //        detailCommand.CreatedBy = entity.CreatedBy;
-            //        detailCommand.UpdatedBy = command.UpdatedBy;
-            //        detailCommand.UpdatedOn = (DateTime)command.UpdatedOn;
-            //        detailCommand.SiteId = command.SiteId;
-
-            //        return detailCommand;
-            //    });
-            //}
             var detailCommands = Enumerable.Empty<QualFqcParameterGroupDetailEntity>();
             if (updateDto.qualFqcParameterGroupDetailDtos != null && updateDto.qualFqcParameterGroupDetailDtos.Any())
             {
@@ -631,7 +453,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     var detailCommand = new QualFqcParameterGroupDetailEntity()
                     {
-                        Id = command.Id,
+                        Id = (long)m.Id,
                         CreatedOn = HymsonClock.Now(),
                         UpdatedOn = HymsonClock.Now(),
                         IsDeleted = 0,
@@ -639,7 +461,7 @@ namespace Hymson.MES.Services.Services.Quality
                         ParameterGroupId = command.Id,
                         ParameterId = m.ParameterId,
                         UpperLimit = m.UpperLimit,
-                        CenterValue = m.CenterValue,
+                        CenterValue = 1,
                         LowerLimit = m.LowerLimit,
                         ReferenceValue = m.ReferenceValue,
                         EnterNumber = 1,//这个不知道从哪里来
@@ -655,21 +477,6 @@ namespace Hymson.MES.Services.Services.Quality
             using var scope = TransactionHelper.GetTransactionScope();
 
             await _qualFqcParameterGroupRepository.UpdateAsync(command);
-
-            //foreach (var details in detailCommands)
-            //{
-            //    QualFqcParameterGroupDetailEntity detailInstance = new QualFqcParameterGroupDetailEntity();
-
-            //    foreach (var item in typeof(QualFqcParameterGroupDetailEntity).GetProperties())
-            //    {
-            //        PropertyInfo Property = typeof(QualFqcParameterGroupDetailCreateCommand).GetProperty(item.Name);
-            //        if (Property != null && Property.PropertyType == Property.PropertyType)
-            //        {
-            //            Property.SetValue(detailInstance, Property.GetValue(details));
-            //        }
-            //    }
-            //    await _qualFqcParameterGroupDetailRepository.InsertAsync(detailInstance);
-            //}
             foreach (var item in detailCommands)
             {
                 await _qualFqcParameterGroupDetailRepository.UpdateAsync(item);
