@@ -359,7 +359,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var stepEntity = new ManuSfcStepEntity
                     {
                         Id = sfcStepId,
-                        Operatetype = ManuSfcStepTypeEnum.Misjudgment,
+                        Operatetype = ManuSfcStepTypeEnum.Compromise,
                         CurrentStatus = sfcProduceEntity.Status,
                         SFC = sfcProduceEntity.SFC,
                         ProductId = sfcProduceEntity.ProductId,
@@ -450,7 +450,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     sfcStepEntities.Add(new ManuSfcStepEntity
                     {
                         Id = sfcStepId,
-                        Operatetype = ManuSfcStepTypeEnum.Misjudgment,
+                        Operatetype = ManuSfcStepTypeEnum.Compromise,
                         CurrentStatus = SfcStatusEnum.Complete,
                         SFC = sfcEntity.SFC,
                         ProductId = sfcInfoEntity.ProductId,
