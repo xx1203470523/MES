@@ -201,7 +201,7 @@ namespace Hymson.MES.Services.Services.Quality
             var pageResult = await _qualFqcParameterGroupRepository.GetPagedListAsync(query);
             if (pageResult.Data != null && pageResult.Data.Any())
             {
-                result.Data = pageResult.Data.Where(x => queryDto.Status==null || x.Status == queryDto.Status).Select(m => m.ToModel<QualFqcParameterGroupOutputDto>());
+                result.Data = pageResult.Data.Where(x => queryDto.Status == null || x.Status == queryDto.Status).Select(m => m.ToModel<QualFqcParameterGroupOutputDto>());
                 result.TotalCount = pageResult.TotalCount;
 
                 var resultMaterialIds = result.Data.Select(m => m.MaterialId);
@@ -259,7 +259,7 @@ namespace Hymson.MES.Services.Services.Quality
         {
             if (!deleteDto.Ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
-            if (deleteDto.Status== (SysDataStatusEnum)1 ) throw new CustomerValidationException(nameof(ErrorCode.MES19983));
+            if (deleteDto.Status == (SysDataStatusEnum)1) throw new CustomerValidationException(nameof(ErrorCode.MES19983));
 
             var entities = await _qualFqcParameterGroupRepository.GetByIdsAsync(deleteDto.Ids);
 
@@ -433,10 +433,13 @@ namespace Hymson.MES.Services.Services.Quality
                 };
                 //相同的物料版本 + 物料 + 检验项目版本
                 var Entity = await _qualFqcParameterGroupRepository.GetEntityAsync(projectCode);
-                if (Entity != null && Entity.Version == command.Version)
+                if (Entity != null && Entity.Id != updateDto.Id)
                 {
-                    var materialEntity = await _procMaterialRepository.GetByIdAsync(Entity.MaterialId);
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19982)).WithData("materialCode", materialEntity.MaterialCode).WithData("materialversion", materialEntity.Version).WithData("version", command.Version);
+                    if (Entity != null && Entity.Version == command.Version)
+                    {
+                        var materialEntity = await _procMaterialRepository.GetByIdAsync(Entity.MaterialId);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19982)).WithData("materialCode", materialEntity.MaterialCode).WithData("materialversion", materialEntity.Version).WithData("version", command.Version);
+                    }
                 }
             }
             var detailCommands = Enumerable.Empty<QualFqcParameterGroupDetailEntity>();
@@ -473,9 +476,9 @@ namespace Hymson.MES.Services.Services.Quality
             foreach (var item in detailCommands)
             {
                 var Isexist = _qualFqcParameterGroupDetailRepository.GetByIdAsync(item.Id);
-                if (Isexist.Result!=null)
+                if (Isexist.Result != null)
                 {
-                    await _qualFqcParameterGroupDetailRepository.UpdateAsync(item); 
+                    await _qualFqcParameterGroupDetailRepository.UpdateAsync(item);
                 }
                 else
                 {
