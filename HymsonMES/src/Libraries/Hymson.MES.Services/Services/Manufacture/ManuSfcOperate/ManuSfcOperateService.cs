@@ -247,6 +247,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             var outStationRequestBo = new OutStationRequestBo
             {
                 SFC = request.SFC,
+                VehicleCode = request.VehicleCode,
+                UnQualifiedQty = request.UnQualifiedQty,
+                QualifiedQty = request.QualifiedQty,
                 IsQualified = request.IsQualified == 1
             };
 
@@ -259,7 +262,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 不合格代码
             if (request.FailInfo != null && request.FailInfo.Any())
             {
-                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode });
+                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode, UnqualifiedQty= s.UnqualifiedQty });
             }
 
             _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
@@ -298,6 +301,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var outStationRequestBo = new OutStationRequestBo
                 {
                     SFC = item.SFC,
+                    VehicleCode = item.VehicleCode,
                     IsQualified = item.IsQualified == 1
                 };
 
@@ -310,7 +314,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 // 不合格代码
                 if (item.FailInfo != null && item.FailInfo.Any())
                 {
-                    outStationRequestBo.OutStationUnqualifiedList = item.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode });
+                    outStationRequestBo.OutStationUnqualifiedList = item.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode, UnqualifiedQty = s.UnqualifiedQty });
                 }
 
                 outStationRequestBos.Add(outStationRequestBo);
@@ -389,7 +393,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 不合格代码
             if (request.FailInfo != null && request.FailInfo.Any())
             {
-                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode });
+                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode });
             }
 
             _ = await _manuPassStationService.OutStationRangeByVehicleAsync(new VehicleOutStationBo
@@ -434,7 +438,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
-        /// 分页查询列表（PDA条码出站）
+        /// PDA分页查询列表
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
@@ -444,7 +448,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var queryData = pagedQueryDto.ToQuery<ManuSfcProduceVehiclePagedQuery>();
             queryData.SiteId = _currentSite.SiteId ?? 0;
-            queryData.Status = SfcStatusEnum.lineUp;
+            queryData.Status = pagedQueryDto.Status;
             var pageInfo = await _manuSfcProduceRepository.GetManuSfcPageListAsync(queryData);
             if (pageInfo.Data == null || !pageInfo.Data.Any())
             {
@@ -467,6 +471,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 model.SFC = item.Sfc;
                 model.Status = item.Status;
                 model.Qty = item.Qty;
+                model.Id = item.Id;
 
                 var materialEntity = materialEntities.FirstOrDefault(a => a.Id == item.ProductId);
                 model.MaterialCode = materialEntity?.MaterialCode ?? "";
@@ -509,18 +514,18 @@ namespace Hymson.MES.Services.Services.Manufacture
             result.OrderCode = planWorkOrderEntity?.OrderCode ?? "";
             result.PlanOutputQty = planWorkOrderEntity?.Qty ?? 0;
 
-            //获取条码工序生产汇总
-            var sfcSummaryEntities = await _manuSfcSummaryRepository.GetEntitiesAsync(new ManuSfcSummaryQuery { SFC = sfc, SiteId = _currentSite.SiteId ?? 0 });
-            if (sfcSummaryEntities == null || !sfcSummaryEntities.Any())
-            {
-                return result;
-            }
+            ////获取条码工序生产汇总
+            //var sfcSummaryEntities = await _manuSfcSummaryRepository.GetEntitiesAsync(new ManuSfcSummaryQuery { SFC = sfc, SiteId = _currentSite.SiteId ?? 0 });
+            //if (sfcSummaryEntities == null || !sfcSummaryEntities.Any())
+            //{
+            //    return result;
+            //}
             //计算不良数量和良品数量
-            var unqualifiedQty = sfcSummaryEntities.Sum(a => a.UnqualifiedQty);
-            var outputQty = sfcSummaryEntities.Sum(a => a.OutputQty);
-            var qualifiedQty = (outputQty ?? 0) - unqualifiedQty ?? 0;
-            result.UnqualifiedQty = unqualifiedQty ?? 0;
-            result.QualifiedQty = qualifiedQty;
+            //var unqualifiedQty = sfcSummaryEntities.Sum(a => a.UnqualifiedQty);
+            //var outputQty = sfcSummaryEntities.Sum(a => a.OutputQty);
+            //var qualifiedQty = (outputQty ?? 0) - unqualifiedQty ?? 0;
+            //result.UnqualifiedQty = unqualifiedQty ?? 0;
+            //result.QualifiedQty = qualifiedQty;
 
             return result;
         }

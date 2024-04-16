@@ -7,6 +7,9 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Services.Common;
@@ -17,6 +20,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -572,6 +576,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     SiteId = _currentSite.SiteId ?? 0
                 });
             }
+            var material = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId);
             if (inteVehicleTypeVerifyEntities != null && inteVehicleTypeVerifyEntities.Any())
             {
                 bool materialcheck = false;
@@ -586,7 +591,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
                 bool materialgroupcheck = false;
                 var bargroup = inteVehicleTypeVerifyEntities.Where(v => v.Type == Core.Enums.Integrated.VehicleTypeVerifyTypeEnum.MaterialGroup).ToList();
-                var material = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId);
+              
                 if (!bargroup.Any(v => v.VerifyId == material.GroupId))
                 {
                     materialgroupcheck = false;
@@ -658,8 +663,9 @@ namespace Hymson.MES.Services.Services.Integrated
                     }
                     if (manuSfcProduceEntity.ProductId != firstmatrialid)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES18630))
-                            .WithData("curCode", manuSfcProduceEntity.ProductId).WithData("provCode", firstmatrialid);
+                        var provmaterial = await _procMaterialRepository.GetByIdAsync(firstmatrialid);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES18631))
+                            .WithData("curCode", material.MaterialCode).WithData("provCode", provmaterial.MaterialCode);
                     }
 
                 }
@@ -1008,18 +1014,32 @@ namespace Hymson.MES.Services.Services.Integrated
             //获取条码生成信息
             var sfcs = inteVehicleFreightStackEntities.Select(a => a.BarCode).Distinct();
             var manuSfcProduceEntities = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery { Sfcs = sfcs, SiteId = _currentSite.SiteId ?? 0 });
+
+            var materialEntities = new List<ProcMaterialEntity>();
+            var workOrderEntities=new List<PlanWorkOrderEntity>();
+            var whMaterialInventoryEntities = new List<WhMaterialInventoryEntity>();
+            //如果在制品条码为空，则去物料库存查询，现在托盘可以绑定在制品和物料库存
             if (manuSfcProduceEntities == null || !manuSfcProduceEntities.Any())
             {
-                return result;
+                //获取物料库存
+                whMaterialInventoryEntities = (await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery { BarCodes= sfcs ,SiteId= _currentSite.SiteId ?? 0 }))?.ToList();
+                if (whMaterialInventoryEntities == null || !whMaterialInventoryEntities.Any()) { 
+                    return result;
+                }
+
+                //获取物料信息
+                var materialIds = whMaterialInventoryEntities.Select(a => a.MaterialId).Distinct();
+                materialEntities = (await _procMaterialRepository.GetByIdsAsync(materialIds))?.ToList();
             }
+            else {
+                //获取物料信息
+                var materialIds = manuSfcProduceEntities.Select(a => a.ProductId).Distinct();
+                materialEntities =(await _procMaterialRepository.GetByIdsAsync(materialIds))?.ToList();
 
-            //获取物料信息
-            var materialIds = manuSfcProduceEntities.Select(a => a.ProductId).Distinct();
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
-
-            //获取工单信息
-            var workOrderIds = manuSfcProduceEntities.Select(a => a.WorkOrderId).Distinct();
-            var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+                //获取工单信息
+                var workOrderIds = manuSfcProduceEntities.Select(a => a.WorkOrderId).Distinct();
+                workOrderEntities = (await _planWorkOrderRepository.GetByIdsAsync(workOrderIds))?.ToList();
+            }
 
             foreach (var entity in inteVehicleFreightStackEntities)
             {
@@ -1040,20 +1060,31 @@ namespace Hymson.MES.Services.Services.Integrated
                 model.Position = $"{inteVehicleFreightEnity.Row}-{inteVehicleFreightEnity.Column}";
                 model.Qty = inteVehicleFreightEnity.Qty;
 
-                var manuSfcProduceEntity = manuSfcProduceEntities.FirstOrDefault(a => a.SFC == entity.BarCode);
+                var manuSfcProduceEntity = manuSfcProduceEntities?.FirstOrDefault(a => a.SFC == entity.BarCode);
                 if (manuSfcProduceEntity == null)
                 {
-                    return result;
+                    var whMaterialInventoryEntity = whMaterialInventoryEntities.FirstOrDefault(a => a.MaterialBarCode == entity.BarCode);
+                    if (whMaterialInventoryEntity == null)
+                    {
+                        return result;
+                    }
+
+                    var materialEntity = materialEntities?.FirstOrDefault(a => a.Id == whMaterialInventoryEntity.MaterialId);
+                    model.MaterialCode = materialEntity?.MaterialCode;
+                    model.MaterialName = materialEntity?.MaterialName;
+                    model.MaterialVersion = materialEntity?.Version;
+                    model.Unit = materialEntity?.Unit;
                 }
+                else {
+                    var materialEntity = materialEntities?.FirstOrDefault(a => a.Id == manuSfcProduceEntity.ProductId);
+                    model.MaterialCode = materialEntity?.MaterialCode;
+                    model.MaterialName = materialEntity?.MaterialName;
+                    model.MaterialVersion = materialEntity?.Version;
+                    model.Unit = materialEntity?.Unit;
 
-                var materialEntity = materialEntities.FirstOrDefault(a => a.Id == manuSfcProduceEntity.ProductId);
-                model.MaterialCode = materialEntity?.MaterialCode;
-                model.MaterialName = materialEntity?.MaterialName;
-                model.MaterialVersion = materialEntity?.Version;
-                model.Unit = materialEntity?.Unit;
-
-                var workOrderEntity = workOrderEntities.FirstOrDefault(a => a.Id == manuSfcProduceEntity.WorkOrderId);
-                model.WorkOrderCode = workOrderEntity?.OrderCode;
+                    var workOrderEntity = workOrderEntities?.FirstOrDefault(a => a.Id == manuSfcProduceEntity.WorkOrderId);
+                    model.WorkOrderCode = workOrderEntity?.OrderCode;
+                }
 
                 result.Add(model);
             }
