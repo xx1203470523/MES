@@ -1215,7 +1215,9 @@ namespace Hymson.MES.Services.Services.Quality
                 if (dto == null) continue;
 
                 // 检验人
-                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperateType == OrderOperateTypeEnum.Start);
+                //var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperateType == OrderOperateTypeEnum.Start);
+                dto.InspectionBy = "-";
+                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.FQCOrderId == entity.Id);
                 if (inspectionEntity != null)
                 {
                     dto.InspectionBy = inspectionEntity.CreatedBy;
@@ -1292,15 +1294,22 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = await _qualFqcOrderRepository.GetByIdAsync(orderId);
             if (entity == null) return rsp;
             //SnapShoot
-            //var snapshotEntity = await _qualFqcParameterGroupSnapshootRepository.GetByIdAsync(entity.GroupSnapshootId);
-            //if (snapshotEntity == null) return rsp;
+
+            int CheckedQty = 0;
+            var sampleEntities = await _qualFqcOrderSampleRepository.GetEntitiesAsync(new QualFqcOrderSampleQuery { FQCOrderId = entity.Id, SiteId = entity.SiteId });
+            if (sampleEntities != null)
+            {
+                CheckedQty = sampleEntities.Count();
+            }
 
             rsp = new QualFqcParameterGroupSnapshootOut
             {
                 Code = entity.InspectionOrder,
                 MaterialId = entity.MaterialId ?? 0,
-                SampleQty = entity.SampleQty
+                SampleQty = entity.SampleQty,
+                CheckedQty = CheckedQty
             };
+
             return rsp;
         }
 
