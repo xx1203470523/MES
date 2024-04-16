@@ -1,12 +1,10 @@
 ﻿using Hymson.MES.CoreServices.Bos.Manufacture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public  class OutputConfirmDto
     {
         /// <summary>

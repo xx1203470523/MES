@@ -157,12 +157,17 @@
     /// <summary>
     /// 中止
     /// </summary>
-    public record StopBoundDto : BaseDto
+    public record StopBoundDto
     {
         /// <summary>
-        /// 工序编码
+        /// 资源Id
         /// </summary>
-        public string ProcedureCode { get; set; } = "";
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 产品条码集合

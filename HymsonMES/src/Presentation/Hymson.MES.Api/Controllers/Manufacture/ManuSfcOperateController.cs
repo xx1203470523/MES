@@ -1,7 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperate;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
-using Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -115,18 +114,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task OutBoundCarrierAsync(OutBoundCarrierDto request)
         {
             await _manuSfcOperateService.OutBoundCarrierAsync(request);
-        }
-
-        /// <summary>
-        /// 中止（多个）
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost("StopStationMore")]
-        [LogDescription("中止（多个）", BusinessType.OTHER, "StopStationMore", ReceiverTypeEnum.MES)]
-        public async Task StopStationMoreAsync(StopBoundDto request)
-        {
-            await _manuSfcOperateService.StopStationMoreAsync(request);
         }
 
 

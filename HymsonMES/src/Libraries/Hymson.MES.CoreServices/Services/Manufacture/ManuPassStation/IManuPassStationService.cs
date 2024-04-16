@@ -55,9 +55,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// 批量中止
         /// </summary>
         /// <param name="bo"></param>
-        /// <param name="source"></param>
         /// <returns></returns>
-        Task<Dictionary<string, JobResponseBo>> StopStationRangeBySFCAsync(SFCStopStationBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi);
+        Task<Dictionary<string, JobResponseBo>> StopStationRangeBySFCAsync(SFCStopStationBo bo);
 
 
     }

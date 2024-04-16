@@ -242,9 +242,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// 批量中止
         /// </summary>
         /// <param name="bo"></param>
-        /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> StopStationRangeBySFCAsync(SFCStopStationBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi)
+        public async Task<Dictionary<string, JobResponseBo>> StopStationRangeBySFCAsync(SFCStopStationBo bo)
         {
             // 作业请求参数（TODO 后面需要把这个改为使用JobRequestBo对象）
             var requestBo = new StopRequestBo

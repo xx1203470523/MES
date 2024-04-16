@@ -262,7 +262,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 不合格代码
             if (request.FailInfo != null && request.FailInfo.Any())
             {
-                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode, UnqualifiedQty= s.UnqualifiedQty });
+                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode, UnqualifiedQty = s.UnqualifiedQty });
             }
 
             _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
@@ -418,23 +418,14 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             if (!request.SFCs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES19101));
 
-            var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                ResourceCode = request.ResourceCode,
-                EquipmentCode = request.EquipmentCode
-            });
-            if (manuBo == null) return;
-
             _ = await _manuPassStationService.StopStationRangeBySFCAsync(new SFCStopStationBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
-                ProcedureId = manuBo.ProcedureId,
-                ResourceId = manuBo.ResourceId,
-                EquipmentId = manuBo.EquipmentId,
+                ProcedureId = request.ProcedureId,
+                ResourceId = request.ResourceId,
                 SFCs = request.SFCs
-            }, RequestSourceEnum.PDA);
+            });
         }
 
         /// <summary>
