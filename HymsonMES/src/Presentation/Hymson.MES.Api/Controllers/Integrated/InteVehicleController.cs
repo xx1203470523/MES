@@ -66,9 +66,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("create")]
         [LogDescription("载具注册", BusinessType.INSERT)]
         [PermissionDescription("inte:inteVehicle:insert")]
-        public async Task AddInteVehicleAsync([FromBody] InteVehicleCreateDto parm)
+        public async Task<long> AddInteVehicleAsync([FromBody] InteVehicleCreateDto parm)
         {
-            await _inteVehicleService.CreateInteVehicleAsync(parm);
+            return await _inteVehicleService.CreateInteVehicleAsync(parm);
         }
 
         /// <summary>
@@ -189,8 +189,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="palletNo"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("getVehicleFreightByPalletNo/pda/{palletNo}")]
+        [HttpGet("getVehicleFreightByPalletNo/pda/{palletNo}")]
         public async Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordByPalletNoPDAAsync(string palletNo)
         {
             return await _inteVehicleService.QueryVehicleFreightRecordByPalletNoAsync(palletNo);

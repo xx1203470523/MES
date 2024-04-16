@@ -32,6 +32,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
         /// </summary>
         public long UnqualifiedId { get; set; }
         /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+        /// <summary>
         /// 报废条码
         /// </summary>
         public string SFC { get; set; }
@@ -48,5 +52,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap
         /// 报废类型
         /// </summary>
         public InventoryScrapTypeEnum? ScrapType { get; set; }
+
     }
 }

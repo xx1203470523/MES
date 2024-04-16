@@ -9,6 +9,20 @@
         /// 条码
         /// </summary>
         public string SFC { get; set; } = string.Empty;
+        /// <summary>
+        /// 载具条码
+        /// </summary>
+        public string? VehicleCode { get; set; }
+        /// <summary>
+        /// 合格数量
+        /// </summary>
+        public decimal QualifiedQty { get; set; } = 1;
+
+        /// <summary>
+        /// 不合格数量
+        /// </summary>
+        public decimal UnQualifiedQty { get; set; }= 0;
+
 
         /// <summary>
         /// 是否合格
@@ -55,6 +69,15 @@
         /// 0不合格,1合格
         /// </summary>
         public int? IsQualified { get; set; }
+        /// <summary>
+        /// 合格数量
+        /// </summary>
+        public decimal QualifiedQty { get; set; }
+
+        /// <summary>
+        /// 不合格数量
+        /// </summary>
+        public decimal UnQualifiedQty { get; set; }
 
         /*
         /// <summary>
@@ -88,7 +111,7 @@
         /// <summary>
         /// 产品条码集合
         /// </summary>
-        public OutBoundItemDto[] SFCs { get; set; }
+        public OutBoundDto[] SFCs { get; set; }
     }
 
     /// <summary>
@@ -156,7 +179,8 @@
         /// <summary>
         /// NG代码
         /// </summary>
-        public string NCCode { get; set; } = string.Empty;
+        public string NGCode { get; set; } = string.Empty;
+        public decimal? UnqualifiedQty { get; set; }
     }
 
 }

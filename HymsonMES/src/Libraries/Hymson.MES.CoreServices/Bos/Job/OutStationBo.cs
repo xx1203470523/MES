@@ -25,6 +25,15 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 是否合格
         /// </summary>
         public bool? IsQualified { get; set; } = true;
+        /// <summary>
+        /// 合格数量
+        /// </summary>
+        public decimal QualifiedQty { get; set; }
+
+        /// <summary>
+        /// 不合格数量
+        /// </summary>
+        public decimal UnQualifiedQty { get; set; }
 
         /// <summary>
         /// 消耗

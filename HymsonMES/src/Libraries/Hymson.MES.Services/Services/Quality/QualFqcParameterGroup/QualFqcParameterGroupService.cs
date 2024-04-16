@@ -277,14 +277,7 @@ namespace Hymson.MES.Services.Services.Quality
 
         public async Task<QualFqcParameterGroupOutputDto> GetOneAsync(QualFqcParameterGroupQueryDto queryDto)
         {
-            var query = _qualFqcParameterGroupRepository.GetByIdAsync(queryDto.Id);
-            var queryentity = new QualFqcParameterGroupQuery()
-            {
-                SiteId = query.Result.SiteId,
-                MaterialId = query.Result.MaterialId,
-                Status = query.Result.Status,
-            };
-            var qualFqcInspectionItemEntity = await _qualFqcParameterGroupRepository.GetEntityAsync(queryentity);
+            var qualFqcInspectionItemEntity = await _qualFqcParameterGroupRepository.GetByIdAsync(queryDto.Id);
             if (qualFqcInspectionItemEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10104));
@@ -341,7 +334,6 @@ namespace Hymson.MES.Services.Services.Quality
                     SiteId = command.SiteId,
                     MaterialId = command.MaterialId,
                     Version = command.Version,
-                    Status = command.Status,
                 };
                 //相同的物料版本 + 物料 + 检验项目版本
                 var Entity = await _qualFqcParameterGroupRepository.GetEntityAsync(projectCode);
@@ -431,6 +423,22 @@ namespace Hymson.MES.Services.Services.Quality
                 LotUnit = updateDto.LotUnit,
                 Status = updateDto.Status,
             };
+            if (command.Code != null || command.Name != null)
+            {
+                var projectCode = new QualFqcParameterGroupQuery
+                {
+                    SiteId = command.SiteId,
+                    MaterialId = command.MaterialId,
+                    Version = command.Version,
+                };
+                //相同的物料版本 + 物料 + 检验项目版本
+                var Entity = await _qualFqcParameterGroupRepository.GetEntityAsync(projectCode);
+                if (Entity != null && Entity.Version == command.Version)
+                {
+                    var materialEntity = await _procMaterialRepository.GetByIdAsync(Entity.MaterialId);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19982)).WithData("materialCode", materialEntity.MaterialCode).WithData("materialversion", materialEntity.Version).WithData("version", command.Version);
+                }
+            }
             var detailCommands = Enumerable.Empty<QualFqcParameterGroupDetailEntity>();
             if (updateDto.qualFqcParameterGroupDetailDtos != null && updateDto.qualFqcParameterGroupDetailDtos.Any())
             {

@@ -563,7 +563,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
             var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
             {
                 SiteId = siteId,
-                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.OQC
+                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.Environment
             });
             if (codeRules == null || !codeRules.Any())
             {
