@@ -84,4 +84,14 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public IEnumerable<PhysicalDeleteSFCProduceByIdsCommand> PhysicalDeleteSFCProduceByIdsCommands { get; set; }
         public IEnumerable<MultiSFCUpdateStatusCommand> MultiSFCUpdateStatusCommands { get; set; }
     }
+    public class BarcodeMergeResponse
+    {
+        
+        public IEnumerable<ManuSfcEntity> manusfcs { get; set; }
+        public IEnumerable<ManuSfcInfoEntity> sfcinfos { get; set; }
+        public IEnumerable<ManuSfcProduceEntity> sfcproduces { get; set; }
+        public IEnumerable<ManuSfcCirculationEntity> manuSfcCirculationEntitys { get; set; }
+        public IEnumerable<ManuSfcStepEntity> manuSfcStepEntities { get; set; }
+      
+    }
 }
