@@ -37,15 +37,15 @@
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="6.2.2" />
-    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.148" />
-    <PackageReference Include="Hymson.Elasticsearch" Version="2.1.148" />
-    <PackageReference Include="Hymson.Excel" Version="2.1.148" />
-    <PackageReference Include="Hymson.Minio" Version="2.1.148" />
-    <PackageReference Include="Hymson.Print.Abstractions" Version="2.1.148" />
-    <PackageReference Include="Hymson.Print.DataService" Version="2.1.148" />
-    <PackageReference Include="Hymson.Snowflake" Version="2.1.148" />
-    <PackageReference Include="Hymson.SqlActuator" Version="2.1.148" />
-    <PackageReference Include="Hymson.Web.Framework" Version="2.1.148" />
+    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.149" />
+    <PackageReference Include="Hymson.Elasticsearch" Version="2.1.149" />
+    <PackageReference Include="Hymson.Excel" Version="2.1.149" />
+    <PackageReference Include="Hymson.Minio" Version="2.1.149" />
+    <PackageReference Include="Hymson.Print.Abstractions" Version="2.1.149" />
+    <PackageReference Include="Hymson.Print.DataService" Version="2.1.149" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.149" />
+    <PackageReference Include="Hymson.SqlActuator" Version="2.1.149" />
+    <PackageReference Include="Hymson.Web.Framework" Version="2.1.149" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
