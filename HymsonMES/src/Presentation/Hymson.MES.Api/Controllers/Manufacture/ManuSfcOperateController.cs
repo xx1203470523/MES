@@ -63,7 +63,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InStationMore")]
-        [LogDescription("进站（多个）", BusinessType.OTHER, "InStationMore", ReceiverTypeEnum.MES)]
+        [LogDescription("进站（多个）", BusinessType.OTHER, "InStationMore    ", ReceiverTypeEnum.MES)]
         public async Task InBoundMoreAsync(InBoundMoreDto request)
         {
             await _manuSfcOperateService.InBoundMoreAsync(request);

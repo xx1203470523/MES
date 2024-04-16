@@ -21,7 +21,7 @@
         /// <summary>
         /// 不合格数量
         /// </summary>
-        public decimal UnQualifiedQty { get; set; }= 0;
+        public decimal UnQualifiedQty { get; set; } = 0;
 
 
         /// <summary>
@@ -168,7 +168,6 @@
         /// 产品条码集合
         /// </summary>
         public string[] SFCs { get; set; }
-
     }
 
     /// <summary>
@@ -180,7 +179,10 @@
         /// NG代码
         /// </summary>
         public string NGCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 不合格数量
+        /// </summary>
         public decimal? UnqualifiedQty { get; set; }
     }
-
 }

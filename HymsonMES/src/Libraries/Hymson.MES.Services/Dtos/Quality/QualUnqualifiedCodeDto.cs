@@ -278,5 +278,10 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 不合格代码名称
         /// </summary>
         public string? OrUnqualifiedCodeName { get; set; }
+
+        /// <summary>
+        /// 不合格代码组id
+        /// </summary>
+        public long? QualUnqualifiedGroupId { get; set; }
     }
 }
