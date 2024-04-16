@@ -666,6 +666,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 样本数量
         /// </summary>
         public int SampleQty { get; set; }
+
+        /// <summary>
+        /// 已检数量
+        /// </summary>
+        public int CheckedQty { get; set; }
     }
 
 }

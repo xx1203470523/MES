@@ -362,6 +362,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 工作中心编码
         /// </summary>
         public string? WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum? BarcodeStatus { get; set; }
     }
 
 }

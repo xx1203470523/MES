@@ -456,6 +456,10 @@
         public const string MES11715 = "检验单状态为检验中、待审核、已关闭的单据，删除失败！";
         public const string MES11716 = "实际已检数量【{CheckedQty}】少于应检数量【{SampleQty}】！";
 
+        public const string MES11717 = "检验单明细为空！";
+        public const string MES11718 = "{materialId}参数项目为空检验单明细为空！";
+        public const string MES11719 = "记录数量小于批次数量，不予生成";
+
 
 
 

@@ -210,7 +210,7 @@ namespace Hymson.MES.Services.Services.Quality
             long materialId = default, workOrderId = default, workCenterId = default;
             if (!string.IsNullOrWhiteSpace(queryDto.MaterialCode))
             {
-                var materialEntities = await _procMaterialRepository.GetByCodeAsync(new EntityByCodeQuery { Code = queryDto.MaterialCode });
+                var materialEntities = await _procMaterialRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _siteId, Code = queryDto.MaterialCode });
                 if (materialEntities != null)
                 {
                     materialId = materialEntities.Id;
@@ -288,7 +288,8 @@ namespace Hymson.MES.Services.Services.Quality
                     //工作中心
                     var workCenterEntities = await _workCenterRepository.GetByIdsAsync(resultWorkCenterIdIds);
 
-                    result.Data = result.Data.Select(m =>
+                    result.Data = result.Data
+                        .Select(m =>
                     {
                         var materialEntity = materialEntities.FirstOrDefault(e => e.Id == m.MaterialId);
                         if (materialEntity != default)
@@ -332,7 +333,6 @@ namespace Hymson.MES.Services.Services.Quality
                             m.BarcodeStatus = sfc.Status;
                         }
 
-
                         return m;
                     });
 
@@ -341,6 +341,8 @@ namespace Hymson.MES.Services.Services.Quality
 
 
             }
+
+            //result.Data = result.Data.Where(m => queryDto.BarcodeStatus == null || m.BarcodeStatus == queryDto.BarcodeStatus);
 
             return result;
         }
