@@ -360,10 +360,11 @@ namespace Hymson.MES.Services.Services.Equipment
                 throw new CustomerValidationException(nameof(ErrorCode.MES10104));
             }
 
+            var isQualifiedCount = saveDto.TaskItemDtos.Count(x => x.IsQualified == false);
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
             recordEntity.IsNoticeRepair = saveDto.IsNoticeRepair;
-            recordEntity.IsQualified = saveDto.IsQualified;
+            recordEntity.IsQualified = isQualifiedCount>0? false:true;
             recordEntity.Remark = saveDto.Remark;
             recordEntity.UpdatedOn = updatedOn;
             recordEntity.UpdatedBy = updatedBy;

@@ -34,12 +34,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 是否合格
         /// </summary>
-        public YesOrNoEnum? IsQualified { get; set; }
+        public bool? IsQualified { get; set; }
 
         /// <summary>
         /// 是否通知维修
         /// </summary>
-        public YesOrNoEnum? IsNoticeRepair { get; set; }
+        public bool? IsNoticeRepair { get; set; }
 
         /// <summary>
         /// 备注

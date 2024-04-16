@@ -217,14 +217,9 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long Id { get; set; }
 
         /// <summary>
-        /// 是否合格
-        /// </summary>
-        public YesOrNoEnum IsQualified { get; set; } = YesOrNoEnum.Yes;
-
-        /// <summary>
         /// 是否通知维修
         /// </summary>
-        public YesOrNoEnum IsNoticeRepair { get; set; } = YesOrNoEnum.No;
+        public bool IsNoticeRepair { get; set; } = false;
 
         /// <summary>
         /// 备注
