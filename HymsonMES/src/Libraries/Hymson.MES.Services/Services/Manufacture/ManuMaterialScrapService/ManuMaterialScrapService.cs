@@ -138,8 +138,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
             //条码信息表
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = param.BarcodeScrapList.Select(x => x.SFC), SiteId = _currentSite.SiteId ?? 00 };
-            //在制品信息
-            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+            ////在制品信息
+            //var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
 
             //修改库存信息
             var whMaterialInventoryList = await _whMaterialInventoryRepository.GetByBarCodesAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryBarCodesQuery
@@ -329,7 +329,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     IsCancellation = TrueOrFalseEnum.No,
                     ProcedureId = barcodeItem.ProcedureId,
                     SiteId = _currentSite.SiteId ?? 123456,
-                    WorkOrderId = whMaterialInventoryEntity.WorkOrderId??0,
+                    WorkOrderId = barcodeItem.WorkOrderId,// whMaterialInventoryEntity.WorkOrderId??0,
                     Remark = barcodeItem.Remark ?? "",
                     CreatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),

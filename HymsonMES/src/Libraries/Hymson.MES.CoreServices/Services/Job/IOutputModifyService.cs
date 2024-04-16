@@ -2,6 +2,7 @@
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -73,16 +74,20 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<OutputModifyBo>();
-            if (bo == null) return null;
+            if (param is not JobRequestBo commonBo) return default;
+
+            // 临时中转变量
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
+
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
+     
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
 
             List<ManuSfcStepEntity> manuSfcStepEnties = new();
             List<UpdateSfcProcedureQtyByIdCommand> updateSfcProcedureQtyCommands = new();
             List<UpdateManuSfcQtyByIdCommand> updateManuSfcQtyByIdCommands = new();
-            foreach (var item in bo.SfcList)
+            foreach (var item in commonBo.OutStationRequestBos)
             {
                 var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(x => x.SFC == item.SFC);
                 if (sfcProduceEntity == null)
@@ -90,14 +95,14 @@ namespace Hymson.MES.CoreServices.Services.Job
                     continue;
                 }
                 sfcProduceEntity.Qty = item.QualifiedQty + item.UnQualifiedQty;
-                sfcProduceEntity.UpdatedBy = bo.UserName;
+                sfcProduceEntity.UpdatedBy = commonBo.UserName;
                 sfcProduceEntity.UpdatedOn = HymsonClock.Now();
 
                 updateSfcProcedureQtyCommands.Add(new UpdateSfcProcedureQtyByIdCommand
                 {
                     Id = sfcProduceEntity.Id,
                     Qty = item.QualifiedQty + item.UnQualifiedQty,
-                    UpdatedBy = bo.UserName,
+                    UpdatedBy = commonBo.UserName,
                     UpdatedOn = HymsonClock.Now()
                 });
 
@@ -105,7 +110,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 {
                     Id = sfcProduceEntity.SFCId,
                     Qty = item.QualifiedQty+ item.UnQualifiedQty,
-                    UpdatedBy = bo.UserName,
+                    UpdatedBy = commonBo.UserName,
                     UpdatedOn = HymsonClock.Now()
                 });
 
@@ -117,16 +122,16 @@ namespace Hymson.MES.CoreServices.Services.Job
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
                     WorkCenterId = sfcProduceEntity.WorkCenterId,
                     ProductBOMId = sfcProduceEntity.ProductBOMId,
-                    ProcedureId = bo.ProcedureId,
+                    ProcedureId = commonBo.ProcedureId,
                     Qty = sfcProduceEntity.Qty,
-                    EquipmentId = bo.EquipmentId,
-                    ResourceId = bo.ResourceId,
+                    EquipmentId = commonBo.EquipmentId,
+                    ResourceId = commonBo.ResourceId,
                     CurrentStatus = sfcProduceEntity.Status,
                     Operatetype = ManuSfcStepTypeEnum.OutputReport,
-                    SiteId = bo.SiteId,
-                    CreatedBy = bo.UserName,
+                    SiteId = commonBo.SiteId,
+                    CreatedBy = commonBo.UserName,
                     CreatedOn = HymsonClock.Now(),
-                    UpdatedBy = bo.UserName,
+                    UpdatedBy = commonBo.UserName,
                     UpdatedOn = HymsonClock.Now()
                 });
             }
