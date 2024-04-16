@@ -1,31 +1,24 @@
-/*
- *creator: Karl
- *
- *describe: 客户维护    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-07-11 09:33:26
- */
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.Minio;
 using Hymson.Snowflake;
-using Hymson.Localization.Services;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
-using System.Transactions;
-using Hymson.Minio;
 using System.Text.RegularExpressions;
+using System.Transactions;
 
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -50,7 +43,19 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteCustomModifyDto> _validationModifyRules;
         private readonly AbstractValidator<InteCustomImportDto> _validationImportRules;
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="inteCustomRepository"></param>
+        /// <param name="excelService"></param>
+        /// <param name="inteCustomRepository1"></param>
+        /// <param name="minioService"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="validationImportRules"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
         public InteCustomService(ICurrentUser currentUser,
             ICurrentSite currentSite,
             IInteCustomRepository inteCustomRepository,
@@ -85,7 +90,8 @@ namespace Hymson.MES.Services.Services.Integrated
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(inteCustomCreateDto);
 
-            if(inteCustomCreateDto.Telephone != null) {
+            if (inteCustomCreateDto.Telephone != null)
+            {
                 if (!BeAValidPhone(inteCustomCreateDto.Telephone))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES18411));

@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 载具注册表    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-07-14 10:03:53
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -111,12 +104,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="inteVehicleCreateDto"></param>
         /// <returns></returns>
-        public async Task CreateInteVehicleAsync(InteVehicleCreateDto inteVehicleCreateDto)
+        public async Task<long> CreateInteVehicleAsync(InteVehicleCreateDto inteVehicleCreateDto)
         {
-            //验证DTO
+            // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(inteVehicleCreateDto);
 
-            //DTO转换实体
+            // DTO转换实体
             var inteVehicleEntity = inteVehicleCreateDto.ToEntity<InteVehicleEntity>();
             inteVehicleEntity.Id = IdGenProvider.Instance.CreateId();
             inteVehicleEntity.CreatedBy = _currentUser.UserName;
@@ -183,88 +176,22 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             #endregion
 
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            using var ts = TransactionHelper.GetTransactionScope();
+
+            await _inteVehicleRepository.InsertAsync(inteVehicleEntity);
+
+            if (inteVehicleVerify != null)
             {
-                //入库
-                await _inteVehicleRepository.InsertAsync(inteVehicleEntity);
-
-                if (inteVehicleVerify != null)
-                {
-                    await _inteVehicleVerifyRepository.InsertAsync(inteVehicleVerify);
-                }
-
-                if (inteVehicleFreightEntitys.Any())
-                {
-                    await _inteVehicleFreightRepository.InsertsAsync(inteVehicleFreightEntitys);
-                }
-
-                ts.Complete();
-            }
-        }
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task DeleteInteVehicleAsync(long id)
-        {
-            await _inteVehicleRepository.DeleteAsync(id);
-        }
-
-        /// <summary>
-        /// 批量删除
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<int> DeletesInteVehicleAsync(long[] ids)
-        {
-            //校验数据 
-            var inteVehicleFreights = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(ids);
-            var hasBinds = inteVehicleFreights.Where(x => x.Qty > 0);
-            if (hasBinds.Any())
-            {
-                //查询是哪些载具
-                var vehicleIds = hasBinds.Select(x => x.VehicleId).Distinct().ToArray();
-                var hasBindVehicles = await _inteVehicleRepository.GetByIdsAsync(vehicleIds);
-
-                throw new CustomerValidationException(nameof(ErrorCode.MES18603)).WithData("codes", string.Join(", ", hasBindVehicles.Select(x => x.Code).Distinct().ToArray()));
+                await _inteVehicleVerifyRepository.InsertAsync(inteVehicleVerify);
             }
 
-            return await _inteVehicleRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
-        }
-
-        /// <summary>
-        /// 根据查询条件获取分页数据
-        /// </summary>
-        /// <param name="inteVehiclePagedQueryDto"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<InteVehicleViewDto>> GetPagedListAsync(InteVehiclePagedQueryDto inteVehiclePagedQueryDto)
-        {
-            var inteVehiclePagedQuery = inteVehiclePagedQueryDto.ToQuery<InteVehiclePagedQuery>();
-            inteVehiclePagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _inteVehicleRepository.GetPagedInfoAsync(inteVehiclePagedQuery);
-
-            //实体到DTO转换 装载数据
-            List<InteVehicleViewDto> inteVehicleDtos = PrepareInteVehicleDtos(pagedInfo);
-            return new PagedInfo<InteVehicleViewDto>(inteVehicleDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<InteVehicleViewDto> PrepareInteVehicleDtos(PagedInfo<InteVehicleView> pagedInfo)
-        {
-            var inteVehicleDtos = new List<InteVehicleViewDto>();
-            foreach (var inteVehicleView in pagedInfo.Data)
+            if (inteVehicleFreightEntitys.Any())
             {
-                var inteVehicleDto = inteVehicleView.ToModel<InteVehicleViewDto>();
-                inteVehicleDtos.Add(inteVehicleDto);
+                await _inteVehicleFreightRepository.InsertsAsync(inteVehicleFreightEntitys);
             }
+            ts.Complete();
 
-            return inteVehicleDtos;
+            return inteVehicleEntity.Id;
         }
 
         /// <summary>
@@ -349,6 +276,71 @@ namespace Hymson.MES.Services.Services.Integrated
 
                 ts.Complete();
             }
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task DeleteInteVehicleAsync(long id)
+        {
+            await _inteVehicleRepository.DeleteAsync(id);
+        }
+
+        /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesInteVehicleAsync(long[] ids)
+        {
+            //校验数据 
+            var inteVehicleFreights = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(ids);
+            var hasBinds = inteVehicleFreights.Where(x => x.Qty > 0);
+            if (hasBinds.Any())
+            {
+                //查询是哪些载具
+                var vehicleIds = hasBinds.Select(x => x.VehicleId).Distinct().ToArray();
+                var hasBindVehicles = await _inteVehicleRepository.GetByIdsAsync(vehicleIds);
+
+                throw new CustomerValidationException(nameof(ErrorCode.MES18603)).WithData("codes", string.Join(", ", hasBindVehicles.Select(x => x.Code).Distinct().ToArray()));
+            }
+
+            return await _inteVehicleRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
+        }
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
+        /// <param name="inteVehiclePagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<InteVehicleViewDto>> GetPagedListAsync(InteVehiclePagedQueryDto inteVehiclePagedQueryDto)
+        {
+            var inteVehiclePagedQuery = inteVehiclePagedQueryDto.ToQuery<InteVehiclePagedQuery>();
+            inteVehiclePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _inteVehicleRepository.GetPagedInfoAsync(inteVehiclePagedQuery);
+
+            //实体到DTO转换 装载数据
+            List<InteVehicleViewDto> inteVehicleDtos = PrepareInteVehicleDtos(pagedInfo);
+            return new PagedInfo<InteVehicleViewDto>(inteVehicleDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pagedInfo"></param>
+        /// <returns></returns>
+        private static List<InteVehicleViewDto> PrepareInteVehicleDtos(PagedInfo<InteVehicleView> pagedInfo)
+        {
+            var inteVehicleDtos = new List<InteVehicleViewDto>();
+            foreach (var inteVehicleView in pagedInfo.Data)
+            {
+                var inteVehicleDto = inteVehicleView.ToModel<InteVehicleViewDto>();
+                inteVehicleDtos.Add(inteVehicleDto);
+            }
+
+            return inteVehicleDtos;
         }
 
         /// <summary>
@@ -651,7 +643,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     //获取首条码的物料ID
                     var firstmanuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
                     {
-                        Sfc = firstobj?.BarCode??"",
+                        Sfc = firstobj?.BarCode ?? "",
                         SiteId = _currentSite.SiteId ?? 0
                     });
 

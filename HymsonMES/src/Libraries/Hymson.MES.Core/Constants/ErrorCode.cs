@@ -2015,7 +2015,7 @@
 
 
         #region FQC检验项目 19982
-        public const string MES19982 = "物料{materialCode}检验项目版本{version}已存在，不允许重复添加！";
+        public const string MES19982 = "物料{materialCode}物料版本{materialversion}检验项目版本{version}已存在，不允许重复添加！";
         public const string MES19983 = "已启用状态的检验单不允许被删除！";
         #endregion
 
