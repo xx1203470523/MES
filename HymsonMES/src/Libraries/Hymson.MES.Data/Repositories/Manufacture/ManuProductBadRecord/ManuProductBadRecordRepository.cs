@@ -258,6 +258,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateStatusByIdRangeAsync(IEnumerable<ManuProductBadRecordUpdateCommand> commands)
         {
+            if (commands == null || !commands.Any()) return 0;
+
             using var conn = GetMESDbConnection();
             var rows = await conn.ExecuteAsync(UpdateStatusByIdSql, commands);
             return rows;

@@ -83,6 +83,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public List<ManuSfcProduceEntity> InsertSFCProduceEntities { get; set; } = new();
 
         /// <summary>
+        /// 条码信息（修改）
+        /// </summary>
+        public List<ManuSfcInfoEntity> UpdateSFCInfoEntities { get; set; } = new();
+
+        /// <summary>
         /// 在制品（修改）
         /// </summary>
         public List<ManuSfcProduceEntity> UpdateSFCProduceEntities { get; set; } = new();
@@ -118,6 +123,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 在制品（新增）
         /// </summary>
         public IEnumerable<ManuSfcProduceEntity> InsertSFCProduceEntities { get; set; }
+
+        /// <summary>
+        /// 条码信息（修改）
+        /// </summary>
+        public IEnumerable<ManuSfcInfoEntity> UpdateSFCInfoEntities { get; set; }
 
         /// <summary>
         /// 在制品（修改）

@@ -399,6 +399,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateRangeAsync(IEnumerable<ManuSfcProduceEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entities);
         }

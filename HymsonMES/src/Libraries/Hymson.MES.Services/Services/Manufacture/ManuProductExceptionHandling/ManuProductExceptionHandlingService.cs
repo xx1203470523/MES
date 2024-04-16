@@ -995,6 +995,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var responseSummaryBo = new ReworkResponseSummaryBo
             {
                 InsertSFCProduceEntities = responseBos.SelectMany(s => s.InsertSFCProduceEntities),
+                UpdateSFCInfoEntities = responseBos.SelectMany(s => s.UpdateSFCInfoEntities),
                 UpdateSFCProduceEntities = responseBos.SelectMany(s => s.UpdateSFCProduceEntities),
                 SFCStepEntities = responseBos.SelectMany(s => s.SFCStepEntities),
                 ProductBadRecordEntities = responseBos.SelectMany(s => s.ProductBadRecordEntities),
@@ -1010,6 +1011,9 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 // 插入 manu_sfc_produce
                 _manuSfcProduceRepository.InsertRangeAsync(responseSummaryBo.InsertSFCProduceEntities),
+                
+                // 更新 manu_sfc_info
+                _manuSfcInfoRepository.UpdateRangeAsync(responseSummaryBo.UpdateSFCInfoEntities),
 
                 // 更新 manu_sfc_produce
                 _manuSfcProduceRepository.UpdateRangeAsync(responseSummaryBo.UpdateSFCProduceEntities),
@@ -2027,6 +2031,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var sfcProduceEntity = dataBo.SFCProduceEntities.FirstOrDefault(f => f.SFCId == sfcEntity.Id);
                 if (sfcProduceEntity == null) continue;
 
+                // 修改条码信息
+                sfcInfoEntity.WorkOrderId = workOrderEntity.Id;
+                sfcInfoEntity.ProductId = workOrderEntity.ProductId;
+                sfcInfoEntity.ProcessRouteId = workOrderEntity.ProcessRouteId;
+                sfcInfoEntity.ProductBOMId = workOrderEntity.ProductBOMId;
+                sfcInfoEntity.UpdatedBy = dataBo.UpdatedBy;
+                sfcInfoEntity.UpdatedOn = dataBo.UpdatedOn;
+                responseBo.UpdateSFCInfoEntities.Add(sfcInfoEntity);
+
                 // 修改在制信息
                 sfcProduceEntity.WorkOrderId = workOrderEntity.Id;
                 sfcProduceEntity.WorkCenterId = workOrderEntity.WorkCenterId ?? 0;
@@ -2187,6 +2200,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                 // 产品信息
                 var productEntity = dataBo.ProductEntities.FirstOrDefault(f => f.Id == sfcInfoEntity.ProductId);
                 if (productEntity == null) continue;
+
+                // 修改条码信息
+                sfcInfoEntity.WorkOrderId = workOrderEntity.Id;
+                sfcInfoEntity.ProductId = workOrderEntity.ProductId;
+                sfcInfoEntity.ProcessRouteId = workOrderEntity.ProcessRouteId;
+                sfcInfoEntity.ProductBOMId = workOrderEntity.ProductBOMId;
+                sfcInfoEntity.UpdatedBy = dataBo.UpdatedBy;
+                sfcInfoEntity.UpdatedOn = dataBo.UpdatedOn;
+                responseBo.UpdateSFCInfoEntities.Add(sfcInfoEntity);
 
                 // 新增在制品
                 var sfcProduceEntity = new ManuSfcProduceEntity
