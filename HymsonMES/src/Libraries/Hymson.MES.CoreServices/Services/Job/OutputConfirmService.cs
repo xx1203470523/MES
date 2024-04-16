@@ -1,4 +1,5 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using FluentValidation;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
@@ -13,11 +14,12 @@ using Hymson.Utils;
 namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
-    /// 不良录入
+    /// 打开产出确认
     /// </summary>
-    [Job("不良录入", JobTypeEnum.Standard)]
-    public class BadRecordJobService : IJobService
+    [Job("打开产出确认", JobTypeEnum.Standard)]
+    public class OutputConfirmService : IJobService
     {
+
         /// <summary>
         /// 服务接口（主数据）
         /// </summary>
@@ -34,13 +36,14 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly ILocalizationService _localizationService;
 
 
+
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="localizationService"></param>
-        public BadRecordJobService(
+        public OutputConfirmService(
             IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             ILocalizationService localizationService)
@@ -54,6 +57,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 参数校验
         /// </summary>
         /// <param name="param"></param>
+        /// <param name="proxy"></param> 
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
@@ -85,11 +89,11 @@ namespace Hymson.MES.CoreServices.Services.Job
             await Task.CompletedTask;
             return null;
         }
-
         /// <summary>
         /// 数据组装
         /// </summary>
         /// <param name="param"></param>
+        /// <param name="proxy"></param>
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
@@ -113,18 +117,18 @@ namespace Hymson.MES.CoreServices.Services.Job
         }
 
         /// <summary>
-        /// 执行
+        /// 执行入库
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<JobResponseBo?> ExecuteAsync(object obj)
+        public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
             JobResponseBo responseBo = new();
             if (obj is not BadRecordResponseBo data) return responseBo;
 
             // 面板需要的数据
             List<PanelModuleEnum> panelModules = new();
-            if (data.IsShow) panelModules.Add(PanelModuleEnum.BadRecord);
+            if (data.IsShow) panelModules.Add(PanelModuleEnum.OutPutconConfirm);
             responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
             return await Task.FromResult(responseBo);
         }

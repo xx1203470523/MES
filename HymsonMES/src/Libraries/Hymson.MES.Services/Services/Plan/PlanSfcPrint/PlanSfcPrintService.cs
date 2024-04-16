@@ -210,7 +210,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 work = await _planWorkOrderRepository.GetByIdAsync(createDto.WorkOrderId);
             }
-            _eventBus.PublishDelay(new PrintIntegrationEvent
+            _eventBus.Publish(new PrintIntegrationEvent
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 PrintId = createDto.PrintId,
@@ -225,7 +225,7 @@ namespace Hymson.MES.Services.Services.Plan
                     }
                 },
                 UserName = _currentUser.UserName
-            },10);
+            });
         }
 
         /// <summary>
@@ -411,7 +411,7 @@ namespace Hymson.MES.Services.Services.Plan
                 });
             }
 
-            _eventBus.PublishDelay(new PrintIntegrationEvent
+            _eventBus.Publish(new PrintIntegrationEvent
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 PrintId = parm.PrintId,
@@ -419,7 +419,7 @@ namespace Hymson.MES.Services.Services.Plan
                 ResourceId = parm.ResourceId,
                 BarCodes = barCodes,
                 UserName = _currentUser.UserName
-            }, 1);
+            });
         }
 
         /// <summary>

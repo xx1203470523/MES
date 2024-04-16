@@ -88,6 +88,17 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
                 if (!pagedQuery.Ids.Any()) return defaultReturn;
             }
 
+            if (pagedQueryDto.QualUnqualifiedGroupId.HasValue)
+            {
+                var defaultReturn = new PagedInfo<QualUnqualifiedCodeDto>(new List<QualUnqualifiedCodeDto>(), pagedQuery.PageIndex, pagedQuery.PageSize, 0);
+                var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetListByGroupIdAsync(new QualUnqualifiedCodeQuery
+                {
+                    UnqualifiedGroupId = pagedQueryDto.QualUnqualifiedGroupId,
+                    SiteId = siteId
+                });
+                pagedQuery.Ids = qualUnqualifiedCodeEntities.Select(m => m.Id);
+                if (!pagedQuery.Ids.Any()) return defaultReturn;
+            }
             var pagedInfo = await _qualUnqualifiedCodeRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

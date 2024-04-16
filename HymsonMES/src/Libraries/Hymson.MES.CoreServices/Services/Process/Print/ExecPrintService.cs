@@ -214,6 +214,10 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
             foreach (var groupItem in groups)
             {
                 var procProcedurePrintReleationByMaterialIdEnties = procProcedurePrintReleationEnties.Where(x => x.MaterialId == groupItem.Key);
+                if (procProcedurePrintReleationByMaterialIdEnties == null || !procProcedurePrintReleationByMaterialIdEnties.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10390));
+                }
                 foreach (var procProcedurePrintReleation in procProcedurePrintReleationByMaterialIdEnties)
                 {
                     var rocLabelTemplateEntity = procLabelTemplateEnties.FirstOrDefault(x => x.Id == procProcedurePrintReleation.TemplateId);
@@ -264,4 +268,4 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
             trans.Complete();
         }
     }
-}
+};
