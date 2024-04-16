@@ -2,6 +2,8 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
+using Hymson.MES.Services.Services.Manufacture.ManuOutbound;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
@@ -20,15 +22,19 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         private readonly IManuSfcProduceService _manuSfcProduceService;
         private readonly ILogger<ManuSfcProduceController> _logger;
+        private readonly IManuOutboundService _manuOutboundService;
 
         /// <summary>
         /// 构造函数（条码生产信息（物理删除））
         /// </summary>
         /// <param name="manuSfcProduceService"></param>
         /// <param name="logger"></param>
-        public ManuSfcProduceController(IManuSfcProduceService manuSfcProduceService, ILogger<ManuSfcProduceController> logger)
+        /// <param name="manuOutboundService"></param>
+        public ManuSfcProduceController(IManuSfcProduceService manuSfcProduceService,
+            ILogger<ManuSfcProduceController> logger, IManuOutboundService manuOutboundService)
         {
             _manuSfcProduceService = manuSfcProduceService;
+            _manuOutboundService=manuOutboundService;
             _logger = logger;
         }
 
