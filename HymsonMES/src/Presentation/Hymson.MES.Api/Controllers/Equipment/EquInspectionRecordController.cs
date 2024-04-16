@@ -103,7 +103,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("start")]
-        public async Task<long> StartVerificationAsync(EquInspectionSaveDto requestDto)
+        public async Task<long> StartVerificationAsync(EquInspectionCompleteDto requestDto)
         {
             return await _equInspectionRecordService.StartVerificationAsync(requestDto);
         }

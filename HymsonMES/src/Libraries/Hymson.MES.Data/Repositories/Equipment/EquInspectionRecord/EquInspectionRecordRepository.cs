@@ -132,14 +132,15 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
 
-            sqlBuilder.Select(@"eir.Id,eir.StartExecuTime,eir.InspectionTaskSnapshootId,eit.Code as OrderCode,,ee.EquipmentCode,ee.EquipmentName,eit.WorkCenterId,eit.InspectionType,eit.Type,eir.UpdatedBy,eir.UpdatedOn");
+            sqlBuilder.Select(@"eir.Id,eir.StartExecuTime,eir.InspectionTaskSnapshootId,eit.Code as OrderCode,ee.EquipmentCode,ee.EquipmentName,eit.WorkCenterId,eit.InspectionType,eit.Type,eir.UpdatedBy,eir.UpdatedOn,eit.CompleteTime,iwc.Code as WorkCenterCode");
 
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("eir.UpdatedOn DESC");
+            sqlBuilder.Where("eir.IsDeleted = 0");
+            sqlBuilder.Where("eir.SiteId = @SiteId");
 
             sqlBuilder.InnerJoin("equ_inspection_task_snapshoot eit on eit.Id=eir.InspectionTaskSnapshootId");
             sqlBuilder.LeftJoin("equ_equipment ee on ee.Id=eit.EquipmentId");
+            sqlBuilder.LeftJoin("inte_work_center iwc on iwc.Id=eit.WorkCenterId");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
             {
@@ -149,7 +150,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentName))
             {
                 pagedQuery.EquipmentName = $"%{pagedQuery.EquipmentName}%";
-                sqlBuilder.Where(" ee.EquipmentCode like @EquipmentCode ");
+                sqlBuilder.Where(" ee.EquipmentName like @EquipmentName ");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterCode))
+            {
+                pagedQuery.WorkCenterCode = $"%{pagedQuery.WorkCenterCode}%";
+                sqlBuilder.Where(" iwc.Code like @WorkCenterCode ");
             }
             if (pagedQuery.WorkCenterId.HasValue)
             {
@@ -163,7 +169,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             {
                 sqlBuilder.Where(" eit.Type=@Type ");
             }
-            if (pagedQuery.StartExecuTime.HasValue)
+            if (pagedQuery.StartExecuTime.HasValue&& pagedQuery.StartExecuTime!=DateTime.MinValue)
             {
                 sqlBuilder.Where("eir.StartExecuTime>=@StartExecuTime");
             }

@@ -4,7 +4,7 @@ using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Equipment
 {
-    public class EquInspectionRecordView :BaseEntity
+    public class EquInspectionRecordView : BaseEntity
     {
         public long Id { get; set; }
 
@@ -31,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 工作中心编码
         /// </summary>
-        // public string WorkCenterCode { get; set; }
+        public string WorkCenterCode { get; set; }
 
         /// <summary>
         /// 设备编码
@@ -54,13 +54,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
         public EquInspectionTaskTypeEnum? Type { get; set; }
 
         /// <summary>
-        /// 更新人
+        /// 完成时长（分钟）
         /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
+        public int? CompleteTime { get; set; }
     }
 }

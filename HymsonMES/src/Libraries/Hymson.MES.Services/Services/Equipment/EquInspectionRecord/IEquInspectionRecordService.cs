@@ -62,7 +62,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> StartVerificationAsync(EquInspectionSaveDto saveDto);
+        Task<int> StartVerificationAsync(EquInspectionCompleteDto saveDto);
 
         /// <summary>
         /// 保存校验

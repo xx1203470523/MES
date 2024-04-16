@@ -31,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// <summary>
         /// 工作中心
         /// </summary>
-        //public string? WorkCenterCode { get; set; }
+        public string? WorkCenterCode { get; set; }
 
         /// <summary>
         /// 点检类型 1、日点检 2、周点检

@@ -29,7 +29,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 是否合格
         /// </summary>
-        public TrueOrFalseEnum? IsQualified { get; set; }
+        public bool? IsQualified { get; set; }
 
         /// <summary>
         /// 备注

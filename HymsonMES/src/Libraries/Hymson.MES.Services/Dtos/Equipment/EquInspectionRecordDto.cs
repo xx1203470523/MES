@@ -147,6 +147,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         // public string Remark { get; set; }
 
         /// <summary>
+        /// 完成时长（分钟）
+        /// </summary>
+        public int? CompleteTime { get; set; }
+
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
@@ -214,12 +219,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 是否合格
         /// </summary>
-        public YesOrNoEnum? IsQualified { get; set; }
+        public YesOrNoEnum IsQualified { get; set; } = YesOrNoEnum.Yes;
 
         /// <summary>
         /// 是否通知维修
         /// </summary>
-        public YesOrNoEnum? IsNoticeRepair { get; set; }
+        public YesOrNoEnum IsNoticeRepair { get; set; } = YesOrNoEnum.No;
 
         /// <summary>
         /// 备注
@@ -229,7 +234,33 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 点检项目和结果列表
         /// </summary>
-        public IEnumerable<EquInspectioTaskItemDto> TaskItemDtos { get; set; }
+        public IEnumerable<EquInspectioTaskSaveDto> TaskItemDtos { get; set; }
+    }
+
+    /// <summary>
+    /// 点检记录表Dto
+    /// </summary>
+    public record EquInspectioTaskSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 记录详情Id
+        /// </summary>
+        public long InspectionRecordDetailId { get; set; }
+
+        /// <summary>
+        /// 点检结果
+        /// </summary>
+        public string InspectionResult { get; set; } = "";
+
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public bool? IsQualified { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; } = "";
     }
 
     /// <summary>
@@ -270,7 +301,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 是否合格
         /// </summary>
-        public TrueOrFalseEnum? IsQualified { get; set; }
+        public bool? IsQualified { get; set; }
 
         /// <summary>
         /// 备注
@@ -298,10 +329,10 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public string? EquipmentName { get; set; }
 
-        ///// <summary>
-        ///// 工作中心
-        ///// </summary>
-        //public string? WorkCenterCode { get; set; }
+        /// <summary>
+        /// 工作中心
+        /// </summary>
+        public string? WorkCenterCode { get; set; }
 
         /// <summary>
         /// 工作中心Id

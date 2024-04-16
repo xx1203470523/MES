@@ -178,21 +178,23 @@ namespace Hymson.MES.Services.Services.Equipment
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equInspectionRecordRepository.GetPagedListAsync(pagedQuery);
 
-            IEnumerable<EquInspectionRecordDto> recordDtos = new List<EquInspectionRecordDto>();
+            List<EquInspectionRecordDto> recordDtos = new List<EquInspectionRecordDto>();
             if (pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
                 return new PagedInfo<EquInspectionRecordDto>(recordDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
             }
 
-            var workCenterIds = pagedInfo.Data.Select(x => x.WorkCenterId).ToArray();
-            var workCenterEntities = await _inteWorkCenterRepository.GetByIdsAsync(workCenterIds);
-            foreach (var data in pagedInfo.Data)
-            {
-                var model = data.ToModel<EquInspectionRecordDto>();
-                model.WorkCenterCode = workCenterEntities.FirstOrDefault(x => x.Id == data.WorkCenterId)?.Code ?? "";
-            }
+            var recordList = pagedInfo.Data.Select(s => s.ToModel<EquInspectionRecordDto>());
+            //var workCenterIds = pagedInfo.Data.Select(x => x.WorkCenterId).ToArray();
+            //var workCenterEntities = await _inteWorkCenterRepository.GetByIdsAsync(workCenterIds);
+            //foreach (var data in pagedInfo.Data)
+            //{
+            //    var model = data.ToModel<EquInspectionRecordDto>();
+            //    model.WorkCenterCode = workCenterEntities.FirstOrDefault(x => x.Id == data.WorkCenterId)?.Code ?? "";
+            //    recordDtos.Add(model);
+            //}
 
-            return new PagedInfo<EquInspectionRecordDto>(recordDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<EquInspectionRecordDto>(recordList, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -206,6 +208,12 @@ namespace Hymson.MES.Services.Services.Equipment
             if (entity == null)
             {
                 return null;
+            }
+
+            //任务是否在校验中
+            if (entity.Status != EquInspectionRecordStatusEnum.Inspecting)
+            {
+                await StartVerificationAsync(entity);
             }
 
             var recordId = entity.Id;
@@ -257,7 +265,8 @@ namespace Hymson.MES.Services.Services.Equipment
             });
             foreach (var item in equInspectionItems)
             {
-                var operation = equInspectionRecords.FirstOrDefault(x => x.InspectionTaskDetailSnapshootId == item.Id);
+                var inspectionTaskDetailSnapshootId = equInspectionTaskDetails.FirstOrDefault(x => x.InspectionItemId == item.Id)?.Id ?? 0;
+                var operation = equInspectionRecords.FirstOrDefault(x => x.InspectionTaskDetailSnapshootId == inspectionTaskDetailSnapshootId);
                 taskItemDtos.Add(new EquInspectioTaskItemDto
                 {
                     InspectionRecordDetailId = operation?.Id ?? 0,
@@ -268,7 +277,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     InspectionResult = operation?.InspectionResult ?? "",
                     IsQualified = operation?.IsQualified,
                     Remark = operation?.Remark ?? ""
-                }); ;
+                });
             }
             return operateDto;
         }
@@ -278,7 +287,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> StartVerificationAsync(EquInspectionSaveDto saveDto)
+        public async Task<int> StartVerificationAsync(EquInspectionCompleteDto saveDto)
         {
             // 判断是否有获取到站点码
             if (_currentSite.SiteId == 0)
@@ -294,6 +303,11 @@ namespace Hymson.MES.Services.Services.Equipment
                 throw new CustomerValidationException(nameof(ErrorCode.MES10104));
             }
 
+            return await StartVerificationAsync(recordEntity);
+        }
+
+        private async Task<int> StartVerificationAsync(EquInspectionRecordEntity recordEntity)
+        {
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
