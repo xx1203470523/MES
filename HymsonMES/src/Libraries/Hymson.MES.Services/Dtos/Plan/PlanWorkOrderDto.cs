@@ -6,6 +6,7 @@
  *build datetime: 2023-03-20 09:39:21
  */
 
+using FluentValidation.Validators;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
@@ -305,6 +306,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
         /// </summary>
         public PlanWorkOrderStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
+        /// </summary>
+        public IEnumerable<PlanWorkOrderStatusEnum>? InStatus { get; set; }
 
         /// <summary>
         /// 计划开始时间  时间范围  数组

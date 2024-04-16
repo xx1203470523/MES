@@ -179,7 +179,7 @@
         /// <summary>
         /// NG代码
         /// </summary>
-        public string NCCode { get; set; } = string.Empty;
+        public string NGCode { get; set; } = string.Empty;
         public decimal? UnqualifiedQty { get; set; }
     }
 

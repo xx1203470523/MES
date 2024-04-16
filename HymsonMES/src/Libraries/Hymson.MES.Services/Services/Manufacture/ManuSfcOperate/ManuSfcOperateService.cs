@@ -262,7 +262,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 不合格代码
             if (request.FailInfo != null && request.FailInfo.Any())
             {
-                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode,UnqualifiedQty= s.UnqualifiedQty });
+                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode, UnqualifiedQty= s.UnqualifiedQty });
             }
 
             _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
@@ -314,7 +314,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 // 不合格代码
                 if (item.FailInfo != null && item.FailInfo.Any())
                 {
-                    outStationRequestBo.OutStationUnqualifiedList = item.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode,UnqualifiedQty = s.UnqualifiedQty });
+                    outStationRequestBo.OutStationUnqualifiedList = item.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode, UnqualifiedQty = s.UnqualifiedQty });
                 }
 
                 outStationRequestBos.Add(outStationRequestBo);
@@ -393,7 +393,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 不合格代码
             if (request.FailInfo != null && request.FailInfo.Any())
             {
-                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode });
+                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode });
             }
 
             _ = await _manuPassStationService.OutStationRangeByVehicleAsync(new VehicleOutStationBo
