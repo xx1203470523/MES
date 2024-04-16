@@ -334,7 +334,6 @@ namespace Hymson.MES.Services.Services.Quality
                     SiteId = command.SiteId,
                     MaterialId = command.MaterialId,
                     Version = command.Version,
-                    Status = command.Status,
                 };
                 //相同的物料版本 + 物料 + 检验项目版本
                 var Entity = await _qualFqcParameterGroupRepository.GetEntityAsync(projectCode);
@@ -431,7 +430,6 @@ namespace Hymson.MES.Services.Services.Quality
                     SiteId = command.SiteId,
                     MaterialId = command.MaterialId,
                     Version = command.Version,
-                    Status = command.Status,
                 };
                 //相同的物料版本 + 物料 + 检验项目版本
                 var Entity = await _qualFqcParameterGroupRepository.GetEntityAsync(projectCode);
