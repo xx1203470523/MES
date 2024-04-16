@@ -449,7 +449,7 @@
         public const string MES11709 = "FQC检验项目，没有配置标准参数，qual_fqc_parameter_group_detail=>ParameterId={Id}";
         public const string MES11710 = "检验单号生成失败：FQC类型编码规则未维护！";
         public const string MES11711 = "检验单号生成失败：编码规则错误，不允许同时存在多条FQC类型编码规则！";
-    
+
         public const string MES11712 = "{SFC}，条码不正确，不存在FQC检验单条码记录表中";
         public const string MES11713 = "条码{sfc}所在检验单{fqcOrder}未关闭";
         public const string MES11714 = "保存检验单附件时，查找FQC检验单数据不存在";
@@ -1391,7 +1391,7 @@
         public const string MES16905 = "找不到实际物料{materialCode}对应的数据收集方式!";
 
         public const string MES16908 = "物料条码【{barCode}】库存不存在！";
-        public const string MES16909 = "物料条码【{barCode}】库存不足,请检查！";
+        public const string MES16909 = "物料条码【{barCode}】库存不足，请检查！";
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
 
@@ -1399,6 +1399,8 @@
         public const string MES16914 = "未找到能挂载物料条码的主物料!";
         public const string MES16915 = "物料条码【{barCode}】需选择要挂载的上料点！";
         public const string MES16916 = "面板详细信息为空!";
+        public const string MES16917 = "物料条码【{BarCode}】剩余库存为【{QuantityResidue}】，上料数量不足【{Quantity}】，请检查！";
+        public const string MES16918 = "物料条码【{BarCode}】状态为【{Status}】，不允许上料，请检查！";
         #endregion
 
         #region 条码打印 MES17000

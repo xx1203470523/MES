@@ -192,6 +192,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string BarCode { get; set; }
 
         /// <summary>
+        /// 上料数量
+        /// </summary>
+        public decimal Quantity { get; set; }
+
+        /// <summary>
         /// 全部主物料ID集合
         /// </summary>
         public IEnumerable<long>? MaterialIds { get; set; }

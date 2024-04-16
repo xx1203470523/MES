@@ -1952,7 +1952,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var inventorySFCEntities = dataBo.SFCEntities.Where(w => reworkIemDtos.Select(s => s.BarCode).Contains(w.SFC) && w.Type == SfcTypeEnum.NoProduce);
             if (inventorySFCEntities != null && inventorySFCEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15453)).WithData("barCode", inventorySFCEntities.Select(s => s.SFC));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15453)).WithData("barCode", string.Join(",", inventorySFCEntities.Select(s => s.SFC)));
             }
 
             // 遍历所有条码

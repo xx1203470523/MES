@@ -429,10 +429,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 BarCode = saveDto.BarCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16908)).WithData("barCode", saveDto.BarCode);
 
-            // 是否有剩余数量
-            if (inventory.QuantityResidue <= 0)
+            // 判断物料条码是否可以上料（状态;锁定/报废）
+            if (inventory.Status == WhMaterialInventoryStatusEnum.Locked || inventory.Status == WhMaterialInventoryStatusEnum.Scrap)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16909)).WithData("barCode", saveDto.BarCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16918))
+                    .WithData("BarCode", saveDto.BarCode)
+                    .WithData("Status", inventory.Status.GetDescription());
             }
 
             // 是否过期
@@ -441,6 +443,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 throw new CustomerValidationException(nameof(ErrorCode.MES15508))
                     .WithData("BarCode", saveDto.BarCode)
                     .WithData("DueDate", inventory.DueDate.Value);
+            }
+
+            // 是否有剩余数量
+            if (inventory.QuantityResidue <= 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16909)).WithData("barCode", saveDto.BarCode);
+            }
+
+            // 检验传入的上料数量是否足够
+            if (saveDto.Quantity <= 0 || saveDto.Quantity > inventory.QuantityResidue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16917))
+                    .WithData("BarCode", saveDto.BarCode)
+                    .WithData("QuantityResidue", inventory.QuantityResidue)
+                    .WithData("Quantity", saveDto.Quantity);
             }
 
             // 当是上料点类型时，一定要选择具体挂载的上料点
@@ -475,21 +492,45 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 如果有设置物料，就用设置的物料
             if (saveDto.ProductId.HasValue) materials = materials.Where(w => w.Id == saveDto.ProductId.Value);
 
-            // DTO转换实体
-            var entity = saveDto.ToEntity<ManuFeedingEntity>();
-            entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = _currentUser.UserName;
-            entity.UpdatedBy = _currentUser.UserName;
-            entity.SiteId = _currentSite.SiteId ?? 0;
-            entity.MaterialId = inventory.MaterialId;
-            entity.SupplierId = inventory.SupplierId;
-            entity.MaterialType = inventory.MaterialType;
-            entity.WorkOrderId = inventory.WorkOrderId;
-            entity.LoadSource = saveDto.Source;
+            // 先查询下当前条码是否加载过
+            var feedingEntity = await _manuFeedingRepository.GetByBarCodeAsync(new EntityByCodeQuery
+            {
+                Site = inventory.SiteId,
+                Code = saveDto.BarCode,
+            });
 
+            ManuFeedingEntity? entity = null;
+            if (feedingEntity == null)
+            {
+                // DTO转换实体
+                entity = saveDto.ToEntity<ManuFeedingEntity>();
+                entity.Id = IdGenProvider.Instance.CreateId();
+                entity.CreatedBy = _currentUser.UserName;
+                entity.UpdatedBy = _currentUser.UserName;
+                entity.SiteId = inventory.SiteId;
+                entity.MaterialId = inventory.MaterialId;
+                entity.SupplierId = inventory.SupplierId;
+                entity.MaterialType = inventory.MaterialType;
+                entity.WorkOrderId = inventory.WorkOrderId;
+                entity.LoadSource = saveDto.Source;
+            }
+            else
+            {
+                entity = feedingEntity;
+                entity.UpdatedBy = _currentUser.UserName;
+                entity.UpdatedOn = HymsonClock.Now();
+            }
+
+            if (entity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16910));
+
+            /*
             // 一次性上完料
             entity.InitQty = inventory.QuantityResidue;
-            entity.Qty += entity.InitQty;
+            */
+
+            // 指定上料数量
+            entity.InitQty = saveDto.Quantity;
+            entity.Qty += saveDto.Quantity;
 
             // 匹配物料
             var bo = new ManuFeedingMatchBo
@@ -515,14 +556,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 当有上料点值时，判断物料条码是否已上到该上料点
             if (entity.FeedingPointId.HasValue)
             {
-                var feedingEntity = await _manuFeedingRepository.GetByBarCodeAndMaterialIdAsync(new GetByBarCodeAndMaterialIdQuery
+                var feedingPointEntity = await _manuFeedingRepository.GetByBarCodeAndMaterialIdAsync(new GetByBarCodeAndMaterialIdQuery
                 {
                     FeedingPointId = entity.FeedingPointId.Value,
                     ProductId = entity.ProductId,
                     BarCode = entity.BarCode
                 });
 
-                if (feedingEntity != null)
+                if (feedingPointEntity != null && feedingPointEntity.Id != entity.Id)
                 {
                     _logger.LogWarning($"MES15507 -> FeedingPointId:{entity.FeedingPointId.Value},ProductId:{entity.ProductId},BarCode:{entity.BarCode}");
                     throw new CustomerValidationException(nameof(ErrorCode.MES15507)).WithData("BarCode", entity.BarCode);
@@ -542,7 +583,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 MaterialVersion = material.Version ?? "",
                 MaterialBarCode = saveDto.BarCode,
                 Batch = inventory.Batch,
-                Quantity = entity.InitQty,
+                Quantity = saveDto.Quantity,
                 Unit = material.Unit ?? "",
                 Type = WhMaterialInventoryTypeEnum.MaterialLoading,
                 Source = inventory.Source,
@@ -552,11 +593,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 UpdatedOn = entity.UpdatedOn
             });
 
-            // 将状态恢复为"使用中"
+            // 将状态更新为"使用中"
             rows += await _whMaterialInventoryRepository.UpdatePointByBarCodeAsync(new UpdateStatusByBarCodeCommand
             {
                 BarCode = saveDto.BarCode,
-                QuantityResidue = inventory.QuantityResidue - entity.InitQty,
+                Quantity = -saveDto.Quantity,
                 Status = WhMaterialInventoryStatusEnum.InUse,
                 UpdatedBy = entity.CreatedBy,
                 UpdatedOn = entity.CreatedOn
@@ -573,7 +614,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 ProductId = entity.ProductId,
                 ProductCode = material.MaterialCode,
                 Version = material.Version ?? "",
-                Qty = inventory.QuantityResidue,
+                Qty = entity.InitQty,
                 BarCode = inventory.MaterialBarCode,
                 CreatedBy = entity.CreatedBy,
                 CreatedOn = entity.CreatedOn
@@ -641,7 +682,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 updateStatusByBarCodeCommands.Add(new UpdateStatusByBarCodeCommand
                 {
                     BarCode = entity.BarCode,
-                    QuantityResidue = entity.Qty,
+                    Quantity = entity.Qty,
                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                     UpdatedBy = entity.UpdatedBy,
                     UpdatedOn = entity.UpdatedOn

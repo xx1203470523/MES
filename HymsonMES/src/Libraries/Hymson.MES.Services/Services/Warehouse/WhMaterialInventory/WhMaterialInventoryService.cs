@@ -414,8 +414,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                 BarCode = barCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES152017)).WithData("Code", barCode);
 
+            /*
             // 只有【待使用】的库存才能上料！
             if (entity.Status != WhMaterialInventoryStatusEnum.ToBeUsed) throw new CustomerValidationException(nameof(ErrorCode.MES152018));
+            */
 
             return entity.ToModel<WhMaterialInventoryDto>();
         }

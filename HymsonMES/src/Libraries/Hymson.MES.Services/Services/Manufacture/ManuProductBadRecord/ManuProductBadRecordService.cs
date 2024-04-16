@@ -468,7 +468,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             updateStatusByBarCodeCommands.Add(new UpdateStatusByBarCodeCommand
                             {
                                 BarCode = sfc,
-                                QuantityResidue = whMaterialInventoryEntity.QuantityResidue,
+                                Quantity = whMaterialInventoryEntity.QuantityResidue,
                                 Status = WhMaterialInventoryStatusEnum.Scrap,
                                 UpdatedBy = _currentUser.UserName,
                                 UpdatedOn = HymsonClock.Now()
