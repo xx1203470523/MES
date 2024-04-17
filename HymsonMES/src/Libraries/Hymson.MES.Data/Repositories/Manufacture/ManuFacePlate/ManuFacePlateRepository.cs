@@ -248,7 +248,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_face_plate`  WHERE Code = @Code  and Status=@Status    and IsDeleted=0 AND SiteId=@SiteId ";
 
-        const string IsExistsSql = "SELECT Id FROM manu_face_plate WHERE `IsDeleted` = 0 AND Code = @Code AND Id != @id LIMIT 1";
+        const string IsExistsSql = "SELECT Id FROM manu_face_plate WHERE `IsDeleted` = 0 AND Code = @Code AND SiteId = @Id";
         #endregion
 
         const string UpdateStatusSql = "UPDATE `manu_face_plate` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
