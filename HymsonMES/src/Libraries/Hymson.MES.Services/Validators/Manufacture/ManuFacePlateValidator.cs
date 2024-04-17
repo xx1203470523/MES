@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES17207));
             RuleFor(x => x).MustAsync(async (manuFacePlate, cancellation) =>
             {
-                var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code.Trim(), 0);
+                var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code.Trim(), manuFacePlate.SiteId);
                 return !isExists;
             }).WithErrorCode(nameof(ErrorCode.MES17205));
             RuleFor(x => x.ConversationTime).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES17212));
