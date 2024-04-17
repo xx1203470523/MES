@@ -229,7 +229,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <summary>
         /// 投入数量
         /// </summary>
-        public string InputQty { get; set; }
+        public decimal InputQty { get; set; }
 
         /// <summary>
         /// 完工数量
