@@ -279,7 +279,17 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
                     trans.Complete();
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception ex) {
+                if (ex.Message.Contains("Duplicate"))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES11720));
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES11721), ex.Message);
+                }
+                
+            }
 
             return rows;
         }

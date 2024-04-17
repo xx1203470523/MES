@@ -459,6 +459,8 @@
         public const string MES11717 = "检验单明细为空！";
         public const string MES11718 = "{materialId}参数项目为空检验单明细为空！";
         public const string MES11719 = "记录数量小于批次数量，不予生成";
+        public const string MES11720 = "重复提交，条码已存在FQC检验单条码记录表中!";
+        public const string MES11721 = "FQC创建保存错误!";
 
 
 
