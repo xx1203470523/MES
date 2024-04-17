@@ -3,7 +3,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -259,6 +258,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateStatusByIdRangeAsync(IEnumerable<ManuProductBadRecordUpdateCommand> commands)
         {
+            if (commands == null || !commands.Any()) return 0;
+
             using var conn = GetMESDbConnection();
             var rows = await conn.ExecuteAsync(UpdateStatusByIdSql, commands);
             return rows;

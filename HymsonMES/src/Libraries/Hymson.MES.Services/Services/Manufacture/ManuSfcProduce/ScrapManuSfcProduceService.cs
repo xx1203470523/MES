@@ -5,7 +5,6 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcScrap.Command;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -34,7 +33,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
             //条码表
-            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 0 });
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SFCs = parm.Sfcs,
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = SfcTypeEnum.Produce
+            });
             //条码信息表
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcEntities.Select(x => x.Id));
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };
@@ -195,7 +199,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 //1.条码信息表
                 rows += await _manuSfcRepository.ManuSfcScrapByIdsAsync(scrapByIdCommands);
 
-                if (rows != parm.Sfcs.Length)
+                if (rows != parm.Sfcs.Count())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15419));
                 }
@@ -230,7 +234,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             }
 
             //条码表
-            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 0 });
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SFCs = parm.Sfcs,
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = SfcTypeEnum.Produce
+            });
             //条码信息表
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfcEntities.Select(x => x.Id));
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = parm.Sfcs, SiteId = _currentSite.SiteId ?? 00 };

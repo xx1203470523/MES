@@ -80,6 +80,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 当前数量
         /// </summary>
         public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SfcStatusEnum Status { get; set; }
     }
 
     /// <summary>
@@ -122,7 +127,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 打印机id
         /// </summary>
-        public long PrintId { get; set; }
+        public long? PrintId { get; set; }
 
         /// <summary>
         /// 工单ID

@@ -46,7 +46,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
         /// <summary>
         /// 打印机id
         /// </summary>
-        public long PrintId { get; set; }
+        public long? PrintId { get; set; }
 
         /// <summary>
         /// 工序ID

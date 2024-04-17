@@ -13,6 +13,16 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public string Sorting { get; set; } = "CreatedOn DESC";
 
         /// <summary>
+        /// 条码
+        /// </summary>
+        public string? Barcode { get; set; }
+
+        /// <summary>
+        /// 条码集合
+        /// </summary>
+        public IEnumerable<string>? Barcodes { get; set; }
+
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }

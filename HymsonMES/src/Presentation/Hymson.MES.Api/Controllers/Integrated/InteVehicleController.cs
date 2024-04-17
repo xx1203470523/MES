@@ -66,9 +66,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("create")]
         [LogDescription("载具注册", BusinessType.INSERT)]
         [PermissionDescription("inte:inteVehicle:insert")]
-        public async Task AddInteVehicleAsync([FromBody] InteVehicleCreateDto parm)
+        public async Task<long> AddInteVehicleAsync([FromBody] InteVehicleCreateDto parm)
         {
-            await _inteVehicleService.CreateInteVehicleAsync(parm);
+            return await _inteVehicleService.CreateInteVehicleAsync(parm);
         }
 
         /// <summary>
@@ -165,8 +165,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("unbindVehicle")]
         public async Task UnbindVehicleAsync(InteVehicleUnbindOperationDto dto)
         {
-
-
             // await _inteVehicleService.VehicleOperationAsync(dto);
             await _inteVehicleService.VehicleUnBindOperationAsync(dto);
         }
@@ -186,5 +184,15 @@ namespace Hymson.MES.Api.Controllers.Integrated
             await _inteVehicleService.VehicleClearOperationAsync(dto);
         }
 
+        /// <summary>
+        /// 通过托盘码获取托盘视图信息(PDA)
+        /// </summary>
+        /// <param name="palletNo"></param>
+        /// <returns></returns>
+        [HttpGet("getVehicleFreightByPalletNo/pda/{palletNo}")]
+        public async Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordByPalletNoPDAAsync(string palletNo)
+        {
+            return await _inteVehicleService.QueryVehicleFreightRecordByPalletNoAsync(palletNo);
+        }
     }
 }

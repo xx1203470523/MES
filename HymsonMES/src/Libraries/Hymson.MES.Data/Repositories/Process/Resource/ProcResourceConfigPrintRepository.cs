@@ -7,11 +7,14 @@
  */
 
 using Dapper;
+using Hymson.DbConnection.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
+using ConnectionOptions = Hymson.MES.Data.Options.ConnectionOptions;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -51,16 +54,18 @@ namespace Hymson.MES.Data.Repositories.Process
             return new PagedInfo<ProcResourceConfigPrintView>(procResourceConfigPrintEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
+
         /// <summary>
-        /// 根据资源id和打印机Id查询数据
-        /// </summary>
-        /// <param name="query"></param>
+        /// 根据资源id查询数据
+        /// </summary> 
+        /// <param name="resourceId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcResourceConfigPrintEntity>> GetByResourceIdAsync(ProcResourceConfigPrintQuery query)
+        public async Task<IEnumerable<ProcResourceConfigPrintEntity>> GetByResourceIdAsync(long resourceId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ProcResourceConfigPrintEntity>(GetByResourceIdSql, new { ResourceId = query.ResourceId, Ids = query.Ids });
+            return await conn.QueryAsync<ProcResourceConfigPrintEntity>(GetByResourceIdSql, new { ResourceId = resourceId });
         }
+
         public async Task<IEnumerable<ProcResourceConfigPrintEntity>> GetByPrintIdAsync(ProcResourceConfigPrintQuery query)
         {
             using var conn = GetMESDbConnection();
@@ -121,7 +126,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateSql = "UPDATE `proc_resource_config_print` SET  PrintId=@PrintId,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id=@Id ";
         const string DeleteSql = "UPDATE `proc_resource_config_print` SET IsDeleted = '1' WHERE Id in @Ids ";
         const string DeleteByResourceIdSql = "delete from `proc_resource_config_print` WHERE ResourceId = @ResourceId ";
-        const string GetByResourceIdSql = "SELECT * FROM proc_resource_config_print where ResourceId=@ResourceId and PrintId  IN @Ids AND IsDeleted =0 ";
+        const string GetByResourceIdSql = "SELECT * FROM proc_resource_config_print where ResourceId=@ResourceId AND IsDeleted =0 ";
         const string GetByPrintIdSql = "SELECT * FROM proc_resource_config_print where  PrintId  IN @Ids AND IsDeleted =0 ";
     }
 }

@@ -28,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcResourceConfigPrintEntity>> GetByResourceIdAsync(ProcResourceConfigPrintQuery query);
+        Task<IEnumerable<ProcResourceConfigPrintEntity>> GetByResourceIdAsync(long resourceId);
         /// <summary>
         /// 根据打印机Id查询数据
         /// </summary>

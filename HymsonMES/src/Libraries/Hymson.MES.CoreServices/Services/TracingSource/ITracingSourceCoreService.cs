@@ -1,4 +1,5 @@
-﻿using Hymson.MES.CoreServices.Bos.Common;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.CoreServices.Services
@@ -8,6 +9,13 @@ namespace Hymson.MES.CoreServices.Services
     /// </summary>
     public interface ITracingSourceCoreService
     {
+        /// <summary>
+        /// 条码追溯（反向）  原始数据 平铺数据 没经过加工的树
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSFCNodeEntity>> OriginalSourceAsync(EntityBySFCQuery query);
+
         /// <summary>
         /// 条码追溯（反向）
         /// </summary>

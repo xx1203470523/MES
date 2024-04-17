@@ -53,7 +53,19 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 设备误判
         /// </summary>
         [Description("设备误判")]
-        Misjudgment = 8
+        Misjudgment = 8,
+
+        /// <summary>
+        /// 返工
+        /// </summary>
+        [Description("返工")]
+        Rework = 9,
+
+        /// <summary>
+        /// 让步接收
+        /// </summary>
+        [Description("让步接收")]
+        Compromise = 10
 
     }
 }

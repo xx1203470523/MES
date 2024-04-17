@@ -158,7 +158,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             _localizationService = localizationService;
         }
 
-
         /// <summary>
         /// 参数校验
         /// </summary>
@@ -280,7 +279,12 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 条码信息
             //var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));
-            var manuSFCEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetByIdsAsync, sfcProduceEntities.Select(s => s.SFCId));
+            var manuSFCEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetListAsync,
+                new ManuSfcQuery
+                {
+                    Ids = sfcProduceEntities.Select(s => s.SFCId)
+                }
+              );
             if (manuSFCEntities == null || !manuSFCEntities.Any()) return default;
 
             // 全部物料加载数据
@@ -705,6 +709,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         Batch = "",//自制品 没有
                         MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                         QuantityResidue = sfcProduceEntity.Qty,
+                        ScrapQty = sfcProduceEntity.ScrapQty,
                         Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                         Source = MaterialInventorySourceEnum.ManuComplete,
                         SiteId = commonBo.SiteId,
@@ -1537,7 +1542,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             foreach (var item in outStationRequestBos)
             {
                 if (item.OutStationUnqualifiedList == null || !item.OutStationUnqualifiedList.Any()) continue;
-                unqualifiedCodes.AddRange((IEnumerable<string>)item.OutStationUnqualifiedList.SelectMany(s => s.UnqualifiedCode));
+                unqualifiedCodes.AddRange(item.OutStationUnqualifiedList.Select(s => s.UnqualifiedCode));
             }
 
             // 如果有传不合格代码，读取能跟数据库对应上的不合格代码

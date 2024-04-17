@@ -187,12 +187,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="ManuSfcInfoEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<ManuSfcInfoEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, ManuSfcInfoEntitys);
+            return await conn.ExecuteAsync(UpdatesSql, entities);
+        }
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateRangeAsync(IEnumerable<ManuSfcInfoEntity> entities)
+        {
+            if (entities == null || !entities.Any()) return 0;
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateRangeSql, entities);
         }
 
         /// <summary>
@@ -385,6 +398,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateSql = "UPDATE `manu_sfc_info` SET   SiteId = @SiteId, SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_sfc_info` SET   SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateRangeSql = "UPDATE manu_sfc_info SET WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
 
         const string DeleteSql = "UPDATE `manu_sfc_info` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc_info` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

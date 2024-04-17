@@ -157,7 +157,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 类型
         /// </summary>
-        public  QualUnqualifiedCodeTypeEnum ? Type { get; set; }
+        public QualUnqualifiedCodeTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 等级
@@ -263,5 +263,25 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 等级
         /// </summary>
         public QualUnqualifiedCodeDegreeEnum? Degree { get; set; }
+
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public string? OrUnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不合格代码名称
+        /// </summary>
+        public string? OrUnqualifiedCodeName { get; set; }
+
+        /// <summary>
+        /// 不合格代码组id
+        /// </summary>
+        public long? QualUnqualifiedGroupId { get; set; }
     }
 }

@@ -19,6 +19,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Linq;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -64,15 +65,16 @@ namespace Hymson.MES.Services.Services.Plan
         {
             //检查当前这些工单 是否属于当前资源对应的线体
             var workCenterEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(bindActivationWorkOrder.ResourceId);
-            if (workCenterEntity == null) 
+            if (workCenterEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16803));
             }
 
-            if (workCenterEntity.Type != WorkCenterTypeEnum.Line) 
+            if (workCenterEntity.Type != WorkCenterTypeEnum.Line)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16801));
             }
+
 
             if (bindActivationWorkOrder.WorkOrderIds != null && bindActivationWorkOrder.WorkOrderIds.Any())
             {
@@ -94,6 +96,14 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16802));
                 }
+                //检查工单站点
+                var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(bindActivationWorkOrder.WorkOrderIds);
+                var firstEntity = planWorkOrderEntities.First();
+                if (firstEntity.SiteId != _currentSite.SiteId)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16805));
+                }
+
             }
 
             //查询已经绑定在该资源上的工单

@@ -16,6 +16,11 @@ namespace Hymson.MES.Core.Enums
         /// 设备API
         /// </summary>
         [Description("设备API")]
-        EquipmentApi = 2
+        EquipmentApi = 2,
+        /// <summary>
+        /// PDA
+        /// </summary>
+        [Description("PDA")]
+        PDA = 3
     }
 }

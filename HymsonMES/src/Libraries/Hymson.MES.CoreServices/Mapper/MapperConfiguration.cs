@@ -72,6 +72,9 @@ namespace Hymson.MES.CoreServices.Mapper
 
             CreateMap<QualFqcParameterGroupEntity, QualFqcParameterGroupSnapshootEntity>();
             CreateMap<QualFqcParameterGroupDetailEntity, QualFqcParameterGroupDetailSnapshootEntity>();
+
+            CreateMap<QualEnvParameterGroupEntity, QualEnvParameterGroupSnapshootEntity>();
+            CreateMap<QualEnvParameterGroupDetailEntity, QualEnvParameterGroupDetailSnapshootEntity>();
         }
 
         /// <summary>

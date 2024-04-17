@@ -57,82 +57,82 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 检验单号
         /// </summary>
         public string InspectionOrder { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// FQC检验参数组快照Id
         /// </summary>
         public long GroupSnapshootId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单Id
         /// </summary>
         public long? WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料Id
         /// </summary>
         public long MaterialId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 样本数量
         /// </summary>
         public int SampleQty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态(1-待检验 2-检验中 3-已检验 4-已关闭)
         /// </summary>
-        public bool Status { get; set; }
+        public InspectionStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否合格(0-否 1-是)
         /// </summary>
-        public bool? IsQualified { get; set; }
+        public TrueOrFalseEnum? IsQualified { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否为预生成单(0-否 1-是)
         /// </summary>
-        public bool IsPreGenerated { get; set; }
+        public TrueOrFalseEnum IsPreGenerated { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -145,77 +145,77 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 检验单号
         /// </summary>
         public string InspectionOrder { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// FQC检验参数组快照Id
         /// </summary>
         public long GroupSnapshootId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单Id
         /// </summary>
         public long? WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料Id
         /// </summary>
         public long MaterialId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 样本数量
         /// </summary>
         public int SampleQty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态(1-待检验 2-检验中 3-已检验 4-已关闭)
         /// </summary>
         public InspectionStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否合格(0-否 1-是)
         /// </summary>
         public TrueOrFalseEnum? IsQualified { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否为预生成单(0-否 1-是)
         /// </summary>
         public TrueOrFalseEnum? IsPreGenerated { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
@@ -275,12 +275,23 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string OrderCode { get; set; }
 
+        /// <summary>
+        /// 状态;1、待检验2、检验中3、已检验4、已关闭
+        /// </summary>
+        public string StatusText { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public string IsQualifiedText { get; set; }
+
     }
 
     /// <summary>
     /// FQC检验单分页Dto
     /// </summary>
-    public class QualFqcOrderPagedQueryDto : PagerInfo {
+    public class QualFqcOrderPagedQueryDto : PagerInfo
+    {
 
         /// <summary>
         /// 检验单号
@@ -291,6 +302,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 物料编码
         /// </summary>
         public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string? OrderCode { get; set; }
 
         /// <summary>
         /// 物料名称
@@ -315,7 +331,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式
         /// </summary>
-        public IQCHandMethodEnum? HandMethod { get; set; }
+        public FQCHandMethodEnum? HandMethod { get; set; }
     }
 
 
@@ -402,12 +418,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检验器具
         /// </summary>
-        public IQCUtensilTypeEnum Utensil { get; set; }
+        //public IQCUtensilTypeEnum Utensil { get; set; }
 
         /// <summary>
         /// 小数位数
         /// </summary>
-        public int? Scale { get; set; }
+        //public int? Scale { get; set; }
 
         /// <summary>
         /// 规格下限
@@ -415,9 +431,19 @@ namespace Hymson.MES.Services.Dtos.Quality
         public decimal UpperLimit { get; set; }
 
         /// <summary>
+        /// 参考值
+        /// </summary>
+        public string ReferenceValue { get; set; }
+
+        /// <summary>
         /// 规格中心
         /// </summary>
-        public decimal Center { get; set; }
+        public decimal? CenterValue { get; set; }
+
+        /// <summary>
+        /// 输入次数
+        /// </summary>
+        public int EnterNumber { get; set; }
 
         /// <summary>
         /// 规格上限
@@ -428,6 +454,16 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 是否合格;0、不合格 1、合格
         /// </summary>
         public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
+        /// 是否设备采集
+        /// </summary>
+        public TrueOrFalseEnum IsDeviceCollect { get; set; }
+
+        /// <summary>
+        /// 显示顺序
+        /// </summary>
+        public int DisplayOrder { get; set; }
 
         /// <summary>
         /// 检验类型;1、常规检验2、外观检验3、包装检验4、特殊性检验5、破坏性检验
@@ -493,6 +529,148 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public OrderOperateTypeEnum OperationType { get; set; }
 
+    }
+
+
+    /// <summary>
+    ///检验单新增/更新Dto
+    /// </summary>
+    public record QualFqcOrderSampleSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long FQCOrderId { get; set; }
+
+        /// <summary>
+        /// 样品条码
+        /// </summary>
+        public string Barcode { get; set; }
+
+        /// <summary>
+        /// 样品参数
+        /// </summary>
+        public IEnumerable<QualFqcOrderParameterSaveDto> Details { get; set; }
+
+    }
+
+    public record QualFqcOrderParameterSaveDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 检验值
+        /// </summary>
+        public string? InspectionValue { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 参数附件
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
+
+    }
+
+
+    /// <summary>
+    /// FQC 已检更新明细Dto
+    /// </summary>
+    public record FQCParameterDetailSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
+        /// 检测值
+        /// </summary>
+        public string? InspectionValue { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 附件集合
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+
+    }
+
+
+    /// <summary>
+    /// 完成Dto
+    /// </summary>
+    public record QualFqcOrderCompleteDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long FQCOrderId { get; set; }
+
+    }
+
+    /// <summary>
+    /// 附件保存dto
+    /// </summary>
+    public record QualFqcOrderSaveAttachmentDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long FQCOrderId { get; set; }
+
+        /// <summary>
+        /// 检验单（附件）
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+
+    }
+
+    /// <summary>
+    /// FQC检验参数组快照输出
+    /// 执行检验查询
+    /// </summary>
+    public record QualFqcParameterGroupSnapshootOut
+    {
+        /// <summary>
+        /// 参数集编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 样本数量
+        /// </summary>
+        public int SampleQty { get; set; }
+
+        /// <summary>
+        /// 已检数量
+        /// </summary>
+        public int CheckedQty { get; set; }
     }
 
 }

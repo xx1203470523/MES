@@ -53,5 +53,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 状态;1：排队；2：活动；
         /// </summary>
         public SfcStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 当前数量
+        /// </summary>
+        public decimal Qty { get; set; }
     }
 }

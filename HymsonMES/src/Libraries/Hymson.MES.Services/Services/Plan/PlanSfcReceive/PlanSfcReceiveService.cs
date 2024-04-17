@@ -8,10 +8,10 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Dtos.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -129,7 +129,12 @@ namespace Hymson.MES.Services.Services.Plan
                 BarCodes = planSfcInfoCreateDto.SFCs,
                 SiteId = _currentSite.SiteId ?? 0
             });
-            var manuSfcList = await _manuSfcRepository.GetBySFCsAsync(planSfcInfoCreateDto.SFCs);
+            var manuSfcList = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SiteId = _currentSite.SiteId,
+                SFCs = planSfcInfoCreateDto.SFCs,
+                Type = SfcTypeEnum.Produce
+            });
             //TODO  考虑库存中是否存放工单字段 王克明
             IEnumerable<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
             var sfcids = manuSfcList.Select(x => x.Id).ToList();
@@ -214,7 +219,7 @@ namespace Hymson.MES.Services.Services.Plan
                         }
                         qty = whMaterialInventoryEntity.QuantityResidue;
                     }
-                    if (manuSfcEntity != null &&  ManuSfcStatus.SfcStatusInProcess.Contains(manuSfcEntity.Status))
+                    if (manuSfcEntity != null && ManuSfcStatus.SfcStatusInProcess.Contains(manuSfcEntity.Status))
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -360,7 +365,12 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
-            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery { SFC = param.SFC, SiteId = _currentSite.SiteId ?? 0 });
+            var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
+            {
+                SFC = param.SFC,
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = SfcTypeEnum.Produce
+            });
 
             decimal qty = 0;
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)

@@ -14,7 +14,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.QualEnvOrderDetail;
-using Hymson.MES.Core.Domain.QualEnvParameterGroupDetailSnapshoot;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.QualEnvOrderDetail;
 using Hymson.MES.Services.Dtos.QualEnvOrderDetail;
@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -136,14 +136,14 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="qualEnvOrderDetailDto"></param>
+        /// <param name="qualEnvOrderDetailModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyQualEnvOrderDetailAsync(QualEnvOrderDetailModifyDto qualEnvOrderDetailModifyDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -168,7 +168,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证参数
@@ -180,13 +180,14 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
                 var data = new QualEnvOrderDetailEntity
                 {
                     Id = item.Id,
-                    RealTime = HymsonClock.Now().ToString($"yyyy-MM-dd {item.RealTime}:ss").ParseToDateTime(),
-                    InspectionValue = item.InspectionValue,
+                    RealTime = item.RealTime == null ? null : HymsonClock.Now().ToString($"yyyy-MM-dd {item.RealTime}:ss").ParseToDateTime(),
+                    InspectionValue = item.InspectionValue.Trim() == "null" ? "" : item.InspectionValue.Trim(),
                     IsQualified = item.IsQualified,
                     Remark = item.Remark,
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 };
+
                 datas.Add(data);
             }
 
@@ -247,7 +248,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrderDetail
                 qualEnvOrderDetailDto.ReferenceValue = groupDetailSnapshoot.ReferenceValue;
                 qualEnvOrderDetailDto.LowerLimit = groupDetailSnapshoot.LowerLimit;
                 qualEnvOrderDetailDto.StartTime = item.StartTime.ToString("HH:mm");
-                qualEnvOrderDetailDto.EndTime = item.StartTime.ToString("HH:mm");
+                qualEnvOrderDetailDto.EndTime = item.EndTime.ToString("HH:mm");
                 qualEnvOrderDetailDto.RealTime = item.RealTime == null ? HymsonClock.Now().ToString("HH:mm") : item.RealTime?.ToString("HH:mm");
                 qualEnvOrderDetailDtos.Add(qualEnvOrderDetailDto);
             }

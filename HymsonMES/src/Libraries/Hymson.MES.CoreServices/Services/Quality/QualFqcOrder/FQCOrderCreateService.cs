@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Bos.Quality;
+using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.Extension;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -13,6 +14,7 @@ using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
 {
@@ -34,6 +36,10 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
 
         private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<FQCOrderCreateService> _logger;
 
         /// <summary>
         /// 构造函数
@@ -61,7 +67,8 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             IQualFqcParameterGroupDetailSnapshootRepository qualFqcParameterGroupDetailSnapshootRepository,
             IProcParameterRepository procParameterRepository,
             IInteCodeRulesRepository inteCodeRulesRepository,
-            IManuGenerateBarcodeService manuGenerateBarcodeService)
+            IManuGenerateBarcodeService manuGenerateBarcodeService,
+            ILogger<FQCOrderCreateService> logger)
         {
             _qualFqcOrderRepository = qualFqcOrderRepository;
             _qualFqcOrderSfcRepository = qualFqcOrderSfcRepository;
@@ -75,6 +82,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             _procParameterRepository = procParameterRepository;
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
+            _logger = logger;
         }
 
 
@@ -101,6 +109,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11700));
             }
+
             //校验是否属于同一物料
             if (outputRecords.Select(x => x.MaterialId).Distinct().Count() > 1)
             {
@@ -165,6 +174,8 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             //检验项目明细快照
             var parameterGroupDetailSnapshootList = new List<QualFqcParameterGroupDetailSnapshootEntity>();
             var parameters = await _procParameterRepository.GetByIdsAsync(parameterGroupDetails.Select(x => x.ParameterId).Distinct());
+            if (!parameters.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES11709)).WithData("Id", parameterGroupEntity.Code);
+
             foreach (var parameterGroupDetail in parameterGroupDetails)
             {
                 var parameterEntity = parameters.First(x => x.Id == parameterGroupDetail.ParameterId);
@@ -201,7 +212,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             {
                 orderSfcList.AddRange(outputRecords.Where(x => x.CodeType == FQCLotUnitEnum.EA).Select(x => new QualFqcOrderSfcEntity
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
+                    Id = x.Id,
                     SiteId = bo.SiteId,
                     FQCOrderId = orderEntity.Id,
                     WorkOrderId = x.WorkOrderId.GetValueOrDefault(),
@@ -221,7 +232,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
                 });
                 orderSfcList.AddRange(recordDetails.Select(x => new QualFqcOrderSfcEntity
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
+                    Id = x.Id,
                     SiteId = bo.SiteId,
                     FQCOrderId = orderEntity.Id,
                     WorkOrderId = x.WorkOrderId,
@@ -242,20 +253,42 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             }
 
             #endregion
-
+            //样本数量
+            var sfccout = orderSfcList.Count;
+            if (sfccout > 0)
+            {
+                if (sfccout < parameterGroupEntity.SampleQty)
+                {
+                    orderEntity.SampleQty = sfccout;
+                }
+            }
             // 保存
             var rows = 0;
-            using (var trans = TransactionHelper.GetTransactionScope())
+            try
             {
-                rows += await _qualFqcOrderRepository.InsertAsync(orderEntity);
-                rows += await _qualFqcOrderSfcRepository.InsertRangeAsync(orderSfcList);
-                rows += await _qualFqcParameterGroupSnapshootRepository.InsertAsync(parameterGroupSnapshoot);
-                rows += await _qualFqcParameterGroupDetailSnapshootRepository.InsertRangeAsync(parameterGroupDetailSnapshootList);
+                using (var trans = TransactionHelper.GetTransactionScope())
+                {
+                    rows += await _qualFqcOrderRepository.InsertAsync(orderEntity);
+                    rows += await _qualFqcOrderSfcRepository.InsertRangeAsync(orderSfcList);
+                    rows += await _qualFqcParameterGroupSnapshootRepository.InsertAsync(parameterGroupSnapshoot);
+                    rows += await _qualFqcParameterGroupDetailSnapshootRepository.InsertRangeAsync(parameterGroupDetailSnapshootList);
 
-                //更新条码产出记录表
-                rows += await _qualFinallyOutputRecordRepository.UpdateRangeAsync(outputRecords);
+                    //更新条码产出记录表
+                    rows += await _qualFinallyOutputRecordRepository.UpdateRangeAsync(outputRecords);
 
-                trans.Complete();
+                    trans.Complete();
+                }
+            }
+            catch (Exception ex) {
+                if (ex.Message.Contains("Duplicate"))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES11720));
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES11721), ex.Message);
+                }
+                
             }
 
             return rows;
@@ -467,6 +500,206 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
         }
 
         /// <summary>
+        /// 创建Fqc
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<bool> CreateFqcAsync(FQCOrderAutoCreateIntegrationEvent bo)
+        {
+            var isNeedFQC = false;
+            if (bo.RecordDetails == null)
+            {
+                _logger.LogError("检验单明细为空");
+                throw new CustomerValidationException(nameof(ErrorCode.MES11717));
+            }
+
+            var updatedBy = bo.UserName;
+            var updatedOn = HymsonClock.Now();
+            string inspectionOrder = await GenerateFQCOrderCodeAsync(bo.SiteId, bo.UserName);
+            var materialId = bo.RecordDetails.Select(x => x.MaterialId).FirstOrDefault();
+            var workOrderId = bo.RecordDetails.Select(x => x.WorkOrderId).FirstOrDefault();
+            //获取所有检验项目
+            var parameterGroupEntity = await _qualFqcParameterGroupRepository.GetEntityAsync(new QualFqcParameterGroupQuery
+            {
+                SiteId = bo.SiteId,
+                MaterialId = materialId,
+                Status = SysDataStatusEnum.Enable
+            });
+
+            if (parameterGroupEntity == null)
+            {
+                _logger.LogError($"qual_fqc_parameter_group,{materialId}参数项目为空检验单明细为空");
+                throw new CustomerValidationException(nameof(ErrorCode.MES11718)).WithData("materialId", materialId);
+            }
+
+            //获取所有检验项目明细
+            var parameterGroupDetails = await _qualFqcParameterGroupDetailRepository.GetEntitiesAsync(new QualFqcParameterGroupDetailQuery
+            {
+                SiteId = bo.SiteId,
+                ParameterGroupId = parameterGroupEntity.Id
+            });
+
+
+            //判定是否需要生成FQC
+            var queryParam = new QualFinallyOutputRecordQuery
+            {
+                SiteId = bo.SiteId,
+                MaterialId = materialId,
+                IsGenerated = TrueOrFalseEnum.No
+            };
+
+            //if (parameterGroupEntity.IsSameWorkOrder == TrueOrFalseEnum.Yes)
+            //{
+            //    queryParam.WorkOrderId = bo.WorkOrderId;
+            //}
+            //if (parameterGroupEntity.IsSameWorkCenter == TrueOrFalseEnum.Yes)
+            //{
+            //    queryParam.WorkCenterId = bo.WorkCenterId;
+            //}
+            //var outputRecords = await _qualFinallyOutputRecordRepository.GetEntitiesAsync(queryParam);
+
+            var outputRecords = bo.RecordDetails;
+            if (outputRecords != null && outputRecords.Count() >= parameterGroupEntity.LotSize)
+            {
+                isNeedFQC = true;
+            }
+            else
+            {
+                _logger.LogError($"记录数量小于批次数量，不予生成");
+                throw new CustomerValidationException(nameof(ErrorCode.MES11719));
+            }
+
+            //检验项目快照
+            var parameterGroupSnapshoot = parameterGroupEntity.ToEntity<QualFqcParameterGroupSnapshootEntity>();
+            parameterGroupSnapshoot.Id = IdGenProvider.Instance.CreateId();
+
+            //检验项目明细快照
+            var parameterGroupDetailSnapshootList = new List<QualFqcParameterGroupDetailSnapshootEntity>();
+            var parameters = await _procParameterRepository.GetByIdsAsync(parameterGroupDetails.Select(x => x.ParameterId).Distinct());
+
+            foreach (var parameterGroupDetail in parameterGroupDetails)
+            {
+                var parameterEntity = parameters.First(x => x.Id == parameterGroupDetail.ParameterId);
+
+                var parameterGroupDetailSnapshoot = parameterGroupDetail.ToEntity<QualFqcParameterGroupDetailSnapshootEntity>();
+                parameterGroupDetailSnapshoot.Id = IdGenProvider.Instance.CreateId();
+                parameterGroupDetailSnapshoot.ParameterGroupId = parameterGroupSnapshoot.Id;
+                parameterGroupDetailSnapshoot.ParameterCode = parameterEntity.ParameterCode;
+                parameterGroupDetailSnapshoot.ParameterName = parameterEntity.ParameterName;
+                parameterGroupDetailSnapshoot.ParameterDataType = parameterEntity.DataType;
+                parameterGroupDetailSnapshoot.ParameterUnit = parameterEntity.ParameterUnit ?? "";
+                parameterGroupDetailSnapshootList.Add(parameterGroupDetailSnapshoot);
+            }
+
+
+            //检验单
+            var orderEntity = new QualFqcOrderEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = bo.SiteId,
+                InspectionOrder = inspectionOrder,
+                GroupSnapshootId = parameterGroupSnapshoot.Id,
+                WorkOrderId = workOrderId,
+                MaterialId = parameterGroupEntity.MaterialId,
+                SampleQty = parameterGroupEntity.SampleQty,
+                Status = InspectionStatusEnum.WaitInspect,
+                IsPreGenerated = TrueOrFalseEnum.No,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            };
+
+            //检验单包含条码
+            List<QualFqcOrderSfcEntity> orderSfcList = new();
+            if (outputRecords.Any(x => x.CodeType == FQCLotUnitEnum.EA))
+            {
+                orderSfcList.AddRange(outputRecords.Where(x => x.CodeType == FQCLotUnitEnum.EA).Select(x => new QualFqcOrderSfcEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = bo.SiteId,
+                    FQCOrderId = orderEntity.Id,
+                    WorkOrderId = x.WorkOrderId.GetValueOrDefault(),
+                    SFC = x.Barcode,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                }));
+
+            }
+            else
+            {
+                var recordIds = outputRecords.Where(x => x.CodeType != FQCLotUnitEnum.EA).Select(x => x.Id);
+                if (recordIds != null)
+                {
+                    //get from detail
+                    var recordDetails = await _qualFinallyOutputRecordDetailRepository.GetEntitiesAsync(new QualFinallyOutputRecordDetailQuery
+                    {
+                        SiteId = bo.SiteId,
+                        OutputRecordIds = (IEnumerable<long>)recordIds
+                    });
+
+                    orderSfcList.AddRange(recordDetails.Select(x => new QualFqcOrderSfcEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = bo.SiteId,
+                        FQCOrderId = orderEntity.Id,
+                        WorkOrderId = x.WorkOrderId,
+                        SFC = x.Barcode,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn
+                    }));
+                }
+
+            }
+
+            //标记为已生成过检验单
+            //foreach (var record in outputRecords)
+            //{
+            //    record.IsGenerated = TrueOrFalseEnum.Yes;
+            //    record.UpdatedBy = updatedBy;
+            //    record.UpdatedOn = updatedOn;
+            //}
+
+            //样本数量
+            var sfccout = orderSfcList.Count;
+            if (sfccout > 0)
+            {
+                if (sfccout < parameterGroupEntity.SampleQty)
+                {
+                    orderEntity.SampleQty = sfccout;
+                }
+            }
+
+            // 保存
+            var rows = 0;
+            try
+            {
+                using (var trans = TransactionHelper.GetTransactionScope())
+                {
+                    rows += await _qualFqcOrderRepository.InsertAsync(orderEntity);
+                    rows += await _qualFqcOrderSfcRepository.InsertRangeAsync(orderSfcList);
+                    rows += await _qualFqcParameterGroupSnapshootRepository.InsertAsync(parameterGroupSnapshoot);
+                    rows += await _qualFqcParameterGroupDetailSnapshootRepository.InsertRangeAsync(parameterGroupDetailSnapshootList);
+
+                    //更新条码产出记录表
+                    //rows += await _qualFinallyOutputRecordRepository.UpdateRangeAsync(outputRecords);
+
+                    trans.Complete();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"FQC生成失败！");
+            }
+
+            return isNeedFQC;
+        }
+
+        /// <summary>
         /// 检验单号生成
         /// </summary>
         /// <param name="bo"></param>
@@ -481,11 +714,11 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             });
             if (codeRules == null || !codeRules.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11991));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11710));
             }
             if (codeRules.Count() > 1)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11992));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11711));
             }
 
             var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new Bos.Manufacture.ManuGenerateBarcode.GenerateBarcodeBo

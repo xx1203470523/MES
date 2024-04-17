@@ -48,6 +48,5 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public long SiteId { get; set; }
 
-       
     }
 }

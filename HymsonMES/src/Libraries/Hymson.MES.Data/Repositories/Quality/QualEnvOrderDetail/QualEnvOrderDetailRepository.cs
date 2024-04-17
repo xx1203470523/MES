@@ -9,7 +9,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.QualEnvOrderDetail;
-using Hymson.MES.Core.Domain.QualEnvParameterGroupDetailSnapshoot;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;

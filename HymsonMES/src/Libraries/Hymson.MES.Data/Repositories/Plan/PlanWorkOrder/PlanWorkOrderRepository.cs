@@ -76,9 +76,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             if (!ids.Any()) return new List<PlanWorkOrderEntity>();
-
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<PlanWorkOrderEntity>(GetByIdsSql, new { ids = ids });
+            return await conn.QueryAsync<PlanWorkOrderEntity>(GetByIdsSql, new { ids});
         }
 
         /// <summary>
@@ -145,7 +144,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("PWO.SiteId = @SiteId");
             }
 
-            if(query.ProcessRouteIds !=null && query.ProcessRouteIds.Any())
+            if (query.ProcessRouteIds != null && query.ProcessRouteIds.Any())
             {
                 sqlBuilder.Where("PWO.ProcessRouteId IN @ProcessRouteIds");
             }
@@ -292,6 +291,10 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.Select("*");
 
             if (!string.IsNullOrWhiteSpace(query.OrderCode)) sqlBuilder.Where("OrderCode LIKE @OrderCode");
+            if (query.Codes != null && query.Codes.Any())
+            {
+                sqlBuilder.Where("OrderCode IN @Codes");
+            }
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderEntity>(template.RawSql, query);

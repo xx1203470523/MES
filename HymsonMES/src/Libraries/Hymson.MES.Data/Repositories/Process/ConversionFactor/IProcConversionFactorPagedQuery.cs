@@ -63,6 +63,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public ManuSfcRepairDetailIsIsCloseEnum? OpenStatus { get; set; }
+        public DisableOrEnableEnum? OpenStatus { get; set; }
     }
 }

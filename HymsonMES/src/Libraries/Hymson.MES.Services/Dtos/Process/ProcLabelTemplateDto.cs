@@ -25,57 +25,57 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 标签名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 标签物理路径
         /// </summary>
         public string? Path { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 模板内容
         /// </summary>
         public string Content { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否删除;删除时赋值为主键
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
     public record PreviewImageDataDto : BaseEntityDto
     {
@@ -89,17 +89,17 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcLabelTemplateCreateDto : BaseEntityDto
     {
-       /// <summary>
+        /// <summary>
         /// 标签名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 标签物理路径
         /// </summary>
         public string? Path { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
@@ -124,17 +124,17 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 标签名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 标签物理路径
         /// </summary>
         public string? Path { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
@@ -148,30 +148,36 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否删除;删除时赋值为主键
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 数据源
+        /// </summary>
+        public string? printDataModel { get; set; }
+
 
         /// <summary>
         /// 模板打印配置信息

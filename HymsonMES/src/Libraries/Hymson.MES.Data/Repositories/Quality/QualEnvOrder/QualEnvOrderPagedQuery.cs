@@ -29,10 +29,10 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
         /// </summary>
         public long? WorkCenterId { get; set; }
 
-        /// <summary>
-        /// 工作中心Code
-        /// </summary>
-        public string? WorkCenterCode { get; set; }
+        ///// <summary>
+        ///// 工作中心Code
+        ///// </summary>
+        //public string? WorkCenterCode { get; set; }
 
         ///// <summary>
         ///// 工作中心Name
@@ -44,10 +44,10 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
         /// </summary>
         public long? ProcedureId { get; set; }
 
-        /// <summary>
-        /// 工序Code
-        /// </summary>
-        public string? ProcedureCode { get; set; }
+        ///// <summary>
+        ///// 工序Code
+        ///// </summary>
+        //public string? ProcedureCode { get; set; }
 
         ///// <summary>
         ///// 工序Name
@@ -57,6 +57,6 @@ namespace Hymson.MES.Data.Repositories.QualEnvOrder
         /// <summary>
         /// 检验日期
         /// </summary>
-        public DateTime[]? InspectionDate { get; set; }
+        public DateTime[]? CreatedOn { get; set; }
     }
 }

@@ -1,5 +1,7 @@
-﻿using Hymson.Localization.Services;
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -57,7 +59,10 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             var bo = param.ToBo<BadRecordRequestBo>();
             if (bo == null) return;
-
+            if (bo.SFCs == null || !bo.SFCs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17259));
+            }
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
@@ -121,11 +126,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             List<PanelModuleEnum> panelModules = new();
             if (data.IsShow) panelModules.Add(PanelModuleEnum.BadRecord);
             responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
-
-            /*
-            var SFCs = string.Join(",", data.SFCs);
-            responseBo.Message = _localizationService.GetResource(data.IsShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), SFCs);
-            */
             return await Task.FromResult(responseBo);
         }
 

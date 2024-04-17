@@ -161,7 +161,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             IEnumerable<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
             {
-                manuSfclist = await _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
+                manuSfclist = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+                {
+                    SiteId = _currentSite.SiteId,
+                    SFCs = manuContainerPackList.Select(x => x.LadeBarCode),
+                    Type = SfcTypeEnum.Produce
+                });
                 var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfclist.Select(x => x.Id));
                 var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
                 {
@@ -245,7 +250,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             IEnumerable<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
             {
-                manuSfclist = await _manuSfcRepository.GetBySFCsAsync(manuContainerPackList.Select(x => x.LadeBarCode));
+                manuSfclist = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+                {
+                    SiteId = _currentSite.SiteId,
+                    SFCs = manuContainerPackList.Select(x => x.LadeBarCode),
+                    Type = SfcTypeEnum.Produce
+                });
                 var manuSfcInfolistTask = _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfclist.Select(x => x.Id));
                 var manuSfcProduceListTask = _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
                 {
@@ -440,7 +450,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             return new ManuContainerPackDto();
         }
-
 
         /// <summary>
         /// 执行作业

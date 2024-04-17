@@ -64,6 +64,18 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 更新IsGenerated（批量）
+        /// </summary>
+        /// <param name="barcode"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateGeneratedRangeAsync(IEnumerable<string> barcode)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdatesIsGeneratedSql, new { barcode });
+        }
+
+
+        /// <summary>
         /// 软删除
         /// </summary>
         /// <param name="id"></param>
@@ -79,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -107,12 +119,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFinallyOutputRecordEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualFinallyOutputRecordEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFinallyOutputRecordEntity>(GetByIdsSql, new { Ids = ids });
         }
-        
+
         /// <summary>
         /// 查询单个实体
         /// </summary>
@@ -159,6 +171,12 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("IsGenerated = @IsGenerated");
             }
+
+            if (query.Barcodes != null)
+            {
+                sqlBuilder.Where("Barcode IN @Barcodes");
+            }
+            sqlBuilder.AddParameters(query);
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
@@ -180,16 +198,38 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
 
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Barcode))
+            {
+                sqlBuilder.Where("T.Barcode = @Barcode");
+            }
+
+            if (pagedQuery.MaterialId != 0)
+            {
+                sqlBuilder.Where("T.MaterialId = @MaterialId");
+            }
+
+            if (pagedQuery.WorkOrderId != 0)
+            {
+                sqlBuilder.Where("T.WorkOrderId = @WorkOrderId");
+            }
+
+            if (pagedQuery.WorkCenterId != 0)
+            {
+                sqlBuilder.Where("T.WorkCenterId = @WorkCenterId");
+            }
+            if (pagedQuery.IsGenerated.HasValue)
+            {
+                sqlBuilder.Where("T.IsGenerated = @IsGenerated");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<QualFinallyOutputRecordEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var entities = await entitiesTask;
-            var totalCount = await totalCountTask;
+            var entities = await conn.QueryAsync<QualFinallyOutputRecordEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             return new PagedInfo<QualFinallyOutputRecordEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
@@ -211,6 +251,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string UpdateSql = "UPDATE qual_finally_output_record SET   SiteId = @SiteId, Barcode = @Barcode, MaterialId = @MaterialId, WorkOrderId = @WorkOrderId, WorkCenterId = @WorkCenterId, CodeType = @CodeType, IsGenerated = @IsGenerated, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_finally_output_record SET   SiteId = @SiteId, Barcode = @Barcode, MaterialId = @MaterialId, WorkOrderId = @WorkOrderId, WorkCenterId = @WorkCenterId, CodeType = @CodeType, IsGenerated = @IsGenerated, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesIsGeneratedSql = "UPDATE qual_finally_output_record SET   IsGenerated = @IsGenerated,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Barcode IN @barcode ";
 
         const string DeleteSql = "UPDATE qual_finally_output_record SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_finally_output_record SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

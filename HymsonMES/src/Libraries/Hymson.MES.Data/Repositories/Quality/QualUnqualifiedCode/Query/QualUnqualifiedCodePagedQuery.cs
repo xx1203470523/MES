@@ -11,11 +11,12 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public class QualUnqualifiedCodePagedQuery : PagerInfo
     {
-        // <summary>
+        /// <summary>
         /// 工厂
         /// </summary>
         public long SiteId { get; set; }
-        // <summary>
+
+        /// <summary>
         /// 不合格代码
         /// </summary>
         public string UnqualifiedCode { get; set; }
@@ -26,7 +27,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         public string UnqualifiedCodeName { get; set; }
 
         /// <summary>
-        /// 描述 :状态 
+        /// 描述 : 状态 
         /// 空值 : true  
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
@@ -40,5 +41,20 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// 等级
         /// </summary>
         public QualUnqualifiedCodeDegreeEnum? Degree { get; set; }
+
+        /// <summary>
+        /// 不合格代码组
+        /// </summary>
+        public IEnumerable<long> Ids {  get; set; }
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public string? OrUnqualifiedCode {  get; set; }
+
+        /// <summary>
+        /// 不合格代码名称
+        /// </summary>
+        public string? OrUnqualifiedCodeName { get; set; }
     }
 }

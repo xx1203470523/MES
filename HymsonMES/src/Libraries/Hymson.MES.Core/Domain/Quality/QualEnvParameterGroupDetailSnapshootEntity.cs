@@ -8,7 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Core.Domain.QualEnvParameterGroupDetailSnapshoot
+namespace Hymson.MES.Core.Domain.Quality
 {
     /// <summary>
     /// 环境检验参数组明细快照，数据实体对象   
@@ -76,12 +76,12 @@ namespace Hymson.MES.Core.Domain.QualEnvParameterGroupDetailSnapshoot
        /// <summary>
         /// 录入次数
         /// </summary>
-        public int EnterNumber { get; set; }
+        public int EntryCount { get; set; }
 
        /// <summary>
         /// 频率
         /// </summary>
-        public bool Frequency { get; set; }
+        public FrequencyEnum? Frequency { get; set; }
 
        
     }

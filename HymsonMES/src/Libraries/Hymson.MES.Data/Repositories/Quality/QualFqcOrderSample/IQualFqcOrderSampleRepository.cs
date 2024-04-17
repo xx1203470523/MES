@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Quality.QualFqcOrderSample.View;
 using Hymson.MES.Data.Repositories.Quality.Query;
 
 namespace Hymson.MES.Data.Repositories.Quality
@@ -65,6 +66,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<QualFqcOrderSampleEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
+        /// 明细条码获取检验单
+        /// </summary>
+        /// <param name="barcode"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SampleFqcOrderView>> GetEntitiesByDetailBacodeAsync(IEnumerable<string> barcodes);
 
         /// <summary>
         /// 获取List

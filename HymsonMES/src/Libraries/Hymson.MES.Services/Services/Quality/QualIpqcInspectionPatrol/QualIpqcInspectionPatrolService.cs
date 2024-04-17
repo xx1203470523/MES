@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -577,7 +578,12 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new ValidationException(nameof(ErrorCode.MES10104));
             }
 
-            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery { SFC = query.SampleCode, SiteId = _currentSite.SiteId ?? 0 });
+            var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
+            {
+                SFC = query.SampleCode,
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = SfcTypeEnum.Produce
+            });
             if (manuSfcEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13235)).WithData("SampleCode", query.SampleCode);

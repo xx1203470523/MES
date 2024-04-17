@@ -65,16 +65,29 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualFqcOrderService.CreateAsync(saveDto);
         }
 
+        
+
         /// <summary>
         /// 更新（FQC检验单）
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("update")]
-        public async Task UpdateAsync([FromBody] QualFqcOrderSaveDto saveDto)
+        //[HttpPut]
+        //[Route("update")]
+        //public async Task UpdateAsync([FromBody] QualFqcOrderSaveDto saveDto)
+        //{
+        //     await _qualFqcOrderService.ModifyAsync(saveDto);
+        //}
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPut("update")]
+        public async Task<int> UpdateOrderAsync(FQCParameterDetailSaveDto requestDto)
         {
-             await _qualFqcOrderService.ModifyAsync(saveDto);
+            return await _qualFqcOrderService.UpdateOrderAsync(requestDto);
         }
 
         /// <summary>
@@ -118,7 +131,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("attachment/save")]
-        public async Task SaveAttachmentAsync([FromBody] QualIqcOrderSaveAttachmentDto requestDto)
+        public async Task SaveAttachmentAsync([FromBody] QualFqcOrderSaveAttachmentDto requestDto)
         {
             await _qualFqcOrderService.SaveAttachmentAsync(requestDto);
         }
@@ -137,13 +150,14 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 生成FQC检验单
         /// </summary>
-        /// <param name="requestDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPost("generated")]
-        public async Task<long> GeneratedOrderAsync([FromBody] GenerateInspectionDto requestDto)
+        public async Task<int> GeneratedOrderAsync([FromBody] QualFqcOrderCreateDto saveDto)
         {
+            return await _qualFqcOrderService.CreateAsync(saveDto);
             // TODO 生成IQC检验单
-            return await _qualFqcOrderService.GeneratedOrderAsync(requestDto);
+            //return await _qualFqcOrderService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -163,7 +177,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("save")]
-        public async Task<long> SaveOrderAsync([FromBody] QualIqcOrderSaveDto requestDto)
+        public async Task<long> SaveOrderAsync([FromBody] QualFqcOrderSampleSaveDto requestDto)
         {
             return await _qualFqcOrderService.SaveOrderAsync(requestDto);
         }
@@ -174,7 +188,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("complete")]
-        public async Task<long> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
+        public async Task<long> CompleteOrderAsync(QualFqcOrderCompleteDto requestDto)
         {
             return await _qualFqcOrderService.CompleteOrderAsync(requestDto);
         }
@@ -202,15 +216,15 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 查询检验类型
+        /// 查询检验项目组,样本数量
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        //[HttpGet("type/{orderId}")]
-        //public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long orderId)
-        //{
-        //    return await _qualFqcOrderService.QueryOrderTypeListByIdAsync(orderId);
-        //}
+        [HttpGet("parametergroupsnapshoot/{orderId}")]
+        public async Task<QualFqcParameterGroupSnapshootOut> QuerySnapshootByIdAsync(long orderId)
+        {
+            return await _qualFqcOrderService.QuerySnapshootByIdAsync(orderId);
+        }
 
         /// <summary>
         /// 查询附件
@@ -246,7 +260,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 
+        /// 参数为验证 暂时不用
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>

@@ -109,6 +109,21 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
+
+        /// <summary>
+        /// 工作中心Id 为获取线体数据做准备 生成的条码需要线体相关数据进行扩展
+        /// </summary>
+        public long? InteWorkCenterId { get; set; }
+
+        /// <summary>
+        /// 极组条码
+        /// </summary>
+        public IEnumerable<string>? Sfcs { get; set; }
+
+        /// <summary>
+        /// 工单id 为生成极片状态创建而设置
+        /// </summary>
+        public long? WorkOrderId { get; set; }
     }
 
     /// <summary>

@@ -72,14 +72,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> SaveOrderAsync(QualIqcOrderSaveDto requestDto);
+        Task<int> SaveOrderAsync(QualFqcOrderSampleSaveDto requestDto);
 
         /// <summary>
         /// 完成检验单
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto);
+        Task<int> CompleteOrderAsync(QualFqcOrderCompleteDto requestDto);
 
         /// <summary>
         /// 免检
@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> SaveAttachmentAsync(QualIqcOrderSaveAttachmentDto requestDto);
+        Task<int> SaveAttachmentAsync(QualFqcOrderSaveAttachmentDto requestDto);
 
         /// <summary>
         /// 删除检验单附件
@@ -114,7 +114,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeleteOrdersAsync(long[] ids);
+        //Task<int> DeleteOrdersAsync(long[] ids);
 
         /// <summary>
         /// 生成IQC检验单
@@ -128,7 +128,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<int> UpdateOrderAsync(OrderParameterDetailSaveDto requestDto);
+        Task<int> UpdateOrderAsync(FQCParameterDetailSaveDto requestDto);
 
         /// <summary>
         /// 获取分页List
@@ -138,11 +138,11 @@ namespace Hymson.MES.Services.Services.Quality
         //Task<PagedInfo<QualFqcOrderDto>> GetPagedListAsync(QualIqcOrderPagedQueryDto pagedQueryDto);
 
         /// <summary>
-        /// 根据ID查询类型
+        /// 查询检验项目组,样本数量
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        //Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryOrderTypeListByIdAsync(long orderId);
+        Task<QualFqcParameterGroupSnapshootOut> QuerySnapshootByIdAsync(long orderId);
 
         /// <summary>
         /// 根据ID查询附件

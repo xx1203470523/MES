@@ -15,7 +15,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 参数集编码
@@ -36,6 +36,11 @@ namespace Hymson.MES.Core.Domain.Quality
         /// 样本数量
         /// </summary>
         public int SampleQty { get; set; }
+
+        /// <summary>
+        /// 抽检数量
+        /// </summary>
+        public int SamplingCount { get; set; }
 
         /// <summary>
         /// 批次数量
@@ -60,10 +65,10 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
         /// <summary>
-        /// 状态(1-新建 2-激活 3-保留 4-废除)
+        /// 状态(0-新建 1-启用 2-保留 3-废除)
         /// </summary>
         public SysDataStatusEnum Status { get; set; }
 

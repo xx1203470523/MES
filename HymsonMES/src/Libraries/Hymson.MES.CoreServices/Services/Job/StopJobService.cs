@@ -26,14 +26,14 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IMasterDataService _masterDataService;
 
         /// <summary>
+        /// 服务接口（多语言）
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 仓储接口（条码信息）
@@ -49,17 +49,19 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 构造函数
         /// </summary>
         /// <param name="masterDataService"></param>
-        /// <param name="manuSfcProduceRepository"></param>
         /// <param name="localizationService"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
         public StopJobService(IMasterDataService masterDataService,
-            IManuSfcProduceRepository manuSfcProduceRepository,
             ILocalizationService localizationService,
+            IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcStepRepository manuSfcStepRepository)
         {
             _masterDataService = masterDataService;
-            _manuSfcProduceRepository = manuSfcProduceRepository;
             _localizationService = localizationService;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
         }
@@ -142,9 +144,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                     WorkCenterId = sfcProduceEntity.WorkCenterId,
                     ProductBOMId = sfcProduceEntity.ProductBOMId,
                     ProcedureId = bo.ProcedureId,
-                    Qty = sfcProduceEntity.Qty,
-                    EquipmentId = sfcProduceEntity.EquipmentId,
                     ResourceId = bo.ResourceId,
+                    EquipmentId = bo.EquipmentId,
+                    Qty = sfcProduceEntity.Qty,
                     SiteId = bo.SiteId,
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,

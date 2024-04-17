@@ -25,6 +25,9 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.CoreServices.Services.Quality.QualFqcOrder;
 using Hymson.MES.Data.Repositories.Plan;
 using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
+using Elastic.Clients.Elasticsearch.QueryDsl;
+using System.Security.Policy;
+using System.Linq;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -118,6 +121,11 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IQualFqcOrderSfcRepository _qualFqcOrderSfcRepository;
 
+        /// <summary>
+        /// 仓储接口（成品条码产出记录(FQC生成使用)）
+        /// </summary>
+        private readonly IQualFinallyOutputRecordRepository _qualFinallyOutputRecordRepository;
+
 
         /// <summary>
         /// struct
@@ -150,7 +158,8 @@ namespace Hymson.MES.Services.Services.Quality
             IQualFqcParameterGroupDetailSnapshootRepository qualFqcParameterGroupDetailSnapshootRepository,
             IQualFqcParameterGroupSnapshootRepository qualFqcParameterGroupSnapshootRepository,
             IFQCOrderCreateService qualFqcOrderCreateService,
-            IPlanWorkOrderRepository planWorkOrderRepository, IQualFqcOrderSfcRepository qualFqcOrderSfcRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IQualFqcOrderSfcRepository qualFqcOrderSfcRepository, IQualFinallyOutputRecordRepository qualFinallyOutputRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -169,6 +178,7 @@ namespace Hymson.MES.Services.Services.Quality
             _qualFqcOrderCreateService = qualFqcOrderCreateService;
             _planWorkOrderRepository = planWorkOrderRepository;
             _qualFqcOrderSfcRepository = qualFqcOrderSfcRepository;
+            _qualFinallyOutputRecordRepository = qualFinallyOutputRecordRepository;
         }
 
 
@@ -254,45 +264,59 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
-            return await _qualFqcOrderRepository.DeletesAsync(new DeleteCommand
+            var entitys = await _qualFqcOrderRepository.GetByIdsAsync(ids);
+            if (entitys != null)
+            {
+                if (!entitys.Any(x => x.Status == InspectionStatusEnum.WaitInspect))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES11715));
+                }
+            }
+
+            //还原条码生成状态
+            //OrderSFC 查询
+            var recordEntitys = Enumerable.Empty<QualFinallyOutputRecordEntity>();
+            var fqcid = entitys?.Select(x => x.Id);
+            var site = entitys?.Select(x => x.SiteId).FirstOrDefault() ?? 0;
+            if (fqcid != null)
+            {
+                var orderSFCEntitys = await _qualFqcOrderSfcRepository.GetEntitiesAsync(new QualFqcOrderSfcQuery { FQCOrderIds = fqcid, SiteId = site });
+                var sfcs = orderSFCEntitys.Select(x => x.SFC);
+                if (sfcs != null)
+                {
+                    recordEntitys = await _qualFinallyOutputRecordRepository.GetEntitiesAsync(new QualFinallyOutputRecordQuery { Barcodes = sfcs, SiteId = site });
+                }
+            }
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            if (recordEntitys != null)
+            {
+                //更新qual_fqc_order
+                foreach (var item in recordEntitys)
+                {
+                    item.IsGenerated = TrueOrFalseEnum.No;
+                    item.UpdatedOn = DateTime.Now;
+                    item.Remark = "检验单删除回滚";
+                }
+                await _qualFinallyOutputRecordRepository.UpdateRangeAsync(recordEntitys);
+
+            }
+            rows = await _qualFqcOrderRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
                 DeleteOn = HymsonClock.Now(),
                 UserId = _currentUser.UserName
             });
+
+            trans.Complete();
+            return rows;
+
         }
 
         /// <summary>
-        /// 根据ID查询
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        //public async Task<QualFqcOrderDto?> QueryByIdAsync(long id) 
-        //{
-        //   var qualFqcOrderEntity = await _qualFqcOrderRepository.GetByIdAsync(id);
-        //   if (qualFqcOrderEntity == null) return null;
-
-        //   return qualFqcOrderEntity.ToModel<QualFqcOrderDto>();
-        //}
-
-        /// <summary>
-        /// 根据查询条件获取分页数据
-        /// </summary>
-        /// <param name="pagedQueryDto"></param>
-        /// <returns></returns>
-        //public async Task<PagedInfo<QualFqcOrderDto>> GetPagedListAsync(QualFqcOrderPagedQueryDto pagedQueryDto)
-        //{
-        //    var pagedQuery = pagedQueryDto.ToQuery<QualFqcOrderPagedQuery>();
-        //    pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-        //    var pagedInfo = await _qualFqcOrderRepository.GetPagedListAsync(pagedQuery);
-
-        //    // 实体到DTO转换 装载数据
-        //    var dtos = pagedInfo.Data.Select(s => s.ToModel<QualFqcOrderDto>());
-        //    return new PagedInfo<QualFqcOrderDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        //}
-
-        /// <summary>
-        /// 生成IQC检验单
+        /// 生成FQC检验单
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -301,21 +325,6 @@ namespace Hymson.MES.Services.Services.Quality
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
-
-            // 收货单明细
-            //var receiptDetails = await _whMaterialReceiptDetailRepository.GetByIdsAsync(requestDto.Details);
-            //if (receiptDetails == null || !receiptDetails.Any())
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10104));
-            //}
-            //校验是否属于同一收货单
-            //if (receiptDetails.Select(x => x.MaterialReceiptId).Distinct().Count() > 1)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES11900));
-            //}
-            // 查询收货单
-            //var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(requestDto.ReceiptId)
-            //    ?? throw new CustomerValidationException(nameof(ErrorCode.MES11901));
 
             //校验是否已生成过检验单
             var orderList = await _qualFqcOrderRepository.GetEntitiesAsync(new QualFqcOrderQuery
@@ -350,7 +359,7 @@ namespace Hymson.MES.Services.Services.Quality
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // IQC检验单
+            // FQC检验单
             var entity = await _qualFqcOrderRepository.GetByIdAsync(requestDto.OrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
@@ -398,18 +407,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<int> SaveOrderAsync(QualIqcOrderSaveDto requestDto)
+        public async Task<int> SaveOrderAsync(QualFqcOrderSampleSaveDto requestDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // IQC检验单
-            var entity = await _qualFqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
+            //检验单
+            var entity = await _qualFqcOrderRepository.GetByIdAsync(requestDto.FQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
-
-            // IQC检验类型
-            //var orderTypeEntity = await _qualIqcOrderTypeRepository.GetByIdAsync(requestDto.IQCOrderTypeId)
-            //    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 检查样品条码在该类型是否已经录入
             var sampleQuery = requestDto.ToQuery<QualFqcOrderSampleQuery>();
@@ -417,7 +422,7 @@ namespace Hymson.MES.Services.Services.Quality
             var sampleEntities = await _qualFqcOrderSampleRepository.GetEntitiesAsync(sampleQuery);
             if (sampleEntities != null && sampleEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11908))
+                throw new CustomerValidationException(nameof(ErrorCode.MES11708))
                     .WithData("Code", requestDto.Barcode);
             }
 
@@ -486,7 +491,7 @@ namespace Hymson.MES.Services.Services.Quality
                         {
                             Id = IdGenProvider.Instance.CreateId(),
                             SiteId = entity.SiteId,
-                            FQCOrderId = requestDto.IQCOrderId,
+                            FQCOrderId = requestDto.FQCOrderId,
                             SampleDetailId = sampleDetailId,
                             AttachmentId = attachmentId,
                             CreatedBy = updatedBy,
@@ -523,13 +528,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<int> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
+        public async Task<int> CompleteOrderAsync(QualFqcOrderCompleteDto requestDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // FQC检验单
-            var entity = await _qualFqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
+            var entity = await _qualFqcOrderRepository.GetByIdAsync(requestDto.FQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 只有"检验中"的状态才允许点击"完成"
@@ -544,18 +549,18 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedOn = HymsonClock.Now();
 
             // 检查每种类型是否已经录入足够
-            //var orderTypeEntities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(entity.Id);
+            var sampleEntities = await _qualFqcOrderSampleRepository.GetEntitiesAsync(new QualFqcOrderSampleQuery
+            {
+                SiteId = entity.SiteId,
+                FQCOrderId = entity.Id
+            });
 
-            //// 读取一个未录入完整的类型
-            //var orderTypeEntity = orderTypeEntities.FirstOrDefault(f => f.SampleQty > f.CheckedQty);
-            //if (orderTypeEntity != null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES11911))
-            //        .WithData("Type", orderTypeEntity.Type.GetDescription())
-            //        .WithData("CheckedQty", orderTypeEntity.CheckedQty)
-            //        .WithData("SampleQty", orderTypeEntity.SampleQty);
-            //}
+            //校验已检数量
 
+            if (sampleEntities.Count() < entity.SampleQty)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11716)).WithData("CheckedQty", sampleEntities.Count()).WithData("SampleQty", entity.SampleQty);
+            }
             // 读取所有明细参数
             var sampleDetailEntities = await _qualFqcOrderSampleDetailRepository.GetEntitiesAsync(new QualFqcOrderSampleDetailQuery
             {
@@ -602,45 +607,6 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
-        /// 免检
-        /// </summary>
-        /// <param name="requestDto"></param>
-        /// <returns></returns>
-        //public async Task<int> FreeOrderAsync(QualIqcOrderFreeDto requestDto)
-        //{
-        //    // 判断是否有获取到站点码 
-        //    if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
-
-        //    // IQC检验单
-        //    var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
-        //        ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
-
-        //    /*
-        //    // 只有"检验中"的状态才允许点击"免检"
-        //    if (entity.Status != InspectionStatusEnum.Inspecting)
-        //    {
-        //        throw new CustomerValidationException(nameof(ErrorCode.MES11912))
-        //            .WithData("Before", InspectionStatusEnum.Inspecting.GetDescription())
-        //            .WithData("After", "免检");   // InspectionStatusEnum.Closed.GetDescription()
-        //    }
-
-        //    // 检查当前操作类型是否已经执行过
-        //    await CheckOperationAsync(entity, OrderOperateTypeEnum.Close);
-        //    */
-
-        //    // 关闭检验单
-        //    entity.IsExemptInspection = TrueOrFalseEnum.Yes;
-        //    entity.IsQualified = TrueOrFalseEnum.Yes;
-        //    entity.Status = InspectionStatusEnum.Closed;
-
-        //    var rows = 0;
-        //    using var trans = TransactionHelper.GetTransactionScope();
-        //    rows += await CommonOperationAsync(entity, OrderOperateTypeEnum.Close);
-        //    trans.Complete();
-        //    return rows;
-        //}
-
-        /// <summary>
         /// 关闭检验单
         /// </summary>
         /// <param name="requestDto"></param>
@@ -679,15 +645,15 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<int> SaveAttachmentAsync(QualIqcOrderSaveAttachmentDto requestDto)
+        public async Task<int> SaveAttachmentAsync(QualFqcOrderSaveAttachmentDto requestDto)
         {
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
             // FQC检验单
-            var entity = await _qualFqcOrderRepository.GetByIdAsync(requestDto.IQCOrderId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            var entity = await _qualFqcOrderRepository.GetByIdAsync(requestDto.FQCOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES11714));
 
             if (!requestDto.Attachments.Any()) return 0;
 
@@ -712,7 +678,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = entity.SiteId,
-                    FQCOrderId = requestDto.IQCOrderId,
+                    FQCOrderId = requestDto.FQCOrderId,
                     AttachmentId = attachmentId,
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
@@ -752,23 +718,23 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeleteOrdersAsync(long[] ids)
-        {
-            if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
+        //public async Task<int> DeleteOrdersAsync(long[] ids)
+        //{
+        //    if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
+        //    //只能删除待检验
+        //    var entities = await _qualFqcOrderRepository.GetByIdsAsync(ids);
+        //    if (entities != null && entities.Any(a => a.Status != InspectionStatusEnum.WaitInspect))
+        //    {
+        //        throw new CustomerValidationException(nameof(ErrorCode.MES10137));
+        //    }        
 
-            var entities = await _qualFqcOrderRepository.GetByIdsAsync(ids);
-            if (entities != null && entities.Any(a => a.Status != InspectionStatusEnum.WaitInspect))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10137));
-            }
-
-            return await _qualFqcOrderRepository.DeletesAsync(new DeleteCommand
-            {
-                Ids = ids,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
-        }
+        //    return await _qualFqcOrderRepository.DeletesAsync(new DeleteCommand
+        //    {
+        //        Ids = ids,
+        //        DeleteOn = HymsonClock.Now(),
+        //        UserId = _currentUser.UserName
+        //    });
+        //}
 
         /// <summary>
         /// 根据ID查询
@@ -783,61 +749,47 @@ namespace Hymson.MES.Services.Services.Quality
             // 实体到DTO转换
             var dto = entity.ToModel<QualFqcOrderDto>();
             //dto.InspectionGradeText = dto.InspectionGrade.GetDescription();
-            //dto.StatusText = dto.Status.GetDescription();
+            dto.StatusText = dto.Status.GetDescription();
 
-            //if (dto.IsQualified.HasValue) dto.IsQualifiedText = dto.IsQualified.GetDescription();
-            //else dto.IsQualifiedText = "";
-
-            // 读取收货单
-            //var receiptDetailEntity = await _whMaterialReceiptDetailRepository.GetByIdAsync(entity.MaterialReceiptDetailId);
-            //if (receiptDetailEntity == null) return dto;
-
-            //dto.SupplierBatch = receiptDetailEntity.SupplierBatch;
-            //dto.InternalBatch = receiptDetailEntity.InternalBatch;
-            //dto.PlanQty = receiptDetailEntity.PlanQty;
-
-            //// 读取收货单
-            //var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(receiptDetailEntity.MaterialReceiptId);
-            //if (receiptEntity == null) return dto;
-
-            //dto.ReceiptNum = receiptEntity.ReceiptNum;
+            if (dto.IsQualified.HasValue) dto.IsQualifiedText = dto.IsQualified.GetDescription();
+            else dto.IsQualifiedText = "";
 
             // TODO 规格型号
-            //dto.Specifications = "-";
+            dto.Specifications = "-";
 
-            //// 读取产品
-            //if (entity.MaterialId.HasValue)
-            //{
-            //    var materialEntity = await _procMaterialRepository.GetByIdAsync(entity.MaterialId.Value);
-            //    if (materialEntity != null)
-            //    {
-            //        dto.MaterialCode = materialEntity.MaterialCode;
-            //        dto.MaterialName = materialEntity.MaterialName;
-            //        dto.MaterialVersion = materialEntity.Version ?? "";
-            //        dto.Unit = materialEntity.Unit ?? "";
-            //    }
-            //}
+            // 读取产品
+            if (entity.MaterialId.HasValue)
+            {
+                var materialEntity = await _procMaterialRepository.GetByIdAsync(entity.MaterialId.Value);
+                if (materialEntity != null)
+                {
+                    dto.MaterialCode = materialEntity.MaterialCode;
+                    dto.MaterialName = materialEntity.MaterialName;
+                    dto.MaterialVersion = materialEntity.Version ?? "";
+                    dto.Unit = materialEntity.Unit ?? "";
+                    dto.Specifications = materialEntity.ProductModel ?? "-";
+                }
+            }
 
-            //// 读取供应商
-            //if (entity.SupplierId.HasValue)
-            //{
-            //    var supplierEntity = await _whSupplierRepository.GetByIdAsync(entity.SupplierId.Value);
-            //    if (supplierEntity != null)
-            //    {
-            //        dto.SupplierCode = supplierEntity.Code;
-            //        dto.SupplierName = supplierEntity.Name;
-            //    }
-            //}
+            //工单
+            if (entity.WorkOrderId.HasValue)
+            {
+                var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(entity.WorkOrderId.Value);
+                if (workOrderEntity != null)
+                {
+                    dto.OrderCode = workOrderEntity.OrderCode;
+                }
+            }
 
             return dto;
         }
 
         /// <summary>
-        /// 根据ID查询
+        /// 更新已检明细 根据ID查询
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<int> UpdateOrderAsync(OrderParameterDetailSaveDto requestDto)
+        public async Task<int> UpdateOrderAsync(FQCParameterDetailSaveDto requestDto)
         {
             var entity = await _qualFqcOrderSampleDetailRepository.GetByIdAsync(requestDto.Id);
             if (entity == null) return 0;
@@ -953,33 +905,17 @@ namespace Hymson.MES.Services.Services.Quality
                 else pagedQuery.MaterialIds = Array.Empty<long>();
             }
 
-            // 转换供应商编码变为供应商ID
-            //if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode)
-            //    || !string.IsNullOrWhiteSpace(pagedQueryDto.SupplierName))
-            //{
-            //    var whSupplierEntities = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery
-            //    {
-            //        SiteId = pagedQuery.SiteId,
-            //        Code = pagedQueryDto.SupplierCode,
-            //        Name = pagedQueryDto.SupplierName
-            //    });
-            //    if (whSupplierEntities != null && whSupplierEntities.Any()) pagedQuery.SupplierIds = whSupplierEntities.Select(s => s.Id);
-            //    else pagedQuery.SupplierIds = Array.Empty<long>();
-            //}
-
-            // 将供应商批次/内部批次转换为收货单详情ID
-            //if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierBatch)
-            //    || !string.IsNullOrWhiteSpace(pagedQueryDto.InternalBatch))
-            //{
-            //    var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
-            //    {
-            //        SiteId = pagedQuery.SiteId,
-            //        SupplierBatch = pagedQueryDto.SupplierBatch,
-            //        InternalBatch = pagedQueryDto.InternalBatch
-            //    });
-            //    if (receiptDetailEntities != null && receiptDetailEntities.Any()) pagedQuery.MaterialReceiptDetailIds = receiptDetailEntities.Select(s => s.Id);
-            //    else pagedQuery.MaterialReceiptDetailIds = Array.Empty<long>();
-            //}
+            // 转换工单编码变为WorkOrderId
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.OrderCode))
+            {
+                var planWorkOrderEntities = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    OrderCode = pagedQueryDto.OrderCode,
+                });
+                if (planWorkOrderEntities != null) pagedQuery.WorkOrderId = planWorkOrderEntities.Id;
+                else pagedQuery.WorkOrderId = default;
+            }
 
             // 将不合格处理方式转换为检验单ID
             if (pagedQueryDto.HandMethod.HasValue)
@@ -1000,17 +936,6 @@ namespace Hymson.MES.Services.Services.Quality
             var dtos = await PrepareOrderDtosAsync(pagedInfo.Data);
             return new PagedInfo<QualFqcOrderDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
-
-        /// <summary>
-        /// 根据ID查询类型
-        /// </summary>
-        /// <param name="orderId"></param>
-        /// <returns></returns>
-        //public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryOrderTypeListByIdAsync(long orderId)
-        //{
-        //    var entities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(orderId);
-        //    return entities.Select(s => s.ToModel<QualIqcOrderTypeBaseDto>());
-        //}
 
         /// <summary>
         /// 根据ID查询附件
@@ -1036,12 +961,12 @@ namespace Hymson.MES.Services.Services.Quality
         public async Task<IEnumerable<FQCParameterDetailDto>> QueryDetailSnapshotAsync(FQCParameterDetailQueryDto query)
         {
             if (string.IsNullOrWhiteSpace(query.Barcode)) throw new CustomerValidationException(nameof(ErrorCode.MES11909));
-
+            var site = _currentSite.SiteId ?? 0;
             //OrderSFC 查询
-            var orderSFCEntity = await _qualFqcOrderSfcRepository.GetEntityAsync(new QualFqcOrderSfcQuery { BarCode = query.Barcode, FQCOrderId = query.FQCOrderId });
-            if(orderSFCEntity == null)
+            var orderSFCEntity = await _qualFqcOrderSfcRepository.GetEntityAsync(new QualFqcOrderSfcQuery { BarCode = query.Barcode, FQCOrderId = query.FQCOrderId, SiteId = site });
+            if (orderSFCEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19981));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11712)).WithData("SFC", query.Barcode);
             }
             //FQCOrder
             var entity = await _qualFqcOrderRepository.GetByIdAsync(query.FQCOrderId);
@@ -1103,7 +1028,7 @@ namespace Hymson.MES.Services.Services.Quality
                     var fqcOrderList = await _qualFqcOrderRepository.GetByIdsAsync(sampleEntities.Select(x => x.FQCOrderId).Distinct().ToArray());
                     if (fqcOrderList.Any(x => x.Status != InspectionStatusEnum.Closed))
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19980)).WithData("sfc", query.SFC).WithData("fqcOrder", fqcOrderList.Where(x => x.Status != InspectionStatusEnum.Closed));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES11713)).WithData("sfc", query.SFC).WithData("fqcOrder", fqcOrderList.Where(x => x.Status != InspectionStatusEnum.Closed));
                     }
                 }
             }
@@ -1160,9 +1085,12 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 查询数据
             var pagedInfo = await _qualFqcOrderSampleDetailRepository.GetPagedListAsync(pagedQuery);
-
-            // 实体到DTO转换 装载数据
-            var dtos = await PrepareSampleDetailDtosAsync(entity, pagedInfo.Data);
+            IEnumerable<FQCParameterDetailDto>? dtos = null;
+            if (pagedInfo.Data.Count() > 0)
+            {
+                // 实体到DTO转换 装载数据
+                dtos = await PrepareSampleDetailDtosAsync(entity, pagedInfo.Data);
+            }
             return new PagedInfo<FQCParameterDetailDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -1217,7 +1145,7 @@ namespace Hymson.MES.Services.Services.Quality
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = entity.SiteId,
                 FQCOrderId = entity.Id,
-                //OperationType = operationType,
+                OperateType = operationType,
                 OperateBy = updatedBy,
                 OperateOn = updatedOn,
                 CreatedBy = updatedBy,
@@ -1253,15 +1181,7 @@ namespace Hymson.MES.Services.Services.Quality
         {
             List<QualFqcOrderDto> dtos = new();
 
-            // 读取收货单明细
-            //var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetByIdsAsync(entities.Select(x => x.MaterialReceiptDetailId));
-            //var receiptDetailDic = receiptDetailEntities.ToDictionary(x => x.Id, x => x);
-
-            //// 读取收货单
-            //var receiptEntities = await _whMaterialReceiptRepository.GetByIdsAsync(receiptDetailEntities.Select(x => x.MaterialReceiptId));
-            //var receiptDic = receiptEntities.ToDictionary(x => x.Id, x => x);
-
-            // 检验单操作
+            //检验人： 检验单操作
             var orderOperationEntities = await _qualFqcOrderOperateRepository.GetEntitiesAsync(new QualFqcOrderOperateQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
@@ -1272,40 +1192,32 @@ namespace Hymson.MES.Services.Services.Quality
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
             var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
 
-            // 读取供应商
-            //var supplierEntities = await _whSupplierRepository.GetByIdsAsync(entities.Where(w => w.SupplierId.HasValue).Select(x => x.SupplierId!.Value));
-            //var supplierDic = supplierEntities.ToDictionary(x => x.Id, x => x);
-
-            // 查询不合格处理数据
+            // 处理人：查询不合格处理数据
             var unqualifiedHandEntities = await _qualFqcOrderUnqualifiedHandleRepository.GetEntitiesAsync(new QualFqcOrderUnqualifiedHandleQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 FQCOrderIds = entities.Select(s => s.Id)
             });
 
-            var planworkEntitys = await _planWorkOrderRepository.GetByIdsAsync(entities.Where(w => w.WorkOrderId.HasValue).Select(x => x.WorkOrderId!.Value));
+            //工单
+            var workids = entities.Where(w => w.WorkOrderId.HasValue).Select(x => x.WorkOrderId!.Value).Distinct();
+            var planworkEntitys = await _planWorkOrderRepository.GetByIdsAsync(workids);
             var planworkDic = planworkEntitys.ToDictionary(x => x.Id, x => x);
+
+            //参数快照
+            var parashoots = entities.Select(s => s.GroupSnapshootId).Distinct().ToArray();
+            var snapshotEntitys = await _qualFqcParameterGroupSnapshootRepository.GetByIdsAsync(parashoots);
+            var snapshotDic = snapshotEntitys.ToDictionary(x => x.Id, x => x);
 
             foreach (var entity in entities)
             {
                 var dto = entity.ToModel<QualFqcOrderDto>();
                 if (dto == null) continue;
 
-                // 收货单明细
-                //var receiptDetailEntity = receiptDetailDic[entity.MaterialReceiptDetailId];
-                //if (receiptDetailEntity != null)
-                //{
-                //    dto.SupplierBatch = receiptDetailEntity.SupplierBatch;
-                //    dto.InternalBatch = receiptDetailEntity.InternalBatch;
-                //    dto.PlanQty = receiptDetailEntity.PlanQty;
-
-                //    // 收货单
-                //    var receiptEntity = receiptDic[receiptDetailEntity.MaterialReceiptId];
-                //    if (receiptEntity != null) dto.ReceiptNum = receiptEntity.ReceiptNum;
-                //}
-
                 // 检验人
-                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperateType == OrderOperateTypeEnum.Start);
+                //var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.OperateType == OrderOperateTypeEnum.Start);
+                dto.InspectionBy = "-";
+                var inspectionEntity = orderOperationEntities.FirstOrDefault(f => f.FQCOrderId == entity.Id);
                 if (inspectionEntity != null)
                 {
                     dto.InspectionBy = inspectionEntity.CreatedBy;
@@ -1343,33 +1255,62 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.MaterialVersion = "-";
                 }
 
-                if (entity.WorkOrderId.HasValue)
+                //参数快照表
+                snapshotDic.TryGetValue(entity.GroupSnapshootId, out var snaphot);
+                if (snaphot != null)
                 {
-                    planworkDic.TryGetValue(entity.WorkOrderId.Value, out var workorder);
-                    if (workorder != null)
-                        dto.OrderCode = workorder.OrderCode;
+                    //允许混线，列表不显示工单
+                    if (snaphot.IsSameWorkOrder == TrueOrFalseEnum.No)
+                    {
+                        dto.OrderCode = "-";
+                    }
+                    else
+                    {
+                        //否则取工单号
+                        if (entity.WorkOrderId.HasValue)
+                        {
+                            planworkDic.TryGetValue(entity.WorkOrderId.Value, out var workorder);
+                            if (workorder != null)
+                                dto.OrderCode = workorder.OrderCode;
+                        }
+                    }
                 }
-
-                //// 供应商
-                //if (entity.SupplierId.HasValue)
-                //{
-                //    var supplierEntity = supplierDic[entity.SupplierId.Value];
-                //    if (supplierEntity != null)
-                //    {
-                //        dto.SupplierCode = supplierEntity.Code;
-                //        dto.SupplierName = supplierEntity.Name;
-                //    }
-                //}
-                //else
-                //{
-                //    dto.SupplierCode = "-";
-                //    dto.SupplierName = "-";
-                //}
 
                 dtos.Add(dto);
             }
 
             return dtos;
+        }
+
+        /// <summary>
+        /// 根据ID查询类型
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<QualFqcParameterGroupSnapshootOut> QuerySnapshootByIdAsync(long orderId)
+        {
+            var rsp = new QualFqcParameterGroupSnapshootOut();
+            //FQCOrder
+            var entity = await _qualFqcOrderRepository.GetByIdAsync(orderId);
+            if (entity == null) return rsp;
+            //SnapShoot
+
+            int CheckedQty = 0;
+            var sampleEntities = await _qualFqcOrderSampleRepository.GetEntitiesAsync(new QualFqcOrderSampleQuery { FQCOrderId = entity.Id, SiteId = entity.SiteId });
+            if (sampleEntities != null)
+            {
+                CheckedQty = sampleEntities.Count();
+            }
+
+            rsp = new QualFqcParameterGroupSnapshootOut
+            {
+                Code = entity.InspectionOrder,
+                MaterialId = entity.MaterialId ?? 0,
+                SampleQty = entity.SampleQty,
+                CheckedQty = CheckedQty
+            };
+
+            return rsp;
         }
 
         /// <summary>

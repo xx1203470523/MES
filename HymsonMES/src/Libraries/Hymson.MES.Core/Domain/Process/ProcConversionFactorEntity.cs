@@ -38,13 +38,13 @@ namespace Hymson.MES.Core.Domain.Process
         /// 转换系数
         /// 空值 : false  
         /// </summary>
-        public string ConversionFactor { get; set; }
+        public decimal ConversionFactor { get; set; }
 
         /// <summary>
         /// 转换系数状态
         /// 空值 : false  
         /// </summary>
-        public ManuSfcRepairDetailIsIsCloseEnum OpenStatus { get; set; }
+        public DisableOrEnableEnum OpenStatus { get; set; }
 
         /// <summary>
         /// 描述 :说明 

@@ -13,9 +13,12 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.QualEnvOrder;
+using Hymson.MES.CoreServices.Bos.Quality;
+using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.QualEnvOrder;
 using Hymson.MES.Services.Dtos.QualEnvOrder;
@@ -43,7 +46,9 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
         private readonly AbstractValidator<QualEnvOrderCreateDto> _validationCreateRules;
         private readonly AbstractValidator<QualEnvOrderModifyDto> _validationModifyRules;
 
-        public QualEnvOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IQualEnvOrderRepository qualEnvOrderRepository, AbstractValidator<QualEnvOrderCreateDto> validationCreateRules, AbstractValidator<QualEnvOrderModifyDto> validationModifyRules, IProcProcedureRepository procProcedureRepository, IInteWorkCenterRepository inteWorkCenterRepository)
+        private readonly IEnvOrderCreateService _envOrderCreateService;
+
+        public QualEnvOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IQualEnvOrderRepository qualEnvOrderRepository, AbstractValidator<QualEnvOrderCreateDto> validationCreateRules, AbstractValidator<QualEnvOrderModifyDto> validationModifyRules, IProcProcedureRepository procProcedureRepository, IInteWorkCenterRepository inteWorkCenterRepository, IEnvOrderCreateService envOrderCreateService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -52,6 +57,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             _validationModifyRules = validationModifyRules;
             _procProcedureRepository = procProcedureRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _envOrderCreateService = envOrderCreateService;
         }
 
         /// <summary>
@@ -64,24 +70,50 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(qualEnvOrderCreateDto);
 
-            //DTO转换实体
-            var qualEnvOrderEntity = qualEnvOrderCreateDto.ToEntity<QualEnvOrderEntity>();
-            qualEnvOrderEntity.Id = IdGenProvider.Instance.CreateId();
-            qualEnvOrderEntity.CreatedBy = _currentUser.UserName;
-            qualEnvOrderEntity.UpdatedBy = _currentUser.UserName;
-            qualEnvOrderEntity.CreatedOn = HymsonClock.Now();
-            qualEnvOrderEntity.UpdatedOn = HymsonClock.Now();
-            qualEnvOrderEntity.SiteId = _currentSite.SiteId ?? 0;
+            var bo = new EnvOrderManualCreateBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                WorkCenterId = qualEnvOrderCreateDto.WorkCenterId,
+                ProcedureId = qualEnvOrderCreateDto.ProcedureId
+            };
 
-            //入库
-            await _qualEnvOrderRepository.InsertAsync(qualEnvOrderEntity);
+            await _envOrderCreateService.ManualCreateAsync(bo);
         }
+
+
+        /// <summary>
+        /// 创建环境检验(转换ID)
+        /// </summary>
+        /// <param name="createConvertDto"></param>
+        /// <returns></returns>
+        public async Task QualEnvOrderCreateConvert(QualEnvOrderCreateConvertDto createConvertDto)
+        {
+            if (createConvertDto == null || string.IsNullOrWhiteSpace(createConvertDto.ProcedureCode) || string.IsNullOrWhiteSpace(createConvertDto.WorkCenterCode))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13605));
+            }
+            var inteWorkCenter = await _inteWorkCenterRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentSite.SiteId, Code = createConvertDto.WorkCenterCode })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES13606));
+
+            var procProcedure = await _procProcedureRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentSite.SiteId, Code = createConvertDto.ProcedureCode })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES13607));
+            var dto = new QualEnvOrderCreateDto()
+            {
+                WorkCenterId = inteWorkCenter.Id,
+                ProcedureId = procProcedure.Id
+            };
+
+            //创建
+            await CreateQualEnvOrderAsync(dto);
+        }
+
 
         /// <summary>
         /// 删除
@@ -114,20 +146,22 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             qualEnvOrderPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var qualEnvOrderDtos = new List<QualEnvOrderDto>();
 
-            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterCode))
+            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterCode) || !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterName))
             {
-                var entityByCodeQuery = new EntityByCodeQuery { Site = _currentSite.SiteId, Code = qualEnvOrderPagedQueryDto.WorkCenterCode };
-                var inteWorkCenter = await _inteWorkCenterRepository.GetByCodeAsync(entityByCodeQuery);
+                var inteWorkCenterQuery = new InteWorkCenterFirstQuery { SiteId = _currentSite.SiteId ?? 0, Code = qualEnvOrderPagedQueryDto.WorkCenterCode, Name = qualEnvOrderPagedQueryDto.WorkCenterName };
+                var inteWorkCenter = await _inteWorkCenterRepository.GetEntitieAsync(inteWorkCenterQuery);
                 if (inteWorkCenter == null)
                 {
                     return new PagedInfo<QualEnvOrderDto>(qualEnvOrderDtos, qualEnvOrderPagedQueryDto.PageIndex, qualEnvOrderPagedQueryDto.PageSize, 0);
                 }
                 qualEnvOrderPagedQuery.WorkCenterId = inteWorkCenter.Id;
             }
-            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureCode))
+            if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureCode) || !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.ProcedureName))
             {
-                var entityByCodeQuery = new EntityByCodeQuery { Site = _currentSite.SiteId, Code = qualEnvOrderPagedQueryDto.WorkCenterCode };
-                var procProcedure = await _procProcedureRepository.GetByCodeAsync(entityByCodeQuery);
+
+                var procProcedureQuery = new ProcProcedureQuery { SiteId = _currentSite.SiteId ?? 0, Code = qualEnvOrderPagedQueryDto.ProcedureCode, Name = qualEnvOrderPagedQueryDto.ProcedureName };
+                var procProcedure = await _procProcedureRepository.GetEntitieAsync(procProcedureQuery);
+
                 if (procProcedure == null)
                 {
                     return new PagedInfo<QualEnvOrderDto>(qualEnvOrderDtos, qualEnvOrderPagedQueryDto.PageIndex, qualEnvOrderPagedQueryDto.PageSize, 0);
@@ -196,7 +230,7 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
