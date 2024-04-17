@@ -83,7 +83,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        
     }
 
-
     /// <summary>
     /// 条码信息表新增Dto
     /// </summary>

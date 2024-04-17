@@ -176,6 +176,7 @@ namespace Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.Prod
                     QualifiedQty = item.Qty,
                     UnQualifiedQty = item.ScrapQty ?? 0,
                     Status = "",
+                    ExpirationDate = createManuSfcStepEntity?.CreatedOn.AddDays(procMaterialEntity?.ValidTime ?? 0).ToString("yyyy-MM-dd HH:mm:ss"),
                     PrintTime = HymsonClock.Now().ToString("yyyy-MM-dd HH:mm:ss"),
                 };
 
