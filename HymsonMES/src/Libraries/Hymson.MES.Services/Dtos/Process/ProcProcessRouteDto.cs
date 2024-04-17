@@ -126,7 +126,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 序号
         /// </summary>
-        public Int16 SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
         /// <summary>
         /// 序号
@@ -189,7 +189,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 序号
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
         /// <summary>
         /// 工序明细ID（起点）

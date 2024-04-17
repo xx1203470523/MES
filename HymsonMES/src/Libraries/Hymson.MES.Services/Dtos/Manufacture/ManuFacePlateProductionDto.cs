@@ -442,7 +442,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 主物料ID
         /// </summary>
-        public string MaterialId { get; set; }
+        public long MaterialId { get; set; }
 
         /// <summary>
         /// 主物料编码

@@ -427,7 +427,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 await _procProcessRouteRepository.ResetCurrentVersionAsync(new ResetCurrentVersionCommand
                 {
                     SiteId = processRoute.SiteId,
-                    Code= processRoute.Code,
+                    Code = processRoute.Code,
                     UpdatedOn = procProcessRouteEntity.UpdatedOn,
                     UpdatedBy = procProcessRouteEntity.UpdatedBy
                 });
@@ -565,7 +565,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = entity.SiteId,
                 ProcessRouteId = entity.Id,
-                SerialNo = "",
+                //SerialNo = "",
                 ManualSortNumber = s.ManualSortNumber,
                 ProcedureId = s.ProcedureId,
                 CheckType = s.CheckType,
@@ -587,13 +587,13 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             SortNodes(ref newNodes, nodesWithEndNode, links, Array.Empty<ProcProcessRouteDetailNodeEntity>());
 
             // 重新排序
-            newNodes.ForEach(f => f.SerialNo = $"{newNodes.IndexOf(f) + 1}");
+            newNodes.ForEach(f => f.SerialNo = newNodes.IndexOf(f) + 1);
 
             // 补回尾工序
             var lastNode = saveNodes.FirstOrDefault(w => w.ProcedureId == EndNodeId);
             if (lastNode != null)
             {
-                lastNode.SerialNo = $"{newNodes.Count + 1}";
+                lastNode.SerialNo = newNodes.Count + 1;
                 newNodes.Add(lastNode);
             }
 
@@ -625,7 +625,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             List<ProcProcessRouteDetailNodeEntity> nextNodes = new();
             foreach (var node in targetNodes)
             {
-                node.SerialNo = $"{nodesOfSorted.Count + 1}";
+                node.SerialNo = nodesOfSorted.Count + 1;
 
                 nodesOfSorted.RemoveAll(f => f.ProcedureId == node.ProcedureId);
                 nodesOfSorted.Add(node);

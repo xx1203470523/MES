@@ -185,7 +185,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
                 response.DetailList.Add(new InteClassDetailDto
                 {
                     Id = item.Id,
-                    SerialNo = $"{index}",
+                    SerialNo = index,
                     DetailClassType = item.DetailClassType,
                     ProjectContent = item.ProjectContent,
                     StartTime = item.StartTime,
