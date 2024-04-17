@@ -57,5 +57,15 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// 完成时长（分钟）
         /// </summary>
         public int? CompleteTime { get; set; }
+
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public bool? IsQualified { get; set; }
+
+        /// <summary>
+        /// 1、待检验2、检验中3、已完成
+        /// </summary>
+        public EquInspectionRecordStatusEnum Status { get; set; }
     }
 }

@@ -126,10 +126,15 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public string OrderCode { get; set; }
 
-        ///// <summary>
-        // /// 1、待检验2、检验中3、已完成
-        // /// </summary>
-        // public string Status { get; set; }
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public bool? IsQualified { get; set; }
+
+        /// <summary>
+        /// 1、待检验2、检验中3、已完成
+        /// </summary>
+        public EquInspectionRecordStatusEnum Status { get; set; }
 
         ///// <summary>
         // /// 是否合格
@@ -188,6 +193,21 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 点检人员
         /// </summary>
         public string OperateBy { get; set; }
+
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public bool IsQualified { get; set; } = false;
+
+        /// <summary>
+        /// 是否通知维修
+        /// </summary>
+        public bool IsNoticeRepair { get; set; } = false;
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 点检项目和结果列表

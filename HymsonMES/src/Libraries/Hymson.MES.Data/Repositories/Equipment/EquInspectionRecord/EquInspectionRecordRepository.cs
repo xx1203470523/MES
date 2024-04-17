@@ -132,7 +132,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
 
-            sqlBuilder.Select(@"eir.Id,eir.StartExecuTime,eir.InspectionTaskSnapshootId,eit.Code as OrderCode,ee.EquipmentCode,ee.EquipmentName,eit.WorkCenterId,eit.InspectionType,eit.Type,eir.UpdatedBy,eir.UpdatedOn,eit.CompleteTime,iwc.Code as WorkCenterCode");
+            sqlBuilder.Select(@"eir.Id,eir.StartExecuTime,eir.InspectionTaskSnapshootId,eit.Code as OrderCode,ee.EquipmentCode,ee.EquipmentName,eit.WorkCenterId,eit.InspectionType,eit.Type,eir.UpdatedBy,eir.UpdatedOn,eit.CompleteTime,iwc.Code as WorkCenterCode,eir.Status,eir.IsQualified");
 
             sqlBuilder.OrderBy("eir.UpdatedOn DESC");
             sqlBuilder.Where("eir.IsDeleted = 0");

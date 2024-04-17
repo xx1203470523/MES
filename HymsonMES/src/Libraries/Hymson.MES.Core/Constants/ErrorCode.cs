@@ -1987,6 +1987,7 @@
         public const string MES15802 = "此设备点检任务{code}在系统中已经存在!";
         public const string MES15803 = "设备点检任务不存在！";
         public const string MES15804 = "点检任务的执行月份不是当前月份,不能生成设备点检录入！";
+        public const string MES15805 = "请先录入点检任务结果！";
         #endregion
     }
 }

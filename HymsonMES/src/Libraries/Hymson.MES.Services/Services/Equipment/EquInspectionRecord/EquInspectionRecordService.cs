@@ -222,6 +222,9 @@ namespace Hymson.MES.Services.Services.Equipment
             {
                 Id = entity.Id,
                 OrderCode = entity.OrderCode,
+                Remark = entity.Remark,
+                IsQualified=entity.IsQualified??false,
+                IsNoticeRepair=entity.IsNoticeRepair??false,
                 TaskItemDtos = taskItemDtos
             };
 
@@ -414,6 +417,11 @@ namespace Hymson.MES.Services.Services.Equipment
                 throw new CustomerValidationException(nameof(ErrorCode.MES10104));
             }
 
+            if (!recordEntity.IsQualified.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15805));
+            }
+
             // 只有"检验中"的状态才允许点击"完成"
             if (recordEntity.Status != EquInspectionRecordStatusEnum.Inspecting)
             {
@@ -421,6 +429,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     .WithData("Before", EquInspectionRecordStatusEnum.Inspecting.GetDescription())
                     .WithData("After", EquInspectionRecordStatusEnum.Completed.GetDescription());
             }
+
 
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
