@@ -289,6 +289,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuToolingBindRepository _manuToolingBindRepository;
 
         /// <summary>
+        /// 降级录入仓储
+        /// </summary>
+        private readonly IManuDowngradingRepository _manuDowngradingRepository;
+
+        /// <summary>
         /// 设备服务
         /// </summary>
         private readonly IEquEquipmentService _equEquipmentService;
@@ -333,6 +338,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuSfcStepRepository manuSfcStepRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuToolingBindRepository manuToolingBindRepository,
+            IManuDowngradingRepository manuDowngradingRepository,
             IEquEquipmentService equEquipmentService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
@@ -376,6 +382,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _equEquipmentService = equEquipmentService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
+            _manuDowngradingRepository = manuDowngradingRepository;
         }
 
 
@@ -991,6 +998,49 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             });
 
             await _manuToolingBindRepository.InsertRangeAsync(entities);
+        }
+
+        /// <summary>
+        /// 获取电芯降级信息051
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<List<SortingSfcInfo>> GetSfcInfoAsync(GetSfcInfoDto dto)
+        {
+            //获取设备基础信息
+            var equResModel = await _equEquipmentService.GetEquResAsync(dto);
+            //查询降级信息
+            var downgradingSfcs = await _manuDowngradingRepository.GetBySFCsAsync(new ManuDowngradingBySFCsQuery
+            {
+                SiteId = equResModel.SiteId,
+                SFCs = dto.SfcList
+            });
+
+            return downgradingSfcs.Select(x => new SortingSfcInfo
+            {
+                SFC = x.SFC,
+                Grade = x.Grade
+            }).ToList();
+        }
+
+        /// <summary>
+        /// 分选拆盘052
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task SortingUnBindAsync(SortingUnBindDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
+            //2. 托盘电芯解绑
+            InteVehicleUnBindDto bindDto = new InteVehicleUnBindDto();
+            bindDto.ContainerCode = dto.ContainCode;
+            bindDto.SfcList = dto.SfcList;
+            bindDto.SiteId = equResModel.SiteId;
+            bindDto.UserName = dto.EquipmentCode;
+
+            //3. 数据操作
+            await _inteVehicleService.VehicleUnBindOperationAsync(bindDto);
         }
 
         /// <summary>

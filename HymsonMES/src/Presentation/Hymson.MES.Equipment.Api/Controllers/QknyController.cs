@@ -54,7 +54,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 是否调试
         /// </summary>
-        private readonly bool IS_DEBUG = true;
+        private readonly bool IS_DEBUG = false;
 
         /// <summary>
         /// 构造函数
@@ -1302,18 +1302,38 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("GetSfcInfo")]
         [LogDescription("获取电芯信息051", BusinessType.OTHER, "GetSfcInfo051", ReceiverTypeEnum.MES)]
-        public async Task GetSfcInfoAsync(GetSfcInfoDto dto)
+        public async Task<List<SortingSfcInfo>> GetSfcInfoAsync(GetSfcInfoDto dto)
         {
             if (IS_DEBUG == true)
             {
-                return;
+                return new List<SortingSfcInfo> { new SortingSfcInfo { SFC = "SFC001", Grade = "B1" } };
             }
+
+            return await _qknyService.GetSfcInfoAsync(dto);
 
             //TODO
             //1. 用于分选工序，获取电芯是B品，NG品，良品
 
             //await _qknyService.InboundAsync(dto);
 
+        }
+
+        /// <summary>
+        /// 分选拆盘052
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SortingUnBind")]
+        [LogDescription("分选拆盘052", BusinessType.OTHER, "SortingUnBind052", ReceiverTypeEnum.MES)]
+        public async Task SortingUnBindAsync(SortingUnBindDto dto)
+        {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.SortingUnBindAsync(dto);
         }
 
     }

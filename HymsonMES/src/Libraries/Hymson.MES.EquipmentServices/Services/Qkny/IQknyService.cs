@@ -114,5 +114,19 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task ToolBindMaterialAsync(ToolBindMaterialDto dto);
+
+        /// <summary>
+        /// 获取电芯降级信息051
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<List<SortingSfcInfo>> GetSfcInfoAsync(GetSfcInfoDto dto);
+
+        /// <summary>
+        /// 分选拆盘052
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task SortingUnBindAsync(SortingUnBindDto dto);
     }
 }
