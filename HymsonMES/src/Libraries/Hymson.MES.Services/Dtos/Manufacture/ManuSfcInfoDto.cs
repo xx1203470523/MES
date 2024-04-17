@@ -79,8 +79,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
     }
 
     /// <summary>
