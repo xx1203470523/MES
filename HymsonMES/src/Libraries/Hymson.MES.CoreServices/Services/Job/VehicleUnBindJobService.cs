@@ -19,9 +19,15 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Enums.Job;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    [Job("载具解绑", JobTypeEnum.Standard)]
     public class VehicleUnBindJobService : IJobService
     {
         private readonly IInteVehicleFreightRepository _inteVehicleFreightRepository;
