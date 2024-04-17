@@ -32,6 +32,10 @@ using Hymson.MES.Services.Services.ManuJzBindRecord;
 using Hymson.MES.Services.Dtos.ManuJzBindRecord;
 using Hymson.MES.CoreServices.Services.Qkny;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory;
+using Hymson.MES.CoreServices.Dtos.Manufacture;
+using Hymson.Localization.Services;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
 {
@@ -81,6 +85,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         private readonly IManuSfcProduceService _manuSfcProduceService;
 
         /// <summary>
+        /// 物料库存
+        /// </summary>
+        private readonly IWhMaterialInventoryService _whMaterialInventoryService;
+
+        /// <summary>
+        /// 多语言
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public FitTogetherService(IEquEquipmentService equEquipmentService,
@@ -90,7 +104,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             IManuCreateBarcodeService manuCreateBarcodeService,
             IPlanWorkOrderService planWorkOrderService,
             IManuJzBindRecordService manuJzBindRecordService,
-            IManuSfcProduceService manuSfcProduceService)
+            IManuSfcProduceService manuSfcProduceService,
+            IWhMaterialInventoryService whMaterialInventoryService,
+            ILocalizationService localizationService)
         {
             _equEquipmentService = equEquipmentService;
             _manuPassStationService = manuPassStationService;
@@ -100,6 +116,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             _planWorkOrderService = planWorkOrderService;
             _manuJzBindRecordService = manuJzBindRecordService;
             _manuSfcProduceService = manuSfcProduceService;
+            _whMaterialInventoryService = whMaterialInventoryService;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -225,9 +243,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
                 //3. 进站
                 await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
             }
-            else if(dto.OperationType == "3")
+            else if (dto.OperationType == "3")
             {
-                if(string.IsNullOrEmpty(jzModel.Sfc) == true)
+                if (string.IsNullOrEmpty(jzModel.Sfc) == true)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES45271));
                 }
@@ -342,7 +360,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             #endregion
 
             #region 极组出站数据
-            foreach(var item in jzSfcList)
+            foreach (var item in jzSfcList)
             {
                 var jzOutStationRequestBo = new OutStationRequestBo
                 {
@@ -459,7 +477,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
 
             //4. 出站
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
-            if(dto.OperationType == "3")
+            if (dto.OperationType == "3")
             {
                 await _manuJzBindService.DeletePhysicsAsync(jzModel.Id);
             }
@@ -468,5 +486,76 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             //清除极组在制
             trans.Complete();
         }
+
+        /// <summary>
+        /// 卷绕极组产出上报
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task CollingPolarAsync(CollingPolarDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //2. 查询极组条码是否已经存在
+            WhMaterialInventoryBarCodeQuery whQuery = new WhMaterialInventoryBarCodeQuery();
+            whQuery.SiteId = equResModel.SiteId;
+            whQuery.BarCode = dto.Sfc;
+            var whInfo = await _whMaterialInventoryService.GetByBarCodeAsync(whQuery);
+            if (whInfo != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45230));
+            }
+            //3. 构造数据
+            //3.1 外部条码下达
+            var barcodeCreateBo = new CreateBarcodeByExternalSFCBo
+            {
+                SiteId = equResModel.SiteId,
+                UserName = equResModel.EquipmentCode,
+                EquipmentId = equResModel.EquipmentId,
+                ResourceId = equResModel.ResId,
+                ProcedureId = equResModel.ProcedureId,
+                WorkOrderId = planEntity.Id,
+                ExternalSFCs = new BarcodeDto[] { new() { SFC = dto.Sfc, Qty = 1 } }
+            };
+            //3.2 进站
+            var inStationBo = new SFCInStationBo
+            {
+                SiteId = equResModel.SiteId,
+                UserName = equResModel.EquipmentCode,
+                EquipmentId = equResModel.EquipmentId,
+                ResourceId = equResModel.ResId,
+                ProcedureId = equResModel.ProcedureId,
+                SFCs = new[] { dto.Sfc }
+            };
+            //3.1 出站
+            var outStationRequestBo = new OutStationRequestBo()
+            {
+                SFC = dto.Sfc,
+                IsQualified = dto.Passed == 1,
+                OutStationUnqualifiedList = dto.NgList?.Select(x => new OutStationUnqualifiedBo { UnqualifiedCode = x })
+            };
+            var outStationBo = new SFCOutStationBo
+            {
+                SiteId = equResModel.SiteId,
+                UserName = equResModel.EquipmentCode,
+                EquipmentId = equResModel.EquipmentId,
+                ResourceId = equResModel.ResId,
+                ProcedureId = equResModel.ProcedureId,
+                OutStationRequestBos = new OutStationRequestBo[] { outStationRequestBo }
+            };
+
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+
+            //外部条码下达
+            await _manuCreateBarcodeService.CreateBarcodeByExternalSFCAsync(barcodeCreateBo, _localizationService);
+            //进站
+            await _manuPassStationService.InStationRangeBySFCAsync(inStationBo);
+            //出站
+            await _manuPassStationService.OutStationRangeBySFCAsync(outStationBo);
+
+            trans.Complete();
+        }
+
     }
 }

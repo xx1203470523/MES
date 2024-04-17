@@ -326,12 +326,19 @@ namespace Hymson.MES.Core.Constants
 
         #endregion
 
-        #region 库存
+        #region 库存接收
 
         /// <summary>
         /// 条码已经在库存中存在
         /// </summary>
         public const string MES45230 = "条码已经在库存中存在";
+
+        /// <summary>
+        /// 物料条码格式错误
+        /// </summary>
+        public const string MES45231 = "物料条码【{BarCode}】格式错误，必须为英文逗号分隔的五段码";
+        public const string MES45232 = "物料条码【{BarCode}】格式错误，第4段内容必须是数字且大于0";
+        public const string MES45233 = "物料【{MaterialCode}】基础信息不存在";
 
         #endregion
 
@@ -346,6 +353,13 @@ namespace Hymson.MES.Core.Constants
         /// 极组条码没有绑定的电芯
         /// </summary>
         public const string MES45271 = "极组条码没有绑定的电芯";
+
+        #endregion
+
+        #region 工装绑定
+
+        public const string MES45280 = "条码已绑定工装，不允许重复绑定！【{Barcode}】";
+        public const string MES45281 = "条码库存不存在，不允许绑定！【{Barcode}】";
 
         #endregion
     }

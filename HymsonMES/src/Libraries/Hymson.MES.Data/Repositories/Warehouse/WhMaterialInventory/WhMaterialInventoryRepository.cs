@@ -177,11 +177,14 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var template = sqlBuilder.AddTemplate(GetWhMaterialInventoryEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
-            sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryQuery.MaterialBarCode))
             {
                 sqlBuilder.Where("MaterialBarCode=@MaterialBarCode");
+            }
+            if (whMaterialInventoryQuery.MaterialBarCodes != null && whMaterialInventoryQuery.MaterialBarCodes.Any())
+            {
+                sqlBuilder.Where("MaterialBarCode IN @MaterialBarCodes");
             }
 
             using var conn = GetMESDbConnection();

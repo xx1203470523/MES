@@ -48,5 +48,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         /// <param name="dto"></param>
         /// <returns></returns>
         Task OutboundBindJzSingleAsync(OutboundBindJzSingleDto dto);
+
+        /// <summary>
+        /// 卷绕极组产出上报
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task CollingPolarAsync(CollingPolarDto dto);
     }
 }
