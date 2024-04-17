@@ -1,6 +1,6 @@
 using Dapper;
 
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Qual;
 
@@ -22,7 +22,7 @@ public partial class QualIqcInspectionItemRepository
     /// <returns></returns>
     public async Task<int> InsertIgnoreAsync(QualIqcInspectionItemCreateCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertIgnoreSql, command);
     }
 
@@ -33,7 +33,7 @@ public partial class QualIqcInspectionItemRepository
     /// <returns></returns>
     public async Task<int> InsertIgnoreAsync(IEnumerable<QualIqcInspectionItemCreateCommand> commands)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertIgnoreSql, commands);
     }
 

@@ -1,5 +1,5 @@
 using Dapper;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Qual;
 
@@ -19,13 +19,13 @@ public partial class QualIqcInspectionItemDetailRepository
     /// <returns></returns>
     public async Task<int> DeleteByQualIqcInspectionItemIdAsync(long qualIqcInspectionItemId)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteByQualIqcInspectionItemIdSql, new { QualIqcInspectionItemId = qualIqcInspectionItemId });
     }
 
     public async Task<int> DeleteByQualIqcInspectionItemIdsAsync(IEnumerable<long> qualIqcInspectionItemIds)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteByQualIqcInspectionItemIdsSql, new { QualIqcInspectionItemIds = qualIqcInspectionItemIds });
     }
 }

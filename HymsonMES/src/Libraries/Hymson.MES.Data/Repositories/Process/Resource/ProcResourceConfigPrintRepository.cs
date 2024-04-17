@@ -13,7 +13,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 using ConnectionOptions = Hymson.MES.Data.Options.ConnectionOptions;
 
 namespace Hymson.MES.Data.Repositories.Process

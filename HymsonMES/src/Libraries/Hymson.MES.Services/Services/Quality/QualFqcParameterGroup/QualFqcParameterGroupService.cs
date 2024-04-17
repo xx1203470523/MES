@@ -24,7 +24,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using MySqlX.XDevAPI.Relational;
+
 using OfficeOpenXml;
 using System.Reflection;
 using System.Security.Policy;

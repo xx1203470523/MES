@@ -18,7 +18,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Linq;
-using static Mysqlx.Expect.Open.Types.Condition.Types;
+
 
 namespace Hymson.MES.Services.Services.Process
 {

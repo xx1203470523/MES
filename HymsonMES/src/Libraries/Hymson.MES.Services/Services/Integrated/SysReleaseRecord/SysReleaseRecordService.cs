@@ -20,7 +20,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using IdGen;
-using MySqlX.XDevAPI;
+
 using System;
 using System.Transactions;
 

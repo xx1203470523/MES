@@ -1,5 +1,5 @@
 using FluentValidation;
-using Google.Protobuf.WellKnownTypes;
+
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
