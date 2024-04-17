@@ -74,7 +74,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             if (notIncludeSFCs.Any())
             {
                 var validationFailure = new ValidationFailure();
-
+                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>();
                 validationFailure.FormattedMessagePlaceholderValues.Add("SFC", string.Join(',', param.Barcodes));
                 validationFailure.ErrorCode = nameof(ErrorCode.MES17415);
                 validationFailures.Add(validationFailure);
@@ -92,7 +92,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             if(sfcCirculationEntities == null || !sfcCirculationEntities.Any())
             {
                 var validationFailure = new ValidationFailure();
-
+                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>();
                 validationFailure.FormattedMessagePlaceholderValues.Add("sfc", string.Join(',', param.Barcodes));
                 validationFailure.ErrorCode = nameof(ErrorCode.MES12840);
                 validationFailures.Add(validationFailure);
@@ -109,7 +109,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 if (groupCirulationEntities.Count() >= 1)
                 {
                     var validationFailure = new ValidationFailure();
-
+                    validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>();
                     validationFailure.FormattedMessagePlaceholderValues.Add("sfc1", string.Join(',', string.Join(',', groupCirulationEntities.ToList()[0].Select(s=>s.SFC))));
                     validationFailure.FormattedMessagePlaceholderValues.Add("sfc2", string.Join(',', string.Join(',', groupCirulationEntities.ToList()[1].Select(s => s.SFC))));
                     validationFailure.ErrorCode = nameof(ErrorCode.MES12841);

@@ -1,8 +1,10 @@
 ﻿using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
@@ -18,6 +20,7 @@ namespace Hymson.MES.CoreServices.Services.Job
     /// <summary>
     /// FQCAutoCreateJOB
     /// </summary>
+    [Job("FQC自动创建检验单", JobTypeEnum.Standard)]
     public class FQCAutoCreateService : IJobService
     {
         /// <summary>
