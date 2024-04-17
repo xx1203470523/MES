@@ -1,9 +1,11 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common;
@@ -24,6 +26,7 @@ namespace Hymson.MES.CoreServices.Services.Job
     /// <summary>
     /// 载具绑定JOB
     /// </summary>
+    [Job("载具绑盘", JobTypeEnum.Standard)]
     public class VehicleBindJobService : IJobService
     {
         private readonly IInteVehicleRepository _inteVehicleRepository;

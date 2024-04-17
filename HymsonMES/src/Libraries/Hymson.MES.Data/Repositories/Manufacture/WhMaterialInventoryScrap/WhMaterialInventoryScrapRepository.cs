@@ -8,7 +8,7 @@ using Hymson.MES.Data.Repositories.Manufacture.WhMaterialInventoryScrap.View;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

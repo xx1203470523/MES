@@ -9,7 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using MySql.Data.MySqlClient;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

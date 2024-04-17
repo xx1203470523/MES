@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using MimeKit;
-using Mysqlx.Crud;
+
 using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.Process

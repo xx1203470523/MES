@@ -13,7 +13,7 @@ using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.QualEnvOrderDetail
 {

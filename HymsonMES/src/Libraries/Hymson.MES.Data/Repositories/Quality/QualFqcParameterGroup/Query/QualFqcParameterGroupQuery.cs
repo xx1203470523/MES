@@ -3,6 +3,31 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Data.Repositories.Quality.Query
 {
     /// <summary>
+    /// 修改FQC检验参数组状态 参数
+    /// </summary>
+    public class UpdateFqcParameterGroupStatusQuery : QueryAbstraction
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 状态(0-新建 1-启用 2-保留 3-废除)
+        /// </summary>
+        public SysDataStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 更新人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdatedOn { get; set; }
+    }
+    /// <summary>
     /// FQC检验参数组 查询参数
     /// </summary>
     public class QualFqcParameterGroupQuery : QueryAbstraction

@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.Data.Repositories;
 using Hymson.MES.Services.Dtos.Qual;
 
 namespace Hymson.MES.Services.Dtos.Quality
@@ -265,4 +266,19 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long[] Ids { get; set; }
     }
 
+    /// <summary>
+    /// 修改FQC检验参数组状态 参数
+    /// </summary> 
+    public class UpdateFqcParameterGroupStatusQueryDto
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 状态(0-新建 1-启用 2-保留 3-废除)
+        /// </summary>
+        public SysDataStatusEnum Status { get; set; }
+    }
 }

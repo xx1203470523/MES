@@ -6,7 +6,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Inte;
 
@@ -17,13 +17,12 @@ namespace Hymson.MES.Data.Repositories.Inte;
 /// <para>@作者：Jim</para>
 /// <para>@创建时间：2023-12-13</para>
 /// </summary>
-public partial class InteContainerFreightRepository : IInteContainerFreightRepository
+public partial class InteContainerFreightRepository : BaseRepository,IInteContainerFreightRepository
 {
-    private readonly ConnectionOptions _connectionOptions;
 
-    public InteContainerFreightRepository(IOptions<ConnectionOptions> connectionOptions)
+    public InteContainerFreightRepository(IOptions<ConnectionOptions> connectionOptions):base(connectionOptions)
     {
-        _connectionOptions = connectionOptions.Value;
+        
     }
 
     #region 查询
@@ -43,7 +42,7 @@ public partial class InteContainerFreightRepository : IInteContainerFreightRepos
 
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         return await conn.QueryFirstOrDefaultAsync<InteContainerFreightEntity>(templateData.RawSql, templateData.Parameters);
     }
@@ -63,7 +62,7 @@ public partial class InteContainerFreightRepository : IInteContainerFreightRepos
 
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         return await conn.QueryAsync<InteContainerFreightEntity>(templateData.RawSql, templateData.Parameters);
     }
@@ -92,7 +91,7 @@ public partial class InteContainerFreightRepository : IInteContainerFreightRepos
         sqlBuilder.AddParameters(new { Rows = query.PageSize });
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         var inteContainerFreightEntities = await conn.QueryAsync<InteContainerFreightEntity>(templateData.RawSql, templateData.Parameters);
         var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
@@ -111,7 +110,7 @@ public partial class InteContainerFreightRepository : IInteContainerFreightRepos
     /// <returns></returns>
     public async Task<int> InsertAsync(InteContainerFreightCreateCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, command);
     }
 
@@ -122,7 +121,7 @@ public partial class InteContainerFreightRepository : IInteContainerFreightRepos
     /// <returns></returns>
     public async Task<int> InsertAsync(IEnumerable<InteContainerFreightCreateCommand> commands)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, commands);
     }
 
@@ -137,7 +136,7 @@ public partial class InteContainerFreightRepository : IInteContainerFreightRepos
     /// <returns></returns>
     public async Task<int> UpdateAsync(InteContainerFreightUpdateCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateByIdSql, command);
     }
 
@@ -148,7 +147,7 @@ public partial class InteContainerFreightRepository : IInteContainerFreightRepos
     /// <returns></returns>
     public async Task<int> UpdateAsync(IEnumerable<InteContainerFreightUpdateCommand> commands)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateByIdSql, commands);
     }
 
@@ -163,7 +162,7 @@ public partial class InteContainerFreightRepository : IInteContainerFreightRepos
     /// <returns></returns>
     public async Task<int> DeleteAsync(DeleteCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteByIdSql, command);
     }
 
@@ -174,7 +173,7 @@ public partial class InteContainerFreightRepository : IInteContainerFreightRepos
     /// <returns></returns>
     public async Task<int> DeleteMoreAsync(DeleteMoreCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteMoreByIdSql, command);
     }
 

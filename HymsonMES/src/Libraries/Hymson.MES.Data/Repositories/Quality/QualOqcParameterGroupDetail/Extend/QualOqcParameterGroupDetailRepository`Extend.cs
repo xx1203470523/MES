@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Hymson.MES.Data.Repositories.Common.Command;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Quality;
 

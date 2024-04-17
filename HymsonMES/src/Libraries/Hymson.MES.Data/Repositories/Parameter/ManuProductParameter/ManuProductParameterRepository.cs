@@ -4,7 +4,7 @@ using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 using System.Text;
 using static Dapper.SqlMapper;
 

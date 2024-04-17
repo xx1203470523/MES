@@ -6,8 +6,6 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquConsumable.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
-
 namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
 {
     /// <summary>

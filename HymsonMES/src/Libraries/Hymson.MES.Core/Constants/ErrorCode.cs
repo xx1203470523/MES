@@ -456,6 +456,12 @@
         public const string MES11715 = "检验单状态为检验中、待审核、已关闭的单据，删除失败！";
         public const string MES11716 = "实际已检数量【{CheckedQty}】少于应检数量【{SampleQty}】！";
 
+        public const string MES11717 = "检验单明细为空！";
+        public const string MES11718 = "{materialId}参数项目为空检验单明细为空！";
+        public const string MES11719 = "记录数量小于批次数量，不予生成";
+        public const string MES11720 = "重复提交，条码已存在FQC检验单条码记录表中!";
+        public const string MES11721 = "FQC创建保存错误!";
+
 
 
 
@@ -686,7 +692,8 @@
         public const string MES12837 = "产品【{ProductCode}】没有生成新条码，请检查!";
         public const string MES12838 = "产品序列码【{sfc}】带有复判标识，不允许操作!";
         public const string MES12839 = "产品序列码【{sfc}】带有NG标识，不允许操作!";
-
+        public const string MES12840 = "产品序列码【{sfc}】没有指定工序的流转记录，合并失败!";
+        public const string MES12841 = "产品序列码【{sfc1}】与产品序列码【{sfc2}】合并流转记录不一致，合并失败!";
         #endregion
 
         #region 故障现象 12900
@@ -2020,6 +2027,10 @@
         #region FQC检验项目 19982
         public const string MES19982 = "物料{materialCode}物料版本{materialversion}检验项目版本{version}已存在，不允许重复添加！";
         public const string MES19983 = "已启用状态的检验单不允许被删除！";
+
+
+        public const string MES19987 = "非新建状态不允许删除！"; 
+        public const string MES19988 = "当前物料已存在启用的检验项目！";
         #endregion
 
 
@@ -2032,6 +2043,16 @@
         public const string MES11605 = "使用状态不能为空！";
         public const string MES11606 = "导入的数据中资源编码重复！";
         public const string MES11607 = "导入的数据中工序编码重复！";
+        #endregion
+
+
+        #region 设备点检 15800
+        public const string MES15801 = "此设备点检项目{code}在系统中已经存在!";
+        public const string MES15802 = "此设备点检任务{code}在系统中已经存在!";
+        public const string MES15803 = "设备点检任务不存在！";
+        public const string MES15804 = "点检任务的执行月份不是当前月份,不能生成设备点检录入！";
+        public const string MES15805 = "请先录入点检任务结果！";
+        public const string MES15806 = "点检任务中,重复配置点检项目！";
         #endregion
     }
 }

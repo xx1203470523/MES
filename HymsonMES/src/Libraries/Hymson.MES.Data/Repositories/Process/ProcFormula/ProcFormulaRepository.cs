@@ -7,7 +7,7 @@ using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.View;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 
 
 namespace Hymson.MES.Data.Repositories.Process
