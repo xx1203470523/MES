@@ -24,6 +24,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using IdGen;
 using MySqlX.XDevAPI.Relational;
 using OfficeOpenXml;
 using System.Reflection;
@@ -259,9 +260,13 @@ namespace Hymson.MES.Services.Services.Quality
         {
             if (!deleteDto.Ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
-            if (deleteDto.Status == (SysDataStatusEnum)1) throw new CustomerValidationException(nameof(ErrorCode.MES19983));
+            //if (deleteDto.Status != SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES19983));
 
             var entities = await _qualFqcParameterGroupRepository.GetByIdsAsync(deleteDto.Ids);
+            if (entities.Any(it => it.Status != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19987));
+            }
 
             using var scope = TransactionHelper.GetTransactionScope();
             var command = new DeleteCommand
@@ -486,6 +491,38 @@ namespace Hymson.MES.Services.Services.Quality
                 }
             }
             scope.Complete();
+        }
+
+        /// <summary>
+        /// 修改FQC参数组状态
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task ModifStatusAsync(UpdateFqcParameterGroupStatusQueryDto dto)
+        {
+            if (dto.Status == SysDataStatusEnum.Enable)
+            {
+                var fqcParameter = await _qualFqcParameterGroupRepository.GetByIdAsync(dto.Id);
+                var isFqcParameterGroupEnable = await _qualFqcParameterGroupRepository.GetEntityAsync(
+                    new QualFqcParameterGroupQuery
+                    {
+                        SiteId = _currentSite.SiteId,
+                        MaterialId = fqcParameter.MaterialId,
+                        Status = SysDataStatusEnum.Enable
+                    });
+                if (isFqcParameterGroupEnable != null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19988));
+                }
+            }
+            var param = new UpdateFqcParameterGroupStatusQuery
+            {
+                Id = dto.Id,
+                Status = dto.Status,
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+            await _qualFqcParameterGroupRepository.UpdateStatusAsync(param);
         }
     }
 }
