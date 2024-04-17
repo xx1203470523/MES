@@ -152,104 +152,87 @@ namespace Hymson.MES.Services.Services.Report
         {
             var responseDto = new WorkshopJobControlStepReportDto() { SFC = sfc };
 
-            var sfcInfo = await _manuSfcInfoRepository.GetUsedBySFCAsync(sfc);
-            if (sfcInfo == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18106)).WithData("sfc", sfc);
-            }
+            var sfcInfoEntity = await _manuSfcInfoRepository.GetUsedBySFCAsync(sfc)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18106)).WithData("sfc", sfc);
 
-            var sfcSteps = await _manuSfcStepRepository.GetInOutStationStepsBySFCAsync(new EntityBySFCQuery() { SiteId = _currentSite.SiteId ?? 0, SFC = sfc });
-
-            if (sfcSteps == null || !sfcSteps.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18101)).WithData("sfc", sfc);
-            }
             #region 查询基础数据
-            //查询工单信息
-            var workOrder = await _planWorkOrderRepository.GetByIdAsync(sfcInfo.WorkOrderId ?? 0);
-            if (workOrder == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18102)).WithData("sfc", sfc);
-            }
+            // 查询工单信息
+            var workOrder = await _planWorkOrderRepository.GetByIdAsync(sfcInfoEntity.WorkOrderId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18102)).WithData("sfc", sfc);
+
+            // 查询物料信息
+            var materialEntity = await _procMaterialRepository.GetByIdAsync(sfcInfoEntity.ProductId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18103)).WithData("sfc", sfc);
+
+            // 查询工艺路线
+            var processRouteEntity = await _procProcessRouteRepository.GetByIdAsync(workOrder.ProcessRouteId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfc);
+
+            // 查询Bom
+            var bomEntity = await _procBomRepository.GetByIdAsync(workOrder.ProductBOMId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18105)).WithData("sfc", sfc);
+
             responseDto.OrderCode = workOrder.OrderCode;
-
-            //查询物料信息
-            var material = await _procMaterialRepository.GetByIdAsync(sfcInfo.ProductId);
-            if (material == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18103)).WithData("sfc", sfc);
-            }
-            responseDto.MaterialCodrNameVersion = material.MaterialCode + "/" + material.MaterialName + "/" + material.Version;
-
-            //查询工艺路线
-            var processRoute = await _procProcessRouteRepository.GetByIdAsync(workOrder.ProcessRouteId);
-            if (processRoute == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfc);
-            }
-            responseDto.ProcessRouteCodeNameVersion = processRoute.Code + "/" + processRoute.Name + "/" + processRoute.Version;
-
-            //查询Bom
-            var bom = await _procBomRepository.GetByIdAsync(workOrder.ProductBOMId);
-            if (bom == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18105)).WithData("sfc", sfc);
-            }
-            responseDto.ProcBomCodeNameVersion = bom.BomCode + "/" + bom.BomName + "/" + bom.Version;
-
+            responseDto.MaterialCodrNameVersion = materialEntity.MaterialCode + "/" + materialEntity.MaterialName + "/" + materialEntity.Version;
+            responseDto.ProcessRouteCodeNameVersion = processRouteEntity.Code + "/" + processRouteEntity.Name + "/" + processRouteEntity.Version;
+            responseDto.ProcBomCodeNameVersion = bomEntity.BomCode + "/" + bomEntity.BomName + "/" + bomEntity.Version;
             #endregion
 
-            //查询工单信息
+            // 查询进出站步骤
+            var sfcSteps = await _manuSfcStepRepository.GetInOutStationStepsBySFCAsync(new EntityBySFCQuery() { SiteId = _currentSite.SiteId ?? 0, SFC = sfc });
+            if (sfcSteps == null || !sfcSteps.Any()) return responseDto;
+
+            // 查询工单信息
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(sfcSteps.Select(x => x.WorkOrderId).Distinct().ToArray());
 
-            //入站
-            var inSfcSteps = sfcSteps.Where(x => x.Operatetype == Core.Enums.Manufacture.ManuSfcStepTypeEnum.InStock).OrderBy(x => x.CreatedOn).ToList();
+            // 入站
+            var inSfcSteps = sfcSteps.Where(x => x.Operatetype == Core.Enums.Manufacture.ManuSfcStepTypeEnum.InStock).OrderBy(x => x.CreatedOn);
 
-            //出站
-            var outSfcSteps = sfcSteps.Where(x => x.Operatetype == Core.Enums.Manufacture.ManuSfcStepTypeEnum.OutStock).ToList();
+            // 出站
+            var outSfcSteps = sfcSteps.Where(x => x.Operatetype == Core.Enums.Manufacture.ManuSfcStepTypeEnum.OutStock);
 
+            // 如果无步骤信息
+            if (inSfcSteps == null || !inSfcSteps.Any()) return responseDto;
 
-            if (inSfcSteps != null && inSfcSteps.Count > 0)
+            var procedureIds = inSfcSteps.Where(w => w.ProcedureId.HasValue).Select(x => x.ProcedureId!.Value).Distinct();
+            var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds);
+
+            List<WorkshopJobControlInOutSteptDto> stepDtos = new();
+
+            var inSfcStepList = inSfcSteps.ToList();
+            for (int i = 0; i < inSfcStepList.Count; i++)
             {
-                //查找工序
-                var procedureIds = inSfcSteps.Where(x => x.ProcedureId != null).Select(x => x.ProcedureId.Value).Distinct().ToArray();
-                var procedures = await _procProcedureRepository.GetByIdsAsync(procedureIds);
+                // 查找当前出站时间
+                var currentStep = inSfcStepList[i];
+                ManuSfcStepEntity? nextStep = null;
+                ManuSfcStepEntity? outStep = null;
 
-                for (int i = 0; i < inSfcSteps.Count; i++)
+                // 是否有下一个进站
+                if (i + 1 < inSfcStepList.Count)
                 {
-                    //查找当前出站时间
-                    var currentStep = inSfcSteps[i];
-                    ManuSfcStepEntity? nextStep = null;
-                    ManuSfcStepEntity? outStep = null;
-
-                    //是否有下一个进站
-                    if (i + 1 < inSfcSteps.Count)
-                    {
-                        nextStep = inSfcSteps[i + 1];
-                        //查找出站时间
-                        outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn && x.CreatedOn < nextStep.CreatedOn);
-                    }
-                    else
-                    {
-                        //查找出站时间
-                        outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn);
-                    }
-
-                    responseDto.WorkshopJobControlInOutSteptDtos.Add(new WorkshopJobControlInOutSteptDto
-                    {
-                        Id = currentStep.Id,
-                        WorkOrderCode = workOrders.FirstOrDefault(x => x.Id == currentStep.WorkOrderId)?.OrderCode ?? string.Empty,
-                        ProcedureCode = procedures.FirstOrDefault(x => x.Id == currentStep.ProcedureId)?.Code ?? string.Empty,
-                        Status = nextStep != null || outStep != null ? SfcInOutStatusEnum.Finished : SfcInOutStatusEnum.Activity,
-                        InDateTime = currentStep.CreatedOn,
-                        OutDatetTime = outStep?.CreatedOn
-                    });
+                    nextStep = inSfcStepList[i + 1];
+                    // 查找出站时间
+                    outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn && x.CreatedOn < nextStep.CreatedOn);
                 }
+                else
+                {
+                    // 查找出站时间
+                    outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn);
+                }
+
+                stepDtos.Add(new WorkshopJobControlInOutSteptDto
+                {
+                    Id = currentStep.Id,
+                    WorkOrderCode = workOrders.FirstOrDefault(x => x.Id == currentStep.WorkOrderId)?.OrderCode ?? string.Empty,
+                    ProcedureCode = procedureEntities.FirstOrDefault(x => x.Id == currentStep.ProcedureId)?.Code ?? string.Empty,
+                    Status = nextStep != null || outStep != null ? SfcInOutStatusEnum.Finished : SfcInOutStatusEnum.Activity,
+                    InDateTime = currentStep.CreatedOn,
+                    OutDatetTime = outStep?.CreatedOn
+                });
             }
 
-            // 对 workshopJobControlInOutSteptDtos 进行排序
-            responseDto.WorkshopJobControlInOutSteptDtos = responseDto.WorkshopJobControlInOutSteptDtos.OrderBy(o => o.Id).AsList();
-
+            // 对 stepDtos 进行排序
+            responseDto.WorkshopJobControlInOutSteptDtos = stepDtos.OrderBy(o => o.Id);
             return responseDto;
         }
 

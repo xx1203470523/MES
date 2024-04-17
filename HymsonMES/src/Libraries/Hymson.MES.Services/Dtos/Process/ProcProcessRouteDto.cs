@@ -14,67 +14,67 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工艺路线代码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工艺路线名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态
         /// </summary>
         public SysDataStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 类型
         /// </summary>
         public ProcessRouteTypeEnum Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 版本
         /// </summary>
         public string Version { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否当前版本
         /// </summary>
         public bool? IsCurrentVersion { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 说明
         /// </summary>
         public string Remark { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+
     }
 
     public class CustomProcessRouteDto
@@ -126,7 +126,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 序号
         /// </summary>
-        public string SerialNo { get; set; }
+        public Int16 SerialNo { get; set; }
 
         /// <summary>
         /// 序号
@@ -215,22 +215,22 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcProcessRouteCreateDto : BaseEntityDto
     {
-       /// <summary>
+        /// <summary>
         /// 工艺路线代码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工艺路线名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 类型
         /// </summary>
         public ProcessRouteTypeEnum Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 版本
         /// </summary>
         public string Version { get; set; }
