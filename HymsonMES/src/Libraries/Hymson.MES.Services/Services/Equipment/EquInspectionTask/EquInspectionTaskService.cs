@@ -143,6 +143,10 @@ namespace Hymson.MES.Services.Services.Equipment
             }
 
             //验证关联项目不能重复
+            if (saveDto.TaskDetailsSaveDtos != null && saveDto.TaskDetailsSaveDtos.Any()&& saveDto.TaskDetailsSaveDtos.GroupBy(x => x.InspectionItemId).Any(g => g.Count() >= 2))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15806));
+            }
             //上下限验证
             #endregion
 
@@ -236,6 +240,12 @@ namespace Hymson.MES.Services.Services.Equipment
            // entity.Time = saveDto.Time.ToString("HH:mm");
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
+
+            //验证关联项目不能重复
+            if (saveDto.TaskDetailsSaveDtos != null && saveDto.TaskDetailsSaveDtos.Any() && saveDto.TaskDetailsSaveDtos.GroupBy(x => x.InspectionItemId).Any(g => g.Count() >= 2))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15806));
+            }
 
             //判断关联项目
             var taskDetailsEntities = new List<EquInspectionTaskDetailsEntity>();
@@ -395,8 +405,9 @@ namespace Hymson.MES.Services.Services.Equipment
                     Id = entity.Id,
                     InspectionItemId = entity.InspectionItemId,
                     InspectionItemCode = item?.Code ?? "",
-                    Code = item?.Code ?? "",
                     InspectionItemName = item?.Name ?? "",
+                    Code = item?.Code ?? "",
+                    Name = item?.Name ??"",
                     BaseValue = entity.BaseValue,
                     MaxValue = entity.MaxValue,
                     MinValue = entity.MinValue,

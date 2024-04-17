@@ -137,6 +137,8 @@ namespace Hymson.MES.Services.Dtos.Equipment
 
         public string Code { get; set; }
 
+        public string Name { get; set; }
+
         /// <summary>
         /// 点检项目名称
         /// </summary>

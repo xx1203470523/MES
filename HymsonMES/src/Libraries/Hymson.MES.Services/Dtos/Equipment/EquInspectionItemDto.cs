@@ -30,12 +30,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 操作内容
         /// </summary>
-        public string OperationContent { get; set; }
+        public string OperationContent { get; set; } = "";
 
         /// <summary>
         /// 单位
         /// </summary>
-        public string Unit { get; set; }
+        public string? Unit { get; set; } = "";
 
         /// <summary>
         /// 备注
