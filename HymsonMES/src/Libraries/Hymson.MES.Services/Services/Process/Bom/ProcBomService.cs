@@ -914,7 +914,8 @@ namespace Hymson.MES.Services.Services.Process
             var planWorkOrderActivations = await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesByBomIdAsync(new PlanWorkOrderActivationByBomIdQuery { SiteId = _currentSite.SiteId ?? 0, BomId = bomId });
             if (planWorkOrderActivations.Any())
             {
-                return true;
+                //余帅强说保留也可修改20240417
+                return false;
             }
             else
             {
