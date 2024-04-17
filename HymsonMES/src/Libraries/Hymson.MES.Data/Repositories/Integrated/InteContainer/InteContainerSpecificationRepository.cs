@@ -6,7 +6,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Inte;
 
@@ -17,13 +17,13 @@ namespace Hymson.MES.Data.Repositories.Inte;
 /// <para>@作者：Jim</para>
 /// <para>@创建时间：2023-12-13</para>
 /// </summary>
-public partial class InteContainerSpecificationRepository : IInteContainerSpecificationRepository
+public partial class InteContainerSpecificationRepository :BaseRepository, IInteContainerSpecificationRepository
 {
-    private readonly ConnectionOptions _connectionOptions;
+    
 
-    public InteContainerSpecificationRepository(IOptions<ConnectionOptions> connectionOptions)
+    public InteContainerSpecificationRepository(IOptions<ConnectionOptions> connectionOptions):base(connectionOptions)
     {
-        _connectionOptions = connectionOptions.Value;
+       
     }
 
     #region 查询
@@ -43,7 +43,7 @@ public partial class InteContainerSpecificationRepository : IInteContainerSpecif
 
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         return await conn.QueryFirstOrDefaultAsync<InteContainerSpecificationEntity>(templateData.RawSql, templateData.Parameters);
     }
@@ -63,7 +63,7 @@ public partial class InteContainerSpecificationRepository : IInteContainerSpecif
 
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         return await conn.QueryAsync<InteContainerSpecificationEntity>(templateData.RawSql, templateData.Parameters);
     }
@@ -92,7 +92,7 @@ public partial class InteContainerSpecificationRepository : IInteContainerSpecif
         sqlBuilder.AddParameters(new { Rows = query.PageSize });
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         var inteContainerSpecificationEntities = await conn.QueryAsync<InteContainerSpecificationEntity>(templateData.RawSql, templateData.Parameters);
         var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
@@ -111,7 +111,7 @@ public partial class InteContainerSpecificationRepository : IInteContainerSpecif
     /// <returns></returns>
     public async Task<int> InsertAsync(InteContainerSpecificationCreateCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, command);
     }
 
@@ -122,7 +122,7 @@ public partial class InteContainerSpecificationRepository : IInteContainerSpecif
     /// <returns></returns>
     public async Task<int> InsertAsync(IEnumerable<InteContainerSpecificationCreateCommand> commands)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, commands);
     }
 
@@ -137,7 +137,7 @@ public partial class InteContainerSpecificationRepository : IInteContainerSpecif
     /// <returns></returns>
     public async Task<int> UpdateAsync(InteContainerSpecificationUpdateCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateByIdSql, command);
     }
 
@@ -148,7 +148,7 @@ public partial class InteContainerSpecificationRepository : IInteContainerSpecif
     /// <returns></returns>
     public async Task<int> UpdateAsync(IEnumerable<InteContainerSpecificationUpdateCommand> commands)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateByIdSql, commands);
     }
 
@@ -163,7 +163,7 @@ public partial class InteContainerSpecificationRepository : IInteContainerSpecif
     /// <returns></returns>
     public async Task<int> DeleteAsync(DeleteCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteByIdSql, command);
     }
 
@@ -174,7 +174,7 @@ public partial class InteContainerSpecificationRepository : IInteContainerSpecif
     /// <returns></returns>
     public async Task<int> DeleteMoreAsync(DeleteMoreCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteMoreByIdSql, command);
     }
 

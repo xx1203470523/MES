@@ -459,6 +459,8 @@
         public const string MES11717 = "检验单明细为空！";
         public const string MES11718 = "{materialId}参数项目为空检验单明细为空！";
         public const string MES11719 = "记录数量小于批次数量，不予生成";
+        public const string MES11720 = "重复提交，条码已存在FQC检验单条码记录表中!";
+        public const string MES11721 = "FQC创建保存错误!";
 
 
 
@@ -2040,6 +2042,16 @@
         public const string MES11605 = "使用状态不能为空！";
         public const string MES11606 = "导入的数据中资源编码重复！";
         public const string MES11607 = "导入的数据中工序编码重复！";
+        #endregion
+
+
+        #region 设备点检 15800
+        public const string MES15801 = "此设备点检项目{code}在系统中已经存在!";
+        public const string MES15802 = "此设备点检任务{code}在系统中已经存在!";
+        public const string MES15803 = "设备点检任务不存在！";
+        public const string MES15804 = "点检任务的执行月份不是当前月份,不能生成设备点检录入！";
+        public const string MES15805 = "请先录入点检任务结果！";
+        public const string MES15806 = "点检任务中,重复配置点检项目！";
         #endregion
     }
 }

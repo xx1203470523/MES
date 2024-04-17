@@ -1,6 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
-using MySqlX.XDevAPI.Common;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

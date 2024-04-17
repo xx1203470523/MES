@@ -4,7 +4,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
 {

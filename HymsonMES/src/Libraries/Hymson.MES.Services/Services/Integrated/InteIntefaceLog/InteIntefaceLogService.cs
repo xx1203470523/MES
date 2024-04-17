@@ -12,7 +12,7 @@ using Hymson.Elasticsearch;
 using Hymson.Infrastructure.Enums;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using Hymson.MES.Core.Enums.Integrated;
-using static Mysqlx.Expect.Open.Types.Condition.Types;
+
 using Elastic.Clients.Elasticsearch.Core.Bulk;
 
 namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
