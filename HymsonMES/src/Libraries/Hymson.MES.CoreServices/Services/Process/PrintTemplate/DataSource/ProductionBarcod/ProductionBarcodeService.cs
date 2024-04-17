@@ -176,7 +176,7 @@ namespace Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.Prod
                     QualifiedQty = item.Qty,
                     UnQualifiedQty = item.ScrapQty ?? 0,
                     Status = "",
-                    ExpirationDate = createManuSfcStepEntity?.CreatedOn.AddDays(procMaterialEntity?.ValidTime ?? 0).ToString("yyyy-MM-dd HH:mm:ss"),
+                 
                     PrintTime = HymsonClock.Now().ToString("yyyy-MM-dd HH:mm:ss"),
                 };
 
@@ -187,6 +187,7 @@ namespace Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.Prod
                 if (outputManuSfcStepEntity != null)
                 {
                     printData.LasttOutputTime = outputManuSfcStepEntity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
+                    printData.ExpirationDate = createManuSfcStepEntity?.CreatedOn.AddDays(procMaterialEntity?.ValidTime ?? 0).ToString("yyyy-MM-dd HH:mm:ss"),
                     var procProcedureEntitiesTask = _procProcedureRepository.GetByIdAsync(outputManuSfcStepEntity.ProcedureId ?? 0);
                     var equEquipmentEntitiesTask = _equEquipmentRepository.GetByIdAsync(outputManuSfcStepEntity.EquipmentId ?? 0);
                     var procResourceEntitiesTask = _procResourceRepository.GetByIdAsync(outputManuSfcStepEntity.ResourceId ?? 0);
