@@ -129,6 +129,7 @@ namespace Hymson.MES.CoreServices.Services.Job
           
             responseBo.manuSfcCirculationEntitys = manuSfcCirculationEntitys;
             var key = IdGenProvider.Instance.CreateId().ToString();
+            bool IsCreated = false;
             foreach (var bo in barcodeChangeBo)
             {
                 var now = HymsonClock.Now();
@@ -146,12 +147,15 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (sfcCirculationEntities!=null&&sfcCirculationEntities.Any()) {
                     continue;
                 }
-
-                (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo, ManuSfcProduceEntity sfcproduce, ManuSfcStepEntity? sfcstep) cellsfc = new();
-                cellsfc = CreateSFCProduceInfoFromCellSFC(workOrderEntity, key, commonBo.ProcedureId, commonBo, sfcProduceEntity.Qty, SfcStatusEnum.lineUp);
-                manusfcs.Add(cellsfc.manusfc);
-                sfcinfos.Add(cellsfc.sfcinfo);
-                sfcproduces.Add(cellsfc.sfcproduce);
+                if(!IsCreated) 
+                {
+                    (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo, ManuSfcProduceEntity sfcproduce, ManuSfcStepEntity? sfcstep) cellsfc = new();
+                    cellsfc = CreateSFCProduceInfoFromCellSFC(workOrderEntity, key, commonBo.ProcedureId, commonBo, sfcProduceEntity.Qty, SfcStatusEnum.lineUp);
+                    manusfcs.Add(cellsfc.manusfc);
+                    sfcinfos.Add(cellsfc.sfcinfo);
+                    sfcproduces.Add(cellsfc.sfcproduce);
+                    IsCreated = true;
+                }
               
                 //新条码 状态变更为开始
                 var manuSfcStepEntity = new ManuSfcStepEntity
@@ -193,6 +197,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 });
                 manuSfcStepEntities.Add(manuSfcStepEntity);
             }
+   
             return responseBo;
 
         }

@@ -211,6 +211,26 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuSfcCirculationEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+            if (!string.IsNullOrEmpty(manuSfcCirculationQuery.Sfc))
+            {
+                sqlBuilder.Where("SFC = @Sfc");
+            }
+
+            if (manuSfcCirculationQuery.CirculationTypes != null && manuSfcCirculationQuery.CirculationTypes.Any())
+            {
+                sqlBuilder.Where("CirculationType IN @CirculationTypes");
+            }
+
+        
+
+            if (manuSfcCirculationQuery.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("ProcedureId = @ProcedureId");
+            }
+            sqlBuilder.AddParameters(manuSfcCirculationQuery);
             using var conn = GetMESDbConnection();
             var manuSfcCirculationEntities = await conn.QueryAsync<ManuSfcCirculationEntity>(template.RawSql, manuSfcCirculationQuery);
             return manuSfcCirculationEntities;
