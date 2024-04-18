@@ -59,7 +59,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind.Tests
             result.Wait();
             Assert.Fail();
         }
-        private static void AddAutoMapper()
+        public static void AddAutoMapper()
         {
             //find mapper configurations provided by other assemblies
             var typeFinder = Singleton<ITypeFinder>.Instance;
