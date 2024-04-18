@@ -47,6 +47,6 @@ namespace Hymson.MES.Core.Enums
         /// 设备接口
         /// </summary>
         [Description("设备接口")]
-        Equipment = 8
+        Equipment = 9
     }
 }
