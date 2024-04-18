@@ -294,7 +294,7 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             rows += await _whMaterialInventoryRepository.UpdatePointByBarCodeAsync(new UpdateStatusByBarCodeCommand
             {
                 BarCode = saveDto.BarCode,
-                QuantityResidue = inventory.QuantityResidue - entity.InitQty,
+                Quantity = -entity.InitQty,
                 Status = WhMaterialInventoryStatusEnum.InUse,
                 UpdatedBy = entity.CreatedBy,
                 UpdatedOn = entity.CreatedOn

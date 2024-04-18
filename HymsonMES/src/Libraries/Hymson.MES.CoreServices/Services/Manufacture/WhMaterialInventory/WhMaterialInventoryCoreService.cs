@@ -232,7 +232,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory
                 throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", materialBarCode);
             }
 
-            var sfcEntit = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery { SFC = materialBarCode, SiteId = siteId });
+            var sfcEntit = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery { SFC = materialBarCode, SiteId = siteId });
             if (sfcEntit != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES152016)).WithData("MaterialCode", materialBarCode);

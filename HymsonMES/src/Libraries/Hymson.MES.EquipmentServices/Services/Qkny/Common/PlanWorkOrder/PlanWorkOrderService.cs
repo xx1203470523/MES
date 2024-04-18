@@ -97,7 +97,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
             var matList = (await _procBomDetailRepository.GetListMainAsync(bomId)).ToList();
             var bomMatReplaceList = (await _procBomDetailRepository.GetListReplaceAsync(bomId)).ToList();
 
-            if(matList.IsNullOrEmpty() == true && bomMatReplaceList.IsNullOrEmpty() == true)
+            if (matList.IsNullOrEmpty() == true && bomMatReplaceList.IsNullOrEmpty() == true)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45033));
             }
@@ -108,23 +108,15 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
             resultList.AddRange(bomMatReplaceList.ToList());
 
             var matIdList = resultList.Select(m => m.MaterialId).ToList();
-            List<long> matIdLongList = new List<long>();
-            foreach(var item in matIdList)
-            {
-                long matId = 0;
-                if(long.TryParse(item, out matId) == true)
-                {
-                    matIdLongList.Add(matId);
-                }
-            }
+
             //查询所有的替代料
-            var matReplaceList = await _procReplaceMaterialRepository.GetListByMaterialIdAsync(matIdLongList);
+            var matReplaceList = await _procReplaceMaterialRepository.GetListByMaterialIdAsync(matIdList);
             if (matReplaceList.IsNullOrEmpty() == false)
             {
-                matIdLongList.AddRange(matReplaceList.Select(m => m.MaterialId).ToList());
+                matIdList.AddRange(matReplaceList.Select(m => m.MaterialId).ToList());
             }
 
-            return matIdLongList;
+            return matIdList;
         }
     }
 }
