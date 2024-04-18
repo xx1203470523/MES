@@ -69,11 +69,11 @@ namespace Hymson.MES.Api
             // TODO 龙总说要这么要开放出来
             //#if DEBUG
             // Configure the HTTP request pipeline.
-            if (!app.Environment.IsProduction())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            //if (!app.Environment.IsProduction())
+            //{
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            //}
             //#endif
 
 #if DEBUG

@@ -52,6 +52,7 @@ namespace Hymson.MES.Equipment.Api
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
             builder.Services.AddLocalization();
+            builder.Services.AddPrintService(builder.Configuration);
 
             // 注入nlog日志服务
             builder.AddNLogWeb(builder.Configuration);
@@ -63,11 +64,11 @@ namespace Hymson.MES.Equipment.Api
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
             // Configure the HTTP request pipeline.
-            if (!app.Environment.IsProduction())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            //if (!app.Environment.IsProduction())
+            //{
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            //}
             #region snippet_ConfigureLocalization
             var supportedCultures = new List<CultureInfo>
             {

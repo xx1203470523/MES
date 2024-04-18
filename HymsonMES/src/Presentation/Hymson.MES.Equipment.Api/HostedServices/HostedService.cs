@@ -2,7 +2,6 @@
 using Hymson.ClearCache;
 using Hymson.Infrastructure.Enums;
 using Hymson.Localization.Services;
-using Hymson.MES.Core.Constants;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Equipment.Api
@@ -39,8 +38,8 @@ namespace Hymson.MES.Equipment.Api
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             //await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] { ServiceTypeEnum.MES }, cancellationToken);
-            await _resourceService.HotLoadingAsync();
-            await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
+            //await _resourceService.HotLoadingAsync();
+            //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
             //var equipmentModel = new EquipmentModel
             //{
             //    FactoryId = 123456,
