@@ -19,7 +19,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :序号 
         /// 空值 : true  
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
         
         /// <summary>
         /// 描述 :所属工艺路线ID 

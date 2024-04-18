@@ -7,7 +7,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 
     /// </summary>
-    public record WorkshopJobControlReportViewDto:BaseEntityDto
+    public record WorkshopJobControlReportViewDto : BaseEntityDto
     {
         /// <summary>
         /// 条码
@@ -157,23 +157,42 @@ namespace Hymson.MES.Services.Dtos.Report
         public long? ResourceId { get; set; }
     }
 
-
-    public class WorkshopJobControlStepReportDto 
+    /// <summary>
+    /// 工单步骤报告
+    /// </summary>
+    public class WorkshopJobControlStepReportDto
     {
+        /// <summary>
+        /// 产品序列码
+        /// </summary>
         public string SFC { get; set; }
-
+        /// <summary>
+        /// 工单编码
+        /// </summary>
         public string OrderCode { get; set; }
-
+        /// <summary>
+        /// 物料编码/版本
+        /// </summary>
         public string MaterialCodrNameVersion { get; set; }
-
+        /// <summary>
+        /// 工艺路线编码/版本
+        /// </summary>
         public string ProcessRouteCodeNameVersion { get; set; }
-
+        /// <summary>
+        /// BOM编码/版本
+        /// </summary>
         public string ProcBomCodeNameVersion { get; set; }
+        /// <summary>
+        /// 集合（步骤）
+        /// </summary>
+        public IEnumerable<WorkshopJobControlInOutSteptDto> WorkshopJobControlInOutSteptDtos { get; set; }
 
-        public List<WorkshopJobControlInOutSteptDto> WorkshopJobControlInOutSteptDtos { get; set; }=new List<WorkshopJobControlInOutSteptDto>();
     }
 
-    public class WorkshopJobControlInOutSteptDto 
+    /// <summary>
+    /// 
+    /// </summary>
+    public class WorkshopJobControlInOutSteptDto
     {
         /// <summary>
         /// 
@@ -217,7 +236,7 @@ namespace Hymson.MES.Services.Dtos.Report
         public string? SFC { get; set; }
     }
 
-    public class ManuSfcStepBySfcViewDto 
+    public class ManuSfcStepBySfcViewDto
     {
         /// <summary>
         /// sfc_step Id
@@ -252,7 +271,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 工序编码
         /// </summary>
-        public string ProcedureCode { get; set;}
+        public string ProcedureCode { get; set; }
 
         /// <summary>
         /// 工序名称
@@ -262,6 +281,6 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 工单
         /// </summary>
-        public string OrderCode { get; set;}
+        public string OrderCode { get; set; }
     }
 }

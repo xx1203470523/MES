@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                 item.Id = IdGenProvider.Instance.CreateId();
                 item.SiteId = entity.SiteId;
                 item.MaskCodeId = entity.Id;
-                item.SerialNo = $"{i + 1}"; //_sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.None,''),
+                item.SerialNo = i + 1; //_sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.None,''),
                 item.CreatedBy = entity.CreatedBy;
                 rules.Add(item);
             }
@@ -147,7 +147,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                 item.Id = IdGenProvider.Instance.CreateId();
                 item.SiteId = entity.SiteId;
                 item.MaskCodeId = entity.Id;
-                item.SerialNo = $"{i + 1}"; //_sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.None,''),
+                item.SerialNo = i + 1; //_sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.None,''),
                 item.CreatedBy = entity.CreatedBy;
                 rules.Add(item);
             }

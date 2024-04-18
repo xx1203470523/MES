@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 序号( 程序生成)
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
        /// <summary>
         /// 所属上料点ID
@@ -129,7 +129,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 序号( 程序生成)
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
        /// <summary>
         /// 所属上料点ID

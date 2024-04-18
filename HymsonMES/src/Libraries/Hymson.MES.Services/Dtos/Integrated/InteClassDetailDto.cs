@@ -18,7 +18,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 序号
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
         /// <summary>
         ///班次（字典名称：manu_detail_class_type）
@@ -56,7 +56,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///项目内容
         /// </summary>
-        public int? SerialNo { get; set; }
+        public long? SerialNo { get; set; }
 
         /// <summary>
         ///班次（字典名称：manu_detail_class_type）

@@ -119,8 +119,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var sfcinfos = new List<ManuSfcInfoEntity>() ;
             var sfcproduces = new List<ManuSfcProduceEntity>();
             var manuSfcStepEntities =  new List<ManuSfcStepEntity>();
-            var PhysicalDeleteSFCProduceByIdsCommands = new List<PhysicalDeleteSFCProduceByIdsCommand>();
-            var MultiSFCUpdateStatusCommands = new List<MultiSFCUpdateStatusCommand>();
+            
             var manuSfcCirculationEntitys = new List<ManuSfcCirculationEntity>();
             //
             responseBo.manusfcs = manusfcs;
@@ -157,7 +156,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 //新条码 状态变更为开始
                 var manuSfcStepEntity = new ManuSfcStepEntity
                 {
-                    Operatetype = ManuSfcStepTypeEnum.Create,
+                    Operatetype = ManuSfcStepTypeEnum.SfcMerge,
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = key,
                     ProductId = sfcProduceEntity.ProductId,

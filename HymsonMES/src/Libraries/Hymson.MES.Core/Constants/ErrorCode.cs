@@ -462,6 +462,8 @@
         public const string MES11720 = "重复提交，条码已存在FQC检验单条码记录表中!";
         public const string MES11721 = "FQC创建保存错误!";
 
+        public const string MES11722 = "检验单{fqcOrder}，未找到FQC检验参数组快照信息!";
+
 
 
 
@@ -692,7 +694,8 @@
         public const string MES12837 = "产品【{ProductCode}】没有生成新条码，请检查!";
         public const string MES12838 = "产品序列码【{sfc}】带有复判标识，不允许操作!";
         public const string MES12839 = "产品序列码【{sfc}】带有NG标识，不允许操作!";
-
+        public const string MES12840 = "产品序列码【{sfc}】没有指定工序的流转记录，合并失败!";
+        public const string MES12841 = "产品序列码【{sfc1}】与产品序列码【{sfc2}】合并流转记录不一致，合并失败!";
         #endregion
 
         #region 故障现象 12900
@@ -2026,6 +2029,10 @@
         #region FQC检验项目 19982
         public const string MES19982 = "物料{materialCode}物料版本{materialversion}检验项目版本{version}已存在，不允许重复添加！";
         public const string MES19983 = "已启用状态的检验单不允许被删除！";
+
+
+        public const string MES19987 = "非新建状态不允许删除！"; 
+        public const string MES19988 = "当前物料已存在启用的检验项目！";
         #endregion
 
 
