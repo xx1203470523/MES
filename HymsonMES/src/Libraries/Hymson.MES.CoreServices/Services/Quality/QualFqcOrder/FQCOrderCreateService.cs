@@ -579,6 +579,8 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             else
             {
                 _logger.LogError($"FQC记录数量小于批次数量，不予生成");
+                isNeedFQC = false;
+                return isNeedFQC;
             }
 
             //检验项目快照
