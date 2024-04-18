@@ -973,7 +973,8 @@ namespace Hymson.MES.Services.Services.Quality
             if (entity == null) return Array.Empty<FQCParameterDetailDto>();
             //SnapShoot
             var snapshotEntity = await _qualFqcParameterGroupSnapshootRepository.GetByIdAsync(entity.GroupSnapshootId);
-            if (snapshotEntity == null) return Array.Empty<FQCParameterDetailDto>();
+            if (snapshotEntity == null) { throw new CustomerValidationException(nameof(ErrorCode.MES11722)).WithData("fqcOrder",entity.InspectionOrder); }
+            //return Array.Empty<FQCParameterDetailDto>();
 
             var snapshotDetailEntities = await _qualFqcParameterGroupDetailSnapshootRepository.GetEntitiesAsync(new QualFqcParameterGroupDetailSnapshootQuery
             {
@@ -1260,7 +1261,7 @@ namespace Hymson.MES.Services.Services.Quality
                 if (snaphot != null)
                 {
                     //允许混线，列表不显示工单
-                    if (snaphot.IsSameWorkOrder == TrueOrFalseEnum.No)
+                    if (snaphot.IsSameWorkOrder == TrueOrFalseEnum.Yes)
                     {
                         dto.OrderCode = "-";
                     }

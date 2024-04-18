@@ -221,6 +221,10 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("T.IsGenerated = @IsGenerated");
             }
+            if (pagedQuery.CodeType.HasValue)
+            {
+                sqlBuilder.Where("T.CodeType = @CodeType");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

@@ -462,6 +462,8 @@
         public const string MES11720 = "重复提交，条码已存在FQC检验单条码记录表中!";
         public const string MES11721 = "FQC创建保存错误!";
 
+        public const string MES11722 = "检验单{fqcOrder}，未找到FQC检验参数组快照信息!";
+
 
 
 

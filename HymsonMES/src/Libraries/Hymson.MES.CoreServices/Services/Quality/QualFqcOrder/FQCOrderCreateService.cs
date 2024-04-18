@@ -707,6 +707,13 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
         /// <exception cref="CustomerValidationException"></exception>
         private async Task<string> GenerateFQCOrderCodeAsync(long siteId, string userName)
         {
+            _logger.LogError($"{siteId},GenerateFQCOrderCodeAsync,FQC检验单号生成！");
+            long test = 0;
+            if (siteId == 0)
+            {
+                siteId = 30654441397841920;
+                test= siteId;
+            }
             var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
             {
                 SiteId = siteId,
@@ -714,7 +721,8 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             });
             if (codeRules == null || !codeRules.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11710));
+                _logger.LogError($"{siteId},FQC检验单号生成失败！");
+                throw new CustomerValidationException(nameof(ErrorCode.MES11710), $"当前{siteId},是否{test}");
             }
             if (codeRules.Count() > 1)
             {
