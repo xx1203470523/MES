@@ -3,6 +3,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture
 {
@@ -22,6 +23,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// 仓储接口（降级品录入记录）
         /// </summary>
         private readonly IManuDowngradingRecordRepository _manuDowngradingRecordRepository;
+        private readonly IManuDowngradingRuleRepository _manuDowngradingRuleRepository;
 
         /// <summary>
         /// 构造函数
@@ -29,10 +31,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// <param name="manuDowngradingRepository"></param>
         /// <param name="manuDowngradingRecordRepository"></param>
         public ManuDegradedProductExtendService(IManuDowngradingRepository manuDowngradingRepository,
+            IManuDowngradingRuleRepository manuDowngradingRuleRepository,
             IManuDowngradingRecordRepository manuDowngradingRecordRepository)
         {
             _manuDowngradingRepository = manuDowngradingRepository;
             _manuDowngradingRecordRepository = manuDowngradingRecordRepository;
+            _manuDowngradingRuleRepository = manuDowngradingRuleRepository;
         }
 
         /// <summary>
@@ -121,31 +125,46 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
 
             List<ManuDowngradingEntity> manuDowngradingEntities = new();
             List<ManuDowngradingRecordEntity> manuDowngradingRecordEntities = new();
-
-            foreach (var entity in downgradingEntities)
+            var downgradingRuleEntities = await _manuDowngradingRuleRepository.GetByCodesAsync(new ManuDowngradingRuleCodesQuery
             {
-                var keyValueBo = bo.KeyValues.FirstOrDefault(f => f.BarCode == entity.SFC);
-                if (keyValueBo == null) continue;
-
-                manuDowngradingEntities.Add(new ManuDowngradingEntity
+                SiteId = bo.SiteId,
+                Codes = downgradingEntities.Select(d => d.Grade).ToArray()
+            });
+            foreach (var groupitem in bo.KeyValues.GroupBy(k => k.SFC))
+            {
+                var targetdowngrads = downgradingEntities.Where(d => groupitem.ToList().Exists(c => c.BarCode == d.SFC)).Select(s => s.Grade);
+                if (targetdowngrads.Any())
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SFC = keyValueBo.SFC,
-                    Grade = entity.Grade,
-                    SiteId = entity.SiteId,
-                    CreatedBy = bo.UserName ?? ""
-                });
+                    var targetrulecode = downgradingRuleEntities
+                                      .Where(d => targetdowngrads.Contains(d.Code))
+                                      .OrderByDescending(r => r.SerialNumber).FirstOrDefault();
+                    if (targetrulecode != null)
+                    {
+                        manuDowngradingEntities.Add(new ManuDowngradingEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SFC = groupitem.Key,
+                            Grade = targetrulecode.Code,
+                            SiteId = bo.SiteId,
+                            CreatedBy = bo.UserName ?? ""
+                        });
 
-                manuDowngradingRecordEntities.Add(new ManuDowngradingRecordEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SFC = keyValueBo.SFC,
-                    Grade = entity.Grade,
-                    SiteId = entity.SiteId,
-                    IsCancellation = Core.Enums.Manufacture.ManuDowngradingRecordTypeEnum.Entry,
-                    CreatedBy = bo.UserName ?? ""
-                });
+                        manuDowngradingRecordEntities.Add(new ManuDowngradingRecordEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SFC = groupitem.Key,
+                            Grade = targetrulecode.Code,
+                            SiteId = bo.SiteId,
+                            IsCancellation = Core.Enums.Manufacture.ManuDowngradingRecordTypeEnum.Entry,
+                            CreatedBy = bo.UserName ?? ""
+                        });
+                    }
+
+                }
+
+
             }
+
 
             return await Task.FromResult((manuDowngradingEntities, manuDowngradingRecordEntities));
         }
