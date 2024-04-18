@@ -106,8 +106,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             if (param is not JobRequestBo commonBo) return default;
-            var barcodeChangeBo = commonBo.InStationRequestBos;
-
+            if(!commonBo.InStationRequestBos.Any()|| commonBo.InStationRequestBos==null) return default;
 
             var planWorkOrderBindEntity = await _planWorkOrderBindRepository.GetByResourceIDAsync(new PlanWorkOrderBindByResourceIdQuery
             {
