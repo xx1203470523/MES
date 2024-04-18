@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Data.Repositories.Quality.Query
 {
@@ -36,6 +37,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 是否预生成
         /// </summary>
         public long? IsGenerated { get; set; }
+
+        /// <summary>
+        /// 条码类型
+        /// </summary>
+        public FQCLotUnitEnum? CodeType { get; set; }
 
     }
 }

@@ -367,6 +367,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 条码状态
         /// </summary>
         public SfcStatusEnum? BarcodeStatus { get; set; }
+
+        /// <summary>
+        /// 条码类型
+        /// </summary>
+        public FQCLotUnitEnum? CodeType { get; set; }
     }
 
 }
