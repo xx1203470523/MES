@@ -121,6 +121,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
 
             List<ManuDowngradingEntity> manuDowngradingEntities = new();
             List<ManuDowngradingRecordEntity> manuDowngradingRecordEntities = new();
+
             foreach (var entity in downgradingEntities)
             {
                 var keyValueBo = bo.KeyValues.FirstOrDefault(f => f.BarCode == entity.SFC);

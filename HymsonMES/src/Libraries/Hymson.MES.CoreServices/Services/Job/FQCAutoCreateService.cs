@@ -124,7 +124,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         WorkCenterId = sfcproduce.WorkCenterId,
                         Barcode = group.Key ?? string.Empty,
                         CodeType = FQCLotUnitEnum.Tray,
-                        IsGenerated = TrueOrFalseEnum.No,
+                        IsGenerated = TrueOrFalseEnum.Yes,
                         CreatedBy = commonBo.UserName,
                         CreatedOn = commonBo.Time,
                         UpdatedBy = commonBo.UserName,
