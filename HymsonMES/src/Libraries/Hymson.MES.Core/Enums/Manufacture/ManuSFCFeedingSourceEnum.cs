@@ -18,4 +18,31 @@ namespace Hymson.MES.Core.Enums
         [Description("上料点")]
         FeedingPoint = 2
     }
+
+    #region 顷刻
+
+    /// <summary>
+    /// 上料转移类型
+    /// </summary>
+    public enum ManuSFCFeedingTransferEnum : sbyte
+    {
+        /// <summary>
+        /// 资源间转移
+        /// </summary>
+        Resource = 1,
+        /// <summary>
+        /// 上料点之间转移
+        /// </summary>
+        FeedingPoint = 2,
+        /// <summary>
+        /// 资源到上料点转移
+        /// </summary>
+        ResourceFeedingPoint = 3,
+        /// <summary>
+        /// 上料点到资源转移
+        /// </summary>
+        FeedingPointResource = 4
+    }
+
+    #endregion
 }

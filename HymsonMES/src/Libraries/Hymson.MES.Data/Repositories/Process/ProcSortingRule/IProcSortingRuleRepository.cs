@@ -9,6 +9,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.ProcSortingRule.Query;
+using Hymson.MES.Data.Repositories.Process.ProcSortingRule.View;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -119,5 +120,15 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
 
+        #region 顷刻
+
+        /// <summary>
+        /// 根据产品id获取分选规则详情
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public Task<IEnumerable<ProcSortRuleDetailEquView>> GetSortRuleDetailAsync(ProcSortRuleDetailEquQuery param);
+
+        #endregion
     }
 }

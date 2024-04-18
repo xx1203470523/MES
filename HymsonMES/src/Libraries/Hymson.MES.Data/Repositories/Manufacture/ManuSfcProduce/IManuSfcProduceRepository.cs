@@ -409,5 +409,23 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="commands"></param>
         /// <returns></returns>
         Task<int> PartialScrapManuSfcProduceByIdAsync(IEnumerable<ManuSfcProducePartialScrapByIdCommand> commands);
+
+        #region 顷刻
+
+        /// <summary>
+        /// 更新数量
+        /// 用于设备产出米数上报接口
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command);
+
+        /// <summary>
+        /// 获取设备最近条码
+        /// </summary>
+        /// <returns></returns>
+        Task<ManuSfcProductMaterialView> GetEquipmentNewestSfc(ManuSfcEquipmentNewestQuery query);
+
+        #endregion
     }
 }

@@ -94,5 +94,29 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="query"></param>
         /// <returns></returns>
         Task<ProcFormulaEntity> GetByCodeAndVersionAsync(ProcFormulaByCodeAndVersion query);
+
+        #region 顷刻
+        /// <summary>
+        /// 获取配方列表
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<List<ProcFormulaListViewDto>> GetFormulaListAsync(ProcFormulaListQueryDto queryDto);
+
+        /// <summary>
+        /// 获取配方详情
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<List<ProcFormulaDetailViewDto>> GetFormulaDetailAsync(ProcFormulaDetailQueryDto query);
+
+        /// <summary>
+        /// 获取激活版本
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcFormulaEntity> GetActivateByCodeAndVersionAsync(ProcFormulaByCodeAndVersion query);
+
+        #endregion
     }
 }

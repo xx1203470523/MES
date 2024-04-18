@@ -69,5 +69,18 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <returns></returns>
         Task VerifyProcedureAsync(JobRequestBo param);
 
+        #region 顷刻
+
+        /// <summary>
+        /// 获取载具里面的条码
+        /// 为空不异常
+        /// 用于空托盘校验接口
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        Task<List<string>> GetSfcListByVehicleCodesAsync(VehicleSFCRequestBo requestBo);
+
+        #endregion
+
     }
 }
