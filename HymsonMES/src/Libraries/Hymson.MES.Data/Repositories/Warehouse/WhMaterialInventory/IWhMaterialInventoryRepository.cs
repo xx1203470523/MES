@@ -115,7 +115,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="Command"></param>
         /// <returns></returns>
-        Task<int> UpdateReduceQuantityResidueAsync(UpdateQuantityRangeCommand Command);
+         Task<int> UpdateReduceQuantityResidueAsync(UpdateQuantityRangeCommand Command);
 
         /// <summary>
         /// 更新库存数量(减少库存)
@@ -228,5 +228,16 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="commands"></param>
         /// <returns></returns>
         Task<int> ScrapPartialWhMaterialInventoryByIdAsync(IEnumerable<ScrapPartialWhMaterialInventoryByIdCommand> commands);
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据物料条码获取数据
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesNoQtyAsync(WhMaterialInventoryBarCodesQuery param);
+
+        #endregion
     }
 }

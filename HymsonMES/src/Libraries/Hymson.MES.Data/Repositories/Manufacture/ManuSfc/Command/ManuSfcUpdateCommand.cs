@@ -275,4 +275,30 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public decimal CurrentQty { get; set; }
     }
+
+    #region 顷刻
+
+    /// <summary>
+    /// 条码数量更新 
+    /// </summary>
+    public class UpdateQtyBySfcCommand : UpdateCommand
+    {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string SFC { get; set; }
+    }
+
+    #endregion
+
 }

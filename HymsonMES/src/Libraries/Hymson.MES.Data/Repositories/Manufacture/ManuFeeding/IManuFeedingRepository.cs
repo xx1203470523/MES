@@ -113,5 +113,51 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         //Task<ManuFeedingEntity> GetOneAsync(ManuFeedingQuery query);
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据上料点获取最新的上料记录
+        /// </summary>
+        /// <param name="loadPointId"></param>
+        /// <returns></returns>
+        Task<ManuFeedingEntity> GetFeedingPointNewAsync(GetFeedingPointNewQuery query);
+
+        /// <summary>
+        /// 根据上料点获取最新的上料记录
+        /// </summary>
+        /// <param name="loadPointId"></param>
+        /// <returns></returns>
+        Task<ManuFeedingEntity> GetManuFeedingSfcAsync(GetManuFeedingSfcQuery query);
+
+        /// <summary>
+        /// 更新上料点数量
+        /// </summary>
+        /// <param name="loadPointId"></param>
+        /// <returns></returns>
+        Task<int> UpdateFeedingQtyAsync(UpdateFeedingQtyCommand command);
+
+        /// <summary>
+        /// 更新条码数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateManuFeedingBarcodeQtyAsync(UpdateFeedingBarcodeQtyCommand command);
+
+        /// <summary>
+        /// 根据资源获取所有的上料信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingEntity>> GetAllByResourceIdAsync(EntityByResourceIdQuery query);
+
+        /// <summary>
+        /// 根据条码获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingEntity>> GetAllBySfcListAsync(GetManuFeedingSfcListQuery query);
+
+        #endregion
     }
 }

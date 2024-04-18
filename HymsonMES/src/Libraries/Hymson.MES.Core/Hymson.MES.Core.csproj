@@ -26,14 +26,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hymson.Infrastructure" Version="2.1.149" />
-    <PackageReference Include="Hymson.MessagePush" Version="2.1.149" />
-    <PackageReference Include="Hymson.Settings" Version="2.1.149" />
+    <PackageReference Include="Hymson.Infrastructure" Version="2.1.151" />
+    <PackageReference Include="Hymson.MessagePush" Version="2.1.151" />
+    <PackageReference Include="Hymson.Settings" Version="2.1.151" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Constants\Quality\" />
+    <Folder Include="Domain\Qkny\" />
     <Folder Include="Options\" />
   </ItemGroup>
 

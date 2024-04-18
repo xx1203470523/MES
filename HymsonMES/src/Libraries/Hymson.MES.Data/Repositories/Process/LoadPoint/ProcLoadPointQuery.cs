@@ -31,4 +31,20 @@ namespace Hymson.MES.Data.Repositories.Process
         public string? LoadPoint { get; set; }
 
     }
+
+    #region 顷刻
+
+    /// <summary>
+    /// 上料点和设备编查询
+    /// </summary>
+    public class ProcLoadPointEquipmentQuery
+    {
+        /// <summary>
+        /// 上料点或者设备编码列表
+        /// </summary>
+        public List<string> CodeList { get; set;} = new List<string>();
+    }
+
+    #endregion
+
 }
