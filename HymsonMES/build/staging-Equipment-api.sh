@@ -1,7 +1,7 @@
 #! /bin/bash
 PublishEnvironment=Release
 timestamp=$(date +%Y%m%d%H%M%S)
-serviceName=hymson-mes-equipment-api-test
+serviceName=hymson-mes-battery-equipment-api-test
 registryUrl=harbor.xnebula.com/new-energy
 imageName=hymson.mes.equipment.api
 docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Equipment.Api/Dockerfile .
