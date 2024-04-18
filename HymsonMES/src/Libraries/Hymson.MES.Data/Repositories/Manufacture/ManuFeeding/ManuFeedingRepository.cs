@@ -82,6 +82,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
+        public async Task<ManuFeedingEntity> GetByBarCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuFeedingEntity>(GetByBarCodeSql, query);
+        }
+
+        /// <summary>
+        /// 根据Code和物料ID查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public async Task<ManuFeedingEntity> GetByBarCodeAndMaterialIdAsync(GetByBarCodeAndMaterialIdQuery query)
         {
             using var conn = GetMESDbConnection();
@@ -268,10 +279,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     /// </summary>
     public partial class ManuFeedingRepository
     {
-        const string InsertSql = "INSERT INTO `manu_feeding`(`Id`, `ResourceId`, `FeedingPointId`, `ProductId`, SupplierId, `BarCode`, MaterialId, `InitQty`, `Qty`,`MaterialType`,  `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkOrderId, LoadSource) VALUES (@Id, @ResourceId, @FeedingPointId, @ProductId, @SupplierId, @BarCode, @MaterialId, @InitQty, @Qty,@MaterialType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId, @LoadSource)  ";
+        const string InsertSql = "REPLACE INTO `manu_feeding`(`Id`, `ResourceId`, `FeedingPointId`, `ProductId`, SupplierId, `BarCode`, MaterialId, `InitQty`, `Qty`,`MaterialType`,  `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkOrderId, LoadSource) VALUES (@Id, @ResourceId, @FeedingPointId, @ProductId, @SupplierId, @BarCode, @MaterialId, @InitQty, @Qty,@MaterialType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId, @LoadSource)  ";
         const string UpdateQtyByIdSql = "UPDATE manu_feeding SET Qty = (CASE WHEN @Qty > Qty THEN 0 ELSE Qty - @Qty END), UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Qty > 0 AND Id = @Id; ";
         const string DeleteSql = "UPDATE manu_feeding SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string DeleteByIds = "DELETE FROM manu_feeding WHERE Id IN @ids; ";
+        const string GetByBarCodeSql = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND SiteId = @Site AND BarCode = @Code;";
         const string GetByBarCodeAndMaterialIdSql = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND FeedingPointId = @FeedingPointId AND ProductId = @ProductId AND BarCode = @BarCode;";
         const string GetByIds = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND Id IN @ids; ";
         const string GetByResourceIdAndMaterialId = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId AND ProductId = @MaterialId; ";

@@ -73,6 +73,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ProcedureId { get; set; }
 
         /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 报废数量
+        /// </summary>
+        public decimal? ScrapQty { get; set; }
+
+        /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
         public SfcStatusEnum Status { get; set; }
@@ -755,6 +765,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 产品版本
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 描述 :计量单位(字典定义) 
+        /// 空值 : true  
+        /// </summary>
+        public string? Unit { get; set; }
 
         /// <summary>
         /// 资源编码

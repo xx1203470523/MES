@@ -232,7 +232,12 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", materialBarCode);
             }
 
-            var sfcEntit = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery { SFC = materialBarCode, SiteId = _currentSite.SiteId ?? 0 });
+            var sfcEntit = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
+            {
+                SFC = materialBarCode,
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = SfcTypeEnum.Produce
+            });
             if (sfcEntit != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES152016)).WithData("MaterialCode", materialBarCode);
@@ -286,8 +291,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                 BarCode = barCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES152017)).WithData("Code", barCode);
 
+            /*
             // 只有【待使用】的库存才能上料！
             if (entity.Status != WhMaterialInventoryStatusEnum.ToBeUsed) throw new CustomerValidationException(nameof(ErrorCode.MES152018));
+            */
 
             return entity.ToModel<WhMaterialInventoryDto>();
         }

@@ -7,7 +7,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
@@ -15,7 +15,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
     /// <summary>
     /// 仓储（容器维护）
     /// </summary>
-    public partial class InteContainerRepository : IInteContainerRepository
+    public partial class InteContainerRepository :BaseRepository, IInteContainerRepository
     {
         /// <summary>
         /// 
@@ -26,9 +26,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteContainerRepository(IOptions<ConnectionOptions> connectionOptions)
+        public InteContainerRepository(IOptions<ConnectionOptions> connectionOptions):base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
+            
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> InsertAsync(InteContainerEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
         }
 
@@ -49,7 +49,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> InsertInfoAsync(InteContainerInfoEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertInfoSql, entity);
         }
 
@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> InsertSpecificationAsync(InteContainerSpecificationEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSpecificationSql, entity);
         }
 
@@ -71,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> InsertFreightAsync(IEnumerable<InteContainerFreightEntity> entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertFreightSql, entity);
         }
 
@@ -82,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> UpdateAsync(InteContainerInfoEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
@@ -93,7 +93,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, command);
 
         }
@@ -105,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteByParentId, command);
         }
 
@@ -116,7 +116,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> DeleteSpecificationByParentIdAsync(DeleteByParentIdCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSpecificationByParentId, command);
         }
 
@@ -127,7 +127,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<InteContainerInfoEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteContainerInfoEntity>(GetByCodeSql, query);
         }
 
@@ -138,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<InteContainerEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteContainerEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -149,7 +149,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<InteContainerInfoEntity> GetContainerInfoByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteContainerInfoEntity>(GetInfoByIdSql, new { Id = id });
         }
 
@@ -160,7 +160,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<InteContainerSpecificationEntity> GetSpecificationAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteContainerSpecificationEntity>(GetSpecificationByIdSql, new { Id = id,IsDeleted=0 });
         }
 
@@ -178,7 +178,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("ContainerId = @ParentId");
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteContainerFreightEntity>(template.RawSql, query);
         }
 
@@ -189,7 +189,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<IEnumerable<InteContainerEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteContainerEntity>(GetByIdsSql, new { Ids = ids });
         }
 
@@ -208,7 +208,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
                 sql += " AND Status = @Status";
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteContainerEntity>(sql, query);
         }
 
@@ -254,7 +254,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var entities = await conn.QueryAsync<InteContainerView>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             return new PagedInfo<InteContainerView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
@@ -267,7 +267,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <returns></returns>
         public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
 

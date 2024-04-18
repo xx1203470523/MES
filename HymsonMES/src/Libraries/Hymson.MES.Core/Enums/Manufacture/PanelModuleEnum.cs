@@ -41,6 +41,12 @@ namespace Hymson.MES.Core.Enums
         /// 条码请求
         /// </summary>
         [Description("条码请求")]
-        SFCRequest = 6
+        SFCRequest = 6,
+
+        /// <summary>
+        /// 产出确认
+        /// </summary>
+        [Description("产出确认")]
+        OutPutconConfirm = 7
     }
 }

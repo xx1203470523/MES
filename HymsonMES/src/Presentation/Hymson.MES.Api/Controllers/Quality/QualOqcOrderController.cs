@@ -42,8 +42,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("create")]
+        [HttpPost("create")]
         public async Task AddAsync([FromBody] QualOqcOrderSaveDto saveDto)
         {
             await _qualOqcOrderService.CreateAsync(saveDto);
@@ -54,8 +53,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("update")]
+        [HttpPut("update")]
         public async Task UpdateAsync([FromBody] QualOqcOrderSaveDto saveDto)
         {
             await _qualOqcOrderService.ModifyAsync(saveDto);
@@ -66,8 +64,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("delete")]
+        [HttpDelete("delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _qualOqcOrderService.DeletesAsync(ids);
@@ -89,8 +86,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("pagelist")]
+        [HttpGet("pagelist")]
         public async Task<PagedInfo<QualOqcOrderDto>> QueryPagedListAsync([FromQuery] QualOqcOrderPagedQueryDto pagedQueryDto)
         {
             return await _qualOqcOrderService.GetPagedListAsync(pagedQueryDto);
@@ -101,8 +97,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("getOqcOrderType/{id}")]
+        [HttpGet("getOqcOrderType/{id}")]
         public async Task<IEnumerable<QualOqcOrderTypeOutDto>> GetOqcOrderTypeAsync(long id)
         {
             return await _qualOqcOrderService.GetOqcOrderTypeAsync(id);
@@ -113,8 +108,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="checkBarCodeQuqryDto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("checkBarCode")]
+        [HttpGet("checkBarCode")]
         public async Task<IEnumerable<CheckBarCodeOutDto>> CheckBarCodeAsync([FromQuery] CheckBarCodeQuqryDto checkBarCodeQuqryDto)
         {
             return await _qualOqcOrderService.CheckBarCodeAsync(checkBarCodeQuqryDto);
@@ -147,8 +141,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="updateStatusDto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("updateStatus")]
+        [HttpPut("updateStatus")]
         public async Task UpdateStatusAsync([FromBody] UpdateStatusDto updateStatusDto)
         {
             await _qualOqcOrderService.UpdateStatusAsync(updateStatusDto);
@@ -192,8 +185,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="updateSampleDetailDto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("updateSampleDetail")]
+        [HttpPut("updateSampleDetail")]
         public async Task UpdateSampleDetailAsync([FromBody] UpdateSampleDetailDto updateSampleDetailDto)
         {
             await _qualOqcOrderService.UpdateSampleDetailAsync(updateSampleDetailDto);

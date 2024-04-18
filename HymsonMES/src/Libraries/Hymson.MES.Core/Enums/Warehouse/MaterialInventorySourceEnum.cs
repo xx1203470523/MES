@@ -39,6 +39,11 @@ namespace Hymson.MES.Core.Enums
         [Description("拆解")]
         Disassembly = 7,
         /// <summary>
+        /// 离脱
+        /// </summary>
+        [Description("离脱")]
+        Detachment = 8,
+        /// <summary>
         /// 设备接口
         /// </summary>
         [Description("设备接口")]

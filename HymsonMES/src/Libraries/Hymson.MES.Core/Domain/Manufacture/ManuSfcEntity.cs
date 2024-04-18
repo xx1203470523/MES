@@ -23,16 +23,21 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public string SFC { get; set; }
 
         /// <summary>
-        /// 数量
+        /// 数量  
         /// </summary>
         public decimal Qty { get; set; }
+
+        /// <summary>
+        ///报废数量
+        /// </summary>
+        public decimal? ScrapQty { get; set; }
 
         /// <summary>
         /// 状态: 1：排队中 2：活动中 3：完成-在制 4：完成 5：锁定 6：报废 7：删除
         /// </summary>
         public SfcStatusEnum Status { get; set; }
 
-        /// <summary>
+        /// <summary>   
         /// 条码类型 1、生产条码 2、非生产条码
         /// </summary>
         public SfcTypeEnum Type { get; set; } = SfcTypeEnum.Produce;

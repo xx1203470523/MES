@@ -1,5 +1,8 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -50,6 +53,14 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 不合格数量
         /// </summary>
         public decimal UnQualifiedQty { get; set; }
+    }
+    public class SFCPartialScrapResponseBo
+    {
+        public List<ManuSfcScrapEntity>  manuSfcScrapEntities { get; set; }
+        public List<ManuSFCPartialScrapByIdCommand> manuSFCPartialScrapByIdCommandList { get; set; }
+        public List<ManuSfcStepEntity> manuSfcStepEntities { get; set; }
+
+       
     }
 
     /// <summary>

@@ -4,6 +4,9 @@ using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using System.Reflection.Emit;
+using Hymson.MES.Core.Constants.Manufacture;
+using System.Reflection;
+using Hymson.MES.Core.Attribute;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode
 {
@@ -78,6 +81,31 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 CodeRulesMakeList= param.CodeRulesMakeList,
                 SiteId=_currentSite.SiteId??0
             }) ;
+        }
+
+        /// <summary>
+        /// 生成通配符列表供前端渲染下拉使用
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<BarcodeWildcardItemDto> GetGenerateBarcodeWildcardItemDtos()
+        {
+            var dtos = new List<BarcodeWildcardItemDto>();
+            var fieldInfos = typeof(GenerateBarcodeWildcard).GetFields(BindingFlags.Public | BindingFlags.Static);
+
+            foreach (var fieldInfo in fieldInfos)
+            {
+                var barcodeWildcardItemDto = new BarcodeWildcardItemDto();
+                var descriptionAttribute = fieldInfo.GetCustomAttribute<GenerateBarcodeWildcardDescriptionAttribute>();
+                if (descriptionAttribute == null) continue;
+                barcodeWildcardItemDto.Description = descriptionAttribute.Description;
+                barcodeWildcardItemDto.CodeTypes = descriptionAttribute.CodeTypes;
+                barcodeWildcardItemDto.CodeModes = descriptionAttribute.CodeModes;
+                var obj = fieldInfo.GetValue(fieldInfo.Name);
+                if (obj == null) continue;
+                barcodeWildcardItemDto.Key = obj?.ToString();
+                dtos.Add(barcodeWildcardItemDto);
+            }
+            return dtos;
         }
     }
 }

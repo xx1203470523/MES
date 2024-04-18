@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Services.Common;
 using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -499,7 +500,7 @@ namespace Hymson.MES.Services.Services.Process
                 foreach (var item in oldMainBomDetails)
                 {
                     //找到新的物料里对应的 物料+工序
-                    var newBomDetail = bomDetails.Where(x => x.MaterialId.ToString() == item.MaterialId && x.ProcedureId == item.ProcedureId).FirstOrDefault();
+                    var newBomDetail = bomDetails.Where(x => x.MaterialId == item.MaterialId && x.ProcedureId == item.ProcedureId).FirstOrDefault();
                     if (newBomDetail == null)
                     {
                         throw new CustomerValidationException(ErrorCode.MES10622);
@@ -523,7 +524,7 @@ namespace Hymson.MES.Services.Services.Process
                     foreach (var replaceItem in oldReplaceBomDetailsByMain)
                     {
                         //找到新的替代物料里对应的 物料
-                        var newBomDetailReplace = newReplaceBomDetailsByMain.Where(x => x.ReplaceMaterialId.ToString() == replaceItem.ReplaceMaterialId).FirstOrDefault();
+                        var newBomDetailReplace = newReplaceBomDetailsByMain.Where(x => x.ReplaceMaterialId == replaceItem.ReplaceMaterialId).FirstOrDefault();
                         if (newBomDetailReplace == null)
                         {
                             throw new CustomerValidationException(ErrorCode.MES10622);
@@ -707,6 +708,17 @@ namespace Hymson.MES.Services.Services.Process
             if (excelImportDtos == null || !excelImportDtos.Any())
             {
                 throw new CustomerValidationException("导入数据为空");
+            }
+
+            ExcelCheck excelCheck = new ExcelCheck();
+            // 读取Excel第一行的值
+            var firstRowValues = await excelCheck.ReadFirstRowAsync(formFile);
+            // 获取Excel模板的值
+            var columnHeaders = excelCheck.GetColumnHeaders<ImportBomDto>();
+            // 校验
+            if (firstRowValues != columnHeaders)
+            {
+                throw new CustomerValidationException("批量导入时使用错误模板提示请安模板导入数据");
             }
 
             #region 验证基础数据
@@ -902,7 +914,8 @@ namespace Hymson.MES.Services.Services.Process
             var planWorkOrderActivations = await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesByBomIdAsync(new PlanWorkOrderActivationByBomIdQuery { SiteId = _currentSite.SiteId ?? 0, BomId = bomId });
             if (planWorkOrderActivations.Any())
             {
-                return true;
+                //余帅强说保留也可修改20240417
+                return false;
             }
             else
             {

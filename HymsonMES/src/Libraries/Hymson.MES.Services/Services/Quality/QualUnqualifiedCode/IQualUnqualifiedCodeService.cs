@@ -14,9 +14,9 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// <summary>
         /// 获取分页List
         /// </summary>
-        /// <param name="qualUnqualifiedCodePagedQueryDto"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualUnqualifiedCodeDto>> GetPageListAsync(QualUnqualifiedCodePagedQueryDto qualUnqualifiedCodePagedQueryDto);
+        Task<PagedInfo<QualUnqualifiedCodeDto>> GetPageListAsync(QualUnqualifiedCodePagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 根据ID查询

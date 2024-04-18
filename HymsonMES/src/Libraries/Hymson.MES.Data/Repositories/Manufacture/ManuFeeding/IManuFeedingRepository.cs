@@ -1,5 +1,6 @@
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -42,6 +43,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeleteByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据Code和物料ID查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuFeedingEntity> GetByBarCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 根据Code和物料ID查询对象

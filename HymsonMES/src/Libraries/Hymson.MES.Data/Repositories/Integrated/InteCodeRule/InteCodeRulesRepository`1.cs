@@ -3,7 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Integrated;
 

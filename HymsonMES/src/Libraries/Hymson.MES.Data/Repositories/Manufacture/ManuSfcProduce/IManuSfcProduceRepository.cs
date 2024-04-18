@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -58,6 +59,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<ManuSfcProduceEntity> GetBySFCAsync(ManuSfcProduceBySfcQuery sfcQuery);
 
         /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcId"></param>
+        /// <returns></returns>
+        Task<ManuSfcProduceEntity> GetBySFCIdAsync(long sfcId);
+
+        /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceEntity>> GetBySFCIdsAsync(IEnumerable<long> sfcIds);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
@@ -109,9 +124,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="manuSfcProduceEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<ManuSfcProduceEntity> manuSfcProduceEntitys);
+        Task<int> UpdateRangeAsync(IEnumerable<ManuSfcProduceEntity> entities);
 
         /// <summary>
         /// 批量更新数量
@@ -153,7 +168,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        Task<int> DeletePhysicalRangeByIdsSqlAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand);
+        Task<int> DeletePhysicalRangeByIdsAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand);
 
         /// <summary>
         /// 删除
@@ -387,6 +402,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateQtyByIdAsync(UpdateManuSfcProduceQtyByIdCommand command);
+
+        /// <summary>
+        /// 部分报废 修改数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> PartialScrapManuSfcProduceByIdAsync(IEnumerable<ManuSfcProducePartialScrapByIdCommand> commands);
 
         #region 顷刻
 

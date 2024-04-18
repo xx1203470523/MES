@@ -35,7 +35,17 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long? ProcedureId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 流出工序id
+        /// </summary>
+        public long? OutFlowProcedureId { get; set; }
+
+        /// <summary>
+        /// 报废不合格代码id
+        /// </summary>
+        public long? UnqualifiedId { get; set; }
+
+        /// <summary>
         /// 报废数量
         /// </summary>
         public decimal? ScrapQty { get; set; }

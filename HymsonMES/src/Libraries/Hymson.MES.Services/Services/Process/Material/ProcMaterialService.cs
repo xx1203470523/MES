@@ -17,11 +17,15 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Services.Common;
 using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
+using OfficeOpenXml;
+using OfficeOpenXml.Attributes;
+using System.Reflection;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -258,6 +262,7 @@ namespace Hymson.MES.Services.Services.Process
             saveDto.Version = saveDto.Version.Trim();
             saveDto.Remark = saveDto?.Remark ?? "".Trim();
             saveDto!.Unit = saveDto?.Unit ?? "".Trim();
+            saveDto!.ValidTime = saveDto?.ValidTime ??null;
 
             // DTO转换实体
             var procMaterialEntity = saveDto!.ToEntity<ProcMaterialEntity>();
@@ -381,6 +386,10 @@ namespace Hymson.MES.Services.Services.Process
                     UpdatedOn = procMaterialEntity.UpdatedOn,
                     ConsumeRatio = procMaterialEntity.ConsumeRatio,
                     QuantityLimit = procMaterialEntity.QuantityLimit,
+                     ProductModel = procMaterialEntity.ProductModel,
+                      Specifications= procMaterialEntity.Specifications,
+                       MaterialType = procMaterialEntity.MaterialType,
+                       ValidTime=procMaterialEntity.ValidTime,
                 });
 
                 if (response == 0)
@@ -715,7 +724,16 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new CustomerValidationException("导入的物料数据为空");
             }
-
+            ExcelCheck excelCheck= new ExcelCheck();
+            // 读取Excel第一行的值
+            var firstRowValues = await excelCheck.ReadFirstRowAsync(formFile);
+            // 获取Excel模板的值
+             var columnHeaders = excelCheck.GetColumnHeaders<ProcMaterialImportDto>();
+            // 校验
+            if (firstRowValues != columnHeaders)
+            {
+                throw new CustomerValidationException("批量导入时使用错误模板提示请安模板导入数据");
+            }
             #region 验证基础数据
             var validationFailures = new List<ValidationFailure>();
             var rows = 1;
@@ -881,7 +899,7 @@ namespace Hymson.MES.Services.Services.Process
             ts.Complete();
 
         }
-
+       
         /// <summary>
         /// 获取验证对象
         /// </summary>

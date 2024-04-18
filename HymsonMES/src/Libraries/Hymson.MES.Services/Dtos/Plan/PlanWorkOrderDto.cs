@@ -6,6 +6,7 @@
  *build datetime: 2023-03-20 09:39:21
  */
 
+using FluentValidation.Validators;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
@@ -307,6 +308,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         public PlanWorkOrderStatusEnum? Status { get; set; }
 
         /// <summary>
+        /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
+        /// </summary>
+        public IEnumerable<PlanWorkOrderStatusEnum>? InStatus { get; set; }
+
+        /// <summary>
         /// 计划开始时间  时间范围  数组
         /// </summary>
         public DateTime[]? PlanStartTime { get; set; }
@@ -556,7 +562,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 下达数量
         /// </summary>
-        public string PassDownQuantity { get; set; }
+        public decimal PassDownQuantity { get; set; }
 
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例
@@ -621,12 +627,12 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 投入数量
         /// </summary>
-        public string InputQty { get; set; }
+        public decimal InputQty { get; set; }
 
         /// <summary>
         /// 完工数量
         /// </summary>
-        public string FinishProductQuantity { get; set; }
+        public decimal FinishProductQuantity { get; set; }
 
         /// <summary>
         /// 实际开始时间

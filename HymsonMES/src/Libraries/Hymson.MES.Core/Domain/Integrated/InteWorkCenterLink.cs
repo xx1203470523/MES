@@ -17,7 +17,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 序号( 程序生成) 
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
         /// <summary>
         /// 描述 :所属工作中心ID 
         /// 空值 : false  

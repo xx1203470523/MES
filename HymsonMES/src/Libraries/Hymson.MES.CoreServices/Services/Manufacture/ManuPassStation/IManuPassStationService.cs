@@ -35,12 +35,29 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFCAsync(SFCOutStationBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi);
 
         /// <summary>
+        /// 产出确认（条码出站）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, JobResponseBo>> OutputConfirmBySFCAsync(OutputConfirmBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi);
+
+        /// <summary>
         /// 批量出站（托盘出站）
         /// </summary>
         /// <param name="bo"></param>
         /// <param name="source"></param>
         /// <returns></returns>
         Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicleAsync(VehicleOutStationBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi);
+
+
+        /// <summary>
+        /// 批量中止
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, JobResponseBo>> StopStationRangeBySFCAsync(SFCStopStationBo bo);
+
 
     }
 }

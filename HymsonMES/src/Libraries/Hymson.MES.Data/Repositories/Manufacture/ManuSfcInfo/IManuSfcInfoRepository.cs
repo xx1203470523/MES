@@ -42,9 +42,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="ManuSfcInfoEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntitys);
+        Task<int> UpdatesAsync(IEnumerable<ManuSfcInfoEntity> entities);
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> UpdateRangeAsync(IEnumerable<ManuSfcInfoEntity> entities);
 
         /// <summary>
         /// 删除  
@@ -73,10 +80,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcId"></param>
         /// <returns></returns>
-        Task<ManuSfcInfoEntity> GetBySFCAsync(long sfcId);
+        Task<ManuSfcInfoEntity> GetBySFCIdWithIsUseAsync(long sfcId);
+
+        /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcId"></param>
+        /// <returns></returns>
+        Task<ManuSfcInfoEntity> GetBySFCIdAsync(long sfcId);
 
         /// <summary>
         /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcInfoEntity>> GetBySFCIdsWithIsUseAsync(IEnumerable<long> sfcIds);
+
+        /// <summary>
+        /// 根据SFCIds获取数据
         /// </summary>
         /// <param name="sfcIds"></param>
         /// <returns></returns>

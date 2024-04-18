@@ -8,7 +8,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Quality
 {
@@ -142,6 +142,26 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            if (query.SiteId.HasValue)
+            {
+                sqlBuilder.Where("SiteId = @SiteId");
+            }
+            if (query.WorkCenterId.HasValue)
+            {
+                sqlBuilder.Where("WorkCenterId = @WorkCenterId");
+            }
+            if (query.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("ProcedureId = @ProcedureId");
+            }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
+            //排序
+            if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualEnvParameterGroupEntity>(template.RawSql, query);
         }
@@ -240,9 +260,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_env_parameter_group T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM qual_env_parameter_group T /**innerjoin**/ /**leftjoin**/ /**where**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM qual_env_parameter_group /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_env_parameter_group /**where**/ /**orderby**/ ";
 
         const string InsertSql = "INSERT IGNORE qual_env_parameter_group(`Id`, `Code`, `Name`, `Version`, `Status`, `WorkCenterId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @WorkCenterId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT IGNORE qual_env_parameter_group(`Id`, `Code`, `Name`, `Version`, `Status`, `WorkCenterId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @WorkCenterId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";

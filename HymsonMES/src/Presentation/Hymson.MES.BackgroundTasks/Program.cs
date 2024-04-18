@@ -1,7 +1,10 @@
-﻿using Hymson.MES.BackgroundTasks;
+﻿using Hymson.Infrastructure.Mapper;
+using Hymson.Infrastructure;
+using Hymson.MES.BackgroundTasks;
 using Hymson.MES.BackgroundTasks.HostedServices;
 using Hymson.MES.BackgroundTasks.Jobs;
 using Hymson.MES.BackgroundTasks.Manufacture;
+using Hymson.MES.BackgroundTasks.Quality;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Print.Options;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using NLog;
 using Quartz;
 using System.Reflection;
+using AutoMapper;
 
 try
 {
@@ -33,11 +37,14 @@ Host.CreateDefaultBuilder(args)
    {
        services.Configure<PrintOptions>(hostContext.Configuration.GetSection(nameof(PrintOptions)));
        services.AddLocalization();
+      
        services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
        services.AddPrintBackgroundService(hostContext.Configuration);
        services.AddClearCacheService(hostContext.Configuration);
+       services.AddPrintService(hostContext.Configuration);
+       
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
        var programName = hostContext.Configuration.GetSection("Quartz").GetValue<string>("ProgramName");
        // Add the required Quartz.NET services
@@ -58,6 +65,12 @@ Host.CreateDefaultBuilder(args)
            q.AddJobAndTrigger<WorkOrderStatisticJob>(hostContext.Configuration);
            #endregion
 
+           #region 品质
+
+           q.AddJobAndTrigger<EnvOrderCreateJob>(hostContext.Configuration);
+
+           #endregion
+
            q.UsePersistentStore((persistentStoreOptions) =>
            {
                persistentStoreOptions.UseProperties = true;
@@ -76,6 +89,31 @@ Host.CreateDefaultBuilder(args)
        services.AddSqlExecuteTaskService(hostContext.Configuration);
        services.AddNLog(hostContext.Configuration);
        services.AddEventBusRabbitMQService(hostContext.Configuration);
+       AddAutoMapper();
 
    });
+
+         static void AddAutoMapper()
+        {
+            //find mapper configurations provided by other assemblies
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var mapperConfigurations = typeFinder.FindClassesOfType<IOrderedMapperProfile>();
+
+            //create and sort instances of mapper configurations
+            var instances = mapperConfigurations
+                .Select(mapperConfiguration => (IOrderedMapperProfile)Activator.CreateInstance(mapperConfiguration))
+                .OrderBy(mapperConfiguration => mapperConfiguration.Order);
+
+            //create AutoMapper configuration
+            var config = new MapperConfiguration(cfg =>
+            {
+                foreach (var instance in instances)
+                {
+                    cfg.AddProfile(instance.GetType());
+                }
+            });
+
+            //register
+            AutoMapperConfiguration.Init(config);
+        }
 

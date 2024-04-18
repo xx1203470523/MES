@@ -88,7 +88,7 @@ namespace Hymson.MES.Services.Services.Integrated
             //校验OQC与IQC只能创建一个
             if (inteCodeRulesCreateDto.CodeType != null)
             {
-                if(inteCodeRulesCreateDto.CodeType== CodeRuleCodeTypeEnum.OQC|| inteCodeRulesCreateDto.CodeType== CodeRuleCodeTypeEnum.IQC)
+                if(inteCodeRulesCreateDto.CodeType== CodeRuleCodeTypeEnum.OQC|| inteCodeRulesCreateDto.CodeType== CodeRuleCodeTypeEnum.IQC || inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.FQC)
                 {
                     var Entities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId = _currentSite.SiteId ?? 0, CodeType = inteCodeRulesCreateDto.CodeType });
                     if (Entities.Any())

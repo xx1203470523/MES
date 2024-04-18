@@ -6,27 +6,27 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteContainer.V1;
 
 /// <summary>
 /// 仓储（容器维护）
 /// </summary>
-public partial class InteContainerRepository : IInteContainerRepository
+public partial class InteContainerRepository :BaseRepository, IInteContainerRepository
 {
     /// <summary>
     /// 
     /// </summary>
-    private readonly ConnectionOptions _connectionOptions;
+    //private readonly ConnectionOptions _connectionOptions;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="connectionOptions"></param>
-    public InteContainerRepository(IOptions<ConnectionOptions> connectionOptions)
+    public InteContainerRepository(IOptions<ConnectionOptions> connectionOptions):base(connectionOptions)
     {
-        _connectionOptions = connectionOptions.Value;
+       
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public partial class InteContainerRepository : IInteContainerRepository
     /// <returns></returns>
     public async Task<int> InsertAsync(InteContainerEntity entity)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, entity);
     }
 
@@ -47,7 +47,7 @@ public partial class InteContainerRepository : IInteContainerRepository
     /// <returns></returns>
     public async Task<int> UpdateAsync(InteContainerEntity entity)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateSql, entity);
     }
 
@@ -58,7 +58,7 @@ public partial class InteContainerRepository : IInteContainerRepository
     /// <returns></returns>
     public async Task<int> DeletesAsync(DeleteCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteSql, command);
 
     }
@@ -70,7 +70,7 @@ public partial class InteContainerRepository : IInteContainerRepository
     /// <returns></returns>
     public async Task<InteContainerEntity> GetByIdAsync(long id)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.QueryFirstOrDefaultAsync<InteContainerEntity>(GetByIdSql, new { Id = id });
     }
 
@@ -81,7 +81,7 @@ public partial class InteContainerRepository : IInteContainerRepository
     /// <returns></returns>
     public async Task<IEnumerable<InteContainerEntity>> GetByIdsAsync(IEnumerable<long> ids)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.QueryAsync<InteContainerEntity>(GetByIdsSql, new { Ids = ids });
     }
 
@@ -100,7 +100,7 @@ public partial class InteContainerRepository : IInteContainerRepository
             sql += " AND Status = @Status";
         }
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.QueryFirstOrDefaultAsync<InteContainerEntity>(sql, query);
     }
 
@@ -155,7 +155,7 @@ public partial class InteContainerRepository : IInteContainerRepository
         sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
         sqlBuilder.AddParameters(pagedQuery);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         var entities = await conn.QueryAsync<InteContainerView>(templateData.RawSql, templateData.Parameters);
         var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
         return new PagedInfo<InteContainerView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
@@ -168,7 +168,7 @@ public partial class InteContainerRepository : IInteContainerRepository
     /// <returns></returns>
     public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateStatusSql, command);
     }
 }

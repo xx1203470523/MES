@@ -6,6 +6,7 @@
  *build datetime: 2023-03-29 10:23:51
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using System;
 using System.Collections.Generic;
@@ -69,12 +70,32 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         Task<PlanWorkOrderActivationDto> QueryPlanWorkOrderActivationByIdAsync(long id);
 
-
         /// <summary>
         /// 激活/取消激活 工单
         /// </summary>
         /// <param name="activationWorkOrderDto"></param>
         /// <returns></returns>
         Task ActivationWorkOrderAsync(ActivationWorkOrderDto activationWorkOrderDto);
+
+        /// <summary>
+        /// 【PDA】设备编码扫描
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        Task<EquipmentCodeScanOutputDto> EquipmentCodeScanAsync(string code);
+        
+        /// <summary>
+        /// 获取未激活工单
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquipmentActivityWorkOrderOutputDto>> GetNotActivityWorkOrderAsync(ActivationWorkOrderPagedQueryDto query);
+
+        /// <summary>
+        /// 获取已激活工单
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquipmentActivityWorkOrderOutputDto>> GetActivityWorkOrderAsync(ActivationWorkOrderPagedQueryDto query);
     }
 }

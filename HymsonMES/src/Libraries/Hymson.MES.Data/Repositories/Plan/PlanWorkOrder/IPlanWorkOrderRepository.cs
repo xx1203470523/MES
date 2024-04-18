@@ -200,5 +200,19 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(UpdateWorkOrderRealTimeCommand command);
+
+        /// <summary>
+        /// 获取激活工单列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderView>> GetActivationWorkOrderDataAsync(PlanWorkOrderPagedQuery query);
+
+        /// <summary>
+        /// 获取工单列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderView>> GetWorkOrderDataAsync(PlanWorkOrderPagedQuery query);
     }
 }

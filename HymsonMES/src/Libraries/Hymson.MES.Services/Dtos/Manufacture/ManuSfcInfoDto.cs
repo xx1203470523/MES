@@ -79,10 +79,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
     }
-
 
     /// <summary>
     /// 条码信息表新增Dto

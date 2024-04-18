@@ -91,10 +91,23 @@ namespace Hymson.MES.Data.Repositories.Process
                     sqlBuilder.Where("Type=@Type");
                 }
             }
+
             if (!string.IsNullOrWhiteSpace(procProcedurePagedQuery.ResTypeName))
             {
                 procProcedurePagedQuery.Name = $"%{procProcedurePagedQuery.ResTypeName}%";
                 sqlBuilder.Where("ResTypeName like @ResTypeName");
+            }
+
+            if (!string.IsNullOrWhiteSpace(procProcedurePagedQuery.OrCode))
+            {
+                procProcedurePagedQuery.OrCode = $"%{procProcedurePagedQuery.OrCode}%";
+                sqlBuilder.OrWhere("Code like @OrCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(procProcedurePagedQuery.OrName))
+            {
+                procProcedurePagedQuery.OrName = $"%{procProcedurePagedQuery.OrName}%";
+                sqlBuilder.OrWhere("Name like @OrName");
             }
 
             var offSet = (procProcedurePagedQuery.PageIndex - 1) * procProcedurePagedQuery.PageSize;
@@ -252,10 +265,17 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" Code = @Code ");
             }
+
             if (procProcedureQuery.Codes != null && procProcedureQuery.Codes.Any())
             {
-                sqlBuilder.Where(" Code in @Codes ");
+                sqlBuilder.Where(" Code IN @Codes ");
             }
+
+            if (procProcedureQuery.ResourceTypeIds != null && procProcedureQuery.ResourceTypeIds.Any())
+            {
+                sqlBuilder.Where(" ResourceTypeId IN @ResourceTypeIds");
+            }
+
             sqlBuilder.AddParameters(procProcedureQuery);
 
             using var conn = GetMESDbConnection();
@@ -285,6 +305,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 query.Name = $"%{query.Name}%";
                 sqlBuilder.Where(" Name LIKE @Name ");
+            }
+            if (query.Codes != null && query.Codes.Any())
+            {
+                sqlBuilder.Where("Code IN @Codes");
             }
             sqlBuilder.AddParameters(query);
 
@@ -357,6 +381,33 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
+
+
+        /// <summary>
+        /// 查询工序单条数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcProcedureEntity> GetEntitieAsync(ProcProcedureQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(query.Code))
+            {
+                sqlBuilder.Where(" Code = @Code ");
+            }
+            if (!string.IsNullOrWhiteSpace(query.Name))
+            {
+                sqlBuilder.Where(" Name = @Name ");
+            }
+            sqlBuilder.AddParameters(query);
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(template.RawSql, template.Parameters);
+        }
     }
 
     /// <summary>
@@ -384,5 +435,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string UpdateStatusSql = "UPDATE `proc_procedure` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
+        const string GetEntitiesSqlTemplate = "SELECT * FROM `proc_procedure` /**where**/ ";
     }
 }

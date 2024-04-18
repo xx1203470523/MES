@@ -8,11 +8,6 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -34,7 +29,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 序号( 程序生成)
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
         /// <summary>
         /// 序号
@@ -107,7 +102,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 序号( 程序生成)
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
        /// <summary>
         /// 所属工序ID
@@ -200,7 +195,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 序号( 程序生成)
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
        /// <summary>
         /// 所属工序ID

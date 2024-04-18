@@ -49,6 +49,21 @@ namespace Hymson.MES.Core.Enums
         /// 条码合并
         /// </summary>
         [Description("条码合并")]
-        Merge = 8
+        Merge = 8,
+        /// <summary>
+        /// 离脱
+        /// </summary>
+        [Description("离脱")]
+        Detachment = 9,
+        // <summary>
+        /// 物料报废
+        /// </summary>
+        [Description("物料报废")]
+        MaterialScrapping = 10,
+        /// <summary>
+        /// 取消报废
+        /// </summary>
+        [Description("取消报废")]
+        CancelScrapping = 11
     }
 }

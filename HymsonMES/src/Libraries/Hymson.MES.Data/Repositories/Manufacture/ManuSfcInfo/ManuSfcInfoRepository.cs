@@ -60,10 +60,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcInfoEntity> GetBySFCAsync(long sfcId)
+        public async Task<ManuSfcInfoEntity> GetBySFCIdWithIsUseAsync(long sfcId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SfcId = sfcId });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCWithIsUseSql, new { SfcId = sfcId });
+        }
+
+        /// <summary>
+        /// 根据SFCId获取数据
+        /// </summary>
+        /// <param name="sfcId"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcInfoEntity> GetBySFCIdAsync(long sfcId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCIdSql, new { SFCId = sfcId });
         }
 
         /// <summary>
@@ -71,10 +82,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcIds"></param>
         /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcInfoEntity>> GetBySFCIdsWithIsUseAsync(IEnumerable<long> sfcIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcInfoEntity>(GetBySFCIdsWithIsUseSql, new { sfcIds });
+        }
+
+        /// <summary>
+        /// 根据SFCIds获取数据
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ManuSfcInfoEntity>> GetBySFCIdsAsync(IEnumerable<long> sfcIds)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuSfcInfoEntity>(GetBySFCIdsSql, new { sfcIds });
+            return await conn.QueryAsync<ManuSfcInfoEntity>(GetBySFCIdsSql, new { SFCIds = sfcIds });
         }
 
         /// <summary>
@@ -165,12 +187,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="ManuSfcInfoEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<ManuSfcInfoEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, ManuSfcInfoEntitys);
+            return await conn.ExecuteAsync(UpdatesSql, entities);
+        }
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateRangeAsync(IEnumerable<ManuSfcInfoEntity> entities)
+        {
+            if (entities == null || !entities.Any()) return 0;
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateRangeSql, entities);
         }
 
         /// <summary>
@@ -363,15 +398,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateSql = "UPDATE `manu_sfc_info` SET   SiteId = @SiteId, SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_sfc_info` SET   SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateRangeSql = "UPDATE manu_sfc_info SET WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
 
         const string DeleteSql = "UPDATE `manu_sfc_info` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc_info` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND Id IN @ids ";
-        const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId = @SfcId  AND  IsUsed=1 ";
-        const string GetBySFCIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId IN @sfcIds  AND  IsUsed=1";
-
+        const string GetBySFCIdSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SFCId = @SFCId ";
+        const string GetBySFCWithIsUseSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId = @SfcId  AND  IsUsed=1 ";
+        const string GetBySFCIdsWithIsUseSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId IN @sfcIds  AND  IsUsed=1";
+        const string GetBySFCIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SFCId IN @SFCIds";
         const string UpdatesIsUsedSql = "UPDATE `manu_sfc_info` SET  IsUsed =0 , UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE SfcId IN @SfcIds AND IsUsed=1";
 
         #endregion

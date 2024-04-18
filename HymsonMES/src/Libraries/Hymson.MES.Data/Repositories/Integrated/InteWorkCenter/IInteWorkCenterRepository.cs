@@ -32,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteWorkCenterEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<InteWorkCenterEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 根据类型获取数据
@@ -169,6 +169,14 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         Task<InteWorkCenterEntity> GetHigherInteWorkCenterAsync(long id);
 
         /// <summary>
+        /// 根据下级工作中心Id获取上级工作中心
+        /// (只获取一级)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteWorkCenterEntity>> GetHigherInteWorkCenterAsync(IEnumerable<long> id);
+
+        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="id"></param>
@@ -195,5 +203,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// <param name="workCenterQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<InteWorkCenterEntity>> GetEntitiesAsync(InteWorkCenterQuery workCenterQuery);
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="workCenterQuery"></param>
+        /// <returns></returns>
+        Task<InteWorkCenterEntity> GetEntitieAsync(InteWorkCenterFirstQuery workCenterQuery);
+        Task<IEnumerable<InteWorkCenterResourceRelationView>> GetWorkCenterResourceRelationAsync(IEnumerable<long> resourceIds);
     }
 }

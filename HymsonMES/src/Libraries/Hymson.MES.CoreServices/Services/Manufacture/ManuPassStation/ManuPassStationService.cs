@@ -4,6 +4,7 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
+using Hymson.MES.Data.Repositories.Quality;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture
 {
@@ -23,15 +24,23 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
+        /// 不合格代码
+        /// </summary>
+        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="executeJobService"></param>
         /// <param name="manuCommonService"></param>
+        /// <param name="qualUnqualifiedCodeRepository"></param>
         public ManuPassStationService(IExecuteJobService<JobBaseBo> executeJobService,
-            IManuCommonService manuCommonService)
+            IManuCommonService manuCommonService,
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
         {
             _executeJobService = executeJobService;
             _manuCommonService = manuCommonService;
+            _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
         }
 
 
@@ -135,6 +144,49 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         }
 
         /// <summary>
+        /// 批量出站（条码出站）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, JobResponseBo>> OutputConfirmBySFCAsync(OutputConfirmBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi)
+        {
+            // 作业请求参数
+            var requestBo = new JobRequestBo
+            {
+                Source = source,
+                Type = ManuFacePlateBarcodeTypeEnum.Product,
+                SiteId = bo.SiteId,
+                UserName = bo.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId
+            };
+
+            var qualUnqualifiedCodeList = await _qualUnqualifiedCodeRepository.GetByIdsAsync(bo.Unqualifieds.Select(x => x.UnqualifiedId));
+
+            requestBo.SFCs = new List<string> { bo.SFC };
+            requestBo.OutStationRequestBos = new List<OutStationRequestBo> {
+                new OutStationRequestBo
+            {
+                    SFC=bo.SFC,
+                    QualifiedQty= bo.QualifiedQty,
+                    UnQualifiedQty= bo.UnQualifiedQty,
+                    OutStationUnqualifiedList=bo.Unqualifieds.Select(x=>new Bos.Parameter.OutStationUnqualifiedBo {
+                        UnqualifiedCode=qualUnqualifiedCodeList.FirstOrDefault(o=>o.Id==x.UnqualifiedId)?.UnqualifiedCode??"",
+                        UnqualifiedQty=x.UnqualifiedQty
+                    }
+                    )
+            }
+            };
+
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "OutStationJobService" });
+
+            return await _executeJobService.ExecuteAsync(jobBos, requestBo);
+        }
+
+        /// <summary>
         /// 批量出站（托盘出站）
         /// </summary>
         /// <param name="bo"></param>
@@ -181,6 +233,30 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             var jobBos = new List<JobBo> { };
             jobBos.Add(new JobBo { Name = "OutStationJobService" });
 
+            return await _executeJobService.ExecuteAsync(jobBos, requestBo);
+        }
+        #endregion
+
+        #region 中止
+        /// <summary>
+        /// 批量中止
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, JobResponseBo>> StopStationRangeBySFCAsync(SFCStopStationBo bo)
+        {
+            // 作业请求参数（TODO 后面需要把这个改为使用JobRequestBo对象）
+            var requestBo = new StopRequestBo
+            {
+                SiteId = bo.SiteId,
+                UserName = bo.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId,
+                SFCs = bo.SFCs
+            };
+
+            var jobBos = new List<JobBo> { new() { Name = "StopJobService" } };
             return await _executeJobService.ExecuteAsync(jobBos, requestBo);
         }
         #endregion

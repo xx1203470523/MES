@@ -73,6 +73,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// </summary>
         public IEnumerable<long>? BlockUnqualifiedIds { get; set; }
 
+        /// <summary>
+        /// 集合（不合格代码）
+        /// </summary>
+        public IEnumerable<QualUnqualifiedCodeEntity> UnqualifiedCodeEntities { get; set; }
+
     }
 
 }

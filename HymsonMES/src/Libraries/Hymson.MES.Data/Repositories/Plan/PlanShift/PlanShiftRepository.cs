@@ -5,7 +5,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
  
 using Hymson.MES.Core.Domain.Plan; 
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;

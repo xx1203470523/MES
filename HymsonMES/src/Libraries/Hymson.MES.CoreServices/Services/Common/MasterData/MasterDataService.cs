@@ -382,10 +382,11 @@ namespace Hymson.MES.CoreServices.Services.Common
         public async Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheckAsync(MultiSFCBo bo)
         {
             // 条码信息
-            var manuSfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery
+            var manuSfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
             {
                 SiteId = bo.SiteId,
-                SFCs = bo.SFCs
+                SFCs = bo.SFCs,
+                Type = SfcTypeEnum.Produce
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17104));
 
             return manuSfcEntities;
@@ -644,10 +645,11 @@ namespace Hymson.MES.CoreServices.Services.Common
             {
                 ProcessRouteId = processRouteId,
                 SerialNo = procProcessRouteDetailNodeEntity.SerialNo,
-                ProcedureId = procProcessRouteDetailNodeEntity.ProcedureId,
+                //ProcedureId = procProcessRouteDetailNodeEntity.ProcedureId,
                 CheckType = procProcessRouteDetailNodeEntity.CheckType,
                 CheckRate = procProcessRouteDetailNodeEntity.CheckRate,
                 IsWorkReport = procProcessRouteDetailNodeEntity.IsWorkReport,
+                ProcedureId = procProcedureEntity.Id,
                 ProcedureCode = procProcedureEntity.Code,
                 ProcedureName = procProcedureEntity.Name,
                 Type = procProcedureEntity.Type,

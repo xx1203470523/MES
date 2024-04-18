@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Qual;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Quality;
 
@@ -16,7 +16,7 @@ public partial class QualOqcParameterGroupRepository
     /// <returns></returns>
     public async Task<int> InsertIgnoreAsync(QualOqcParameterGroupCreateCommand command)
     {
-        //using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        //using var conn = GetMESDbConnection();
         using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertIgnoreSql, command);
     }
@@ -28,7 +28,7 @@ public partial class QualOqcParameterGroupRepository
     /// <returns></returns>
     public async Task<int> InsertIgnoreAsync(IEnumerable<QualOqcParameterGroupCreateCommand> commands)
     {
-        //using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        //using var conn = GetMESDbConnection();
         using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertIgnoreSql, commands);
     }

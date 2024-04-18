@@ -25,6 +25,15 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 是否合格
         /// </summary>
         public bool? IsQualified { get; set; } = true;
+        /// <summary>
+        /// 合格数量
+        /// </summary>
+        public decimal QualifiedQty { get; set; }
+
+        /// <summary>
+        /// 不合格数量
+        /// </summary>
+        public decimal UnQualifiedQty { get; set; }
 
         /// <summary>
         /// 消耗
@@ -35,6 +44,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 出站不良信息
         /// </summary>
         public IEnumerable<OutStationUnqualifiedBo>? OutStationUnqualifiedList { get; set; }
+
     }
 
     /// <summary>
@@ -105,7 +115,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 不良品录入对象
         /// </summary>
-        public ManuProductBadRecordEntity ProductBadRecordEntity { get; set; }
+        public IEnumerable<ManuProductBadRecordEntity> ProductBadRecordEntities { get; set; }
 
         /// <summary>
         /// 产品NG记录对象

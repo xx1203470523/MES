@@ -6,7 +6,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -51,6 +51,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcPrinterEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcPrinterEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 

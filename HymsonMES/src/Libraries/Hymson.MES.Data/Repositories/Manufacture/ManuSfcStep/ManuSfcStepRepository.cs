@@ -2,8 +2,10 @@ using Dapper;
 using Force.Crc32;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Parameter;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -162,8 +164,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(string.Format(UpdateSql, PrepareTableName(manuSfcStepEntity)), manuSfcStepEntity);
         }
 
-
-
         #region 业务表
         /// <summary>
         /// 根据实体列表对数据进行按表名分组
@@ -218,6 +218,41 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetInOutStepBySFCsSql, tableName), query);
+        }
+
+
+        /// <summary>
+        /// 根据条码获取参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetProductParameterBySFCEntitiesAsync(EntityBySFCsQuery param)
+        {
+            var list = new List<ManuSfcStepEntity>();
+            var dic = new Dictionary<string, List<string>>();
+
+            foreach (var sfc in param.SFCs)
+            {
+                var tableNameBySFC = PrepareTableName(param.SiteId, sfc,false);
+                if (!dic.ContainsKey(tableNameBySFC))
+                {
+                    dic[tableNameBySFC] = new List<string>();
+                }
+                dic[tableNameBySFC].Add(sfc);
+            }
+
+            List<Task<IEnumerable<ManuSfcStepEntity>>> tasks = new();
+            using var conn = GetMESDbConnection();
+            foreach (var dicItem in dic)
+            {
+                tasks.Add(conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetStepBySFCsSql, dicItem.Key), new EntityBySFCsQuery { SiteId = param.SiteId, SFCs = dicItem.Value }));
+            }
+            var result = await Task.WhenAll(tasks);
+            foreach (var item in result)
+            {
+                list.AddRange(item);
+            }
+            return list;
         }
 
         /// <summary>
@@ -294,12 +329,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ManuSfcStepEntity> GetSfcMergeOrSplitAddStepAsync(SfcMergeOrSplitAddStepQuery query) 
+        public async Task<ManuSfcStepEntity> GetSfcMergeOrSplitAddStepAsync(SfcMergeOrSplitAddStepQuery query)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcStepEntity>(GetSfcsMergeOrSliptAddStepSql, query);
         }
-
 
         #region private
         /// <summary>
@@ -391,7 +425,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
         const string GetManuSfcStepEntitiesSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**where**/  ";
         const string InsertSfcStepBusinessSql = "INSERT INTO `manu_sfc_step_business`(`Id`, `SiteId`, `SfcStepId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcStepId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertSql = "INSERT INTO `{0}`(Id, SFC, ProductId, WorkOrderId, WorkCenterId, ProductBOMId, Qty, EquipmentId, VehicleCode, ResourceId, ProcedureId, Operatetype, CurrentStatus, AfterOperationStatus, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (   @Id, @SFC, @ProductId, @WorkOrderId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @VehicleCode, @ResourceId, @ProcedureId, @Operatetype, @CurrentStatus, @AfterOperationStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `{0}`(Id, SFC, ProductId, WorkOrderId, WorkCenterId, ProductBOMId, Qty, ScrapQty,EquipmentId, VehicleCode, ResourceId, ProcedureId, Operatetype, CurrentStatus, AfterOperationStatus, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (   @Id, @SFC, @ProductId, @WorkOrderId, @WorkCenterId, @ProductBOMId, @Qty,@ScrapQty, @EquipmentId, @VehicleCode, @ResourceId, @ProcedureId, @Operatetype, @CurrentStatus, @AfterOperationStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string UpdateSql = "UPDATE `{0}` SET SFC = @SFC, ProductId = @ProductId, WorkOrdeId = @WorkOrdeId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Type = @Type, Status = @Status, Lock = @Lock, IsMultiplex = @IsMultiplex, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_sfc_step` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT * FROM `manu_sfc_step`  WHERE Id = @Id ";
@@ -407,6 +441,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetOutStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype = 4 AND SFC = @SFC ORDER BY Id ASC ";
         const string GetInOutStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype IN (3, 4) AND SFC = @SFC ORDER BY Id ASC ";
         const string GetInOutStepBySFCsSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype IN (3, 4) AND SFC IN @SFCs ORDER BY Id ASC ";
+        const string GetStepBySFCsSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND  SFC IN @SFCs ORDER BY Id DESC ";
         const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY Id desc LIMIT @Offset, @Rows ";
         const string GetBySFCPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
 

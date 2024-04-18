@@ -31,6 +31,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public string MaterialCode { get; set; }
 
         /// <summary>
+        /// 所属物料Code
+        /// </summary>
+        public string? MaterialName { get; set; }
+
+        /// <summary>
         /// 版本
         /// </summary>
         public string? Version { get; set; }
@@ -56,7 +61,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 序号( 程序生成)
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
        /// <summary>
         /// 所属上料点ID
@@ -124,7 +129,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 序号( 程序生成)
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
        /// <summary>
         /// 所属上料点ID

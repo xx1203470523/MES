@@ -250,7 +250,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     SegmentedValue = s.SegmentedValue,
                     CustomValue = s.CustomValue,
                 }),
-
+                ProductId= procMaterialEntity.Id,
                 CodeRuleKey = $"{inteCodeRulesEntity.Id}",
                 Count = discuss,
                 Base = inteCodeRulesEntity.Base,
@@ -261,6 +261,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 StartNumber = inteCodeRulesEntity.StartNumber,
                 CodeMode = inteCodeRulesEntity.CodeMode,
                 SiteId = param.SiteId,
+                InteWorkCenterId= inteWorkCenterEntity.Id
             });
 
             List<CreateBarcodeByWorkOrderOutputBo> result = new();
@@ -412,8 +413,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 WorkOrderId = param.WorkOrderId,
                 IsVerifyActivation = false
             });
-            var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.ExternalSFCs.Select(x => x.SFC));
-
+            var sfclist = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SiteId = param.SiteId,
+                SFCs = param.ExternalSFCs.Select(x => x.SFC),
+                Type = SfcTypeEnum.Produce
+            });
             var processRouteFirstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
@@ -547,8 +552,13 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 WorkOrderId = param.WorkOrderId,
                 IsVerifyActivation = false
             });
-            var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.OldSFCs.Select(x => x.SFC));
-            var sfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfclist.Select(x => x.Id));
+            var sfclist = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SiteId = param.SiteId,
+                SFCs = param.OldSFCs.Select(x => x.SFC),
+                Type = SfcTypeEnum.Produce
+            });
+            var sfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(sfclist.Select(x => x.Id));
             var processRouteFirstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
@@ -969,11 +979,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         }
 
         /// <summary>
-        /// 半成品条码生成
+        /// 条码生成（半成品）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<List<ManuSfcEntity>> CreateBarcodeBySemiProductIdAsync(CreateBarcodeBySemiProductId param)
+        public async Task<List<ManuSfcEntity>> CreateBarcodeBySemiProductIdAsync(CreateBarcodeByResourceCode param)
         {
             // 查询资源
             var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
@@ -1074,9 +1084,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 StartNumber = inteCodeRulesEntity.StartNumber,
                 CodeMode = inteCodeRulesEntity.CodeMode,
                 SiteId = param.SiteId,
-            }, new BarCodeExtendBo
-            {
-                LineCode = inteWorkCenterEntity.Code
+                InteWorkCenterId= inteWorkCenterEntity.Id
             });
             // 开启事务
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
@@ -1181,5 +1189,17 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
 
             return manuSfcList;
         }
+
+        /// <summary>
+        /// 条码生成（电芯）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<List<ManuSfcEntity>> CreateCellBarCodeAsync(CreateBarcodeByResourceCode param)
+        {
+            // TODO
+            return await Task.FromResult(new List<ManuSfcEntity> { });
+        }
+
     }
 }

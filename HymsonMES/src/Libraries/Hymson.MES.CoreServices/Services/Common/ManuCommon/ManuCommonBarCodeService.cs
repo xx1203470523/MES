@@ -4,6 +4,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -24,7 +25,12 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <exception cref="ValidationException">状态(在 无效 删除 报废 锁定) 产品序列码状态为【xxxx】，不允许操作  包装验证  产品序列码已经被包装，不允许操作 </exception>
         public async Task<IEnumerable<ManuSfcBo>> GetManuSfcInfos(MultiSFCBo param, ILocalizationService localizationService)
         {
-            var manuSfcEntitiesTask = _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SiteId = param.SiteId, SFCs = param.SFCs });
+            var manuSfcEntitiesTask = _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SiteId = param.SiteId,
+                SFCs = param.SFCs,
+                Type = SfcTypeEnum.Produce
+            });
             var manuSfcProduceEntitiesTask = _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery { SiteId = param.SiteId, Sfcs = param.SFCs });
             var sfcPackListTask = _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { LadeBarCodes = param.SFCs, SiteId = param.SiteId });
 
@@ -32,8 +38,8 @@ namespace Hymson.MES.CoreServices.Services.Common
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
             var sfcPackList = await sfcPackListTask;
 
-            var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcEntities.Select(x => x.Id));
-            var planWorkOrderEntities = await _masterDataService.GetWorkOrderEntitiesByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId??0));
+            var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsWithIsUseAsync(manuSfcEntities.Select(x => x.Id));
+            var planWorkOrderEntities = await _masterDataService.GetWorkOrderEntitiesByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId ?? 0));
 
             List<ManuSfcBo> list = new List<ManuSfcBo>();
             var validationFailures = new List<ValidationFailure>();

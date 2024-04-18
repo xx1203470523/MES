@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 
@@ -159,18 +160,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         Task<WhMaterialInventoryEntity> GetByBarCodeAsync(WhMaterialInventoryBarCodeQuery query);
 
         /// <summary>
-        /// 根据物料条码获取数据
-        /// </summary>
-        /// <param name="barCode"></param>
-        /// <returns></returns>
-        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarCodesQuery param);
-
-        /// <summary>
         /// 根据物料条码获取数据（剩余数量大于0的条码）
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
         Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesOfHasQtyAsync(WhMaterialInventoryBarCodesQuery param);
+
+        /// <summary>
+        /// 根据物料条码获取数据
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarCodesQuery param);
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -193,15 +194,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         Task<PagedInfo<WhMaterialInventoryPageListView>> GetPagedInfoAsync(WhMaterialInventoryPagedQuery whMaterialInventoryPagedQuery);
 
-
-
         /// <summary>
         /// 根据物料编码获取物料数据
         /// </summary>
         /// <param name="materialCode"></param>
         /// <returns></returns>
         Task<ProcMaterialInfoView> GetProcMaterialByMaterialCodeAsync(long materialId);
-
 
         /// <summary>
         /// 根据物料编码获取供应商信息
@@ -222,7 +220,14 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> UpdateQuantityResidueBySfcsAsync(UpdateQuantityResidueBySfcsCommand command);
+        Task<int> UpdateQuantityResidueBySFCsAsync(UpdateQuantityResidueBySfcsCommand command);
+
+        /// <summary>
+        /// 部分报废条码修改库存数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> ScrapPartialWhMaterialInventoryByIdAsync(IEnumerable<ScrapPartialWhMaterialInventoryByIdCommand> commands);
 
         #region 顷刻
 

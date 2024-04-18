@@ -39,7 +39,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// 创建条码
+        /// 创建条码（半成品）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -49,6 +49,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<IEnumerable<string>> CreateBarCodeBySemiProductAsync(BaseDto dto)
         {
             return await _manufactureService.CreateBarcodeBySemiProductIdAsync(dto);
+        }
+
+        /// <summary>
+        /// 创建条码（电芯）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CreateCellBarCode")]
+        [LogDescription("创建电芯条码", BusinessType.OTHER, "CreateCellBarCode", ReceiverTypeEnum.MES)]
+        public async Task<IEnumerable<string>> CreateCellBarCodeAsync(BaseDto dto)
+        {
+            return await _manufactureService.CreateCellBarCodeAsync(dto);
         }
 
         /// <summary>

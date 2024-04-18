@@ -14,7 +14,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -96,6 +96,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 manuDowngradingRulePagedQuery.Name = $"%{manuDowngradingRulePagedQuery.Name}%";
                 sqlBuilder.Where("Name LIKE @Name");
+            }
+
+            if (!string.IsNullOrWhiteSpace(manuDowngradingRulePagedQuery.OrCode))
+            {
+                manuDowngradingRulePagedQuery.OrCode = $"%{manuDowngradingRulePagedQuery.OrCode}%";
+                sqlBuilder.OrWhere("Code LIKE @OrCode");
+            }
+            if (!string.IsNullOrWhiteSpace(manuDowngradingRulePagedQuery.OrName))
+            {
+                manuDowngradingRulePagedQuery.OrName = $"%{manuDowngradingRulePagedQuery.OrName}%";
+                sqlBuilder.OrWhere("Name LIKE @OrName");
             }
 
             var offSet = (manuDowngradingRulePagedQuery.PageIndex - 1) * manuDowngradingRulePagedQuery.PageSize;

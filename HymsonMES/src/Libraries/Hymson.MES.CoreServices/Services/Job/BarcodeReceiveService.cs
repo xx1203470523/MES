@@ -141,7 +141,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                 Sfcs = multiSFCBo.SFCs
             });
 
-            var sfcEntitys = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetAllManuSfcEntitiesAsync, new EntityBySFCsQuery { SiteId = multiSFCBo.SiteId, SFCs = multiSFCBo.SFCs });
+            var sfcEntitys = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetListAsync, new ManuSfcQuery
+            {
+                SiteId = multiSFCBo.SiteId,
+                SFCs = multiSFCBo.SFCs,
+                Type = SfcTypeEnum.Produce
+            });
 
             var resourceEntity = await _procResourceRepository.GetByIdAsync(commonBo.ResourceId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16337));
@@ -164,7 +169,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19937)).WithData("WorkOrderCode", planWorkOrderEntity.OrderCode);
             }
-     
+
             // 获取产出设置的产品ID
             var productIdOfSet = await _masterDataService.GetProductSetIdAsync(new ProductSetBo
             {
@@ -190,7 +195,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             bomMaterials.AddRange(initialMaterials.SelectMany(s => s.ReplaceMaterials).Select(s => new MaterialDeductItemBo { MaterialId = s.MaterialId, DataCollectionWay = s.DataCollectionWay }));
 
             // 获取库存数据
-            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+            var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(new WhMaterialInventoryBarCodesQuery
             {
                 SiteId = multiSFCBo.SiteId,
                 BarCodes = multiSFCBo.SFCs

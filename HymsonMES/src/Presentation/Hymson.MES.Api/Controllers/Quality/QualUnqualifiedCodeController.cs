@@ -32,13 +32,13 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 分页查询列表
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<QualUnqualifiedCodeDto>> QueryPagedQualUnqualifiedCodeAsync([FromQuery] QualUnqualifiedCodePagedQueryDto parm)
+        public async Task<PagedInfo<QualUnqualifiedCodeDto>> QueryPagedQualUnqualifiedCodeAsync([FromQuery] QualUnqualifiedCodePagedQueryDto pagedQueryDto)
         {
-            return await _qualUnqualifiedCodeService.GetPageListAsync(parm);
+            return await _qualUnqualifiedCodeService.GetPageListAsync(pagedQueryDto);
         }
 
         /// <summary>

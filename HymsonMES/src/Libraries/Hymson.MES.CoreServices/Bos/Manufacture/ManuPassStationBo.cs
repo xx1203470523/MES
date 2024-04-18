@@ -24,7 +24,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long? EquipmentId { get; set; }
 
         /// <summary>
-        /// 载具条码
+        /// 产品序列码
         /// </summary>
         public IEnumerable<string> SFCs { get; set; }
     }
@@ -76,7 +76,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long? EquipmentId { get; set; }
 
         /// <summary>
-        /// 载具条码
+        /// 产品序列码
         /// </summary>
         public IEnumerable<OutStationRequestBo> OutStationRequestBos { get; set; }  = new List<OutStationRequestBo>();
     }
@@ -105,6 +105,32 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 载具条码
         /// </summary>
         public IEnumerable<OutStationRequestBo> OutStationRequestBos { get; set; }
+    }
+
+    /// <summary>
+    /// 中止实体类
+    /// </summary>
+    public sealed class SFCStopStationBo : CoreBaseBo
+    {
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
+        /// 产品序列码
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
     }
 
 }

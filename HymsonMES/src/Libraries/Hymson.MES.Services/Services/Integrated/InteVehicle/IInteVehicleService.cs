@@ -30,6 +30,13 @@ namespace Hymson.MES.Services.Services.Integrated
         Task ModifyInteVehicleAsync(InteVehicleModifyDto inteVehicleModifyDto);
 
         /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task DeleteInteVehicleAsync(long id);
+
+        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
@@ -68,6 +75,15 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="dto"></param>
         /// <returns></returns>
         Task VehicleOperationAsync(InteVehicleOperationDto dto);
-        
+        Task VehicleBindOperationAsync(InteVehicleOperationDto dto);
+        Task VehicleUnBindOperationAsync(InteVehicleOperationDto dto);
+        Task VehicleClearOperationAsync(InteVehicleOperationDto dto);
+
+        /// <summary>
+        /// 通过托盘码获取托盘视图信息
+        /// </summary>
+        /// <param name="palletNo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordByPalletNoAsync(string palletNo);
     }
 }
