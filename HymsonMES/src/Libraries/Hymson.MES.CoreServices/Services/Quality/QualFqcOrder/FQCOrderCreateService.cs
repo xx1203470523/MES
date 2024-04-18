@@ -279,7 +279,8 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
                     trans.Complete();
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 if (ex.Message.Contains("Duplicate"))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES11720));
@@ -288,7 +289,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES11721), ex.Message);
                 }
-                
+
             }
 
             return rows;
@@ -509,7 +510,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             var isNeedFQC = false;
             if (bo.RecordDetails == null)
             {
-                _logger.LogError("检验单明细为空");
+                _logger.LogError("FQC:检验单明细为空");
                 throw new CustomerValidationException(nameof(ErrorCode.MES11717));
             }
 
@@ -518,6 +519,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             string inspectionOrder = await GenerateFQCOrderCodeAsync(bo.SiteId, bo.UserName);
             var materialId = bo.RecordDetails.Select(x => x.MaterialId).FirstOrDefault();
             var workOrderId = bo.RecordDetails.Select(x => x.WorkOrderId).FirstOrDefault();
+
             //获取所有检验项目
             var parameterGroupEntity = await _qualFqcParameterGroupRepository.GetEntityAsync(new QualFqcParameterGroupQuery
             {
@@ -528,7 +530,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
 
             if (parameterGroupEntity == null)
             {
-                _logger.LogError($"qual_fqc_parameter_group,{materialId}参数项目为空检验单明细为空");
+                _logger.LogError($"qual_fqc_parameter_group,FQC:物料ID={materialId}参数项目为空");
                 throw new CustomerValidationException(nameof(ErrorCode.MES11718)).WithData("materialId", materialId);
             }
 
@@ -539,14 +541,19 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
                 ParameterGroupId = parameterGroupEntity.Id
             });
 
+            if (parameterGroupDetails == null)
+            {
+                _logger.LogError($"qual_fqc_parameter_group,FQC:{parameterGroupEntity.Id}参数项目明细为空");
+                throw new CustomerValidationException(nameof(ErrorCode.MES11718)).WithData("materialId", materialId);
+            }
 
             //判定是否需要生成FQC
-            var queryParam = new QualFinallyOutputRecordQuery
-            {
-                SiteId = bo.SiteId,
-                MaterialId = materialId,
-                IsGenerated = TrueOrFalseEnum.No
-            };
+            //var queryParam = new QualFinallyOutputRecordQuery
+            //{
+            //    SiteId = bo.SiteId,
+            //    MaterialId = materialId,
+            //    IsGenerated = TrueOrFalseEnum.No
+            //};
 
             //if (parameterGroupEntity.IsSameWorkOrder == TrueOrFalseEnum.Yes)
             //{
@@ -565,8 +572,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             }
             else
             {
-                _logger.LogError($"记录数量小于批次数量，不予生成");
-                throw new CustomerValidationException(nameof(ErrorCode.MES11719));
+                _logger.LogError($"FQC记录数量小于批次数量，不予生成");
             }
 
             //检验项目快照
@@ -693,7 +699,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"FQC生成失败！");
+                _logger.LogError(ex, "FQC生成失败！");
             }
 
             return isNeedFQC;
@@ -707,13 +713,8 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
         /// <exception cref="CustomerValidationException"></exception>
         private async Task<string> GenerateFQCOrderCodeAsync(long siteId, string userName)
         {
-            _logger.LogError($"{siteId},GenerateFQCOrderCodeAsync,FQC检验单号生成！");
-            long test = 0;
-            if (siteId == 0)
-            {
-                siteId = 30654441397841920;
-                test= siteId;
-            }
+            _logger.LogError($"SiteId={siteId},FQC检验单号开始生成");
+  
             var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
             {
                 SiteId = siteId,
@@ -721,8 +722,8 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             });
             if (codeRules == null || !codeRules.Any())
             {
-                _logger.LogError($"{siteId},FQC检验单号生成失败！");
-                throw new CustomerValidationException(nameof(ErrorCode.MES11710), $"当前{siteId},是否{test}");
+                _logger.LogError($"{siteId},FQC检验单号生成失败：FQC类型编码规则未维护，前往综合-编码规则维护");
+                throw new CustomerValidationException(nameof(ErrorCode.MES11710));
             }
             if (codeRules.Count() > 1)
             {
