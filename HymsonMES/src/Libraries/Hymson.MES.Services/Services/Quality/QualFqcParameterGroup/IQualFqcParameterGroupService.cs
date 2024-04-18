@@ -67,5 +67,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         Task DeleteAsync(QualFqcParameterGroupDeleteDto deleteDto);
 
+        /// <summary>
+        /// 修改FQC参数组状态
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task ModifStatusAsync(UpdateFqcParameterGroupStatusQueryDto dto);
+
     }
 }

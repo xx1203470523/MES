@@ -101,17 +101,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             //按bom主物料顺序处理
             foreach (var item in mainBomDetails)
             {
-                long mainMaterialId = 0;
-                if (!long.TryParse(item.MaterialId, out mainMaterialId))
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16902));
-                }
-
                 //查找每个主物料是否已经完成组装 --根据装配数量来判断
-                var hasAssembleNum = manuSfcCirculationEntitys.Where(x => x.CirculationMainProductId == mainMaterialId).Sum(x => x.CirculationQty);
+                var hasAssembleNum = manuSfcCirculationEntitys.Where(x => x.CirculationMainProductId == item.MaterialId).Sum(x => x.CirculationQty);
                 if (hasAssembleNum >= item.Usages)
                 {
-                    
+
                 }
                 else
                 {
@@ -127,7 +121,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             var mainMaterialReplaces = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(new ProcReplaceMaterialQuery
                             {
                                 SiteId = _currentSite.SiteId ?? 0,
-                                MaterialId = long.Parse(item.MaterialId)
+                                MaterialId = item.MaterialId
                             });
                             foreach (var replace in mainMaterialReplaces)
                             {

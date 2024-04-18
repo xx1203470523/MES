@@ -37,13 +37,6 @@ namespace Hymson.MES.Services.Services.Process
         Task ModifyProcMaterialGroupAsync(ProcMaterialGroupModifyDto procMaterialGroupModifyDto);
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task DeleteProcMaterialGroupAsync(long id);
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="idsArr"></param>

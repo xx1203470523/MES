@@ -6,7 +6,7 @@ using Hymson.MES.Core.Domain.Qual;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+
 
 namespace Hymson.MES.Data.Repositories.Qual;
 
@@ -17,13 +17,13 @@ namespace Hymson.MES.Data.Repositories.Qual;
 /// <para>@作者：Jim</para>
 /// <para>@创建时间：2024-2-5</para>
 /// </summary>
-public partial class QualIqcInspectionItemRepository : IQualIqcInspectionItemRepository
+public partial class QualIqcInspectionItemRepository :BaseRepository, IQualIqcInspectionItemRepository
 {
     private readonly ConnectionOptions _connectionOptions;
 
-    public QualIqcInspectionItemRepository(IOptions<ConnectionOptions> connectionOptions)
+    public QualIqcInspectionItemRepository(IOptions<ConnectionOptions> connectionOptions):base(connectionOptions)
     {
-        _connectionOptions = connectionOptions.Value;
+        
     }
 
     #region 查询
@@ -43,7 +43,7 @@ public partial class QualIqcInspectionItemRepository : IQualIqcInspectionItemRep
 
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         return await conn.QueryFirstOrDefaultAsync<QualIqcInspectionItemEntity>(templateData.RawSql, templateData.Parameters);
     }
@@ -63,7 +63,7 @@ public partial class QualIqcInspectionItemRepository : IQualIqcInspectionItemRep
 
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         return await conn.QueryAsync<QualIqcInspectionItemEntity>(templateData.RawSql, templateData.Parameters);
     }
@@ -92,7 +92,7 @@ public partial class QualIqcInspectionItemRepository : IQualIqcInspectionItemRep
         sqlBuilder.AddParameters(new { Rows = query.PageSize });
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         var qualIqcInspectionItemEntities = await conn.QueryAsync<QualIqcInspectionItemEntity>(templateData.RawSql, templateData.Parameters);
         var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
@@ -111,7 +111,7 @@ public partial class QualIqcInspectionItemRepository : IQualIqcInspectionItemRep
     /// <returns></returns>
     public async Task<int> InsertAsync(QualIqcInspectionItemCreateCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, command);
     }
 
@@ -122,7 +122,7 @@ public partial class QualIqcInspectionItemRepository : IQualIqcInspectionItemRep
     /// <returns></returns>
     public async Task<int> InsertAsync(IEnumerable<QualIqcInspectionItemCreateCommand> commands)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, commands);
     }
 
@@ -137,7 +137,7 @@ public partial class QualIqcInspectionItemRepository : IQualIqcInspectionItemRep
     /// <returns></returns>
     public async Task<int> UpdateAsync(QualIqcInspectionItemUpdateCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateByIdSql, command);
     }
 
@@ -148,7 +148,7 @@ public partial class QualIqcInspectionItemRepository : IQualIqcInspectionItemRep
     /// <returns></returns>
     public async Task<int> UpdateAsync(IEnumerable<QualIqcInspectionItemUpdateCommand> commands)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateByIdSql, commands);
     }
 
@@ -163,7 +163,7 @@ public partial class QualIqcInspectionItemRepository : IQualIqcInspectionItemRep
     /// <returns></returns>
     public async Task<int> DeleteAsync(DeleteCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteByIdSql, command);
     }
 
@@ -174,7 +174,7 @@ public partial class QualIqcInspectionItemRepository : IQualIqcInspectionItemRep
     /// <returns></returns>
     public async Task<int> DeleteMoreAsync(DeleteCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteMoreByIdSql, command);
     }
 

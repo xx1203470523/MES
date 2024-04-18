@@ -244,6 +244,7 @@ namespace Hymson.MES.Services.Services.Quality
                 MaterialId = materialId,
                 WorkOrderId = workOrderId,
                 WorkCenterId = workCenterId,
+                CodeType = queryDto.CodeType,
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
                 IsGenerated = 0,

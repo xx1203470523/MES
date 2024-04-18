@@ -500,7 +500,7 @@ namespace Hymson.MES.Services.Services.Process
                 foreach (var item in oldMainBomDetails)
                 {
                     //找到新的物料里对应的 物料+工序
-                    var newBomDetail = bomDetails.Where(x => x.MaterialId.ToString() == item.MaterialId && x.ProcedureId == item.ProcedureId).FirstOrDefault();
+                    var newBomDetail = bomDetails.Where(x => x.MaterialId == item.MaterialId && x.ProcedureId == item.ProcedureId).FirstOrDefault();
                     if (newBomDetail == null)
                     {
                         throw new CustomerValidationException(ErrorCode.MES10622);
@@ -524,7 +524,7 @@ namespace Hymson.MES.Services.Services.Process
                     foreach (var replaceItem in oldReplaceBomDetailsByMain)
                     {
                         //找到新的替代物料里对应的 物料
-                        var newBomDetailReplace = newReplaceBomDetailsByMain.Where(x => x.ReplaceMaterialId.ToString() == replaceItem.ReplaceMaterialId).FirstOrDefault();
+                        var newBomDetailReplace = newReplaceBomDetailsByMain.Where(x => x.ReplaceMaterialId == replaceItem.ReplaceMaterialId).FirstOrDefault();
                         if (newBomDetailReplace == null)
                         {
                             throw new CustomerValidationException(ErrorCode.MES10622);
@@ -914,7 +914,8 @@ namespace Hymson.MES.Services.Services.Process
             var planWorkOrderActivations = await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesByBomIdAsync(new PlanWorkOrderActivationByBomIdQuery { SiteId = _currentSite.SiteId ?? 0, BomId = bomId });
             if (planWorkOrderActivations.Any())
             {
-                return true;
+                //余帅强说保留也可修改20240417
+                return false;
             }
             else
             {

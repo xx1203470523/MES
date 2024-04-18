@@ -34,7 +34,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Policy;
 using System.Text;
 using System.Transactions;
-using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
+
 
 namespace Hymson.MES.Services.Services.Integrated
 {

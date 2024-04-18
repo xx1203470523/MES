@@ -26,7 +26,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :序号( 程序生成) 
         /// 空值 : true  
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
         /// <summary>
         /// 描述 :掩码规则 
