@@ -234,12 +234,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <summary>
         /// 完工数量
         /// </summary>
-        public string FinishProductQuantity { get; set; }
+        public decimal FinishProductQuantity { get; set; }
 
         /// <summary>
         /// 下达数量
         /// </summary>
-        public string PassDownQuantity { get; set; }
+        public decimal PassDownQuantity { get; set; }
 
         /// <summary>
         /// 实际开始时间
