@@ -529,8 +529,11 @@ public partial class PlanCalendarRepository
 public partial class PlanCalendarRepository
 {
     #region 新增
-
+#if DM
+    const string InsertIgnoreSql = "INSERT  INTO `plan_calendar` (`Id`,`SiteId`,`ShiftId`,`Year`,`Month`,`Workday`,`Status`,`CreatedBy`,`CreatedOn`,`UpdatedBy`,`UpdatedOn`,`IsDeleted`,`Remark`) VALUES (@Id,@SiteId,@ShiftId,@Year,@Month,@Workday,@Status,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted,@Remark);";
+#else
     const string InsertIgnoreSql = "INSERT IGNORE INTO `plan_calendar` (`Id`,`SiteId`,`ShiftId`,`Year`,`Month`,`Workday`,`Status`,`CreatedBy`,`CreatedOn`,`UpdatedBy`,`UpdatedOn`,`IsDeleted`,`Remark`) VALUES (@Id,@SiteId,@ShiftId,@Year,@Month,@Workday,@Status,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted,@Remark);";
 
+#endif
     #endregion
 }

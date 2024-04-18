@@ -264,9 +264,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                            FROM `manu_container_pack` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `manu_container_pack`(  `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `PackType`, `LadeBarCode`,  `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId,@ResourceId,@ProcedureId, @ContainerBarCodeId, @PackType, @LadeBarCode, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+#if DM
+        const string InsertIgnoreSql = "INSERT  INTO `manu_container_pack`(  `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `PackType`, `LadeBarCode`,  `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId,@ResourceId,@ProcedureId, @ContainerBarCodeId, @PackType, @LadeBarCode, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+#else
 
         const string InsertIgnoreSql = "INSERT IGNORE INTO `manu_container_pack`(  `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `PackType`, `LadeBarCode`,  `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId,@ResourceId,@ProcedureId, @ContainerBarCodeId, @PackType, @LadeBarCode, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
+#endif
         const string UpdateSql = "UPDATE `manu_container_pack` SET   SiteId = @SiteId,ResourceId=@ResourceId,ProcedureId=@ProcedureId, ContainerBarCodeId = @ContainerBarCodeId, LadeBarCode = @LadeBarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_container_pack` SET   SiteId = @SiteId,ResourceId=@ResourceId,ProcedureId=@ProcedureId, ContainerBarCodeId = @ContainerBarCodeId, LadeBarCode = @LadeBarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
@@ -284,6 +288,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT * FROM `manu_container_pack`  WHERE Id IN @Ids ";
         const string GetBysfcsSql = @"SELECT * FROM `manu_container_pack`  WHERE LadeBarCode IN @LadeBarCodes  and SiteId=@SiteId ";
         const string GetCountByrBarCodeIdSql = "SELECT COUNT(*) FROM manu_container_pack where ContainerBarCodeId=@ContainerBarCodeId";
-        #endregion
+#endregion
     }
 }

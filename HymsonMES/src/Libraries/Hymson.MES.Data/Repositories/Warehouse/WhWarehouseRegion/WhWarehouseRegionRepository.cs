@@ -243,9 +243,12 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseRegion
 
         const string InsertSql = "INSERT INTO wh_warehouse_region(  `Id`, `Code`, `Name`, `WarehouseId`, `Remark`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @Remark, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
         const string InsertsSql = "INSERT INTO wh_warehouse_region(  `Id`, `Code`, `Name`, `WarehouseId`, `Remark`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @Remark, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
-
+#if DM
+        const string InsertIgnoreSql = "MERGE INTO wh_warehouse_region AS targetTable USING((SELECT @Id) AS sourceTable(Id))  ON(targetTable.Id=sourceTable.Id ) WHEN MATCHED THEN UPDATE SET UpdatedOn=@UpdatedOn  WHEN NOT MATCHED THEN INSERT (  `Id`, `Code`, `Name`, `WarehouseId`, `Remark`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @Remark, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId);";
+#else
         const string InsertIgnoreSql = "INSERT IGNORE INTO wh_warehouse_region(  `Id`, `Code`, `Name`, `WarehouseId`, `Remark`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @Remark, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
+#endif
         const string UpdateSql = "UPDATE wh_warehouse_region SET Name = @Name, Remark = @Remark, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE wh_warehouse_region SET Name = @Name,  Remark = @Remark, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 

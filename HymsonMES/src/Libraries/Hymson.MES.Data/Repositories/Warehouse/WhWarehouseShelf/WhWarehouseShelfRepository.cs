@@ -269,9 +269,12 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseShelf
 
         const string InsertSql = "INSERT INTO wh_warehouse_shelf(  `Id`, `Code`, `Name`, `WarehouseId`, `WarehouseRegionId`, `Column`, `Row`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @WarehouseRegionId, @Column, @Row, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
         const string InsertsSql = "INSERT INTO wh_warehouse_shelf(  `Id`, `Code`, `Name`, `WarehouseId`, `WarehouseRegionId`, `Column`, `Row`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @WarehouseRegionId, @Column, @Row, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
-
+#if DM
+        const string InsertIgnoreSql = "MERGE INTO wh_warehouse_shelf AS targetTable USING((SELECT @Id) AS sourceTable(Id))  ON(targetTable.Id=sourceTable.Id ) WHEN MATCHED THEN UPDATE SET UpdatedOn=@UpdatedOn WHEN NOT MATCHED THEN INSERT (  `Id`, `Code`, `Name`, `WarehouseId`, `WarehouseRegionId`, `Column`, `Row`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @WarehouseRegionId, @Column, @Row, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId);";
+#else
         const string InsertIgnoreSql = "INSERT IGNORE INTO wh_warehouse_shelf(  `Id`, `Code`, `Name`, `WarehouseId`, `WarehouseRegionId`, `Column`, `Row`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @WarehouseRegionId, @Column, @Row, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
+#endif
         const string UpdateSql = "UPDATE wh_warehouse_shelf SET  Name = @Name,`Column` = @Column, `Row` = @Row, Status = @Status, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE wh_warehouse_shelf SET  Name = @Name,`Column` = @Column, `Row` = @Row, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
