@@ -647,8 +647,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
 
                 if (codeRulesMakeBo != null)
                 {
-                    //var values = codeRulesMakeBo.CustomValue!.Split(';');//查询出自定义值能转换成几个
-                    //count = (int)Math.Ceiling(param.Count / (values.Length * 1.0));//修改生成的数量
+                    var values = codeRulesMakeBo.CustomValue!.Split(';');//查询出自定义值能转换成几个
+                    count = (int)Math.Ceiling(param.Count / (values.Length * 1.0));//修改生成的数量
                 }
             }
 

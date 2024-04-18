@@ -146,6 +146,17 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            if (ids.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10102));
+            }
+
+            var recordEntities = await _equInspectionRecordRepository.GetByIdsAsync(ids);
+            if (recordEntities.Any(x=>x.Status!= EquInspectionRecordStatusEnum.WaitInspect))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15807));
+            }
+
             return await _equInspectionRecordRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
@@ -223,8 +234,8 @@ namespace Hymson.MES.Services.Services.Equipment
                 Id = entity.Id,
                 OrderCode = entity.OrderCode,
                 Remark = entity.Remark,
-                IsQualified=entity.IsQualified??false,
-                IsNoticeRepair=entity.IsNoticeRepair??false,
+                IsQualified = entity.IsQualified ?? false,
+                IsNoticeRepair = entity.IsNoticeRepair ?? false,
                 TaskItemDtos = taskItemDtos
             };
 
@@ -367,7 +378,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
             recordEntity.IsNoticeRepair = saveDto.IsNoticeRepair;
-            recordEntity.IsQualified = isQualifiedCount>0? false:true;
+            recordEntity.IsQualified = isQualifiedCount > 0 ? false : true;
             recordEntity.Remark = saveDto.Remark;
             recordEntity.UpdatedOn = updatedOn;
             recordEntity.UpdatedBy = updatedBy;

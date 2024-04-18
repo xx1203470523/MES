@@ -1261,7 +1261,7 @@ namespace Hymson.MES.Services.Services.Quality
                 if (snaphot != null)
                 {
                     //允许混线，列表不显示工单
-                    if (snaphot.IsSameWorkOrder == TrueOrFalseEnum.Yes)
+                    if (snaphot.IsSameWorkOrder == TrueOrFalseEnum.No)
                     {
                         dto.OrderCode = "-";
                     }
