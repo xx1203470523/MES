@@ -563,7 +563,13 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
             //{
             //    queryParam.WorkCenterId = bo.WorkCenterId;
             //}
-            //var outputRecords = await _qualFinallyOutputRecordRepository.GetEntitiesAsync(queryParam);
+
+            IEnumerable<QualFinallyOutputRecordEntity> recordList = null;
+            long[] recrodids = bo.RecordDetails.Select(x => x.Id).Where(id => id.HasValue).Select(id => id.Value).ToArray();
+            if (recrodids != null)
+            {
+                recordList = await _qualFinallyOutputRecordRepository.GetByIdsAsync(recrodids);
+            }
 
             var outputRecords = bo.RecordDetails;
             if (outputRecords != null && outputRecords.Count() >= parameterGroupEntity.LotSize)
@@ -660,15 +666,8 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
                     }));
                 }
 
-            }
-
-            //标记为已生成过检验单
-            //foreach (var record in outputRecords)
-            //{
-            //    record.IsGenerated = TrueOrFalseEnum.Yes;
-            //    record.UpdatedBy = updatedBy;
-            //    record.UpdatedOn = updatedOn;
-            //}
+            } 
+ 
 
             //样本数量
             var sfccout = orderSfcList.Count;
@@ -692,7 +691,17 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
                     rows += await _qualFqcParameterGroupDetailSnapshootRepository.InsertRangeAsync(parameterGroupDetailSnapshootList);
 
                     //更新条码产出记录表
-                    //rows += await _qualFinallyOutputRecordRepository.UpdateRangeAsync(outputRecords);
+                    if (recordList != null)
+                    {
+                        //标记为已生成过检验单
+                        foreach (var record in recordList)
+                        {
+                            record.IsGenerated = TrueOrFalseEnum.Yes;
+                            record.UpdatedBy = updatedBy;
+                            record.UpdatedOn = updatedOn;
+                        }
+                        rows += await _qualFinallyOutputRecordRepository.UpdateRangeAsync(recordList);
+                    }
 
                     trans.Complete();
                 }
@@ -714,7 +723,7 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
         private async Task<string> GenerateFQCOrderCodeAsync(long siteId, string userName)
         {
             _logger.LogError($"SiteId={siteId},FQC检验单号开始生成");
-  
+
             var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
             {
                 SiteId = siteId,
