@@ -379,6 +379,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                 {
                     await _whMaterialInventoryScrapRepository.InsertAsync(manuSfcScrapEntities);
                 }
+                trans.Complete();
             }
         }
 

@@ -124,7 +124,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         WorkCenterId = sfcproduce.WorkCenterId,
                         Barcode = group.Key ?? string.Empty,
                         CodeType = FQCLotUnitEnum.Tray,
-                        IsGenerated = TrueOrFalseEnum.No,
+                        IsGenerated = TrueOrFalseEnum.Yes,
                         CreatedBy = commonBo.UserName,
                         CreatedOn = commonBo.Time,
                         UpdatedBy = commonBo.UserName,
@@ -186,7 +186,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseBo.Rows +=await _qualFinallyOutputRecordDetailRepository.InsertRangeAsync(data.QualFinallyOutputRecordDetailEntities);
             if(data.FQCOrderAutoCreateIntegrationEvent != null&&data.FQCOrderAutoCreateIntegrationEvent.RecordDetails.Any())
             {
-                _eventBus.PublishDelay(data.FQCOrderAutoCreateIntegrationEvent,3);
+                _eventBus.Publish(data.FQCOrderAutoCreateIntegrationEvent);
             }
 
             return responseBo;

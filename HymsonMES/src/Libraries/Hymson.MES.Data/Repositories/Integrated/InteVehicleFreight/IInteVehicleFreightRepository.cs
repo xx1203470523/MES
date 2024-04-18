@@ -103,5 +103,16 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="vehicleIds"></param>
         /// <returns></returns>
         Task<int> DeletesTrueByVehicleIdsAsync(long[] vehicleIds);
+
+        #region 顷刻
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="entityList"></param>
+        /// <returns></returns>
+        Task<int> UpdateQtyByLocationAsync(List<InteVehicleFreightEntity> entityList);
+
+        #endregion
     }
 }

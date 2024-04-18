@@ -169,8 +169,8 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string DeleteSql = "UPDATE qual_fqc_parameter_group_snapshoot SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_fqc_parameter_group_snapshoot SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM qual_fqc_parameter_group_snapshoot WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM qual_fqc_parameter_group_snapshoot WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM qual_fqc_parameter_group_snapshoot WHERE IsDeleted=0 AND Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM qual_fqc_parameter_group_snapshoot WHERE IsDeleted=0 AND Id IN @Ids ";
 
     }
 }

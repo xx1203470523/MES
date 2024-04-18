@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <Folder Include="Constants\Quality\" />
+    <Folder Include="Domain\Qkny\" />
     <Folder Include="Options\" />
   </ItemGroup>
 

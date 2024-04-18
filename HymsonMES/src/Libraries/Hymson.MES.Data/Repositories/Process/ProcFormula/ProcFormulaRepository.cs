@@ -231,6 +231,54 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcFormulaEntity>(GetByCodeAndVersionSql, query);
         }
+
+        #region 顷刻
+
+        /// <summary>
+        /// 获取配方列表
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<List<ProcFormulaListViewDto>> GetFormulaListAsync(ProcFormulaListQueryDto query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetFormulaListSqlTemplate);
+            sqlBuilder.Where("t1.IsDeleted = 0");
+            sqlBuilder.Where($"t5.Id = @EquipmentId");
+            sqlBuilder.Where("t1.Status = '1'");
+            if (string.IsNullOrEmpty(query.ProductCode) == false)
+            {
+                sqlBuilder.Where("t2.MaterialCode = @ProductCode");
+            }
+            using var conn = GetMESDbConnection();
+            var list = await conn.QueryAsync<ProcFormulaListViewDto>(template.RawSql, query);
+            return list.ToList();
+        }
+
+        /// <summary>
+        /// 获取配方详情
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<List<ProcFormulaDetailViewDto>> GetFormulaDetailAsync(ProcFormulaDetailQueryDto query)
+        {
+            using var conn = GetMESDbConnection();
+            var list = await conn.QueryAsync<ProcFormulaDetailViewDto>(GetFormulaDetailSql, query);
+            return list.ToList();
+        }
+
+        /// <summary>
+        /// 获取激活版本
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcFormulaEntity> GetActivateByCodeAndVersionAsync(ProcFormulaByCodeAndVersion query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcFormulaEntity>(GetActivateByCodeAndVersionSql, query);
+        }
+
+        #endregion
     }
 
 
@@ -259,5 +307,47 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string UpdateStatusSql = @"UPDATE `proc_formula` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
         const string GetByCodeAndVersionSql = @"SELECT * FROM proc_formula WHERE SiteId=@SiteId AND Code=@Code AND Version=@Version AND IsDeleted=0 ";
+
+        #region 顷刻
+
+        /// <summary>
+        /// 获取配方列表
+        /// </summary>
+        const string GetFormulaListSqlTemplate = $@"
+            select t1.Code ,t1.Version ,t1.CreatedOn ,t1.UpdatedBy ,t2.MaterialCode 
+            from proc_formula t1
+            inner join proc_material t2 on t1.MaterialId = t2.Id and t2.IsDeleted = 0
+            inner join proc_process_equipment_group t3 on t3.Id = t1.EquipmentGroupId and t3.IsDeleted = 0
+            inner join proc_process_equipment_group_relation t4 on t4.EquipmentGroupId = t3.Id and t4.IsDeleted = 0
+            inner join equ_equipment t5 on t5.Id = t4.EquipmentId and t4.IsDeleted = 0
+            /**where**/ 
+        ";
+
+        /// <summary>
+        /// 获取配方详情
+        /// </summary>
+        const string GetFormulaDetailSql = @"
+            select t1.Code FormulaCode, t1.Version , t2.Serial , t2.Unit , t2.FunctionCode ,t2.Setvalue ,
+	            t3.Code OperationCode, t3.`Type` , t4.MaterialCode ,
+	            t5.GroupCode MaterialGroupCode , t6.ParameterCode  ,t7.Name FunctionName 
+            from proc_formula t1
+            inner join proc_formula_details t2 on t1.Id = t2.FormulaId
+            inner join proc_formula_operation t3 on t3.Id = t2.FormulaOperationId and t3.IsDeleted = 0
+            left join proc_material t4 on t4.Id = t2.MaterialId and t4.IsDeleted = 0
+            left join proc_material_group t5 on t5.Id = t2.MaterialGroupId and t5.IsDeleted = 0
+            left join proc_parameter t6 on t6.Id = t2.ParameterId and t6.IsDeleted = 0
+            left join proc_formula_operation_set t7 on t7.Code = t2.FunctionCode and t7.IsDeleted = 0 and t7.FormulaOperationId = t3.Id 
+            where t1.IsDeleted = 0
+            and t1.Code = @FormulaCode
+            and t1.status = '1'
+            and t1.SiteId  = @SiteId
+        ";
+
+        /// <summary>
+        /// 获取激活版本配方
+        /// </summary>
+        const string GetActivateByCodeAndVersionSql = @"SELECT * FROM proc_formula WHERE SiteId=@SiteId AND Code=@Code AND Version=@Version AND IsDeleted=0 AND Status = '1'";
+
+        #endregion
     }
 }

@@ -130,15 +130,15 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SiteId = bo.SiteId,
                 Codes = downgradingEntities.Select(d => d.Grade).ToArray()
             });
-            foreach (var groupitem in bo.KeyValues.GroupBy(k=>k.SFC))
+            foreach (var groupitem in bo.KeyValues.GroupBy(k => k.SFC))
             {
-                var targetdowngrads = downgradingEntities.Where(d => groupitem.ToList().Exists(c => c.BarCode == d.SFC)).Select(s=>s.Grade);
-                if(targetdowngrads.Any())
+                var targetdowngrads = downgradingEntities.Where(d => groupitem.ToList().Exists(c => c.BarCode == d.SFC)).Select(s => s.Grade);
+                if (targetdowngrads.Any())
                 {
                     var targetrulecode = downgradingRuleEntities
                                       .Where(d => targetdowngrads.Contains(d.Code))
                                       .OrderByDescending(r => r.SerialNumber).FirstOrDefault();
-                    if(targetrulecode != null)
+                    if (targetrulecode != null)
                     {
                         manuDowngradingEntities.Add(new ManuDowngradingEntity
                         {
@@ -159,12 +159,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                             CreatedBy = bo.UserName ?? ""
                         });
                     }
-                  
+
                 }
-              
+
 
             }
-       
+
 
             return await Task.FromResult((manuDowngradingEntities, manuDowngradingRecordEntities));
         }

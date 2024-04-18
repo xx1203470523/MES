@@ -6,6 +6,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using IdGen;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Plan
@@ -443,6 +444,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 更新数量（完工数量）每次执行完工数量加1
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateFinishProductQuantityAddOne(long workOrderId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateFinishProductQuantityAddOneSql, new { WorkOrderId = workOrderId });         
+        }
+
+        /// <summary>
         /// 更新数量（完工数量）
         /// </summary>
         /// <param name="commands"></param>
@@ -550,6 +562,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string UpdateFinishProductQuantitySql = "UPDATE plan_work_order_record SET " +
             "FinishProductQuantity = (CASE WHEN FinishProductQuantity IS NULL THEN 0 ELSE FinishProductQuantity END) + @Qty, " +
             "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
+
+        const string UpdateFinishProductQuantityAddOneSql = "UPDATE plan_work_order_record " +
+            "SET FinishProductQuantity = FinishProductQuantity + 1 " +
+            "WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
 
         const string DeleteSql = "UPDATE `plan_work_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";

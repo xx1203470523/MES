@@ -42,6 +42,11 @@ namespace Hymson.MES.Core.Enums
         /// 离脱
         /// </summary>
         [Description("离脱")]
-        Detachment = 8
+        Detachment = 8,
+        /// <summary>
+        /// 设备接口
+        /// </summary>
+        [Description("设备接口")]
+        Equipment = 9
     }
 }

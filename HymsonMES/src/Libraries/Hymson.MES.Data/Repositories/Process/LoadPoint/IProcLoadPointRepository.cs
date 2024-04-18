@@ -9,7 +9,8 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-
+using Hymson.MES.Data.Repositories.Process.LoadPoint.View;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,5 +108,29 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
 
+        #region 顷刻
+
+        /// <summary>
+        /// 获取上料点或者设备
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PointOrEquipmentView>> GetPointOrEquipmmentAsync(ProcLoadPointEquipmentQuery query);
+
+        /// <summary>
+        /// 获取上料点
+        /// </summary>
+        /// <param name="procLoadPointQuery"></param>
+        /// <returns></returns>
+        Task<ProcLoadPointEntity> GetProcLoadPointAsync(ProcLoadPointQuery query);
+
+        /// <summary>
+        /// 获取上料点物料
+        /// </summary>
+        /// <param name="procLoadPointQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcLoadPointMaterialView>> GetProcLoadPointMaterialAsync(ProcLoadPointQuery query);
+
+        #endregion
     }
 }
