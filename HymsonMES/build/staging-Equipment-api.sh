@@ -12,7 +12,7 @@ docker service create \
   --with-registry-auth \
   --name $serviceName \
   --mode global \
-  --publish mode=host,published=20833,target=80 \
+  --publish mode=host,published=20733,target=80 \
   --env ASPNETCORE_ENVIRONMENT=Staging \
   --env TZ="Asia/Shanghai" \
   --env SERVICE_CHECK_HTTP=/health \
