@@ -271,6 +271,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         WorkCenterId = entity.Id,
+                        SiteId=_currentSite.SiteId??0,
                         ResourceId = s,
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
@@ -389,6 +390,7 @@ namespace Hymson.MES.Services.Services.Integrated
                         Id = IdGenProvider.Instance.CreateId(),
                         WorkCenterId = entity.Id,
                         ResourceId = s,
+                        SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
                     }));
