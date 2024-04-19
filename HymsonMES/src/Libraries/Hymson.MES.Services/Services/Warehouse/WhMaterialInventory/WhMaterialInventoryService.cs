@@ -444,7 +444,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             whMaterialInventoryEntity.Id = modifyDto.Id;
             whMaterialInventoryEntity.MaterialId = modifyDto.MaterialId;
             whMaterialInventoryEntity.QuantityResidue = modifyDto.QuantityResidue;
-            whMaterialInventoryEntity.Batch = modifyDto.Batch ?? "";
+            whMaterialInventoryEntity.Batch = modifyDto.Batch;
             whMaterialInventoryEntity.SupplierId = modifyDto.SupplierId;
 
 

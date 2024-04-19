@@ -47,7 +47,7 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public string Batch { get; set; }
+        public int? Batch { get; set; }
 
         /// <summary>
         /// 数量
