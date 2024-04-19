@@ -12,7 +12,9 @@ using Hymson.MES.CoreServices.Bos.Quality;
 using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Quality;
+using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using System.Data;
 
 namespace Hymson.MES.CoreServices.Services.Job
@@ -45,7 +47,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             _qualFinallyOutputRecordDetailRepository = qualFinallyOutputRecordDetailRepository;
             _qualFinallyOutputRecordRepository = qualFinallyOutputRecordRepository;
-            _masterDataService = masterDataService; 
+            _masterDataService = masterDataService;
             _qualFqcParameterGroupDetailRepository = qualFqcParameterGroupDetailRepository;
             _qualFqcParameterGroupRepository = qualFqcParameterGroupRepository;
             _eventBus = eventBus;
@@ -58,7 +60,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
         public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            
+
             return null;
         }
 
@@ -79,12 +81,74 @@ namespace Hymson.MES.CoreServices.Services.Job
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
             }
 
+            //未生成
+            var waitSendRecordList = new List<QualFinallyOutputRecordEntity>();
+            //生成容量
+            var lotSizeDict = new Dictionary<long, int>();
+            //产品分组
+            var resultsfcProduceEntitys = sfcProduceEntities
+                                            .Select(x => new MaterialBo { ProductId = x.ProductId, WorkOrderId = x.WorkOrderId, WorkCenterId = x.WorkCenterId })
+                                            .GroupBy(g => g.ProductId)
+                                            .Select(group => group.First()); // 这里选择每个分组中的第一个元素，以消除重复项
+            //循环取MATERAIL
+            foreach (var item in resultsfcProduceEntitys)
+            {
+                var parameterGroupEntity = await _qualFqcParameterGroupRepository.GetEntityAsync(new QualFqcParameterGroupQuery
+                {
+                    SiteId = commonBo.SiteId,
+                    MaterialId = item.ProductId,
+                    Status = SysDataStatusEnum.Enable
+                });
+
+                if (parameterGroupEntity == null)
+                {
+                    continue;
+                }
+
+                //获取所有检验项目明细
+                var parameterGroupDetails = await _qualFqcParameterGroupDetailRepository.GetEntitiesAsync(new QualFqcParameterGroupDetailQuery
+                {
+                    SiteId = commonBo.SiteId,
+                    ParameterGroupId = parameterGroupEntity.Id
+                });
+
+                if (parameterGroupDetails == null)
+                {
+                    continue;
+                }
+
+                // 判定是否需要生成FQC
+                var queryParam = new QualFinallyOutputRecordQuery
+                {
+                    SiteId = commonBo.SiteId,
+                    MaterialId = item.ProductId,
+                    IsGenerated = TrueOrFalseEnum.No
+                };
+
+                if (parameterGroupEntity.IsSameWorkOrder == TrueOrFalseEnum.Yes)
+                {
+                    queryParam.WorkOrderId = item.WorkOrderId;
+                }
+                if (parameterGroupEntity.IsSameWorkCenter == TrueOrFalseEnum.Yes)
+                {
+                    queryParam.WorkCenterId = item.WorkCenterId;
+                }
+                var recordList = await _qualFinallyOutputRecordRepository.GetEntitiesAsync(queryParam);
+                if (recordList != null)
+                {
+                    waitSendRecordList.AddRange(recordList);
+                    lotSizeDict.Add(item.ProductId, parameterGroupEntity.LotSize);
+                }
+
+            }
+
 
             // 待执行的命令
             FQCOrderAutoCreateAutoResponse responseBo = new();
             responseBo.QualFinallyOutputRecordDetailEntities = new List<QualFinallyOutputRecordDetailEntity>();
             responseBo.QualFinallyOutputRecords = new List<QualFinallyOutputRecordEntity>();
             responseBo.FQCOrderAutoCreateIntegrationEvent = new FQCOrderAutoCreateIntegrationEvent();
+            responseBo.FQCOrderAutoCreateIntegrationEvents = new List<FQCOrderAutoCreateIntegrationEvent>();
             #region 先写入成品条码产出记录表
 
             foreach (var group in commonBo.OutStationRequestBos.GroupBy(g => g.VehicleCode))
@@ -93,9 +157,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (first == null) continue;
                 var sfcproduce = sfcProduceEntities.FirstOrDefault(s => s.SFC == first.SFC)
                       ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", first.SFC);
-                if(string.IsNullOrEmpty(group.Key)) //电芯出站
+                if (string.IsNullOrEmpty(group.Key)) //电芯出站
                 {
-                    var recordEntitys = group.Select(g=> new QualFinallyOutputRecordEntity
+                    var recordEntitys = group.Select(g => new QualFinallyOutputRecordEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = commonBo.SiteId,
@@ -152,21 +216,61 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
             if (responseBo.QualFinallyOutputRecords != null && responseBo.QualFinallyOutputRecords.Any())
             {
-                responseBo.FQCOrderAutoCreateIntegrationEvent = new FQCOrderAutoCreateIntegrationEvent
+                // 使用LINQ查询获取每个MaterialId的数量
+                var materialIdCounts = responseBo.QualFinallyOutputRecords
+                    .GroupBy(record => record.MaterialId)
+                    .Select(group => new { MaterialId = group.Key, Count = group.Count() });
+
+
+                //每个MaterialId的数量
+                foreach (var item in materialIdCounts)
                 {
-                    SiteId = commonBo.SiteId,
-                    UserName = commonBo.UserName,
-                    RecordDetails = responseBo.QualFinallyOutputRecords.Select(q=>new FQCOrderAutoCreateIntegration
+                    //当前产品容量
+                    lotSizeDict.TryGetValue(item.MaterialId, out var lotsize);
+                    //记录数量
+                    var currentMaterial = waitSendRecordList.Where(x => x.MaterialId == item.MaterialId);
+                    //判断容量是否生成
+                    if ((currentMaterial.Count() + item.Count) >= lotsize)
                     {
-                        Barcode = q.Barcode,
-                        CodeType = q.CodeType,
-                        Id = q.Id,
-                        MaterialId = q.MaterialId,
-                        Remark = q.Remark,
-                        WorkCenterId= q.WorkCenterId,
-                        WorkOrderId= q.WorkOrderId,
-                    })
-                };
+                        var fqcFromData = waitSendRecordList.Select(q => new FQCOrderAutoCreateIntegration
+                        {
+                            Barcode = q.Barcode,
+                            CodeType = q.CodeType,
+                            Id = q.Id,
+                            MaterialId = q.MaterialId,
+                            Remark = q.Remark,
+                            WorkCenterId = q.WorkCenterId,
+                            WorkOrderId = q.WorkOrderId,
+                        });
+
+                        var fqcDataFromJob = responseBo.QualFinallyOutputRecords.Select(q => new FQCOrderAutoCreateIntegration
+                        {
+                            Barcode = q.Barcode,
+                            CodeType = q.CodeType,
+                            Id = q.Id,
+                            MaterialId = q.MaterialId,
+                            Remark = q.Remark,
+                            WorkCenterId = q.WorkCenterId,
+                            WorkOrderId = q.WorkOrderId,
+                        });
+
+                        if (fqcFromData != null)
+                        {
+                            fqcDataFromJob = fqcDataFromJob.Concat(fqcFromData);
+                        }
+
+                        var fqcevent = new FQCOrderAutoCreateIntegrationEvent
+                        {
+                            SiteId = commonBo.SiteId,
+                            UserName = commonBo.UserName,
+                            RecordDetails = fqcDataFromJob,
+                        };
+
+                        responseBo.FQCOrderAutoCreateIntegrationEvents.Add(fqcevent);
+                    }
+
+                }
+
             }
 
 
@@ -181,20 +285,81 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 return responseBo;
             }
-            
+
             responseBo.Rows += await _qualFinallyOutputRecordRepository.InsertRangeAsync(data.QualFinallyOutputRecords);
-            responseBo.Rows +=await _qualFinallyOutputRecordDetailRepository.InsertRangeAsync(data.QualFinallyOutputRecordDetailEntities);
-            if(data.FQCOrderAutoCreateIntegrationEvent != null&&data.FQCOrderAutoCreateIntegrationEvent.RecordDetails.Any())
+            responseBo.Rows += await _qualFinallyOutputRecordDetailRepository.InsertRangeAsync(data.QualFinallyOutputRecordDetailEntities);
+
+            if (data.FQCOrderAutoCreateIntegrationEvents != null && data.FQCOrderAutoCreateIntegrationEvents.Any())
             {
-                _eventBus.Publish(data.FQCOrderAutoCreateIntegrationEvent);
+
+                foreach (var item in data.FQCOrderAutoCreateIntegrationEvents)
+                {
+                    _eventBus.Publish(item);
+                }
+
+                #region 更新FinallyOutputRecord
+                // 从 FQCOrderAutoCreateIntegrationEvents 中获取所有 FQCOrderAutoCreateIntegration 的 Id 并去重
+                var distinctIds = data.FQCOrderAutoCreateIntegrationEvents
+                    // 选择所有的 RecordDetails
+                    .SelectMany(eventObj => eventObj.RecordDetails ?? Enumerable.Empty<FQCOrderAutoCreateIntegration>())
+                    // 选择所有的 Id
+                    .Select(detail => detail.Id)
+                    // 去除空的 Id
+                    .Where(id => id.HasValue)
+                    // 去重
+                    .Distinct();
+
+                //long?[]转long[]
+                long[] recrodids = distinctIds.Where(x => x.HasValue).Select(x => x.Value).ToArray();
+
+                IEnumerable<QualFinallyOutputRecordEntity> recordList = null;
+               
+                if (recrodids != null)
+                {
+                    recordList = await _qualFinallyOutputRecordRepository.GetByIdsAsync(recrodids);
+                }
+
+                //更新条码产出记录表
+                if (recordList != null)
+                {
+                    //标记为已生成过检验单
+                    foreach (var record in recordList)
+                    {
+                        record.IsGenerated = TrueOrFalseEnum.Yes;
+                        record.UpdatedBy = "FQCOrderAutoJob";
+                        record.UpdatedOn = HymsonClock.Now();
+                    }
+                    await _qualFinallyOutputRecordRepository.UpdateRangeAsync(recordList);
+                }
+                #endregion
             }
+
 
             return responseBo;
         }
 
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            
+
         }
+    }
+
+    public class MaterialBo
+    {
+        /// <summary>
+        /// 产品id
+        /// </summary>
+        public long ProductId { get; set; }
+
+        /// <summary>
+        /// 工单id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 工作中心
+        /// </summary>
+        public long WorkCenterId { get; set; }
+
     }
 }
