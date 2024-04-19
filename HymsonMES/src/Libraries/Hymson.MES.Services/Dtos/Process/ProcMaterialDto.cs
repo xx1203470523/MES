@@ -84,7 +84,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 批次大小
         /// </summary>
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 标包数量
@@ -223,7 +223,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 批次大小
         /// </summary>
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 标包数量
@@ -404,7 +404,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 批次大小
         /// </summary>
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 标包数量
@@ -733,7 +733,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 批次大小
         /// </summary>
         [EpplusTableColumn(Header = "批次大小(必填)", Order = 8)]
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 标包数量
@@ -848,7 +848,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 批次大小
         /// </summary>
         [EpplusTableColumn(Header = "批次大小(必填)", Order = 9)]
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 标包数量

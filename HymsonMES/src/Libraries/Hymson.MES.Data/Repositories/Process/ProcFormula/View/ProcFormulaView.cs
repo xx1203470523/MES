@@ -110,7 +110,7 @@ namespace Hymson.MES.Data.Repositories.Process.View
         /// <summary>  
         /// 类型  
         /// </summary>  
-        public string Type { get; set; }
+        public int Type { get; set; }
 
         /// <summary>  
         /// 材料编码  

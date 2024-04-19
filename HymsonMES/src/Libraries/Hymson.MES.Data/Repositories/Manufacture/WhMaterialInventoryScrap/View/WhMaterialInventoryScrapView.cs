@@ -64,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.WhMaterialInventoryScrap.View
         /// <summary>
         /// 批次
         /// </summary>
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 单位

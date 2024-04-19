@@ -18,7 +18,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// <summary>
         /// 批次
         /// </summary>
-        public int? Batch { get; set; }
+        public decimal? Batch { get; set; }
         /// <summary>
         /// 物料条码
         /// </summary>

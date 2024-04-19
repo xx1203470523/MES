@@ -44,7 +44,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 数量
@@ -141,7 +141,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 数量
@@ -229,7 +229,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 数量
@@ -296,7 +296,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public int? Batch { get; set; }
+        public decimal? Batch { get; set; }
 
         /// <summary>
         /// 物料编码

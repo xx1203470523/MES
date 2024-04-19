@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command
         /// <summary>
         /// 批次
         /// </summary>
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 工序ID
@@ -148,7 +148,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command
         /// <summary>
         /// 批次
         /// </summary>
-        public int? Batch { get; set; }
+        public decimal? Batch { get; set; }
 
         /// <summary>
         /// 单位

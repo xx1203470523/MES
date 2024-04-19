@@ -87,7 +87,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :批次大小 
         /// 空值 : true  
         /// </summary>
-        public int Batch { get; set; }
+        public decimal Batch { get; set; }
 
         /// <summary>
         /// 有效时间
