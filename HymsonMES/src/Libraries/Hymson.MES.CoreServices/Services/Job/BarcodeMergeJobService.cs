@@ -160,7 +160,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 //新条码 状态变更为开始
                 var manuSfcStepEntity = new ManuSfcStepEntity
                 {
-                    Operatetype = ManuSfcStepTypeEnum.SfcMerge,
+                    Operatetype = ManuSfcStepTypeEnum.BarcodeBinding, //多个条码归一为一个条码，还可以拆分，故使用绑定枚举 by keming
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = key,
                     ProductId = sfcProduceEntity.ProductId,
