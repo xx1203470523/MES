@@ -334,6 +334,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcStepEntity>(GetSfcsMergeOrSliptAddStepSql, query);
         }
+        public async Task<ManuSfcStepEntity> GetBarcodeBindingStepAsync(SfcMergeOrSplitAddStepQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcStepEntity>(GetBarcodeBindingStepSql, query);
+        }
 
         #region private
         /// <summary>
@@ -454,6 +459,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 获取条码的合并新增或拆分新增信息
         /// </summary>
         const string GetSfcsMergeOrSliptAddStepSql = @"SELECT * FROM  manu_sfc_step WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype in (39,42) AND sfc = @Sfc ";
+        const string GetBarcodeBindingStepSql = @"SELECT * FROM  manu_sfc_step WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype = 27 AND sfc = @Sfc ";
     }
 
 }

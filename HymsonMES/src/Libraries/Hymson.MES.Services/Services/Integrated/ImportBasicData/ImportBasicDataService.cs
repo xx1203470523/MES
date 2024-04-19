@@ -140,8 +140,8 @@ namespace Hymson.MES.Services.Services.Integrated
 
             //获取设备组列表信息
             IEnumerable<EquEquipmentGroupEntity> groupEntities = new List<EquEquipmentGroupEntity>();
-            var equGroupCodes = excelImportDtos.Select(x => x.EquipmentGroup).Distinct().ToArray();
-            if (equGroupCodes.Any())
+            var equGroupCodes = excelImportDtos.Where(x=>!string.IsNullOrWhiteSpace(x.EquipmentGroup)).Select(x => x.EquipmentGroup).Distinct().ToArray();
+            if (equGroupCodes!=null&&equGroupCodes.Any())
             {
                 var groupQuery = new EquEquipmentGroupQuery() { SiteId = _currentSite.SiteId ?? 0, EquipmentGroupCodes = equGroupCodes };
                 groupEntities = await _equipmentGroupRepository.GetEntitiesAsync(groupQuery);

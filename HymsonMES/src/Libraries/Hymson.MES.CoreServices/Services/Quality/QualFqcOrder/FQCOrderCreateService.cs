@@ -557,31 +557,31 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
 
             //if (parameterGroupEntity.IsSameWorkOrder == TrueOrFalseEnum.Yes)
             //{
-            //    queryParam.WorkOrderId = bo.WorkOrderId;
+            //    queryParam.WorkOrderId = workOrderId;
             //}
             //if (parameterGroupEntity.IsSameWorkCenter == TrueOrFalseEnum.Yes)
             //{
             //    queryParam.WorkCenterId = bo.WorkCenterId;
             //}
 
-            IEnumerable<QualFinallyOutputRecordEntity> recordList = null;
-            long[] recrodids = bo.RecordDetails.Select(x => x.Id).Where(id => id.HasValue).Select(id => id.Value).ToArray();
-            if (recrodids != null)
-            {
-                recordList = await _qualFinallyOutputRecordRepository.GetByIdsAsync(recrodids);
-            }
+            //IEnumerable<QualFinallyOutputRecordEntity> recordList = null;
+            //long[] recrodids = bo.RecordDetails.Select(x => x.Id).Where(id => id.HasValue).Select(id => id.Value).ToArray();
+            //if (recrodids != null)
+            //{
+            //    recordList = await _qualFinallyOutputRecordRepository.GetByIdsAsync(recrodids);
+            //}
 
             var outputRecords = bo.RecordDetails;
-            if (outputRecords != null && outputRecords.Count() >= parameterGroupEntity.LotSize)
-            {
-                isNeedFQC = true;
-            }
-            else
-            {
-                _logger.LogError($"FQC记录数量小于批次数量，不予生成");
-                isNeedFQC = false;
-                return isNeedFQC;
-            }
+            //if (outputRecords != null && outputRecords.Count() >= parameterGroupEntity.LotSize)
+            //{
+            //    isNeedFQC = true;
+            //}
+            //else
+            //{
+            //    _logger.LogError($"FQC记录数量小于批次数量，不予生成");
+            //    isNeedFQC = false;
+            //    return isNeedFQC;
+            //}
 
             //检验项目快照
             var parameterGroupSnapshoot = parameterGroupEntity.ToEntity<QualFqcParameterGroupSnapshootEntity>();
@@ -693,17 +693,17 @@ namespace Hymson.MES.CoreServices.Services.Quality.QualFqcOrder
                     rows += await _qualFqcParameterGroupDetailSnapshootRepository.InsertRangeAsync(parameterGroupDetailSnapshootList);
 
                     //更新条码产出记录表
-                    if (recordList != null)
-                    {
-                        //标记为已生成过检验单
-                        foreach (var record in recordList)
-                        {
-                            record.IsGenerated = TrueOrFalseEnum.Yes;
-                            record.UpdatedBy = updatedBy;
-                            record.UpdatedOn = updatedOn;
-                        }
-                        rows += await _qualFinallyOutputRecordRepository.UpdateRangeAsync(recordList);
-                    }
+                    //if (recordList != null)
+                    //{
+                    //    //标记为已生成过检验单
+                    //    foreach (var record in recordList)
+                    //    {
+                    //        record.IsGenerated = TrueOrFalseEnum.Yes;
+                    //        record.UpdatedBy = updatedBy;
+                    //        record.UpdatedOn = updatedOn;
+                    //    }
+                    //    rows += await _qualFinallyOutputRecordRepository.UpdateRangeAsync(recordList);
+                    //}
 
                     trans.Complete();
                 }
