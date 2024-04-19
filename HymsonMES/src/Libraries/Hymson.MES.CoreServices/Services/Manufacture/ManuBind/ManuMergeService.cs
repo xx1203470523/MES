@@ -10,6 +10,7 @@ using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.Snowflake;
 using Hymson.Utils.Tools;
 using System;
 using System.Collections.Generic;
@@ -86,7 +87,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 Sfc = param.Barcodes,
                 SiteId = param.SiteId,
                 CirculationTypes = new List<SfcCirculationTypeEnum>() { SfcCirculationTypeEnum.Merge }.ToArray(),
-                ProcedureId = param.ProcedureId,
+                //ProcedureId = param.ProcedureId,
             });
            
             if(sfcCirculationEntities == null || !sfcCirculationEntities.Any())
@@ -106,7 +107,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 //    throw new CustomerValidationException(nameof(ErrorCode.MES12817));//.WithData("SFC", string.Join(',', notIncludeSFCs));
                 //}
                 var groupCirulationEntities = sfcCirculationEntities.GroupBy(g => g.CirculationBarCode);
-                if (groupCirulationEntities.Count() >= 1)
+                if (groupCirulationEntities.Count() > 1)
                 {
                     var validationFailure = new ValidationFailure();
                     validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>();
@@ -137,22 +138,23 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 manusfc.SFC = param.TargetSFC;
                 var sfcproduce = await _manuSfcProduceRepository.GetBySFCIdAsync(manusfc.Id);
                 sfcproduce.SFC = param.TargetSFC;
-                var sfcStepEntity = await _manuSfcStepRepository.GetSfcMergeOrSplitAddStepAsync(new SfcMergeOrSplitAddStepQuery
-                {
-                    Sfc = sourcekey,
-                    SiteId = param.SiteId,
-                });
-                sfcStepEntity.SFC = param.TargetSFC;
+                //var sfcStepEntity = await _manuSfcStepRepository.GetBarcodeBindingStepAsync(new SfcMergeOrSplitAddStepQuery
+                //{
+                //    Sfc = sourcekey,
+                //    SiteId = param.SiteId,
+                //});
+                //sfcStepEntity.SFC = param.TargetSFC;
+             //   sfcStepEntity.Id = IdGenProvider.Instance.CreateId();
                 using var trans = TransactionHelper.GetTransactionScope();
 
                
-                await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+              //  await _manuSfcStepRepository.UpdateAsync(sfcStepEntity);
                 
 
                 await _manuSfcRepository.UpdateAsync(manusfc);
 
                 
-                await _manuSfcCirculationRepository.InsertRangeAsync(lst);
+                await _manuSfcCirculationRepository.UpdateRangeAsync(lst);
                 await _manuSfcProduceRepository.UpdateAsync(sfcproduce);
                 trans.Complete();
 
