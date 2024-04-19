@@ -987,7 +987,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                                         SupplierId = 0,//自制品 没有
                                         MaterialId = manuSfcInfoEntity?.ProductId ?? 0,
                                         MaterialBarCode = item,
-                                        Batch = "",//自制品 没有
+                                        //Batch = "",//自制品 没有
                                         MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                                         QuantityResidue = manuSfcEntity.Qty,
                                         Status = WhMaterialInventoryStatusEnum.ToBeUsed,
@@ -1009,7 +1009,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                                         MaterialName = procMaterialEntitity?.MaterialName ?? "",
                                         MaterialVersion = procMaterialEntitity?.Version ?? "",
                                         MaterialBarCode = item,
-                                        Batch = "",//自制品 没有
+                                        //Batch = "",//自制品 没有
                                         Quantity = manuSfcEntity.Qty,
                                         Unit = procMaterialEntitity?.Unit ?? "",
                                         Type = WhMaterialInventoryTypeEnum.StepControl,

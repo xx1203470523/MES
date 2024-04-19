@@ -118,10 +118,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.Where(" wmi.SiteId=@SiteId");
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
 
-            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Batch))
+            if (whMaterialInventoryPagedQuery.Batch.HasValue)
             {
-                whMaterialInventoryPagedQuery.Batch = $"%{whMaterialInventoryPagedQuery.Batch}%";
-                sqlBuilder.Where(" wmi.Batch like @Batch");
+                whMaterialInventoryPagedQuery.Batch = whMaterialInventoryPagedQuery.Batch;
+                sqlBuilder.Where(" wmi.Batch = @Batch");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialBarCode))
             {

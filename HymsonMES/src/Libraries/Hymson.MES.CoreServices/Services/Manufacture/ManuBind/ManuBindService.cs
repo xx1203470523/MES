@@ -998,7 +998,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                     SupplierId = 0,//自制品 没有
                     MaterialId = manuSfcCirculationBySfcEntity.CirculationProductId,
                     MaterialBarCode = manuSfcCirculationBySfcEntity.CirculationBarCode,
-                    Batch = "",//自制品 没有
+                    //Batch = "",//自制品 没有
                     MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                     QuantityResidue = manuSfcCirculationBySfcEntity.CirculationQty ?? 0,
                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,

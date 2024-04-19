@@ -143,7 +143,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
                     MaterialId = materialEntities.First(x => x.MaterialCode == x.MaterialCode).Id,
                     MaterialBarCode = x.BarCode,
                     QuantityResidue = x.Qty,
-                    Batch = "",
+                    //Batch = "",
                     SupplierId = 0,
                     Type = Core.Enums.WhMaterialInventoryTypeEnum.MaterialReceiving
                 })

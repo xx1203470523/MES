@@ -286,7 +286,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         SupplierId = 0,//自制品 没有
                         MaterialId = sfcProduceEntity.ProductId,
                         MaterialBarCode = sfcProduceEntity.SFC,
-                        Batch = "",//自制品 没有
+                        //Batch = "",//自制品 没有
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
                         MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                         QuantityResidue = sfcProduceEntity.Qty,
@@ -308,7 +308,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         MaterialName = procMaterialEntity.MaterialName,
                         MaterialVersion = procMaterialEntity.Version ?? "",
                         MaterialBarCode = sfcProduceEntity.SFC,
-                        Batch = "",//自制品 没有
+                        //Batch = "",//自制品 没有
                         Quantity = sfcProduceEntity.Qty,
                         Unit = procMaterialEntity.Unit ?? "",
                         Type = WhMaterialInventoryTypeEnum.ManuComplete,

@@ -47,7 +47,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 批次
         /// </summary>
-        public string Batch { get; set; }
+        public int Batch { get; set; }
 
         /// <summary>
         /// 供应商ID

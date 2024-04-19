@@ -300,7 +300,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     MaterialName = materialEntity.MaterialName,
                     MaterialVersion = materialEntity.Version,
                     MaterialBarCode = barcodeItem.SFC ?? "",
-                    Batch = materialEntity.Batch.ToString(),
+                    Batch = materialEntity.Batch,
                     Quantity = barcodeItem.Qty,
                     //ScrapQty=item.ScrapQuantity,
                     Unit = materialEntity.Unit ?? "",
