@@ -550,7 +550,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         MaterialName = material?.MaterialName ?? "",
                         MaterialVersion = material?.Version ?? "",
                         MaterialBarCode = item.SFC,
-                        Batch = whMaterialInventory?.Batch,
+                        Batch = whMaterialInventory.Batch,
                         Quantity = 0,//库存修改为0 
                         Unit = material?.Unit ?? "",
                         Type = WhMaterialInventoryTypeEnum.InventoryModify,
@@ -636,7 +636,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SupplierId = whMaterialInventoryFather?.SupplierId ?? 0,
                     MaterialId = oneManuSfc.ProductId,
                     MaterialBarCode = oneNewSfc,
-                    Batch = whMaterialInventoryFather?.Batch,
+                    Batch = whMaterialInventoryFather.Batch,
                     MaterialType = whMaterialInventoryFather?.MaterialType ?? 0,
                     QuantityResidue = qty,
                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,
@@ -655,7 +655,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     MaterialName = material?.MaterialName ?? "",
                     MaterialVersion = material?.Version ?? "",
                     MaterialBarCode = oneNewSfc,
-                    Batch = whMaterialInventoryFather?.Batch,
+                    Batch = whMaterialInventoryFather.Batch,
                     Quantity = qty,//库存修改为0 
                     Unit = material?.Unit ?? "",
                     Type = WhMaterialInventoryTypeEnum.Merge,
