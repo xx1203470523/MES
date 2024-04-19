@@ -188,7 +188,8 @@ namespace Hymson.MES.Services.Services.Integrated
                 var freights = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(useInteVehicleEntities.Select(x => x.Id).ToArray());
                 if (freights.Any(x => x.Qty > 0))
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18518));
+                    var exceedingQty = freights.FirstOrDefault(x => x.Qty > 0)?.Qty ?? 0; // 获取第一个数量大于零的已存放的数量值
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18518)).WithData("exceedingQty", exceedingQty);
                 }
             }
 

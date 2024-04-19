@@ -1661,7 +1661,7 @@
         public const string MES18515 = "载具类型验证物料或物料组不合法";
         public const string MES18516 = "载具类型编码不允许有空格";
         public const string MES18517 = "选择的载具类型有被载具绑定，请先去载具上解绑！";
-        public const string MES18518 = "该载具类型已被关联了产品的载具关联，不允许更改该载具类型";
+        public const string MES18518 = "该载具类型已被关联了产品的载具关联，已存放的数量为[{exceedingQty}],不允许更改该载具类型！";
         public const string MES18519 = "不支持对载具进行组装操作！";
         public const string MES18520 = "不支持对载具进行参数收集操作！";
         public const string MES18521 = "只允许对单一条码进行参数收集操作！";
