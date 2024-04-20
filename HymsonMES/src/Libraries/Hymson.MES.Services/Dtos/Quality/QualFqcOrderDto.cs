@@ -673,4 +673,115 @@ namespace Hymson.MES.Services.Dtos.Quality
         public int CheckedQty { get; set; }
     }
 
+    /// <summary>
+    /// 不合格挑选输出
+    /// </summary>
+    public record FqcSelectionView : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
+        /// FQCId
+        /// </summary>
+        public long? FQCOrderId { get; set; }
+
+        /// <summary>
+        /// 样品条码
+        /// </summary>
+        public string? Barcode { get; set; }
+
+        /// <summary>
+        /// 检验单号
+        /// </summary>
+        public string? InspectionOrder { get; set; }
+
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string? OrderCode { get; set; }
+
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料单位
+        /// </summary>
+        public string? MaterialUnit { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 更新人(操作人)
+        /// </summary>
+        public string? UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 更新时间(操作时间)
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
+    }
+
+    /// <summary>
+    /// 不合格挑选查询
+    /// </summary>
+    public class FqcSelectionQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long FQCOrderId { get; set; }
+
+        /// <summary>
+        /// 样品条码
+        /// </summary>
+        public string? Barcode { get; set; }
+
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string? OrderCode { get; set; }
+
+        /// <summary>
+        /// 检验单号
+        /// </summary>
+        public string? InspectionOrder { get; set; }
+
+    }
+
+    /// <summary>
+    /// 不合格挑选-处理更新
+    /// </summary>
+    public record FqcSelectionUpdateDto
+    {
+        /// <summary>
+        /// 处理类型
+        /// </summary>
+        public FQCSFCHandMethodSelectEnum? HandMethod { get; set; }
+
+        /// <summary>
+        /// 明细
+        /// </summary>
+        public IEnumerable<long>? DetailIds { get; set; }
+    }
+ 
+
 }

@@ -463,6 +463,8 @@
         public const string MES11721 = "FQC创建保存错误!";
 
         public const string MES11722 = "检验单{fqcOrder}，未找到FQC检验参数组快照信息!";
+        public const string MES11723 = "所选条码查不到数据,处置失败";
+        public const string MES11724 = "未选择处置项";
 
 
 

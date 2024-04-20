@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFqcOrderUnqualifiedHandleEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualFqcOrderUnqualifiedHandleEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcOrderUnqualifiedHandleEntity>(GetByIdsSql, new { Ids = ids });
@@ -113,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="query"></param>
         /// <returns></returns>
         public async Task<IEnumerable<QualFqcOrderUnqualifiedHandleEntity>> GetEntitiesAsync(QualFqcOrderUnqualifiedHandleQuery query)
-        { 
+        {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
