@@ -108,10 +108,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
-        /// <summary>
-        /// 统计服务
-        /// </summary>
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
         /// 构造函数
@@ -163,7 +159,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _localizationService = localizationService;
-            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
@@ -568,9 +563,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 {                   
                     var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
                     if (SFCProduceEntity != null)
-                    {
-                        // 更新工单的产出数量
-                        await _planWorkOrderRepository.UpdateFinishProductQuantityAddOneAsync(SFCProduceEntity.WorkOrderId);                    
+                    {                   
                         responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18226),
                         data.Type.GetDescription(),
                         data.Code);
