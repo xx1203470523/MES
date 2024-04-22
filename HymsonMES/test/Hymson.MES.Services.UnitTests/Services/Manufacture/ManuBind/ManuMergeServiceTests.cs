@@ -51,7 +51,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind.Tests
         {
             var result = _service.MergeAsync(new Dtos.Manufacture.ManuBind.ManuMergeRequestDto
             {
-                Barcodes = new[] { "AMF1E041801138", "CMF2E041802123" },
+                Barcodes = new[] { "CMF2E042201130", "AMF1E042201153" },
                 SiteId = 39612349211041792,
                // ProcedureId = 12816809150152704,
                 //TargetSFC = "hahaha"

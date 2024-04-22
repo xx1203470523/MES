@@ -948,7 +948,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
         }
-
+       
+        public async Task<int> UpdateSFCByIdAsync(UpdateManuSfcProduceSFCByIdCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSFCByIdSql, command);
+        }
         /// <summary>
         /// 部分报废 修改数量
         /// </summary>
@@ -1069,7 +1074,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateStatusAndQtyBySfcsSql = @"UPDATE `manu_sfc_produce` SET Status = @Status, Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND SFC IN @SFCs ";
         const string UpdateQtyByIdSql = @"UPDATE `manu_sfc_produce` SET  Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
         const string PartialScrapManuSfcProduceByIdSql = @"UPDATE `manu_sfc_produce` SET  Qty = @Qty , ScrapQty = @ScrapQty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
-
+        const string UpdateSFCByIdSql = @"UPDATE `manu_sfc_produce` SET  SFC = @SFC ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
         #region 顷刻
 
         /// <summary>
