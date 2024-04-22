@@ -251,8 +251,9 @@ namespace Hymson.MES.Services.Services.Integrated
 
                     //验证产线是否已经绑定过车间，一个产线只能绑定一个车间
                     //根据产线获取信息
-                    var inteWorkCenterByLineEntities = await _inteWorkCenterRepository.GetInteWorkCenterRelationEntityAsync(new InteWorkCenterRelationQuery {SubWorkCenterIds= param.WorkCenterIds });
-                    if (inteWorkCenterByLineEntities != null && inteWorkCenterByLineEntities.Any()) {
+                    var inteWorkCenterByLineEntities = await _inteWorkCenterRepository.GetInteWorkCenterRelationEntityAsync(new InteWorkCenterRelationQuery { SubWorkCenterIds = param.WorkCenterIds });
+                    if (inteWorkCenterByLineEntities != null && inteWorkCenterByLineEntities.Any())
+                    {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12126));
                     }
                     // 判断资源的状态是否存在新建和废除状态
@@ -271,7 +272,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         WorkCenterId = entity.Id,
-                        SiteId=_currentSite.SiteId??0,
+                        SiteId = _currentSite.SiteId ?? 0,
                         ResourceId = s,
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName
@@ -319,8 +320,8 @@ namespace Hymson.MES.Services.Services.Integrated
             // 验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
 
-             var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES12111));
+            var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
+               ?? throw new CustomerValidationException(nameof(ErrorCode.MES12111));
 
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
@@ -411,8 +412,12 @@ namespace Hymson.MES.Services.Services.Integrated
                     }
 
                     // 判断资源是否被重复绑定
-                    var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(param.ResourceIds);
-                    if (workCenterIds != null && workCenterIds.Any() && !workCenterIds.Contains(entity.Id)) throw new CustomerValidationException(nameof(ErrorCode.MES12117));
+                    var workCenters = await _inteWorkCenterRepository.GetWorkCenterResourceRelationAsync(param.ResourceIds);
+                    if (workCenters.Any(x => x.Id != entity.Id))
+                    {
+                        var procResourceEnties = await _procResourceRepository.GetResByIdsAsync(workCenters.Where(x => x.Id != entity.Id).Select(x => x.ResourceId).Distinct());
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12128)).WithData("ResourceCodes",string.Join( ",", procResourceEnties.Select(x => x.ResCode)));
+                    }
                     break;
                 default:
                     break;
