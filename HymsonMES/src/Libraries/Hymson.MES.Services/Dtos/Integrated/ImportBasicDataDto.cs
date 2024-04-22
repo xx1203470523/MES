@@ -370,7 +370,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 验证掩码组
         /// </summary>
         [EpplusTableColumn(Header = "验证掩码组", Order = 16)]
-        public string? ValidationMaskGroup { get; set; }
+        public string? MaskCode { get; set; }
     }
 
     public record class ImportMaterialGroupDto : BaseExcelDto
