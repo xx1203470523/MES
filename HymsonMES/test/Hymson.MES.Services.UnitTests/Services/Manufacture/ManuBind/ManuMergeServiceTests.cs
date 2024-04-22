@@ -49,13 +49,13 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind.Tests
         [Test()]
         public void MergeAsyncTest()
         {
-            var result = _service.MergeAsync(new Dtos.Manufacture.ManuBind.ManuMergeDto
+            var result = _service.MergeAsync(new Dtos.Manufacture.ManuBind.ManuMergeRequestDto
             {
                 Barcodes = new[] { "AMF1E041801138", "CMF2E041802123" },
                 SiteId = 39612349211041792,
                // ProcedureId = 12816809150152704,
-                TargetSFC = "hahaha"
-            }, _localizationService);
+                //TargetSFC = "hahaha"
+            });
             result.Wait();
             Assert.Fail();
         }
