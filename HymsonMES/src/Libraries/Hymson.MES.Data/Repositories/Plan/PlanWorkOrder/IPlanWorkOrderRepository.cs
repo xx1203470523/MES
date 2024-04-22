@@ -168,18 +168,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<int> UpdateFinishProductQuantityByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param);
 
         /// <summary>
-        /// // 更新工单的产出数量加上当前物料批次数量
+        /// 更新数量（完工数量）每次完工数量加1
         /// </summary>
         /// <param name="workOrderId"></param>
         /// <returns></returns>
-        Task<int> UpdateFinishProductQuantityAddOneAsync(long workOrderId, int batch);
-
-        /// <summary>
-        /// 根据物料ID获取批次数量
-        /// </summary>
-        /// <param name="materialId"></param>
-        /// <returns></returns>
-        Task<int> GetMaterialBatch(long id);
+        Task<int> UpdateFinishProductQuantityAddOneAsync(long workOrderId);
 
         /// <summary>
         /// 更新数量（完工数量）

@@ -569,10 +569,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
                     if (SFCProduceEntity != null)
                     {
-                        //获取物料批次数量
-                        var batchData = _planWorkOrderRepository.GetMaterialBatch(SFCProduceEntity.ProductId);
                         // 更新工单的产出数量
-                        await _planWorkOrderRepository.UpdateFinishProductQuantityAddOneAsync(SFCProduceEntity.WorkOrderId, batchData.Result);                    
+                        await _planWorkOrderRepository.UpdateFinishProductQuantityAddOneAsync(SFCProduceEntity.WorkOrderId);                    
                         responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18226),
                         data.Type.GetDescription(),
                         data.Code);

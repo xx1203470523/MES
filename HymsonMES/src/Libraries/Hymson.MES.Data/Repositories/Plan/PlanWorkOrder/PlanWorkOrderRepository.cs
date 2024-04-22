@@ -447,21 +447,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateFinishProductQuantityAddOneAsync(long workOrderId, int batch)
+        public async Task<int> UpdateFinishProductQuantityAddOneAsync(long workOrderId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateFinishProductQuantityAddOneSql, new { WorkOrderId = workOrderId, Batch = batch });
-        }
-
-        /// <summary>
-        /// 获取批次数量
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task<int> GetMaterialBatch(long id)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<int>(GetMaterialBatchSql, new { Id = id });
+            return await conn.ExecuteAsync(UpdateFinishProductQuantityAddOneSql, new { WorkOrderId = workOrderId });
         }
 
         /// <summary>
@@ -580,10 +569,8 @@ namespace Hymson.MES.Data.Repositories.Plan
             "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
 
         const string UpdateFinishProductQuantityAddOneSql = "UPDATE plan_work_order_record " +
-            "SET FinishProductQuantity = FinishProductQuantity + @Batch " +
+            "SET FinishProductQuantity = FinishProductQuantity + 1 " +
             "WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
-
-        const string GetMaterialBatchSql = "SELECT Batch FROM proc_material WHERE IsDeleted = 0 AND Id = @Id";
 
         const string DeleteSql = "UPDATE `plan_work_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
