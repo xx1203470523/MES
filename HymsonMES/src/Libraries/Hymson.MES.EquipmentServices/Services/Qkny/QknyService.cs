@@ -632,7 +632,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             await _manuSfcProduceService.UpdateQtyBySfcAsync(command);
             await _manuSfcServicecs.UpdateQtyBySfcAsync(command);
             await _equProductParamRecordService.AddMultAsync(saveDtoList);
-            int updateNum = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(updateQtyCommand);
+            int updateNum = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(updateQtyCommand);
             if (updateNum == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", planEntity.OrderCode);

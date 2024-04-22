@@ -326,7 +326,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 当产出设置的产品和工单对应的产品一致时，才更新工单的下达数量
             if (data.IsProductSame)
             {
-                responseBo.Rows += await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+                responseBo.Rows += await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(new UpdatePassDownQuantityCommand
                 {
                     WorkOrderId = data.WorkOrderId,
                     PlanQuantity = data.PlanQuantity,

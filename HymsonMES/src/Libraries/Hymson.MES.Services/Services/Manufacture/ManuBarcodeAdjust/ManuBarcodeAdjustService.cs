@@ -1257,7 +1257,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (updateSfcProcedureQtyByIdCommands.Any()) await _manuSfcProduceRepository.UpdateQtyRangeAsync(updateSfcProcedureQtyByIdCommands);
 
                 //更新可下达数量
-                if (updatePassDownQuantityCommand != null) await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(updatePassDownQuantityCommand);
+                if (updatePassDownQuantityCommand != null) await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(updatePassDownQuantityCommand);
 
                 //步骤记录
                 if (manuSfcStepEntities.Any()) await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntities);

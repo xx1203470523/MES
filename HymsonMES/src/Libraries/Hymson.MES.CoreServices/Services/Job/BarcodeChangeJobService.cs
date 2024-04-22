@@ -348,7 +348,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             //条码接收的情况
             if(data.PassDownQuantity>0)
             {
-                var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+                var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(new UpdatePassDownQuantityCommand
                 {
                     WorkOrderId = data.WorkOrderId,
                     PlanQuantity = data.PlanQuantity,
