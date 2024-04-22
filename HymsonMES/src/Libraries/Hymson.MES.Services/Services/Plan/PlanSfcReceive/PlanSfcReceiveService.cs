@@ -290,7 +290,7 @@ namespace Hymson.MES.Services.Services.Plan
                         validationFailures.Add(validationFailure);
                     }
 
-                    qty = procMaterialEntity.Batch;
+                    qty = procMaterialEntity.Batch ?? 0;
                     if (qty <= 0)
                     {
                         var validationFailure = new ValidationFailure();
@@ -424,7 +424,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16122)).WithData("sfc", param.SFC);
                 }
-                qty = procMaterialEntity.Batch;
+                qty = procMaterialEntity.Batch ?? 0;
                 if (qty <= 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16610)).WithData("sfc", param.SFC);

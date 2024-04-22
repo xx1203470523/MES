@@ -47,7 +47,7 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal Batch { get; set; } = 0;
+        public decimal? Batch { get; set; } = 0;
 
         /// <summary>
         /// 数量

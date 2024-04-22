@@ -169,7 +169,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
-            var qty = procMaterialEntity.Batch;
+            var qty = procMaterialEntity.Batch ?? 0;
 
             var processRouteDetailNodeEntities = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(planWorkOrderEntity.ProcessRouteId);
             var processRouteDetailNodeEntity = processRouteDetailNodeEntities.FirstOrDefault(x => x.ProcedureId == commonBo.ProcedureId);

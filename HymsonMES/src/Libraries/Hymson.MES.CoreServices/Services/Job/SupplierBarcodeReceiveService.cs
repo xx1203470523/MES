@@ -237,7 +237,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         continue;
                     }
 
-                    qty = procMaterialEntity.Batch;
+                    qty = procMaterialEntity.Batch ?? 0;
                     if (qty == 0)
                     {
                         var validationFailure = new ValidationFailure();

@@ -28,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal Batch { get; set; } = 0;
+        public decimal? Batch { get; set; } = 0;
 
         /// <summary>
         /// 物料编码

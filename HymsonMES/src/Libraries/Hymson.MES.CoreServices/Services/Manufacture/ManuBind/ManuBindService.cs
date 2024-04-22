@@ -145,7 +145,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 var outputProductId = await _masterDataService.GetProductSetIdAsync(new ProductSetBo { SiteId = param.SiteId, ProductId = planWorkOrderEntity.ProductId, ProcedureId = param.ProcedureId, ResourceId = param.ResourceId }) ?? planWorkOrderEntity.ProductId;
                 //获取 物料批次大小
                 var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(productId);
-                var qty = procMaterialEntity.Batch;
+                var qty = procMaterialEntity.Batch ?? 0;
                 //掩码校验
                 if (!await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(param.SFC, outputProductId))
                 {
