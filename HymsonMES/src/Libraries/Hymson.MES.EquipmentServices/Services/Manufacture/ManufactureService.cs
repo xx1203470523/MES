@@ -11,6 +11,8 @@ using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.Web.Framework.WorkContext;
 
@@ -49,6 +51,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// </summary>
         private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
         private readonly IManuMergeService _manuMergeService;
+        private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
 
         /// <summary>
         /// 构造函数
@@ -69,6 +72,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             IManuCommonService manuCommonService,
             IManuPassStationService manuPassStationService,
             IManuMergeService manuMergeService,
+            IManuGenerateBarcodeService manuGenerateBarcodeService,
             IManuCreateBarcodeService manuCreateBarcodeService)
         {
             _currentEquipment = currentEquipment;
@@ -80,6 +84,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             _manuPassStationService = manuPassStationService;
             _manuCreateBarcodeService = manuCreateBarcodeService;
             _manuMergeService = manuMergeService;
+            _manuGenerateBarcodeService =   manuGenerateBarcodeService;
         }
 
         /// <summary>
@@ -353,9 +358,19 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
             }, RequestSourceEnum.EquipmentApi);
         }
-        public async Task MergeAsync(ManuMergeDto param)
+        public async Task<string> MergeAsync(ManuMergeRequestDto param)
         {
-            await _manuMergeService.MergeAsync(param);
+            
+            //获取GB
+            if(param.Barcodes==null||!param.Barcodes.Any()) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+            else
+            {
+                return await _manuMergeService.MergeAsync(param);
+            }
+            
+            
         }
 
     }

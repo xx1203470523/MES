@@ -70,7 +70,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// <param name="param"></param>
         /// <param name="localizationService"></param>
         /// <returns></returns>
-        Task MergeAsync(ManuMergeDto param);
+        Task<string> MergeAsync(ManuMergeRequestDto param);
 
 
     }

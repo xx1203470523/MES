@@ -149,11 +149,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _manufactureService.OutBoundCarrierAsync(request);
         }
-        [HttpPost("GBCodeReceive")]
-        [LogDescription("国标码接收", BusinessType.OTHER, "GBCodeReceive", ReceiverTypeEnum.MES)]
-        public async Task GBCodeReceiveAsync(ManuMergeDto request)
+        [HttpPost("CreateGBCode")]
+        [LogDescription("生成国标码", BusinessType.OTHER, "CreateGBCode", ReceiverTypeEnum.MES)]
+        public async Task<string> CreateGBCodeAsync(ManuMergeRequestDto request)
         {
-            await _manufactureService.MergeAsync(request);
+            return await _manufactureService.MergeAsync(request);
         }
     }
 }
