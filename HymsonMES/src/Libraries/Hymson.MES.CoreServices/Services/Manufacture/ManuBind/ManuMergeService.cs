@@ -153,15 +153,16 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     SFC = sourcekey,
                     SiteId = param.SiteId,
                 });
+                var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdAsync(manusfc.Id);
                
-                var sfcproduce = await _manuSfcProduceRepository.GetBySFCIdAsync(manusfc.Id);
+               // var sfcproduce = await _manuSfcProduceRepository.GetBySFCIdAsync(manusfc.Id);
 
                 //生成GB码
-                var  materialEntity = await _procMaterialRepository.GetByIdAsync(sfcproduce.ProductId);
+                var  materialEntity = await _procMaterialRepository.GetByIdAsync(sfcInfoEntity.ProductId);
                 var inteCodeRule = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(new Data.Repositories.Integrated.InteCodeRule.Query.InteCodeRulesByProductQuery
                 {
                     CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.ProcessControlSeqCode,
-                    ProductId = sfcproduce.ProductId,
+                    ProductId = sfcInfoEntity.ProductId,
                 }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", materialEntity.MaterialCode);
 
                 var barcodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new Bos.Manufacture.ManuGenerateBarcode.GenerateBarcodeBo
@@ -169,6 +170,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     SiteId = param.SiteId,
                     CodeRuleId = inteCodeRule.Id,
                     Count = 1,
+                    Sfcs = param.Barcodes,
+                    ProductId = sfcInfoEntity.ProductId,
+                    WorkOrderId = sfcInfoEntity.WorkOrderId,
+                    UserName = sfcInfoEntity.CreatedBy,
 
                 });
                 if(barcodes==null||!barcodes.Any())
@@ -179,24 +184,30 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 {
                     targetSFC = barcodes.First();
                 }
-                manusfc.SFC = targetSFC;
+                manusfc.SFC = targetSFC; //替换条码为国标码
                 var lst = sfcCirculationEntities.ToList();
-                lst.ForEach(i => i.CirculationBarCode = targetSFC);
-                sfcproduce.SFC = targetSFC;
+                lst.ForEach(i => i.CirculationBarCode = targetSFC); //更新流转记录的流转后条码值
+
+                var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+                {
+                    SFCs = param.Barcodes,
+                    SiteId = param.SiteId,
+                });
+                
                
                 using var trans = TransactionHelper.GetTransactionScope();
-
-                await _manuSfcRepository.UpdateAsync(manusfc);
+                
+                await _manuSfcRepository.UpdateAsync(manusfc); 
 
                 await _manuSfcCirculationRepository.UpdateRangeAsync(lst);
-                await _manuSfcProduceRepository.UpdateSFCByIdAsync(new UpdateManuSfcProduceSFCByIdCommand
+                await _manuSfcRepository.UpdateStatusAsync(new ManuSfcUpdateCommand
                 {
-                    SFC = targetSFC,
-                    Id = sfcproduce.Id,
-                    UpdatedBy = sfcproduce.UpdatedBy,
-                    UpdatedOn = sfcproduce.UpdatedOn,
+                    SiteId = param.SiteId,
+                    Sfcs = param.Barcodes.ToArray(),
+                    Status = Core.Enums.SfcStatusEnum.Complete,
+                    UpdatedOn = DateTime.Now,
+                    UserId = manusfc.CreatedBy
                 });
-               
                 trans.Complete();
                 return targetSFC;
 
