@@ -189,7 +189,14 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 await _manuSfcRepository.UpdateAsync(manusfc);
 
                 await _manuSfcCirculationRepository.UpdateRangeAsync(lst);
-                await _manuSfcProduceRepository.UpdateAsync(sfcproduce);
+                await _manuSfcProduceRepository.UpdateSFCByIdAsync(new UpdateManuSfcProduceSFCByIdCommand
+                {
+                    SFC = targetSFC,
+                    Id = sfcproduce.Id,
+                    UpdatedBy = sfcproduce.UpdatedBy,
+                    UpdatedOn = sfcproduce.UpdatedOn,
+                });
+               
                 trans.Complete();
                 return targetSFC;
 
