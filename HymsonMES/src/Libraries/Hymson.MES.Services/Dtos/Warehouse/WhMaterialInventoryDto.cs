@@ -445,7 +445,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal Batch { get; set; } = 0;
+        public decimal? Batch { get; set; } = 0;
         /// <summary>
         /// 物料条码
         /// </summary>
