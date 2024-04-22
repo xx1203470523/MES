@@ -443,6 +443,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 更新数量（完工数量）每次执行完工数量加1
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateFinishProductQuantityAddOneAsync(long workOrderId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateFinishProductQuantityAddOneSql, new { WorkOrderId = workOrderId });
+        }
+
+        /// <summary>
         /// 更新数量（完工数量）
         /// </summary>
         /// <param name="commands"></param>
