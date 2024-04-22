@@ -1,4 +1,6 @@
-﻿using Hymson.MES.EquipmentServices.Dtos;
+﻿using Hymson.Localization.Services;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
+using Hymson.MES.EquipmentServices.Dtos;
 
 namespace Hymson.MES.EquipmentServices.Services.Manufacture
 {
@@ -62,6 +64,13 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// <param name="request"></param>
         /// <returns></returns>
         Task OutBoundCarrierAsync(OutBoundCarrierDto request);
+        /// <summary>
+        /// 合并国标码
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="localizationService"></param>
+        /// <returns></returns>
+        Task MergeAsync(ManuMergeDto param);
 
 
     }

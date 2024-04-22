@@ -24,6 +24,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
         /// <param name="param"></param>
         /// <param name="localizationService"></param>
         /// <returns></returns>
-        Task MergeAsync(ManuMergeDto param, ILocalizationService localizationService);
+        Task MergeAsync(ManuMergeDto param);
     }
 }

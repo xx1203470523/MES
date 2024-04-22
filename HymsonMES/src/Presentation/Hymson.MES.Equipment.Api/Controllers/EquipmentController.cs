@@ -1,4 +1,5 @@
-﻿using Hymson.MES.EquipmentServices;
+﻿using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
+using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
@@ -147,6 +148,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task OutBoundCarrierAsync(OutBoundCarrierDto request)
         {
             await _manufactureService.OutBoundCarrierAsync(request);
+        }
+        [HttpPost("GBCodeReceive")]
+        [LogDescription("国标码接收", BusinessType.OTHER, "GBCodeReceive", ReceiverTypeEnum.MES)]
+        public async Task GBCodeReceiveAsync(ManuMergeDto request)
+        {
+            await _manufactureService.MergeAsync(request);
         }
     }
 }

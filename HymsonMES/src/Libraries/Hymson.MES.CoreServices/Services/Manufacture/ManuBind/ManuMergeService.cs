@@ -56,7 +56,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
         /// <param name="localizationService"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task MergeAsync(ManuMergeDto param, ILocalizationService localizationService)
+        public async Task MergeAsync(ManuMergeDto param)
         {
             var validationFailures = new List<ValidationFailure>();
             string sourcekey = string.Empty;
@@ -124,7 +124,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             }
             if (validationFailures.Any())
             {
-                throw new ValidationException(localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
             else
             {
