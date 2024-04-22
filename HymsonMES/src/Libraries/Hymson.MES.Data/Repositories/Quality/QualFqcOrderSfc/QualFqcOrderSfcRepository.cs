@@ -155,6 +155,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("SFC = @BarCode");
             }
+            if (query.BarCodes != null)
+            {
+                sqlBuilder.Where("SFC IN @BarCodes");
+            }
+
             if (query.FQCOrderIds != null)
             {
                 sqlBuilder.Where("FQCOrderId IN @FQCOrderIds");

@@ -121,15 +121,10 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 
             var getlogdate = await _logDataService.GetLogDataPagedAsync(logDataPagedQuery);
 
-            //var ids = getlogdate.Data.Select(x => x.Id).Distinct().ToArray();
-            //long[] longArray = ConvertToLongArray(ids);
-            //var logDataInfo = await _inteSystemTokenService.QueryInteSystemTokenByIdsAsync(longArray);
-
             // 实体到DTO转换 装载数据
             List<InteIntefaceLogDto> dtos = new();
             foreach (var item in getlogdate.Data)
             {
-                //var currentData = logDataInfo.Where(x => x.Id.ToString() == item.Id).FirstOrDefault();
                 var dict = item.Data;
 
                 // 提取特定键的值并赋给对应变量
@@ -199,7 +194,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
                     //自增Id
                     Id = item.Id,
                     //接口编码
-                    InterfaceCode = item.InterfaceCode,
+                    InterfaceCode = item.InterfaceCode?? path,
                     //接口名称
                     InterfaceName = item.Message,
                     //请求方
@@ -228,12 +223,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 
             return new PagedInfo<InteIntefaceLogDto>(dtos, getlogdate.PageIndex, getlogdate.PageSize, getlogdate.TotalCount);
         }
-
-        //public async Task<InteIntefaceLogDto?> QueryByIdAsync(long id)
-        //{
-        //    string _id=id.ToString();
-        //    var traceLogEntry = await _logDataService.GetTraceLogEntryByIdAsync(_id);
-        //}
 
         private long[] ConvertToLongArray(string[] stringArray)
         {

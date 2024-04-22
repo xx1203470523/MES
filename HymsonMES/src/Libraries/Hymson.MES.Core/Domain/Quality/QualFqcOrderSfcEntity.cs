@@ -40,7 +40,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 不合格处理方式(1-合格 2-让步 3-降级 4-维修 5-报废)
         /// </summary>
-        public FQCSFCHandMethodEnum? HandMethod { get; set; }
+        public FQCSFCHandMethodSelectEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 维修工艺路线Id

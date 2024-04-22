@@ -5,7 +5,6 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
 
 namespace Hymson.MES.Api.Controllers.Quality
@@ -193,17 +192,6 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 检验单免检
-        /// </summary>
-        /// <param name="requestDto"></param>
-        /// <returns></returns>
-        //[HttpPost("free")]
-        //public async Task<long> FreeOrderAsync(QualIqcOrderFreeDto requestDto)
-        //{
-        //    return await _qualFqcOrderService.FreeOrderAsync(requestDto);
-        //}
-
-        /// <summary>
         /// 关闭检验单
         /// </summary>
         /// <param name="requestDto"></param>
@@ -278,6 +266,30 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<PagedInfo<FQCParameterDetailDto>> QueryDetailSamplePagedListAsync([FromQuery] FQCParameterDetailPagedQueryDto pagedQueryDto)
         {
             return await _qualFqcOrderService.QueryDetailSamplePagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 不合格挑选
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("FqcSelection")]
+        public async Task<PagedInfo<FqcSelectionView>> query([FromQuery] FqcSelectionQueryDto query)
+        {
+            return await _qualFqcOrderService.FqcSelectionPageQuery(query);
+        }
+
+        /// <summary>
+        /// 不合格挑选更新
+        /// </summary>
+        /// <param name="updateDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("FqcSelectionUpdate")]
+        public async Task<int> FqcSelectionUpdate([FromBody] FqcSelectionUpdateDto updateDto)
+        {
+            return await _qualFqcOrderService.FqcSelectionUpdate(updateDto);
         }
 
     }
