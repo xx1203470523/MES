@@ -203,8 +203,10 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
 
             if (param is not JobRequestBo commonBo) return default;
+            if(commonBo.OutStationRequestBos==null|| !commonBo.OutStationRequestBos.Any()) return default;
+         
 
-            // 临时中转变量
+                // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
 
             // 获取生产条码信息
@@ -224,6 +226,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 SiteId = commonBo.SiteId,
                 Codes = commonBo.OutStationRequestBos.SelectMany(s => s.OutStationUnqualifiedList?.Select(o => o.UnqualifiedCode))
             });
+            if (qualUnqualifiedCodeEntities == null || !qualUnqualifiedCodeEntities.Any())
+                return default;
             List<ManuSfcScrapEntity> manuSfcScrapEntities = new();
             List<ManuSFCPartialScrapByIdCommand> manuSFCPartialScrapByIdCommandList = new();
           //  List<ManuSfcProducePartialScrapByIdCommand> manuSfcProducePartialScrapByIdCommandList = new();

@@ -211,6 +211,26 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuSfcCirculationEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+            if (!string.IsNullOrEmpty(manuSfcCirculationQuery.Sfc))
+            {
+                sqlBuilder.Where("SFC = @Sfc");
+            }
+
+            if (manuSfcCirculationQuery.CirculationTypes != null && manuSfcCirculationQuery.CirculationTypes.Any())
+            {
+                sqlBuilder.Where("CirculationType IN @CirculationTypes");
+            }
+
+        
+
+            if (manuSfcCirculationQuery.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("ProcedureId = @ProcedureId");
+            }
+            sqlBuilder.AddParameters(manuSfcCirculationQuery);
             using var conn = GetMESDbConnection();
             var manuSfcCirculationEntities = await conn.QueryAsync<ManuSfcCirculationEntity>(template.RawSql, manuSfcCirculationQuery);
             return manuSfcCirculationEntities;
@@ -368,7 +388,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                            FROM `manu_sfc_circulation` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `manu_sfc_circulation`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `FeedingPointId`, `SFC`, `WorkOrderId`, `ProductId`, `CirculationBarCode`, `CirculationWorkOrderId`,`Location`, `CirculationProductId`,`CirculationMainProductId`, `CirculationQty`, `CirculationType`,  `IsDisassemble`,`CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @FeedingPointId, @SFC, @WorkOrderId, @ProductId, @CirculationBarCode, @CirculationWorkOrderId,@Location,@CirculationProductId,@CirculationMainProductId,@CirculationQty, @CirculationType, @IsDisassemble,@CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `manu_sfc_circulation` SET ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, FeedingPointId = @FeedingPointId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, CirculationBarCode = @CirculationBarCode, CirculationWorkOrderId = @CirculationWorkOrderId, CirculationProductId = @CirculationProductId, @CirculationMainProductId =@CirculationMainProductId,  CirculationQty=@CirculationQty,  CirculationType = @CirculationType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        
+        const string UpdateSql = "UPDATE `manu_sfc_circulation` SET ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, FeedingPointId = @FeedingPointId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, CirculationBarCode = @CirculationBarCode, CirculationWorkOrderId = @CirculationWorkOrderId, CirculationProductId = @CirculationProductId, CirculationMainProductId =@CirculationMainProductId,  CirculationQty=@CirculationQty,  CirculationType = @CirculationType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_sfc_circulation` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
 
         const string GetByLocationSql = @"SELECT * FROM manu_sfc_circulation WHERE SiteId = @SiteId AND SFC = @SFC AND Location = @Location ";

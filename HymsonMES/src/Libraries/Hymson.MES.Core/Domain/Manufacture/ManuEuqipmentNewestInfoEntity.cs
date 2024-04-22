@@ -3,7 +3,7 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Core.Domain.Manufacture
 {
     /// <summary>
-    /// 设备最新信息数据实体对象
+    /// 设备最新信息数据实体对象 -- 废弃
     /// @author admin
     /// @date 2023-02-08
     /// </summary>

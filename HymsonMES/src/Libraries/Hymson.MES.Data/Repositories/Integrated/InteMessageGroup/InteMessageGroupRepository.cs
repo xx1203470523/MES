@@ -205,10 +205,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_message_group T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_message_group T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/  FROM inte_message_group /**where**/  ";
-
-        const string InsertSql = "INSERT IGNORE inte_message_group(`Id`, `SiteId`, `Code`, `Name`, `WorkShopId`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @WorkShopId, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+#if DM
+        const string InsertSql = "INSERT  inte_message_group(`Id`, `SiteId`, `Code`, `Name`, `WorkShopId`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @WorkShopId, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT  inte_message_group(`Id`, `SiteId`, `Code`, `Name`, `WorkShopId`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @WorkShopId, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+#else
+const string InsertSql = "INSERT IGNORE inte_message_group(`Id`, `SiteId`, `Code`, `Name`, `WorkShopId`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @WorkShopId, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT IGNORE inte_message_group(`Id`, `SiteId`, `Code`, `Name`, `WorkShopId`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @WorkShopId, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
+#endif
         const string UpdateSql = "UPDATE inte_message_group SET SiteId = @SiteId, Code = @Code, Name = @Name, WorkShopId = @WorkShopId, Status = @Status, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE inte_message_group SET SiteId = @SiteId, Code = @Code, Name = @Name, WorkShopId = @WorkShopId, Status = @Status, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 

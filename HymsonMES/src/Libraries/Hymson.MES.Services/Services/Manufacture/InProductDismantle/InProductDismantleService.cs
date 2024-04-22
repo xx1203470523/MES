@@ -915,7 +915,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="productId"></param>
         /// <returns></returns>
-        private async Task<int> GetOutsideQtyAsync(long productId)
+        private async Task<decimal> GetOutsideQtyAsync(long productId)
         {
             //外部获取批次数量
             var material = await _procMaterialRepository.GetByIdAsync(productId);

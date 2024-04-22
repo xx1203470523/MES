@@ -121,5 +121,17 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procReplaceMaterialPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcReplaceMaterialEntity>> GetPagedInfoAsync(ProcReplaceMaterialPagedQuery procReplaceMaterialPagedQuery);
+
+        #region 顷刻
+
+        /// <summary>
+        /// 多个-根据物料id查询替代料
+        /// </summary>
+        /// <param name="materialIdList"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcReplaceMaterialEntity>> GetListByMaterialIdAsync(List<long> materialIdList);
+
+        #endregion
+
     }
 }

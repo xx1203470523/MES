@@ -50,8 +50,11 @@ public partial class QualIqcInspectionItemRepository
 public partial class QualIqcInspectionItemRepository
 {
     #region 新增
-
+#if DM
+    const string InsertIgnoreSql = "INSERT  INTO `qual_iqc_inspection_item` (`Id`,`Code`,`Name`,`MaterialId`,`SupplierId`,`Status`,`Remark`,`CreatedOn`,`CreatedBy`,`UpdatedOn`,`UpdatedBy`,`SiteId`,`IsDeleted`) VALUES (@Id,@Code,@Name,@MaterialId,@SupplierId,@Status,@Remark,@CreatedOn,@CreatedBy,@UpdatedOn,@UpdatedBy,@SiteId,@IsDeleted);";
+#else
     const string InsertIgnoreSql = "INSERT IGNORE INTO `qual_iqc_inspection_item` (`Id`,`Code`,`Name`,`MaterialId`,`SupplierId`,`Status`,`Remark`,`CreatedOn`,`CreatedBy`,`UpdatedOn`,`UpdatedBy`,`SiteId`,`IsDeleted`) VALUES (@Id,@Code,@Name,@MaterialId,@SupplierId,@Status,@Remark,@CreatedOn,@CreatedBy,@UpdatedOn,@UpdatedBy,@SiteId,@IsDeleted);";
 
+#endif
     #endregion
 }

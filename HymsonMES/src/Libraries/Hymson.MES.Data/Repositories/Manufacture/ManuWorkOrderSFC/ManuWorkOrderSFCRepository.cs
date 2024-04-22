@@ -77,7 +77,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuWorkOrderSFCRepository
     {
+#if DM
+        const string InsertsSql = "INSERT  manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+#else
         const string InsertsSql = "INSERT IGNORE manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+#endif
         const string ReplacesSql = "REPLACE INTO manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
         const string DeletesSql = "DELETE FROM manu_workorder_sfc WHERE SiteId = @SiteId AND WorkOrderId = @WorkOrderId AND SFC = @SFC";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_workorder_sfc /**where**/  ";

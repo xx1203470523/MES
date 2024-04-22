@@ -190,6 +190,21 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(UpdatesSql, procLoadPointLinkResourceEntitys);
         }
 
+        #region 顷刻
+
+        /// <summary>
+        /// 根据上料点编码获取关联的资源
+        /// </summary>
+        /// <param name="loadPoint"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetByCodeAsync(ProcLoadPointCodeLinkResourceQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(GetByCodeSql, query);
+        }
+
+        #endregion
+
     }
 
     /// <summary>
@@ -223,5 +238,14 @@ namespace Hymson.MES.Data.Repositories.Process
                             Inner JOIN proc_resource b on a.ResourceId = b.Id
                             WHERE a.LoadPointId IN @ids 
                             Order by a.CreatedOn ";
+        #region 顷刻
+        const string GetByCodeSql = @"
+            select t2.*
+            from proc_load_point t1
+            inner join proc_load_point_link_resource t2 on t1.Id = t2.LoadPointId and t2.IsDeleted = 0
+            where t1.LoadPoint = @LoadPoint
+            and t1.IsDeleted = 0
+        ";
+        #endregion
     }
 }

@@ -463,6 +463,8 @@
         public const string MES11721 = "FQC创建保存错误!";
 
         public const string MES11722 = "检验单{fqcOrder}，未找到FQC检验参数组快照信息!";
+        public const string MES11723 = "所选条码查不到数据,处置失败";
+        public const string MES11724 = "未选择处置项";
 
 
 
@@ -1661,7 +1663,7 @@
         public const string MES18515 = "载具类型验证物料或物料组不合法";
         public const string MES18516 = "载具类型编码不允许有空格";
         public const string MES18517 = "选择的载具类型有被载具绑定，请先去载具上解绑！";
-        public const string MES18518 = "该载具类型已被关联了产品的载具关联，不允许更改该载具类型";
+        public const string MES18518 = "该载具类型已被关联了产品的载具关联，已存放的数量为[{exceedingQty}],不允许更改该载具类型！";
         public const string MES18519 = "不支持对载具进行组装操作！";
         public const string MES18520 = "不支持对载具进行参数收集操作！";
         public const string MES18521 = "只允许对单一条码进行参数收集操作！";

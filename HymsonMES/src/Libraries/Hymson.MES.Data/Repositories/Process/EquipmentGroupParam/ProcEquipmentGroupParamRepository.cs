@@ -4,7 +4,9 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using IdGen;
 using Microsoft.Extensions.Options;
+using System.Net.NetworkInformation;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -216,6 +218,57 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据设备ID和产品型号查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<List<ProcEquipmentGroupParamEquProductView>> QueryByEquProductAsync(ProcEquipmentGroupParamEquProductQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetByEquProductSqlTemplate);
+            if (string.IsNullOrEmpty(query.ProductCode) == false)
+            {
+                sqlBuilder.Where("t2.MaterialCode = @ProductCode");
+            }
+            sqlBuilder.Where("t1.`Type` = @Type");
+            sqlBuilder.Where("t4.Id = @EquipmentId");
+            sqlBuilder.Where("t1.Status = '1'");
+            sqlBuilder.Where("t1.IsDeleted = 0");
+
+            using var conn = GetMESDbConnection();
+            var list = await conn.QueryAsync<ProcEquipmentGroupParamEquProductView>(template.RawSql, query);
+            return list.ToList();
+        }
+
+        /// <summary>
+        /// 根据编码获取激活的数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<List<ProcEquipmentGroupParamDetailView>> GetDetailByCode(ProcEquipmentGroupParamCodeDetailQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            var list = await conn.QueryAsync<ProcEquipmentGroupParamDetailView>(GetDetailByCodeSql, query);
+            return list.ToList();
+        }
+
+        /// <summary>
+        /// 根据编码版本型号获取激活的数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcEquipmentGroupParamEntity> GetEntityByCodeVersion(ProcEquipmentGroupCheckQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            var model = await conn.QueryFirstOrDefaultAsync<ProcEquipmentGroupParamEntity>(GetEntityByCodeVersionSql, query);
+            return model;
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -240,10 +293,14 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcEquipmentGroupParamEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_equipment_group_param` /**where**/  ";
-
+#if DM
+        const string InsertSql = "INSERT  `proc_equipment_group_param`(  `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `ProcedureId`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`) VALUES (   @Id, @SiteId, @Code, @Name, @Type, @ProductId, @ProcedureId, @EquipmentGroupId, @Version, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @IsUsed )  ";
+        const string InsertsSql = "INSERT  `proc_equipment_group_param`(  `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `ProcedureId`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`) VALUES (   @Id, @SiteId, @Code, @Name, @Type, @ProductId, @ProcedureId, @EquipmentGroupId, @Version, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @IsUsed )  ";
+#else
         const string InsertSql = "INSERT IGNORE `proc_equipment_group_param`(  `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `ProcedureId`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`) VALUES (   @Id, @SiteId, @Code, @Name, @Type, @ProductId, @ProcedureId, @EquipmentGroupId, @Version, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @IsUsed )  ";
         const string InsertsSql = "INSERT IGNORE `proc_equipment_group_param`(  `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `ProcedureId`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`) VALUES (   @Id, @SiteId, @Code, @Name, @Type, @ProductId, @ProcedureId, @EquipmentGroupId, @Version, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @IsUsed )  ";
 
+#endif
         const string UpdateSql = "UPDATE `proc_equipment_group_param` SET  Name = @Name, Type = @Type, ProductId = @ProductId, ProcedureId = @ProcedureId, EquipmentGroupId = @EquipmentGroupId, Version = @Version, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_equipment_group_param` SET Name = @Name, Type = @Type, ProductId = @ProductId, ProcedureId = @ProcedureId, EquipmentGroupId = @EquipmentGroupId, Version = @Version, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
@@ -256,7 +313,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `ProcedureId`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`
                             FROM `proc_equipment_group_param`  WHERE Id IN @Ids ";
-        #endregion
+#endregion
 
         const string GetByCodeSql = "SELECT * FROM proc_equipment_group_param WHERE IsDeleted = 0 AND SiteId = @Site AND Code = @Code AND Version = @Version LIMIT 1";
 
@@ -269,5 +326,45 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string UpdateStatusSql = "UPDATE `proc_equipment_group_param` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
+        #region 顷刻
+        /// <summary>
+        /// 根据设备ID和产品型号查询
+        /// </summary>
+        const string GetByEquProductSqlTemplate = @"
+            select t1.Code, t1.Version, t1.ProductId , t2.MaterialCode ,t1.UpdatedOn 
+            from proc_equipment_group_param t1
+            inner join proc_material t2 on t1.ProductId = t2.Id and t2.IsDeleted = 0
+            inner join proc_process_equipment_group_relation t3 on t3.EquipmentGroupId = t1.EquipmentGroupId and t3.IsDeleted = 0
+            inner join equ_equipment t4 on t4.Id = t3.EquipmentId and t4.IsDeleted = 0
+            /**where**/ 
+        ";
+
+        /// <summary>
+        /// 根据编码获取激活的数据
+        /// </summary>
+        const string GetDetailByCodeSql = @"
+            select t1.Code, t1.Version, t1.CreatedOn, t1.UpdatedOn, t2.`MaxValue` ,t2.`MinValue` ,t2.ParamId ,t3.ParameterCode ,t3.ParameterName 
+            from proc_equipment_group_param t1
+            left join proc_equipment_group_param_detail t2 on t1.Id = t2.RecipeId and t2.IsDeleted = 0
+            left join proc_parameter t3 on t3.Id = t2.ParamId and t3.IsDeleted = 0
+            where t1.Code = @Code
+            and t1.Status = '1'
+            and t1.SiteId = @SiteId
+        ";
+
+        /// <summary>
+        /// 根据配方编码和版本获取实体
+        /// </summary>
+        const string GetEntityByCodeVersionSql = @"
+            select t1.*
+            from proc_equipment_group_param t1
+            inner join proc_material t2 on t1.ProductId = t2.Id and t2.IsDeleted = 0
+            where t1.Code = @Code
+            and t1.Version = @Version
+            and t2.MaterialCode = @MaterialCode
+            and t1.SiteId = @SiteId
+            and t1.Status  = '1'         
+        ";
+        #endregion
     }
 }

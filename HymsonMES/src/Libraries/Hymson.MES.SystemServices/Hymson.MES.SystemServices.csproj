@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Configurations>Debug;Release;DM</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

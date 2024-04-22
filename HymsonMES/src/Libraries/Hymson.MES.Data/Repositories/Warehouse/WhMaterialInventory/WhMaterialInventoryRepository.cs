@@ -118,10 +118,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.Where(" wmi.SiteId=@SiteId");
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
 
-            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Batch))
+            if (whMaterialInventoryPagedQuery.Batch > 0)
             {
-                whMaterialInventoryPagedQuery.Batch = $"%{whMaterialInventoryPagedQuery.Batch}%";
-                sqlBuilder.Where(" wmi.Batch like @Batch");
+                whMaterialInventoryPagedQuery.Batch = whMaterialInventoryPagedQuery.Batch;
+                sqlBuilder.Where(" wmi.Batch = @Batch");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialBarCode))
             {
@@ -182,6 +182,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryQuery.MaterialBarCode))
             {
                 sqlBuilder.Where("MaterialBarCode=@MaterialBarCode");
+            }
+            if (whMaterialInventoryQuery.MaterialBarCodes != null && whMaterialInventoryQuery.MaterialBarCodes.Any())
+            {
+                sqlBuilder.Where("MaterialBarCode IN @MaterialBarCodes");
             }
 
             using var conn = GetMESDbConnection();
@@ -444,6 +448,21 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(ScrapPartialWhMaterialInventoryByIdSql, commands);
         }
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据物料条码获取数据
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesNoQtyAsync(WhMaterialInventoryBarCodesQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodesNoQtySql, param);
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -455,10 +474,20 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `wh_material_inventory` wmi /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/";
         const string GetWhMaterialInventoryEntitiesSqlTemplate = @"SELECT /**select**/ FROM `wh_material_inventory` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `wh_material_inventory`(`Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`,`ScrapQty`, `Status`, `DueDate`, `Source`, `MaterialType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkOrderId) VALUES (@Id, @SupplierId, @MaterialId, @MaterialBarCode, @Batch, @QuantityResidue, @QuantityResidue,@ScrapQty, @Status, @DueDate, @Source,@MaterialType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId) ON DUPLICATE KEY UPDATE UpdatedOn = NOW()  ";
+#if DM
+        const string InsertSql = "MERGE INTO wh_material_inventory AS targetTable USING((SELECT @Id) AS sourceTable(Id))  ON(targetTable.Id=sourceTable.Id ) WHEN MATCHED THEN UPDATE SET UpdatedOn=@UpdatedOn WHEN NOT MATCHED THEN INSERT (`Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`,`ScrapQty`, `Status`, `DueDate`, `Source`, `MaterialType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkOrderId) VALUES (@Id, @SupplierId, @MaterialId, @MaterialBarCode, @Batch, @QuantityResidue, @QuantityResidue,@ScrapQty, @Status, @DueDate, @Source,@MaterialType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId);  ";
+#else
+        const string InsertSql = "INSERT INTO `wh_material_inventory`(`Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`,`ScrapQty`, `Status`, `DueDate`, `Source`, `MaterialType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkOrderId) VALUES (@Id, @SupplierId, @MaterialId, @MaterialBarCode, @Batch, @QuantityResidue, @QuantityResidue,@ScrapQty, @Status, @DueDate, @Source,@MaterialType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId) ON DUPLICATE KEY UPDATE UpdatedOn = @UpdatedOn  ";
+#endif
+
         const string UpdateSql = "UPDATE `wh_material_inventory` SET SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `wh_material_inventory` SET SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+
+#if DM
+        const string UpQuantityByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = QuantityResidue + CAST(@Quantity AS DECIMAL), UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+#else
         const string UpQuantityByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = QuantityResidue + @Quantity, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+#endif
         const string UpPointByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET QuantityResidue = 0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE SiteId = @SiteId AND MaterialBarCode IN @BarCodeList";
         const string UpdateWhMaterialInventoryEmptyByIdSql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
@@ -488,8 +517,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
         const string UpdateOutsideWhMaterilInventorySql = "UPDATE wh_material_inventory SET  MaterialId=@MaterialId, QuantityResidue =@QuantityResidue, Batch=@Batch, SupplierId=@SupplierId,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id; ";
 
-        const string UpdateQuantityResidueBySfcsSql = "UPDATE wh_material_inventory SET QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode IN @Sfcs AND QuantityResidue > 0  ";
+        const string UpdateQuantityResidueBySfcsSql = "UPDATE wh_material_inventory SET QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode IN @Sfcs AND QuantityResidue >0  ";
         const string ScrapPartialWhMaterialInventoryByIdSql = "UPDATE wh_material_inventory SET QuantityResidue = @Qty,ScrapQty = @ScrapQty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id=@Id AND QuantityResidue =@CurrentQuantityResidue ";
 
+
+        #region 顷刻
+
+        /// <summary>
+        /// 获取条码不管数量
+        /// </summary>
+        const string GetByBarCodesNoQtySql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes";
+
+        #endregion
     }
 }

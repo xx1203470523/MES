@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
+
+    <Configurations>Debug;Release;DM</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,6 +48,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Libraries\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
+    <ProjectReference Include="..\..\src\Libraries\Hymson.MES.Data\Hymson.MES.Data.csproj" />
     <ProjectReference Include="..\..\src\Libraries\Hymson.MES.Services\Hymson.MES.Services.csproj" />
     <ProjectReference Include="..\..\src\Presentation\Hymson.MES.Api\Hymson.MES.Api.csproj" />
   </ItemGroup>

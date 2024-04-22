@@ -37,18 +37,19 @@ namespace Hymson.MES.Equipment.Api
         /// <returns></returns>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] { ServiceTypeEnum.MES }, cancellationToken);
-            await _resourceService.HotLoadingAsync();
-            var equipmentModel = new EquipmentModel
-            {
-                FactoryId = 123456,
-                Id = 12870073632952320,
-                Name = "盖板转接片激光焊接机1#",
-                SiteId = 123456,
-                Code = ""
-            };
-            var token = JwtHelper.GenerateJwtToken(equipmentModel, _jwtOptions);
-            Console.WriteLine(token);
+            //await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] { ServiceTypeEnum.MES }, cancellationToken);
+            //await _resourceService.HotLoadingAsync();
+            //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
+            //var equipmentModel = new EquipmentModel
+            //{
+            //    FactoryId = 123456,
+            //    Id = 12870073632952320,
+            //    Name = "盖板转接片激光焊接机1#",
+            //    SiteId = 123456,
+            //    Code = ""
+            //};
+            //var token = JwtHelper.GenerateJwtToken(equipmentModel, _jwtOptions);
+            //Console.WriteLine(token);
         }
         /// <summary>
         /// 关闭时运行

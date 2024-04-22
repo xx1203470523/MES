@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
@@ -143,7 +144,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdatePassDownQuantityByWorkOrderId(UpdatePassDownQuantityCommand param);
+        Task<int> UpdatePassDownQuantityByWorkOrderIdAsync(UpdatePassDownQuantityCommand param);
 
         /// <summary>
         /// 更新数量（投入数量）
@@ -165,6 +166,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="param"></param>
         /// <returns></returns>
         Task<int> UpdateFinishProductQuantityByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param);
+
+        /// <summary>
+        /// 更新数量（完工数量）每次完工数量加1
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        Task<int> UpdateFinishProductQuantityAddOneAsync(long workOrderId);
 
         /// <summary>
         /// 更新数量（完工数量）

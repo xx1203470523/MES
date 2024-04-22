@@ -242,10 +242,14 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `qual_inspection_parameter_group` /**where**/  ";
-
+#if DM
+        const string InsertSql = "INSERT  `qual_inspection_parameter_group`(`Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT  `qual_inspection_parameter_group`(`Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+#else
         const string InsertSql = "INSERT IGNORE `qual_inspection_parameter_group`(`Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
         const string InsertsSql = "INSERT IGNORE `qual_inspection_parameter_group`(`Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
+#endif
         const string UpdateSql = "UPDATE `qual_inspection_parameter_group` SET Name = @Name, Version = @Version, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `qual_inspection_parameter_group` SET Name = @Name, Version = @Version, Status = @Status, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 

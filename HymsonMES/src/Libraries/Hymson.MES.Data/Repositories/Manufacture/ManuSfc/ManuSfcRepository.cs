@@ -354,9 +354,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (param.Sfcs != null && param.Sfcs.Any())
             {
                 sqlBuilder.Where("sfc.SFC in @Sfcs");
-            }
+        }
             if (param.Statuss != null && param.Statuss.Any())
-            {
+        {
                 sqlBuilder.Where("sfc.Status in @Statuss");
             }
             using var conn = GetMESDbConnection();
@@ -425,7 +425,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(UpdateWithStatusCheckSql, entities);
         }
 
-     
+
         /// <summary>
         /// 批量更新条码状态
         /// </summary>
@@ -602,6 +602,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(manuSFCPartialScrapByIdSql, commands);
         }
         #endregion
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据SFCs设置条码状态与数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -629,7 +644,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdatesSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdateStatusSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SiteId = @SiteId AND Status <> @Status AND SFC IN @Sfcs ";
         const string UpdateWithStatusCheckSql = "UPDATE manu_sfc SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
-        const string UpdateManuSfcQtyByIdSql = "UPDATE `manu_sfc` SET Qty = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateManuSfcQtyByIdSql = "UPDATE `manu_sfc` SET  Qty = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string MultiUpdateSfcIsUsedSql = "UPDATE manu_sfc SET IsUsed = @IsUsed, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND IsUsed <> @IsUsed AND SFC IN @SFCs ";
         const string MultiUpdateStatusSql = "UPDATE manu_sfc SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE SiteId = @SiteId AND SFC IN @SFCs; ";
@@ -638,7 +653,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string ManuSfcUpdateStatusCommandSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Status= @Status AND SFC =@Sfc AND SiteId = @SiteId";
         const string ManuSfcUpdateStatuByIdsSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  Id IN @Ids";
         const string ManuSfcUpdateStatuByIdSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id = @Id AND Status=@CurrentStatus";
-        const string ManuSfcScrapByIdsSql = "UPDATE `manu_sfc` SET StatusBack = Status,SfcScrapId = @SfcScrapId, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id = @Id AND Status=@CurrentStatus ";
+        const string ManuSfcScrapByIdsSql = "UPDATE `manu_sfc` SET StatusBack=Status,SfcScrapId=@SfcScrapId, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id = @Id AND Status=@CurrentStatus ";
         const string ManuSfcCancellScrapByIdsSql = "UPDATE `manu_sfc` SET Status=StatusBack,SfcScrapId=null, StatusBack = null, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id = @Id AND Status=@CurrentStatus";
         const string GetManSfcAboutInfoBySfcSql = @"SELECT ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
@@ -653,6 +668,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateStatusAndQtyByIdSql = @"UPDATE `manu_sfc` SET Status=@Status, Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id=@Id  AND Status=@CurrentStatus AND Qty=@CurrentQty ";
         const string UpdateManuSfcQtyAndCurrentQtyVerifyByIdSql = @"UPDATE `manu_sfc` SET  Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id=@Id  AND Status=@CurrentStatus AND Qty=@CurrentQty ";
         const string manuSFCPartialScrapByIdSql = @"UPDATE `manu_sfc` SET  Qty=@Qty, UpdatedBy = @UpdatedBy,ScrapQty=@ScrapQty,Status=@Status, UpdatedOn = @UpdatedOn  WHERE  Id=@Id  AND Status=@CurrentStatus AND Qty=@CurrentQty ";
+
+        #region 顷刻
+
+        /// <summary>
+        /// 更新条码数量
+        /// </summary>
+        const string UpdateQtyByIdSql = @"UPDATE manu_sfc SET Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE SFC = @SFC ";
+
+        #endregion
     }
 
     /// <summary>
@@ -674,7 +698,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (query.Id.HasValue)
             {
                 sqlBuilder.Where("Id = @Id");
-            }
+}
 
             if (query.Ids != null && query.Ids.Any())
             {

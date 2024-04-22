@@ -987,7 +987,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                                         SupplierId = 0,//自制品 没有
                                         MaterialId = manuSfcInfoEntity?.ProductId ?? 0,
                                         MaterialBarCode = item,
-                                        Batch = "",//自制品 没有
+                                        //Batch = "",//自制品 没有
                                         MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                                         QuantityResidue = manuSfcEntity.Qty,
                                         Status = WhMaterialInventoryStatusEnum.ToBeUsed,
@@ -1009,7 +1009,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                                         MaterialName = procMaterialEntitity?.MaterialName ?? "",
                                         MaterialVersion = procMaterialEntitity?.Version ?? "",
                                         MaterialBarCode = item,
-                                        Batch = "",//自制品 没有
+                                        //Batch = "",//自制品 没有
                                         Quantity = manuSfcEntity.Qty,
                                         Unit = procMaterialEntitity?.Unit ?? "",
                                         Type = WhMaterialInventoryTypeEnum.StepControl,
@@ -1516,7 +1516,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 if (newPlanWorkOrderEntity.Id > 0)
                 {
                     //新工单
-                    await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+                    await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(new UpdatePassDownQuantityCommand
                     {
                         WorkOrderId = newPlanWorkOrderEntity.Id,
                         PlanQuantity = newPlanWorkOrderEntity.Qty * (1 + newPlanWorkOrderEntity.OverScale / 100),
@@ -1528,7 +1528,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     if (planWorkOrderEntity != null && planWorkOrderEntity.Id > 0)
                     {
                         //老工单
-                        await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+                        await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(new UpdatePassDownQuantityCommand
                         {
                             WorkOrderId = workOrderId,
                             PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),

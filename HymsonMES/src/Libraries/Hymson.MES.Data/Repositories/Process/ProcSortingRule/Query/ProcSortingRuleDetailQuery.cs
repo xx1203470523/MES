@@ -20,4 +20,15 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public long[]? SortingRuleIds { get; set; }
     }
+
+    /// <summary>
+    /// 设备接口用的分选规则详情查询
+    /// </summary>
+    public class ProcSortRuleDetailEquQuery
+    {
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long MaterialId { get; set; }
+    }
 }

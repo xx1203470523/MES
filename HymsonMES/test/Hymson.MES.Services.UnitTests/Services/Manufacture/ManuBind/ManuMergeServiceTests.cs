@@ -51,15 +51,15 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind.Tests
         {
             var result = _service.MergeAsync(new Dtos.Manufacture.ManuBind.ManuMergeDto
             {
-                Barcodes = new[] { "0BWEE1BT271002305232", "0BWEE1BT271002305243" },
-                SiteId = 123456,
-                ProcedureId = 12816809150152704,
+                Barcodes = new[] { "AMF1E041801138", "CMF2E041802123" },
+                SiteId = 39612349211041792,
+               // ProcedureId = 12816809150152704,
                 TargetSFC = "hahaha"
             }, _localizationService);
             result.Wait();
             Assert.Fail();
         }
-        private static void AddAutoMapper()
+        public static void AddAutoMapper()
         {
             //find mapper configurations provided by other assemblies
             var typeFinder = Singleton<ITypeFinder>.Instance;

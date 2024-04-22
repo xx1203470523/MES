@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;DM</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -14,10 +15,18 @@
     <NoWarn>1701;1702;1591;8618</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DM|AnyCPU'">
+    <NoWarn>1701;1702;1591;8618</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="DependencyInjection\**" />
     <EmbeddedResource Remove="DependencyInjection\**" />
     <None Remove="DependencyInjection\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Enums\Quality\FQCSFCHandMethodSelectEnum.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +38,7 @@
 
   <ItemGroup>
     <Folder Include="Constants\Quality\" />
+    <Folder Include="Domain\Qkny\" />
     <Folder Include="Options\" />
   </ItemGroup>
 

@@ -80,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -102,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFqcOrderSampleEntity>> GetByIdsAsync(IEnumerable<long> ids) 
+        public async Task<IEnumerable<QualFqcOrderSampleEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcOrderSampleEntity>(GetByIdsSql, new { Ids = ids });
@@ -158,6 +158,16 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+
+            if (pagedQuery.FQCOrderIds != null && pagedQuery.FQCOrderIds.Any())
+            {
+                sqlBuilder.Where("FQCOrderId IN @FQCOrderIds");
+            }
+
+            if (pagedQuery.Barcode != null)
+            {
+                sqlBuilder.Where("Barcode = @Barcode");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
