@@ -51,7 +51,18 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcResourceEntity> GetResByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetResByIdsSql, new { Id = id });
+            return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetResByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 查询详情
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceEntity> > GetResByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcResourceEntity>(GetResByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -592,8 +603,8 @@ namespace Hymson.MES.Data.Repositories.Process
             LEFT JOIN equ_equipment E ON REB.EquipmentId = E.Id
             LEFT JOIN proc_resource R ON REB.ResourceId = R.Id
             WHERE E.IsDeleted = 0 AND R.IsDeleted = 0 AND E.EquipmentCode = @EquipmentCode AND E.SiteId =@SiteId";
-        const string GetResByIdsSql = "select * from proc_resource where  Id  =@Id";
-
+        const string GetResByIdSql = "select * from proc_resource where  Id  =@Id";
+        const string GetResByIdsSql = "select * from proc_resource where  Id  IN @Ids";
         const string ExistsSql = "SELECT Id FROM proc_resource WHERE `IsDeleted`= 0 AND ResCode=@ResCode and SiteId=@SiteId LIMIT 1";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResType,b.ResTypeName  FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id and b.IsDeleted =0 /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
