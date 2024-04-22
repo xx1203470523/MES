@@ -342,6 +342,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatesAsync(List<ProcMaterialEntity> procMaterialEntitys)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSql, procMaterialEntitys);
+        }
+
+        /// <summary>
         /// 更新 同编码的其他物料设置为非当前版本
         /// </summary>
         /// <param name="procMaterialEntity"></param>
