@@ -1,4 +1,5 @@
 using Hymson.MES.Services.Services.Integrated;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -123,7 +124,44 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("importMaterial")]
         public async Task ImportMaterialDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
-            await _importBasicDataService.ImportMaterialGroupDataAsync(formFile);
+            await _importBasicDataService.ImportMaterialDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 物料数据导入
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importParameter")]
+        public async Task ImportParameterDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _importBasicDataService.ImportParameterDataAsync(formFile);
+        }
+
+        /// <summary>
+        /// 物料导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadMaterialTemplate")]
+        //[LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadMaterialTemplateAsync()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _importBasicDataService.DownloadMaterialTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"物料导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 参数导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadParameterTTemplate")]
+        //[LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadParameterTemplateAsync()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _importBasicDataService.DownloadParameterTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"参数导入模板.xlsx");
         }
     }
 }

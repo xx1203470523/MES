@@ -32,6 +32,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> UpdateAsync(ProcParameterEntity procParameterEntity);
 
         /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="parameterEntities"></param>
+        /// <returns></returns>
+        Task<int> UpdatesAsync(IEnumerable<ProcParameterEntity> parameterEntities);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
