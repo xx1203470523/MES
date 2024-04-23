@@ -49,6 +49,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind.Tests
         [Test()]
         public void MergeAsyncTest()
         {
+            /*
             var result = _service.MergeAsync(new Dtos.Manufacture.ManuBind.ManuMergeRequestDto
             {
                 Barcodes = new[] { "CMF2E042201130", "AMF1E042201153" },
@@ -57,6 +58,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind.Tests
                 //TargetSFC = "hahaha"
             });
             result.Wait();
+            */
             Assert.Fail();
         }
         public static void AddAutoMapper()
