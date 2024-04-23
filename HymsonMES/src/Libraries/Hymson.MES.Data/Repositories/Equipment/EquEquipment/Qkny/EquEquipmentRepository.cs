@@ -73,6 +73,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquEquipmentResAllView>(GetEquResProcedureSql, query);
         }
+
+        /// <summary>
+        /// 获取设备列表
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquEquipmentEntity>> GetBySiteIdAsync(EquQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquEquipmentEntity>(GetEquBySiteIdSql, query);
+        }
     }
 
     /// <summary>
@@ -171,5 +182,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             where t1.EquipmentCode = @EquipmentCode
             and t3.ResCode = @ResCode
         ";
+
+        /// <summary>
+        /// 查询工厂所有设备
+        /// </summary>
+        const string GetEquBySiteIdSql = "select * from equ_equipment where SiteId = @SiteId and IsDeleted = 0";
     }
 }
