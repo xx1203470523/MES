@@ -1,6 +1,6 @@
-﻿using Hymson.MES.Data.Options;
+﻿using Dm;
+using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 using System.Data;
 
 namespace Hymson.MES.Data.Repositories
@@ -27,7 +27,7 @@ namespace Hymson.MES.Data.Repositories
         /// <returns></returns>
         protected IDbConnection GetMESDbConnection()
         {
-            var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var conn = new DmConnection(_connectionOptions.MESConnectionString);
             return conn;
         }
 
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories
         /// <returns></returns>
         protected IDbConnection GetMESParamterDbConnection()
         {
-            var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
+            var conn = new DmConnection(_connectionOptions.MESParamterConnectionString);
             return conn;
         }
 
@@ -47,7 +47,7 @@ namespace Hymson.MES.Data.Repositories
         /// <returns></returns>
         protected IDbConnection GetDorisParamterDbConnection()
         {
-            var conn = new MySqlConnection(_connectionOptions.DorisParamterConnectionString);
+            var conn = new DmConnection(_connectionOptions.DorisParamterConnectionString);
             return conn;
         }
 
@@ -59,7 +59,7 @@ namespace Hymson.MES.Data.Repositories
     /// <typeparam name="T"></typeparam>
     public abstract class BaseRepositorySingleton<T> : IDisposable where T : BaseRepositorySingleton<T>, new()
     {
-        private readonly Lazy<MySqlConnection> _connection;
+        private readonly Lazy<DmConnection> _connection;
         private readonly IOptions<ConnectionOptions> _connectionOptions;
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Hymson.MES.Data.Repositories
         public BaseRepositorySingleton(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions;
-            _connection = new Lazy<MySqlConnection>(() => new MySqlConnection(_connectionOptions.Value.MESConnectionString));
+            _connection = new Lazy<DmConnection>(() => new DmConnection(_connectionOptions.Value.MESConnectionString));
         }
 
         /// <summary>
