@@ -202,6 +202,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, procParameterEntity);
         }
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="parameterEntities"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatesAsync(IEnumerable<ProcParameterEntity> parameterEntities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSql, parameterEntities);
+        }
     }
 
     /// <summary>
