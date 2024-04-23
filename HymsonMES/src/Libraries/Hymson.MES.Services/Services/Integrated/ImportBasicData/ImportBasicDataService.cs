@@ -22,9 +22,12 @@ using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Services.Process;
 using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -38,6 +41,7 @@ using System.Reactive;
 using System.Security.Policy;
 using System.Text;
 using System.Transactions;
+using static Dapper.SqlMapper;
 
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -82,6 +86,8 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IProcBomRepository _procBomRepository;
         private readonly IProcProcessRouteRepository _processRouteRepository;
         private readonly IProcMaskCodeRepository _maskCodeRepository;
+        private readonly IProcParameterRepository _procParameterRepository;
+        private readonly IProcParameterLinkTypeRepository _parameterLinkTypeRepository;
         private readonly IExcelService _excelService;
         private readonly IMinioService _minioService;
 
@@ -99,6 +105,8 @@ namespace Hymson.MES.Services.Services.Integrated
                IProcBomRepository procBomRepository,
                IProcProcessRouteRepository processRouteRepository,
                IProcMaskCodeRepository maskCodeRepository,
+               IProcParameterRepository procParameterRepository,
+               IProcParameterLinkTypeRepository parameterLinkTypeRepository,
                IExcelService excelService, IMinioService minioService)
         {
             _currentUser = currentUser;
@@ -115,6 +123,8 @@ namespace Hymson.MES.Services.Services.Integrated
             _procBomRepository = procBomRepository;
             _processRouteRepository = processRouteRepository;
             _maskCodeRepository = maskCodeRepository;
+            _procParameterRepository = procParameterRepository;
+            _parameterLinkTypeRepository = parameterLinkTypeRepository;
             _excelService = excelService;
             _minioService = minioService;
         }
@@ -1453,7 +1463,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     continue;
                 }
 
-                var materialEntity = materialEntities?.FirstOrDefault(x => x.MaterialCode == materialCode && x.Version == entity.MaterialCode);
+                var materialEntity = materialEntities?.FirstOrDefault(x => x.MaterialCode == materialCode && x.Version == entity.Version);
                 var isDefaultVersion = true;
                 if (entity.IsDefaultVersion.HasValue && entity.IsDefaultVersion == TrueOrFalseEnum.No)
                 {
@@ -1543,7 +1553,7 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             using var memoryStream = new MemoryStream();
             await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
-            var excelImportDtos = _excelService.Import<ImportMaterialDto>(memoryStream);
+            var excelImportDtos = _excelService.Import<ImportParameterDto>(memoryStream);
 
             #region 验证基础数据
             if (excelImportDtos == null || !excelImportDtos.Any())
@@ -1551,138 +1561,61 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES11601));
             }
 
-            //获取物料列表信息
-            IEnumerable<ProcMaterialEntity> materialEntities = new List<ProcMaterialEntity>();
-            var materialCodes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.MaterialCode)).Select(x => x.MaterialCode).Distinct().ToArray();
-            if (materialCodes.Any())
+            //获取参数列表信息
+            IEnumerable<ProcParameterEntity> parameterEntities = new List<ProcParameterEntity>();
+            var parameterCodes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.ParameterCode)).Select(x => x.ParameterCode).Distinct().ToArray();
+            if (parameterCodes.Any())
             {
-                var materialQuery = new ProcMaterialQuery() { SiteId = _currentSite.SiteId ?? 0, MaterialCodes = materialCodes.ToArray() };
-                materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(materialQuery);
+                var codeQuery = new ProcParametersByCodeQuery() { SiteId = _currentSite.SiteId ?? 0, Codes = parameterCodes.ToArray() };
+                parameterEntities = await _procParameterRepository.GetByCodesAsync(codeQuery);
             }
 
-            //获取Bom列表信息
-            IEnumerable<ProcBomEntity> procBomEntities = new List<ProcBomEntity>();
-            var bomCodes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.BomCode)).Select(x => x.BomCode).Distinct().ToArray();
-            if (bomCodes.Any())
-            {
-                var materialQuery = new ProcBomsByCodeQuery() { SiteId = _currentSite.SiteId ?? 0, Codes = bomCodes.ToArray() };
-                procBomEntities = await _procBomRepository.GetByCodesAsync(materialQuery);
-            }
-
-            //获取工艺路线列表信息
-            IEnumerable<ProcProcessRouteEntity> processRouteEntities = new List<ProcProcessRouteEntity>();
-            var routeCodes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.ProcessRouteCode)).Select(x => x.ProcessRouteCode).Distinct().ToArray();
-            if (routeCodes.Any())
-            {
-                var routesByCodeQuery = new ProcProcessRoutesByCodeQuery() { SiteId = _currentSite.SiteId ?? 0, Codes = routeCodes.ToArray() };
-                processRouteEntities = await _processRouteRepository.GetByCodesAsync(routesByCodeQuery);
-            }
-
-            //获取掩码组列表信息
-            IEnumerable<ProcMaskCodeEntity> maskCodeEntities = new List<ProcMaskCodeEntity>();
-            var maskCodes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.MaskCode)).Select(x => x.MaskCode).Distinct().ToArray();
-            if (routeCodes.Any())
-            {
-                var codesByCodeQuery = new ProcMaskCodesByCodeQuery() { SiteId = _currentSite.SiteId ?? 0, Codes = maskCodes.ToArray() };
-                maskCodeEntities = await _maskCodeRepository.GetByCodesAsync(codesByCodeQuery);
-            }
-
-            var importMaterial = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.MaterialCode)).ToList();
-            var addMaterials = new List<ProcMaterialEntity>();
-            var updateMaterials = new List<ProcMaterialEntity>();
+            var addParameters = new List<ProcParameterEntity>();
+            var updateParameters = new List<ProcParameterEntity>();
+            var linkTypeEntities = new List<ProcParameterLinkTypeEntity>();
 
             var errorMessage = new StringBuilder("");
             var row = 0;
             foreach (var entity in excelImportDtos)
             {
                 row++;
-                if (string.IsNullOrWhiteSpace(entity.MaterialCode) && string.IsNullOrWhiteSpace(entity.MaterialName))
+                if (string.IsNullOrWhiteSpace(entity.ParameterCode) && string.IsNullOrWhiteSpace(entity.ParameterName))
                 {
                     continue;
                 }
 
                 var validFlag = true;
-                if (string.IsNullOrWhiteSpace(entity.MaterialName))
+                if (string.IsNullOrWhiteSpace(entity.ParameterCode))
                 {
-                    errorMessage.Append($"物料编码{entity.MaterialCode}的物料名称不能为空,");
+                    errorMessage.Append($"参数编码{entity.ParameterCode}不能为空,");
                     validFlag = false;
                 }
 
-                var processRouteId = 0L;
-                var bomId = 0L;
-                var maskCodeId = 0L;
-                //工艺路线验证
-                if (!string.IsNullOrWhiteSpace(entity.ProcessRouteCode))
+                if (string.IsNullOrWhiteSpace(entity.ParameterName))
                 {
-                    var processRouteEntity = processRouteEntities.FirstOrDefault(x => x.Code == entity.ProcessRouteCode.ToTrimSpace().ToUpperInvariant());
-                    if (processRouteEntity == null)
-                    {
-                        errorMessage.Append($"第{row}行的工艺路线编码{entity.ProcessRouteCode}在系统中不存在,");
-                        validFlag = false;
-                    }
-                    processRouteId = processRouteEntity?.Id ?? 0;
+                    errorMessage.Append($"参数编码{entity.ParameterName}的参数名称不能为空,");
+                    validFlag = false;
                 }
 
-                //Bom验证
-                if (!string.IsNullOrWhiteSpace(entity.BomCode))
-                {
-                    var procBomEntity = procBomEntities.FirstOrDefault(x => x.BomCode == entity.BomCode.ToTrimSpace().ToUpperInvariant());
-                    if (procBomEntity == null)
-                    {
-                        errorMessage.Append($"第{row}行的Bom编码{entity.BomCode}在系统中不存在,");
-                        validFlag = false;
-                    }
-                    bomId = procBomEntity?.Id ?? 0;
-                }
-
-                //掩码组验证
-                if (!string.IsNullOrWhiteSpace(entity.MaskCode))
-                {
-                    var maskCodeEntity = maskCodeEntities.FirstOrDefault(x => x.Code == entity.MaskCode.ToTrimSpace().ToUpperInvariant());
-                    if (maskCodeEntity == null)
-                    {
-                        errorMessage.Append($"第{row}行的掩码组{entity.MaskCode}在系统中不存在,");
-                        validFlag = false;
-                    }
-                    maskCodeId = maskCodeEntity?.Id ?? 0;
-                }
-
-                var materialCode = entity.MaterialCode.ToTrimSpace().ToUpperInvariant();
+                var parameterCode = entity.ParameterCode.ToTrimSpace().ToUpperInvariant();
                 if (!validFlag)
                 {
                     continue;
                 }
 
-                var materialEntity = materialEntities?.FirstOrDefault(x => x.MaterialCode == materialCode && x.Version == entity.MaterialCode);
-                var isDefaultVersion = true;
-                if (entity.IsDefaultVersion.HasValue && entity.IsDefaultVersion == TrueOrFalseEnum.No)
+                var parameterEntity = parameterEntities?.FirstOrDefault(x => x.ParameterCode == parameterCode);
+                var parameterId = parameterEntity?.Id ?? 0;
+                if (parameterEntity == null)
                 {
-                    isDefaultVersion = false;
-                }
-
-                if (materialEntity == null)
-                {
-                    addMaterials.Add(new ProcMaterialEntity
+                    parameterId = IdGenProvider.Instance.CreateId();
+                    addParameters.Add(new ProcParameterEntity
                     {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        MaterialCode = materialCode,
-                        MaterialName = entity.MaterialName.Trim(),
-                        GroupId = 0,
-                        Version = entity.Version,
-                        Batch = entity.Batch,
-                        BuyType = entity.BuyType,
-                        SerialNumber = entity.SerialNumber,
-                        IsDefaultVersion = isDefaultVersion,
-                        PackageNum = entity.PackageNum,
-                        Remark = entity.Remark,
-                        Unit = entity.Unit,
-                        BaseTime = entity.BaseTime,
-                        ConsumptionTolerance = entity.ConsumptionTolerance,
-                        ProcessRouteId = processRouteId,
-                        BomId = bomId,
-                        ConsumeRatio = entity.ConsumeRatio,
-                        MaskCodeId = maskCodeId,
-                        Status = SysDataStatusEnum.Enable,
+                        Id = parameterId,
+                        ParameterCode = parameterCode,
+                        ParameterName = entity.ParameterName.Trim(),
+                        ParameterUnit = entity.ParameterUnit,
+                        DataType = entity.DataType,
+                        Remark = entity.Remark ?? "",
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName,
                         SiteId = _currentSite.SiteId ?? 0
@@ -1690,25 +1623,69 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
                 else
                 {
-                    materialEntity.MaterialName = entity.MaterialName.Trim();
-                    materialEntity.Version = entity.Version;
-                    materialEntity.Batch = entity.Batch;
-                    materialEntity.BuyType = entity.BuyType;
-                    materialEntity.SerialNumber = entity.SerialNumber;
-                    materialEntity.IsDefaultVersion = isDefaultVersion;
-                    materialEntity.PackageNum = entity.PackageNum;
-                    materialEntity.Remark = entity.Remark;
-                    materialEntity.Unit = entity.Unit;
-                    materialEntity.BaseTime = entity.BaseTime;
-                    materialEntity.ConsumptionTolerance = entity.ConsumptionTolerance;
-                    materialEntity.ProcessRouteId = processRouteId;
-                    materialEntity.BomId = bomId;
-                    materialEntity.ConsumeRatio = entity.ConsumeRatio;
-                    materialEntity.MaskCodeId = maskCodeId;
-                    materialEntity.Remark = entity.Remark;
-                    materialEntity.UpdatedBy = _currentUser.UserName;
-                    materialEntity.UpdatedOn = HymsonClock.Now();
-                    updateMaterials.Add(materialEntity);
+                    parameterEntity.ParameterName = entity.ParameterName.Trim();
+                    parameterEntity.ParameterUnit = entity.ParameterUnit;
+                    parameterEntity.DataType = entity.DataType;
+                    parameterEntity.Remark = entity.Remark;
+                    parameterEntity.UpdatedBy = _currentUser.UserName;
+                    parameterEntity.UpdatedOn = HymsonClock.Now();
+                    updateParameters.Add(parameterEntity);
+                }
+
+                //环境参数
+                if (entity.IsEnvironment.HasValue && entity.IsEnvironment == TrueOrFalseEnum.Yes)
+                {
+                    linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ParameterID = parameterId,
+                        ParameterType = ParameterTypeEnum.Environment,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        SiteId = _currentSite.SiteId ?? 0
+                    });
+                }
+
+                //设备参数
+                if (entity.IsEquipment.HasValue && entity.IsEquipment == TrueOrFalseEnum.Yes)
+                {
+                    linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ParameterID = parameterId,
+                        ParameterType = ParameterTypeEnum.Equipment,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        SiteId = _currentSite.SiteId ?? 0
+                    });
+                }
+
+                //品质参数
+                if (entity.IsIQC.HasValue && entity.IsIQC == TrueOrFalseEnum.Yes)
+                {
+                    linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ParameterID = parameterId,
+                        ParameterType = ParameterTypeEnum.IQC,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        SiteId = _currentSite.SiteId ?? 0
+                    });
+                }
+
+                //产品参数
+                if (entity.IsIQC.HasValue && entity.IsIQC == TrueOrFalseEnum.Yes)
+                {
+                    linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ParameterID = parameterId,
+                        ParameterType = ParameterTypeEnum.Product,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        SiteId = _currentSite.SiteId ?? 0
+                    });
                 }
             }
 
@@ -1722,18 +1699,44 @@ namespace Hymson.MES.Services.Services.Integrated
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //保存记录
-                if (addMaterials.Any())
+                if (addParameters.Any())
                 {
-                    await _procMaterialRepository.InsertsAsync(addMaterials);
+                    await _procParameterRepository.InsertsAsync(addParameters);
                 }
-                if (updateMaterials.Any())
+                if (updateParameters.Any())
                 {
-                    await _procMaterialRepository.UpdatesAsync(updateMaterials);
+                    await _procParameterRepository.UpdatesAsync(updateParameters);
+                }
+
+                if (linkTypeEntities.Any())
+                {
+                    await _parameterLinkTypeRepository.InsertsAsync(linkTypeEntities);
                 }
                 ts.Complete();
             }
             #endregion
         }
 
+        /// <summary>
+        /// 下载物料导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadMaterialTemplateAsync(Stream stream)
+        {
+            var excelTemplateDtos = new List<ImportMaterialDto>();
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "物料导入模板");
+        }
+
+        /// <summary>
+        /// 下载参数导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadParameterTemplateAsync(Stream stream)
+        {
+            var excelTemplateDtos = new List<ImportParameterDto>();
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "参数导入模板");
+        }
     }
 }
