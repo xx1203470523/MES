@@ -184,7 +184,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 {
                     targetSFC = barcodes.First();
                 }
-                manusfc.SFC = targetSFC; //替换条码为国标码
+                //manusfc.SFC = targetSFC; //替换条码为国标码
                 var lst = sfcCirculationEntities.ToList();
                 lst.ForEach(i => i.CirculationBarCode = targetSFC); //更新流转记录的流转后条码值
 
@@ -197,7 +197,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                
                 using var trans = TransactionHelper.GetTransactionScope();
                 
-                await _manuSfcRepository.UpdateAsync(manusfc); 
+                //await _manuSfcRepository.UpdateAsync(manusfc); 
 
                 await _manuSfcCirculationRepository.UpdateRangeAsync(lst);
                 await _manuSfcRepository.UpdateStatusAsync(new ManuSfcUpdateCommand
