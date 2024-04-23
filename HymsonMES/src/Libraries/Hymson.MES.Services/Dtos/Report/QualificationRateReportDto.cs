@@ -151,7 +151,7 @@ namespace Hymson.MES.Services.Dtos.QualificationRateReport
         /// <summary>
         /// 一次合格率
         /// </summary>
-        [EpplusTableColumn(Header = "合格率", Order = 8)]
+        [EpplusTableColumn(Header = "一次合格率", Order = 9)]
         public decimal? OneQualifiedRate { get; set; }
 
     }
