@@ -466,6 +466,8 @@
         public const string MES11723 = "所选条码查不到数据,处置失败";
         public const string MES11724 = "未选择处置项";
 
+        public const string MES11725 = "无需要处置！";
+
 
 
 
