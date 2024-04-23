@@ -402,6 +402,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateQtyByIdAsync(UpdateManuSfcProduceQtyByIdCommand command);
+        /// <summary>
+        /// 根据id 更新SFC
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateSFCByIdAsync(UpdateManuSfcProduceSFCByIdCommand command);
 
         /// <summary>
         /// 部分报废 修改数量

@@ -555,6 +555,7 @@
         public const string MES12125 = "对应工作中心数据不存在.";
         public const string MES12126 = "存在已被关联产线,不允许重复关联!";
         public const string MES12127 = "新建状态的产线不能用于工作中心!";
+        public const string MES12128 = "存在已被其他产线关联的资源{ResourceCodes}！";
         #endregion
 
         #region 编码规则 12400

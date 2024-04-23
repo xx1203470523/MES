@@ -25,5 +25,10 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// 是否上料点
         /// </summary>
         public bool IsFeedingPoint { get; set; } = false;
+
+        /// <summary>
+        /// 是否工装
+        /// </summary>
+        public bool IsTooling {  get; set; } = false;
     }
 }

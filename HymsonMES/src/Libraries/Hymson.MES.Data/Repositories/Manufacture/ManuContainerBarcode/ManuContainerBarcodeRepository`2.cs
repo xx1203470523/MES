@@ -82,10 +82,19 @@ public partial class ManuContainerBarcodeRepository
     /// </summary>
     const string InsertReSql = "INSERT INTO `manu_container_barcode` (`Id`,`SiteId`,`BarCode`,`ContainerId`,`Status`,`Qty`,`CreatedBy`,`CreatedOn`,`UpdatedBy`,`UpdatedOn`,`IsDeleted`) VALUES (@Id,@SiteId,@BarCode,@ContainerId,@Status,@Qty,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted);";
 
+
+#if DM
+    /// <summary>
+    /// Qty增量
+    /// </summary>
+    const string IncrementQtySql = "UPDATE manu_container_barcode SET Qty = Qty + CAST(@IncrementValue AS DECIMAL) WHERE Id = @Id AND (Qty + CAST(@IncrementValue AS DECIMAL)) <= @MaxValue";
+#else
     /// <summary>
     /// Qty增量
     /// </summary>
     const string IncrementQtySql = "UPDATE manu_container_barcode SET Qty = Qty + @IncrementValue WHERE Id = @Id AND Qty + @IncrementValue <= @MaxValue";
+#endif
+
 
     /// <summary>
     /// 刷新状态

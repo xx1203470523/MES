@@ -393,38 +393,79 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task FeedingAsync(FeedingDto dto)
         {
-            ManuFeedingMaterialSaveDto saveDto = new ManuFeedingMaterialSaveDto();
-            saveDto.BarCode = dto.Sfc;
-            if (dto.IsFeedingPoint == false)
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
+            var sfcs = new List<string>() { dto.Sfc };
+            if (dto.IsTooling)
             {
-                //1. 获取设备基础信息
-                //EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
-                EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
-                //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
-
-                saveDto.Source = ManuSFCFeedingSourceEnum.BOM;
-                saveDto.SiteId = equResModel.SiteId;
-                saveDto.ResourceId = equResModel.ResId;
-                saveDto.UserName = dto.EquipmentCode;
+                //查询工装绑定的条码
+                var toolingBindEntities = await _manuToolingBindRepository.GetEntitiesAsync(new Data.Repositories.Manufacture.Query.ManuToolingBindQuery
+                {
+                    SiteId = equResModel.SiteId,
+                    ToolingCode = dto.Sfc,
+                    Status = Core.Enums.Common.BindStatusEnum.Bind
+                });
+                if (toolingBindEntities == null || !toolingBindEntities.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45041));
+                }
+                sfcs = toolingBindEntities.Select(x => x.Barcode).ToList();
             }
-            else
+            //组装参数
+            var feedingMaterialSaveDtos = new List<ManuFeedingMaterialSaveDto>();
+            foreach (var item in sfcs)
             {
-                //根据
-                //ProcLoadPointCodeLinkResourceQuery query = new ProcLoadPointCodeLinkResourceQuery();
-                //query.LoadPoint = dto.EquipmentCode;
-                //var res = await _procLoadPointLinkResourceRepository.GetByCodeAsync(query);
+                var feedingMaterialSaveDto = new ManuFeedingMaterialSaveDto()
+                {
+                    SiteId = equResModel.SiteId,
+                    UserName = dto.EquipmentCode,
+                    BarCode = item
+                };
 
-                ProcLoadPointQuery query = new ProcLoadPointQuery();
-                query.LoadPoint = dto.EquipmentCode;
-                var loadPoint = await _procLoadPointService.GetProcLoadPointAsync(query);
-                //saveDto.ResourceId = res.FirstOrDefault()!.ResourceId!;
-                saveDto.Source = ManuSFCFeedingSourceEnum.FeedingPoint;
-                saveDto.FeedingPointId = loadPoint.Id;
-                saveDto.SiteId = loadPoint.SiteId;
-                saveDto.UserName = dto.EquipmentCode;
+                if (dto.IsFeedingPoint == false)
+                {
+                    //1. 获取设备基础信息
+                    //EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+                    //EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
+                    //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+
+                    feedingMaterialSaveDto.Source = ManuSFCFeedingSourceEnum.BOM;
+                    feedingMaterialSaveDto.ResourceId = equResModel.ResId;
+                }
+                else
+                {
+                    //根据
+                    //ProcLoadPointCodeLinkResourceQuery query = new ProcLoadPointCodeLinkResourceQuery();
+                    //query.LoadPoint = dto.EquipmentCode;
+                    //var res = await _procLoadPointLinkResourceRepository.GetByCodeAsync(query);
+
+                    ProcLoadPointQuery query = new ProcLoadPointQuery();
+                    query.LoadPoint = dto.EquipmentCode;
+                    var loadPoint = await _procLoadPointService.GetProcLoadPointAsync(query);
+                    //saveDto.ResourceId = res.FirstOrDefault()!.ResourceId!;
+                    feedingMaterialSaveDto.Source = ManuSFCFeedingSourceEnum.FeedingPoint;
+                    feedingMaterialSaveDto.FeedingPointId = loadPoint.Id;
+                }
+                feedingMaterialSaveDtos.Add(feedingMaterialSaveDto);
             }
             //3. 上料
-            var feedResult = await _manuFeedingService.CreateAsync(saveDto);
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            foreach (var item in feedingMaterialSaveDtos)
+            {
+                var feedResult = await _manuFeedingService.CreateAsync(item);
+            }
+            //工装解绑
+            if (dto.IsTooling)
+            {
+                await _manuToolingBindRepository.UnBindToolingAsync(new Data.Repositories.Manufacture.ManuToolingBind.Command.UnBindToolingCommand
+                {
+                    SiteId = equResModel.SiteId,
+                    ToolingCode = dto.Sfc,
+                    UpdatedBy = dto.EquipmentCode,
+                    UpdatedOn = HymsonClock.Now()
+                });
+            }
+            trans.Complete();
 
             //TODO
             //1. 校验物料是否在lims系统发过来的条码表lims_material(wh_material_inventory)，验证是否存在及合格，以及生成日期
