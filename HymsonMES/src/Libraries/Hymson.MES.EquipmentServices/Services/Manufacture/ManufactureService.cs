@@ -367,7 +367,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             }
             else
             {
-                return await _manuMergeService.MergeAsync(param);
+                return await _manuMergeService.MergeAsync(param,_currentEquipment.Name);
             }
             
             

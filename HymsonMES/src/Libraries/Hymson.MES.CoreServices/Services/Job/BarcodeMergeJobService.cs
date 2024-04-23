@@ -149,11 +149,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
                 if(!IsCreated) 
                 {
-                    (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo) cellsfc = new();
-                    cellsfc = CreateSFCProduceInfoFromCellSFC(workOrderEntity, key, commonBo.ProcedureId, commonBo, sfcProduceEntity.Qty, SfcStatusEnum.lineUp);
+                    (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo,ManuSfcProduceEntity ManuSfcProduceEntity) cellsfc = new();
+                    cellsfc = CreateSFCProduceInfoFromCellSFC(workOrderEntity, key, commonBo.ProcedureId, commonBo, sfcProduceEntity.Qty, SfcStatusEnum.Activity);
                     manusfcs.Add(cellsfc.manusfc);
                     sfcinfos.Add(cellsfc.sfcinfo);
-                  //  sfcproduces.Add(cellsfc.sfcproduce);
+                    sfcproduces.Add(cellsfc.ManuSfcProduceEntity);
                     ////新条码 状态变更为开始  , 不写步骤表 by keming
                     //var manuSfcStepEntity = new ManuSfcStepEntity
                     //{
@@ -165,7 +165,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     //    WorkCenterId = sfcProduceEntity.WorkCenterId,
                     //    ProductBOMId = sfcProduceEntity.ProductBOMId,
                     //    ProcedureId = commonBo.ProcedureId,
-                    //    Qty = sfcProduceEntity.Qty, //TODO:
+                    //    Qty = sfcProduceEntity.Qty, 
 
                     //    EquipmentId = commonBo.EquipmentId,
                     //    ResourceId = commonBo.ResourceId,
@@ -178,7 +178,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                     //manuSfcStepEntities.Add(manuSfcStepEntity);
                     IsCreated = true;
                 }
-              
                 
                 manuSfcCirculationEntitys.Add(new ManuSfcCirculationEntity
                 {
@@ -192,7 +191,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     CirculationBarCode = key,
                     CirculationProductId = sfcProduceEntity.ProductId,
                     CirculationMainProductId = sfcProduceEntity.ProductId,
-                    CirculationQty = sfcProduceEntity.Qty, //TODO: 新工单 产品的标包大小
+                    CirculationQty = sfcProduceEntity.Qty,
                     CirculationType = SfcCirculationTypeEnum.Merge,
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
@@ -211,7 +210,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="sfc"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        private ( ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo) CreateSFCProduceInfoFromCellSFC(PlanWorkOrderEntity planWorkOrderEntity, string sfc, long procedureId, JobRequestBo bo,decimal qty,SfcStatusEnum sfcStatus)
+        private ( ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo,ManuSfcProduceEntity sfcproduce) CreateSFCProduceInfoFromCellSFC(PlanWorkOrderEntity planWorkOrderEntity, string sfc, long procedureId, JobRequestBo bo,decimal qty,SfcStatusEnum sfcStatus)
         {
 
             var manuSfcEntity = new ManuSfcEntity
@@ -239,27 +238,27 @@ namespace Hymson.MES.CoreServices.Services.Job
                 UpdatedBy = bo.UserName,
             };
 
-            //var manuSfcProduceEntity = new ManuSfcProduceEntity
-            //{
-            //    Id = IdGenProvider.Instance.CreateId(),
-            //    SiteId = bo.SiteId,
-            //    SFC = sfc,
-            //    SFCId = manuSfcEntity.Id,
-            //    ProductId = planWorkOrderEntity.ProductId,
-            //    WorkOrderId = planWorkOrderEntity.Id,
-            //    BarCodeInfoId = manuSfcEntity.Id,
-            //    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
-            //    WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-            //    ProductBOMId = planWorkOrderEntity.ProductBOMId,
-            //    EquipmentId = bo.EquipmentId,
-            //    Qty = qty,
-            //    ProcedureId = procedureId,
-            //    Status = sfcStatus,
-            //    RepeatedCount = 0,
-            //    IsScrap = TrueOrFalseEnum.No,
-            //    CreatedBy = bo.UserName,
-            //    UpdatedBy = bo.UserName
-            //};
+            var manuSfcProduceEntity = new ManuSfcProduceEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = bo.SiteId,
+                SFC = sfc,
+                SFCId = manuSfcEntity.Id,
+                ProductId = planWorkOrderEntity.ProductId,
+                WorkOrderId = planWorkOrderEntity.Id,
+                BarCodeInfoId = manuSfcEntity.Id,
+                ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+                ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                EquipmentId = bo.EquipmentId,
+                Qty = qty,
+                ProcedureId = procedureId,
+                Status = sfcStatus,
+                RepeatedCount = 0,
+                IsScrap = TrueOrFalseEnum.No,
+                CreatedBy = bo.UserName,
+                UpdatedBy = bo.UserName
+            };
 
             //var manuSfcStepEntity = new ManuSfcStepEntity
             //{
@@ -272,12 +271,12 @@ namespace Hymson.MES.CoreServices.Services.Job
             //    WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
             //    Qty = qty,
             //    ProcedureId = procedureId,
-            //    Operatetype = ManuSfcStepTypeEnum.Create,
-            //    CurrentStatus = SfcStatusEnum.lineUp,
+            //    Operatetype = ManuSfcStepTypeEnum.,
+            //    CurrentStatus = SfcStatusEnum.Activity,
             //    CreatedBy = bo.UserName,
             //    UpdatedBy = bo.UserName
             //};
-            return (manuSfcEntity, manuSfcInfoEntity);
+            return (manuSfcEntity, manuSfcInfoEntity, manuSfcProduceEntity);
         }
 
 
@@ -299,7 +298,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             //生成流转记录
             if(data.manuSfcCirculationEntitys!=null)
                 responseBo.Rows += await _manuSfcCirculationRepository.InsertRangeAsync(data.manuSfcCirculationEntitys);
-            responseBo.Rows += await _manuSfcStepRepository.InsertRangeAsync(data.manuSfcStepEntities);
+           // responseBo.Rows += await _manuSfcStepRepository.InsertRangeAsync(data.manuSfcStepEntities);
 
             return responseBo;
         }

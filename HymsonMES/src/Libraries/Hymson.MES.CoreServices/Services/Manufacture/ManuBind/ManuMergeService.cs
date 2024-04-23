@@ -16,6 +16,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
 using System;
@@ -45,6 +46,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
         private readonly IMasterDataService _masterDataService;
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         
+
         public ManuMergeService(ILocalizationService localizationService
             , IManuSfcCirculationRepository manuSfcCirculationRepository
             , IManuSfcInfoRepository manuSfcInfoRepository
@@ -75,7 +77,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
         /// <param name="localizationService"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<string> MergeAsync(ManuMergeRequestDto param)
+        public async Task<string> MergeAsync(ManuMergeRequestDto param,string updateName)
         {
             var validationFailures = new List<ValidationFailure>();
             string sourcekey = string.Empty;  //隐式条码 ，需要被GB替换
@@ -116,15 +118,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 validationFailure.FormattedMessagePlaceholderValues.Add("sfc", string.Join(',', param.Barcodes));
                 validationFailure.ErrorCode = nameof(ErrorCode.MES12840);
                 validationFailures.Add(validationFailure);
-               // throw new CustomerValidationException(nameof(ErrorCode.MES12840)).WithData("sfc", string.Join(',', param.Barcodes));
+               
             }
             else
             {
-                //notIncludeSFCs = param.Barcodes.Except(sfcCirculationEntities.Select(s => s.SFC));
-                //if (notIncludeSFCs.Any())
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES12817));//.WithData("SFC", string.Join(',', notIncludeSFCs));
-                //}
+                
                 var groupCirulationEntities = sfcCirculationEntities.GroupBy(g => g.CirculationBarCode);
                 if (groupCirulationEntities.Count() > 1)
                 {
@@ -155,7 +153,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 });
                 var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdAsync(manusfc.Id);
                
-               // var sfcproduce = await _manuSfcProduceRepository.GetBySFCIdAsync(manusfc.Id);
+                var sfcproduce = await _manuSfcProduceRepository.GetBySFCIdAsync(manusfc.Id);
 
                 //生成GB码
                 var  materialEntity = await _procMaterialRepository.GetByIdAsync(sfcInfoEntity.ProductId);
@@ -173,7 +171,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     Sfcs = param.Barcodes,
                     ProductId = sfcInfoEntity.ProductId,
                     WorkOrderId = sfcInfoEntity.WorkOrderId,
-                    UserName = sfcInfoEntity.CreatedBy,
+                    UserName = updateName,
 
                 });
                 if(barcodes==null||!barcodes.Any())
@@ -187,26 +185,28 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 manusfc.SFC = targetSFC; //替换条码为国标码
                 var lst = sfcCirculationEntities.ToList();
                 lst.ForEach(i => i.CirculationBarCode = targetSFC); //更新流转记录的流转后条码值
-
-                var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
-                {
-                    SFCs = param.Barcodes,
-                    SiteId = param.SiteId,
-                });
-                
                
                 using var trans = TransactionHelper.GetTransactionScope();
                 
-                await _manuSfcRepository.UpdateAsync(manusfc); 
-
+                await _manuSfcRepository.UpdateAsync(manusfc); //更新分组条码为国标码
+                //更新条码转换表 ，分组条码变更为国标码
                 await _manuSfcCirculationRepository.UpdateRangeAsync(lst);
+                //更新 级组条码为完成状态
                 await _manuSfcRepository.UpdateStatusAsync(new ManuSfcUpdateCommand
                 {
                     SiteId = param.SiteId,
                     Sfcs = param.Barcodes.ToArray(),
                     Status = Core.Enums.SfcStatusEnum.Complete,
-                    UpdatedOn = DateTime.Now,
-                    UserId = manusfc.CreatedBy
+                    UpdatedOn =HymsonClock.Now(),
+                    UserId = updateName
+                });
+                //在制表更新分组条码为国标码
+                await _manuSfcProduceRepository.UpdateSFCByIdAsync(new UpdateManuSfcProduceSFCByIdCommand
+                {
+                    SFC = targetSFC,
+                    Id = sfcproduce.Id,
+                    UpdatedBy = updateName,
+                    UpdatedOn = HymsonClock.Now(),
                 });
                 trans.Complete();
                 return targetSFC;
