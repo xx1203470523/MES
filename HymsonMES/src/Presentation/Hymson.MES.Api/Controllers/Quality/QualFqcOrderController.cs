@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
@@ -287,6 +288,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("FqcSelectionUpdate")]
+        [LogDescription("不合格挑选更新", BusinessType.OTHER, "FqcSelectionUpdate", ReceiverTypeEnum.MES)]
         public async Task<int> FqcSelectionUpdate([FromBody] FqcSelectionUpdateDto updateDto)
         {
             return await _qualFqcOrderService.FqcSelectionUpdate(updateDto);

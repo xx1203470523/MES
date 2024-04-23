@@ -1126,6 +1126,13 @@ namespace Hymson.MES.Services.Services.Quality
                     var materialEntities = await _procMaterialRepository.GetByIdsAsync(fQCEntities.Where(w => w.MaterialId.HasValue).Select(s => s.MaterialId!.Value));
                     //工单
                     var workOrderEntites = await _planWorkOrderRepository.GetByIdsAsync(fQCEntities.Where(w => w.WorkOrderId.HasValue).Select(s => s.WorkOrderId!.Value));
+                    //处置状态
+                    var orderSFCs = await _qualFqcOrderSfcRepository.GetEntitiesAsync(new QualFqcOrderSfcQuery
+                    {
+                        BarCodes = result.Data.Select(m => m.Barcode!),
+                        FQCOrderIds = resultFQCIds,
+                        SiteId = site,
+                    });
 
                     result.Data = result.Data.Select(m =>
                     {
@@ -1148,6 +1155,17 @@ namespace Hymson.MES.Services.Services.Quality
                         if (workOrderEntity != default)
                         {
                             m.OrderCode = workOrderEntity.OrderCode;
+                        }
+
+                        var sfcHandMethod = orderSFCs.FirstOrDefault(e => e.SFC == m.Barcode)?.HandMethod;
+                
+                        if (sfcHandMethod != default)
+                        {
+                            m.HandMethodText = sfcHandMethod!.GetDescription();
+                        }
+                        else
+                        {
+                            m.HandMethodText = "-";
                         }
 
                         return m;
@@ -1186,12 +1204,14 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 BarCodes = barCodes,
                 FQCOrderIds = fqcs,
-                SiteId=site,
+                SiteId = site,
             });
 
+            var filteredItems = FQCOrderSFC.Where(item => item.HandMethod == null);
 
-            if (!FQCOrderSFC.Any()) return 0;
-            foreach (var item in FQCOrderSFC)
+            if (!filteredItems.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES11725));
+
+            foreach (var item in filteredItems)
             {
                 item.HandMethod = updateDto.HandMethod;
             }
