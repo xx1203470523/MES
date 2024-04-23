@@ -218,7 +218,12 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string UpdateSql = "UPDATE qual_oqc_order_type SET   SiteId = @SiteId, OQCOrderId = @OQCOrderId, InspectionType = @InspectionType, VerificationLevel = @VerificationLevel, AcceptanceLevel = @AcceptanceLevel, SampleQty = @SampleQty, CheckedQty = @CheckedQty, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_oqc_order_type SET   SiteId = @SiteId, OQCOrderId = @OQCOrderId, InspectionType = @InspectionType, VerificationLevel = @VerificationLevel, AcceptanceLevel = @AcceptanceLevel, SampleQty = @SampleQty, CheckedQty = @CheckedQty, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesCheckedQtySql = "UPDATE qual_oqc_order_type SET  CheckedQty =CheckedQty+@CheckedQty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn,IsQualified=@IsQualified WHERE Id = @Id ";
+
+#if DM
+        const string UpdatesCheckedQtySql = "UPDATE qual_oqc_order_type SET CheckedQty = CheckedQty + CAST(@CheckedQty AS DECIMAL), IsQualified = @IsQualified, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+#else
+        const string UpdatesCheckedQtySql = "UPDATE qual_oqc_order_type SET CheckedQty = CheckedQty + @CheckedQty, IsQualified = @IsQualified, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+#endif
 
         const string DeleteSql = "UPDATE qual_oqc_order_type SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_oqc_order_type SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
