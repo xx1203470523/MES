@@ -570,7 +570,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     if (SFCProduceEntity != null)
                     {
                         // 更新工单的产出数量
-                        await _planWorkOrderRepository.UpdateFinishProductQuantityAddOne(SFCProduceEntity.WorkOrderId);                    
+                        await _planWorkOrderRepository.UpdateFinishProductQuantityAddOneAsync(SFCProduceEntity.WorkOrderId);                    
                         responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18226),
                         data.Type.GetDescription(),
                         data.Code);
@@ -721,7 +721,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         SupplierId = 0,//自制品 没有
                         MaterialId = sfcProduceEntity.ProductId,
                         MaterialBarCode = sfcProduceEntity.SFC,
-                        Batch = "",//自制品 没有
+                        //Batch = "",//自制品 没有
                         MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                         QuantityResidue = sfcProduceEntity.Qty,
                         ScrapQty = sfcProduceEntity.ScrapQty,
@@ -742,7 +742,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         MaterialName = procMaterialEntity.MaterialName,
                         MaterialVersion = procMaterialEntity.Version ?? "",
                         MaterialBarCode = sfcProduceEntity.SFC,
-                        Batch = "",//自制品 没有
+                        //Batch = "",//自制品 没有
                         Quantity = sfcProduceEntity.Qty,
                         Unit = procMaterialEntity.Unit ?? "",
                         Type = WhMaterialInventoryTypeEnum.ManuComplete,

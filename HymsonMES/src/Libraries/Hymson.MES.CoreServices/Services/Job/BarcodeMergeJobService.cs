@@ -129,6 +129,7 @@ namespace Hymson.MES.CoreServices.Services.Job
           
             responseBo.manuSfcCirculationEntitys = manuSfcCirculationEntitys;
             var key = IdGenProvider.Instance.CreateId().ToString();
+            bool IsCreated = false;
             foreach (var bo in barcodeChangeBo)
             {
                 var now = HymsonClock.Now();
@@ -146,34 +147,39 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (sfcCirculationEntities!=null&&sfcCirculationEntities.Any()) {
                     continue;
                 }
-
-                (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo, ManuSfcProduceEntity sfcproduce, ManuSfcStepEntity? sfcstep) cellsfc = new();
-                cellsfc = CreateSFCProduceInfoFromCellSFC(workOrderEntity, key, commonBo.ProcedureId, commonBo, sfcProduceEntity.Qty, SfcStatusEnum.lineUp);
-                manusfcs.Add(cellsfc.manusfc);
-                sfcinfos.Add(cellsfc.sfcinfo);
-                sfcproduces.Add(cellsfc.sfcproduce);
-              
-                //新条码 状态变更为开始
-                var manuSfcStepEntity = new ManuSfcStepEntity
+                if(!IsCreated) 
                 {
-                    Operatetype = ManuSfcStepTypeEnum.SfcMerge,
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SFC = key,
-                    ProductId = sfcProduceEntity.ProductId,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    WorkCenterId = sfcProduceEntity.WorkCenterId,
-                    ProductBOMId = sfcProduceEntity.ProductBOMId,
-                    ProcedureId = commonBo.ProcedureId,
-                    Qty = sfcProduceEntity.Qty, //TODO:
+                    (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo) cellsfc = new();
+                    cellsfc = CreateSFCProduceInfoFromCellSFC(workOrderEntity, key, commonBo.ProcedureId, commonBo, sfcProduceEntity.Qty, SfcStatusEnum.lineUp);
+                    manusfcs.Add(cellsfc.manusfc);
+                    sfcinfos.Add(cellsfc.sfcinfo);
+                  //  sfcproduces.Add(cellsfc.sfcproduce);
+                    ////新条码 状态变更为开始  , 不写步骤表 by keming
+                    //var manuSfcStepEntity = new ManuSfcStepEntity
+                    //{
+                    //    Operatetype = ManuSfcStepTypeEnum.BarcodeBinding, //多个条码归一为一个条码，还可以拆分，故使用绑定枚举 by keming
+                    //    Id = IdGenProvider.Instance.CreateId(),
+                    //    SFC = key,
+                    //    ProductId = sfcProduceEntity.ProductId,
+                    //    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    //    WorkCenterId = sfcProduceEntity.WorkCenterId,
+                    //    ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    //    ProcedureId = commonBo.ProcedureId,
+                    //    Qty = sfcProduceEntity.Qty, //TODO:
 
-                    EquipmentId = commonBo.EquipmentId,
-                    ResourceId = commonBo.ResourceId,
-                    SiteId = commonBo.SiteId,
-                    CreatedBy = commonBo.UserName,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = HymsonClock.Now()
-                };
+                    //    EquipmentId = commonBo.EquipmentId,
+                    //    ResourceId = commonBo.ResourceId,
+                    //    SiteId = commonBo.SiteId,
+                    //    CreatedBy = commonBo.UserName,
+                    //    CreatedOn = HymsonClock.Now(),
+                    //    UpdatedBy = commonBo.UserName,
+                    //    UpdatedOn = HymsonClock.Now()
+                    //};
+                    //manuSfcStepEntities.Add(manuSfcStepEntity);
+                    IsCreated = true;
+                }
+              
+                
                 manuSfcCirculationEntitys.Add(new ManuSfcCirculationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -191,8 +197,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
                 });
-                manuSfcStepEntities.Add(manuSfcStepEntity);
+               
             }
+   
             return responseBo;
 
         }
@@ -204,7 +211,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="sfc"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        private ( ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo, ManuSfcProduceEntity sfcproduce, ManuSfcStepEntity sfcstep) CreateSFCProduceInfoFromCellSFC(PlanWorkOrderEntity planWorkOrderEntity, string sfc, long procedureId, JobRequestBo bo,decimal qty,SfcStatusEnum sfcStatus)
+        private ( ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo) CreateSFCProduceInfoFromCellSFC(PlanWorkOrderEntity planWorkOrderEntity, string sfc, long procedureId, JobRequestBo bo,decimal qty,SfcStatusEnum sfcStatus)
         {
 
             var manuSfcEntity = new ManuSfcEntity
@@ -232,45 +239,45 @@ namespace Hymson.MES.CoreServices.Services.Job
                 UpdatedBy = bo.UserName,
             };
 
-            var manuSfcProduceEntity = new ManuSfcProduceEntity
-            {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = bo.SiteId,
-                SFC = sfc,
-                SFCId = manuSfcEntity.Id,
-                ProductId = planWorkOrderEntity.ProductId,
-                WorkOrderId = planWorkOrderEntity.Id,
-                BarCodeInfoId = manuSfcEntity.Id,
-                ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
-                WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                ProductBOMId = planWorkOrderEntity.ProductBOMId,
-                EquipmentId = bo.EquipmentId,
-                Qty = qty,
-                ProcedureId = procedureId,
-                Status = sfcStatus,
-                RepeatedCount = 0,
-                IsScrap = TrueOrFalseEnum.No,
-                CreatedBy = bo.UserName,
-                UpdatedBy = bo.UserName
-            };
+            //var manuSfcProduceEntity = new ManuSfcProduceEntity
+            //{
+            //    Id = IdGenProvider.Instance.CreateId(),
+            //    SiteId = bo.SiteId,
+            //    SFC = sfc,
+            //    SFCId = manuSfcEntity.Id,
+            //    ProductId = planWorkOrderEntity.ProductId,
+            //    WorkOrderId = planWorkOrderEntity.Id,
+            //    BarCodeInfoId = manuSfcEntity.Id,
+            //    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+            //    WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+            //    ProductBOMId = planWorkOrderEntity.ProductBOMId,
+            //    EquipmentId = bo.EquipmentId,
+            //    Qty = qty,
+            //    ProcedureId = procedureId,
+            //    Status = sfcStatus,
+            //    RepeatedCount = 0,
+            //    IsScrap = TrueOrFalseEnum.No,
+            //    CreatedBy = bo.UserName,
+            //    UpdatedBy = bo.UserName
+            //};
 
-            var manuSfcStepEntity = new ManuSfcStepEntity
-            {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = bo.SiteId,
-                SFC = sfc,
-                ProductId = planWorkOrderEntity.ProductId,
-                WorkOrderId = planWorkOrderEntity.Id,
-                ProductBOMId = planWorkOrderEntity.ProductBOMId,
-                WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                Qty = qty,
-                ProcedureId = procedureId,
-                Operatetype = ManuSfcStepTypeEnum.Create,
-                CurrentStatus = SfcStatusEnum.lineUp,
-                CreatedBy = bo.UserName,
-                UpdatedBy = bo.UserName
-            };
-            return (manuSfcEntity, manuSfcInfoEntity, manuSfcProduceEntity, manuSfcStepEntity);
+            //var manuSfcStepEntity = new ManuSfcStepEntity
+            //{
+            //    Id = IdGenProvider.Instance.CreateId(),
+            //    SiteId = bo.SiteId,
+            //    SFC = sfc,
+            //    ProductId = planWorkOrderEntity.ProductId,
+            //    WorkOrderId = planWorkOrderEntity.Id,
+            //    ProductBOMId = planWorkOrderEntity.ProductBOMId,
+            //    WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+            //    Qty = qty,
+            //    ProcedureId = procedureId,
+            //    Operatetype = ManuSfcStepTypeEnum.Create,
+            //    CurrentStatus = SfcStatusEnum.lineUp,
+            //    CreatedBy = bo.UserName,
+            //    UpdatedBy = bo.UserName
+            //};
+            return (manuSfcEntity, manuSfcInfoEntity);
         }
 
 

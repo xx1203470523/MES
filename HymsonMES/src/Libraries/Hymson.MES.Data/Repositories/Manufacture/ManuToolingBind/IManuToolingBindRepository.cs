@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuToolingBind.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -86,6 +87,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuToolingBindEntity>> GetPagedListAsync(ManuToolingBindPagedQuery pagedQuery);
+
+        /// <summary>
+        /// 工装解绑
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UnBindToolingAsync(UnBindToolingCommand command);
 
     }
 }

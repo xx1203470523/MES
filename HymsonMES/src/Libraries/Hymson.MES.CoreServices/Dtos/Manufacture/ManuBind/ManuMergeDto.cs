@@ -6,11 +6,20 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind
 {
-    public class ManuMergeDto
+    
+    /// <summary>
+    /// 条码合并
+    /// </summary>
+    public class ManuMergeRequestDto
     {
+        /// <summary>
+        /// 要合并的条码集合
+        /// </summary>
         public IEnumerable<string> Barcodes { get; set; }
+        /// <summary>
+        /// 站点Id
+        /// </summary>
         public long SiteId { get; set; }
-        public long ProcedureId { get; set; }
-        public string TargetSFC { get; set; }
+       
     }
 }

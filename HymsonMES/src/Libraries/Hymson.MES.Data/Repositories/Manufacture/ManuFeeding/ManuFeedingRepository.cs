@@ -279,7 +279,37 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     /// </summary>
     public partial class ManuFeedingRepository
     {
+#if DM
+        const string InsertSql = "MERGE INTO manu_feeding t " +
+            "USING (SELECT :Id AS Id, :ResourceId AS ResourceId, :FeedingPointId AS FeedingPointId, :ProductId AS ProductId, :SupplierId AS SupplierId, :BarCode AS BarCode, :MaterialId AS MaterialId, :InitQty AS InitQty, :Qty AS Qty, :MaterialType AS MaterialType, :CreatedBy AS CreatedBy, :CreatedOn AS CreatedOn, :UpdatedBy AS UpdatedBy, :UpdatedOn AS UpdatedOn, :IsDeleted AS IsDeleted, :SiteId AS SiteId, :WorkOrderId AS WorkOrderId, :LoadSource AS LoadSource FROM dual) s " +
+            "ON (t.Id = s.Id) " +
+            "WHEN MATCHED THEN " +
+              "UPDATE SET " +
+                "t.ResourceId = s.ResourceId, " +
+                "t.FeedingPointId = s.FeedingPointId, " +
+                "t.ProductId = s.ProductId, " +
+                "t.SupplierId = s.SupplierId, " +
+                "t.BarCode = s.BarCode, " +
+                "t.MaterialId = s.MaterialId, " +
+                "t.InitQty = s.InitQty, " +
+                "t.Qty = s.Qty, " +
+                "t.MaterialType = s.MaterialType, " +
+                "t.CreatedBy = s.CreatedBy, " +
+                "t.CreatedOn = s.CreatedOn, " +
+                "t.UpdatedBy = s.UpdatedBy, " +
+                "t.UpdatedOn = s.UpdatedOn, " +
+                "t.IsDeleted = s.IsDeleted, " +
+                "t.SiteId = s.SiteId, " +
+                "t.WorkOrderId = s.WorkOrderId, " +
+                "t.LoadSource = s.LoadSource " +
+            "WHEN NOT MATCHED THEN " +
+              "INSERT (Id, ResourceId, FeedingPointId, ProductId, SupplierId, BarCode, MaterialId, InitQty, Qty, MaterialType, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId, WorkOrderId, LoadSource) " +
+              "VALUES (s.Id, s.ResourceId, s.FeedingPointId, s.ProductId, s.SupplierId, s.BarCode, s.MaterialId, s.InitQty, s.Qty, s.MaterialType, s.CreatedBy, s.CreatedOn, s.UpdatedBy, s.UpdatedOn, s.IsDeleted, s.SiteId, s.WorkOrderId, s.LoadSource);";
+#else
         const string InsertSql = "REPLACE INTO `manu_feeding`(`Id`, `ResourceId`, `FeedingPointId`, `ProductId`, SupplierId, `BarCode`, MaterialId, `InitQty`, `Qty`,`MaterialType`,  `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkOrderId, LoadSource) VALUES (@Id, @ResourceId, @FeedingPointId, @ProductId, @SupplierId, @BarCode, @MaterialId, @InitQty, @Qty,@MaterialType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId, @LoadSource)  ";
+#endif
+
+
         const string UpdateQtyByIdSql = "UPDATE manu_feeding SET Qty = (CASE WHEN @Qty > Qty THEN 0 ELSE Qty - @Qty END), UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Qty > 0 AND Id = @Id; ";
         const string DeleteSql = "UPDATE manu_feeding SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string DeleteByIds = "DELETE FROM manu_feeding WHERE Id IN @ids; ";

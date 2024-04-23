@@ -206,6 +206,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuDowngradingRuleEntity>(GetByCodeSql, query);
         }
+        public async Task<IEnumerable<ManuDowngradingRuleEntity>> GetByCodesAsync(ManuDowngradingRuleCodesQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuDowngradingRuleEntity>(GetByCodesSql, query);
+        }
 
         /// <summary>
         /// 批量更新序号
@@ -249,6 +254,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetMaxSerialNumberSql = @"SELECT * FROM `manu_downgrading_rule`  WHERE SiteId =@SiteId AND IsDeleted=0 ORDER BY SerialNumber DESC ";
         const string GetByCodeSql = @"SELECT * 
                             FROM `manu_downgrading_rule`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
+        const string GetByCodesSql = @"SELECT * 
+                            FROM `manu_downgrading_rule`  WHERE Code IN @Codes AND IsDeleted=0 AND SiteId=@SiteId ";
         const string UpdateSerialNumbersSql = @"UPDATE `manu_downgrading_rule` SET  SerialNumber = @SerialNumber, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
     }
 }

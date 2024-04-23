@@ -948,7 +948,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
         }
-
+       
+        public async Task<int> UpdateSFCByIdAsync(UpdateManuSfcProduceSFCByIdCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSFCByIdSql, command);
+        }
         /// <summary>
         /// 部分报废 修改数量
         /// </summary>
@@ -1034,8 +1039,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeleteSfcProduceBusinessByIdSql = "DELETE FROM manu_sfc_produce_business WHERE Id in @Ids";
         const string DeleteSfcProduceBusinessBySfcInfoIdsSql = "DELETE FROM manu_sfc_produce_business WHERE SiteId = @SiteId AND SfcProduceId IN @SfcInfoIds";
         const string RealDeletesSfcProduceBusinessSql = "DELETE FROM manu_sfc_produce_business WHERE SfcProduceId IN @SfcInfoIds AND BusinessType=@BusinessType";
+#if DM
+
+        const string InsertOrUpdateSfcProduceBusinessSql = @"MERGE INTO manu_sfc_produce_business AS targetTable USING((SELECT @SfcProduceId,@BusinessType) AS sourceTable(SfcProduceId,BusinessType))  ON(targetTable.SfcProduceId=sourceTable.SfcProduceId AND targetTable.BusinessType=sourceTable.BusinessType) WHEN MATCHED THEN UPDATE SET BusinessContent = @BusinessContent,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted
+ WHEN NOT MATCHED THEN INSERT (  `Id`, `SiteId`, `SfcProduceId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcProduceId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted ); ";
+#else
         const string InsertOrUpdateSfcProduceBusinessSql = @"INSERT INTO `manu_sfc_produce_business`(  `Id`, `SiteId`, `SfcProduceId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcProduceId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted ) ON DUPLICATE KEY UPDATE
                                                              BusinessContent = @BusinessContent,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  ";
+#endif
         //质量锁定sql
         const string UpdateQualityLockSql = "update  manu_sfc_produce set `Lock`=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs  and SiteId=@SiteId ";
         const string UpdateIsScrapSql = "UPDATE `manu_sfc_produce` SET IsScrap = @IsScrap, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId and IsScrap =@CurrentIsScrap  ";
@@ -1063,7 +1074,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateStatusAndQtyBySfcsSql = @"UPDATE `manu_sfc_produce` SET Status = @Status, Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND SFC IN @SFCs ";
         const string UpdateQtyByIdSql = @"UPDATE `manu_sfc_produce` SET  Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
         const string PartialScrapManuSfcProduceByIdSql = @"UPDATE `manu_sfc_produce` SET  Qty = @Qty , ScrapQty = @ScrapQty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
-
+        const string UpdateSFCByIdSql = @"UPDATE `manu_sfc_produce` SET  SFC = @SFC ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
         #region 顷刻
 
         /// <summary>

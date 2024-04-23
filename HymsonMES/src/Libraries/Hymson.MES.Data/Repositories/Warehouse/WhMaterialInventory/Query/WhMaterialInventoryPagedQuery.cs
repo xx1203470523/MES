@@ -7,11 +7,6 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
 {
@@ -23,7 +18,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// <summary>
         /// 批次
         /// </summary>
-        public string? Batch { get; set; }
+        public decimal? Batch { get; set; } = 0;
         /// <summary>
         /// 物料条码
         /// </summary>

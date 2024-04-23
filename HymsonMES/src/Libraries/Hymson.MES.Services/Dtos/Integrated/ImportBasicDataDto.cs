@@ -298,7 +298,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 批次大小(去工作重心表中匹配)
         /// </summary>
         [EpplusTableColumn(Header = "批次大小(必填)", Order = 4)]
-        public int Batch { get; set; }
+        public decimal? Batch { get; set; } = 0;
 
         /// <summary>
         /// 采购类型
@@ -370,7 +370,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 验证掩码组
         /// </summary>
         [EpplusTableColumn(Header = "验证掩码组", Order = 16)]
-        public string? ValidationMaskGroup { get; set; }
+        public string? MaskCode { get; set; }
     }
 
     public record class ImportMaterialGroupDto : BaseExcelDto

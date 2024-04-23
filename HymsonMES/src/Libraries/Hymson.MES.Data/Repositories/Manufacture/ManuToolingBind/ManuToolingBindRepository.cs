@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuToolingBind.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Microsoft.Extensions.Options;
 
@@ -79,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,12 +102,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuToolingBindEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuToolingBindEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuToolingBindEntity>(GetByIdsSql, new { Ids = ids });
         }
-        
+
         /// <summary>
         /// 查询单个实体
         /// </summary>
@@ -179,6 +180,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return new PagedInfo<ManuToolingBindEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 工装解绑
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UnBindToolingAsync(UnBindToolingCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UnBindToolingSql, command);
+        }
+
     }
 
 
@@ -204,5 +216,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT * FROM manu_tooling_bind WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_tooling_bind WHERE Id IN @Ids ";
 
+        const string UnBindToolingSql = "UPDATE manu_tooling_bind SET Status = 0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND ToolingCode = @ToolingCode AND IsDeleted = 0 AND Status = 1";
     }
 }

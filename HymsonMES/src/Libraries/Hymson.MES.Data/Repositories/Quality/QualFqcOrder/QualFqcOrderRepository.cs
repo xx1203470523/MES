@@ -97,6 +97,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 依检验单查询
+        /// </summary>
+        /// <param name="inspectionOrder"></param>
+        /// <returns></returns>
+        public async Task<QualFqcOrderEntity> GetByInspectionOrderAsync(string inspectionOrder)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<QualFqcOrderEntity>(GetByCodeSql, new { InspectionOrder = inspectionOrder });
+        }
+
+        /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
@@ -105,6 +116,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcOrderEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        public async Task<IEnumerable<QualFqcOrderEntity>> GetByIdsAsync(IEnumerable<long> Ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualFqcOrderEntity>(GetByIdsSql, new { Ids});
         }
 
         /// <summary>
@@ -116,6 +133,18 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if(query.WorkOrderId != null)
+            {
+                sqlBuilder.Where("WorkOrderId = @WorkOrderId");
+            }
+
+            sqlBuilder.AddParameters(query);
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualFqcOrderEntity>(template.RawSql, query);
         }
@@ -181,6 +210,8 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string DeletesSql = "UPDATE qual_fqc_order SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM qual_fqc_order WHERE Id = @Id ";
+        const string GetByCodeSql = @"SELECT * FROM qual_fqc_order WHERE IsDeleted=0 AND InspectionOrder = @InspectionOrder ";
+
         const string GetByIdsSql = @"SELECT * FROM qual_fqc_order WHERE Id IN @Ids ";
 
     }

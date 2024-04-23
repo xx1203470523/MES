@@ -403,7 +403,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             SupplierId = 0,//自制品 没有
                             MaterialId = sfcProduceEntity.ProductId,
                             MaterialBarCode = sfcProduceEntity.SFC,
-                            Batch = "",//自制品 没有
+                            //Batch = "",//自制品 没有
                             MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                             QuantityResidue = sfcProduceEntity.Qty,
                             Status = WhMaterialInventoryStatusEnum.ToBeUsed,
@@ -423,7 +423,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             MaterialName = productEntity.MaterialName,
                             MaterialVersion = productEntity.Version ?? "",
                             MaterialBarCode = sfcProduceEntity.SFC,
-                            Batch = "",//自制品 没有
+                            //Batch = "",//自制品 没有
                             Quantity = sfcProduceEntity.Qty,
                             Unit = productEntity.Unit ?? "",
                             Type = WhMaterialInventoryTypeEnum.ManuComplete,
@@ -756,7 +756,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             SupplierId = 0,//自制品 没有
                             MaterialId = sfcProduceEntity.ProductId,
                             MaterialBarCode = sfcProduceEntity.SFC,
-                            Batch = "",//自制品 没有
+                            //Batch = "",//自制品 没有
                             MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                             QuantityResidue = sfcProduceEntity.Qty,
                             Status = WhMaterialInventoryStatusEnum.ToBeUsed,
@@ -776,7 +776,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             MaterialName = productEntity.MaterialName,
                             MaterialVersion = productEntity.Version ?? "",
                             MaterialBarCode = sfcProduceEntity.SFC,
-                            Batch = "",//自制品 没有
+                            //Batch = "",//自制品 没有
                             Quantity = sfcProduceEntity.Qty,
                             Unit = productEntity.Unit ?? "",
                             Type = WhMaterialInventoryTypeEnum.ManuComplete,
@@ -1348,7 +1348,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         MaterialName = productEntity.MaterialName,
                         MaterialVersion = productEntity.Version ?? "",
                         MaterialBarCode = sfcEntity.SFC,
-                        Batch = "",//自制品 没有
+                        //Batch = "",//自制品 没有
                         Quantity = 0,
                         Unit = productEntity.Unit ?? "",
                         Type = WhMaterialInventoryTypeEnum.Detachment,
@@ -1872,7 +1872,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ProcessRouteId = workOrderEntity.ProcessRouteId,
                         WorkCenterId = workOrderEntity.WorkCenterId ?? 0,
                         ProductBOMId = workOrderEntity.ProductBOMId,
-                        Qty = productEntity.Batch,
+                        Qty = productEntity.Batch ?? 0,
                         ProcedureId = dto.ReworkProcedureId ?? 0,
                         Status = SfcStatusEnum.lineUp,
                         RepeatedCount = 0,
@@ -2222,7 +2222,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     WorkCenterId = workOrderEntity.WorkCenterId ?? 0,
                     ProcessRouteId = workOrderEntity.ProcessRouteId,
                     ProductBOMId = workOrderEntity.ProductBOMId,
-                    Qty = productEntity.Batch,
+                    Qty = productEntity.Batch ?? 0,
                     ProcedureId = routeProcedureDto.ProcedureId,
                     Status = SfcStatusEnum.lineUp,
                     RepeatedCount = 0,

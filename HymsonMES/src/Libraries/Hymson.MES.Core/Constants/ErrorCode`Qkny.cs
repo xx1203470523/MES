@@ -93,6 +93,10 @@ namespace Hymson.MES.Core.Constants
         /// 上料点没有维护对应的资源或者维护多个资源
         /// </summary>
         public const string MES45040 = "上料点没有维护对应的资源或者维护多个资源";
+        /// <summary>
+        /// 工装未绑定条码
+        /// </summary>
+        public const string MES45041 = "工装未绑定条码";
         #endregion
 
         #region 配方
@@ -336,8 +340,8 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 物料条码格式错误
         /// </summary>
-        public const string MES45231 = "物料条码【{BarCode}】格式错误，必须为英文逗号分隔的五段码";
-        public const string MES45232 = "物料条码【{BarCode}】格式错误，第4段内容必须是数字且大于0";
+        public const string MES45231 = "物料条码【{BarCode}】格式错误，必须为英文逗号分隔的6段码";
+        public const string MES45232 = "物料条码【{BarCode}】格式错误，第5段内容必须是数字且大于0";
         public const string MES45233 = "物料【{MaterialCode}】基础信息不存在";
 
         #endregion

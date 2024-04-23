@@ -1162,7 +1162,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             SupplierId = 0,//自制品 没有
                             MaterialId = manuSfcProduceEntity.ProductId,
                             MaterialBarCode = manuSfcProduceEntity.SFC,
-                            Batch = "",//自制品 没有
+                            //Batch = "",//自制品 没有
                             MaterialType = planWorkOrderEntity.ProductId == procMaterialEntity.Id ? MaterialInventoryMaterialTypeEnum.FinishedParts : MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                             QuantityResidue = manuSfcProduceEntity.Qty,
                             Status = WhMaterialInventoryStatusEnum.ToBeUsed,

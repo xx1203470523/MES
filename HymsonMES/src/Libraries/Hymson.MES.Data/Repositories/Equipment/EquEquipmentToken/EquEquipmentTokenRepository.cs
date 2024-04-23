@@ -167,9 +167,15 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetEquEquipmentTokenEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `equ_equipment_token` /**where**/  ";
+#if DM
+        const string InsertSql = "MERGE INTO equ_equipment_token AS targetTable USING((SELECT @Id) AS sourceTable(Id))  ON(targetTable.Id=sourceTable.Id ) WHEN MATCHED THEN UPDATE SET UpdatedOn=@UpdatedOn  WHEN NOT MATCHED THEN INSERT (  `Id`, `EquipmentId`,  `Token`, `ExpirationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @EquipmentId,   @Token, @ExpirationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId );";
+        const string InsertsSql = "MERGE INTO equ_equipment_token AS targetTable USING((SELECT @Id) AS sourceTable(Id))  ON(targetTable.Id=sourceTable.Id ) WHEN MATCHED THEN UPDATE SET UpdatedOn=@UpdatedOn  WHEN NOT MATCHED THEN INSERT (  `Id`, `EquipmentId`,  `Token`, `ExpirationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @EquipmentId,   @Token, @ExpirationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId );";
 
+#else
         const string InsertSql = "INSERT INTO `equ_equipment_token`(  `Id`, `EquipmentId`,  `Token`, `ExpirationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @EquipmentId,   @Token, @ExpirationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ON DUPLICATE KEY UPDATE UpdatedOn=@UpdatedOn";
         const string InsertsSql = "INSERT INTO `equ_equipment_token`(  `Id`, `EquipmentId`,   `Token`, `ExpirationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @EquipmentId,  @Token, @ExpirationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ON DUPLICATE KEY UPDATE UpdatedOn=@UpdatedOn";
+
+#endif
 
         const string UpdateSql = "UPDATE `equ_equipment_token` SET   EquipmentId = @EquipmentId,   Token = @Token, ExpirationTime = @ExpirationTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `equ_equipment_token` SET   EquipmentId = @EquipmentId,   Token = @Token, ExpirationTime = @ExpirationTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
@@ -187,6 +193,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetByEquipmentIdSql = @"SELECT  
                                `Id`, `EquipmentId`,  `Token`, `ExpirationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `equ_equipment_token`  WHERE IsDeleted=0 AND EquipmentId = @EquipmentId ";
-        #endregion
+#endregion
     }
 }

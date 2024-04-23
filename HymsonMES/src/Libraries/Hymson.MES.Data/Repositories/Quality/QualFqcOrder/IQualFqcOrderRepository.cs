@@ -58,13 +58,23 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualFqcOrderEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 依检验单查询
+        /// </summary>
+        /// <param name="inspectionOrder"></param>
+        /// <returns></returns>
+        Task<QualFqcOrderEntity> GetByInspectionOrderAsync(string inspectionOrder);
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<QualFqcOrderEntity>> GetByIdsAsync(long[] ids);
+
+
+        Task<IEnumerable<QualFqcOrderEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List

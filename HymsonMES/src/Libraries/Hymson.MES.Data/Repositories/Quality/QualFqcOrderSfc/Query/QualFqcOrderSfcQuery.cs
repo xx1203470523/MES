@@ -16,6 +16,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public string? BarCode { get; set; }
 
         /// <summary>
+        /// 批量条码
+        /// </summary>
+        public IEnumerable<string>? BarCodes { get; set; }
+
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }

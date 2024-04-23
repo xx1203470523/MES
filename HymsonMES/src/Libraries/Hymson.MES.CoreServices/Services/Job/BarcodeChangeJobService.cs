@@ -64,7 +64,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
         public BarcodeChangeJobService(IManuCommonService manuCommonService
-            ,IMasterDataService manuService
+            , IMasterDataService manuService
             , IPlanWorkOrderRepository planWorkOrderRepository
             , ILocalizationService localizationService
             , IWhMaterialInventoryRepository whMaterialInventoryRepository
@@ -106,20 +106,20 @@ namespace Hymson.MES.CoreServices.Services.Job
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             if (param is not JobRequestBo commonBo) return default;
-            if(!commonBo.InStationRequestBos.Any()|| commonBo.InStationRequestBos==null) return default;
+            if (!commonBo.InStationRequestBos.Any() || commonBo.InStationRequestBos == null) return default;
 
             var planWorkOrderBindEntity = await _planWorkOrderBindRepository.GetByResourceIDAsync(new PlanWorkOrderBindByResourceIdQuery
             {
                 SiteId = commonBo.SiteId,
                 ResourceId = commonBo.ResourceId
             });
-      
+
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(planWorkOrderBindEntity.WorkOrderId);
             BarcodeChangeResponse responseBo = new();
             var manusfcs = new List<ManuSfcEntity>();
-            var sfcinfos = new List<ManuSfcInfoEntity>() ;
+            var sfcinfos = new List<ManuSfcInfoEntity>();
             var sfcproduces = new List<ManuSfcProduceEntity>();
-            var manuSfcStepEntities =  new List<ManuSfcStepEntity>();
+            var manuSfcStepEntities = new List<ManuSfcStepEntity>();
             var PhysicalDeleteSFCProduceByIdsCommands = new List<PhysicalDeleteSFCProduceByIdsCommand>();
             var MultiSFCUpdateStatusCommands = new List<MultiSFCUpdateStatusCommand>();
             var manuSfcCirculationEntitys = new List<ManuSfcCirculationEntity>();
@@ -137,19 +137,19 @@ namespace Hymson.MES.CoreServices.Services.Job
                 decimal qty = 0;
 
                 var materialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
-                qty = materialEntity.Batch;
+                qty = materialEntity.Batch ?? 0;
                 var now = HymsonClock.Now();
                 //如果在制已经生成 跳过该条码的数据组装
-                var sfcProduceEntity =  await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
+                var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
                 {
                     Sfc = bo.SFC,
                     SiteId = commonBo.SiteId
                 });
                 if (sfcProduceEntity != null)
                     continue;
-                 
+
                 //生成在制记录
-                
+
                 (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo, ManuSfcProduceEntity sfcproduce, ManuSfcStepEntity? sfcstep) cellsfc = new();
                 cellsfc = CreateSFCProduceInfoFromCellSFC(planWorkOrderEntity, bo.SFC, commonBo.ProcedureId, commonBo, qty, SfcStatusEnum.lineUp);
                 manusfcs.Add(cellsfc.manusfc);
@@ -260,7 +260,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             return responseBo;
 
         }
-     
+
         /// <summary>
         /// 通过外部电芯码生成在制记录
         /// </summary>
@@ -268,7 +268,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="sfc"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        private ( ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo, ManuSfcProduceEntity sfcproduce, ManuSfcStepEntity sfcstep) CreateSFCProduceInfoFromCellSFC(PlanWorkOrderEntity planWorkOrderEntity, string sfc, long procedureId, JobRequestBo bo,decimal qty,SfcStatusEnum sfcStatus)
+        private (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo, ManuSfcProduceEntity sfcproduce, ManuSfcStepEntity sfcstep) CreateSFCProduceInfoFromCellSFC(PlanWorkOrderEntity planWorkOrderEntity, string sfc, long procedureId, JobRequestBo bo, decimal qty, SfcStatusEnum sfcStatus)
         {
 
             var manuSfcEntity = new ManuSfcEntity
@@ -346,9 +346,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 return responseBo;
             }
             //条码接收的情况
-            if(data.PassDownQuantity>0)
+            if (data.PassDownQuantity > 0)
             {
-                var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+                var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(new UpdatePassDownQuantityCommand
                 {
                     WorkOrderId = data.WorkOrderId,
                     PlanQuantity = data.PlanQuantity,
@@ -363,13 +363,13 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             //生成在制相关信息
-            
+
             responseBo.Rows += await _manuSfcRepository.InsertRangeAsync(data.manusfcs);
 
             responseBo.Rows += await _manuSfcInfoRepository.InsertsAsync(data.sfcinfos);
             responseBo.Rows += await _manuSfcProduceRepository.InsertRangeAsync(data.sfcproduces);
             //生成流转记录
-            if(data.manuSfcCirculationEntitys!=null)
+            if (data.manuSfcCirculationEntitys != null)
                 responseBo.Rows += await _manuSfcCirculationRepository.InsertRangeAsync(data.manuSfcCirculationEntitys);
             responseBo.Rows += await _manuSfcStepRepository.InsertRangeAsync(data.manuSfcStepEntities);
 
@@ -425,13 +425,13 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
             foreach (var bo in commonBo.InStationRequestBos)
             {
-                if(productSetEntity == null)
+                if (productSetEntity == null)
                 {
                     //验证掩码规则
                     var isCodeRule = await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(bo.SFC, planWorkOrderEntity.ProductId);
                     if (!isCodeRule)
                     {
-                        
+
                         throw new CustomerValidationException(nameof(ErrorCode.MES19916)).WithData("SFC", bo.SFC);
                     }
                 }
@@ -443,8 +443,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                         throw new CustomerValidationException(nameof(ErrorCode.MES19916)).WithData("SFC", bo.SFC);
                     }
                 }
-               
-             
+
+
                 ////SourceSFC 为空 说明走的条码接收逻辑，没有在制信息
                 //if (!string.IsNullOrEmpty(bo.SourceSFC))
                 //{

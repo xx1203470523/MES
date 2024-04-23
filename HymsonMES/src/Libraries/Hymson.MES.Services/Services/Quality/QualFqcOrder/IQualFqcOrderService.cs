@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
+using Microsoft.AspNetCore.Mvc;
 using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
 
 namespace Hymson.MES.Services.Services.Quality
@@ -179,6 +180,20 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<FQCParameterDetailDto>> QueryDetailSamplePagedListAsync(FQCParameterDetailPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 不合格挑选查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<FqcSelectionView>> FqcSelectionPageQuery(FqcSelectionQueryDto query);
+
+        /// <summary>
+        /// 不合格挑选的处理
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<int> FqcSelectionUpdate( FqcSelectionUpdateDto updateDto);
 
     }
 }
