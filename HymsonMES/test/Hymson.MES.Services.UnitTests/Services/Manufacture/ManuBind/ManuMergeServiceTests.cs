@@ -56,7 +56,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind.Tests
                 SiteId = 39612349211041792,
                // ProcedureId = 12816809150152704,
                 //TargetSFC = "hahaha"
-            });
+            },"");
             result.Wait();
             */
             Assert.Fail();
