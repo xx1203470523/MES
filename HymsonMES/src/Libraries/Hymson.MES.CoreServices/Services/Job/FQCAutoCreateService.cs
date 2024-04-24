@@ -8,7 +8,6 @@ using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Quality;
 using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.Services.Common;
@@ -16,12 +15,7 @@ using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Mysqlx.Crud;
-using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
