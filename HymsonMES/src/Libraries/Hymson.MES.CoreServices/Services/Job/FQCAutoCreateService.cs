@@ -165,23 +165,47 @@ namespace Hymson.MES.CoreServices.Services.Job
                       ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", first.SFC);
                 if (string.IsNullOrEmpty(group.Key)) //电芯出站
                 {
-                    var recordEntitys = group.Select(g => new QualFinallyOutputRecordEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = commonBo.SiteId,
-                        MaterialId = sfcproduce.ProductId,
-                        WorkOrderId = sfcproduce.WorkOrderId,
-                        WorkCenterId = sfcproduce.WorkCenterId,
-                        Barcode = g.SFC,
-                        CodeType = FQCLotUnitEnum.EA,
-                        IsGenerated = TrueOrFalseEnum.No,
-                        CreatedBy = commonBo.UserName,
-                        CreatedOn = commonBo.Time,
-                        UpdatedBy = commonBo.UserName,
-                        UpdatedOn = commonBo.Time
-                    });
+                    //var recordEntitys = group.Select(g => new QualFinallyOutputRecordEntity
+                    //{
+                    //    Id = IdGenProvider.Instance.CreateId(),
+                    //    SiteId = commonBo.SiteId,
+                    //    MaterialId = sfcproduce.ProductId,
+                    //    WorkOrderId = sfcproduce.WorkOrderId,
+                    //    WorkCenterId = sfcproduce.WorkCenterId,
+                    //    Barcode = g.SFC,
+                    //    CodeType = FQCLotUnitEnum.EA,
+                    //    IsGenerated = TrueOrFalseEnum.No,
+                    //    CreatedBy = commonBo.UserName,
+                    //    CreatedOn = commonBo.Time,
+                    //    UpdatedBy = commonBo.UserName,
+                    //    UpdatedOn = commonBo.Time
+                    //});
 
-                    responseBo.QualFinallyOutputRecords.AddRange(recordEntitys);
+                    foreach(var item in commonBo.OutStationRequestBos)
+                    {
+                         sfcproduce = sfcProduceEntities.FirstOrDefault(s => s.SFC == item.SFC)
+                                                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", first.SFC);
+
+                        var recordEntitys = new QualFinallyOutputRecordEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = commonBo.SiteId,
+                            MaterialId = sfcproduce.ProductId,
+                            WorkOrderId = sfcproduce.WorkOrderId,
+                            WorkCenterId = sfcproduce.WorkCenterId,
+                            Barcode = item.SFC,
+                            CodeType = FQCLotUnitEnum.EA,
+                            IsGenerated = TrueOrFalseEnum.No,
+                            CreatedBy = commonBo.UserName,
+                            CreatedOn = commonBo.Time,
+                            UpdatedBy = commonBo.UserName,
+                            UpdatedOn = commonBo.Time
+                        };
+
+                        responseBo.QualFinallyOutputRecords.Add(recordEntitys);
+                    }
+
+                    
                 }
                 else //包装出站
                 {
@@ -259,7 +283,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     });
 
 
-                    if (fqcFromData != null)
+                    if (fqcFromData != null&& fqcFromData.Any())
                     {
                         fqcDataFromJob = fqcDataFromJob.Concat(fqcFromData);
                     }
@@ -270,7 +294,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                        var groupedOrders = fqcDataFromJob.GroupBy(order => new  { order.WorkOrderId,order.WorkCenterId });
                         foreach (var groupedOrder in groupedOrders)
                         {
-                            if (groupedOrder.Count() > lotsize)
+                            if (groupedOrder.Count() >= lotsize)
                             {
                                 var fqcevent = new FQCOrderAutoCreateIntegrationEvent
                                 {
@@ -292,7 +316,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         var groupedOrders = fqcDataFromJob.GroupBy(order => new { order.WorkOrderId });
                         foreach (var groupedOrder in groupedOrders)
                         {
-                            if (groupedOrder.Count() > lotsize)
+                            if (groupedOrder.Count() >= lotsize)
                             {
                                 var fqcevent = new FQCOrderAutoCreateIntegrationEvent
                                 {
@@ -312,7 +336,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         var groupedOrders = fqcDataFromJob.GroupBy(order => new  { order.WorkCenterId });
                         foreach (var groupedOrder in groupedOrders)
                         {
-                            if (groupedOrder.Count() > lotsize)
+                            if (groupedOrder.Count() >= lotsize)
                             {
                                 var fqcevent = new FQCOrderAutoCreateIntegrationEvent
                                 {
@@ -324,14 +348,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                                 responseBo.FQCOrderAutoCreateIntegrationEvents.Add(fqcevent);
                             }
                         }
-
                     }
-
 
                     //混线
                     if (!_isSameWorkOrder & !_isSameWorkCenter)
                     {
-                        if (fqcDataFromJob.Count() > lotsize)
+                        if (fqcDataFromJob.Count() >= lotsize)
                         {
                             var fqcevent = new FQCOrderAutoCreateIntegrationEvent
                             {
@@ -342,70 +364,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                             responseBo.FQCOrderAutoCreateIntegrationEvents.Add(fqcevent);
                         }
-                    }
-
-                    //判断容量是否生成
-                    //if ((currentMaterial.Count() + item.Count) >= lotsize)
-                    //{
-                    //    var fqcFromData = waitSendRecordList.Select(q => new FQCOrderAutoCreateIntegration
-                    //    {
-                    //        Barcode = q.Barcode,
-                    //        CodeType = q.CodeType,
-                    //        Id = q.Id,
-                    //        MaterialId = q.MaterialId,
-                    //        Remark = q.Remark,
-                    //        WorkCenterId = q.WorkCenterId,
-                    //        WorkOrderId = q.WorkOrderId,
-                    //    });
-
-                    //    var fqcDataFromJob = responseBo.QualFinallyOutputRecords.Select(q => new FQCOrderAutoCreateIntegration
-                    //    {
-                    //        Barcode = q.Barcode,
-                    //        CodeType = q.CodeType,
-                    //        Id = q.Id,
-                    //        MaterialId = q.MaterialId,
-                    //        Remark = q.Remark,
-                    //        WorkCenterId = q.WorkCenterId,
-                    //        WorkOrderId = q.WorkOrderId,
-                    //    });
-
-
-                    //    if (fqcFromData != null)
-                    //    {
-                    //        fqcDataFromJob = fqcDataFromJob.Concat(fqcFromData);
-                    //    }
-
-                    //    //同工单校验
-                    //    if (_isSameWorkOrder)
-                    //    {
-                    //        //是否存在具有不同 WorkOrderId 的元素
-                    //        bool hasDiffWorkOrderId = fqcDataFromJob.Select(order => order.WorkOrderId)
-                    //                                                .GroupBy(id => id)
-                    //                                                .Any(group => group.Count() > 1);
-                    //        if (hasDiffWorkOrderId) continue;
-
-                    //    }
-
-                    //    //同产线校验
-                    //    if (_isSameWorkCenter)
-                    //    {
-                    //        //是否存在具有不同 WorkCenterId 的元素
-                    //        bool hasDiffWorkCenterId = fqcDataFromJob.Select(order => order.WorkCenterId)
-                    //                                                .GroupBy(id => id)
-                    //                                                .Any(group => group.Count() > 1);
-                    //        if (hasDiffWorkCenterId) continue;
-
-                    //    }
-
-                    //var fqcevent = new FQCOrderAutoCreateIntegrationEvent
-                    //{
-                    //    SiteId = commonBo.SiteId,
-                    //    UserName = commonBo.UserName,
-                    //    RecordDetails = fqcDataFromJob,
-                    //};
-
-                    //responseBo.FQCOrderAutoCreateIntegrationEvents.Add(fqcevent);
-                    //}
+                    }                    
 
                 }
 
