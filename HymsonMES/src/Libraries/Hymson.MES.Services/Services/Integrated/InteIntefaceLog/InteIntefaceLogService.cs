@@ -1,6 +1,4 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Authentication;
-using Hymson.Infrastructure;
+﻿using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Elasticsearch;
 using Hymson.Infrastructure.Enums;
@@ -12,31 +10,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
     public class InteIntefaceLogService : IInteIntefaceLogService
     {
         /// <summary>
-        /// 当前用户
-        /// </summary>
-        private readonly ICurrentUser _currentUser;
-        /// <summary>
-        /// 当前站点
-        /// </summary>
-        private readonly ICurrentSite _currentSite;
-
-        /// <summary>
         /// ES日志查询
         /// </summary>
         private readonly ILogDataService _logDataService;
 
         /// <summary>
-        /// 获取TOKEN Info
-        /// </summary>
-        private readonly IInteSystemTokenService _inteSystemTokenService;
-
-        /// <summary>
-        public InteIntefaceLogService(ICurrentUser currentUser, ICurrentSite currentSite, ILogDataService logDataService, IInteSystemTokenService inteSystemTokenService)
+        public InteIntefaceLogService(ILogDataService logDataService)
         {
-            _currentUser = currentUser;
-            _currentSite = currentSite;
             _logDataService = logDataService;
-            _inteSystemTokenService = inteSystemTokenService;
         }
 
         /// <summary>
