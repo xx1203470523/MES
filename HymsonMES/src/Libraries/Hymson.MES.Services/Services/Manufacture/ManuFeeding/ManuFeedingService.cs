@@ -631,17 +631,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var entities = await _manuFeedingRepository.GetByIdsAsync(idsArr);
             if (!entities.Any()) return 0;
 
-            var feeds = await _manuFeedingRepository.GetByIdsAsync(idsArr);
-
             // 查询条码
-            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesOfHasQtyAsync(new WhMaterialInventoryBarCodesQuery
+            var inventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
-                BarCodes = feeds.Select(s => s.BarCode),
+                BarCodes = entities.Select(s => s.BarCode),
                 SiteId = _currentSite.SiteId ?? 0
             });
 
             // 查询物料
-            var materials = await _procMaterialRepository.GetByIdsAsync(feeds.Select(s => s.ProductId).ToArray());
+            var materials = await _procMaterialRepository.GetByIdsAsync(entities.Select(s => s.ProductId));
 
             var now = HymsonClock.Now();
             List<WhMaterialStandingbookEntity> whMaterialStandingbookEntities = new();
