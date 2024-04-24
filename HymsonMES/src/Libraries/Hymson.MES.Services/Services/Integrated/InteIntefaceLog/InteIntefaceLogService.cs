@@ -11,7 +11,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 {
     public class InteIntefaceLogService : IInteIntefaceLogService
     {
-
         /// <summary>
         /// 当前用户
         /// </summary>
@@ -58,10 +57,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             {
                 queryType = pagedQueryDto?.QueryType!.ToString();
             }
-            //if (pagedQueryDto.QueryType.HasValue)
-            //{
-            //    queryType = Enum.GetName(typeof(InterfaceLogQueryTyeEnum), pagedQueryDto?.QueryType!);
-            //}
+
             if (pagedQueryDto?.QueryType == InterfaceLogQueryTyeEnum.SystemLog)
             {
                 logDataPagedQuery.ServiceType = ServiceTypeEnum.MES;
