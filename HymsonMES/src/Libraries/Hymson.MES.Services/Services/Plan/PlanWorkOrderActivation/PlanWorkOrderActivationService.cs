@@ -559,8 +559,8 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
             return result;
         }
         wirebodyIds = wirebodyIds.Distinct();
-
-        var workCenterResourceRelationEntities = await _inteWorkCenterRepository.GetWorkCenterResourceRelationAsync(resourceIds);
+        long id = 0;
+        var workCenterResourceRelationEntities = await _inteWorkCenterRepository.GetWorkCenterResourceRelationAsync(resourceIds,id);
         var wirebodyEntities = await _inteWorkCenterRepository.GetByIdsAsync(wirebodyIds);
         result.EquipmentLines = wirebodyEntities.Select(m =>
         {
