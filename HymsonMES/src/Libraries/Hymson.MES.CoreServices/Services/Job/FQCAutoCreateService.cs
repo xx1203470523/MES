@@ -300,7 +300,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                                 {
                                     SiteId = commonBo.SiteId,
                                     UserName = commonBo.UserName,
-                                    RecordDetails = fqcDataFromJob,
+                                    RecordDetails = groupedOrder,
                                 };
 
                                 responseBo.FQCOrderAutoCreateIntegrationEvents.Add(fqcevent);
@@ -322,7 +322,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                                 {
                                     SiteId = commonBo.SiteId,
                                     UserName = commonBo.UserName,
-                                    RecordDetails = fqcDataFromJob,
+                                    RecordDetails = groupedOrder,
                                 };
 
                                 responseBo.FQCOrderAutoCreateIntegrationEvents.Add(fqcevent);
@@ -342,7 +342,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                                 {
                                     SiteId = commonBo.SiteId,
                                     UserName = commonBo.UserName,
-                                    RecordDetails = fqcDataFromJob,
+                                    RecordDetails = groupedOrder,
                                 };
 
                                 responseBo.FQCOrderAutoCreateIntegrationEvents.Add(fqcevent);
