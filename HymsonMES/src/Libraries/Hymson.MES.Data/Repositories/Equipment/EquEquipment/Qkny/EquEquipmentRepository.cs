@@ -111,6 +111,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             inner join inte_work_center_relation t8 on t8.SubWorkCenterId = t7.Id and t8.IsDeleted = 0
             inner join inte_work_center t9 on t9.Id = t8.WorkCenterId and t8.IsDeleted = 0
             where t1.EquipmentCode = @EquipmentCode
+            and t1.IsDeleted = 0
             and t3.ResCode = @ResCode
         ";
 
@@ -134,6 +135,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             inner join inte_work_center_relation t8 on t8.SubWorkCenterId = t7.Id and t8.IsDeleted = 0
             inner join inte_work_center t9 on t9.Id = t8.WorkCenterId and t8.IsDeleted = 0
             where t1.EquipmentCode in @EquipmentCodeList
+            and t1.IsDeleted = 0
             and t3.ResCode in @ResCodeList
         ";
 
@@ -147,6 +149,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0 and t2.IsMain = 1
             inner join proc_resource t3 on t3.Id = t2.ResourceId and t3.IsDeleted = 0
             where t1.EquipmentCode = @EquipmentCode
+            and t1.IsDeleted = 0
             and t3.ResCode = @ResCode
         ";
 
@@ -163,6 +166,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             inner join inte_work_center_resource_relation t6 on t6.ResourceId = t3.Id and t6.IsDeleted = 0
             inner join inte_work_center t7 on t7.Id = t6.WorkCenterId and t7.IsDeleted = 0  
             where t1.EquipmentCode = @EquipmentCode
+            and t1.IsDeleted = 0
             and t3.ResCode = @ResCode
         ";
 
@@ -180,6 +184,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             inner join proc_resource_type t4 on t4.Id = t3.ResTypeId and t4.IsDeleted = 0
             inner join proc_procedure t5 on t5.ResourceTypeId = t3.ResTypeId and t5.IsDeleted = 0
             where t1.EquipmentCode = @EquipmentCode
+            and t1.IsDeleted = 0
             and t3.ResCode = @ResCode
         ";
 
