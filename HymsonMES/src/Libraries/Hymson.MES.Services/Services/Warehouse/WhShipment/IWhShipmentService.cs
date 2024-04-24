@@ -63,6 +63,5 @@ namespace Hymson.MES.Services.Services.WhShipment
         /// <param name="whShipmentQueryDto"></param>
         /// <returns></returns>
         Task<IEnumerable<WhShipmentSupplierMaterialViewDto>> QueryShipmentSupplierMaterialAsync(WhShipmentQueryDto whShipmentQueryDto);
-
     }
 }

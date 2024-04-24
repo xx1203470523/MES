@@ -21,6 +21,7 @@ using Hymson.MES.Services.Dtos.WhShipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.WhShipment
@@ -294,8 +295,17 @@ namespace Hymson.MES.Services.Services.WhShipment
         /// <returns></returns>
         public async Task<IEnumerable<WhShipmentSupplierMaterialViewDto>> QueryShipmentSupplierMaterialAsync(WhShipmentQueryDto whShipmentQueryDto)
         {
+            var query = new WhShipmentQuery();
+            if (whShipmentQueryDto.Id != null) {
+                query.ShipmentId = whShipmentQueryDto.Id;
+            }
+
+            if (!string.IsNullOrWhiteSpace(whShipmentQueryDto.ShipmentNum)) {
+                query.ShipmentNumNoLike=whShipmentQueryDto.ShipmentNum;
+            }
+
             //获取出货单
-            var whShipmentEntity = await _whShipmentRepository.GetByIdAsync(whShipmentQueryDto.Id.GetValueOrDefault());
+            var whShipmentEntity = await _whShipmentRepository.GetEntityAsync(query);
             if (whShipmentEntity==null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17800));
@@ -305,7 +315,7 @@ namespace Hymson.MES.Services.Services.WhShipment
             var inteCustomEntity = await _inteCustomRepository.GetByIdAsync(whShipmentEntity.CustomerId);
 
             //获取出货详情
-            var whShipmentDetailEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { ShipmentId = whShipmentQueryDto.Id.GetValueOrDefault(),SiteId=_currentSite.SiteId??0 });
+            var whShipmentDetailEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { ShipmentId = whShipmentEntity.Id,SiteId=_currentSite.SiteId??0 });
             if (whShipmentDetailEntities == null || !whShipmentDetailEntities.Any()) {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17801));
             }
