@@ -108,6 +108,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 StartNumber = codeRule.StartNumber,
                 CodeMode = codeRule.CodeMode,
                 SiteId = param.SiteId,
+                Sfcs   =param.Sfcs,
+                ProductId = param.ProductId,
+                WorkOrderId = param.WorkOrderId,
+
             });
             var list = new List<string>();
             foreach (var barcode in barcodes)

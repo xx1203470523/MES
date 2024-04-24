@@ -37,4 +37,15 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query
         /// </summary>
         public List<string> ResCodeList { get; set; } = new List<string>();
     }
+
+    /// <summary>
+    /// 设备查询
+    /// </summary>
+    public class EquQuery
+    {
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+    }
 }

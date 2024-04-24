@@ -27,6 +27,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
+        /// 供应商仓储
+        /// </summary>
+        private readonly IWhSupplierRepository _whSupplierRepository;
+
+        /// <summary>
         /// 库存接收CoreService
         /// </summary>
         private readonly IWhMaterialInventoryCoreService _whMaterialInventoryCoreService;
@@ -41,15 +46,18 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
         /// </summary>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="procMaterialRepository"></param>
+        /// <param name="whSupplierRepository"></param>
         /// <param name="whMaterialInventoryCoreService"></param>
         /// <param name="equEquipmentService"></param>
         public WhMaterialInventoryService(IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IProcMaterialRepository procMaterialRepository,
+            IWhSupplierRepository whSupplierRepository,
             IWhMaterialInventoryCoreService whMaterialInventoryCoreService,
             IEquEquipmentService equEquipmentService)
         {
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _procMaterialRepository = procMaterialRepository;
+            _whSupplierRepository = whSupplierRepository;
             _whMaterialInventoryCoreService = whMaterialInventoryCoreService;
             _equEquipmentService = equEquipmentService;
         }
@@ -98,25 +106,27 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
             //获取设备基础信息
             var equResModel = await _equEquipmentService.GetEquResAsync(dto);
 
-            //原材料条码解析
+            //原材料条码解析（物料代码(6)，供应商代码(5)，生产批号/日期(8)，班次P01(3)，最小包装数量,最小包装流水号(P001B001)）
+            var barcodeSupplierDic = new Dictionary<string, string>();
             foreach (var item in dto.BarCodeList)
             {
                 if (item == null) continue;
                 if (!item.IsRawMaterial) continue;
 
                 var arr = item.BarCode.Trim().Split(',');
-                if (arr.Length != 5)
+                if (arr.Length != 6)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES45231)).WithData("BarCode", item.BarCode);
                 }
 
-                if (!decimal.TryParse(arr[3], out decimal qty) || qty <= 0)
+                if (!decimal.TryParse(arr[4], out decimal qty) || qty <= 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES45232)).WithData("BarCode", item.BarCode);
                 }
 
                 item.MaterialCode = arr[0];
                 item.Qty = qty;
+                barcodeSupplierDic.Add(item.BarCode, arr[1]);
             }
 
             //查询物料信息
@@ -131,6 +141,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45233)).WithData("MaterialCode", string.Join(',', noExistMaterialCodes));
             }
+            //查询供应商信息
+            var supplierCodes = await _whSupplierRepository.GetByCodesAsync(new WhSuppliersByCodeQuery
+            {
+                SiteId = equResModel.SiteId,
+                Codes = barcodeSupplierDic.Values.Distinct()
+            });
 
             await _whMaterialInventoryCoreService.MaterialInventoryAsync(new CoreServices.Bos.Manufacture.MaterialInventoryBo
             {
@@ -140,11 +156,10 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
                 BarCodeList = dto.BarCodeList.Select(x => new CoreServices.Bos.Manufacture.MaterialInventorySfcInfoBo
                 {
                     Source = Core.Enums.MaterialInventorySourceEnum.Equipment,
-                    MaterialId = materialEntities.First(x => x.MaterialCode == x.MaterialCode).Id,
+                    MaterialId = materialEntities.First(z => z.MaterialCode == x.MaterialCode).Id,
                     MaterialBarCode = x.BarCode,
                     QuantityResidue = x.Qty,
-                    //Batch = "",
-                    SupplierId = 0,
+                    SupplierId = supplierCodes.FirstOrDefault(s => s.Code == barcodeSupplierDic[x.BarCode])?.Id ?? 0,
                     Type = Core.Enums.WhMaterialInventoryTypeEnum.MaterialReceiving
                 })
             });

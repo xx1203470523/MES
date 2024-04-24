@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
@@ -150,5 +151,17 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
             return await _equEquipmentService.GetEquipmentVerifyByEquipmentIdAsync(equEquipmentId);
         }
 
+        /// <summary>
+        /// 批量生成token
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        [HttpPost("GenerateToken")]
+        [LogDescription("批量生成token", BusinessType.OTHER, "GenerateToken", ReceiverTypeEnum.MES)]
+        [AllowAnonymous]
+        public async Task<string> GenerateToken(long siteId)
+        {
+            return await _equEquipmentService.CreateEquTokenAsync(siteId);
+        }
     }
 }

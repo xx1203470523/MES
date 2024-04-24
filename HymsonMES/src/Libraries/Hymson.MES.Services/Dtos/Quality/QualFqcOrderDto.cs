@@ -738,6 +738,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 处置状态
+        /// </summary>
+        public string? HandMethodText { get; set; }
     }
 
     /// <summary>

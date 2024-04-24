@@ -55,5 +55,26 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <returns></returns>
         Task ImportMaterialDataAsync(IFormFile formFile);
+
+        /// <summary>
+        /// 参数数据导入
+        /// </summary>
+        /// <returns></returns>
+        Task ImportParameterDataAsync(IFormFile formFile);
+
+        /// <summary>
+        /// 下载物料导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task DownloadMaterialTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 下载参数导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task DownloadParameterTemplateAsync(Stream stream);
+
     }
 }

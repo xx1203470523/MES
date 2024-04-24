@@ -1,8 +1,12 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using Hymson.Authentication.JwtBearer;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
+using Hymson.Snowflake;
+using Hymson.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -116,5 +120,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
             }
             return list.ToList(); ;
         }
+
     }
 }

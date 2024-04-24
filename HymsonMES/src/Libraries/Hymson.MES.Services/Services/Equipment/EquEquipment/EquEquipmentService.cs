@@ -495,13 +495,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         {
             var equEquipmentEntity = await _equEquipmentRepository.GetByIdAsync(EquipmentId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES12604));
+            long siteId = 0;
             var equipmentModel = new EquipmentModel
             {
-                FactoryId = _currentSite.SiteId ?? 0,
+                FactoryId = _currentSite.SiteId ?? siteId,
                 Id = equEquipmentEntity.Id,
                 Name = equEquipmentEntity.EquipmentName,
                 Code = equEquipmentEntity.EquipmentCode,
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = _currentSite.SiteId ?? siteId,
             };
             var token = JwtHelper.GenerateJwtToken(equipmentModel, _jwtOptions);
 
@@ -529,7 +530,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedOn = HymsonClock.Now(),
-                    SiteId = _currentSite.SiteId ?? 0
+                    SiteId = _currentSite.SiteId ?? siteId
                 };
                 await _equEquipmentTokenRepository.InsertAsync(equEquipmentTokenEntity);
             }
@@ -577,6 +578,23 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             return verifyDtos;
         }
 
+        /// <summary>
+        /// 创建Token
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<string> CreateEquTokenAsync(long siteId)
+        {
+            EquQuery query = new EquQuery();
+            query.SiteId = siteId;
+            var equList = await _equEquipmentRepository.GetBySiteIdAsync(query);
+            foreach (var item in equList)
+            {
+                await GetEquEquipmentTokenAsync(item.Id);
+            }
+
+            return "Ok";
+        }
 
         #region 这里是供其他业务层调用的方法，个人觉得应该直接在其他业务层调用各业务仓储层
         /// <summary>

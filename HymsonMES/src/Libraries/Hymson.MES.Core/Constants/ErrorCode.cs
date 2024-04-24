@@ -466,6 +466,8 @@
         public const string MES11723 = "所选条码查不到数据,处置失败";
         public const string MES11724 = "未选择处置项";
 
+        public const string MES11725 = "无需要处置！";
+
 
 
 
@@ -555,6 +557,7 @@
         public const string MES12125 = "对应工作中心数据不存在.";
         public const string MES12126 = "存在已被关联产线,不允许重复关联!";
         public const string MES12127 = "新建状态的产线不能用于工作中心!";
+        public const string MES12128 = "存在已被其他产线关联的资源{ResourceCodes}！";
         #endregion
 
         #region 编码规则 12400
@@ -1145,7 +1148,7 @@
         public const string MES16205 = "通配符{value}未定义";
         public const string MES16206 = "流水号转换只实现了16,32进制";
         public const string MES16207 = "生成的序列号{BarCode}超过规则限制";
-        public const string MES16208 = "统配失败-统配编码{code},类型{type}查询不到值";
+        public const string MES16208 = "通配失败-通配编码{code},类型{type}查询不到值";
         public const string MES16209 = "线别必须维护自定义值，请查看【编码规则维护】";
         public const string MES16210 = "线别配置值【{Value}】异常，格式为【线体编码:设定值】，例如【L001:1;L002:2】，请查看【编码规则维护】";
         public const string MES16211 = "未上报线体信息";
