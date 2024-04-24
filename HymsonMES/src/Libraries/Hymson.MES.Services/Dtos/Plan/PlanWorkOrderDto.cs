@@ -562,7 +562,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 下达数量
         /// </summary>
-        public string PassDownQuantity { get; set; }
+        public decimal PassDownQuantity { get; set; }
 
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例
@@ -627,12 +627,12 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 投入数量
         /// </summary>
-        public string InputQty { get; set; }
+        public decimal InputQty { get; set; }
 
         /// <summary>
         /// 完工数量
         /// </summary>
-        public string FinishProductQuantity { get; set; }
+        public decimal FinishProductQuantity { get; set; }
 
         /// <summary>
         /// 实际开始时间

@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteVehicleFreight.Command;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
@@ -93,6 +94,24 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteVehiceFreightStackPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<InteVehicleFreightStackEntity>> GetPagedInfoAsync(InteVehiceFreightStackPagedQuery inteVehiceFreightStackPagedQuery);
+        #endregion
+
+        #region 顷刻
+
+        /// <summary>
+        /// 查询已绑定条码列表
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteVehicleFreightStackEntity>> GetBySfcListAsync(InteVehiceSfcListQuery query);
+
+        /// <summary>
+        /// 根据托盘id和条码进行删除
+        /// </summary>
+        /// <param name="commandList"></param>
+        /// <returns></returns>
+        Task<int> DeleteByVehiceBarCode(List<UpdateVehicleFreightStackCommand> commandList);
+
         #endregion
     }
 }

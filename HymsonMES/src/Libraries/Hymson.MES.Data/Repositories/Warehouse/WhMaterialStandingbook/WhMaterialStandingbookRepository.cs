@@ -83,10 +83,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.OrderBy(" CreatedOn DESC");
             sqlBuilder.Where("SiteId=@SiteId");
 
-            if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.Batch))
+            if (whMaterialStandingbookPagedQuery.Batch > 0)
             {
-                whMaterialStandingbookPagedQuery.Batch = $"%{whMaterialStandingbookPagedQuery.Batch}%";
-                sqlBuilder.Where("Batch like @Batch");
+                whMaterialStandingbookPagedQuery.Batch = whMaterialStandingbookPagedQuery.Batch;
+                sqlBuilder.Where("Batch = @Batch");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.MaterialBarCode))
             {

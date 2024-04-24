@@ -102,6 +102,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<ManuDowngradingRuleEntity> GetByCodeAsync(ManuDowngradingRuleCodeQuery query);
+        Task<IEnumerable<ManuDowngradingRuleEntity>> GetByCodesAsync(ManuDowngradingRuleCodesQuery query);
 
         /// <summary>
         /// 批量更新序号

@@ -17,6 +17,7 @@ using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
@@ -108,6 +109,11 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
+        /// 统计服务
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
@@ -139,7 +145,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             IManuProductNgRecordRepository manuProductNgRecordRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _logger = logger;
             _masterDataService = masterDataService;
@@ -156,6 +163,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _localizationService = localizationService;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
@@ -551,15 +559,20 @@ namespace Hymson.MES.CoreServices.Services.Job
                         { "NextProcedureCode", $"{data.ProcedureCode}" }
                     };
 
+            var WorkOrderId = data.SFCProduceEntities;
+
             // 面板需要的提示信息
             if (data.IsLastProcedure)
             {
                 if (data.Count == 1)
-                {
+                {                   
                     var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
-                    if (SFCProduceEntity != null) responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18226),
+                    if (SFCProduceEntity != null)
+                    {              
+                        responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18226),
                         data.Type.GetDescription(),
                         data.Code);
+                    }
                 }
                 else if (data.Count > 1)
                 {
@@ -706,7 +719,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         SupplierId = 0,//自制品 没有
                         MaterialId = sfcProduceEntity.ProductId,
                         MaterialBarCode = sfcProduceEntity.SFC,
-                        Batch = "",//自制品 没有
+                        //Batch = "",//自制品 没有
                         MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                         QuantityResidue = sfcProduceEntity.Qty,
                         ScrapQty = sfcProduceEntity.ScrapQty,
@@ -727,7 +740,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         MaterialName = procMaterialEntity.MaterialName,
                         MaterialVersion = procMaterialEntity.Version ?? "",
                         MaterialBarCode = sfcProduceEntity.SFC,
-                        Batch = "",//自制品 没有
+                        //Batch = "",//自制品 没有
                         Quantity = sfcProduceEntity.Qty,
                         Unit = procMaterialEntity.Unit ?? "",
                         Type = WhMaterialInventoryTypeEnum.ManuComplete,

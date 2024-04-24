@@ -24,5 +24,10 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// </summary>
         [Description("清盘")]
         Clear = 2,
+        /// <summary>
+        /// 报废解盘
+        /// </summary>
+        [Description("报废解盘")]
+        NgUnbind = 3
     }
 }

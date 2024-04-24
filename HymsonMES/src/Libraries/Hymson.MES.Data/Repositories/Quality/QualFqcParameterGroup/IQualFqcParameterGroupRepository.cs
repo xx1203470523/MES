@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(QualFqcParameterGroupEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(QualFqcParameterGroupEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -39,12 +39,19 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<int> UpdateRangeAsync(IEnumerable<QualFqcParameterGroupEntity> entities);
 
         /// <summary>
+        /// 更新 (仅更新状态)
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(UpdateFqcParameterGroupStatusQuery entity);
+
+        /// <summary>
         /// 软删除  
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -58,7 +65,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualFqcParameterGroupEntity> GetByIdAsync(long? id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -79,7 +86,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<QualFqcParameterGroupEntity>> GetEntitiesAsync(QualFqcParameterGroupQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

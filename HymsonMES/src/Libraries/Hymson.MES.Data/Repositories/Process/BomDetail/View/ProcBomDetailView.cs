@@ -11,12 +11,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 物料Id
         /// </summary>
-        public string MaterialId { get; set; }
+        public long MaterialId { get; set; }
 
         /// <summary>
         /// 替代物料Id
         /// </summary>
-        public string ReplaceMaterialId { get; set; }
+        public long ReplaceMaterialId { get; set; }
 
         /// <summary>
         /// BOM明细ID

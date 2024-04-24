@@ -6,9 +6,13 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Bos.Parameter;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.Web.Framework.WorkContext;
 
@@ -46,6 +50,8 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// 业务接口（创建条码服务）
         /// </summary>
         private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
+        private readonly IManuMergeService _manuMergeService;
+        private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
 
         /// <summary>
         /// 构造函数
@@ -65,6 +71,8 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             AbstractValidator<OutBoundMoreDto> validationOutBoundMoreDtoRules,
             IManuCommonService manuCommonService,
             IManuPassStationService manuPassStationService,
+            IManuMergeService manuMergeService,
+            IManuGenerateBarcodeService manuGenerateBarcodeService,
             IManuCreateBarcodeService manuCreateBarcodeService)
         {
             _currentEquipment = currentEquipment;
@@ -75,6 +83,8 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             _manuCommonService = manuCommonService;
             _manuPassStationService = manuPassStationService;
             _manuCreateBarcodeService = manuCreateBarcodeService;
+            _manuMergeService = manuMergeService;
+            _manuGenerateBarcodeService =   manuGenerateBarcodeService;
         }
 
         /// <summary>
@@ -347,6 +357,20 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 EquipmentId = manuBo.EquipmentId,
                 OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
             }, RequestSourceEnum.EquipmentApi);
+        }
+        public async Task<string> MergeAsync(ManuMergeRequestDto param)
+        {
+            
+            //获取GB
+            if(param.Barcodes==null||!param.Barcodes.Any()) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+            else
+            {
+                return await _manuMergeService.MergeAsync(param,_currentEquipment.Name);
+            }
+            
+            
         }
 
     }

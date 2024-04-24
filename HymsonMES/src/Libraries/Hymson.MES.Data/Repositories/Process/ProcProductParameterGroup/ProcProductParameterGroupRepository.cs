@@ -251,10 +251,14 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_product_parameter_group` /**where**/  ";
-
-        const string InsertSql = "INSERT IGNORE `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @IsDefaultVersion, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+#if DM
+        const string InsertSql = "INSERT  `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @IsDefaultVersion, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT  `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @IsDefaultVersion, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+#else
+   const string InsertSql = "INSERT IGNORE `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @IsDefaultVersion, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
         const string InsertsSql = "INSERT IGNORE `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @IsDefaultVersion, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
+#endif
         const string UpdateSql = "UPDATE `proc_product_parameter_group` SET Name = @Name, Version = @Version, IsDefaultVersion=@IsDefaultVersion, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_product_parameter_group` SET Name = @Name, Version = @Version, IsDefaultVersion=@IsDefaultVersion, Status = @Status, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 

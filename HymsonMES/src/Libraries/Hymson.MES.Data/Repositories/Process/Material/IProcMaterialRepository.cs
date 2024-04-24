@@ -25,6 +25,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> UpdateAsync(ProcMaterialEntity procMaterialEntity);
 
         /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdatesAsync(List<ProcMaterialEntity> procMaterialEntitys);
+
+        /// <summary>
         /// 更新 同编码的其他物料设置为非当前版本
         /// </summary>
         /// <param name="procMaterialEntity"></param>

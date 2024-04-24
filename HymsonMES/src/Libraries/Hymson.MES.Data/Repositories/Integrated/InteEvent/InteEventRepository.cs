@@ -246,10 +246,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_event T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_event T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event /**where**/  ";
-
-        const string InsertSql = "INSERT IGNORE inte_event(  `Id`, `Code`, `Name`, `EventTypeId`, `Status`, `IsAutoClose`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @Name, @EventTypeId, @Status, @IsAutoClose, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+#if DM
+        const string InsertSql = "INSERT  inte_event(  `Id`, `Code`, `Name`, `EventTypeId`, `Status`, `IsAutoClose`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @Name, @EventTypeId, @Status, @IsAutoClose, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+        const string InsertsSql = "INSERT  inte_event(  `Id`, `Code`, `Name`, `EventTypeId`, `Status`, `IsAutoClose`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @Name, @EventTypeId, @Status, @IsAutoClose, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+#else
+const string InsertSql = "INSERT IGNORE inte_event(  `Id`, `Code`, `Name`, `EventTypeId`, `Status`, `IsAutoClose`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @Name, @EventTypeId, @Status, @IsAutoClose, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
         const string InsertsSql = "INSERT IGNORE inte_event(  `Id`, `Code`, `Name`, `EventTypeId`, `Status`, `IsAutoClose`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @Name, @EventTypeId, @Status, @IsAutoClose, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
-
+#endif
         const string UpdateSql = "UPDATE inte_event SET   Code = @Code, Name = @Name, EventTypeId = @EventTypeId, Status = @Status, IsAutoClose = @IsAutoClose, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE inte_event SET   Code = @Code, Name = @Name, EventTypeId = @EventTypeId, Status = @Status, IsAutoClose = @IsAutoClose, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdateEventTypeIdSql = "UPDATE inte_event SET EventTypeId = @EventTypeId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id IN @Ids ";

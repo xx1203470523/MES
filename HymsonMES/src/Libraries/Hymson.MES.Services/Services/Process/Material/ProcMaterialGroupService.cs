@@ -177,28 +177,15 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task DeleteProcMaterialGroupAsync(long id)
-        {
-            await _procMaterialGroupRepository.DeleteAsync(id);
-        }
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
         public async Task<int> DeletesProcMaterialGroupAsync(long[] idsArr)
         {
-            if (idsArr.Length < 1)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10213));
-            }
+            if (idsArr.Length < 1) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
-            //判断物料中是否有当前物料组
+            // 判断物料中是否有当前物料组
             var procMaterials = await _procMaterialRepository.GetByGroupIdsAsync(idsArr);
             if (procMaterials != null && procMaterials.Any())
             {

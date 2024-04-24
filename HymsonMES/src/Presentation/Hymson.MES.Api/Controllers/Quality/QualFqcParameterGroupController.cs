@@ -80,6 +80,19 @@ namespace Hymson.MES.Api.Controllers.QualityFqcParameterGroup
              await _qualFqcParameterGroupService.ModifyAsync(updateDto);
         }
 
+
+        /// <summary>
+        /// 更新（修改FQC参数组状态）
+        /// </summary>
+        /// <param name="updateDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("updateStatus")]
+        public async Task ModifStatusAsync([FromBody] UpdateFqcParameterGroupStatusQueryDto updateDto)
+        {
+            await _qualFqcParameterGroupService.ModifStatusAsync(updateDto);
+        }
+
         /// <summary>
         /// 查询详情（FQC检验参数组）
         /// </summary>

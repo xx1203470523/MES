@@ -948,7 +948,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
         }
-
+       
+        public async Task<int> UpdateSFCByIdAsync(UpdateManuSfcProduceSFCByIdCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSFCByIdSql, command);
+        }
         /// <summary>
         /// 部分报废 修改数量
         /// </summary>
@@ -959,6 +964,32 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(PartialScrapManuSfcProduceByIdSql, commands);
         }
+
+        #region 顷刻
+
+        /// <summary>
+        /// 根据条码更改条码状态
+        /// 用于设备接口产出米数上报
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQtyBySfcAsync(UpdateQtyBySfcCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateQtyBySfcsSql, command);
+        }
+
+        /// <summary>
+        /// 获取设备最近条码
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ManuSfcProductMaterialView> GetEquipmentNewestSfc(ManuSfcEquipmentNewestQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcProductMaterialView>(GetEquipmentNewestSfcsql, query);
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -1008,8 +1039,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeleteSfcProduceBusinessByIdSql = "DELETE FROM manu_sfc_produce_business WHERE Id in @Ids";
         const string DeleteSfcProduceBusinessBySfcInfoIdsSql = "DELETE FROM manu_sfc_produce_business WHERE SiteId = @SiteId AND SfcProduceId IN @SfcInfoIds";
         const string RealDeletesSfcProduceBusinessSql = "DELETE FROM manu_sfc_produce_business WHERE SfcProduceId IN @SfcInfoIds AND BusinessType=@BusinessType";
+#if DM
+
+        const string InsertOrUpdateSfcProduceBusinessSql = @"MERGE INTO manu_sfc_produce_business AS targetTable USING((SELECT @SfcProduceId,@BusinessType) AS sourceTable(SfcProduceId,BusinessType))  ON(targetTable.SfcProduceId=sourceTable.SfcProduceId AND targetTable.BusinessType=sourceTable.BusinessType) WHEN MATCHED THEN UPDATE SET BusinessContent = @BusinessContent,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted
+ WHEN NOT MATCHED THEN INSERT (  `Id`, `SiteId`, `SfcProduceId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcProduceId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted ); ";
+#else
         const string InsertOrUpdateSfcProduceBusinessSql = @"INSERT INTO `manu_sfc_produce_business`(  `Id`, `SiteId`, `SfcProduceId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcProduceId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted ) ON DUPLICATE KEY UPDATE
                                                              BusinessContent = @BusinessContent,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  ";
+#endif
         //质量锁定sql
         const string UpdateQualityLockSql = "update  manu_sfc_produce set `Lock`=@Lock,LockProductionId=@LockProductionId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn where SFC in  @Sfcs  and SiteId=@SiteId ";
         const string UpdateIsScrapSql = "UPDATE `manu_sfc_produce` SET IsScrap = @IsScrap, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId and IsScrap =@CurrentIsScrap  ";
@@ -1037,5 +1074,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateStatusAndQtyBySfcsSql = @"UPDATE `manu_sfc_produce` SET Status = @Status, Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND SFC IN @SFCs ";
         const string UpdateQtyByIdSql = @"UPDATE `manu_sfc_produce` SET  Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
         const string PartialScrapManuSfcProduceByIdSql = @"UPDATE `manu_sfc_produce` SET  Qty = @Qty , ScrapQty = @ScrapQty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
+        const string UpdateSFCByIdSql = @"UPDATE `manu_sfc_produce` SET  SFC = @SFC ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =  @Id  ";
+        #region 顷刻
+
+        /// <summary>
+        /// 更新条码数量
+        /// </summary>
+        const string UpdateQtyBySfcsSql = @"UPDATE manu_sfc_produce SET Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND SFC = @SFC ";
+
+        /// <summary>
+        /// 获取设备最新条码
+        /// </summary>
+        const string GetEquipmentNewestSfcsql = @"
+            select t2.MaterialCode , t1.* 
+            from manu_sfc_produce t1
+            inner join proc_material t2 on t1.ProductId = t2.Id and t2.IsDeleted = 0
+            where t1.EquipmentId = @EquipmentId
+            and t1.IsDeleted = 0
+            order by t1.CreatedOn desc 
+            limit 0,1
+        ";
+
+        #endregion
     }
 }

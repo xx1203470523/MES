@@ -23,7 +23,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 序号
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
         /// <summary>
         /// 前一工艺路线工序明细ID
@@ -56,7 +56,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 序号
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
         /// <summary>
         /// 所属工艺路线ID
@@ -124,7 +124,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 序号
         /// </summary>
-        public string SerialNo { get; set; }
+        public long SerialNo { get; set; }
 
         /// <summary>
         /// 所属工艺路线ID

@@ -1061,6 +1061,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualFqcParameterGroupDetailQueryDto, QualFqcParameterGroupDetailQuery>();
             CreateMap<QualFqcParameterGroupUpdateDto, QualFqcParameterGroupUpdateCommand>();
 
+            CreateMap<QualFqcOrderSampleEntity, FqcSelectionView>();
+
 
 
             #endregion

@@ -508,8 +508,12 @@ namespace Hymson.MES.Services.Services.Equipment
             if (taskEntity.InspectionType == EquInspectionTypeEnum.WeeklyInspection)
             {
                 //获取当前周拼成时间,当前年+当前周的执行日+执行时间
-                // var time = DateTime.Now.ToString("yyyy-MM-dd")+taskEntity.Time;
-                var day = CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+                DateTime today = DateTime.Today;
+                int diff = (7 + (DateTime.Today.DayOfWeek - DayOfWeek.Monday)) % 7;
+                var dayOfweek = taskEntity.Day.HasValue?(int)taskEntity.Day:0;
+                var days = (-diff) + dayOfweek - 1;
+                DateTime firstDayOfWeek = today.AddDays(days);
+                execuTime= firstDayOfWeek.ToString("yyyy-MM-dd") + " " + taskEntity.Time;
             }
 
             //读取详情

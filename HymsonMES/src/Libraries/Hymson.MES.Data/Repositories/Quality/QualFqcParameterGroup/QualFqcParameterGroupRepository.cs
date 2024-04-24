@@ -54,6 +54,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 更新 (仅更新状态)
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(UpdateFqcParameterGroupStatusQuery entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusSql, entity);
+        }
+
+        /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
@@ -128,7 +139,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("Status = @Status");
             }
-            if (query.Version!=null)
+            if (query.Version != null)
             {
                 sqlBuilder.Where("Version = @Version");
             }
@@ -219,12 +230,15 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string UpdateSql = "UPDATE qual_fqc_parameter_group SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaterialId = @MaterialId, SampleQty = @SampleQty,SamplingCount=@SamplingCount, LotSize = @LotSize, LotUnit = @LotUnit, IsSameWorkOrder = @IsSameWorkOrder, IsSameWorkCenter = @IsSameWorkCenter, Version = @Version, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_fqc_parameter_group SET   SiteId = @SiteId, Code = @Code, Name = @Name, MaterialId = @MaterialId, SampleQty = @SampleQty, LotSize = @LotSize, LotUnit = @LotUnit, IsSameWorkOrder = @IsSameWorkOrder, IsSameWorkCenter = @IsSameWorkCenter, Version = @Version, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateStatusSql = "UPDATE qual_fqc_parameter_group SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_fqc_parameter_group SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_fqc_parameter_group SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM qual_fqc_parameter_group WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM qual_fqc_parameter_group WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM qual_fqc_parameter_group WHERE IsDeleted=0 AND Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM qual_fqc_parameter_group WHERE IsDeleted=0 AND Id IN @Ids ";
+
+
 
     }
 }

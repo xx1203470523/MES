@@ -139,4 +139,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public decimal Qty { get; set; }
     }
+    public class UpdateManuSfcProduceSFCByIdCommand : UpdateCommand
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public string SFC { get; set; }
+    }
 }
