@@ -393,61 +393,64 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task FeedingAsync(FeedingDto dto)
         {
-            //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
-            var sfcs = new List<string>() { dto.Sfc };
-            if (dto.IsTooling)
+            long siteId = 0;
+            var feedingMaterialSaveDto = new ManuFeedingMaterialSaveDto()
             {
-                //查询工装绑定的条码
-                var toolingBindEntities = await _manuToolingBindRepository.GetEntitiesAsync(new Data.Repositories.Manufacture.Query.ManuToolingBindQuery
-                {
-                    SiteId = equResModel.SiteId,
-                    ToolingCode = dto.Sfc,
-                    Status = Core.Enums.Common.BindStatusEnum.Bind
-                });
-                if (toolingBindEntities == null || !toolingBindEntities.Any())
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES45041));
-                }
-                sfcs = toolingBindEntities.Select(x => x.Barcode).ToList();
-            }
+                UserName = dto.EquipmentCode
+            };
             //组装参数
             var feedingMaterialSaveDtos = new List<ManuFeedingMaterialSaveDto>();
-            foreach (var item in sfcs)
+            if (dto.IsFeedingPoint == true)
             {
-                var feedingMaterialSaveDto = new ManuFeedingMaterialSaveDto()
+                ProcLoadPointQuery query = new ProcLoadPointQuery();
+                query.LoadPoint = dto.EquipmentCode;
+                var loadPoint = await _procLoadPointService.GetProcLoadPointAsync(query);
+                siteId = loadPoint.SiteId;
+                //saveDto.ResourceId = res.FirstOrDefault()!.ResourceId!;
+                feedingMaterialSaveDto.Source = ManuSFCFeedingSourceEnum.FeedingPoint;
+                feedingMaterialSaveDto.FeedingPointId = loadPoint.Id;
+                feedingMaterialSaveDto.BarCode = dto.Sfc;
+                feedingMaterialSaveDto.SiteId = siteId;
+                feedingMaterialSaveDtos.Add(feedingMaterialSaveDto);
+            }
+            else
+            {
+                //1. 获取设备基础信息
+                EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
+                siteId = equResModel.SiteId;
+                var sfcs = new List<string>() { dto.Sfc };
+                if (dto.IsTooling)
                 {
-                    SiteId = equResModel.SiteId,
-                    UserName = dto.EquipmentCode,
-                    BarCode = item
-                };
+                    //查询工装绑定的条码
+                    var toolingBindEntities = await _manuToolingBindRepository.GetEntitiesAsync(new Data.Repositories.Manufacture.Query.ManuToolingBindQuery
+                    {
+                        SiteId = equResModel.SiteId,
+                        ToolingCode = dto.Sfc,
+                        Status = Core.Enums.Common.BindStatusEnum.Bind
+                    });
+                    if (toolingBindEntities == null || !toolingBindEntities.Any())
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES45041));
+                    }
+                    sfcs = toolingBindEntities.Select(x => x.Barcode).ToList();
+                }
 
-                if (dto.IsFeedingPoint == false)
+                foreach (var item in sfcs)
                 {
-                    //1. 获取设备基础信息
-                    //EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
-                    //EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
-                    //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+                    feedingMaterialSaveDto = new ManuFeedingMaterialSaveDto()
+                    {
+                        SiteId = equResModel.SiteId,
+                        UserName = dto.EquipmentCode,
+                        BarCode = item
+                    };
 
                     feedingMaterialSaveDto.Source = ManuSFCFeedingSourceEnum.BOM;
                     feedingMaterialSaveDto.ResourceId = equResModel.ResId;
+                    feedingMaterialSaveDtos.Add(feedingMaterialSaveDto);
                 }
-                else
-                {
-                    //根据
-                    //ProcLoadPointCodeLinkResourceQuery query = new ProcLoadPointCodeLinkResourceQuery();
-                    //query.LoadPoint = dto.EquipmentCode;
-                    //var res = await _procLoadPointLinkResourceRepository.GetByCodeAsync(query);
 
-                    ProcLoadPointQuery query = new ProcLoadPointQuery();
-                    query.LoadPoint = dto.EquipmentCode;
-                    var loadPoint = await _procLoadPointService.GetProcLoadPointAsync(query);
-                    //saveDto.ResourceId = res.FirstOrDefault()!.ResourceId!;
-                    feedingMaterialSaveDto.Source = ManuSFCFeedingSourceEnum.FeedingPoint;
-                    feedingMaterialSaveDto.FeedingPointId = loadPoint.Id;
-                }
-                feedingMaterialSaveDtos.Add(feedingMaterialSaveDto);
             }
+
             //3. 上料
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             foreach (var item in feedingMaterialSaveDtos)
@@ -459,7 +462,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             {
                 await _manuToolingBindRepository.UnBindToolingAsync(new Data.Repositories.Manufacture.ManuToolingBind.Command.UnBindToolingCommand
                 {
-                    SiteId = equResModel.SiteId,
+                    SiteId = siteId,
                     ToolingCode = dto.Sfc,
                     UpdatedBy = dto.EquipmentCode,
                     UpdatedOn = HymsonClock.Now()
