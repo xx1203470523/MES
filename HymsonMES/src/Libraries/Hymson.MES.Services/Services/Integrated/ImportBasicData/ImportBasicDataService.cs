@@ -227,12 +227,9 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
 
@@ -349,7 +346,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             //获取设备列表信息
             IEnumerable<EquEquipmentEntity> equEquipmentEntities = new List<EquEquipmentEntity>();
-            var equCodes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.EquipmentCode)).Select(x => x.EquipmentCode).Distinct().ToArray();
+            var equCodes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.EquipmentCode)).Select(x => x.EquipmentCode ?? "").Distinct().ToArray();
             if (equCodes != null && equCodes.Any())
             {
                 var query = new EquEquipmentQuery() { SiteId = _currentSite.SiteId ?? 0, EquipmentCodes = equCodes };
@@ -358,7 +355,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             //获取资源类型列表信息
             IEnumerable<ProcResourceTypeEntity> resourceTypeEntities = new List<ProcResourceTypeEntity>();
-            var resTypes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.ResType)).Select(x => x.ResType).Distinct().ToArray();
+            var resTypes = excelImportDtos.Where(x => !string.IsNullOrWhiteSpace(x.ResType)).Select(x => x.ResType ?? "").Distinct().ToArray();
             if (resTypes != null && resTypes.Any())
             {
                 var query = new ProcResourceTypeQuery() { SiteId = _currentSite.SiteId ?? 0, ResTypes = resTypes };
@@ -472,13 +469,10 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 var isMain = false;
-                errorMessage.ToString().TrimEnd(',').TrimEnd(';');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
+                errorMessage.ToString().TrimEnd(',');
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
                 equList.Add(new ProcResourceEquipmentBindEntity
@@ -571,12 +565,9 @@ namespace Hymson.MES.Services.Services.Integrated
 
                 //资源,修改资源表的资源类型
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
 
@@ -713,12 +704,9 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
 
@@ -1106,12 +1094,9 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
 
@@ -1295,12 +1280,9 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
 
