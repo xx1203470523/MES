@@ -39,7 +39,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 抽检数量
         /// </summary>
-        public int SamplingCount { get; set; }
+        public int SamplingCount { get; set; } = 0;
 
         /// <summary>
         /// 检验容量
@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 抽检数量
         /// </summary>
-        public int SamplingCount { get; set; }
+        public int SamplingCount { get; set; } = 0;
 
         /// <summary>
         /// 批次数量
