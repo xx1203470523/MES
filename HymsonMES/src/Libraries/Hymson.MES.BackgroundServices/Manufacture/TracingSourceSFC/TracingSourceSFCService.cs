@@ -115,12 +115,12 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             {
                 var barCodes = item.Value.Select(s => s.SFC).Union(item.Value.Select(s => s.CirculationBarCode)).Distinct();
 
-                // 根据流转条码批量查询条码（注意：经过这步之后，仅在库存，而不在条码表的数据会被过滤掉）
+                // 根据流转条码批量查询条码
                 sfcEntities.AddRange(await _manuSfcRepository.GetListAsync(new ManuSfcQuery
                 {
                     SiteId = item.Key,
                     SFCs = barCodes,
-                    Type = SfcTypeEnum.Produce
+                    //Type = SfcTypeEnum.Produce （注意：经过这步之后，仅在库存，而不在条码表的数据会被过滤掉）
                 }));
             }
 
