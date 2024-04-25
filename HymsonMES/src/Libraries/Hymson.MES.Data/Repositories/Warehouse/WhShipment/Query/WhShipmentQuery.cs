@@ -16,9 +16,14 @@ namespace Hymson.MES.Data.Repositories.WhShipment.Query
         public long? ShipmentId { get; set; }
 
         /// <summary>
-        /// 出货单号
+        /// 出货单号(模糊查询)
         /// </summary>
         public string ShipmentNum { get; set; }
+
+        /// <summary>
+        /// 出货单号
+        /// </summary>
+        public string ShipmentNumNoLike { get; set; }
 
         /// <summary>
         /// Ids

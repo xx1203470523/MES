@@ -186,6 +186,12 @@ namespace Hymson.MES.Data.Repositories.WhShipment
                 query.ShipmentNum = $"%{query.ShipmentNum}%";
                 sqlBuilder.Where("T.ShipmentNum LIKE @ShipmentNum");
             }
+
+            if (!string.IsNullOrWhiteSpace(query.ShipmentNumNoLike))
+            {
+                sqlBuilder.Where("T.ShipmentNum = @ShipmentNumNoLike");
+            }
+
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();

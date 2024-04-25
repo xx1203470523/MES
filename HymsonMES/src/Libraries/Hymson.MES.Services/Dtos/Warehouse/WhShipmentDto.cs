@@ -249,5 +249,10 @@ namespace Hymson.MES.Services.Dtos.WhShipment
         /// 出货单Id
         /// </summary>
         public long? Id { get; set; }
+
+        /// <summary>
+        /// 出货单号
+        /// </summary>
+        public string? ShipmentNum { get; set; }
     }
 }

@@ -1088,6 +1088,61 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
+        /// 分选出站053
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task SortingOutboundAsync(SortingOutboundDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
+            //2. 参数组装
+            //2.1 托盘电芯绑定
+            var vehicleBindDto = new InteVehicleBindDto
+            {
+                SiteId = equResModel.SiteId,
+                UserName = dto.EquipmentCode,
+                ContainerCode = dto.ContainerCode,
+                SfcList = dto.ContainerSfcList.Select(x => new InteVehicleSfcDto
+                {
+                    Sfc = x.Sfc,
+                    Location = x.Location,
+                }).ToList()
+            };
+            //2.2 托盘出站
+            VehicleOutStationBo outStationBo = new VehicleOutStationBo
+            {
+                SiteId = equResModel.SiteId,
+                UserName = dto.EquipmentCode,
+                EquipmentId = equResModel.EquipmentId,
+                ResourceId = equResModel.ResId,
+                ProcedureId = equResModel.ProcedureId,
+                OutStationRequestBos = new OutStationRequestBo[] { new() { VehicleCode = dto.ContainerCode, IsQualified = dto.Passed == 1 } }
+            };
+            //2.3 托盘参数
+            var paramRecordSaveDtos = dto.ParamList.Select(x => new EquProductParamRecordSaveDto
+            {
+                ParamCode = x.ParamCode,
+                ParamValue = x.ParamValue,
+                CollectionTime = x.CollectionTime,
+                SiteId = equResModel.SiteId,
+                Sfc = dto.ContainerCode,
+                EquipmentId = equResModel.EquipmentId,
+                CreatedBy = dto.EquipmentCode,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = dto.EquipmentCode,
+                UpdatedOn = HymsonClock.Now()
+            }).ToList();
+
+            //3. 数据操作
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            await _inteVehicleService.VehicleBindOperationAsync(vehicleBindDto);
+            await _manuPassStationService.OutStationRangeByVehicleAsync(outStationBo, RequestSourceEnum.EquipmentApi);
+            await _equProductParamRecordService.AddMultAsync(paramRecordSaveDtos);
+            trans.Complete();
+        }
+
+        /// <summary>
         /// 获取设备资源对应的基础信息
         /// </summary>
         /// <param name="param"></param>

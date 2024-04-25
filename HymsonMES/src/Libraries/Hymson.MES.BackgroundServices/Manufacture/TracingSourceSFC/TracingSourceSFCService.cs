@@ -115,12 +115,12 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             {
                 var barCodes = item.Value.Select(s => s.SFC).Union(item.Value.Select(s => s.CirculationBarCode)).Distinct();
 
-                // 根据流转条码批量查询条码（注意：经过这步之后，仅在库存，而不在条码表的数据会被过滤掉）
+                // 根据流转条码批量查询条码
                 sfcEntities.AddRange(await _manuSfcRepository.GetListAsync(new ManuSfcQuery
                 {
                     SiteId = item.Key,
                     SFCs = barCodes,
-                    Type = SfcTypeEnum.Produce
+                    //Type = SfcTypeEnum.Produce （注意：经过这步之后，仅在库存，而不在条码表的数据会被过滤掉）
                 }));
             }
 
@@ -233,23 +233,24 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 if (!nodeEntities.Any(a => a.Id == afterNode.Id)) nodeEntities.Add(afterNode);
             }
 
+            var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
 
             // 保存节点信息
-            await _manuSFCNodeRepository.InsertRangeAsync(nodeEntities);
+            rows += await _manuSFCNodeRepository.InsertRangeAsync(nodeEntities);
 
             // 保存节点的来源信息
-            await _manuSFCNodeSourceRepository.InsertRangeAsync(nodeSourceEntities);
+            rows += await _manuSFCNodeSourceRepository.InsertRangeAsync(nodeSourceEntities);
 
             // 保存节点的去向信息
-            await _manuSFCNodeDestinationRepository.InsertRangeAsync(nodeDestinationEntities);
+            rows += await _manuSFCNodeDestinationRepository.InsertRangeAsync(nodeDestinationEntities);
 
             // 更新水位
             var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
             if (maxUpdateWaterMarkUpdatedOn != null)
             {
                 long timestamp = ((DateTimeOffset)maxUpdateWaterMarkUpdatedOn.Value).ToUnixTimeMilliseconds();
-                await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
+                rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
             }
             trans.Complete();
 

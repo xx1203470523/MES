@@ -16,7 +16,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long OQCOrderId { get; set; }
 
         /// <summary>
-        /// IQC检验单（附件）
+        /// OQC检验单（附件）
         /// </summary>
         public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
 
@@ -49,7 +49,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record OqcOrderParameterDetailDto : BaseEntityDto
     {
         /// <summary>
-        /// 主键
+        /// 已检验样本Id
         /// </summary>
         public long Id { get; set; }
 

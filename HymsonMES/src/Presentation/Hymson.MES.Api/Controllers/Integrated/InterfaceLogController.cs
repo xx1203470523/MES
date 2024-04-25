@@ -1,9 +1,6 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Services.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteIntefaceLog;
-using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,10 +47,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [HttpGet("{id}")]
         public async Task<InteIntefaceLogDto> QueryByIdAsync(long id)
         {
-            var query = new InteIntefaceLogPagedQueryDto() { Id = id.ToString(),PageSize=10,PageIndex=1 };
+            var query = new InteIntefaceLogPagedQueryDto() { Id = id.ToString(), PageSize = 10, PageIndex = 1 };
             var dtos = await _inteIntefaceLogService.GetPagedListAsync(query);
-            InteIntefaceLogDto? dto = dtos.Data.FirstOrDefault();
-            return dto;
+            return dtos.Data.FirstOrDefault() ?? new InteIntefaceLogDto();
         }
 
     }
