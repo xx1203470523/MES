@@ -1116,16 +1116,16 @@ namespace Hymson.MES.Services.Services.Quality
                     }
                 }
 
+                //删除样品附件
+                var delSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.DeleteAnnexBySampleDetailIdAsync(new DeleteCommand { Id = qualOqcOrderSampleDetailEntity.Id, UserId = updatedBy, DeleteOn = updatedOn });
+                if (delSampleDateilAnnexRes == 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17811));
+                }
+
                 //新增样品附件
                 if (orderSampleDetailAnnexEntities.Any())
                 {
-                    //删除样品附件
-                    var delSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.DeleteAnnexBySampleDetailIdAsync(new DeleteCommand { Id = qualOqcOrderSampleDetailEntity.Id, UserId = updatedBy, DeleteOn = updatedOn });
-                    if (delSampleDateilAnnexRes == 0)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17811));
-                    }
-
                     var insertSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.InsertRangeAsync(orderSampleDetailAnnexEntities);
                     if (insertSampleDateilAnnexRes == 0)
                     {
