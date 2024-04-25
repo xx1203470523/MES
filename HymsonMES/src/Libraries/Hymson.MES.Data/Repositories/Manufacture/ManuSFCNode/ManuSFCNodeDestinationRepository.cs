@@ -90,8 +90,35 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuSFCNodeDestinationRepository
     {
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_destination /**where**/  ";
+
+#if DM
+        const string GetTreeEntitiesSql = @"WITH RECURSIVE CTE (CirculationId, NodeId, DestinationId) AS (
+              SELECT CirculationId, NodeId, DestinationId
+              FROM manu_sfc_node_destination
+              WHERE NodeId = @NodeId
+              UNION ALL
+              SELECT T.CirculationId, T.NodeId, T.DestinationId
+              FROM manu_sfc_node_destination T
+              INNER JOIN CTE ON CTE.DestinationId = T.NodeId
+            )
+            SELECT * FROM CTE;";
+
+        const string InsertsSql = "MERGE INTO manu_sfc_node_destination t " +
+            "USING (SELECT @NodeId AS NodeId, @DestinationId AS DestinationId FROM dual) s " +
+            "ON (t.NodeId = s.NodeId AND t.DestinationId = s.DestinationId) " +
+            "WHEN MATCHED THEN " +
+              "UPDATE SET " +
+                "t.CirculationId = @CirculationId, " +
+                "t.CreatedBy = @CreatedBy, " +
+                "t.CreatedOn = @CreatedOn, " +
+                "t.SiteId = @SiteId " +
+            "WHEN NOT MATCHED THEN " +
+              "INSERT (Id, CirculationId, NodeId, DestinationId, CreatedBy, CreatedOn, SiteId) " +
+              "VALUES (@Id, @CirculationId, s.NodeId, s.DestinationId, @CreatedBy, @CreatedOn, @SiteId);";
+#else
         const string GetTreeEntitiesSql = @"
-                            ;WITH RECURSIVE CTE AS (
+                            WITH RECURSIVE CTE AS (
                               SELECT CirculationId, NodeId, DestinationId
                               FROM manu_sfc_node_destination
                               WHERE NodeId = @NodeId 
@@ -102,10 +129,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             )
                             SELECT * FROM CTE;";
 
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_destination /**where**/  ";
-
         const string InsertsSql = "REPLACE INTO manu_sfc_node_destination(`Id`, CirculationId, `NodeId`, `DestinationId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @DestinationId, @CreatedBy, @CreatedOn, @SiteId) ";
-
+#endif
 
     }
 }

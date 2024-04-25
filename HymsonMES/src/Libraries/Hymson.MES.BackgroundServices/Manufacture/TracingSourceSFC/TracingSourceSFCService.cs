@@ -233,23 +233,24 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 if (!nodeEntities.Any(a => a.Id == afterNode.Id)) nodeEntities.Add(afterNode);
             }
 
+            var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
 
             // 保存节点信息
-            await _manuSFCNodeRepository.InsertRangeAsync(nodeEntities);
+            rows += await _manuSFCNodeRepository.InsertRangeAsync(nodeEntities);
 
             // 保存节点的来源信息
-            await _manuSFCNodeSourceRepository.InsertRangeAsync(nodeSourceEntities);
+            rows += await _manuSFCNodeSourceRepository.InsertRangeAsync(nodeSourceEntities);
 
             // 保存节点的去向信息
-            await _manuSFCNodeDestinationRepository.InsertRangeAsync(nodeDestinationEntities);
+            rows += await _manuSFCNodeDestinationRepository.InsertRangeAsync(nodeDestinationEntities);
 
             // 更新水位
             var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
             if (maxUpdateWaterMarkUpdatedOn != null)
             {
                 long timestamp = ((DateTimeOffset)maxUpdateWaterMarkUpdatedOn.Value).ToUnixTimeMilliseconds();
-                await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
+                rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
             }
             trans.Complete();
 
