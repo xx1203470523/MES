@@ -131,12 +131,10 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 if (parameterGroupEntity.IsSameWorkOrder == TrueOrFalseEnum.Yes)
                 {
-                    queryParam.WorkOrderId = item.WorkOrderId;
                     _isSameWorkOrder = true;
                 }
                 if (parameterGroupEntity.IsSameWorkCenter == TrueOrFalseEnum.Yes)
                 {
-                    queryParam.WorkCenterId = item.WorkCenterId;
                     _isSameWorkCenter = true;
                 }
                 var recordList = await _qualFinallyOutputRecordRepository.GetEntitiesAsync(queryParam);
@@ -409,7 +407,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 //long?[]转long[]
                 long[] recrodids = distinctIds.Where(x => x.HasValue).Select(x => x.Value).ToArray();
 
-                IEnumerable<QualFinallyOutputRecordEntity> recordList = null;
+                IEnumerable<QualFinallyOutputRecordEntity>? recordList = null;
 
                 if (recrodids != null)
                 {

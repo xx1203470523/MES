@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
         {
             var dto = new InteIntefaceLogDto
             {
-                Id = entry.Data["Id"],
+                Id = entry.Id,
                 InterfaceCode = entry.InterfaceCode ?? entry.Data["Path"],
                 InterfaceName = entry.Message,
                 Requestor = entry.Data.ContainsKey("Name") ? entry.Data["Name"] : string.Empty,
