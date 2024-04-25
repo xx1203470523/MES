@@ -113,12 +113,10 @@ namespace Hymson.MES.Api.Controllers.WhShipment
         /// </summary>
         /// <param name="whShipmentQueryDto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("QueryShipmentSupplierMaterial")]
+        [HttpGet("QueryShipmentSupplierMaterial")]
         public async Task<IEnumerable<WhShipmentSupplierMaterialViewDto>> QueryShipmentSupplierMaterialAsync([FromQuery] WhShipmentQueryDto whShipmentQueryDto)
         {
             return await _whShipmentService.QueryShipmentSupplierMaterialAsync(whShipmentQueryDto);
         }
-
     }
 }
