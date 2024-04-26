@@ -46,6 +46,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("attachment/save")]
+        [LogDescription("IQC检验水平", BusinessType.OTHER)]
         public async Task SaveAttachmentAsync([FromBody] QualIqcOrderSaveAttachmentDto requestDto)
         {
             await _qualIqcOrderService.SaveAttachmentAsync(requestDto);
@@ -57,6 +58,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="orderAnnexId"></param>
         /// <returns></returns>
         [HttpDelete("attachment/delete/{orderAnnexId}")]
+        [LogDescription("IQC检验水平", BusinessType.OTHER)]
         public async Task DeleteAttachmentByIdAsync(long orderAnnexId)
         {
             await _qualIqcOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
@@ -68,6 +70,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete("delete")]
+        [LogDescription("除（iqc检验单", BusinessType.DELETE)]
         public async Task DeleteOrdersAsync([FromBody] long[] ids)
         {
             await _qualIqcOrderService.DeleteOrdersAsync(ids);
@@ -80,6 +83,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("generated")]
+        [LogDescription("生成IQC检验单", BusinessType.INSERT)]
         public async Task<long> GeneratedOrderAsync([FromBody] GenerateInspectionDto requestDto)
         {
             // TODO 生成IQC检验单
@@ -92,6 +96,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("operation")]
+        [LogDescription("更改检验单状态", BusinessType.INSERT)]
         public async Task<long> OperationOrderAsync([FromBody] QualOrderOperationStatusDto requestDto)
         {
             return await _qualIqcOrderService.OperationOrderAsync(requestDto);
@@ -103,6 +108,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("save")]
+        [LogDescription("保存样品数据", BusinessType.OTHER)]
         public async Task<long> SaveOrderAsync([FromBody] QualIqcOrderSaveDto requestDto)
         {
             return await _qualIqcOrderService.SaveOrderAsync(requestDto);
@@ -114,6 +120,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("complete")]
+        [LogDescription("完成检验单", BusinessType.OTHER)]
         public async Task<long> CompleteOrderAsync(QualIqcOrderCompleteDto requestDto)
         {
             return await _qualIqcOrderService.CompleteOrderAsync(requestDto);
@@ -125,6 +132,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("free")]
+        [LogDescription("检验单免检", BusinessType.OTHER)]
         public async Task<long> FreeOrderAsync(QualIqcOrderFreeDto requestDto)
         {
             return await _qualIqcOrderService.FreeOrderAsync(requestDto);
@@ -136,6 +144,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("close")]
+        [LogDescription("关闭检验单", BusinessType.OTHER)]
         public async Task<long> CloseOrderAsync(QualIqcOrderCloseDto requestDto)
         {
             return await _qualIqcOrderService.CloseOrderAsync(requestDto);
@@ -159,6 +168,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPut("update")]
+        [LogDescription("更新检验单", BusinessType.OTHER)]
         public async Task<int> UpdateOrderAsync(OrderParameterDetailSaveDto requestDto)
         {
             return await _qualIqcOrderService.UpdateOrderAsync(requestDto);

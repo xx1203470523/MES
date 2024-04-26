@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMarking;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,6 +61,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="checkDto"></param>
         /// <returns></returns>
         [HttpPost("markingCloseConfirm")]
+        [LogDescription("Marking关闭确认提交", BusinessType.OTHER)]
         public async Task MarkingCloseConfirmAsync([FromBody] MarkingCloseConfirmDto checkDto)
         {
              await _manuMarkingService.SaveMarkingCloseAsync(checkDto);

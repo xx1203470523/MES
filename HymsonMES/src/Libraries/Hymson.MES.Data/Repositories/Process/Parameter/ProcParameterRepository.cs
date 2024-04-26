@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.Query;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -148,7 +149,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcParameterEntity>> GetProcParameterEntitiesAsync(ProcParameterQuery procParameterQuery)
         {
-            var key = $"proc_parameter&{procParameterQuery.SiteId}&{procParameterQuery.ParameterCode}";
+            var key = $"{CachedTables.PROC_PARAMETER}&{procParameterQuery.SiteId}&{procParameterQuery.ParameterCode}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 var sqlBuilder = new SqlBuilder();

@@ -43,6 +43,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("trigger")]
+        [LogDescription("消息管理", BusinessType.INSERT)]
         [PermissionDescription("integrated:inteMessageManage:insert")]
         public async Task TriggerAsync([FromBody] InteMessageManageTriggerSaveDto dto)
         {
@@ -56,6 +57,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("update")]
+        [LogDescription("消息管理", BusinessType.INSERT)]
         [PermissionDescription("integrated:inteMessageManage:insert")]
         public async Task UpdateAsync([FromBody] InteMessageManageTriggerSaveDto dto)
         {
@@ -69,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("receive")]
+        [LogDescription("消息管理", BusinessType.UPDATE)]
         [PermissionDescription("integrated:inteMessageManage:update")]
         public async Task ReceiveAsync([FromBody] InteMessageManageReceiveSaveDto dto)
         {
@@ -82,6 +85,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("handle")]
+        [LogDescription("消息管理", BusinessType.UPDATE)]
         [PermissionDescription("integrated:inteMessageManage:update")]
         public async Task HandleAsync([FromBody] InteMessageManageHandleSaveDto dto)
         {
@@ -95,6 +99,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("close")]
+        [LogDescription("消息管理", BusinessType.UPDATE)]
         [PermissionDescription("integrated:inteMessageManage:update")]
         public async Task CloseAsync([FromBody] InteMessageManageCloseSaveDto dto)
         {
@@ -141,6 +146,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("消息管理", BusinessType.DELETE)]
         [PermissionDescription("integrated:inteMessageManage:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
