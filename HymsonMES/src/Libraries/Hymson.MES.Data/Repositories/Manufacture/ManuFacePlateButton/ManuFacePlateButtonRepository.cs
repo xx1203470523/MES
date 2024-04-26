@@ -69,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<ManuFacePlateButtonEntity> GetByIdAsync(long id)
         {
-            var key = $"manu_face_plate_button&{id}";
+            var key = $"{CachedTables.MANU_FACE_PLATE_BUTTON}&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();

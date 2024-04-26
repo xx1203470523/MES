@@ -45,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("IPQC检验项目", BusinessType.INSERT)]
         [PermissionDescription("quality:ipqcInspection:insert")]
         public async Task AddAsync([FromBody] QualIpqcInspectionSaveDto saveDto)
         {
@@ -58,6 +59,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("IPQC检验项目", BusinessType.UPDATE)]
         [PermissionDescription("quality:ipqcInspection:update")]
         public async Task UpdateAsync([FromBody] QualIpqcInspectionSaveDto saveDto)
         {
@@ -71,6 +73,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("IPQC检验项目", BusinessType.DELETE)]
         [PermissionDescription("quality:ipqcInspection:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {

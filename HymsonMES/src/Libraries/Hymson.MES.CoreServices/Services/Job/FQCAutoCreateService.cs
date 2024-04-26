@@ -85,6 +85,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             var waitSendRecordList = new List<QualFinallyOutputRecordEntity>();
             //生成容量
             var lotSizeDict = new Dictionary<long, int>();
+            //是存存在项目设置
+            var isPGDict = new Dictionary<long, bool>();
             //同工单
             var _isSameWorkOrder = false;
             //同产线
@@ -108,6 +110,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 if (parameterGroupEntity == null)
                 {
+                    isPGDict.Add(item.ProductId, false);
                     continue;
                 }
 
@@ -143,6 +146,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (recordList != null)
                 {
                     waitSendRecordList.AddRange(recordList);
+                    isPGDict.Add(item.ProductId, true);
                     lotSizeDict.Add(item.ProductId, parameterGroupEntity.LotSize);
                 }
 
@@ -266,10 +270,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                     {
 
                         var materilid = groupedOrder.FirstOrDefault()!.MaterialId;
+                        isPGDict.TryGetValue(materilid, out var isexist);
                         //当前产品容量
                         lotSizeDict.TryGetValue(materilid, out var lotsize);
 
-                        if (groupedOrder.Count() >= lotsize)
+                        if (groupedOrder.Count() >= lotsize && isexist)
                         {
                             var fqcevent = new FQCOrderAutoCreateIntegrationEvent
                             {
@@ -292,9 +297,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                     foreach (var groupedOrder in groupedOrders)
                     {
                         var materilid = groupedOrder.FirstOrDefault()!.MaterialId;
+                        isPGDict.TryGetValue(materilid, out var isexist);
                         lotSizeDict.TryGetValue(materilid, out var lotsize);
 
-                        if (groupedOrder.Count() >= lotsize)
+                        if (groupedOrder.Count() >= lotsize && isexist)
                         {
                             var fqcevent = new FQCOrderAutoCreateIntegrationEvent
                             {
@@ -315,9 +321,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                     foreach (var groupedOrder in groupedOrders)
                     {
                         var materilid = groupedOrder.FirstOrDefault()!.MaterialId;
+                        isPGDict.TryGetValue(materilid, out var isexist);
                         lotSizeDict.TryGetValue(materilid, out var lotsize);
 
-                        if (groupedOrder.Count() >= lotsize)
+                        if (groupedOrder.Count() >= lotsize&& isexist)
                         {
                             var fqcevent = new FQCOrderAutoCreateIntegrationEvent
                             {
@@ -334,8 +341,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 //混线
                 if (!_isSameWorkOrder & !_isSameWorkCenter)
                 {
-                    lotSizeDict.TryGetValue(fqcDataFromJob.FirstOrDefault()!.MaterialId, out var lotsizeFirst);
-                    if (fqcDataFromJob.Count() >= lotsizeFirst)
+                    var materilid = fqcDataFromJob.FirstOrDefault()!.MaterialId;
+                    isPGDict.TryGetValue(materilid, out var isexist);
+                    lotSizeDict.TryGetValue(materilid, out var lotsizeFirst);
+
+                    if (fqcDataFromJob.Count() >= lotsizeFirst && isexist)
                     {
                         var fqcevent = new FQCOrderAutoCreateIntegrationEvent
                         {

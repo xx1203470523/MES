@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -78,6 +79,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("操作面板按钮", BusinessType.INSERT)]
         public async Task AddManuFacePlateButtonAsync([FromBody] ManuFacePlateButtonCreateDto parm)
         {
             await _manuFacePlateButtonService.CreateManuFacePlateButtonAsync(parm);
@@ -90,6 +92,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("操作面板按钮", BusinessType.UPDATE)]
         public async Task UpdateManuFacePlateButtonAsync([FromBody] ManuFacePlateButtonModifyDto parm)
         {
             await _manuFacePlateButtonService.ModifyManuFacePlateButtonAsync(parm);
@@ -102,6 +105,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("操作面板按钮", BusinessType.DELETE)]
         public async Task DeleteManuFacePlateButtonAsync([FromBody] long[] ids)
         {
             await _manuFacePlateButtonService.DeletesManuFacePlateButtonAsync(ids);
@@ -114,6 +118,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("enter")]
+        [LogDescription("回车", BusinessType.OTHER)]
         [AllowAnonymous]
         public async Task<Dictionary<string, JobResponseDto>> EnterAsync(EnterRequestDto dto)
         {
@@ -126,6 +131,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("button")]
+        [LogDescription("点击", BusinessType.OTHER)]
         [AllowAnonymous]
         public async Task<Dictionary<string, JobResponseDto>> ClickAsync(ButtonRequestDto dto)
         {
@@ -138,6 +144,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("parameterCollect")]
+        [LogDescription("点击", BusinessType.OTHER)]
         [AllowAnonymous]
         public async Task<int> ParameterCollectAsync(ProductProcessParameterDto dto)
         {
@@ -149,6 +156,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <returns></returns>
         [HttpPut("test")]
+        [LogDescription("测试", BusinessType.OTHER)]
         [AllowAnonymous]
         public async Task TeastAsync()
         {

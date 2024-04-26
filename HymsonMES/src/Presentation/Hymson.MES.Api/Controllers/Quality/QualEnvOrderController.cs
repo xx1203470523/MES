@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.QualEnvOrder;
 using Hymson.MES.Services.Services.QualEnvOrder;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -82,6 +83,7 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrder
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("环境检验单", BusinessType.INSERT)]
         public async Task AddQualEnvOrderAsync([FromBody] QualEnvOrderCreateConvertDto parm)
         {
             await _qualEnvOrderService.QualEnvOrderCreateConvert(parm);
@@ -94,6 +96,7 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrder
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("环境检验单", BusinessType.UPDATE)]
         public async Task UpdateQualEnvOrderAsync([FromBody] QualEnvOrderModifyDto parm)
         {
             await _qualEnvOrderService.ModifyQualEnvOrderAsync(parm);
@@ -106,6 +109,7 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrder
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("环境检验单", BusinessType.DELETE)]
         public async Task DeleteQualEnvOrderAsync([FromBody] long[] ids)
         {
             await _qualEnvOrderService.DeletesQualEnvOrderAsync(ids);

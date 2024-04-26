@@ -113,6 +113,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("sendDown")]
+        [LogDescription("修改订单状态,工单下达", BusinessType.UPDATE)]
         [PermissionDescription("plan:workOrder:sendDown")]
         public async Task SendDownWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
         {
@@ -126,6 +127,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("finish")]
+        [LogDescription("工单完工", BusinessType.UPDATE)]
         [PermissionDescription("plan:workOrder:finish")]
         public async Task FinishWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
         {
@@ -139,6 +141,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("closeOrder")]
+        [LogDescription("关闭完工", BusinessType.UPDATE)]
         [PermissionDescription("plan:workOrder:closeOrder")]
         public async Task CloseWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms)
         {
@@ -152,6 +155,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("locked")]
+        [LogDescription("锁定", BusinessType.UPDATE)]
         [PermissionDescription("plan:workOrder:locked")]
         public async Task LockedAsync(List<PlanWorkOrderLockedDto> parms)
         {
@@ -165,6 +169,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("cancelLocked")]
+        [LogDescription("解锁", BusinessType.UPDATE)]
         [PermissionDescription("plan:workOrder:cancelLocked")]
         public async Task CancelLockedAsync(List<PlanWorkOrderLockedDto> parms)
         {
