@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -167,7 +168,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(long siteId)
         {
-            var key = $"proc_replace_material&proc_material";
+            //var key = $"proc_replace_material&proc_material";
+            var key = $"{CachedTables.PROC_REPLACE_MATERIAL}&{CachedTables.PROC_MATERIAL}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 var sqlBuilder = new SqlBuilder();
@@ -188,7 +190,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewListAsync(long siteId)
         {
-            var key = $"proc_replace_material&proc_material";
+            var key = $"{CachedTables.PROC_REPLACE_MATERIAL}&{CachedTables.PROC_MATERIAL}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 var sqlBuilder = new SqlBuilder();
@@ -209,7 +211,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialsQuery procReplaceMaterialQuery)
         {
-            var key = $"proc_replace_material&proc_material&{procReplaceMaterialQuery.SiteId}&{procReplaceMaterialQuery.MaterialIds}";
+            var key = $"{CachedTables.PROC_REPLACE_MATERIAL}&{CachedTables.PROC_MATERIAL}&{procReplaceMaterialQuery.SiteId}&{procReplaceMaterialQuery.MaterialIds}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 var sqlBuilder = new SqlBuilder();

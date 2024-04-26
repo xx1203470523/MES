@@ -156,10 +156,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
                 BarCodeList = dto.BarCodeList.Select(x => new CoreServices.Bos.Manufacture.MaterialInventorySfcInfoBo
                 {
                     Source = Core.Enums.MaterialInventorySourceEnum.Equipment,
-                    MaterialId = materialEntities.First(x => x.MaterialCode == x.MaterialCode).Id,
+                    MaterialId = materialEntities.First(z => z.MaterialCode == x.MaterialCode).Id,
                     MaterialBarCode = x.BarCode,
                     QuantityResidue = x.Qty,
-                    //Batch = "",
                     SupplierId = supplierCodes.FirstOrDefault(s => s.Code == barcodeSupplierDic[x.BarCode])?.Id ?? 0,
                     Type = Core.Enums.WhMaterialInventoryTypeEnum.MaterialReceiving
                 })

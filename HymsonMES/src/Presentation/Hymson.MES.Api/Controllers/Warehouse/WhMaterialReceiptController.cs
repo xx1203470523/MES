@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.WHMaterialReceipt;
 using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 using Hymson.MES.Services.Services.WHMaterialReceipt;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,6 +46,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("物料收货表", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] WhMaterialReceiptSaveDto saveDto)
         {
             await _whMaterialReceiptService.CreateAsync(saveDto);
@@ -57,6 +59,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("物料收货表", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] WhMaterialReceiptSaveDto saveDto)
         {
             await _whMaterialReceiptService.ModifyAsync(saveDto);
@@ -69,6 +72,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("物料收货表", BusinessType.DELETE)]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _whMaterialReceiptService.DeletesAsync(ids);

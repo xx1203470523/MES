@@ -1,7 +1,14 @@
-﻿using Hymson.MES.Data.Options;
+﻿#if DM
+using Dm;
+using Hymson.MES.Data.Options;
+using Microsoft.Extensions.Options;
+using System.Data;
+#else
+using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 using System.Data;
+#endif
 
 namespace Hymson.MES.Data.Repositories
 {
@@ -27,7 +34,11 @@ namespace Hymson.MES.Data.Repositories
         /// <returns></returns>
         protected IDbConnection GetMESDbConnection()
         {
+#if DM
+            var conn = new DmConnection(_connectionOptions.MESConnectionString);
+#else
             var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+#endif
             return conn;
         }
 
@@ -37,7 +48,11 @@ namespace Hymson.MES.Data.Repositories
         /// <returns></returns>
         protected IDbConnection GetMESParamterDbConnection()
         {
+#if DM
+            var conn = new DmConnection(_connectionOptions.MESParamterConnectionString);
+#else
             var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
+#endif
             return conn;
         }
 
@@ -47,7 +62,11 @@ namespace Hymson.MES.Data.Repositories
         /// <returns></returns>
         protected IDbConnection GetDorisParamterDbConnection()
         {
+#if DM
+            var conn = new DmConnection(_connectionOptions.DorisParamterConnectionString);
+#else
             var conn = new MySqlConnection(_connectionOptions.DorisParamterConnectionString);
+#endif
             return conn;
         }
 
@@ -59,7 +78,12 @@ namespace Hymson.MES.Data.Repositories
     /// <typeparam name="T"></typeparam>
     public abstract class BaseRepositorySingleton<T> : IDisposable where T : BaseRepositorySingleton<T>, new()
     {
+#if DM
+        private readonly Lazy<DmConnection> _connection;
+#else
         private readonly Lazy<MySqlConnection> _connection;
+#endif
+
         private readonly IOptions<ConnectionOptions> _connectionOptions;
 
         /// <summary>
@@ -69,7 +93,11 @@ namespace Hymson.MES.Data.Repositories
         public BaseRepositorySingleton(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions;
+#if DM
+            _connection = new Lazy<DmConnection>(() => new DmConnection(_connectionOptions.Value.MESConnectionString));
+#else
             _connection = new Lazy<MySqlConnection>(() => new MySqlConnection(_connectionOptions.Value.MESConnectionString));
+#endif
         }
 
         /// <summary>

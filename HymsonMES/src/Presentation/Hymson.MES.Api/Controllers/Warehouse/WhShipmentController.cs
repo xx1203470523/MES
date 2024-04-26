@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.WhShipment;
 using Hymson.MES.Services.Services.WhShipment;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.WhShipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("出货单", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] WhShipmentSaveDto saveDto)
         {
              await _whShipmentService.CreateAsync(saveDto);
@@ -56,6 +58,7 @@ namespace Hymson.MES.Api.Controllers.WhShipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("出货单", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] WhShipmentSaveDto saveDto)
         {
              await _whShipmentService.ModifyAsync(saveDto);
@@ -68,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.WhShipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("出货单", BusinessType.DELETE)]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _whShipmentService.DeletesAsync(ids);
@@ -113,12 +117,10 @@ namespace Hymson.MES.Api.Controllers.WhShipment
         /// </summary>
         /// <param name="whShipmentQueryDto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("QueryShipmentSupplierMaterial")]
+        [HttpGet("QueryShipmentSupplierMaterial")]
         public async Task<IEnumerable<WhShipmentSupplierMaterialViewDto>> QueryShipmentSupplierMaterialAsync([FromQuery] WhShipmentQueryDto whShipmentQueryDto)
         {
             return await _whShipmentService.QueryShipmentSupplierMaterialAsync(whShipmentQueryDto);
         }
-
     }
 }

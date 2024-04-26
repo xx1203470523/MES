@@ -96,7 +96,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<InteWorkCenterEntity> GetByIdAsync(long id)
         {
-            var key = $"inte_work_center&{id}";
+            var key = $"{CachedTables.INTE_WORK_CENTER}&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
@@ -153,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<IEnumerable<InteWorkCenterEntity>> GetWorkCenterListByTypeAsync(EntityByTypeQuery query)
         {
-            var key = $"inte_work_center&Type-{query.Type}&Status-{query.Status}&SiteId-{query.SiteId}";
+            var key = $"{CachedTables.INTE_WORK_CENTER}&Type-{query.Type}&Status-{query.Status}&SiteId-{query.SiteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
@@ -467,10 +467,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// </summary>
         /// <param name="resourceIds"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteWorkCenterResourceRelationView>> GetWorkCenterResourceRelationAsync(IEnumerable<long> resourceIds)
+        public async Task<IEnumerable<InteWorkCenterResourceRelationView>> GetWorkCenterResourceRelationAsync(IEnumerable<long> resourceIds, long workCenterId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteWorkCenterResourceRelationView>(GetWorkCenterResourceRelationSql, new { ResourceIds = resourceIds });
+            return await conn.QueryAsync<InteWorkCenterResourceRelationView>(GetWorkCenterResourceRelationSql, new { ResourceIds = resourceIds, WorkCenterId = workCenterId });
         }
     }
 
@@ -530,6 +530,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string UpdateStatusSql = "UPDATE `inte_work_center` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
         const string GetEntitiesSqlTemplate = "SELECT * FROM `inte_work_center` /**where**/ ";
 
-        const string GetWorkCenterResourceRelationSql = "SELECT * FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND ResourceId IN @ResourceIds";
+        const string GetWorkCenterResourceRelationSql = "SELECT * FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND ResourceId IN @ResourceIds AND WorkCenterId != @WorkCenterId;";
     }
 }

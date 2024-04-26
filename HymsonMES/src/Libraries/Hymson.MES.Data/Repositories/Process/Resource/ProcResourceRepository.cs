@@ -7,6 +7,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -72,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcResourceEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
-            var key = $"proc_resource&{query.Site}&{query.Code}";
+            var key = $"{CachedTables.PROC_RESOURCE}&{query.Site}&{query.Code}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
@@ -413,7 +414,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcResourceEntity>> GetProcResourceListByProcedureIdAsync(long procedureId)
         {
-            var key = $"proc_resource&proc_procedure&{procedureId}";
+            var key = $"{CachedTables.PROC_RESOURCE}&{CachedTables.PROC_PROCEDURE}&{procedureId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();

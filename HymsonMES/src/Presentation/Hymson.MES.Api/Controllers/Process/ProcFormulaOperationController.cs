@@ -48,6 +48,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("配方操作", BusinessType.INSERT)]
         public async Task AddProcFormulaOperationAsync([FromBody] AddFormulaOperationDto addDto)
         {
              await _procFormulaOperationService.CreateProcFormulaOperationAsync(addDto);
@@ -60,6 +61,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("配方操作", BusinessType.UPDATE)]
         public async Task UpdateProcFormulaOperationAsync([FromBody] AddFormulaOperationDto addDto)
         {
              await _procFormulaOperationService.ModifyProcFormulaOperationAsync(addDto);
@@ -72,6 +74,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("配方操作", BusinessType.DELETE)]
         public async Task DeletesProcFormulaOperationAsync([FromBody] long[] ids)
         {
             await _procFormulaOperationService.DeletesProcFormulaOperationAsync(ids);

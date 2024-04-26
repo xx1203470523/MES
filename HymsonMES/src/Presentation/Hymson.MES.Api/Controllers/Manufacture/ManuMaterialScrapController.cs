@@ -2,6 +2,7 @@
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSFCScrap;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,6 +46,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("BarcodeScrap")]
+        [LogDescription("物料报废表", BusinessType.OTHER)]
         public async Task PartialScrapAsync(ManuMaterialScrapDto param)
         {
             await _manuMaterialScrapService.ScrapAsync(param);

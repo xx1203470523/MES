@@ -100,6 +100,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("badReJudgment")]
+        [LogDescription("不良复判", BusinessType.INSERT)]
         [PermissionDescription("manu:badReJudgment:reJudgment")]
         public async Task BadReJudgmentAsync(BadReJudgmentDto badReJudgmentDto)
         {
@@ -113,6 +114,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("cancelIdentify")]
+        [LogDescription("取消标识", BusinessType.INSERT)]
         [PermissionDescription("manu:cancelIdentify:cancel")]
         public async Task CancelSfcIdentification(CancelSfcIdentificationDto parm)
         {
@@ -125,6 +127,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("产品不良录入", BusinessType.UPDATE)]
         public async Task UpdateManuProductBadRecordAsync([FromBody] ManuProductBadRecordModifyDto parm)
         {
             await _manuProductBadRecordService.ModifyManuProductBadRecordAsync(parm);
@@ -136,6 +139,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("产品不良录入", BusinessType.DELETE)]
         public async Task DeleteManuProductBadRecordAsync(DeleteDto deleteDto)
         {
             await _manuProductBadRecordService.DeletesManuProductBadRecordAsync(deleteDto.Ids);
@@ -150,6 +154,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("saveBadRecordMarkEntry")]
+        [LogDescription("不良标识录入", BusinessType.INSERT)]
         //[PermissionDescription("manu:sfcMarking:save")]
         public async Task SaveBadRecordMarkEntryAsync([FromBody] List<ManuProductBadRecordMarkSaveDto> productBadRecordMarkSaveDtos)
         {
@@ -163,6 +168,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("importBadRecordMark")]
+        [LogDescription("不良标识录入", BusinessType.INSERT)]
         //[PermissionDescription("manu:BadRecordMark:import")]
         public async Task ImportBadRecordMarkAsync([FromForm(Name = "file")] IFormFile formFile)
         {

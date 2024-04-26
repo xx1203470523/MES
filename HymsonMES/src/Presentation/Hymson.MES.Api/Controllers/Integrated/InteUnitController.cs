@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         
         [HttpPost]
         [Route("create")]
+        [LogDescription("单位维护", BusinessType.INSERT)]
         public async Task<long> AddInteUnitAsync([FromBody] InteUnitSaveDto saveDto)
         {
            return  await _inteUnitService.CreateInteUnitAsync(saveDto);
@@ -56,6 +58,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("单位维护", BusinessType.UPDATE)]
         public async Task UpdateInteUnitAsync([FromBody] InteUnitSaveDto saveDto)
         {
              await _inteUnitService.ModifyInteUnitAsync(saveDto);
@@ -68,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("单位维护", BusinessType.DELETE)]
         public async Task DeleteInteUnitAsync([FromBody] long[] ids)
         {
             await _inteUnitService.DeletesInteUnitAsync(ids);

@@ -69,6 +69,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("import")]
+        [LogDescription("导入", BusinessType.EXPORT)]
         [PermissionDescription("quality:qualAQLPlan:import")]
         public async Task ImportAsync([FromForm(Name = "file")] IFormFile formFile)
         {

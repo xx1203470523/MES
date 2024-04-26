@@ -367,7 +367,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
                     SFC = item,
                     IsQualified = true,
                 };
-                outStationRequestBos.Add(outStationRequestBo);
+                outStationRequestBos.Add(jzOutStationRequestBo);
             }
             #endregion
             outBo.OutStationRequestBos = outStationRequestBos;

@@ -49,6 +49,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("班制", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] PlanShiftSaveDto saveDto)
         {
             await _planShiftService.ModifyAsync(saveDto, InteShiftModifyTypeEnum.create);
@@ -61,6 +62,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("班制", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] PlanShiftSaveDto saveDto)
         {
             await _planShiftService.ModifyAsync(saveDto, InteShiftModifyTypeEnum.modify);
@@ -73,6 +75,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("班制", BusinessType.DELETE)]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _planShiftService.DeletesAsync(ids);

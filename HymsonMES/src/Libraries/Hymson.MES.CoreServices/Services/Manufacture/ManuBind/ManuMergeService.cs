@@ -34,26 +34,26 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
     public class ManuMergeService : IManuMergeService
     {
         private readonly ILocalizationService _localizationService;
-        private readonly IManuCommonService _manuCommonService;
+       
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+       
         private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+       
         private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
         private readonly IProcMaterialRepository _procMaterialRepository;
-        private readonly IMasterDataService _masterDataService;
+       
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         
 
         public ManuMergeService(ILocalizationService localizationService
             , IManuSfcCirculationRepository manuSfcCirculationRepository
             , IManuSfcInfoRepository manuSfcInfoRepository
-            ,IManuSfcStepRepository manuSfcStepRepository
+       
             ,IManuSfcRepository manuSfcRepository
             , IProcMaterialRepository procMaterialRepository
-            , IMasterDataService masterDataService
+          
             , IManuGenerateBarcodeService manuGenerateBarcodeService
             , IInteCodeRulesRepository inteCodeRulesRepository
             , IManuSfcProduceRepository manuSfcProduceRepository) {
@@ -62,10 +62,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcRepository = manuSfcRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
+           
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
             _procMaterialRepository = procMaterialRepository;
-            _masterDataService = masterDataService;
+           
             _inteCodeRulesRepository = inteCodeRulesRepository;
         }
         

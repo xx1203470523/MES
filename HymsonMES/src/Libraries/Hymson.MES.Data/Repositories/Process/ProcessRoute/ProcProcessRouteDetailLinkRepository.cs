@@ -1,8 +1,10 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -42,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcessRouteDetailLinksByProcessRouteIdAsync(long processRouteId)
         {
-            var key = $"proc_process_route_detail_link&{processRouteId}";
+            var key = $"{CachedTables.PROC_PROCESS_ROUTE_DETAIL_LINK}&{processRouteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
@@ -68,7 +70,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetNextProcessRouteDetailLinkAsync(ProcProcessRouteDetailLinkQuery query)
         {
-            var key = $"proc_process_route_detail_link&{query.ProcessRouteId}&{query.ProcedureId}";
+            var key = $"{CachedTables.PROC_PROCESS_ROUTE_DETAIL_LINK}&{query.ProcessRouteId}&{query.ProcedureId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
@@ -123,7 +125,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(EntityBySiteIdQuery query)
         {
-            var key = $"proc_process_route_detail_link&SiteId={query.SiteId}";
+            var key = $"{CachedTables.PROC_PROCESS_ROUTE_DETAIL_LINK}&SiteId={query.SiteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 var sqlBuilder = new SqlBuilder();

@@ -155,6 +155,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         Task<EquEquipmentResAllView> GetEquResProcedureAsync(EquResAllQuery param);
 
+        /// <summary>
+        /// 获取设备列表
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentEntity>> GetBySiteIdAsync(EquQuery query);
+
         #endregion
     }
 }

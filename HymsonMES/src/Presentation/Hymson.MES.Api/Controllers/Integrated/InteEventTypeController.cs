@@ -44,6 +44,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("事件维护", BusinessType.INSERT)]
         [PermissionDescription("integrated:inteEventType:insert")]
         public async Task<long> AddAsync([FromBody] InteEventTypeSaveDto saveDto)
         {
@@ -57,6 +58,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("事件维护", BusinessType.UPDATE)]
         [PermissionDescription("integrated:inteEventType:update")]
         public async Task UpdateAsync([FromBody] InteEventTypeSaveDto saveDto)
         {
@@ -70,6 +72,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("事件维护", BusinessType.DELETE)]
         [PermissionDescription("integrated:inteEventType:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {

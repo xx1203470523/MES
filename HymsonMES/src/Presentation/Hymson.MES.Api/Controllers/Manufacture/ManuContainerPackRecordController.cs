@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -61,6 +62,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("容器装载记录", BusinessType.INSERT)]
         public async Task AddManuContainerPackRecordAsync([FromBody] ManuContainerPackRecordCreateDto parm)
         {
              await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(parm);
@@ -73,6 +75,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("容器装载记录", BusinessType.UPDATE)]
         public async Task UpdateManuContainerPackRecordAsync([FromBody] ManuContainerPackRecordModifyDto parm)
         {
              await _manuContainerPackRecordService.ModifyManuContainerPackRecordAsync(parm);
@@ -85,6 +88,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("容器装载记录", BusinessType.DELETE)]
         public async Task DeleteManuContainerPackRecordAsync([FromBody] long[] ids)
         {
             await _manuContainerPackRecordService.DeletesManuContainerPackRecordAsync(ids);

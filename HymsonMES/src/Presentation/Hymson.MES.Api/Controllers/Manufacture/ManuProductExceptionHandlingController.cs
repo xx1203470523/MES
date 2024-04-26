@@ -52,6 +52,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("compromise/submit")]
+        [LogDescription("让步接收", BusinessType.INSERT)]
         public async Task<int> SubmitCompromiseAsync(ManuCompromiseDto requestDto)
         {
             return await _manuProductExceptionHandlingService.SubmitCompromiseAsync(requestDto);
@@ -77,6 +78,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="formFile"></param>
         /// <returns></returns>
         [HttpPost("compromise/import")]
+        [LogDescription("让步接收", BusinessType.INSERT)]
         //[PermissionDescription("manufacture:manuProductExceptionHandling:import")]
         public async Task ImportCompromiseAsync([FromForm(Name = "file")] IFormFile formFile)
         {
@@ -103,6 +105,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("misjudgment/submit")]
+        [LogDescription("设备误判", BusinessType.INSERT)]
         public async Task<int> SubmitMisjudgmentAsync(ManuMisjudgmentDto requestDto)
         {
             return await _manuProductExceptionHandlingService.SubmitMisjudgmentAsync(requestDto);
@@ -139,6 +142,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("rework/submit")]
+        [LogDescription("返工", BusinessType.INSERT)]
         public async Task<int> SubmitReworkAsync(ManuReworkDto requestDto)
         {
             return await _manuProductExceptionHandlingService.SubmitReworkAsync(requestDto);
@@ -164,6 +168,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="formFile"></param>
         /// <returns></returns>
         [HttpPost("rework/import")]
+        [LogDescription("返工", BusinessType.INSERT)]
         //[PermissionDescription("manufacture:manuProductExceptionHandling:import")]
         public async Task ImportReworkAsync([FromForm(Name = "file")] IFormFile formFile)
         {
@@ -190,6 +195,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("detachment/submit")]
+        [LogDescription("离脱", BusinessType.INSERT)]
         public async Task<int> SubmitDetachmentAsync(ManuDetachmentDto requestDto)
         {
             return await _manuProductExceptionHandlingService.SubmitDetachmentAsync(requestDto);

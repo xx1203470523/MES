@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Services.WhWarehouseLocation;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.WhWarehouseLocation
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("库位", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] WhWarehouseLocationSaveDto saveDto)
         {
              await _whWarehouseLocationService.CreateAsync(saveDto);
@@ -56,6 +58,7 @@ namespace Hymson.MES.Api.Controllers.WhWarehouseLocation
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("库位", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] WhWarehouseLocationModifyDto modifyDto)
         {
              await _whWarehouseLocationService.ModifyAsync(modifyDto);
@@ -68,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.WhWarehouseLocation
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("库位", BusinessType.DELETE)]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _whWarehouseLocationService.DeletesAsync(ids);

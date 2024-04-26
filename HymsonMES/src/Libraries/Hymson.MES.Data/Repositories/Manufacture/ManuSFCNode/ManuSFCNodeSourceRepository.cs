@@ -2,7 +2,6 @@ using Dapper;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
-using IdGen;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -91,8 +90,35 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuSFCNodeSourceRepository
     {
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_source /**where**/  ";
+
+#if DM
+        const string GetTreeEntitiesSql = @"WITH RECURSIVE CTE (CirculationId, NodeId, SourceId) AS (
+              SELECT CirculationId, NodeId, SourceId
+              FROM manu_sfc_node_source
+              WHERE NodeId = @NodeId
+              UNION ALL
+              SELECT T.CirculationId, T.NodeId, T.SourceId
+              FROM manu_sfc_node_source T
+              INNER JOIN CTE ON CTE.SourceId = T.NodeId
+            )
+            SELECT * FROM CTE;";
+
+        const string InsertsSql = "MERGE INTO manu_sfc_node_source t " +
+            "USING (SELECT @NodeId AS NodeId, @SourceId AS SourceId FROM dual) s " +
+            "ON (t.NodeId = s.NodeId AND t.SourceId = s.SourceId) " +
+            "WHEN MATCHED THEN " +
+              "UPDATE SET " +
+                "t.CirculationId = @CirculationId, " +
+                "t.CreatedBy = @CreatedBy, " +
+                "t.CreatedOn = @CreatedOn, " +
+                "t.SiteId = @SiteId " +
+            "WHEN NOT MATCHED THEN " +
+              "INSERT (Id, CirculationId, NodeId, SourceId, CreatedBy, CreatedOn, SiteId) " +
+              "VALUES (@Id, @CirculationId, s.NodeId, s.SourceId, @CreatedBy, @CreatedOn, @SiteId);";
+#else
         const string GetTreeEntitiesSql = @"
-                            ;WITH RECURSIVE CTE AS (
+                            WITH RECURSIVE CTE AS (
                               SELECT CirculationId, NodeId, SourceId
                               FROM manu_sfc_node_source
                               WHERE NodeId = @NodeId 
@@ -103,9 +129,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             )
                             SELECT * FROM CTE;";
 
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_source /**where**/  ";
-
         const string InsertsSql = "REPLACE INTO manu_sfc_node_source(`Id`, CirculationId, `NodeId`, `SourceId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @SourceId, @CreatedBy, @CreatedOn, @SiteId) ";
+#endif
 
     }
 }

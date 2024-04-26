@@ -163,6 +163,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("importLoadPoint")]
+        [LogDescription("导入上料点数据", BusinessType.EXPORT)]
         public async Task ImportCustomAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _procLoadPointService.ImportLoadPointAsync(formFile);

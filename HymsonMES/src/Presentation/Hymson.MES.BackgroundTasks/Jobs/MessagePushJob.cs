@@ -1,25 +1,37 @@
 ﻿using Hymson.MessagePush.Services;
 using Microsoft.Extensions.Logging;
 using Quartz;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.BackgroundTasks.Jobs
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [DisallowConcurrentExecution]
     internal class MessagePushJob : IJob
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly IMessageService _messageService;
         private readonly ILogger<MessagePushJob> _logger;
 
-        public MessagePushJob(IMessageService messageService,ILogger<MessagePushJob> logger)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="messageService"></param>
+        /// <param name="logger"></param>
+        public MessagePushJob(IMessageService messageService, ILogger<MessagePushJob> logger)
         {
             this._messageService = messageService;
             _logger = logger;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public async Task Execute(IJobExecutionContext context)
         {
             if (context.CancellationToken.IsCancellationRequested) return;
@@ -30,8 +42,9 @@ namespace Hymson.MES.BackgroundTasks.Jobs
             catch (Exception ex)
             {
 
-                _logger.LogError(ex,"定时执行发送消息出错:");
+                _logger.LogError(ex, "定时执行发送消息出错:");
             }
         }
+
     }
 }
