@@ -46,7 +46,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [Route("create")]
         public async Task AddAsync([FromBody] QualFinallyOutputRecordSaveDto saveDto)
         {
-             await _qualFinallyOutputRecordService.CreateAsync(saveDto);
+            await _qualFinallyOutputRecordService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [Route("update")]
         public async Task UpdateAsync([FromBody] QualFinallyOutputRecordSaveDto saveDto)
         {
-             await _qualFinallyOutputRecordService.ModifyAsync(saveDto);
+            await _qualFinallyOutputRecordService.ModifyAsync(saveDto);
         }
 
         /// <summary>
@@ -93,6 +93,17 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<PagedInfo<QualFinallyOutputRecordView>?> QueryBySFCAsync([FromQuery] FQCInspectionSFCQueryDto query)
         {
             return await _qualFinallyOutputRecordService.QueryBySFCAsync(query);
+        }
+
+        /// <summary>
+        /// 查询详情（成品条码产出记录(FQC生成使用)）
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet("finallyRecordBarCode/{sfc}")]
+        public async Task<QualFinallyOutputRecordView?> FinallyRecordBarCodeAsync(string sfc)
+        {
+            return await _qualFinallyOutputRecordService.QueryBySFCFirstAsync(sfc);
         }
 
         /// <summary>
