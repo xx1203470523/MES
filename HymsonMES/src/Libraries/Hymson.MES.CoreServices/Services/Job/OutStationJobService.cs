@@ -355,6 +355,16 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 2024.03.19 克明大佬说出站时需要清除设备ID值
                 sfcProduceEntity.EquipmentId = null;
 
+                // 出站核心业务参数
+                var coreRequestBo = new OutStationCoreRequestBo
+                {
+                    CommonBo = commonBo,
+                    RequestBo = requestBo,
+                    SFCEntity = manuSfcEntity,
+                    SFCProduceEntity = sfcProduceEntity,
+                    ProcedureRejudgeBo = procedureRejudgeBo
+                };
+
                 // 是否有传是否合格标识
                 if (requestBo.IsQualified.HasValue && !requestBo.IsQualified.Value)
                 {
@@ -362,18 +372,18 @@ namespace Hymson.MES.CoreServices.Services.Job
                     if (procedureRejudgeBo.MarkUnqualifiedId.HasValue)
                     {
                         // 不合格出站（平台）
-                        responseBo = await OutStationForUnQualifiedProcedureAsync(commonBo, requestBo, manuSfcEntity, sfcProduceEntity, procedureRejudgeBo);
+                        responseBo = await OutStationForUnQualifiedProcedureAsync(coreRequestBo);
                     }
                     else
                     {
                         // 不合格出站（顷刻）
-                        responseBo = await OutStationForUnQualifiedProcedureWithoutMarkAsync(commonBo, requestBo, manuSfcEntity, sfcProduceEntity, procedureRejudgeBo);
+                        responseBo = await OutStationForUnQualifiedProcedureWithoutMarkAsync(coreRequestBo);
                     }
                 }
                 else
                 {
                     // 合格出站（为了逻辑清晰，跟上面的不合格出站区分开）
-                    responseBo = await OutStationForQualifiedProcedureAsync(commonBo, requestBo, manuSfcEntity, sfcProduceEntity);
+                    responseBo = await OutStationForQualifiedProcedureAsync(coreRequestBo);
                 }
 
                 // 保存单个条码的出站结果
@@ -644,13 +654,16 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <summary>
         /// 合格工序出站
         /// </summary>
-        /// <param name="commonBo"></param>
-        /// <param name="requestBo"></param>
-        /// <param name="manuSfcEntity"></param>
-        /// <param name="sfcProduceEntity"></param>
+        /// <param name="coreRequestBo"></param>
         /// <returns></returns>
-        private async Task<OutStationResponseBo?> OutStationForQualifiedProcedureAsync(JobRequestBo commonBo, OutStationRequestBo requestBo, ManuSfcEntity manuSfcEntity, ManuSfcProduceEntity sfcProduceEntity)
+        private async Task<OutStationResponseBo?> OutStationForQualifiedProcedureAsync(OutStationCoreRequestBo coreRequestBo)
         {
+            // 为了让下面的代码不动，这里做了一个转换
+            var commonBo = coreRequestBo.CommonBo;
+            var requestBo = coreRequestBo.RequestBo;
+            var manuSfcEntity = coreRequestBo.SFCEntity;
+            var sfcProduceEntity = coreRequestBo.SFCProduceEntity;
+
             if (commonBo == null) return default;
             if (commonBo.Proxy == null) return default;
 
@@ -802,14 +815,17 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <summary>
         /// 不合格工序出站（标记复判NG版）
         /// </summary>
-        /// <param name="commonBo"></param>
-        /// <param name="requestBo"></param>
-        /// <param name="manuSfcEntity"></param>
-        /// <param name="sfcProduceEntity"></param>
-        /// <param name="procedureRejudgeBo"></param>
+        /// <param name="coreRequestBo"></param>
         /// <returns></returns>
-        private async Task<OutStationResponseBo?> OutStationForUnQualifiedProcedureAsync(JobRequestBo commonBo, OutStationRequestBo requestBo, ManuSfcEntity manuSfcEntity, ManuSfcProduceEntity sfcProduceEntity, ProcedureRejudgeBo procedureRejudgeBo)
+        private async Task<OutStationResponseBo?> OutStationForUnQualifiedProcedureAsync(OutStationCoreRequestBo coreRequestBo)
         {
+            // 为了让下面的代码不动，这里做了一个转换
+            var commonBo = coreRequestBo.CommonBo;
+            var requestBo = coreRequestBo.RequestBo;
+            var manuSfcEntity = coreRequestBo.SFCEntity;
+            var sfcProduceEntity = coreRequestBo.SFCProduceEntity;
+            var procedureRejudgeBo = coreRequestBo.ProcedureRejudgeBo;
+
             if (commonBo == null) return default;
             if (commonBo.Proxy == null) return default;
 
@@ -1150,14 +1166,17 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <summary>
         /// 不合格工序出站（无标记复判NG版）
         /// </summary>
-        /// <param name="commonBo"></param>
-        /// <param name="requestBo"></param>
-        /// <param name="manuSfcEntity"></param>
-        /// <param name="sfcProduceEntity"></param>
-        /// <param name="procedureRejudgeBo"></param>
+        /// <param name="coreRequestBo"></param>
         /// <returns></returns>
-        private async Task<OutStationResponseBo?> OutStationForUnQualifiedProcedureWithoutMarkAsync(JobRequestBo commonBo, OutStationRequestBo requestBo, ManuSfcEntity manuSfcEntity, ManuSfcProduceEntity sfcProduceEntity, ProcedureRejudgeBo procedureRejudgeBo)
+        private async Task<OutStationResponseBo?> OutStationForUnQualifiedProcedureWithoutMarkAsync(OutStationCoreRequestBo coreRequestBo)
         {
+            // 为了让下面的代码不动，这里做了一个转换
+            var commonBo = coreRequestBo.CommonBo;
+            var requestBo = coreRequestBo.RequestBo;
+            var manuSfcEntity = coreRequestBo.SFCEntity;
+            var sfcProduceEntity = coreRequestBo.SFCProduceEntity;
+            var procedureRejudgeBo = coreRequestBo.ProcedureRejudgeBo;
+
             if (commonBo == null) return default;
             if (commonBo.Proxy == null) return default;
 

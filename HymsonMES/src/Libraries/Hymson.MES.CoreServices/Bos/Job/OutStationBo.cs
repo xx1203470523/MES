@@ -143,6 +143,38 @@ namespace Hymson.MES.CoreServices.Bos.Job
     }
 
     /// <summary>
+    /// 出站业务对象（请求）
+    /// </summary>
+    public class OutStationCoreRequestBo
+    {
+        /// <summary>
+        /// 作业基础参数
+        /// </summary>
+        public JobRequestBo CommonBo { get; set; }
+
+        /// <summary>
+        /// 出站参数
+        /// </summary>
+        public OutStationRequestBo RequestBo { get; set; }
+
+        /// <summary>
+        /// 复投相关参数
+        /// </summary>
+        public ProcedureRejudgeBo ProcedureRejudgeBo { get; set; }
+
+        /// <summary>
+        /// 条码实体
+        /// </summary>
+        public ManuSfcEntity SFCEntity { get; set; }
+
+        /// <summary>
+        /// 在制条码实体
+        /// </summary>
+        public ManuSfcProduceEntity SFCProduceEntity { get; set; }
+
+    }
+
+    /// <summary>
     /// 
     /// </summary>
     public class OutStationResponseSummaryBo : CommonResponseBo
