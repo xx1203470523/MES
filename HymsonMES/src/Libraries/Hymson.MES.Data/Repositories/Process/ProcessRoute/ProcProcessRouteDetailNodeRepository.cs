@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -52,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetListAsync(EntityBySiteIdQuery query)
         {
-            var key = $"proc_process_route_detail_node&SiteId={query.SiteId}";
+            var key = $"{CachedTables.PROC_PROCESS_ROUTE_DETAIL_NODE}&SiteId={query.SiteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 var sqlBuilder = new SqlBuilder();
@@ -75,7 +76,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetProcessRouteDetailNodesByProcessRouteIdAsync(long processRouteId)
         {
-            var key = $"proc_process_route_detail_node&{processRouteId}";
+            var key = $"{CachedTables.PROC_PROCESS_ROUTE_DETAIL_NODE}&{processRouteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
@@ -164,7 +165,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcProcessRouteDetailNodeEntity> GetFirstProcedureByProcessRouteIdAsync(long processRouteId)
         {
-            var key = $"proc_process_route_detail_node&FirstProcedure&{processRouteId}";
+            var key = $"{CachedTables.PROC_PROCESS_ROUTE_DETAIL_NODE}&FirstProcedure&{processRouteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
