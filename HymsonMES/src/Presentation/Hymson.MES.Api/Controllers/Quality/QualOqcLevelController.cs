@@ -46,6 +46,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("OQC检验水平", BusinessType.INSERT)]
         [PermissionDescription("quality:qualOQCLevel:insert")]
         public async Task AddAsync([FromBody] QualOqcLevelSaveDto saveDto)
         {
@@ -59,6 +60,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("OQC检验水平", BusinessType.UPDATE)]
         [PermissionDescription("quality:qualOQCLevel:update")]
         public async Task UpdateAsync([FromBody] QualOqcLevelSaveDto saveDto)
         {
@@ -72,6 +74,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("OQC检验水平", BusinessType.DELETE)]
         [PermissionDescription("quality:qualOQCLevel:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {

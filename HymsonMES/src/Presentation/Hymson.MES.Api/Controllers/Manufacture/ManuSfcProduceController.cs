@@ -70,6 +70,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [HttpPost]
         [Route("lock")]
         [PermissionDescription("qual:qualityLock:lock")]
+        [LogDescription("质量锁定", BusinessType.INSERT)]
         public async Task QualityLockAsync(ManuSfcProduceLockDto parm)
         {
             await _manuSfcProduceService.QualityLockAsync(parm);
@@ -83,6 +84,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [HttpPost]
         [Route("scrap")]
         [PermissionDescription("qual:productScrap:scrap")]
+        [LogDescription("条码报废", BusinessType.INSERT)]
         public async Task QualityScrapAsync(ManuSfScrapDto parm)
         {
             if (parm.OperationType == ScrapOperateTypeEnum.Scrapping)
@@ -123,6 +125,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("条码生产信息", BusinessType.INSERT)]
         public async Task AddManuSfcProduceAsync([FromBody] ManuSfcProduceCreateDto parm)
         {
             await _manuSfcProduceService.CreateManuSfcProduceAsync(parm);
@@ -134,6 +137,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
+        [LogDescription("条码生产信息", BusinessType.UPDATE)]
         public async Task UpdateManuSfcProduceAsync([FromBody] ManuSfcProduceModifyDto parm)
         {
             await _manuSfcProduceService.ModifyManuSfcProduceAsync(parm);
@@ -145,6 +149,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("条码生产信息", BusinessType.DELETE)]
         public async Task DeleteManuSfcProduceAsync(string ids)
         {
             await _manuSfcProduceService.DeletesManuSfcProduceAsync(ids);
@@ -207,6 +212,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="sfcs"></param>
         /// <returns></returns>
         [HttpPost("getManuSfcProduceStep")]
+        [LogDescription("根据SFC查询在制品步骤列表", BusinessType.INSERT)]
         public async Task<IEnumerable<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs)
         {
             return await _manuSfcProduceService.QueryManuSfcProduceStepBySFCsAsync(sfcs);
@@ -233,6 +239,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="sfcs"></param>
         /// <returns></returns>
         [HttpPost("getManuUpdateList")]
+        [LogDescription("获取更改生产列表数据", BusinessType.INSERT)]
         public async Task<List<ManuUpdateViewDto>> GetManuUpdateList(string[] sfcs)
         {
             return await _manuSfcProduceService.GetManuUpdateListAsync(sfcs);
@@ -291,6 +298,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="sfcs"></param>
         /// <returns></returns>
         [HttpPost("getSfcAboutManuDowngrading")]
+        [LogDescription("根据条码获取条码相关联降级等级信息", BusinessType.INSERT)]
         public async Task<IEnumerable<ManuSfcProduceAboutDowngradingViewDto>> GetLastProcedureAsync(string[] sfcs)
         {
             return await _manuSfcProduceService.GetManuSfcAboutManuDowngradingBySfcsAsync(sfcs);

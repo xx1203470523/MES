@@ -45,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("环境检验参数表", BusinessType.INSERT)]
         [PermissionDescription("quality:qualEnvParameterGroup:insert")]
         public async Task AddAsync([FromBody] QualEnvParameterGroupSaveDto saveDto)
         {
@@ -58,6 +59,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("环境检验参数表", BusinessType.UPDATE)]
         [PermissionDescription("quality:qualEnvParameterGroup:update")]
         public async Task UpdateAsync([FromBody] QualEnvParameterGroupSaveDto saveDto)
         {
@@ -71,6 +73,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("环境检验参数表", BusinessType.DELETE)]
         [PermissionDescription("quality:qualEnvParameterGroup:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {

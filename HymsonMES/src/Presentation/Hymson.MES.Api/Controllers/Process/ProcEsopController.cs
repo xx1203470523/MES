@@ -68,6 +68,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("ESOP", BusinessType.INSERT)]
         [PermissionDescription("proc:esop:insert")]
         public async Task AddProcEsopAsync([FromBody] ProcEsopCreateDto parm)
         {
@@ -81,6 +82,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("ESOP", BusinessType.UPDATE)]
         [PermissionDescription("proc:esop:update")]
         public async Task UpdateProcEsopAsync([FromBody] ProcEsopModifyDto parm)
         {
@@ -94,6 +96,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("ESOP", BusinessType.DELETE)]
         [PermissionDescription("proc:esop:delete")]
         public async Task DeleteProcEsopAsync(DeleteDto deleteDto)
         {
@@ -107,6 +110,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("attachmentAdd")]
+        [LogDescription("附件上传", BusinessType.INSERT)]
         [PermissionDescription("quality:ipqcInspectionHead:attachmentAdd")]
         public async Task AttachmentAddAsync([FromBody] AttachmentAddDto dto)
         {
@@ -120,6 +124,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("attachmentDelete")]
+        [LogDescription("附件删除", BusinessType.DELETE)]
         [PermissionDescription("quality:ipqcInspectionHead:attachmentDelete")]
         public async Task AttachmentDeleteAsync([FromBody] long[] ids)
         {
