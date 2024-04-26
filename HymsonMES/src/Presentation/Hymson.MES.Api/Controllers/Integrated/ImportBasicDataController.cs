@@ -42,6 +42,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("importEqu")]
+        [LogDescription("设备数据导入", BusinessType.EXPORT)]
         public async Task ImportEquDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportEquDataAsync(formFile);
@@ -54,6 +55,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("importResource")]
+        [LogDescription("资源数据导入", BusinessType.EXPORT)]
         public async Task ImportResourceDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportResourceDataAsync(formFile);
@@ -66,6 +68,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("importResType")]
+        [LogDescription("资源类型数据导入", BusinessType.EXPORT)]
         public async Task ImportResourceTypeDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportResourceTypeDataAsync(formFile);
@@ -78,6 +81,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("importProcedure")]
+        [LogDescription("工序数据导入", BusinessType.EXPORT)]
         public async Task ImportProcedureDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportProcedureDataAsync(formFile);
@@ -89,6 +93,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("importWorkLine")]
+        [LogDescription("产线数据导入", BusinessType.EXPORT)]
         public async Task ImportWorkLineDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportWorkLineDataAsync(formFile);
@@ -100,6 +105,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("importWorkShop")]
+        [LogDescription("车间数据导入", BusinessType.EXPORT)]
         public async Task ImportWorkShopDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportWorkShopDataAsync(formFile);
@@ -111,6 +117,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("importMaterialGroup")]
+        [LogDescription("物料组数据导入", BusinessType.EXPORT)]
         public async Task ImportMaterialGroupDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportMaterialGroupDataAsync(formFile);
@@ -122,6 +129,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("importMaterial")]
+        [LogDescription("物料数据导入", BusinessType.EXPORT)]
         public async Task ImportMaterialDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportMaterialDataAsync(formFile);
@@ -133,6 +141,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("importParameter")]
+        [LogDescription("物料数据导入", BusinessType.EXPORT)]
         public async Task ImportParameterDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportParameterDataAsync(formFile);
@@ -143,6 +152,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpGet("downloadMaterialTemplate")]
+        [LogDescription("物料导入模板下载", BusinessType.EXPORT)]
         //[LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
         public async Task<IActionResult> DownloadMaterialTemplateAsync()
         {
@@ -156,6 +166,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <returns></returns>
         [HttpGet("downloadParameterTTemplate")]
+        [LogDescription("参数导入模板下载", BusinessType.EXPORT)]
         //[LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
         public async Task<IActionResult> DownloadParameterTemplateAsync()
         {

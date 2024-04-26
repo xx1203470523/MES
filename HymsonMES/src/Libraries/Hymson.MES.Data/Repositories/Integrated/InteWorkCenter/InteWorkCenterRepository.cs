@@ -96,7 +96,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<InteWorkCenterEntity> GetByIdAsync(long id)
         {
-            var key = $"inte_work_center&{id}";
+            var key = $"{CachedTables.INTE_WORK_CENTER}&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
@@ -153,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<IEnumerable<InteWorkCenterEntity>> GetWorkCenterListByTypeAsync(EntityByTypeQuery query)
         {
-            var key = $"inte_work_center&Type-{query.Type}&Status-{query.Status}&SiteId-{query.SiteId}";
+            var key = $"{CachedTables.INTE_WORK_CENTER}&Type-{query.Type}&Status-{query.Status}&SiteId-{query.SiteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();

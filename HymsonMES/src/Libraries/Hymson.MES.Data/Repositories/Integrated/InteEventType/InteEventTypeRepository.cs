@@ -114,7 +114,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<InteEventTypeEntity> GetByIdAsync(long id)
         {
-            var key = $"inte_event_type&id-{id}";
+            var key = $"{CachedTables.INTE_EVENT_TYPE}&id-{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();

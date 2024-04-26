@@ -639,6 +639,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             OutStationRequestBo outReqBo = new OutStationRequestBo();
             outReqBo.SFC = dto.Sfc;
             outReqBo.IsQualified = true;
+            outReqBo.QualifiedQty = dto.OkQty;
+            outReqBo.UnQualifiedQty = dto.NgQty;
             outReqBo.ConsumeList = consumeSfcList;
             outBo.OutStationRequestBos = new List<OutStationRequestBo>() { outReqBo };
             //步骤记录

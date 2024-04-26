@@ -4,6 +4,8 @@ using Hymson.Elasticsearch;
 using Hymson.Infrastructure.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.Logging;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
 
 namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 {
@@ -56,6 +58,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             }
             else
             {
+                if(string.IsNullOrWhiteSpace(queryType)) throw new CustomerValidationException(nameof(ErrorCode.MES10138));
                 logDataPagedQuery.Type = queryType;
             }
 

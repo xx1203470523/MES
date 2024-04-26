@@ -347,7 +347,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         const string UpdateFeedingQtySql = @"
             update manu_feeding
-            set Qty = Qty - @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn,IsDeleted = @IsDeleted
+            set Qty = Qty - cast(@Qty as decimal), UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn,IsDeleted = @IsDeleted
             where BarCode = @BarCode
             and ( ResourceId = @ResourceId or FeedingPointId = @FeedingPointId )
         ";

@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,6 +46,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("addOrUpdate")]
+        [LogDescription("自定义字段", BusinessType.UPDATE)]
         public async Task AddOrUpdateAsync([FromBody] IEnumerable<InteCustomFieldSaveDto> saveDtos)
         {
              await _inteCustomFieldService.AddOrUpdateAsync(saveDtos);
@@ -68,6 +70,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("saveBusinessData")]
+        [LogDescription("自定义字段", BusinessType.OTHER)]
         public async Task SaveBusinessDataAsync(IEnumerable<InteCustomFieldBusinessEffectuateDto> saveBusinessDtos) 
         {
             await _inteCustomFieldService.SaveBusinessDataAsync(saveBusinessDtos);
@@ -92,6 +95,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpDelete]
         [Route("delBusinessEffectuates")]
+        [LogDescription("自定义字段", BusinessType.DELETE)]
         public async Task<int> DelBusinessEffectuatesAsync(long[] ids)
         {
             return await _inteCustomFieldService.DelBusinessEffectuatesAsync(ids);

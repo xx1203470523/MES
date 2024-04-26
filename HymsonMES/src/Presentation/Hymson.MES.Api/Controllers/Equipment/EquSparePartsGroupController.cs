@@ -3,6 +3,7 @@ using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Equipment;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,6 +47,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("备件类型", BusinessType.INSERT)]
         public async Task AddEquSparePartsGroupAsync([FromBody] EquSparePartsGroupSaveDto saveDto)
         {
              await _equSparePartsGroupService.CreateEquSparePartsGroupAsync(saveDto);
@@ -58,6 +60,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("备件类型", BusinessType.UPDATE)]
         public async Task UpdateEquSparePartsGroupAsync([FromBody] EquSparePartsGroupSaveDto saveDto)
         {
              await _equSparePartsGroupService.ModifyEquSparePartsGroupAsync(saveDto);
@@ -70,6 +73,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("备件类型", BusinessType.DELETE)]
         public async Task DeleteEquSparePartsGroupAsync([FromBody] long[] ids)
         {
             await _equSparePartsGroupService.DeletesEquSparePartsGroupAsync(ids);

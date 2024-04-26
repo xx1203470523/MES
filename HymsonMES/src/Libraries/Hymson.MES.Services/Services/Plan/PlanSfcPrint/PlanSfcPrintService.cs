@@ -1,4 +1,3 @@
-using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -9,7 +8,6 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
@@ -22,12 +20,10 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.HttpClients;
-using Hymson.MES.HttpClients.Requests.Print;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
-using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -192,36 +188,37 @@ namespace Hymson.MES.Services.Services.Plan
 
             var resourceEntity = await _procResourceRepository.GetResByIdAsync(createDto.ResourceId);
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(createDto.ProcedureId);
+
             // 对工序资源类型和资源的资源类型校验
             if (resourceEntity != null && procedureEntity != null && procedureEntity.ResourceTypeId.HasValue && resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16507));
             }
-            PlanWorkOrderEntity work;
-            if (createDto.WorkOrderId == 0)
+
+            // 读取条码
+            var sfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
             {
-                work = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery()
-                {
-                    OrderCode = createDto.OrderCode,
-                    SiteId = _currentSite.SiteId ?? 0
-                });
-            }
-            else
-            {
-                work = await _planWorkOrderRepository.GetByIdAsync(createDto.WorkOrderId);
-            }
+                SiteId = resourceEntity?.SiteId,
+                SFC = createDto.SFC
+            });
+            if (sfcEntity == null) return;
+
+            // 读取条码信息
+            var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdAsync(sfcEntity.Id);
+            if (sfcInfoEntity == null) return;
+
             _eventBus.Publish(new PrintIntegrationEvent
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 PrintId = createDto.PrintId,
-                ProcedureId= createDto.ProcedureId,
+                ProcedureId = createDto.ProcedureId,
                 ResourceId = createDto.ResourceId,
                 BarCodes = new List<LabelTemplateBarCodeDto>
                 {
                     new LabelTemplateBarCodeDto
                     {
-                    BarCode=createDto.SFC??"",
-                    MateriaId=work.ProductId
+                        BarCode = createDto.SFC ?? "",
+                        MateriaId = sfcInfoEntity.ProductId
                     }
                 },
                 UserName = _currentUser.UserName

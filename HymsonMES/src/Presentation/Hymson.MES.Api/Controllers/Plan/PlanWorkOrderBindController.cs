@@ -1,5 +1,6 @@
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Plan
@@ -35,6 +36,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPost]
         [Route("bindActivationWorkOrder")]
+        [LogDescription("绑定/取消绑定工单", BusinessType.INSERT)]
         public async Task BindActivationWorkOrder(BindActivationWorkOrderDto bindActivationWorkOrder) 
         {
             await _planWorkOrderBindService.BindActivationWorkOrderAsync(bindActivationWorkOrder);
