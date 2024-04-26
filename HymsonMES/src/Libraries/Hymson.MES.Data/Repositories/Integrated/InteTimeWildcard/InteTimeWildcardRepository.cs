@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -176,8 +177,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteTimeWildcardEntity>> GetAllAsync(long siteId)
         {
-            var cachedKey = "inte_time_wildcard_All";
-            return await _memoryCache.GetOrCreateLazyAsync(cachedKey, async (ICacheEntry cacheEntry) =>
+            //var cachedKey = "inte_time_wildcard_All";
+            var key = $"{CachedTables.INTE_TIME_WILDCARD}_All";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (ICacheEntry cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
                 return await conn.QueryAsync<InteTimeWildcardEntity>(GetAllSql, new { SiteId = siteId });

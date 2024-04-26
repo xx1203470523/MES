@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Equipment;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,6 +46,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("点检记录表", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] EquInspectionRecordSaveDto saveDto)
         {
              await _equInspectionRecordService.CreateAsync(saveDto);
@@ -57,6 +59,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("点检记录表", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] EquInspectionRecordSaveDto saveDto)
         {
              await _equInspectionRecordService.ModifyAsync(saveDto);
@@ -69,6 +72,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("点检记录表", BusinessType.DELETE)]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _equInspectionRecordService.DeletesAsync(ids);
@@ -103,6 +107,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("start")]
+        [LogDescription("点检记录表", BusinessType.OTHER)]
         public async Task<long> StartVerificationAsync(EquInspectionCompleteDto requestDto)
         {
             return await _equInspectionRecordService.StartVerificationAsync(requestDto);
@@ -114,6 +119,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("save")]
+        [LogDescription("点检记录表", BusinessType.OTHER)]
         public async Task<long> SaveVerificationnAsync(EquInspectionSaveDto requestDto)
         {
             return await _equInspectionRecordService.SaveVerificationnAsync(requestDto);
@@ -125,6 +131,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("complete")]
+        [LogDescription("点检记录表", BusinessType.OTHER)]
         public async Task<long> CompleteVerificationAsync(EquInspectionCompleteDto requestDto)
         {
             return await _equInspectionRecordService.CompleteVerificationAsync(requestDto);

@@ -88,6 +88,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("分选规则", BusinessType.INSERT)]
         [PermissionDescription("proc:procSortingRule:insert")]
         public async Task<long> AddProcSortingRuleAsync([FromBody] ProcSortingRuleCreateDto parm)
         {
@@ -101,6 +102,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("分选规则", BusinessType.UPDATE)]
         [PermissionDescription("proc:procSortingRule:update")]
         public async Task UpdateProcSortingRuleAsync([FromBody] ProcSortingRuleModifyDto parm)
         {
@@ -114,6 +116,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("分选规则", BusinessType.DELETE)]
         [PermissionDescription("proc:procSortingRule:delete")]
         public async Task DeleteProcSortingRuleAsync([FromBody] long[] ids)
         {

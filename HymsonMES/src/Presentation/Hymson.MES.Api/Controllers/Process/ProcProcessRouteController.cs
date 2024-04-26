@@ -63,6 +63,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("listByIds")]
+        [LogDescription("根据id查询不合格工艺路线列表", BusinessType.INSERT)]
         public async Task<IEnumerable<ProcProcessRouteDto>> GetListByIdsAsync(ProcProcessRouteQueryDto queryDto)
         {
             return await _procProcessRouteService.GetListByIdsAsync(queryDto.Ids);

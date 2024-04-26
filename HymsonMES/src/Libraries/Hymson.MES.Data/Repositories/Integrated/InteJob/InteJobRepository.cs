@@ -6,6 +6,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -110,7 +111,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// <returns></returns>
         public async Task<IEnumerable<InteJobEntity>> GetEntitiesAsync(EntityBySiteIdQuery query)
         {
-            var key = $"inte_job&SiteId-{query.SiteId}";
+            var key = $"{CachedTables.INTE_JOB}&SiteId-{query.SiteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
