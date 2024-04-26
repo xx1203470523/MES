@@ -129,7 +129,6 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// <returns></returns>
         public async Task AddProcPrintConfigAsync(ProcPrinterDto param)
         {
-            param.PrintName = param.PrintName.ToTrimSpace();
             param.PrintIp = param.PrintIp.ToTrimSpace();
             param.Remark = param.Remark?.Trim();
 
@@ -175,7 +174,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// <returns></returns>
         public async Task UpdateProcPrintConfigAsync(ProcPrinterUpdateDto param)
         {
-            param.PrintName = param.PrintName.ToTrimSpace();
+           
             param.Remark = param.Remark.Trim();
 
             // 验证DTO

@@ -61,6 +61,10 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public long WorkOrderId { get; set; }
         public string WorkCode { get; set; }
+        /// <summary>
+        /// 是否产品一致
+        /// </summary>
+        public bool IsProductSame { get; set; } = true;
 
         /// <summary>
         /// 计划数量

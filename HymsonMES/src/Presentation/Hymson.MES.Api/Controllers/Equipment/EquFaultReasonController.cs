@@ -46,6 +46,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("设备故障原因表", BusinessType.INSERT)]
         [PermissionDescription("equipment:equFaultReason:insert")]
         public async Task AddAsync(EquFaultReasonSaveDto parm)
         {
@@ -59,6 +60,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("设备故障原因表", BusinessType.UPDATE)]
         [PermissionDescription("equipment:equFaultReason:update")]
         public async Task UpdateAsync(EquFaultReasonSaveDto parm)
         {
@@ -72,6 +74,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("设备故障原因表", BusinessType.DELETE)]
         [PermissionDescription("equipment:equFaultReason:delete")]
         public async Task DeleteAsync(long[] ids)
         {

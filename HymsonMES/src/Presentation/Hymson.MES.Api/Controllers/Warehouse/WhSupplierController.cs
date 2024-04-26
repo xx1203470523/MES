@@ -50,6 +50,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("createNew")]
+        [LogDescription("供应商管理", BusinessType.INSERT)]
         [PermissionDescription("integrated:inteSupplier:insert")]
         public async Task AddAsync([FromBody] WhSupplierCreateDto saveDto)
         {
@@ -63,6 +64,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPut]
         [Route("updateNew")]
+        [LogDescription("供应商管理", BusinessType.UPDATE)]
         [PermissionDescription("integrated:inteSupplier:update")]
         public async Task UpdateAsync([FromBody] WhSupplierModifyDto saveDto)
         {
@@ -78,6 +80,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("pagelist")]
+        [LogDescription("供应商管理", BusinessType.OTHER)]
         public async Task<PagedInfo<WhSupplierDto>> QueryPagedWhSupplierAsync(WhSupplierPagedQueryDto parm)
         {
             return await _whSupplierService.GetPageListAsync(parm);
@@ -154,6 +157,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("import")]
+        [LogDescription("导入供应商数据", BusinessType.EXPORT)]
         [PermissionDescription("wh:supplier:import")]
         public async Task ImportWhSupplierAsync([FromForm(Name = "file")] IFormFile formFile)
         {
@@ -180,6 +184,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpGet]
         [Route("export")]
+        [LogDescription("导出供应商信息", BusinessType.EXPORT)]
         [PermissionDescription("wh:supplier:export")]
         public async Task<WhSupplierExportResultDto> ExprotWhSupplierListAsync([FromQuery] WhSupplierPagedQueryDto param)
         {

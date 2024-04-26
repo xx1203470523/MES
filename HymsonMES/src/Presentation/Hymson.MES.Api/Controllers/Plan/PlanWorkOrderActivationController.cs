@@ -72,7 +72,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        //[LogDescription("工单激活", BusinessType.INSERT)]
+        [LogDescription("工单激活", BusinessType.INSERT)]
         //[PermissionDescription("plan:workOrderActivation:insert")]
         public async Task AddPlanWorkOrderActivationAsync([FromBody] PlanWorkOrderActivationCreateDto parm)
         {
@@ -86,7 +86,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        //[LogDescription("工单激活", BusinessType.UPDATE)]
+        [LogDescription("工单激活", BusinessType.UPDATE)]
         //[PermissionDescription("plan:workOrderActivation:update")]
         public async Task UpdatePlanWorkOrderActivationAsync([FromBody] PlanWorkOrderActivationModifyDto parm)
         {
@@ -100,7 +100,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        //[LogDescription("工单激活", BusinessType.DELETE)]
+        [LogDescription("工单激活", BusinessType.DELETE)]
         //[PermissionDescription("plan:workOrderActivation:delete")]
         public async Task DeletePlanWorkOrderActivationAsync([FromBody] long[] ids)
         {
@@ -114,6 +114,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPost]
         [Route("activationWorkOrder")]
+        [LogDescription("工单激活", BusinessType.INSERT)]
         [PermissionDescription("plan:workOrderActivation:activationWorkOrder")]
         public async Task ActivationWorkOrderAsync(ActivationWorkOrderDto activationWorkOrderDto) 
         {

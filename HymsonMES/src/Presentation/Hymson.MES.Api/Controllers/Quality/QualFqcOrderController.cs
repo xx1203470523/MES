@@ -48,6 +48,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("FQC检验单", BusinessType.INSERT)]
         public async Task<int> AddAsync([FromBody] QualFqcOrderCreateDto saveDto)
         {
              return await _qualFqcOrderService.CreateAsync(saveDto);
@@ -60,6 +61,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("createtest")]
+        [LogDescription("FQC检验单", BusinessType.INSERT)]
         public async Task<bool> AddAsync([FromBody] QualFqcOrderCreateTestDto saveDto)
         {
             return await _qualFqcOrderService.CreateAsync(saveDto);
@@ -84,6 +86,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPut("update")]
+        [LogDescription("FQC检验单", BusinessType.UPDATE)]
         public async Task<int> UpdateOrderAsync(FQCParameterDetailSaveDto requestDto)
         {
             return await _qualFqcOrderService.UpdateOrderAsync(requestDto);
@@ -96,6 +99,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("FQC检验单", BusinessType.DELETE)]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _qualFqcOrderService.DeletesAsync(ids);
@@ -130,6 +134,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("attachment/save")]
+        [LogDescription("上传检验单附件", BusinessType.EXPORT)]
         public async Task SaveAttachmentAsync([FromBody] QualFqcOrderSaveAttachmentDto requestDto)
         {
             await _qualFqcOrderService.SaveAttachmentAsync(requestDto);
@@ -141,6 +146,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="orderAnnexId"></param>
         /// <returns></returns>
         [HttpDelete("attachment/delete/{orderAnnexId}")]
+        [LogDescription("删除检验单附件", BusinessType.OTHER)]
         public async Task DeleteAttachmentByIdAsync(long orderAnnexId)
         {
             await _qualFqcOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
@@ -152,6 +158,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPost("generated")]
+        [LogDescription("生成FQC检验单", BusinessType.INSERT)]
         public async Task<int> GeneratedOrderAsync([FromBody] QualFqcOrderCreateDto saveDto)
         {
             return await _qualFqcOrderService.CreateAsync(saveDto);
@@ -165,6 +172,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("operation")]
+        [LogDescription("更改检验单状态", BusinessType.OTHER)]
         public async Task<long> OperationOrderAsync([FromBody] OrderOperationStatusDto requestDto)
         {
             return await _qualFqcOrderService.OperationOrderAsync(requestDto);
@@ -176,6 +184,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("save")]
+        [LogDescription("保存样品数据", BusinessType.OTHER)]
         public async Task<long> SaveOrderAsync([FromBody] QualFqcOrderSampleSaveDto requestDto)
         {
             return await _qualFqcOrderService.SaveOrderAsync(requestDto);
@@ -187,6 +196,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("complete")]
+        [LogDescription("完成检验单", BusinessType.OTHER)]
         public async Task<long> CompleteOrderAsync(QualFqcOrderCompleteDto requestDto)
         {
             return await _qualFqcOrderService.CompleteOrderAsync(requestDto);
@@ -198,6 +208,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("close")]
+        [LogDescription("关闭检验单", BusinessType.OTHER)]
         public async Task<long> CloseOrderAsync(QualFqcOrderCloseDto requestDto)
         {
             return await _qualFqcOrderService.CloseOrderAsync(requestDto);

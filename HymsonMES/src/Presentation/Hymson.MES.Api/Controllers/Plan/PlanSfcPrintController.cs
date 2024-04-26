@@ -44,7 +44,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        //[LogDescription("条码打印", BusinessType.INSERT)]
+        [LogDescription("条码打印", BusinessType.INSERT)]
         //[PermissionDescription("plan:sfcPrint:insert")]
         public async Task CreateAsync([FromBody] PlanSfcPrintCreateDto createDto)
         {
@@ -53,6 +53,7 @@ namespace Hymson.MES.Api.Controllers.Plan
 
         [HttpPost]
         [Route("print")]
+        [LogDescription("条码打印", BusinessType.INSERT)]
         [PermissionDescription("plan:sfcPrint:print")]
         public async Task PrintAsync([FromBody] PlanSfcPrintCreatePrintDto createDto)
         {

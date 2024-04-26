@@ -45,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("产品检验参数组", BusinessType.INSERT)]
         [PermissionDescription("process:procProductParameterGroup:insert")]
         public async Task<long> AddAsync([FromBody] ProcProductParameterGroupSaveDto saveDto)
         {
@@ -58,6 +59,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("产品检验参数组", BusinessType.UPDATE)]
         [PermissionDescription("process:procProductParameterGroup:update")]
         public async Task UpdateAsync([FromBody] ProcProductParameterGroupSaveDto saveDto)
         {
@@ -71,6 +73,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("产品检验参数组", BusinessType.DELETE)]
         [PermissionDescription("process:procProductParameterGroup:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {

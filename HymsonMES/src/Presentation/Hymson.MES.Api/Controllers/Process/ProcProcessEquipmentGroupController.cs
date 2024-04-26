@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,6 +43,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("工艺设备组", BusinessType.INSERT)]
         public async Task<long> AddProcProcessEquipmentGroupAsync([FromBody] ProcProcessEquipmentGroupSaveDto saveDto)
         {
             return await _procProcessEquipmentGroupService.CreateProcProcessEquipmentGroupAsync(saveDto);
@@ -54,6 +56,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("工艺设备组", BusinessType.UPDATE)]
         public async Task UpdateProcProcessEquipmentGroupAsync([FromBody] ProcProcessEquipmentGroupSaveDto saveDto)
         {
              await _procProcessEquipmentGroupService.ModifyProcProcessEquipmentGroupAsync(saveDto);
@@ -66,6 +69,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("工艺设备组", BusinessType.DELETE)]
         public async Task DeleteProcProcessEquipmentGroupAsync([FromBody] long[] ids)
         {
             await _procProcessEquipmentGroupService.DeletesProcProcessEquipmentGroupAsync(ids);

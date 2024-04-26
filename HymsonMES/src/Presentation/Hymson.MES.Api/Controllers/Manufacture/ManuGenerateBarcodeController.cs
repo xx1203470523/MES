@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,6 +27,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("generateBarcodeByCodeRuleId")]
+        [LogDescription("生成条码", BusinessType.INSERT)]
         public async Task<IEnumerable<string>> GenerateBarcodeAsync(GenerateBarcodeDto parm)
         {
             return await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(parm);
@@ -38,6 +40,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("generateBarcodeByCodeRuleData")]
+        [LogDescription("生成条码", BusinessType.INSERT)]
         public async Task<IEnumerable<string>> GenerateBarcodeAsync(CodeRuleDto parm)
         {
             return await _manuGenerateBarcodeService.GenerateBarcodeListAsync(parm);

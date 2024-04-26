@@ -43,6 +43,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("消息组", BusinessType.INSERT)]
         [PermissionDescription("integrated:inteMessageGroup:insert")]
         public async Task<long> AddAsync([FromBody] InteMessageGroupSaveDto saveDto)
         {
@@ -56,6 +57,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPut]       
         [Route("update")]
+        [LogDescription("消息组", BusinessType.UPDATE)]
         [PermissionDescription("integrated:inteMessageGroup:update")]
         public async Task UpdateAsync([FromBody] InteMessageGroupSaveDto saveDto)
         {
@@ -69,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("消息组", BusinessType.DELETE)]
         [PermissionDescription("integrated:inteMessageGroup:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {

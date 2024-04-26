@@ -45,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("全检参数表", BusinessType.INSERT)]
         [PermissionDescription("quality:qualInspectionParameterGroup:insert")]
         public async Task<long> AddAsync([FromBody] QualInspectionParameterGroupSaveDto saveDto)
         {
@@ -58,6 +59,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("全检参数表", BusinessType.UPDATE)]
         [PermissionDescription("quality:qualInspectionParameterGroup:update")]
         public async Task UpdateAsync([FromBody] QualInspectionParameterGroupSaveDto saveDto)
         {
@@ -71,6 +73,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("全检参数表", BusinessType.DELETE)]
         [PermissionDescription("quality:qualInspectionParameterGroup:delete")]
         public async Task DeletesAsync([FromBody] long[] ids)
         {

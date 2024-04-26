@@ -73,6 +73,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("容器条码表", BusinessType.INSERT)]
         public async Task<ManuContainerBarcodeView> AddManuContainerBarcodeAsync([FromBody] CreateManuContainerBarcodeDto parm)
         {
             return await _manuContainerBarcodeService.CreateManuContainerBarcodeAsync(parm);
@@ -85,6 +86,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("容器条码表", BusinessType.UPDATE)]
         public async Task UpdateManuContainerBarcodeAsync([FromBody] ManuContainerBarcodeModifyDto parm)
         {
             await _manuContainerBarcodeService.ModifyManuContainerBarcodeAsync(parm);
@@ -93,6 +95,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 
         [HttpPost]
         [Route("open")]
+        [LogDescription("容器条码表", BusinessType.INSERT)]
         [PermissionDescription("manu:containerUnPackaging:open")]
         public async Task OpenManuContainerBarcodeStatusAsync([FromBody] UpdateManuContainerBarcodeStatusDto parm)
         {
@@ -101,6 +104,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 
         [HttpPost]
         [Route("close")]
+        [LogDescription("容器条码表", BusinessType.INSERT)]
         [PermissionDescription("manu:containerUnPackaging:close")]
         public async Task CloseManuContainerBarcodeStatusAsync([FromBody] UpdateManuContainerBarcodeStatusDto parm)
         {
@@ -114,6 +118,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("容器条码表", BusinessType.DELETE)]
         public async Task DeleteManuContainerBarcodeAsync([FromBody] long[] ids)
         {
             await _manuContainerBarcodeService.DeletesManuContainerBarcodeAsync(ids);

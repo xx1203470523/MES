@@ -1,6 +1,7 @@
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -80,6 +81,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [LogDescription("物料加载", BusinessType.INSERT)]
         public async Task<ManuFeedingMaterialResponseDto> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
         {
             return await _manuFeedingService.CreateAsync(saveDto);
@@ -91,6 +93,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("物料加载", BusinessType.DELETE)]
         public async Task DeletesAsync(long[] ids)
         {
             await _manuFeedingService.DeletesAsync(ids);

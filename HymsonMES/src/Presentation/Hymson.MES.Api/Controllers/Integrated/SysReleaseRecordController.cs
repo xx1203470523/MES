@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -71,6 +72,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("发布记录表", BusinessType.INSERT)]
         public async Task AddSysReleaseRecordAsync([FromBody] SysReleaseRecordCreateDto parm)
         {
             await _sysReleaseRecordService.CreateSysReleaseRecordAsync(parm);
@@ -83,6 +85,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("发布记录表", BusinessType.UPDATE)]
         public async Task UpdateSysReleaseRecordAsync([FromBody] SysReleaseRecordModifyDto parm)
         {
             await _sysReleaseRecordService.ModifySysReleaseRecordAsync(parm);
@@ -95,6 +98,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPut]
         [Route("updateStatus")]
+        [LogDescription("发布记录表", BusinessType.UPDATE)]
         public async Task UpdateSysReleaseRecordStatusAsync([FromBody] SysReleaseRecordModifyDto parm)
         {
             await _sysReleaseRecordService.ModifySysReleaseRecordStatusAsync(parm);
@@ -107,6 +111,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("发布记录表", BusinessType.DELETE)]
         public async Task DeleteSysReleaseRecordAsync([FromBody] long[] ids)
         {
             await _sysReleaseRecordService.DeletesSysReleaseRecordAsync(ids);

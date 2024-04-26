@@ -265,20 +265,21 @@ namespace Hymson.MES.Services.Services.WhShipment
                 SiteId = _currentSite.SiteId ?? 0
             });
 
-            //获取出货单物料明细
-            var shipmentDetailIds = qualOqcOrderEntities?.Select(a => a.ShipmentMaterialId).Distinct();
-            var whShipmentDetailEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { Ids= shipmentDetailIds, SiteId = _currentSite.SiteId ?? 0 });
-
-            //获取出货单
-            var whShipmentIds = whShipmentDetailEntities.Select(a => a.ShipmentId).Distinct();
-            //var whShipmentEntities = await _whShipmentRepository.GetEntitiesAsync(new WhShipmentQuery {Ids= whShipmentIds });
-
             var pagedQuery = pagedQueryDto.ToQuery<WhShipmentPagedQuery>();
             if (!pagedQuery.SiteId.HasValue)
             {
-                pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+                pagedQuery.SiteId = _currentSite.SiteId??0;
             }
-            pagedQuery.NotInIds = whShipmentIds;
+            if (qualOqcOrderEntities != null && qualOqcOrderEntities.Any())
+            {
+                //获取出货单物料明细
+                var shipmentDetailIds = qualOqcOrderEntities?.Select(a => a.ShipmentMaterialId).Distinct();
+                var whShipmentDetailEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { Ids = shipmentDetailIds, SiteId = _currentSite.SiteId ?? 0 });
+
+                //获取出货单id
+                var whShipmentIds = whShipmentDetailEntities.Select(a => a.ShipmentId).Distinct();
+                pagedQuery.NotInIds = whShipmentIds;
+            }
 
             var pagedInfo = await _whShipmentRepository.GetPagedListAsync(pagedQuery);
 
