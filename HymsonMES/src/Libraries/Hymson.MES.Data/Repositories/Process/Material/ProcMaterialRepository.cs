@@ -4,8 +4,10 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -70,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcMaterialEntity> GetByIdAsync(long id)
         {
-            var key = $"proc_material&{id}";
+            var key = $"{CachedTables.PROC_MATERIAL}&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
@@ -112,7 +114,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcMaterialEntity>> GetBySiteIdAsync(long siteId)
         {
-            var key = $"proc_material&all&{siteId}";
+            var key = $"{CachedTables.PROC_MATERIAL}&all&{siteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
@@ -311,7 +313,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcMaterialEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
-            var key = $"proc_material&Site-{query.Site}&Code-{query.Code}";
+            var key = $"{CachedTables.PROC_MATERIAL}&Site-{query.Site}&Code-{query.Code}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();
