@@ -17,7 +17,6 @@ using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
@@ -88,10 +87,17 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         private readonly IManuDowngradingRecordRepository _manuDowngradingRecordRepository;
 
+        /*
         /// <summary>
         /// 仓储接口（条码流转）
         /// </summary>
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
+        */
+
+        /// <summary>
+        /// 仓储接口（条码关系）
+        /// </summary>
+        private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
 
         /// <summary>
         /// 仓储接口（物料库存）
@@ -108,10 +114,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
-        /// <summary>
-        /// 统计服务
-        /// </summary>
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
         /// 构造函数
@@ -123,7 +125,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
-        /// <param name="manuSfcCirculationRepository"></param>
+        /// <param name="manuBarCodeRelationRepository"></param>
         /// <param name="manuDowngradingRepository"></param>
         /// <param name="manuDowngradingRecordRepository"></param>
         /// <param name="manuProductBadRecordRepository"></param>
@@ -138,15 +140,15 @@ namespace Hymson.MES.CoreServices.Services.Job
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IManuSfcCirculationRepository manuSfcCirculationRepository,
+            //IManuSfcCirculationRepository manuSfcCirculationRepository,
+            IManuBarCodeRelationRepository manuBarCodeRelationRepository,
             IManuDowngradingRepository manuDowngradingRepository,
             IManuDowngradingRecordRepository manuDowngradingRecordRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
             IManuProductNgRecordRepository manuProductNgRecordRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            ILocalizationService localizationService,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            ILocalizationService localizationService)
         {
             _logger = logger;
             _masterDataService = masterDataService;
@@ -155,7 +157,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
-            _manuSfcCirculationRepository = manuSfcCirculationRepository;
+            //_manuSfcCirculationRepository = manuSfcCirculationRepository;
+            _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
             _manuDowngradingRepository = manuDowngradingRepository;
             _manuDowngradingRecordRepository = manuDowngradingRecordRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
@@ -163,7 +166,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _localizationService = localizationService;
-            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
@@ -391,25 +393,34 @@ namespace Hymson.MES.CoreServices.Services.Job
                 });
                 if (initialMaterialSummary == null) continue;
 
-                MaterialConsumptionBo consumptionBo = new();
+                // 消耗Bo传入参数
+                var requestConsumptionBo = new MaterialConsumptionRequestBo
+                {
+                    SFCProduceEntity = sfcProduceEntity,
+                    InitialMaterialSummaryBo = initialMaterialSummary,
+                    ConsumeList = requestBo.ConsumeList,
+                    SFCStepId = responseBo.SFCStepEntity.Id
+                };
+
+                MaterialConsumptionResponseBo consumptionBo = new();
                 // 指定消耗物料
                 if (requestBo.ConsumeList != null && requestBo.ConsumeList.Any())
                 {
-                    consumptionBo = ExecutenMaterialConsumptionWithBarCode(ref allFeedingEntities, initialMaterialSummary, requestBo, sfcProduceEntity);
+                    consumptionBo = ExecutenMaterialConsumptionWithBarCode(ref allFeedingEntities, requestConsumptionBo);
                 }
                 // 默认消耗逻辑
                 else
                 {
-                    consumptionBo = ExecutenMaterialConsumptionWithBOM(ref allFeedingEntities, initialMaterialSummary, sfcProduceEntity);
+                    consumptionBo = ExecutenMaterialConsumptionWithBOM(ref allFeedingEntities, requestConsumptionBo);
                 }
                 responseBo.UpdateFeedingQtyByIdCommands = consumptionBo.UpdateFeedingQtyByIdCommands;
-                responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
+                responseBo.ManuBarCodeRelationEntities = consumptionBo.ManuBarCodeRelationEntities;
                 #endregion
 
                 #region 降级品信息
                 if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute
-                    && responseSummaryBo.ManuSfcCirculationEntities != null
-                    && responseSummaryBo.ManuSfcCirculationEntities.Any())
+                    && responseSummaryBo.ManuBarCodeRelationEntities != null
+                    && responseSummaryBo.ManuBarCodeRelationEntities.Any())
                 {
                     var degradedProductExtendBo = new DegradedProductExtendBo
                     {
@@ -418,9 +429,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                     };
 
                     // 添加降级品记录
-                    degradedProductExtendBo.KeyValues.AddRange(responseSummaryBo.ManuSfcCirculationEntities.Select(s => new DegradedProductExtendKeyValueBo
+                    degradedProductExtendBo.KeyValues.AddRange(responseSummaryBo.ManuBarCodeRelationEntities.Select(s => new DegradedProductExtendKeyValueBo
                     {
-                        BarCode = s.CirculationBarCode,
+                        BarCode = s.InputBarCode,
                         SFC = sfcProduceEntity.SFC
                     }));
 
@@ -451,7 +462,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseSummaryBo.WhMaterialInventoryEntities = responseBos.Where(w => w.MaterialInventoryEntity != null).Select(s => s.MaterialInventoryEntity);
             responseSummaryBo.WhMaterialStandingbookEntities = responseBos.Where(w => w.MaterialStandingbookEntity != null).Select(s => s.MaterialStandingbookEntity);
             responseSummaryBo.UpdateFeedingQtyByIdCommands = responseBos.SelectMany(s => s.UpdateFeedingQtyByIdCommands);
-            responseSummaryBo.ManuSfcCirculationEntities = responseBos.SelectMany(s => s.ManuSfcCirculationEntities);
+            responseSummaryBo.ManuBarCodeRelationEntities = responseBos.SelectMany(s => s.ManuBarCodeRelationEntities);
             responseSummaryBo.DowngradingEntities = responseBos.Where(w => w.DowngradingEntities != null).SelectMany(s => s.DowngradingEntities);
             responseSummaryBo.DowngradingRecordEntities = responseBos.Where(w => w.DowngradingRecordEntities != null).SelectMany(s => s.DowngradingRecordEntities);
             responseSummaryBo.ProductBadRecordEntities = responseBos.Where(w => w.ProductBadRecordEntities != null).SelectMany(s => s.ProductBadRecordEntities);
@@ -528,8 +539,13 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // manu_sfc 更新状态
                 _manuSfcRepository.UpdateRangeWithStatusCheckAsync(data.SFCEntities),
 
+                /*
                 // 添加流转记录
                 _manuSfcCirculationRepository.InsertRangeAsync(data.ManuSfcCirculationEntities),
+                */
+
+                // 添加条码关系
+                _manuBarCodeRelationRepository.InsertRangeAsync(data.ManuBarCodeRelationEntities),
 
                 // 插入 manu_sfc_step
                 _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities),
@@ -565,10 +581,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (data.IsLastProcedure)
             {
                 if (data.Count == 1)
-                {                   
+                {
                     var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
                     if (SFCProduceEntity != null)
-                    {              
+                    {
                         responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18226),
                         data.Type.GetDescription(),
                         data.Code);
@@ -669,10 +685,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 初始化步骤
             var stepEntity = new ManuSfcStepEntity
             {
+                Id = IdGenProvider.Instance.CreateId(),
                 // 插入 manu_sfc_step 状态为出站（默认值）
                 Operatetype = ManuSfcStepTypeEnum.OutStock,
                 CurrentStatus = currentStatus,
-                Id = IdGenProvider.Instance.CreateId(),
                 SFC = sfcProduceEntity.SFC,
                 ProductId = sfcProduceEntity.ProductId,
                 WorkOrderId = sfcProduceEntity.WorkOrderId,
@@ -868,10 +884,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 初始化步骤
             var stepEntity = new ManuSfcStepEntity
             {
+                Id = IdGenProvider.Instance.CreateId(),
                 // 插入 manu_sfc_step 状态为出站（默认值）
                 Operatetype = ManuSfcStepTypeEnum.OutStock,
                 CurrentStatus = currentStatus,
-                Id = IdGenProvider.Instance.CreateId(),
                 SFC = sfcProduceEntity.SFC,
                 ProductId = sfcProduceEntity.ProductId,
                 WorkOrderId = sfcProduceEntity.WorkOrderId,
@@ -1216,10 +1232,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 初始化步骤
             var stepEntity = new ManuSfcStepEntity
             {
+                Id = IdGenProvider.Instance.CreateId(),
                 // 插入 manu_sfc_step 状态为出站（默认值）
                 Operatetype = ManuSfcStepTypeEnum.OutStock,
                 CurrentStatus = currentStatus,
-                Id = IdGenProvider.Instance.CreateId(),
                 SFC = sfcProduceEntity.SFC,
                 ProductId = sfcProduceEntity.ProductId,
                 WorkOrderId = sfcProduceEntity.WorkOrderId,
@@ -1360,13 +1376,18 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 执行物料消耗（默认BOM清单）
         /// </summary>
         /// <param name="allFeedingEntities"></param>
-        /// <param name="summaryBo"></param>
-        /// <param name="sfcProduceEntity"></param>
+        /// <param name="requestConsumptionBo"></param>
         /// <returns></returns>
-        private MaterialConsumptionBo ExecutenMaterialConsumptionWithBOM(ref List<ManuFeedingEntity> allFeedingEntities, MaterialDeductResponseSummaryBo summaryBo, ManuSfcProduceEntity sfcProduceEntity)
+        private MaterialConsumptionResponseBo ExecutenMaterialConsumptionWithBOM(ref List<ManuFeedingEntity> allFeedingEntities, MaterialConsumptionRequestBo requestConsumptionBo)
         {
             // 物料消耗对象
-            MaterialConsumptionBo responseBo = new();
+            MaterialConsumptionResponseBo responseBo = new();
+
+            if (requestConsumptionBo == null) return responseBo;
+
+            // 为了让下面的代码不动，这里做了一个转换
+            var summaryBo = requestConsumptionBo.InitialMaterialSummaryBo;
+            var sfcProduceEntity = requestConsumptionBo.SFCProduceEntity;
 
             if (summaryBo == null) return responseBo;
             if (summaryBo.InitialMaterials == null) return responseBo;
@@ -1378,7 +1399,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var feedings = allFeedingEntities.Where(w => w.Qty > 0 && materialIds.Contains(w.MaterialId));
 
             // 通过物料分组
-            var manuFeedingsDictionary = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
+            var manuFeedingsDict = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
             // 取得半成品的总数量
             var smiFinishedUsages = 1m;
@@ -1386,37 +1407,45 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
-            List<ManuSfcCirculationEntity> adds = new();
-            foreach (var materialBo in summaryBo.InitialMaterials)
+            List<ManuBarCodeRelationEntity> adds = new();
+            foreach (var mainMaterialBo in summaryBo.InitialMaterials)
             {
-                if (manuFeedingsDictionary == null) continue;
+                if (manuFeedingsDict == null) continue;
 
                 // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗%) * 物料消耗系数 ÷ 100)
                 // 需扣减数量 = 产出数量 * 物料用量 * (1 + 物料损耗%) * 物料消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
-                decimal residue = sfcProduceEntity.Qty * materialBo.Usages / smiFinishedUsages;
+                decimal residue = sfcProduceEntity.Qty * mainMaterialBo.Usages / smiFinishedUsages;
 
-                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value / 100);
-                if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
+                if (mainMaterialBo.Loss.HasValue && mainMaterialBo.Loss > 0) residue *= (1 + mainMaterialBo.Loss.Value / 100);
+                if (mainMaterialBo.ConsumeRatio > 0) residue *= (mainMaterialBo.ConsumeRatio / 100);
 
-                /*
+                // 消耗请求参数
+                var coreEntryRequestBo = new ConsumptionCoreEntryRequestBo
+                {
+                    SFCProduceEntity = sfcProduceEntity,
+                    ManuFeedingsDict = manuFeedingsDict,
+                    MainMaterialBo = mainMaterialBo,
+                    CurrentMaterialBo = mainMaterialBo,
+                    SFCStepId = requestConsumptionBo.SFCStepId
+                };
+
                 // 收集方式是批次
-                if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
+                if (mainMaterialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
                 {
                     // 进行扣料
-                    _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                    _masterDataService.BatchMaterialConsumptionCoreEntry(ref updates, ref adds, ref residue, coreEntryRequestBo);
                     continue;
                 }
 
                 // 2.确认主物料的收集方式，不是"批次"就结束（不对该物料进行扣料）
-                if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
-                */
+                if (mainMaterialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
 
                 // 进行扣料
-                _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                _masterDataService.BatchMaterialConsumptionCoreEntry(ref updates, ref adds, ref residue, coreEntryRequestBo);
             }
 
             responseBo.UpdateFeedingQtyByIdCommands = updates;
-            responseBo.ManuSfcCirculationEntities = adds;
+            responseBo.ManuBarCodeRelationEntities = adds;
 
             // 回改外层的上料数据集合数据
             foreach (var item in allFeedingEntities)
@@ -1434,35 +1463,30 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 执行物料消耗（指定物料条码）
         /// </summary>
         /// <param name="allFeedingEntities"></param>
-        /// <param name="summaryBo"></param>
-        /// <param name="requestBo"></param>
-        /// <param name="sfcProduceEntity"></param>
+        /// <param name="requestConsumptionBo"></param>
         /// <returns></returns>
-        private MaterialConsumptionBo ExecutenMaterialConsumptionWithBarCode(ref List<ManuFeedingEntity> allFeedingEntities, MaterialDeductResponseSummaryBo summaryBo, OutStationRequestBo requestBo, ManuSfcProduceEntity sfcProduceEntity)
+        private MaterialConsumptionResponseBo ExecutenMaterialConsumptionWithBarCode(ref List<ManuFeedingEntity> allFeedingEntities, MaterialConsumptionRequestBo requestConsumptionBo)
         {
             // 物料消耗对象
-            MaterialConsumptionBo responseBo = new();
+            MaterialConsumptionResponseBo responseBo = new();
 
-            if (requestBo.ConsumeList == null) return responseBo;
+            // 为了让下面的代码不动，这里做了一个转换
+            var summaryBo = requestConsumptionBo.InitialMaterialSummaryBo;
+            var sfcProduceEntity = requestConsumptionBo.SFCProduceEntity;
+            var consumeList = requestConsumptionBo.ConsumeList;
+
             if (summaryBo == null) return responseBo;
             if (summaryBo.InitialMaterials == null) return responseBo;
+            if (consumeList == null) return responseBo;
 
             List<ManuFeedingEntity> feedings = new();
-            foreach (var item in requestBo.ConsumeList)
+            foreach (var item in consumeList)
             {
-                var feedingEntity = allFeedingEntities.FirstOrDefault(f => f.BarCode == item.BarCode);
-                if (feedingEntity == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17113))
-                        .WithData("BarCodes", item.BarCode);
-                }
+                var feedingEntity = allFeedingEntities.FirstOrDefault(f => f.BarCode == item.BarCode) ??
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17113)).WithData("BarCodes", item.BarCode);
 
-                var bomMaterial = summaryBo.InitialMaterials.FirstOrDefault(f => f.MaterialId == feedingEntity.MaterialId);
-                if (bomMaterial == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17107))
-                        .WithData("BarCodes", item.BarCode);
-                }
+                var bomMaterial = summaryBo.InitialMaterials.FirstOrDefault(f => f.MaterialId == feedingEntity.MaterialId) ??
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17107)).WithData("BarCodes", item.BarCode);
 
                 item.MaterialId = bomMaterial.MaterialId;
                 feedings.Add(feedingEntity);
@@ -1472,7 +1496,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             List<MaterialDeductResponseBo> filterMaterials = new();
             foreach (var item in summaryBo.InitialMaterials)
             {
-                var consume = requestBo.ConsumeList.FirstOrDefault(f => f.MaterialId == item.MaterialId);
+                var consume = consumeList.FirstOrDefault(f => f.MaterialId == item.MaterialId);
                 if (consume == null) continue;
 
                 if (consume.ConsumeQty.HasValue)
@@ -1488,7 +1512,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             // 通过物料分组
-            var manuFeedingsDictionary = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
+            var manuFeedingsDict = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
             // 取得半成品的总数量
             var smiFinishedUsages = 1m;
@@ -1496,17 +1520,17 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
-            List<ManuSfcCirculationEntity> adds = new();
-            foreach (var materialBo in filterMaterials)
+            List<ManuBarCodeRelationEntity> adds = new();
+            foreach (var mainMaterialBo in filterMaterials)
             {
-                if (manuFeedingsDictionary == null) continue;
+                if (manuFeedingsDict == null) continue;
 
                 // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗) * 物料消耗系数 ÷ 100)
                 // 需扣减数量 = 物料用量 * (1 + 物料损耗) * 物料消耗系数 ÷ 100
-                decimal residue = sfcProduceEntity.Qty * materialBo.Usages / smiFinishedUsages;// materialBo.Usages / smiFinishedUsages;
+                decimal residue = sfcProduceEntity.Qty * mainMaterialBo.Usages / smiFinishedUsages;// materialBo.Usages / smiFinishedUsages;
 
-                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value / 100);
-                if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
+                if (mainMaterialBo.Loss.HasValue && mainMaterialBo.Loss > 0) residue *= (1 + mainMaterialBo.Loss.Value / 100);
+                if (mainMaterialBo.ConsumeRatio > 0) residue *= (mainMaterialBo.ConsumeRatio / 100);
 
                 /*
                 // 收集方式是批次
@@ -1522,11 +1546,18 @@ namespace Hymson.MES.CoreServices.Services.Job
                 */
 
                 // 进行扣料
-                _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                _masterDataService.BatchMaterialConsumptionCoreEntry(ref updates, ref adds, ref residue, new ConsumptionCoreEntryRequestBo
+                {
+                    SFCProduceEntity = sfcProduceEntity,
+                    ManuFeedingsDict = manuFeedingsDict,
+                    MainMaterialBo = mainMaterialBo,
+                    CurrentMaterialBo = mainMaterialBo,
+                    SFCStepId = requestConsumptionBo.SFCStepId
+                });
             }
 
             responseBo.UpdateFeedingQtyByIdCommands = updates;
-            responseBo.ManuSfcCirculationEntities = adds;
+            responseBo.ManuBarCodeRelationEntities = adds;
 
             // 回改外层的上料数据集合数据
             foreach (var item in allFeedingEntities)
@@ -1633,6 +1664,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             return procedureRejudgeBo;
         }
+
         #endregion
 
     }

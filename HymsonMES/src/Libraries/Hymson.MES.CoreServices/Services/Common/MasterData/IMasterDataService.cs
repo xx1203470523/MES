@@ -316,6 +316,7 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <param name="mainMaterialBo">主物料BO对象</param>
         /// <param name="currentBo">当前进行消耗的物料BO对象</param>
         /// <param name="isMain">是否主物料</param>
+        [Obsolete("建议用BatchMaterialConsumption", true)]
         void DeductMaterialQty(ref List<UpdateFeedingQtyByIdCommand> updates,
              ref List<ManuSfcCirculationEntity> adds,
              ref decimal residue,
@@ -325,6 +326,17 @@ namespace Hymson.MES.CoreServices.Services.Common
              MaterialDeductResponseBo currentBo,
              bool isMain = true);
 
+        /// <summary>
+        /// 进行扣料（单一物料，包含物料的替代料）
+        /// </summary>
+        /// <param name="updates">需要更新数量的集合</param>
+        /// <param name="adds">需要新增的条码流转集合</param>
+        /// <param name="residue">剩余未扣除的数量</param>
+        /// <param name="coreEntryRequestBo">是否主物料</param>
+        void BatchMaterialConsumptionCoreEntry(ref List<UpdateFeedingQtyByIdCommand> updates,
+            ref List<ManuBarCodeRelationEntity> adds,
+            ref decimal residue,
+            ConsumptionCoreEntryRequestBo coreEntryRequestBo);
 
         /// <summary>
         /// 读取分选规则信息

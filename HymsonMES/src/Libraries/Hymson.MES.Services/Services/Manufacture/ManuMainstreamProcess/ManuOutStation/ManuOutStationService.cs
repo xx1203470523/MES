@@ -159,6 +159,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
+        [Obsolete("这个方法可能有点问题，已经跟出站作业逻辑不一致了", false)]
         public async Task<int> OutStationAsync(ManuSfcProduceEntity sfcProduceEntity)
         {
             var rows = 0;

@@ -35,22 +35,22 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 投入条码
         /// </summary>
-        public string InputBarcode { get; set; }
+        public string InputBarCode { get; set; }
 
         /// <summary>
         /// 投入条码位置号
         /// </summary>
-        public string InputBarcodeLocation { get; set; }
+        public string InputBarCodeLocation { get; set; }
 
         /// <summary>
         /// 投入条码物料id
         /// </summary>
-        public long InputBarcodeMaterialId { get; set; }
+        public long InputBarCodeMaterialId { get; set; }
 
         /// <summary>
         /// 投入条码工单id
         /// </summary>
-        public long? InputBarcodeWorkorderId { get; set; }
+        public long? InputBarCodeWorkOrderId { get; set; }
 
         /// <summary>
         /// 投入数量
@@ -60,22 +60,22 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 产出条码
         /// </summary>
-        public string OutputBarcode { get; set; }
+        public string OutputBarCode { get; set; }
 
         /// <summary>
         /// 产出条码物料id
         /// </summary>
-        public long? OutputBarcodeMaterialId { get; set; }
+        public long? OutputBarCodeMaterialId { get; set; }
 
         /// <summary>
         /// 产出条码工单id
         /// </summary>
-        public long? OutputBarcodeWorkorderId { get; set; }
+        public long? OutputBarCodeWorkOrderId { get; set; }
 
         /// <summary>
         /// 产出条码模式 1、分组（无条码时采用分组模式）  2、正常
         /// </summary>
-        public ManuBarCodeOutputModeEnum OutputBarcodeMode { get; set; }
+        public ManuBarCodeOutputModeEnum OutputBarCodeMode { get; set; }
 
         /// <summary>
         /// 关系类型 1、条码绑定 2、条码消耗3、转换4、合并5、拆分6、批次合并7、批次合并
