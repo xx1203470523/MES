@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("配方操作组", BusinessType.INSERT)]
         public async Task AddProcFormulaOperationGroupAsync([FromBody] AddFormulaOperationGroupDto saveDto)
         {
              await _procFormulaOperationGroupService.CreateProcFormulaOperationGroupAsync(saveDto);
@@ -56,6 +58,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("配方操作组", BusinessType.UPDATE)]
         public async Task UpdateProcFormulaOperationGroupAsync([FromBody] AddFormulaOperationGroupDto saveDto)
         {
              await _procFormulaOperationGroupService.ModifyProcFormulaOperationGroupAsync(saveDto);
@@ -68,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("配方操作组", BusinessType.DELETE)]
         public async Task DeleteProcFormulaOperationGroupAsync([FromBody] long[] ids)
         {
             await _procFormulaOperationGroupService.DeletesProcFormulaOperationGroupAsync(ids);

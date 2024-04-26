@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,6 +46,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("FQC检验参数组明细", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] QualFqcParameterGroupDetailSaveDto saveDto)
         {
              await _qualFqcParameterGroupDetailService.CreateAsync(saveDto);
@@ -57,6 +59,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("FQC检验参数组明细", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] QualFqcParameterGroupDetailSaveDto saveDto)
         {
              await _qualFqcParameterGroupDetailService.ModifyAsync(saveDto);
@@ -69,6 +72,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("FQC检验参数组明细", BusinessType.DELETE)]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _qualFqcParameterGroupDetailService.DeletesAsync(ids);

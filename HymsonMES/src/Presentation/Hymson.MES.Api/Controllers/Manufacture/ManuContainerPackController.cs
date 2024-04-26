@@ -63,6 +63,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("容器包装", BusinessType.INSERT)]
         public async Task AddManuContainerPackAsync([FromBody] ManuContainerPackCreateDto parm)
         {
             await _manuContainerPackService.CreateManuContainerPackAsync(parm);
@@ -75,6 +76,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("容器包装", BusinessType.UPDATE)]
         public async Task UpdateManuContainerPackAsync([FromBody] ManuContainerPackModifyDto parm)
         {
             await _manuContainerPackService.ModifyManuContainerPackAsync(parm);

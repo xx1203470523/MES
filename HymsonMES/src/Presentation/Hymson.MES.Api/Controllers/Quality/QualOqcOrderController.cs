@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,6 +44,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPost("create")]
+        [LogDescription("OQC检验单", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] QualOqcOrderSaveDto saveDto)
         {
             await _qualOqcOrderService.CreateAsync(saveDto);
@@ -54,6 +56,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPut("update")]
+        [LogDescription("OQC检验单", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] QualOqcOrderSaveDto saveDto)
         {
             await _qualOqcOrderService.ModifyAsync(saveDto);
@@ -65,6 +68,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete("delete")]
+        [LogDescription("OQC检验单", BusinessType.DELETE)]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _qualOqcOrderService.DeletesAsync(ids);
@@ -120,6 +124,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("save")]
+        [LogDescription("保存样品数据", BusinessType.OTHER)]
         public async Task SaveOrderAsync([FromBody] QualOqcOrderExecSaveDto requestDto)
         {
             await _qualOqcOrderService.SaveOrderAsync(requestDto);
@@ -131,6 +136,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPut("complete")]
+        [LogDescription("完成检验单", BusinessType.OTHER)]
         public async Task CompleteOrderAsync(QualOqcOrderCompleteDto requestDto)
         {
             await _qualOqcOrderService.CompleteOrderAsync(requestDto);
@@ -142,6 +148,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="updateStatusDto"></param>
         /// <returns></returns>
         [HttpPut("updateStatus")]
+        [LogDescription("更新OQC检验单状态", BusinessType.UPDATE)]
         public async Task UpdateStatusAsync([FromBody] UpdateStatusDto updateStatusDto)
         {
             await _qualOqcOrderService.UpdateStatusAsync(updateStatusDto);
@@ -153,6 +160,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpPost("attachment/save")]
+        [LogDescription("保存检验单附件", BusinessType.OTHER)]
         public async Task<IEnumerable<OQCAnnexOutDto>> SaveAttachmentAsync([FromBody] QualOqcOrderSaveAttachmentDto requestDto)
         {
             return await _qualOqcOrderService.SaveAttachmentAsync(requestDto);
@@ -164,6 +172,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("attachment/delete/{id}")]
+        [LogDescription("删除检验单附件", BusinessType.OTHER)]
         public async Task DeleteAttachmentByIdAsync(long id)
         {
             await _qualOqcOrderService.DeleteAttachmentByIdAsync(id);
@@ -186,6 +195,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="updateSampleDetailDto"></param>
         /// <returns></returns>
         [HttpPut("updateSampleDetail")]
+        [LogDescription("更新已检验", BusinessType.OTHER)]
         public async Task UpdateSampleDetailAsync([FromBody] UpdateSampleDetailDto updateSampleDetailDto)
         {
             await _qualOqcOrderService.UpdateSampleDetailAsync(updateSampleDetailDto);
@@ -197,6 +207,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="oQCOrderUnqualifiedHandleDto"></param>
         /// <returns></returns>
         [HttpPost("unqualifiedHandle")]
+        [LogDescription("不合格处理", BusinessType.OTHER)]
         public async Task UnqualifiedHandleAsync([FromBody] OQCOrderUnqualifiedHandleDto oQCOrderUnqualifiedHandleDto)
         {
             await _qualOqcOrderService.UnqualifiedHandleAnync(oQCOrderUnqualifiedHandleDto);

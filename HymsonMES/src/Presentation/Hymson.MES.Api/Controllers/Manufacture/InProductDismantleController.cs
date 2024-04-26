@@ -73,6 +73,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("replaceModule")]
+        [LogDescription("在制品拆解换件", BusinessType.OTHER)]
         [PermissionDescription("manu:inProductDismantle:replace")]
         public async Task ReplaceModuleAsync(InProductDismantleReplaceDto replaceDto)
         {

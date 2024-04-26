@@ -71,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("物料库存", BusinessType.INSERT)]
         public async Task AddWhMaterialInventoryAsync([FromBody] WhMaterialInventoryCreateDto parm)
         {
             await _whMaterialInventoryService.CreateWhMaterialInventoryAsync(parm);

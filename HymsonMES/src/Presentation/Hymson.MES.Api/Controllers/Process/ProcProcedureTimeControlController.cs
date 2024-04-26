@@ -47,6 +47,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("跨工序时间管控", BusinessType.INSERT)]
         [PermissionDescription("process:procProcedureTimeControl:insert")]
         public async Task AddAsync([FromBody] ProcProcedureTimeControlCreateDto parm)
         {
@@ -60,6 +61,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("跨工序时间管控", BusinessType.UPDATE)]
         [PermissionDescription("process:procProcedureTimeControl:update")]
         public async Task UpdateAsync([FromBody] ProcProcedureTimeControlModifyDto parm)
         {
@@ -73,6 +75,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("跨工序时间管控", BusinessType.DELETE)]
         [PermissionDescription("process:procProcedureTimeControl:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
@@ -111,6 +114,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("enable")]
+        [LogDescription("启用", BusinessType.OTHER)]
         [PermissionDescription("process:procProcedureTimeControl:enable")]
         public async Task EnableAsync([FromBody] long id)
         {
@@ -128,6 +132,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("retain")]
+        [LogDescription("保留", BusinessType.OTHER)]
         [PermissionDescription("process:procProcedureTimeControl:retain")]
         public async Task RetainAsync([FromBody] long id)
         {
@@ -145,6 +150,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("abolish")]
+        [LogDescription("废除", BusinessType.OTHER)]
         [PermissionDescription("process:procProcedureTimeControl:abolish")]
         public async Task AbolishAsync([FromBody] long id)
         {

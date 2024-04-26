@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,6 +64,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("烘烤工序", BusinessType.INSERT)]
         public async Task AddManuBakingAsync([FromBody] ManuBakingCreateDto parm)
         {
              await _manuBakingService.CreateManuBakingAsync(parm);
@@ -75,6 +77,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("烘烤工序", BusinessType.UPDATE)]
         public async Task UpdateManuBakingAsync([FromBody] ManuBakingModifyDto parm)
         {
              await _manuBakingService.ModifyManuBakingAsync(parm);
@@ -87,6 +90,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("烘烤工序", BusinessType.DELETE)]
         public async Task DeleteManuBakingAsync([FromBody] long[] ids)
         {
             await _manuBakingService.DeletesManuBakingAsync(ids);
