@@ -1336,5 +1336,23 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _qknyService.SortingUnBindAsync(dto);
         }
 
+        /// <summary>
+        /// 分选出站053
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SortingOutbound")]
+        [LogDescription("分选出站053", BusinessType.OTHER, "SortingOutbound053", ReceiverTypeEnum.MES)]
+        public async Task SortingOutboundAsync(SortingOutboundDto dto)
+        {
+            if (IS_DEBUG)
+            {
+                return;
+            }
+
+            await _qknyService.SortingOutboundAsync(dto);
+        }
+
     }
 }

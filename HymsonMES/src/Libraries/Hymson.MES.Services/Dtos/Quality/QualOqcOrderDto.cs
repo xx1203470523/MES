@@ -118,14 +118,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string? Version { get; set; }
 
         /// <summary>
-        /// 供应商编码
+        /// 客户编码
         /// </summary>
-        public string? SupplierCode { get; set; }
+        public string? CustomCode { get; set; }
 
         /// <summary>
-        /// 供应商名称
+        /// 客户名称
         /// </summary>
-        public string? SupplierName { get; set; }
+        public string? CustomName { get; set; }
 
         /// <summary>
         /// 供应商批次
@@ -219,14 +219,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string? MaterialName { get; set; }
 
         /// <summary>
-        /// 供应商编码
+        /// 客户编码
         /// </summary>
-        public string? SupplierCode { get; set; }
+        public string? CustomCode { get; set; }
 
         /// <summary>
-        /// 供应商名称
+        /// 客户名称
         /// </summary>
-        public string? SupplierName { get; set; }
+        public string? CustomName { get; set; }
 
         /// <summary>
         /// 状态(1-待检验 2-检验中 3-已检验 4-已关闭)
@@ -303,7 +303,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record CheckBarCodeOutDto: BaseEntityDto
     {
         /// <summary>
-        /// Id
+        /// OQC检验参数组明细快照id
         /// </summary>
         public long? Id { get; set; }
 
@@ -350,7 +350,7 @@ namespace Hymson.MES.Services.Dtos.Quality
 
 
     /// <summary>
-    /// OQC检验单新增/更新Dto
+    /// OQC检验单样本新增/更新Dto
     /// </summary>
     public record QualOqcOrderExecSaveDto : BaseEntityDto
     {

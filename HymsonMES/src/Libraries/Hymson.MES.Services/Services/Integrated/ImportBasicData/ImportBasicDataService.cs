@@ -227,12 +227,9 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
 
@@ -473,12 +470,9 @@ namespace Hymson.MES.Services.Services.Integrated
 
                 var isMain = false;
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
                 equList.Add(new ProcResourceEquipmentBindEntity
@@ -571,12 +565,9 @@ namespace Hymson.MES.Services.Services.Integrated
 
                 //资源,修改资源表的资源类型
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
 
@@ -713,12 +704,9 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
 
@@ -1106,12 +1094,9 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
 
@@ -1295,12 +1280,9 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 errorMessage.ToString().TrimEnd(',');
-                if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-                {
-                    errorMessage.Append(";");
-                }
                 if (!validFlag)
                 {
+                    errorMessage.Append(";");
                     continue;
                 }
 

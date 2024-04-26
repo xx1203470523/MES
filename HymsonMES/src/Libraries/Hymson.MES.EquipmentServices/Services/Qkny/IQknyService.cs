@@ -128,5 +128,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task SortingUnBindAsync(SortingUnBindDto dto);
+
+        /// <summary>
+        /// 分选出站053
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task SortingOutboundAsync(SortingOutboundDto dto);
     }
 }

@@ -290,14 +290,17 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] ids)
+        public async Task DeletesAsync(long[] ids)
         {
-            return await _qualOqcOrderRepository.DeletesAsync(new DeleteCommand
+            var result= await _qualOqcOrderRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
                 DeleteOn = HymsonClock.Now(),
                 UserId = _currentUser.UserName
             });
+            if (result == 0) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10137));
+            }
         }
 
         /// <summary>
@@ -343,8 +346,8 @@ namespace Hymson.MES.Services.Services.Quality
             var supplierEntity = await _inteCustomRepository.GetByIdAsync(whShipmentEntity.CustomerId);
             if (supplierEntity != null)
             {
-                dto.SupplierCode = supplierEntity.Code;
-                dto.SupplierName = supplierEntity.Name;
+                dto.CustomCode = supplierEntity.Code;
+                dto.CustomName = supplierEntity.Name;
                 //TODO
                 dto.SupplierBatch = "";
             }
@@ -392,15 +395,15 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             //客户信息
-            var supplierEntities = await _inteCustomRepository.GetInteCustomEntitiesAsync(new InteCustomQuery { Code = pagedQueryDto.SupplierCode??"",SiteId=_currentSite.SiteId??0 });
+            var customEntities = await _inteCustomRepository.GetInteCustomEntitiesAsync(new InteCustomQuery { Code = pagedQueryDto.CustomCode??"",SiteId=_currentSite.SiteId??0 });
             
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode))
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.CustomCode))
             {
-                if (supplierEntities == null || !supplierEntities.Any())
+                if (customEntities == null || !customEntities.Any())
                 {
                     return resultData;
                 }
-                pagedQuery.CustomerIds = supplierEntities.Select(a => a.Id).Distinct();
+                pagedQuery.CustomerIds = customEntities.Select(a => a.Id).Distinct();
             }
 
             var whShipmentMaterialQuery = new WhShipmentMaterialQuery();
@@ -487,9 +490,9 @@ namespace Hymson.MES.Services.Services.Quality
                 model.Version = materialEntitiy?.Version;
                 model.Unit = materialEntitiy?.Unit;
 
-                var supplierEntity = supplierEntities.FirstOrDefault(a => a.Id == item.CustomerId);
-                model.SupplierCode= supplierEntity?.Code;
-                model.SupplierName = supplierEntity?.Name;
+                var supplierEntity = customEntities.FirstOrDefault(a => a.Id == item.CustomerId);
+                model.CustomCode= supplierEntity?.Code;
+                model.CustomName = supplierEntity?.Name;
 
                 var operateType = OrderOperateTypeEnum.Start;
                 switch (item.Status)
@@ -1113,16 +1116,16 @@ namespace Hymson.MES.Services.Services.Quality
                     }
                 }
 
+                //删除样品附件
+                var delSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.DeleteAnnexBySampleDetailIdAsync(new DeleteCommand { Id = qualOqcOrderSampleDetailEntity.Id, UserId = updatedBy, DeleteOn = updatedOn });
+                if (delSampleDateilAnnexRes == 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17811));
+                }
+
                 //新增样品附件
                 if (orderSampleDetailAnnexEntities.Any())
                 {
-                    //删除样品附件
-                    var delSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.DeleteAnnexBySampleDetailIdAsync(new DeleteCommand { Id = qualOqcOrderSampleDetailEntity.Id, UserId = updatedBy, DeleteOn = updatedOn });
-                    if (delSampleDateilAnnexRes == 0)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17811));
-                    }
-
                     var insertSampleDateilAnnexRes = await _qualOqcOrderSampleDetailAnnexRepository.InsertRangeAsync(orderSampleDetailAnnexEntities);
                     if (insertSampleDateilAnnexRes == 0)
                     {

@@ -412,7 +412,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     }
 
                     // 判断资源是否被重复绑定
-                    var workCenters = await _inteWorkCenterRepository.GetWorkCenterResourceRelationAsync(param.ResourceIds);
+                    var workCenters = await _inteWorkCenterRepository.GetWorkCenterResourceRelationAsync(param.ResourceIds, param.Id);
                     if (workCenters.Any(x => x.Id != entity.Id))
                     {
                         var procResourceEnties = await _procResourceRepository.GetResByIdsAsync(workCenters.Where(x => x.Id != entity.Id).Select(x => x.ResourceId).Distinct());

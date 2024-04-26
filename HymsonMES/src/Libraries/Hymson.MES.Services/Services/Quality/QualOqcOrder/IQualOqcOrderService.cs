@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] ids);
+        Task DeletesAsync(long[] ids);
 
         /// <summary>
         /// 根据ID查询
