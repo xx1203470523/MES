@@ -78,11 +78,31 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuWorkOrderSFCRepository
     {
 #if DM
-        const string InsertsSql = "INSERT  manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+        const string InsertsSql = "MERGE INTO manu_workorder_sfc t " +
+            "USING (SELECT @WorkOrderId AS WorkOrderId, @SFC AS SFC FROM dual) s " +
+            "ON (t.WorkOrderId = s.WorkOrderId AND t.SFC = s.SFC) " +
+            "WHEN NOT MATCHED THEN " +
+              "INSERT (Id, SiteId, WorkOrderId, SFC, Status, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn) " +
+              "VALUES (@Id, @SiteId, s.WorkOrderId, s.SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn); ";
+
+        const string ReplacesSql = "MERGE INTO manu_workorder_sfc t " +
+            "USING (SELECT @WorkOrderId AS WorkOrderId, @SFC AS SFC FROM dual) s " +
+            "ON (t.WorkOrderId = s.WorkOrderId AND t.SFC = s.SFC) " +
+            "WHEN MATCHED THEN " +
+              "UPDATE SET " +
+                "t.Id = @Id, " +
+                "t.SiteId = @SiteId, " +
+                "t.Status = @Status, " +
+                "t.UpdatedBy = @UpdatedBy, " +
+                "t.UpdatedOn = @UpdatedOn " +
+            "WHEN NOT MATCHED THEN " +
+              "INSERT (Id, SiteId, WorkOrderId, SFC, Status, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn) " +
+              "VALUES (@Id, @SiteId, s.WorkOrderId, s.SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn); ";
 #else
         const string InsertsSql = "INSERT IGNORE manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
-#endif
         const string ReplacesSql = "REPLACE INTO manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+#endif
+
         const string DeletesSql = "DELETE FROM manu_workorder_sfc WHERE SiteId = @SiteId AND WorkOrderId = @WorkOrderId AND SFC = @SFC";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_workorder_sfc /**where**/  ";
 
