@@ -51,6 +51,13 @@ namespace Hymson.MES.Services.Services.Quality
         Task<PagedInfo<QualFinallyOutputRecordView>> QueryBySFCAsync(FQCInspectionSFCQueryDto queryDto);
 
         /// <summary>
+        /// 获取条码产了最终记录(根据条码获取单条)
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<QualFinallyOutputRecordView?> QueryBySFCFirstAsync(string sfc);
+
+        /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>
