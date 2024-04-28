@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.QualEnvOrderDetail;
 using Hymson.MES.Services.Services.QualEnvOrderDetail;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -71,6 +72,7 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrderDetail
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("环境检验单检验明细", BusinessType.INSERT)]
         public async Task AddQualEnvOrderDetailAsync([FromBody] QualEnvOrderDetailCreateDto parm)
         {
             await _qualEnvOrderDetailService.CreateQualEnvOrderDetailAsync(parm);
@@ -83,6 +85,7 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrderDetail
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("环境检验单检验明细", BusinessType.UPDATE)]
         public async Task UpdateQualEnvOrderDetailAsync([FromBody] QualEnvOrderDetailModifyDto parm)
         {
             await _qualEnvOrderDetailService.ModifyQualEnvOrderDetailAsync(parm);
@@ -95,6 +98,7 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrderDetail
         /// <returns></returns>
         [HttpPut]
         [Route("updates")]
+        [LogDescription("环境检验单检验明细", BusinessType.UPDATE)]
         public async Task ModifyQualEnvOrderDetailsAsync([FromBody] List<QualEnvOrderDetailModifyDto> parm)
         {
             await _qualEnvOrderDetailService.ModifyQualEnvOrderDetailsAsync(parm);
@@ -107,6 +111,7 @@ namespace Hymson.MES.Api.Controllers.QualEnvOrderDetail
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("环境检验单检验明细", BusinessType.DELETE)]
         public async Task DeleteQualEnvOrderDetailAsync([FromBody] long[] ids)
         {
             await _qualEnvOrderDetailService.DeletesQualEnvOrderDetailAsync(ids);

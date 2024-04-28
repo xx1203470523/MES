@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<EquEquipmentEntity> GetByIdAsync(long id)
         {
-            var key = $"equ_equipment&{id}";
+            var key = $"{CachedTables.EQU_EQUIPMENT}&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = GetMESDbConnection();

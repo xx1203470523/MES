@@ -980,7 +980,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         }
 
         /// <summary>
-        /// 条码生成（半成品）
+        /// 条码生成（半成品）（从欣世界项目复制的代码）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>

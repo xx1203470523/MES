@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,6 +46,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         [HttpPost("mergeAdjustVerifySfcs")]
+        [LogDescription("合并的 验证条码", BusinessType.INSERT)]
         public async Task<bool> MergeAdjustVerifySfcsAsync(string[] sfcs)
         {
             return await _manuBarcodeAdjustService.MergeAdjustVerifySfcAsync(sfcs);
@@ -55,6 +57,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         [HttpPost("qtyAdjustVerifySfcs")]
+        [LogDescription("调整条码数量 验证条码", BusinessType.UPDATE)]
         public async Task<bool> QtyAdjustVerifySfcsAsync(string[] sfcs)
         {
             return await _manuBarcodeAdjustService.QtyAdjustVerifySfcAsync(sfcs);
@@ -66,6 +69,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="sfc"></param>
         /// <returns></returns>
         [HttpGet("getSfcAboutInfoBySfcInMerge/{sfc}")]
+        [LogDescription(" 合并的 获取条码", BusinessType.INSERT)]
         public async Task<ManuSfcAboutInfoViewDto?> GetSfcAboutInfoBySfcInMergeAsync(string sfc)
         {
             return await _manuBarcodeAdjustService.GetSfcAboutInfoBySfcInMergeAsync(sfc);
@@ -100,6 +104,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("barcodeQtyAdjust")]
+        [LogDescription("条码数量调整", BusinessType.INSERT)]
         public async Task BarcodeQtyAdjustAsync(ManuBarcodeQtyAdjustDto adjustDto)
         {
             await _manuBarcodeAdjustService.BarcodeQtyAdjustAsync(adjustDto);
@@ -112,6 +117,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("barcodeSplitAdjust")]
+        [LogDescription("条码拆分", BusinessType.INSERT)]
         public async Task<string> BarcodeSplitAdjustAsync(ManuBarcodeSplitAdjustDto adjustDto)
         {
             return await _manuBarcodeAdjustService.BarcodeSplitAdjustAsync(adjustDto);
@@ -125,6 +131,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("barcodeMergeAdjust")]
+        [LogDescription("条码合并", BusinessType.INSERT)]
         public async Task<string> BarcodeMergeAdjustAsync(ManuBarcodeMergeAdjust adjustDto)
         {
             return await _manuBarcodeAdjustService.BarcodeMergeAdjustAsync(adjustDto);

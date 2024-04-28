@@ -175,6 +175,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("importBom")]
+        [LogDescription("导入Bom数据", BusinessType.EXPORT)]
         public async Task ImportCustomAsync([FromForm(Name = "file")] IFormFile formFile)
         {
 
@@ -188,6 +189,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpGet]
         [Route("export")]
+        [LogDescription("导出客户维护信息", BusinessType.EXPORT)]
         [PermissionDescription("proc:parameter:export")]
         public async Task<BomExportResultDto> ExprotBomPageListAsync([FromQuery] ProcBomPagedQuery param)
         {

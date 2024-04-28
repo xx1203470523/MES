@@ -945,13 +945,15 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <returns></returns>
         public async Task<long?> GetProductSetIdAsync(ProductSetBo param)
         {
+            // 读取资源的产出设置（优先）
             var productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ResourceId, SiteId = param.SiteId });
-            if (productSetEntity == null)
-            {
-                productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ProcedureId, SiteId = param.SiteId });
-                if (productSetEntity == null) return null;
-            }
-            return productSetEntity.SemiProductId;
+            if (productSetEntity != null) return productSetEntity.SemiProductId;
+
+            // 读取工序的产出设置
+            productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ProcedureId, SiteId = param.SiteId });
+            if (productSetEntity != null) return productSetEntity.SemiProductId;
+
+            return null;
         }
 
         /// <summary>
@@ -1481,6 +1483,141 @@ namespace Hymson.MES.CoreServices.Services.Common
             }
         }
 
+        /// <summary>
+        /// 进行扣料（单一物料，包含物料的替代料）
+        /// </summary>
+        /// <param name="updates">需要更新数量的集合</param>
+        /// <param name="adds">需要新增的条码流转集合</param>
+        /// <param name="residue">剩余未扣除的数量</param>
+        /// <param name="coreEntryRequestBo">是否主物料</param>
+        public void BatchMaterialConsumptionCoreEntry(ref List<UpdateFeedingQtyByIdCommand> updates,
+            ref List<ManuBarCodeRelationEntity> adds,
+            ref decimal residue,
+            ConsumptionCoreEntryRequestBo coreEntryRequestBo)
+        {
+            // 没有剩余需要抵扣时，直接返回
+            if (residue <= 0) return;
+
+            // 为了让下面的代码不动，这里做了一个转换
+            var sfcProduceEntity = coreEntryRequestBo.SFCProduceEntity;
+            var currentMaterialBo = coreEntryRequestBo.CurrentMaterialBo;
+
+            // 取得当前物料的库存
+            if (!coreEntryRequestBo.ManuFeedingsDict.TryGetValue(currentMaterialBo.MaterialId, out var feedingEntities)) return;
+            if (!feedingEntities.Any()) return;
+
+            // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
+            decimal originQty = currentMaterialBo.Usages;
+            if (currentMaterialBo.Loss.HasValue && currentMaterialBo.Loss > 0) originQty *= (1 + currentMaterialBo.Loss.Value / 100);
+            if (currentMaterialBo.ConsumeRatio > 0) originQty *= (currentMaterialBo.ConsumeRatio / 100);
+
+            // 遍历当前物料的所有的物料库存
+            foreach (var feeding in feedingEntities)
+            {
+                decimal targetQty = originQty;
+                var consume = 0m;
+                if (residue <= 0) break;
+                if (feeding.Qty <= 0) continue;
+
+                // 如果是替代料条码，就将替代料的消耗数值重新算下
+                if (currentMaterialBo.MaterialId != feeding.MaterialId)
+                {
+                    var replaceBo = currentMaterialBo.ReplaceMaterials.FirstOrDefault(f => f.MaterialId == feeding.MaterialId);
+                    if (replaceBo != null)
+                    {
+                        // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
+                        targetQty = replaceBo.Usages;
+                        if (replaceBo.Loss.HasValue && replaceBo.Loss > 0) targetQty *= replaceBo.Loss.Value;
+                        if (replaceBo.ConsumeRatio > 0) targetQty *= (replaceBo.ConsumeRatio / 100);
+                    }
+                }
+
+                // 剩余折算成目标数量
+                var convertResidue = ToTargetValue(originQty, targetQty, residue);
+
+                // 数量足够
+                if (convertResidue <= feeding.Qty)
+                {
+                    consume = convertResidue;
+                    residue = 0;
+                    feeding.Qty -= consume;
+                }
+                // 数量不够，继续下一个
+                else
+                {
+                    consume = feeding.Qty;
+                    residue -= ToTargetValue(targetQty, originQty, consume);
+                    feeding.Qty = 0;
+                }
+
+                // 添加到扣减物料库存
+                updates.Add(new UpdateFeedingQtyByIdCommand
+                {
+                    UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
+                    UpdatedOn = sfcProduceEntity.UpdatedOn,
+                    Qty = consume,  // 因为现在是在SQL语句进行的扣减，所以不能用 feeding.Qty,
+                    Id = feeding.Id
+                });
+
+                // 添加条码流转记录（消耗）
+                adds.Add(new ManuBarCodeRelationEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = sfcProduceEntity.SiteId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    EquipmentId = 0,
+                    RelationType = ManuBarCodeRelationTypeEnum.SFC_Consumption,
+
+                    InputBarCode = feeding.BarCode,
+                    InputBarCodeLocation = "",
+                    InputBarCodeWorkOrderId = sfcProduceEntity.WorkOrderId,
+                    InputBarCodeMaterialId = feeding.MaterialId,
+                    InputQty = consume,
+
+                    OutputBarCode = sfcProduceEntity.SFC,
+                    OutputBarCodeWorkOrderId = sfcProduceEntity.WorkOrderId,
+                    OutputBarCodeMaterialId = sfcProduceEntity.ProductId,
+                    OutputBarCodeMode = ManuBarCodeOutputModeEnum.Normal,
+
+                    BusinessContent = new
+                    {
+                        InputSFCStepId = coreEntryRequestBo.SFCStepId,
+                        OutputSFCStepId = coreEntryRequestBo.SFCStepId,
+                        BomId = sfcProduceEntity.ProductBOMId,
+                        BomMainMaterialId = coreEntryRequestBo.MainMaterialBo.MaterialId
+                    }.ToSerialize(),
+                    Remark = "",
+
+                    CreatedBy = sfcProduceEntity.CreatedBy,
+                    UpdatedBy = sfcProduceEntity.UpdatedBy
+                });
+            }
+
+            // 主物料才扣除检索下级替代料，当还有剩余未扣除的数量时，扣除替代料（替代料不再递归扣除下级替代料库存）
+            if (!coreEntryRequestBo.IsMainMaterial || residue <= 0) return;
+
+            // 扣除替代料
+            foreach (var replaceFeeding in currentMaterialBo.ReplaceMaterials)
+            {
+                // 递归扣除替代料库存
+                BatchMaterialConsumptionCoreEntry(ref updates, ref adds, ref residue, new ConsumptionCoreEntryRequestBo
+                {
+                    SFCProduceEntity = sfcProduceEntity,
+                    ManuFeedingsDict = coreEntryRequestBo.ManuFeedingsDict,
+                    MainMaterialBo = coreEntryRequestBo.MainMaterialBo,
+                    CurrentMaterialBo = new MaterialDeductResponseBo
+                    {
+                        MaterialId = replaceFeeding.MaterialId,
+                        Usages = replaceFeeding.Usages,
+                        Loss = replaceFeeding.Loss,
+                        ConsumeRatio = replaceFeeding.ConsumeRatio,
+                        DataCollectionWay = coreEntryRequestBo.MainMaterialBo.DataCollectionWay
+                    },
+                    IsMainMaterial = false
+                });
+            }
+        }
 
         /// <summary>
         /// 转换数量

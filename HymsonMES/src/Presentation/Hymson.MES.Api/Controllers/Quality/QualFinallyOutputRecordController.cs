@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("成品条码产出记录", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] QualFinallyOutputRecordSaveDto saveDto)
         {
              await _qualFinallyOutputRecordService.CreateAsync(saveDto);
@@ -56,6 +58,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("成品条码产出记录", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] QualFinallyOutputRecordSaveDto saveDto)
         {
              await _qualFinallyOutputRecordService.ModifyAsync(saveDto);
@@ -68,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("成品条码产出记录", BusinessType.DELETE)]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _qualFinallyOutputRecordService.DeletesAsync(ids);

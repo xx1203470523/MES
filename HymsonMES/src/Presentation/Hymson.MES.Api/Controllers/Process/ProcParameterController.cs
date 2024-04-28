@@ -102,6 +102,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("import")]
+        [LogDescription("导入参数数据", BusinessType.EXPORT)]
         [PermissionDescription("proc:parameter:import")]
         public async Task ImportParameterAsync([FromForm(Name = "file")] IFormFile formFile)
         {
@@ -128,6 +129,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpGet]
         [Route("export")]
+        [LogDescription("导出标准参数信息", BusinessType.EXPORT)]
         [PermissionDescription("proc:parameter:export")]
         public async Task<ParameterExportResultDto> ExprotParameterListAsync([FromQuery] ProcParameterPagedQueryDto param)
         {

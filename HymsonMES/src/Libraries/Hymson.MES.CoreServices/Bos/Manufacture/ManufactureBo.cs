@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Domain.Process;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.Utils;
 
@@ -103,6 +104,43 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 产品条码
         /// </summary>
         public string SFC { get; set; } = "";
+    }
+
+    /// <summary>
+    /// 核心入口请求
+    /// </summary>
+    public class ConsumptionCoreEntryRequestBo
+    {
+        /// <summary>
+        /// 产品序列码
+        /// </summary>
+        public ManuSfcProduceEntity SFCProduceEntity { get; set; }
+
+        /// <summary>
+        /// 已分组的物料库存集合
+        /// </summary>
+        public Dictionary<long, IGrouping<long, ManuFeedingEntity>> ManuFeedingsDict { get; set; }
+
+        /// <summary>
+        /// 进行消耗的物料对象（主物料对象）
+        /// </summary>
+        public MaterialDeductResponseBo MainMaterialBo { get; set; }
+
+        /// <summary>
+        /// 进行消耗的物料对象（当前物料对象）
+        /// </summary>
+        public MaterialDeductResponseBo CurrentMaterialBo { get; set; }
+
+        /// <summary>
+        /// 是否主物料
+        /// </summary>
+        public bool IsMainMaterial { get; set; } = true;
+
+        /// <summary>
+        /// 步骤ID
+        /// </summary>
+        public long SFCStepId { get; set; }
+
     }
 
     /// <summary>

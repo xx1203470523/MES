@@ -1,13 +1,14 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.Data.Repositories.Manufacture;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
     /// <summary>
-    /// 出站job实体
+    /// 出站业务对象（请求）
     /// </summary>
     public class OutStationRequestBo
     {
@@ -48,7 +49,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
     }
 
     /// <summary>
-    /// 
+    /// 出站业务对象（响应）
     /// </summary>
     public class OutStationResponseBo
     {
@@ -97,10 +98,17 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public IEnumerable<UpdateFeedingQtyByIdCommand> UpdateFeedingQtyByIdCommands { get; set; } = new List<UpdateFeedingQtyByIdCommand>();
 
+        /*
         /// <summary>
-        /// 
+        /// 流转记录
         /// </summary>
         public IEnumerable<ManuSfcCirculationEntity> ManuSfcCirculationEntities { get; set; } = new List<ManuSfcCirculationEntity>();
+        */
+
+        /// <summary>
+        /// 条码关系
+        /// </summary>
+        public IEnumerable<ManuBarCodeRelationEntity> ManuBarCodeRelationEntities { get; set; } = new List<ManuBarCodeRelationEntity>();
 
         /// <summary>
         /// 降级品录入对象
@@ -132,6 +140,38 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 下一工序编码
         /// </summary>
         public string NextProcedureCode { get; set; } = "";
+    }
+
+    /// <summary>
+    /// 出站业务对象（请求）
+    /// </summary>
+    public class OutStationCoreRequestBo
+    {
+        /// <summary>
+        /// 作业基础参数
+        /// </summary>
+        public JobRequestBo CommonBo { get; set; }
+
+        /// <summary>
+        /// 出站参数
+        /// </summary>
+        public OutStationRequestBo RequestBo { get; set; }
+
+        /// <summary>
+        /// 复投相关参数
+        /// </summary>
+        public ProcedureRejudgeBo ProcedureRejudgeBo { get; set; }
+
+        /// <summary>
+        /// 条码实体
+        /// </summary>
+        public ManuSfcEntity SFCEntity { get; set; }
+
+        /// <summary>
+        /// 在制条码实体
+        /// </summary>
+        public ManuSfcProduceEntity SFCProduceEntity { get; set; }
+
     }
 
     /// <summary>
@@ -169,10 +209,17 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public IEnumerable<UpdateFeedingQtyByIdCommand>? UpdateFeedingQtyByIdCommands { get; set; }
 
+        /*
         /// <summary>
-        /// 
+        /// 流转记录
         /// </summary>
         public IEnumerable<ManuSfcCirculationEntity>? ManuSfcCirculationEntities { get; set; }
+        */
+
+        /// <summary>
+        /// 条码关系
+        /// </summary>
+        public IEnumerable<ManuBarCodeRelationEntity> ManuBarCodeRelationEntities { get; set; } = new List<ManuBarCodeRelationEntity>();
 
         /// <summary>
         /// 降级品录入对象
@@ -212,9 +259,36 @@ namespace Hymson.MES.CoreServices.Bos.Job
     }
 
     /// <summary>
-    /// 出站消耗
+    /// 出站消耗业务对象（请求）
     /// </summary>
-    public class MaterialConsumptionBo
+    public class MaterialConsumptionRequestBo
+    {
+        /// <summary>
+        /// 产品序列码
+        /// </summary>
+        public ManuSfcProduceEntity SFCProduceEntity { get; set; }
+
+        /// <summary>
+        /// 可以消耗的物料清单
+        /// </summary>
+        public MaterialDeductResponseSummaryBo InitialMaterialSummaryBo { get; set; }
+
+        /// <summary>
+        /// 消耗
+        /// </summary>
+        public IEnumerable<OutStationConsumeBo>? ConsumeList { get; set; }
+
+        /// <summary>
+        /// 步骤ID
+        /// </summary>
+        public long SFCStepId { get; set; }
+
+    }
+
+    /// <summary>
+    /// 出站消耗业务对象（响应）
+    /// </summary>
+    public class MaterialConsumptionResponseBo
     {
         /// <summary>
         /// 
@@ -222,10 +296,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public IEnumerable<UpdateFeedingQtyByIdCommand> UpdateFeedingQtyByIdCommands { get; set; } = new List<UpdateFeedingQtyByIdCommand>();
 
         /// <summary>
-        /// 
+        /// 条码关系
         /// </summary>
-        public IEnumerable<ManuSfcCirculationEntity> ManuSfcCirculationEntities { get; set; } = new List<ManuSfcCirculationEntity>();
+        public IEnumerable<ManuBarCodeRelationEntity> ManuBarCodeRelationEntities { get; set; } = new List<ManuBarCodeRelationEntity>();
 
     }
+
 
 }

@@ -114,7 +114,21 @@ namespace Hymson.MES.CoreServices.Services.Job
                 ResourceId = commonBo.ResourceId
             });
 
+        
+
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(planWorkOrderBindEntity.WorkOrderId);
+
+            // 获取产出设置的产品ID
+            var productIdOfSet = await _masterDataService.GetProductSetIdAsync(new ProductSetBo
+            {
+                SiteId = commonBo.SiteId,
+                ProductId = planWorkOrderEntity.ProductId,
+                ProcedureId = commonBo.ProcedureId,
+                ResourceId = commonBo.ResourceId
+            });
+            // 产品ID
+            var productId = productIdOfSet ?? planWorkOrderEntity.ProductId;
+
             BarcodeChangeResponse responseBo = new();
             var manusfcs = new List<ManuSfcEntity>();
             var sfcinfos = new List<ManuSfcInfoEntity>();
@@ -124,6 +138,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var MultiSFCUpdateStatusCommands = new List<MultiSFCUpdateStatusCommand>();
             var manuSfcCirculationEntitys = new List<ManuSfcCirculationEntity>();
             //
+            responseBo.IsProductSame = productId == planWorkOrderEntity.ProductId;
             responseBo.manusfcs = manusfcs;
             responseBo.sfcinfos = sfcinfos;
             responseBo.sfcproduces = sfcproduces;
@@ -152,6 +167,8 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo, ManuSfcProduceEntity sfcproduce, ManuSfcStepEntity? sfcstep) cellsfc = new();
                 cellsfc = CreateSFCProduceInfoFromCellSFC(planWorkOrderEntity, bo.SFC, commonBo.ProcedureId, commonBo, qty, SfcStatusEnum.lineUp);
+                cellsfc.sfcinfo.ProductId = productId;
+                cellsfc.sfcproduce.ProductId = productId;   
                 manusfcs.Add(cellsfc.manusfc);
                 sfcinfos.Add(cellsfc.sfcinfo);
                 sfcproduces.Add(cellsfc.sfcproduce);
@@ -160,87 +177,15 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBo.PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100);
                 responseBo.PassDownQuantity = responseBo.sfcproduces.Sum(x => x.Qty);
                 responseBo.UserName = commonBo.UserName;
-                //if (!string.IsNullOrEmpty(bo.SFC))
-                //{
-                //    var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
-                //    {
-                //        Sfc = bo.SourceSFC,
-                //        SiteId = commonBo.SiteId
-                //    }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16600));
-                //    //继承旧在制条码的复投次数
-                //    cellsfc.sfcproduce.RepeatedCount = manuSfcProduceEntity.RepeatedCount;
-                //    //旧条码 状态变更为 转换
-                //    var sfcStepEntity = new ManuSfcStepEntity
-                //    {
-                //        Operatetype = bo.SourceStepType,
-                //        Id = IdGenProvider.Instance.CreateId(),
-                //        SFC = bo.SourceSFC,
-                //        ProductId = manuSfcProduceEntity.ProductId,
-                //        WorkOrderId = manuSfcProduceEntity.WorkOrderId,
-                //        WorkCenterId = manuSfcProduceEntity.WorkCenterId,
-                //        ProductBOMId = manuSfcProduceEntity.ProductBOMId,
-                //        ProcedureId = manuSfcProduceEntity.ProcedureId,
-                //        Qty = manuSfcProduceEntity.Qty,
-
-                //        EquipmentId = manuSfcProduceEntity.EquipmentId,
-                //        ResourceId = manuSfcProduceEntity.ResourceId,
-                //        SiteId = commonBo.SiteId,
-                //        CreatedBy = commonBo.UserName,
-                //        CreatedOn = now,
-                //        UpdatedBy = commonBo.UserName,
-                //        UpdatedOn = now
-                //    };
-                //    manuSfcStepEntities.Add(sfcStepEntity);
-                //    // 删除 manu_sfc_produce
-
-                //    PhysicalDeleteSFCProduceByIdsCommands.Add( new PhysicalDeleteSFCProduceByIdsCommand
-                //    {
-                //        SiteId = commonBo.SiteId,
-                //        Ids = new long[] { manuSfcProduceEntity.Id }
-                //    });
-
-                //    // manu_sfc_info 修改为完成 且入库
-                //    MultiSFCUpdateStatusCommands.Add(new MultiSFCUpdateStatusCommand
-                //    {
-                //        SiteId = commonBo.SiteId,
-                //        UpdatedBy = commonBo.UserName,
-                //        UpdatedOn = now,
-                //        Status = SfcStatusEnum.Complete,
-                //        SFCs = new string[] { bo.SourceSFC } //manuSfcEntities
-                //    });
-                //    manuSfcCirculationEntitys.Add( new ManuSfcCirculationEntity
-                //    {
-                //        Id = IdGenProvider.Instance.CreateId(),
-                //        SiteId = commonBo.SiteId,
-                //        ProcedureId = commonBo.ProcedureId,
-                //        ResourceId = commonBo.ResourceId,
-                //        SFC = bo.SourceSFC,
-                //        WorkOrderId = barcodeChangeBo.WO.Id,
-                //        ProductId = 0,//克明说留空
-                //        CirculationBarCode = bo.TargetSFC,
-                //        CirculationProductId = barcodeChangeBo.WO.ProductId,
-                //        CirculationMainProductId = barcodeChangeBo.WO.ProductId,
-                //        CirculationQty = qty, //TODO: 新工单 产品的标包大小
-                //        CirculationType = bo.CirculationType,
-                //        CreatedBy = commonBo.UserName,
-                //        UpdatedBy = commonBo.UserName
-                //    });
-                //}
-                //else
-                //{
-                //    responseBo.WorkCode = barcodeChangeBo.WO.OrderCode;
-                //    responseBo.WorkOrderId = barcodeChangeBo.WO.Id;
-                //    responseBo.PlanQuantity = barcodeChangeBo.WO.Qty * (1 + barcodeChangeBo.WO.OverScale / 100);
-                //    responseBo.PassDownQuantity = responseBo.sfcproduces.Sum(x => x.Qty);
-                //    responseBo.UserName = commonBo.UserName;
-                //}
+                
+              
                 //新条码 状态变更为开始
                 var manuSfcStepEntity = new ManuSfcStepEntity
                 {
                     Operatetype = ManuSfcStepTypeEnum.Create,
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = bo.SFC,
-                    ProductId = planWorkOrderEntity.ProductId,
+                    ProductId = productId,
                     WorkOrderId = planWorkOrderEntity.Id,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
@@ -257,6 +202,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 };
                 manuSfcStepEntities.Add(manuSfcStepEntity);
             }
+
             return responseBo;
 
         }
@@ -346,7 +292,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 return responseBo;
             }
             //条码接收的情况
-            if (data.PassDownQuantity > 0)
+            if (data.IsProductSame)
             {
                 var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(new UpdatePassDownQuantityCommand
                 {
@@ -361,6 +307,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", data.WorkCode);
                 }
             }
+            
 
             //生成在制相关信息
 

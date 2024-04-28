@@ -43,6 +43,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("巡检检验单", BusinessType.INSERT)]
         //[PermissionDescription("quality:ipqcInspectionPatrol:insert")]
         public async Task AddAsync([FromBody] QualIpqcInspectionPatrolSaveDto saveDto)
         {
@@ -55,6 +56,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [LogDescription("巡检检验单", BusinessType.DELETE)]
         [PermissionDescription("quality:qualIpqcInspectionPatrol:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
@@ -113,6 +115,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("execute")]
+        [LogDescription("执行检验", BusinessType.OTHER)]
         //[PermissionDescription("quality:ipqcInspectionPatrol:execute")]
         public async Task ExecuteAsync([FromBody] StatusChangeDto updateDto)
         {
@@ -126,6 +129,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("sampleAdd")]
+        [LogDescription("样品检验数据录入", BusinessType.OTHER)]
         //[PermissionDescription("quality:ipqcInspectionPatrol:sampleAdd")]
         public async Task InsertSampleDataAsync([FromBody] List<QualIpqcInspectionPatrolSampleCreateDto> dto)
         {
@@ -139,6 +143,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("sampleUpdate")]
+        [LogDescription("样品检验数据修改", BusinessType.OTHER)]
         //[PermissionDescription("quality:ipqcInspectionPatrol:sampleUpdate")]
         public async Task UpdateSampleDataAsync([FromBody] QualIpqcInspectionPatrolSampleUpdateDto dto)
         {
@@ -152,6 +157,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("complete")]
+        [LogDescription("检验完成", BusinessType.OTHER)]
         //[PermissionDescription("quality:ipqcInspectionPatrol:complete")]
         public async Task CompleteAsync([FromBody] StatusChangeDto dto)
         {
@@ -165,6 +171,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("unqualifiedHandle")]
+        [LogDescription("不合格处理", BusinessType.OTHER)]
         //[PermissionDescription("quality:ipqcInspectionPatrol:unqualifiedHandle")]
         public async Task UnqualifiedHandleAsync([FromBody] UnqualifiedHandleDto dto)
         {
@@ -178,6 +185,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("attachmentAdd")]
+        [LogDescription("附件上传", BusinessType.OTHER)]
         //[PermissionDescription("quality:ipqcInspectionPatrol:attachmentAdd")]
         public async Task AttachmentAddAsync([FromBody] AttachmentAddDto dto)
         {
@@ -191,6 +199,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("attachmentDelete")]
+        [LogDescription("附件删除", BusinessType.OTHER)]
         //[PermissionDescription("quality:ipqcInspectionPatrol:attachmentDelete")]
         public async Task AttachmentDeleteAsync([FromBody] long[] ids)
         {

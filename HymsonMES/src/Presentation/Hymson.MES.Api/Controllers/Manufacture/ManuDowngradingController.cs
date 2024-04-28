@@ -49,6 +49,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]        
         [Route("saveManuDowngrading")]
+        [LogDescription("降级录入", BusinessType.INSERT)]
         [PermissionDescription("manu:downgrading:save")]
         public async Task SaveManuDowngradingAsync([FromBody] ManuDowngradingSaveDto manuDowngradingSaveDto)
         {
@@ -62,6 +63,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("saveManuDowngradingRemove")]
+        [LogDescription("进行降级移除", BusinessType.INSERT)]
         [PermissionDescription("manu:downgrading:saveRemove")]
         public async Task SaveManuDowngradingRemoveAsync([FromBody] ManuDowngradingSaveRemoveDto manuDowngradingSaveRemoveDto)
         {

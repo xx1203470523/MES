@@ -1,6 +1,7 @@
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -37,6 +38,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("exJob")]
+        [LogDescription("执行作业", BusinessType.OTHER)]
         public async Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto)
         {
             return await _manuFacePlateRepairService.ExecuteJobAsync(manuFacePlateRepairExJobDto);
@@ -49,6 +51,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("beginRepair")]
+        [LogDescription("开始维修", BusinessType.OTHER)]
         public async Task<ManuFacePlateRepairOpenInfoDto> BeginManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto)
         {
             return await _manuFacePlateRepairService.BeginManuFacePlateRepairAsync(beginRepairDto);
@@ -61,6 +64,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("endRepair")]
+        [LogDescription("结束维修", BusinessType.OTHER)]
         public async Task<ManuFacePlateRepairOpenInfoDto> EndManuFacePlateRepairAsync(ManuFacePlateRepairBeginRepairDto beginRepairDto)
         {
             return await _manuFacePlateRepairService.EndManuFacePlateRepairAsync(beginRepairDto);
@@ -73,6 +77,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("confirmSubmit")]
+        [LogDescription("确认提交", BusinessType.OTHER)]
         public async Task ConfirmSubmitManuFacePlateRepairAsync([FromBody] ManuFacePlateRepairConfirmSubmitDto confirmSubmitDto)
         {
             await _manuFacePlateRepairService.ConfirmSubmitManuFacePlateRepairAsync(confirmSubmitDto);
