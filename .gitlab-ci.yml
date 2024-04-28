@@ -11,10 +11,12 @@ sonarqube-check:
     key: "${CI_JOB_NAME}"
     paths:
       - .sonar/cache
+  before_script:
+    - "echo \"192.168.0.208   gitlab.example.com\" >> /etc/hosts"
   script: 
       - "apt-get update"
       - "apt-get install --yes --no-install-recommends openjdk-17-jre"
-      - "echo \"192.168.0.208   gitlab.example.com\" >> /etc/hosts"
+
       - "dotnet tool install --global dotnet-sonarscanner"
       - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
       - "dotnet sonarscanner begin /k:\"MES-backend\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=$SONAR_HOST_URL\" "
