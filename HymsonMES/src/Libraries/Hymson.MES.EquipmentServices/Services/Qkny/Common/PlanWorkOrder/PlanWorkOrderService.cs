@@ -2,6 +2,7 @@
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.IdentityModel.Tokens;
@@ -39,51 +40,89 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
 
         /// <summary>
+        /// 设备工单绑定仓储
+        /// </summary>
+        private readonly IPlanWorkOrderBindRepository _planWorkOrderBindRepository;
+
+        /// <summary>
+        /// 工作中心仓储
+        /// </summary>
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public PlanWorkOrderService(IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcBomDetailRepository procBomDetailRepository,
-            IProcReplaceMaterialRepository procReplaceMaterialRepository)
+            IProcReplaceMaterialRepository procReplaceMaterialRepository,
+            IPlanWorkOrderBindRepository planWorkOrderBindRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository)
         {
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
+            _planWorkOrderBindRepository = planWorkOrderBindRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
         }
 
         /// <summary>
-        /// 根据产线ID获取工单数据（激活的工单）
+        /// 根据产线ID、资源ID获取工单数据（激活的工单）
         /// </summary>
         /// <param name="workLineId"></param>
+        /// <param name="resourceId"></param>
         /// <returns></returns>
-        public async Task<PlanWorkOrderEntity> GetByWorkLineIdAsync(long workLineId)
+        public async Task<PlanWorkOrderEntity> GetByWorkLineIdAsync(long workLineId, long resourceId)
         {
-            //获取线体对应工单
-            var orderList = await _planWorkOrderRepository.GetByWorkLineIdAsync(workLineId);
-            //1. 校验是否存在工单
-            if(orderList == null || orderList.Any() == false)
+            PlanWorkOrderEntity? orderEntity = null;
+            //查询产线信息
+            var workLineEntity = await _inteWorkCenterRepository.GetByIdAsync(workLineId);
+            if (workLineEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12125));
+            }
+            //获取线体激活工单
+            var activeOrderList = await _planWorkOrderRepository.GetByWorkLineIdAsync(workLineId);
+            if (activeOrderList == null || !activeOrderList.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45030));
             }
-            //2. 查询激活工单
-            orderList = orderList.Where(m => m.Status == PlanWorkOrderStatusEnum.InProduction).ToList(); //激活后会变成生产中
-            List<long> orderIdList = orderList.Select(m => m.Id).ToList();
-            var activeList = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(orderIdList.ToArray());
-            if(activeList == null || activeList.Any() == false)
+            if (activeOrderList.Count() == 1)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45030));
+                orderEntity = activeOrderList.First();
+                return orderEntity;
             }
-            //3. 校验是否激活大于一个工单
-            if(activeList.Count() > 1)
+            if (workLineEntity.IsMixLine != true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45031));
+                //不混线时 校验是否激活大于一个工单
+                if (activeOrderList.Count() > 1)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45031));
+                }
+                orderEntity = activeOrderList.First();
+            }
+            else
+            {
+                //获取资源绑定的工单
+                var workOrderBindEntities = await _planWorkOrderBindRepository.GetPlanWorkOrderBindEntitiesAsync(new PlanWorkOrderBindQuery
+                {
+                    SiteId = workLineEntity.SiteId ?? 0,
+                    ResourceId = resourceId
+                });
+                if (workOrderBindEntities == null || !workOrderBindEntities.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45034));
+                }
+                var tempOrderList = activeOrderList.Where(x => workOrderBindEntities.Select(z => z.WorkOrderId).Contains(x.Id));
+                if (tempOrderList == null || tempOrderList.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45035));
+                }
+                orderEntity = tempOrderList.First();
             }
 
-            //获取激活工单
-            var activeIdList = activeList.Select(m => m.WorkOrderId).ToList();
-            var curOrder = orderList.Where(m => activeIdList.Contains(m.Id)).FirstOrDefault();
-            return curOrder!;
+            return orderEntity;
         }
 
         /// <summary>

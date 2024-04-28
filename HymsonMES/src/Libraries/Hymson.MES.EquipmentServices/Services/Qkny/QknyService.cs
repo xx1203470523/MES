@@ -488,7 +488,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
 
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             //2. 构造数据
             ManuFeedingMaterialSaveDto saveDto = new ManuFeedingMaterialSaveDto();
             saveDto.BarCode = dto.Sfc;
@@ -509,7 +509,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
             //2. 校验设备是否激活工单
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             //3. 调用AGV接口
             var result = ""; //await HttpHelper.HttpPostAsync("", dto.Content, "");
             //4. 存储数据
@@ -538,7 +538,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
             //2. 构造数据
             //2.1 条码数据
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             CreateBarcodeByWorkOrderBo query = new CreateBarcodeByWorkOrderBo();
             query.WorkOrderId = planEntity.Id;
             query.ResourceId = equResModel.ResId;
@@ -574,7 +574,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
             //2. 工单信息
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             //3. 查询条码信息
             var manuSfcInfo = await _manuSfcRepository.GetManSfcAboutInfoBySfcAsync(new ManuSfcAboutInfoBySfcQuery()
             {

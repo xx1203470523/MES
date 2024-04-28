@@ -414,7 +414,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
             //2. 查询激活的工单
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             //3. 查询分选规则
             ProcSortRuleDetailEquQuery query = new ProcSortRuleDetailEquQuery();
             query.MaterialId = planEntity.ProductId;

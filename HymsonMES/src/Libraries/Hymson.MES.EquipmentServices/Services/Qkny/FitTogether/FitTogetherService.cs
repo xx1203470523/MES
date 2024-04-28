@@ -274,7 +274,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             //1.1 获取工单
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             //2. 构造数据
             CreateBarcodeByWorkOrderBo query = new CreateBarcodeByWorkOrderBo();
             query.WorkOrderId = planEntity.Id;
@@ -496,7 +496,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         {
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             //2. 查询极组条码是否已经存在
             WhMaterialInventoryBarCodeQuery whQuery = new WhMaterialInventoryBarCodeQuery();
             whQuery.SiteId = equResModel.SiteId;
