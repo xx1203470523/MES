@@ -349,6 +349,22 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
+        /// 获取条码产了最终记录(根据条码获取单条)
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<QualFinallyOutputRecordView?> QueryBySFCFirstAsync(string sfc)
+        {
+            var param = new FQCInspectionSFCQueryDto
+            {
+                Barcode = sfc,
+                PageSize = 1,
+            };
+            var res = await QueryBySFCAsync(param);
+            return res.Data.FirstOrDefault();
+        }
+
+        /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
         /// <param name="pagedQueryDto"></param>
