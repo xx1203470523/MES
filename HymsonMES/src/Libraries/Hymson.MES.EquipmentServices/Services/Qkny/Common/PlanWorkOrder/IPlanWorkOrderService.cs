@@ -14,11 +14,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
     public interface IPlanWorkOrderService
     {
         /// <summary>
-        /// 根据产线ID获取工单数据（激活的工单）
+        /// 根据产线ID、资源ID获取工单数据（激活的工单）
         /// </summary>
         /// <param name="workLineId"></param>
+        /// <param name="resourceId"></param>
         /// <returns></returns>
-        Task<PlanWorkOrderEntity> GetByWorkLineIdAsync(long workLineId);
+        Task<PlanWorkOrderEntity> GetByWorkLineIdAsync(long workLineId, long resourceId);
 
         /// <summary>
         /// 获取工单对应物料

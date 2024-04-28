@@ -295,7 +295,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
                 equDto.ResourceCode = dto.ConsumeResourceCode;
                 EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(equDto);
                 //2. 查询设备激活工单
-                PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+                PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
                 //4. 校验物料是否在激活工单对应的BOM里
                 materialDbList = await _planWorkOrderService.GetWorkOrderMaterialAsync(planEntity.ProductBOMId);
             }
@@ -318,7 +318,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
             equDto.ResourceCode = dto.ConsumeResourceCode;
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(equDto);
             //2. 查询设备激活工单
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             //3. 批次转移数据
             MultBatchMoveDto moveDto = new MultBatchMoveDto();
             moveDto.EquipmentCode = dto.EquipmentCode;
@@ -423,7 +423,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             //2. 查询设备激活工单
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             //3. 构造数据
             //3.1 产出条码
             CreateBarcodeByWorkOrderBo query = new CreateBarcodeByWorkOrderBo();
@@ -482,7 +482,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 查询设备激活工单
-            //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             //3. 查询转移的类型及数据
             List<string> codeList = new List<string>() { dto.EquipmentCodeIn, dto.EquipmentCodeOut };
             ProcLoadPointEquipmentQuery query = new ProcLoadPointEquipmentQuery();
@@ -553,7 +553,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
             ////1. 获取设备基础信息
             //EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             ////2. 查询设备激活工单
-            //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId);
+            //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
             //3. 查询转移的类型及数据
             List<string> codeList = new List<string>() { dto.EquipmentCodeIn, dto.EquipmentCodeOut };
             ProcLoadPointEquipmentQuery query = new ProcLoadPointEquipmentQuery();

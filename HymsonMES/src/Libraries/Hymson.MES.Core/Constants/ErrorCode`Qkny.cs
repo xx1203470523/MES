@@ -86,6 +86,16 @@ namespace Hymson.MES.Core.Constants
         /// 工单所在BOM没有物料
         /// </summary>
         public const string MES45033 = "工单所在BOM没有物料";
+
+        /// <summary>
+        /// 设备未绑定工单
+        /// </summary>
+        public const string MES45034 = "设备未绑定工单";
+
+        /// <summary>
+        /// 设备未绑定激活状态工单
+        /// </summary>
+        public const string MES45035 = "设备未绑定激活状态工单";
         #endregion
 
         #region 上料
