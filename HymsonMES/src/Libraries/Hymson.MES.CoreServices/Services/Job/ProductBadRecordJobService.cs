@@ -251,7 +251,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 if (scrapCode != null)
                 {
-                    var scrapStep = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.Discard, bo.SiteId, bo.Remark ?? "");
+                    var scrapStep = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.Discard, bo.SiteId, bo.ProcedureId,bo.ResourceId,null, bo.Remark ?? "");
                     sfcStepList.Add(scrapStep);
                 }
 
