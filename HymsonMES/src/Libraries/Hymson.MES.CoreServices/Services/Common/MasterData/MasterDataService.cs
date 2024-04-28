@@ -34,6 +34,7 @@ using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Hymson.MES.CoreServices.Services.Common
 {
@@ -1302,15 +1303,20 @@ namespace Hymson.MES.CoreServices.Services.Common
             return await _qualUnqualifiedCodeRepository.GetByCodesAsync(query);
         }
 
-
         /// <summary>
         /// 创建条码步骤数据
         /// </summary>
         /// <param name="sfc"></param>
         /// <param name="type"></param>
+        /// <param name="siteId"></param>
+        /// <param name="operationProcedureId"></param>
+        /// <param name="operationResourceId"></param>
+        /// <param name="operationEquipmentId"></param>
         /// <param name="remark"></param>
         /// <returns></returns>
-        public ManuSfcStepEntity CreateSFCStepEntity(ManuSfcProduceEntity sfc, ManuSfcStepTypeEnum type, long siteId, string remark = "")
+        public ManuSfcStepEntity CreateSFCStepEntity(ManuSfcProduceEntity sfc, ManuSfcStepTypeEnum type, long siteId,
+          long? operationProcedureId, long? operationResourceId, long? operationEquipmentId,
+            string remark = "")
         {
             return new ManuSfcStepEntity
             {
@@ -1326,6 +1332,9 @@ namespace Hymson.MES.CoreServices.Services.Common
                 ProcedureId = sfc.ProcedureId,
                 Operatetype = type,
                 CurrentStatus = sfc.Status,
+                OperationProcedureId = operationProcedureId,
+                OperationResourceId = operationResourceId,
+                OperationEquipmentId = operationEquipmentId,
                 //Lock = sfc.Lock,
                 Remark = remark,
                 SiteId = siteId,

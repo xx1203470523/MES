@@ -301,9 +301,15 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// </summary>
         /// <param name="sfc"></param>
         /// <param name="type"></param>
+        /// <param name="siteId"></param>
+        /// <param name="operationProcedureId"></param>
+        /// <param name="operationResourceId"></param>
+        /// <param name="operationEquipmentId"></param>
         /// <param name="remark"></param>
         /// <returns></returns>
-        ManuSfcStepEntity CreateSFCStepEntity(ManuSfcProduceEntity sfc, ManuSfcStepTypeEnum type, long siteId, string remark = "");
+        ManuSfcStepEntity CreateSFCStepEntity(ManuSfcProduceEntity sfc, ManuSfcStepTypeEnum type, long siteId,
+              long? operationProcedureId, long? operationResourceId, long? operationEquipmentId,
+                string remark = "");
 
         /// <summary>
         /// 进行扣料（单一物料，包含物料的替代料）
