@@ -20,6 +20,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\Manufacture\ManuBarcodeReceive\**" />
+    <EmbeddedResource Remove="Services\Manufacture\ManuBarcodeReceive\**" />
+    <None Remove="Services\Manufacture\ManuBarcodeReceive\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Crc32.NET" Version="1.2.0" />
     <PackageReference Include="Hymson.EventBus.Abstractions" Version="2.1.149" />
     <PackageReference Include="Hymson.Infrastructure" Version="2.1.149" />
@@ -36,7 +42,6 @@
 
   <ItemGroup>
     <Folder Include="Options\" />
-    <Folder Include="Services\Manufacture\ManuBarcodeReceive\" />
   </ItemGroup>
 
 </Project>

@@ -17,13 +17,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<ManuSfcStepEntity> GetByIdAsync(long id);
 
         /// <summary>
-        /// 根据IDs批量获取数据
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcStepEntity>> GetByIdsAsync(long[] ids);
-
-        /// <summary>
         /// 根据水位批量获取数据
         /// </summary>
         /// <param name="query"></param>

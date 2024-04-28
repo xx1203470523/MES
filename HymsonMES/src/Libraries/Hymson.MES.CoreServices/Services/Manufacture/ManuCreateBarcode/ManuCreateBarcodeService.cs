@@ -289,7 +289,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         Qty = qty,
                         IsUsed = YesOrNoEnum.No,
                         Status = SfcStatusEnum.lineUp,
-                        CreatedBy = param.UserName!,
+                        CreatedBy = param.UserName,
                         UpdatedBy = param.UserName
                     };
                     manuSfcList.Add(manuSfcEntity);
@@ -304,7 +304,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                         ProductBOMId = planWorkOrderEntity.ProductBOMId,
                         IsUsed = true,
-                        CreatedBy = param.UserName!,
+                        CreatedBy = param.UserName,
                         UpdatedBy = param.UserName
                     };
                     manuSfcInfoList.Add(manuSfcInfoEntity);
@@ -326,7 +326,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         Status = SfcStatusEnum.lineUp,
                         RepeatedCount = 0,
                         IsScrap = TrueOrFalseEnum.No,
-                        CreatedBy = param.UserName!,
+                        CreatedBy = param.UserName,
                         UpdatedBy = param.UserName
                     };
                     manuSfcProduceList.Add(manuSfcProduceEntity);
@@ -338,13 +338,14 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         SFC = sfc,
                         ProductId = productId,
                         WorkOrderId = planWorkOrderEntity.Id,
-                        ProductBOMId = planWorkOrderEntity.ProductBOMId,
-                        WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                         Qty = qty,
-                        ProcedureId = procProcedureEntity.Id,
                         Operatetype = ManuSfcStepTypeEnum.Create,
-                        CurrentStatus = SfcStatusEnum.lineUp,
-                        CreatedBy = param.UserName!,
+                        AfterOperationStatus=SfcStatusEnum.lineUp,
+                        RepeatedCount = 0,
+                        IsRepair = TrueOrFalseEnum.No,
+                        OperationProcedureId = param.ProcedureId,
+                        OperationResourceId= param.ResourceId,
+                        CreatedBy = param.UserName,
                         UpdatedBy = param.UserName
                     };
                     manuSfcStepList.Add(manuSfcStepEntity);
@@ -1200,6 +1201,5 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             // TODO
             return await Task.FromResult(new List<ManuSfcEntity> { });
         }
-
     }
 }
