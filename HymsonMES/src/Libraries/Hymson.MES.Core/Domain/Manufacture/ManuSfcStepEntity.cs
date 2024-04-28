@@ -75,7 +75,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 当前状态
         /// </summary>
-        public SfcStatusEnum CurrentStatus { get; set; }
+        public SfcStatusEnum? CurrentStatus { get; set; }
 
         /// <summary>
         /// 操作后状态
@@ -88,7 +88,22 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public int? RepeatedCount { get; set; }
 
         /// <summary>
-        /// 
+        /// 操作工序id
+        /// </summary>
+        public long? OperationProcedureId { get; set; }
+
+        /// <summary>
+        /// 操作资源id
+        /// </summary>
+        public long? OperationResourceId { get; set; }
+
+        /// <summary>
+        /// 操作设备id
+        /// </summary>
+        public long? OperationEquipmentId { get; set; }
+
+        /// <summary>
+        /// 维修
         /// </summary>
         public TrueOrFalseEnum? IsRepair { get; set; }
 

@@ -216,7 +216,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 var manuSfc = manuSfcs.FirstOrDefault(x => x.SFC == item.SFC);
 
                 // 不良录入条码步骤
-                var sfcStepEntity = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.BadEntry, bo.SiteId, bo.Remark ?? "");
+                var sfcStepEntity = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.BadEntry, bo.SiteId, bo.ProcedureId,bo.ResourceId,null, bo.Remark ?? "");
                 sfcStepList.Add(sfcStepEntity);
 
                 foreach (var unqualified in qualUnqualifiedCodes)
@@ -251,7 +251,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 if (scrapCode != null)
                 {
-                    var scrapStep = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.Discard, bo.SiteId, bo.Remark ?? "");
+                    var scrapStep = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.Discard, bo.SiteId, bo.ProcedureId,bo.ResourceId,null, bo.Remark ?? "");
                     sfcStepList.Add(scrapStep);
                 }
 

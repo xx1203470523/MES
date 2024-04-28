@@ -15,7 +15,7 @@ namespace Hymson.MES.CoreServices.Services.Job
     /// 条码产出上报
     /// </summary>
     [Job("条码产出上报", JobTypeEnum.Standard)]
-    public class IOutputModifyService : IJobService
+    public class OutputModifyService : IJobService
     {
         /// <summary>
         /// 服务接口（主数据）
@@ -37,7 +37,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
-        public IOutputModifyService(IMasterDataService masterDataService, IManuSfcRepository manuSfcRepository,
+        public OutputModifyService(IMasterDataService masterDataService, IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository, IManuSfcStepRepository manuSfcStepRepository)
         {
             _masterDataService = masterDataService;
@@ -128,6 +128,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ResourceId = commonBo.ResourceId,
                     CurrentStatus = sfcProduceEntity.Status,
                     Operatetype = ManuSfcStepTypeEnum.OutputReport,
+                    OperationProcedureId = commonBo.ProcedureId,
+                    OperationResourceId = commonBo.ResourceId,
+                    OperationEquipmentId = commonBo.EquipmentId,
                     SiteId = commonBo.SiteId,
                     CreatedBy = commonBo.UserName,
                     CreatedOn = HymsonClock.Now(),

@@ -220,8 +220,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                             ProcedureId = manuSfcProduceEntity.ProcedureId,
                             Operatetype = ManuSfcStepTypeEnum.BarcodeBinding,
                             CurrentStatus = SfcStatusEnum.lineUp,
-                            EquipmentId = vehicleBo.EquipmentId,
-                            ResourceId = jobRequestBo.ResourceId,
+                            EquipmentId = manuSfcProduceEntity.EquipmentId,
+                            ResourceId = manuSfcProduceEntity.ResourceId,
+                            OperationProcedureId = jobRequestBo.ProcedureId,
+                            OperationResourceId = jobRequestBo.ResourceId,
+                            OperationEquipmentId = jobRequestBo.EquipmentId,
                             CreatedBy = jobRequestBo.UserName,
                             UpdatedBy = jobRequestBo.UserName,
                         };
