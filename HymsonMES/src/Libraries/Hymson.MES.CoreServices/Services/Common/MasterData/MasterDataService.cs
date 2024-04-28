@@ -944,13 +944,15 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <returns></returns>
         public async Task<long?> GetProductSetIdAsync(ProductSetBo param)
         {
+            // 读取资源的产出设置（优先）
             var productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ResourceId, SiteId = param.SiteId });
-            if (productSetEntity == null)
-            {
-                productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ProcedureId, SiteId = param.SiteId });
-                if (productSetEntity == null) return null;
-            }
-            return productSetEntity.SemiProductId;
+            if (productSetEntity != null) return productSetEntity.SemiProductId;
+
+            // 读取工序的产出设置
+            productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ProcedureId, SiteId = param.SiteId });
+            if (productSetEntity != null) return productSetEntity.SemiProductId;
+
+            return null;
         }
 
         /// <summary>
