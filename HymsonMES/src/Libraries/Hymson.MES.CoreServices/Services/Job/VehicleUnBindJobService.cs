@@ -21,6 +21,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums.Job;
+using Hymson.MES.CoreServices.Dtos.Common;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -132,6 +133,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                                 ResourceId = jobRequest.ResourceId,
                                 ProcedureId = manuSfcProduceEntity.ProcedureId,
                                 Operatetype = ManuSfcStepTypeEnum.BarcodeUnbinding,
+                                OperationProcedureId = jobRequest.ProcedureId,
+                                OperationResourceId = jobRequest.ResourceId,
+                                OperationEquipmentId = jobRequest.EquipmentId,
                                 CurrentStatus = SfcStatusEnum.lineUp,
                                 CreatedBy = jobRequest.UserName,
                                 UpdatedBy = jobRequest.UserName,
