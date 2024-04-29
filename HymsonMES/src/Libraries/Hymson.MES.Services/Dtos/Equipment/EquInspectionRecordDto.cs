@@ -322,6 +322,21 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 基准值
+        /// </summary>
+        public decimal? BaseValue { get; set; }
+
+        /// <summary>
+        /// 最大值
+        /// </summary>
+        public decimal? MaxValue { get; set; }
+
+        /// <summary>
+        /// 最小值
+        /// </summary>
+        public decimal? MinValue { get; set; }
     }
 
     /// <summary>

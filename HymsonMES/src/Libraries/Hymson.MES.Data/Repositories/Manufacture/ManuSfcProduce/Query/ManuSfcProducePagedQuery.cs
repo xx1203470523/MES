@@ -200,6 +200,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public IEnumerable<string> Sfcs { get; set; }
 
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string? OrderCode { get; set; }
+
+        /// <summary>
+        /// 是否使用
+        /// </summary>
+        public YesOrNoEnum? IsUsed { get; set; }
     }
 
     /// <summary>

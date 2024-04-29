@@ -196,6 +196,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// BomId
         /// </summary>
         public long ProductBomId {  get; set; }
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string OrderCode { get; set; }
     }
 
     #region 顷刻

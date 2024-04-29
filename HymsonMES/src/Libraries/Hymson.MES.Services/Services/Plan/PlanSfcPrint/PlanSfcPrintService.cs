@@ -303,23 +303,33 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<PagedInfo<PlanSfcPrintDto>> GetPagedListAsync(PlanSfcPrintPagedQueryDto pagedQueryDto)
         {
-            var pagedQuery = pagedQueryDto.ToQuery<ManuSfcProduceNewPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId;
+            //var pagedQuery = pagedQueryDto.ToQuery<ManuSfcProduceNewPagedQuery>();
+            //pagedQuery.SiteId = _currentSite.SiteId;
 
             // 将工单号转换为工单Id
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.OrderCode))
-            {
-                var workOrderEntities = await _planWorkOrderRepository.GetEntitiesAsync(new PlanWorkOrderNewQuery
-                {
-                    OrderCode = pagedQueryDto.OrderCode,
-                    SiteId = pagedQuery.SiteId
-                });
-                if (workOrderEntities != null && workOrderEntities.Any()) pagedQuery.WorkOrderIds = workOrderEntities.Select(s => s.Id);
-                else pagedQuery.WorkOrderIds = Array.Empty<long>();
-            }
+            //if (!string.IsNullOrWhiteSpace(pagedQueryDto.OrderCode))
+            //{
+            //    var workOrderEntities = await _planWorkOrderRepository.GetEntitiesAsync(new PlanWorkOrderNewQuery
+            //    {
+            //        OrderCode = pagedQueryDto.OrderCode,
+            //        SiteId = pagedQuery.SiteId
+            //    });
+            //    if (workOrderEntities != null && workOrderEntities.Any()) pagedQuery.WorkOrderIds = workOrderEntities.Select(s => s.Id);
+            //    else pagedQuery.WorkOrderIds = Array.Empty<long>();
+            //}
 
             // 查询数据
-            var pagedInfo = await _manuSfcProduceRepository.GetPagedListAsync(pagedQuery);
+           // var pagedInfo1 = await _manuSfcProduceRepository.GetPagedListAsync(pagedQuery);
+            var pagedQuery = new ManuSfcAboutInfoPagedQuery
+            {
+                SiteId= _currentSite.SiteId ?? 0,
+                OrderCode = pagedQueryDto.OrderCode,
+                IsUsed  =pagedQueryDto.IsUsed,
+                Sfc=pagedQueryDto.SFC,
+                PageIndex = pagedQueryDto.PageIndex,
+                PageSize = pagedQueryDto.PageSize
+            };
+           var pagedInfo = await _manuSfcRepository.GetManuSfcAboutInfoPagedAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = await PrepareDtosAsync(pagedInfo.Data);
@@ -424,7 +434,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<PlanSfcPrintDto>> PrepareDtosAsync(IEnumerable<ManuSfcProduceEntity> entities)
+        private async Task<IEnumerable<PlanSfcPrintDto>> PrepareDtosAsync(IEnumerable<ManuSfcAboutInfoView> entities)
         {
             List<PlanSfcPrintDto> dtos = new();
 
@@ -433,41 +443,45 @@ namespace Hymson.MES.Services.Services.Plan
             var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
 
             // 读取工单
-            var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(entities.Select(x => x.WorkOrderId));
-            var workOrderDic = workOrderEntities.ToDictionary(x => x.Id, x => x);
+            //var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(entities.Select(x => x.WorkOrderId));
+            //var workOrderDic = workOrderEntities.ToDictionary(x => x.Id, x => x);
 
             // 读取条码
-            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
-            {
-                Ids = entities.Select(x => x.SFCId)
-            });
-            var sfcDic = sfcEntities.ToDictionary(x => x.Id, x => x);
+            //var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            //{
+            //    Ids = entities.Select(x => x.SFCId)
+            //});
+            //var sfcDic = sfcEntities.ToDictionary(x => x.Id, x => x);
 
             // 遍历填充
             foreach (var entity in entities)
             {
-                var dto = entity.ToModel<PlanSfcPrintDto>();
-                if (dto == null) continue;
-
-                dto.UpdatedOn = entity.CreatedOn;    // 这里用创建时间作为条码生成时间更准确
+                var dto = new PlanSfcPrintDto
+                {
+                    Id = entity.Id,
+                    SFC = entity.SFC,
+                    IsUsed = entity.IsUsed,
+                    UpdatedOn=entity.CreatedOn,// 这里用创建时间作为条码生成时间更准确
+                    OrderCode=entity.OrderCode
+                };
 
                 // 条码信息
-                if (!sfcDic.ContainsKey(entity.SFCId)) continue;
-                var sfcEntity = sfcDic[entity.SFCId];
-                if (sfcEntity != null)
-                {
-                    dto.Id = sfcEntity.Id;
-                    dto.SFC = sfcEntity.SFC;
-                    dto.IsUsed = sfcEntity.IsUsed;
-                }
+                //if (!sfcDic.ContainsKey(entity.SFCId)) continue;
+                //var sfcEntity = sfcDic[entity.SFCId];
+                //if (sfcEntity != null)
+                //{
+                //    dto.Id = sfcEntity.Id;
+                //    dto.SFC = sfcEntity.SFC;
+                //    dto.IsUsed = sfcEntity.IsUsed;
+                //}
 
                 // 工单
-                if (!workOrderDic.ContainsKey(entity.WorkOrderId)) continue;
-                var workOrderEntity = workOrderDic[entity.WorkOrderId];
-                if (workOrderEntity != null)
-                {
-                    dto.OrderCode = workOrderEntity.OrderCode;
-                }
+                //if (!workOrderDic.ContainsKey(entity.WorkOrderId)) continue;
+                //var workOrderEntity = workOrderDic[entity.WorkOrderId];
+                //if (workOrderEntity != null)
+                //{
+                //    dto.OrderCode = workOrderEntity.OrderCode;
+                //}
 
                 // 产品
                 if (!materialDic.ContainsKey(entity.ProductId)) continue;
