@@ -363,6 +363,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 类别 1、白班2、晚班3、巡检
         /// </summary>
         public EquInspectionTaskTypeEnum? Type { get; set; }
+
+        /// <summary>
+        /// 1、待检验2、检验中3、已完成
+        /// </summary>
+        public EquInspectionRecordStatusEnum? Status { get; set; }
     }
 
 }

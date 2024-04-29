@@ -169,6 +169,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
             {
                 sqlBuilder.Where(" eit.Type=@Type ");
             }
+            if (pagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where(" eir.Status=@Status ");
+            }
+
             if (pagedQuery.StartExecuTime.HasValue&& pagedQuery.StartExecuTime!=DateTime.MinValue)
             {
                 sqlBuilder.Where("eir.StartExecuTime>=@StartExecuTime");

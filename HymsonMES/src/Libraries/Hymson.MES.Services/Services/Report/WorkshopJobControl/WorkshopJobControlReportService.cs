@@ -212,12 +212,14 @@ namespace Hymson.MES.Services.Services.Report
                 {
                     nextStep = inSfcStepList[i + 1];
                     // 查找出站时间
-                    outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn && x.CreatedOn < nextStep.CreatedOn);
+                    outStep = outSfcSteps.FirstOrDefault(x => currentStep.Id < x.Id && x.Id < nextStep.Id);
+                    // outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn && x.CreatedOn < nextStep.CreatedOn);
                 }
                 else
                 {
                     // 查找出站时间
-                    outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn);
+                    // outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn);
+                    outStep = outSfcSteps.FirstOrDefault(x => currentStep.Id < x.Id);
                 }
 
                 stepDtos.Add(new WorkshopJobControlInOutSteptDto
