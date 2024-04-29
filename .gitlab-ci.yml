@@ -1,6 +1,11 @@
 stages:
     - sonarqube-check
-
+deploy to production:
+  stage: deploy
+  script: git push production HEAD:main
+  environment:
+    name: production
+    url: http://192.168.0.208:8880/
 sonarqube-check:
   stage: sonarqube-check
   image: mcr.microsoft.com/dotnet/sdk:6.0
@@ -11,6 +16,8 @@ sonarqube-check:
     key: "${CI_JOB_NAME}"
     paths:
       - .sonar/cache
+
+
   environment: production
   script: 
       - "apt-get update"
