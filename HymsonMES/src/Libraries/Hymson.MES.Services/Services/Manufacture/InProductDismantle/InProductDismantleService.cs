@@ -918,8 +918,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task<decimal> GetOutsideQtyAsync(long productId)
         {
             //外部获取批次数量
+            decimal qty = 0;
             var material = await _procMaterialRepository.GetByIdAsync(productId);
-            return material?.Batch ?? 0;
+            if(material.Batch == null)
+            {
+                qty =string.IsNullOrEmpty(material.Batch) ? 0 : decimal.Parse(material.Batch);
+            }
+            return qty;
         }
 
         /// <summary>

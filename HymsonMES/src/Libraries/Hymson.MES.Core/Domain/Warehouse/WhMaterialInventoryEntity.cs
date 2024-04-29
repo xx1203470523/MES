@@ -30,7 +30,7 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 数量（剩余 不包含报废数量）

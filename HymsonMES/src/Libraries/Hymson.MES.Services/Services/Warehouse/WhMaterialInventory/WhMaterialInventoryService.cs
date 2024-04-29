@@ -1,5 +1,4 @@
 using FluentValidation;
-using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -7,14 +6,10 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
@@ -298,6 +293,22 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             return entity.ToModel<WhMaterialInventoryDto>();
         }
+
+        public async Task<WhMaterialInventoryPageListViewDto?> QueryWhMaterialBarCodeAsync(string barCode)
+        {
+            var infoList = await _whMaterialInventoryRepository.GetPagedInfoAsync(new WhMaterialInventoryPagedQuery { MaterialBarCode = barCode, SiteId = _currentSite.SiteId ?? 0, PageIndex = 1, PageSize = 1 });
+                
+            if(infoList.TotalCount < 1) throw new CustomerValidationException(nameof(ErrorCode.MES152017)).WithData("Code", barCode);
+            var result = new WhMaterialInventoryPageListViewDto();
+            if (infoList != null)
+            {
+                var entityOne = infoList?.Data.FirstOrDefault();
+                result = entityOne?.ToModel<WhMaterialInventoryPageListViewDto>();
+            }
+
+            return result;
+        }
+
 
         /// <summary>
         /// 根据物料编码查询物料与供应商信息

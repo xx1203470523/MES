@@ -1907,6 +1907,7 @@
 
         public const string MES19227 = "{ReceiptNum}收货单重复";
         public const string MES19228 = "{ShipmentNum}出货单重复";
+        public const string MES19229 = "客户SiteId与当前保存信息不一致！";
         #endregion
 
         #region 发布记录 19300 

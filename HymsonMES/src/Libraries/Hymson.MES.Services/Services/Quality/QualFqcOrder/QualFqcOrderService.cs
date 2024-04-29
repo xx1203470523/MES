@@ -14,8 +14,6 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
-using Hymson.MES.Data.Repositories.Query;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
@@ -25,11 +23,6 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.CoreServices.Services.Quality.QualFqcOrder;
 using Hymson.MES.Data.Repositories.Plan;
 using static Hymson.MES.Services.Dtos.Quality.QualFqcParameterGroup;
-using Elastic.Clients.Elasticsearch.QueryDsl;
-using System.Security.Policy;
-using System.Linq;
-using Hymson.MES.CoreServices.Bos.Manufacture;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -112,7 +105,6 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IFQCOrderCreateService _qualFqcOrderCreateService;
 
-
         /// <summary>
         /// 工单信息表仓储接口
         /// </summary>
@@ -130,7 +122,7 @@ namespace Hymson.MES.Services.Services.Quality
 
 
         /// <summary>
-        /// struct
+        /// 构造
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
@@ -147,6 +139,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="qualFqcParameterGroupDetailSnapshootRepository"></param>
         /// <param name="qualFqcParameterGroupSnapshootRepository"></param>
         /// <param name="qualFqcOrderCreateService"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="qualFqcOrderSfcRepository"></param>
+        /// <param name="qualFinallyOutputRecordRepository"></param>
         public QualFqcOrderService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<QualFqcOrderSaveDto> validationSaveRules,
             IQualFqcOrderRepository qualFqcOrderRepository,
             IQualFqcOrderAttachmentRepository qualFqcOrderAttachmentRepository,
@@ -730,14 +725,30 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             //工单
-            if (entity.WorkOrderId.HasValue)
+            IEnumerable<long>? workOrderIds = null;
+            dto.OrderCode = "-";
+            var fqcOrderSFC = await _qualFqcOrderSfcRepository.GetEntitiesAsync(new QualFqcOrderSfcQuery { FQCOrderId = entity.Id, SiteId = entity.SiteId });
+            if (fqcOrderSFC != null)
             {
-                var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(entity.WorkOrderId.Value);
-                if (workOrderEntity != null)
+                workOrderIds = fqcOrderSFC.Select(s => s.WorkOrderId).Distinct();
+            }
+            if (workOrderIds != null)
+            {
+                var workOrderEntitys = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+                if (workOrderEntitys != null && workOrderEntitys.Any())
                 {
-                    dto.OrderCode = workOrderEntity.OrderCode;
+                    dto.OrderCode = string.Join(",", workOrderEntitys.Select(s => s.OrderCode));
                 }
             }
+            //工单
+            //if (entity.WorkOrderId.HasValue)
+            //{
+            //    var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(entity.WorkOrderId.Value);
+            //    if (workOrderEntity != null)
+            //    {
+            //        dto.OrderCode = workOrderEntity.OrderCode;
+            //    }
+            //}
 
             return dto;
         }
@@ -1158,7 +1169,7 @@ namespace Hymson.MES.Services.Services.Quality
                         }
 
                         var sfcHandMethod = orderSFCs.FirstOrDefault(e => e.SFC == m.Barcode)?.HandMethod;
-                
+
                         if (sfcHandMethod != default)
                         {
                             m.HandMethodText = sfcHandMethod!.GetDescription();

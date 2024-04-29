@@ -65,6 +65,17 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         }
 
         /// <summary>
+        /// 物料拆分与合并条码查询
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        [HttpGet("getbarCode/{barCode}")]
+        public async Task<WhMaterialInventoryPageListViewDto?> QueryWhMaterialBarCodeAsync(string barCode)
+        {
+            return await _whMaterialInventoryService.QueryWhMaterialBarCodeAsync(barCode);
+        }
+
+        /// <summary>
         /// 添加（物料库存）
         /// </summary>
         /// <param name="parm"></param>

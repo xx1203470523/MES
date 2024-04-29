@@ -67,19 +67,6 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualFqcOrderService.CreateAsync(saveDto);
         }
 
-
-        /// <summary>
-        /// 更新（FQC检验单）
-        /// </summary>
-        /// <param name="saveDto"></param>
-        /// <returns></returns>
-        //[HttpPut]
-        //[Route("update")]
-        //public async Task UpdateAsync([FromBody] QualFqcOrderSaveDto saveDto)
-        //{
-        //     await _qualFqcOrderService.ModifyAsync(saveDto);
-        //}
-
         /// <summary>
         /// 更新
         /// </summary>
@@ -153,7 +140,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 生成FQC检验单
+        /// 手动生成FQC检验单
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
@@ -162,8 +149,6 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<int> GeneratedOrderAsync([FromBody] QualFqcOrderCreateDto saveDto)
         {
             return await _qualFqcOrderService.CreateAsync(saveDto);
-            // TODO 生成IQC检验单
-            //return await _qualFqcOrderService.CreateAsync(saveDto);
         }
 
         /// <summary>

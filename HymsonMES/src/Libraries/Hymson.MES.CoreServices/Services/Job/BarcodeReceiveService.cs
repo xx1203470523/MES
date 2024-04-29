@@ -236,7 +236,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     if (material != null)
                     {
                         var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(material.MaterialId);
-                        qty = procMaterialEntity.Batch ?? 0;
+                        qty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
                         if (qty == 0)
                         {
                             var validationFailure = new ValidationFailure();

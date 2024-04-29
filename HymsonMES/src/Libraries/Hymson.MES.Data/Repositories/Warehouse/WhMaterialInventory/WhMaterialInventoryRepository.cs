@@ -6,6 +6,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
@@ -159,12 +160,16 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.AddParameters(whMaterialInventoryPagedQuery);
 
             using var conn = GetMESDbConnection();
+
             var whMaterialInventoryEntitiesTask = conn.QueryAsync<WhMaterialInventoryPageListView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var whMaterialInventoryEntities = await whMaterialInventoryEntitiesTask;
             var totalCount = await totalCountTask;
+
             var pageList = new PagedInfo<WhMaterialInventoryPageListView>(whMaterialInventoryEntities, whMaterialInventoryPagedQuery.PageIndex, whMaterialInventoryPagedQuery.PageSize, totalCount);
             return pageList;
+
+
         }
 
         /// <summary>

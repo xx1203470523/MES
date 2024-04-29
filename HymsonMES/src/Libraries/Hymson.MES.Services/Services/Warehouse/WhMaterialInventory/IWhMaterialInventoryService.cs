@@ -31,6 +31,13 @@ namespace Hymson.MES.Services.Services.Warehouse
         Task<WhMaterialInventoryDto?> QueryWhMaterialInventoryByBarCodeAsync(string barCode);
 
         /// <summary>
+        /// 获取条码信息
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        Task<WhMaterialInventoryPageListViewDto?> QueryWhMaterialBarCodeAsync(string barCode);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="whMaterialInventoryCreateDto"></param>
