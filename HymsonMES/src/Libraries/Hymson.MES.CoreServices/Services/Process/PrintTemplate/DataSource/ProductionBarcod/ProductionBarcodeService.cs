@@ -177,17 +177,17 @@ namespace Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.Prod
                     UnQualifiedQty = item.ScrapQty ?? 0,
                     Status = "",
                  
-                    PrintTime = HymsonClock.Now().ToString("yyyy-MM-dd HH:mm:ss"),
+                    PrintTime = HymsonClock.Now().ToString("yyyyMMddHHmm"),
                 };
 
                 if (createManuSfcStepEntity != null)
                 {
-                    printData.ProductionBatch = createManuSfcStepEntity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
+                    printData.ProductionBatch = createManuSfcStepEntity.CreatedOn.ToString("yyyyMMdd");
                 }
                 if (outputManuSfcStepEntity != null)
                 {
-                    printData.LasttOutputTime = outputManuSfcStepEntity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
-                    printData.ExpirationDate = createManuSfcStepEntity?.CreatedOn.AddDays(procMaterialEntity?.ValidTime ?? 0).ToString("yyyy-MM-dd HH:mm:ss");
+                    printData.LasttOutputTime = outputManuSfcStepEntity.CreatedOn.ToString("yyyyMMddHHmm");
+                    printData.ExpirationDate = createManuSfcStepEntity?.CreatedOn.AddDays(procMaterialEntity?.ValidTime ?? 0).ToString("yyyyMMddHHmm");
                     var procProcedureEntitiesTask = _procProcedureRepository.GetByIdAsync(outputManuSfcStepEntity.ProcedureId ?? 0);
                     var equEquipmentEntitiesTask = _equEquipmentRepository.GetByIdAsync(outputManuSfcStepEntity.EquipmentId ?? 0);
                     var procResourceEntitiesTask = _procResourceRepository.GetByIdAsync(outputManuSfcStepEntity.ResourceId ?? 0);
@@ -201,7 +201,6 @@ namespace Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.Prod
                     printData.EquipmentCode = equEquipmentEntity?.EquipmentCode;
                     printData.EquipmentName = equEquipmentEntity?.EquipmentName;
                 }
-
                 list.Add(printData);
             }
             return list;

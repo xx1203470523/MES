@@ -163,7 +163,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(vehicleQuery);
             if (inteVehicleEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45112));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45110));
             }
             if (inteVehicleEntity.VehicleTypeId == 0)
             {
@@ -190,8 +190,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             if (vehiceStatckList != null && vehiceStatckList.Count > 0)
             {
                 //已经绑定的数量+当前数量
-                var curNum = vehiceStatckList.Count * vehicleTypeEntity.CellQty + sfcList.Count;
-                if (curNum > okMaxNum)
+                var curNum = vehiceStatckList.Count + sfcList.Count;
+                if (curNum > okMaxNum * vehicleTypeEntity.CellQty)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES45119));
                 }
@@ -202,12 +202,22 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             List<InteVehicleFreightStackEntity> addList = new List<InteVehicleFreightStackEntity>();
             //List<InteVehicleFreightEntity> updateQtyList = new List<InteVehicleFreightEntity>();
             List<InteVehicleFreightRecordEntity> recordList = new List<InteVehicleFreightRecordEntity>();
-            foreach (var item in param.SfcList)
+            var paramSfcList = param.SfcList.OrderBy(x => x.Location.ParseToInt());
+            var locationIds = vehicleDetail.OrderBy(x => x.Location?.ParseToInt()).Select(x => x.Id).ToList();
+            foreach (var item in paramSfcList)
             {
+                //获取位置号Id
+                var locationId = vehicleDetail.Where(x => x.Location == item.Location).FirstOrDefault()?.Id ?? 0;
+                if (locationId == 0)
+                {
+                    locationId = locationIds.FirstOrDefault();
+                }
+                locationIds.Remove(locationId);
+
                 InteVehicleFreightStackEntity addModel = new InteVehicleFreightStackEntity();
                 addModel.Id = IdGenProvider.Instance.CreateId();
                 addModel.BarCode = item.Sfc;
-                addModel.LocationId = 0;
+                addModel.LocationId = locationId;
                 addModel.SiteId = param.SiteId;
                 addModel.CreatedBy = param.UserName;
                 addModel.UpdatedBy = param.UserName;
@@ -218,7 +228,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
 
                 //InteVehicleFreightEntity updateModel = new InteVehicleFreightEntity();
                 //updateModel.VehicleId = inteVehicleEntity.Id;
-                //updateModel.Qty = vehicleTypeEntity.CellQty;
+                //updateModel.Qty = 1;
                 //updateModel.UpdatedBy = param.UserName;
                 //updateModel.UpdatedOn = curDate;
                 //updateModel.Location = item.Location;
@@ -227,7 +237,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
                 InteVehicleFreightRecordEntity recordEntity = new InteVehicleFreightRecordEntity();
                 recordEntity.Id = IdGenProvider.Instance.CreateId();
                 recordEntity.BarCode = item.Sfc;
-                recordEntity.LocationId = 0;
+                recordEntity.LocationId = locationId;
                 recordEntity.SiteId = param.SiteId;
                 recordEntity.CreatedBy = param.UserName;
                 recordEntity.UpdatedBy = param.UserName;
