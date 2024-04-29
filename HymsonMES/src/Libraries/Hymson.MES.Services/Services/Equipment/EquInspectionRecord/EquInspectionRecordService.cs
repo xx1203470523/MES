@@ -279,7 +279,8 @@ namespace Hymson.MES.Services.Services.Equipment
             });
             foreach (var item in equInspectionItems)
             {
-                var inspectionTaskDetailSnapshootId = equInspectionTaskDetails.FirstOrDefault(x => x.InspectionItemId == item.Id)?.Id ?? 0;
+                var detailsSnapshootEntity = equInspectionTaskDetails.FirstOrDefault(x => x.InspectionItemId == item.Id);
+                var inspectionTaskDetailSnapshootId = detailsSnapshootEntity?.Id ?? 0;
                 var operation = equInspectionRecords.FirstOrDefault(x => x.InspectionTaskDetailSnapshootId == inspectionTaskDetailSnapshootId);
                 taskItemDtos.Add(new EquInspectioTaskItemDto
                 {
@@ -290,7 +291,10 @@ namespace Hymson.MES.Services.Services.Equipment
                     OperationContent = item.OperationContent,
                     InspectionResult = operation?.InspectionResult ?? "",
                     IsQualified = operation?.IsQualified,
-                    Remark = operation?.Remark ?? ""
+                    Remark = operation?.Remark ?? "",
+                    BaseValue= detailsSnapshootEntity?.BaseValue,
+                    MaxValue = detailsSnapshootEntity?.MaxValue,
+                    MinValue = detailsSnapshootEntity?.MinValue
                 });
             }
             return operateDto;

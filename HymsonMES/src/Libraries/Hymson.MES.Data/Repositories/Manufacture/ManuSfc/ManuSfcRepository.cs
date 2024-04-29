@@ -279,7 +279,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Select(@" ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
                                 pwo.OrderCode as WorkOrderCode, 
-                                msi.ProcessRouteId, msi.ProductBomId
+                                msi.ProcessRouteId,msi.ProductBomId,pwo.OrderCode
             ");
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
@@ -291,6 +291,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 query.Sfc = $"%{query.Sfc}%";
                 sqlBuilder.Where("ms.Sfc like  @Sfc");
             }
+
+            if (!string.IsNullOrEmpty(query.OrderCode))
+            {
+                sqlBuilder.Where("pwo.OrderCode=@OrderCode");
+            }
+            if (query.IsUsed.HasValue)
+            {
+                sqlBuilder.Where("ms.IsUsed=@IsUsed");
+            }
+
             if (!string.IsNullOrEmpty(query.SfcHard))
             {
                 sqlBuilder.Where("ms.Sfc = @SfcHard ");
@@ -354,9 +364,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (param.Sfcs != null && param.Sfcs.Any())
             {
                 sqlBuilder.Where("sfc.SFC in @Sfcs");
-        }
+            }
             if (param.Statuss != null && param.Statuss.Any())
-        {
+            {
                 sqlBuilder.Where("sfc.Status in @Statuss");
             }
             using var conn = GetMESDbConnection();
@@ -596,7 +606,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> PartialScrapmanuSFCByIdAsync(IEnumerable<ManuSFCPartialScrapByIdCommand>  commands)
+        public async Task<int> PartialScrapmanuSFCByIdAsync(IEnumerable<ManuSFCPartialScrapByIdCommand> commands)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(manuSFCPartialScrapByIdSql, commands);
@@ -698,7 +708,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (query.Id.HasValue)
             {
                 sqlBuilder.Where("Id = @Id");
-}
+            }
 
             if (query.Ids != null && query.Ids.Any())
             {
