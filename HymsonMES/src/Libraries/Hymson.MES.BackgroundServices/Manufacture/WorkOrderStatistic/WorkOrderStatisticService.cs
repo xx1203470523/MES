@@ -175,7 +175,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 });
             }
 
-            using var trans = TransactionHelper.GetTransactionScope();
+            using var trans = TransactionHelper.GetTransactionScope(timeout: 60);
 
             // 更新工单的投入数量
             await _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdsAsync(updateInputQtyCommands);
