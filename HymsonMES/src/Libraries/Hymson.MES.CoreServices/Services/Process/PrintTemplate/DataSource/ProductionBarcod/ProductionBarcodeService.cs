@@ -201,7 +201,6 @@ namespace Hymson.MES.CoreServices.Services.Process.PrintTemplate.DataSource.Prod
                     printData.EquipmentCode = equEquipmentEntity?.EquipmentCode;
                     printData.EquipmentName = equEquipmentEntity?.EquipmentName;
                 }
-
                 list.Add(printData);
             }
             return list;
