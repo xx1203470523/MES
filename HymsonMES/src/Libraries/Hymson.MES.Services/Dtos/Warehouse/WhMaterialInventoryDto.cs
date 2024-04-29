@@ -528,4 +528,26 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public long SupplierId { get; set; }
     }
+
+
+    /// <summary>
+    /// 条码拆分
+    /// </summary>
+    public record MaterialBarCodeSplitAdjustDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 待拆分的数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+    }
 }

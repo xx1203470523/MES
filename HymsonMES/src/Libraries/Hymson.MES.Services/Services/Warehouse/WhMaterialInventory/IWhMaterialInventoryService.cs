@@ -116,5 +116,12 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         Task UpdateOutsideWhMaterialInventoryAsync(OutsideWhMaterialInventoryModifyDto modifyDto);
+
+        /// <summary>
+        /// 条码拆分
+        /// </summary>
+        /// <param name="adjustDto"></param>
+        /// <returns></returns>
+        Task<string> BarcodeSplitAdjustAsync(MaterialBarCodeSplitAdjustDto adjustDto);
     }
 }

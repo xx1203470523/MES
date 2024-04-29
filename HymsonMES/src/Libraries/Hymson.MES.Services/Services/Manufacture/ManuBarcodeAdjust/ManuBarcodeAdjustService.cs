@@ -1566,7 +1566,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Count = 1,
                 Base = inteCodeRulesEntity.Base,
                 Increment = inteCodeRulesEntity.Increment,
-                IgnoreChar = inteCodeRulesEntity.IgnoreChar,
+                IgnoreChar = inteCodeRulesEntity.IgnoreChar ?? string.Empty,
                 OrderLength = inteCodeRulesEntity.OrderLength,
                 ResetType = inteCodeRulesEntity.ResetType,
                 StartNumber = inteCodeRulesEntity.StartNumber,

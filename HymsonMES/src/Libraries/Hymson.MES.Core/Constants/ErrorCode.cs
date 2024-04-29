@@ -851,6 +851,9 @@
         public const string MES15122 = " 物料条码{materialBarCode}状态{status},不允许执行该操作！";
         public const string MES15123 = " 不允许操作非原材料库存！";
         public const string MES15124 = " 没有查询到对应库存数据";
+
+        public const string MES15125 = " 拆分数量不能为空";
+        public const string MES15126 = "待拆分数量不能大于原始数量";
         #endregion
 
         #region 物料台账 15200

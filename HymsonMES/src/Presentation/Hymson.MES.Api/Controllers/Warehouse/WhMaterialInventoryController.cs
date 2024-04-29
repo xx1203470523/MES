@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.Web.Framework.Attributes;
@@ -129,6 +130,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             await _whMaterialInventoryService.DeletesWhMaterialInventoryAsync(ids);
         }
+
         /// <summary>
         /// 查询物料与供应商
         /// </summary>
@@ -139,7 +141,6 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.GetMaterialAndSupplierByMateialCodeIdAsync(id);
         }
-
 
         /// <summary>
         /// 来源外部的数据分页查询列表（物料库存）
@@ -183,10 +184,24 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [HttpPost]
         [Route("updateOutsideWhMaterialInventory")]
         [LogDescription("修改外部来源库存", BusinessType.UPDATE)]
-        //[PermissionDescription("wh:materialInventory:updateOutsideWhMaterialInventory")]
         public async Task UpdateOutsideWhMaterialInventoryAsync(OutsideWhMaterialInventoryModifyDto modifyDto) 
         {
             await _whMaterialInventoryService.UpdateOutsideWhMaterialInventoryAsync(modifyDto);
+        }
+
+        
+        /// <summary>
+        /// 物料条码拆分
+        /// </summary>
+        /// <param name="adjustDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("barcodeSplitAdjust")]
+        [LogDescription("条码拆分", BusinessType.INSERT)]
+        public async Task<string> BarcodeSplitAdjustAsync(MaterialBarCodeSplitAdjustDto adjustDto)
+        {
+            return await _whMaterialInventoryService.BarcodeSplitAdjustAsync(adjustDto);
+
         }
     }
 }
