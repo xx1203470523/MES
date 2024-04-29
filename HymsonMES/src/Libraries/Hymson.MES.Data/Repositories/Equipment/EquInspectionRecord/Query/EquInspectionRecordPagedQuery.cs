@@ -48,5 +48,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// </summary>
         public DateTime? StartExecuTime { get; set; }
 
+        /// <summary>
+        /// 1、待检验2、检验中3、已完成
+        /// </summary>
+        public EquInspectionRecordStatusEnum? Status { get; set; }
     }
 }

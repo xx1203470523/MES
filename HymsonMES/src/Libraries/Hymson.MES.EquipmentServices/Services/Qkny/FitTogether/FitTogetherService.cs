@@ -384,7 +384,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             bindDto.EquipmentId = equResModel.EquipmentId;
             bindDto.JzSfc1 = jzModel.JzSfc1;
             bindDto.JzSfc2 = jzModel.JzSfc2;
-            bindDto.Sfc = jzModel.Sfc;
+            bindDto.Sfc = dto.Sfc;
             bindDto.BindType = "1";
             bindDto.CreatedOn = HymsonClock.Now();
             bindDto.CreatedBy = dto.EquipmentCode;

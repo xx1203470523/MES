@@ -168,8 +168,12 @@ namespace Hymson.MES.Services.Services.Report
             foreach (var detailEntity in bomDetails)
             {
                 //查询有没有挂载组件
-                var listCirculations = manuSfcCirculations.Where(a => a.ProcedureId == detailEntity.ProcedureId
-                                                && a.CirculationMainProductId == detailEntity.MaterialId).OrderByDescending(x => x.UpdatedOn).ToList();
+                //var listCirculations = manuSfcCirculations.Where(a => a.ProcedureId == detailEntity.ProcedureId
+                //                                && a.CirculationMainProductId == detailEntity.MaterialId).OrderByDescending(x => x.UpdatedOn).ToList();
+                //查询有没有挂载组件
+                var bomId = detailEntity.BomId;
+                var orderId = orders.FirstOrDefault(x => x.ProductBOMId == bomId)?.Id ?? 0;
+                var listCirculations = manuSfcCirculations.Where(a => a.WorkOrderId == orderId && a.CirculationMainProductId == detailEntity.MaterialId).OrderByDescending(x => x.UpdatedOn).ToList();
                 if (!listCirculations.Any())
                 {
                     continue;
