@@ -261,7 +261,7 @@ namespace Hymson.MES.Core.Constants
         public const string MES45118 = "载具对应载具类型状态已禁用";
 
         /// <summary>
-        /// 载具对应载具类型状态已禁用
+        /// 载具装载数量加上这次已超过最大值
         /// </summary>
         public const string MES45119 = "载具装载数量加上这次已超过最大值";
 
