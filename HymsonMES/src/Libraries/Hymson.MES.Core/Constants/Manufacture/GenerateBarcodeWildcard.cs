@@ -110,9 +110,9 @@ namespace Hymson.MES.Core.Constants.Manufacture
         public const string PositivePlate = "%POSITIVEPLATE%";
 
         /// <summary>
-        /// 极片状态通配符
+        /// 工单类型映射通配符
         /// </summary>
-        [GenerateBarcodeWildcardDescriptionAttribute("极片状态通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        [GenerateBarcodeWildcardDescriptionAttribute("工单类型映射通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
         public const string ElectrodeState = "%ELECTRODESTATE%";
     }
 }
