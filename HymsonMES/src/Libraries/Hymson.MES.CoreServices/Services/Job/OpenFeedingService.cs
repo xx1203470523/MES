@@ -14,41 +14,16 @@ using Hymson.Utils;
 namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
-    /// 打开产出确认
+    /// 打开物料加载
     /// </summary>
-    [Job("打开产出确认", JobTypeEnum.Standard)]
-    public class OutputConfirmService : IJobService
+    [Job("打开物料加载", JobTypeEnum.Standard)]
+    public class OpenFeedingService : IJobService
     {
-
-        /// <summary>
-        /// 服务接口（主数据）
-        /// </summary>
-        private readonly IMasterDataService _masterDataService;
-
-        /// <summary>
-        /// 仓储接口（条码生产信息）
-        /// </summary>
-        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly ILocalizationService _localizationService;
-
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="masterDataService"></param>
-        /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="localizationService"></param>
-        public OutputConfirmService(
-            IMasterDataService masterDataService,
-            IManuSfcProduceRepository manuSfcProduceRepository,
-            ILocalizationService localizationService)
+        public OpenFeedingService()
         {
-            _masterDataService = masterDataService;
-            _manuSfcProduceRepository = manuSfcProduceRepository;
-            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -61,20 +36,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             var bo = param.ToBo<BadRecordRequestBo>();
             if (bo == null) return;
-            if (bo.SFCs == null || !bo.SFCs.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17259));
-            }
-            // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
-            if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
-
-            await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
-
-            // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService)
-                              .VerifyProcedure(bo.ProcedureId)
-                              .VerifyResource(bo.ResourceId);
         }
 
         /// <summary>
@@ -91,7 +52,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 数据组装
         /// </summary>
         /// <param name="param"></param>
-        /// <param name="proxy"></param>
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
@@ -100,17 +60,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 待执行的命令
             BadRecordResponseBo responseBo = new();
-
-            // 获取维修业务
-            var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessEntitiesBySFCAsync(new SfcListProduceBusinessQuery
-            {
-                SiteId = bo.SiteId,
-                Sfcs = bo.SFCs,
-                BusinessType = ManuSfcProduceBusinessType.Repair
-            });
-
-            responseBo.SFCs = bo.SFCs;
-            responseBo.IsShow = !sfcProduceBusinessEntities.Any();
+            responseBo.IsShow = true;
             return responseBo;
         }
 
@@ -126,7 +76,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 面板需要的数据
             List<PanelModuleEnum> panelModules = new();
-            if (data.IsShow) panelModules.Add(PanelModuleEnum.OutPutconConfirm);
+            if (data.IsShow) panelModules.Add(PanelModuleEnum.Feeding);
             responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
             return await Task.FromResult(responseBo);
         }
