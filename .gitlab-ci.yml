@@ -1,8 +1,6 @@
 stages:
     - sonarqube-check
 deploy to production:
-  stage: deploy
-  script: git push production HEAD:main
   environment:
     name: production
     url: http://192.168.0.208:8880/
