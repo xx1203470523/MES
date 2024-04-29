@@ -1,16 +1,3 @@
-stages:
-    - deploy
-    - sonarqube-check
-
-deploy to production:
-  stage: deploy
-  script: echo 'a'
-  environment:
-    name: production
-    url: http://192.168.0.208:8880/
-
-  
-
 sonarqube-check:
   stage: sonarqube-check
   image: mcr.microsoft.com/dotnet/sdk:6.0
