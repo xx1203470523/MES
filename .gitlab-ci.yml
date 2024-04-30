@@ -4,7 +4,6 @@ stages:
 
 sonarqube-check:
   stage: sonarqube-check
-  image: mcr.microsoft.com/dotnet/sdk:6.0
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
@@ -13,9 +12,7 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script: 
-      - "git config --list"
-      - "apt-get update"
-      - "apt-get install --yes --no-install-recommends openjdk-17-jre"
+
       - "dotnet tool install --global dotnet-sonarscanner"
       - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
       - "dotnet sonarscanner begin /k:\"MES-backend\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=$SONAR_HOST_URL\" "
