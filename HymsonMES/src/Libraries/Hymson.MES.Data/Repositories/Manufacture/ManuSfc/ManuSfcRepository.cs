@@ -275,6 +275,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.Where("ms.SiteId = @SiteId");
             sqlBuilder.Where("ms.IsDeleted=0");
+            sqlBuilder.Where("ms.Type=1");
 
             sqlBuilder.Select(@" ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
