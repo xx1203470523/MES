@@ -47,6 +47,11 @@ namespace Hymson.MES.Core.Enums
         /// 产出确认
         /// </summary>
         [Description("产出确认")]
-        OutPutconConfirm = 7
+        OutPutconConfirm = 7,
+        /// <summary>
+        /// 物料加载
+        /// </summary>
+        [Description("产出确认")]
+        Feeding = 8
     }
 }
