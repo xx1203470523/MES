@@ -102,7 +102,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuSFCNodeDestinationRepository
     {
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_destination /**where**/  ";
+
+#if DM
+        const string InsertsSql = "INSERT INTO manu_sfc_node_destination(`Id`, CirculationId, `NodeId`, `DestinationId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @DestinationId, @CreatedBy, @CreatedOn, @SiteId) ";
+#else
         const string InsertsSql = "REPLACE INTO manu_sfc_node_destination(`Id`, CirculationId, `NodeId`, `DestinationId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @DestinationId, @CreatedBy, @CreatedOn, @SiteId) ";
+#endif
+
         const string DeleteSql = "DELETE FROM manu_sfc_node_destination WHERE NodeId = @NodeId AND DestinationId = @DestinationId; ";
 
 #if DM
