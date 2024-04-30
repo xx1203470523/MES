@@ -30,6 +30,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdateRangeAsync(IEnumerable<ManuSFCNodeEntity> entities);
 
         /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteAsync(IEnumerable<long> ids);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>

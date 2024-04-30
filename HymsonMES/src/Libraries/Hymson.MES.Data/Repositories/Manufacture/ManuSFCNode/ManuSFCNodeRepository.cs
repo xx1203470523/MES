@@ -51,6 +51,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteSql, new { Ids = ids });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -97,8 +108,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuSFCNodeRepository
     {
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node /**where**/  ";
+        //const string InsertSql = "INSERT INTO manu_sfc_node (Id, ProductId, SFC, Name, Location, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (@Id, @ProductId, @SFC, @Name, @Location, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId);";
+        const string DeleteSql = "DELETE FROM manu_sfc_node WHERE Id IN @Ids ";
+
 #if DM
-        const string InsertsSql = "MERGE INTO manu_sfc_node t " +
+        const string MergeSql = "MERGE INTO manu_sfc_node t " +
             "USING (SELECT @Id AS Id FROM dual) s " +
             "ON (t.Id = s.Id) " +
             "WHEN NOT MATCHED THEN " +
