@@ -1657,7 +1657,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
 
                 //产品参数
-                if (entity.IsIQC.HasValue && entity.IsIQC == TrueOrFalseEnum.Yes)
+                if (entity.IsProduct.HasValue && entity.IsProduct == TrueOrFalseEnum.Yes)
                 {
                     linkTypeEntities.Add(new ProcParameterLinkTypeEntity
                     {
