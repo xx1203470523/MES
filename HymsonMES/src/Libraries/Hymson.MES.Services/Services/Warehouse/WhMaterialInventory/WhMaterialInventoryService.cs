@@ -7,14 +7,11 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory;
-using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
@@ -26,7 +23,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Plan;
 using System.Transactions;
 
@@ -539,36 +535,21 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             if (oldWhMEntirty.QuantityResidue < adjustDto.Qty) throw new CustomerValidationException(nameof(ErrorCode.MES15126));
 
-            var subWhMEntirty = oldWhMEntirty;
             var remainsQty = oldWhMEntirty.QuantityResidue - adjustDto.Qty;
-            oldWhMEntirty.QuantityResidue = remainsQty;
-            subWhMEntirty.QuantityResidue = adjustDto.Qty;
 
             //新条码编码
             var newSplitSFC = await GeneratewhSfcAdjustAsync(oldWhMEntirty.SiteId, oldWhMEntirty.CreatedBy);
-            //var barCodeList = await GenerateBarcodeByproductId(oldWhMEntirty.MaterialId);
+
             if (newSplitSFC == null || string.IsNullOrEmpty(newSplitSFC))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16200));
             }
-
-            //if (barCodeList.Count() > 1)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES12831)).WithData("ProductCode", oldWhMEntirty.MaterialBarCode);
-            //}
-
-            //string? newSplitSFC = barCodeList.SelectMany(x => x.BarCodes.Select(x => x)).FirstOrDefault();
-            //if (newSplitSFC == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES12837)).WithData("ProductCode", oldWhMEntirty.MaterialBarCode);
-            //}
 
             //SFC及SFC信息
             var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
             {
                 SFC = oldWhMEntirty.MaterialBarCode,
                 SiteId = _currentSite.SiteId ?? 0,
-                //Type = SfcTypeEnum.Produce
             });
 
             var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);
@@ -580,8 +561,6 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
 
             var procMaterialEntitity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity?.ProductId ?? 0);
-
-
 
             //更新MANUSFC条码表-父条码
             var updateStatusAndQtyByIdCommand = new UpdateStatusAndQtyByIdCommand
@@ -600,7 +579,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 Status = oldWhMEntirty.Status,
                 BarCode = oldWhMEntirty.MaterialBarCode,
-                QuantityResidue = remainsQty,
+                QuantityResidue = adjustDto.Qty,
                 UpdatedBy = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
             };
@@ -634,6 +613,14 @@ namespace Hymson.MES.Services.Services.Warehouse
                 UpdatedBy = _currentUser.UserName,
             };
 
+
+            var subWhMEntirty = oldWhMEntirty.ToCopy();
+
+            subWhMEntirty.Id = IdGenProvider.Instance.CreateId();
+            subWhMEntirty.MaterialBarCode = newSplitSFC;
+            subWhMEntirty.QuantityResidue = adjustDto.Qty;
+
+
             //物料台账+2
             var whMaterialStandingbookEntities = new List<WhMaterialStandingbookEntity>();
             for (int i = 1; i <= 2; i++)
@@ -650,6 +637,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     Source = MaterialInventorySourceEnum.Disassembly,
                     SiteId = _currentSite.SiteId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
+                    Batch = oldWhMEntirty.Batch ?? string.Empty,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
@@ -668,7 +656,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     if (row != 1)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12832));
-                    }                  
+                    }
                 }
 
                 //INVENTORY UPDATE
@@ -683,7 +671,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 {
                     await _manuSfcInfoRepository.InsertAsync(manuSfcInfo);
                 }
-                
+
                 //INVENTORY INSERT
                 if (subWhMEntirty != null)
                 {
@@ -693,7 +681,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 if (whMaterialStandingbookEntities.Any())
                 {
                     await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
-                }               
+                }
 
                 ts.Complete();
             }
@@ -726,48 +714,6 @@ namespace Hymson.MES.Services.Services.Warehouse
             });
 
             return orderCodes.First();
-        }
-
-        private async Task<IEnumerable<BarCodeInfo>> GenerateBarcodeByproductId(long productId)
-        {
-            var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(new InteCodeRulesByProductQuery
-            {
-                ProductId = 0,
-                CodeType = CodeRuleCodeTypeEnum.WhSfcSplitAdjust
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES12820));
-
-            var codeRulesMakeList = await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                CodeRulesId = inteCodeRulesEntity.Id
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES12821));
-
-            //生成子条码
-            var barcodeList = await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
-            {
-                IsTest = false,
-                IsSimulation = false,
-                CodeRulesMakeBos = codeRulesMakeList.Select(s => new CodeRulesMakeBo
-                {
-                    Seq = s.Seq,
-                    ValueTakingType = s.ValueTakingType,
-                    SegmentedValue = s.SegmentedValue,
-                    CustomValue = s.CustomValue,
-                }),
-
-                CodeRuleKey = $"{inteCodeRulesEntity.Id}",
-                Count = 1,
-                Base = inteCodeRulesEntity.Base,
-                Increment = inteCodeRulesEntity.Increment,
-                IgnoreChar = inteCodeRulesEntity.IgnoreChar ?? string.Empty,
-                OrderLength = inteCodeRulesEntity.OrderLength,
-                ResetType = inteCodeRulesEntity.ResetType,
-                StartNumber = inteCodeRulesEntity.StartNumber,
-                CodeMode = inteCodeRulesEntity.CodeMode,
-                SiteId = _currentSite.SiteId ?? 0
-            });
-
-            return barcodeList;
         }
 
     }
