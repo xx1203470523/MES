@@ -36,6 +36,8 @@ using Hymson.MES.Services.Dtos.EquProcessParamRecord;
 using Hymson.MES.Services.Services.EquProcessParamRecord;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Services.EquProductParamRecord;
+using Hymson.MES.Services.Services.EquOpenParamRecord;
+using Hymson.MES.Services.Dtos.EquOpenParamRecord;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
 {
@@ -164,6 +166,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         private readonly IEquProductParamRecordService _equProductParamRecordService;
 
         /// <summary>
+        /// 开机参数
+        /// </summary>
+        private readonly IEquOpenParamRecordService _equOpenParamRecordService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public EquCommonService(
@@ -179,6 +186,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             IProcEquipmentGroupParamService procEquipmentGroupParamService,
             IEquProcessParamRecordService equProcessParamRecordService,
             IEquProductParamRecordService equProductParamRecordService,
+            IEquOpenParamRecordService equOpenParamRecordService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto,
             AbstractValidator<HeartbeatDto> validationHeartbeatDto,
             AbstractValidator<StateDto> validationStateDto,
@@ -203,6 +211,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             _procEquipmentGroupParamService = procEquipmentGroupParamService;
             _equProcessParamRecordService = equProcessParamRecordService;
             _equProductParamRecordService = equProductParamRecordService;
+            _equOpenParamRecordService = equOpenParamRecordService;
             //验证器
             _validationOperationLoginDto = validationOperationLoginDto;
             _validationHeartbeatDto = validationHeartbeatDto;
@@ -428,7 +437,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         }
 
         /// <summary>
-        /// 获取开机参数列表
+        /// 获取开机参数列表007
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -456,7 +465,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         }
 
         /// <summary>
-        /// 获取开机参数明细
+        /// 获取开机参数明细008
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -493,7 +502,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         }
 
         /// <summary>
-        /// 开机参数校验
+        /// 开机参数校验009
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -501,7 +510,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationRecipeDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 参数上下限校验
             //暂不加
             //3. 版本校验
@@ -511,6 +520,31 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             query.Version = dto.Version;
             query.MaterialCode = dto.ProductCode;
             var entity = await _procEquipmentGroupParamService.GetEntityByCodeVersion(query);
+            //4. 记录
+            List<EquOpenParamRecordSaveDto> saveDtoList = new List<EquOpenParamRecordSaveDto>();
+            foreach (var item in dto.ParamList)
+            {
+                EquOpenParamRecordSaveDto saveDto = new EquOpenParamRecordSaveDto();
+                saveDto.ParamCode = item.ParamCode;
+                saveDto.ParamValue = item.ParamValue;
+                saveDtoList.Add(saveDto);
+            }
+            long bitchId = IdGenProvider.Instance.CreateId();
+            saveDtoList.ForEach(m =>
+            {
+                m.SiteId = equResModel.SiteId;
+                m.EquipmentId = equResModel.EquipmentId;
+                m.CreatedOn = HymsonClock.Now();
+                m.CreatedBy = dto.EquipmentCode;
+                m.UpdatedOn = m.CreatedOn;
+                m.UpdatedBy = m.CreatedBy;
+                m.CollectionTime = m.CreatedOn;
+                m.BatchId = bitchId;
+                m.RecipeId = entity.Id;
+            });
+
+            //5. 数据库操作
+            await _equOpenParamRecordService.AddMultAsync(saveDtoList);
         }
 
         /// <summary>
