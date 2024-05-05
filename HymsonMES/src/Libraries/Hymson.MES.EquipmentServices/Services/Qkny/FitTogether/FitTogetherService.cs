@@ -360,15 +360,15 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             #endregion
 
             #region 极组出站数据
-            foreach (var item in jzSfcList)
-            {
-                var jzOutStationRequestBo = new OutStationRequestBo
-                {
-                    SFC = item,
-                    IsQualified = true,
-                };
-                outStationRequestBos.Add(jzOutStationRequestBo);
-            }
+            //foreach (var item in jzSfcList)
+            //{
+            //    var jzOutStationRequestBo = new OutStationRequestBo
+            //    {
+            //        SFC = item,
+            //        IsQualified = true,
+            //    };
+            //    outStationRequestBos.Add(jzOutStationRequestBo);
+            //}
             #endregion
             outBo.OutStationRequestBos = outStationRequestBos;
 
@@ -403,7 +403,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             await _manuJzBindRecordService.AddAsync(bindDto);
             await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
             await _equProductParamRecordService.AddMultAsync(saveDtoList);
-            await _manuSfcProduceService.DeletePhysicalRangeAsync(jzCommand);
+            //await _manuSfcProduceService.DeletePhysicalRangeAsync(jzCommand);
             trans.Complete();
         }
 

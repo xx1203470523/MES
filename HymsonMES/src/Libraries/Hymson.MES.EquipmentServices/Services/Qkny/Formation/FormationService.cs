@@ -199,7 +199,15 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         public async Task BindContainerAsync(BindContainerDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
+            EquEquipmentResAllView equResModel = new EquEquipmentResAllView();
+            if(dto.OperationType == 0)
+            {
+                equResModel = await _equEquipmentService.GetEquResAsync(dto);
+            }
+            else
+            {
+                equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            }
             //2. 托盘电芯绑定
             InteVehicleBindDto bindDto = new InteVehicleBindDto();
             bindDto.ContainerCode = dto.ContainerCode;
@@ -209,31 +217,37 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             }
             bindDto.SiteId = equResModel.SiteId;
             bindDto.UserName = dto.EquipmentCode;
-            ////多条码进站
-            //SFCInStationBo inStationBo = new SFCInStationBo
-            //{
-            //    SiteId = equResModel.SiteId,
-            //    UserName = dto.EquipmentCode,
-            //    EquipmentId = equResModel.EquipmentId,
-            //    ResourceId = equResModel.ResId,
-            //    ProcedureId = equResModel.ProcedureId,
-            //    SFCs = dto.ContainerSfcList.Select(x => x.Sfc)
-            //};
-            ////托盘出站
-            //VehicleOutStationBo outStationBo = new VehicleOutStationBo
-            //{
-            //    SiteId = equResModel.SiteId,
-            //    UserName = dto.EquipmentCode,
-            //    EquipmentId = equResModel.EquipmentId,
-            //    ResourceId = equResModel.ResId,
-            //    ProcedureId = equResModel.ProcedureId,
-            //    OutStationRequestBos = new OutStationRequestBo[] { new() { VehicleCode = dto.ContainerCode, IsQualified = true } }
-            //};
+            //多条码进站
+            SFCInStationBo inStationBo = new SFCInStationBo
+            {
+                SiteId = equResModel.SiteId,
+                UserName = dto.EquipmentCode,
+                EquipmentId = equResModel.EquipmentId,
+                ResourceId = equResModel.ResId,
+                ProcedureId = equResModel.ProcedureId,
+                SFCs = dto.ContainerSfcList.Select(x => x.Sfc)
+            };
+            //托盘出站
+            VehicleOutStationBo outStationBo = new VehicleOutStationBo
+            {
+                SiteId = equResModel.SiteId,
+                UserName = dto.EquipmentCode,
+                EquipmentId = equResModel.EquipmentId,
+                ResourceId = equResModel.ResId,
+                ProcedureId = equResModel.ProcedureId,
+                OutStationRequestBos = new OutStationRequestBo[] { new() { VehicleCode = dto.ContainerCode, IsQualified = true } }
+            };
 
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
-            //await _manuPassStationService.InStationRangeBySFCAsync(inStationBo);
+            if((dto.OperationType & 1) == 1)
+            {
+                await _manuPassStationService.InStationRangeBySFCAsync(inStationBo);
+            }
             await _inteVehicleService.VehicleBindOperationAsync(bindDto);
-            //await _manuPassStationService.OutStationRangeByVehicleAsync(outStationBo);
+            if((dto.OperationType & 2) == 2)
+            {
+                await _manuPassStationService.OutStationRangeByVehicleAsync(outStationBo);
+            }
             trans.Complete();
 
             //TODO 添加进出站逻辑
