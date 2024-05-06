@@ -13,6 +13,7 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script: 
+      - "cat /etc/apt/sources.list"
       - "chmod -R 777 /etc/apt/sources.list"
       - "sed -i 's#http://cn.archive.ubuntu.com#https://mirrors.aliyun.com#g' /etc/apt/sources.list"
       - "apt-get update"
