@@ -426,12 +426,18 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         public async Task<List<ProcSortRuleDetailEquDto>> SortingRuleAsync(SortingRuleDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 查询激活的工单
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
+            //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
+
+            ManuSfcProduceBySfcQuery sfcQuery = new ManuSfcProduceBySfcQuery();
+            sfcQuery.Sfc = dto.Sfc;
+            sfcQuery.SiteId = equResModel.SiteId;
+            var sfcInfo = await _manuSfcProduceService.GetBySFCAsync(sfcQuery);
+
             //3. 查询分选规则
             ProcSortRuleDetailEquQuery query = new ProcSortRuleDetailEquQuery();
-            query.MaterialId = planEntity.ProductId;
+            query.MaterialId = sfcInfo.ProductId;
             var resultList = (await _procSortingRuleService.GetSortRuleDetailAsync(query)).ToList();
             return resultList!;
         }
