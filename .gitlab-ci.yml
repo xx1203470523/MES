@@ -13,8 +13,8 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script: 
-      - "apt-get update"
-      - "apt-get install --yes --no-install-recommends openjdk-17-jre"
+#      - "apt-get update"
+#      - "apt-get install --yes --no-install-recommends openjdk-17-jre"
       - "dotnet tool install --global dotnet-sonarscanner"
       - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
       - "dotnet sonarscanner begin /k:\"MES-backend\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=$SONAR_HOST_URL\" "
