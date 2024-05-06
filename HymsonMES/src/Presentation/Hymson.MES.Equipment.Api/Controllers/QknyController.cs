@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
@@ -1372,6 +1373,24 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             return await _qknyService.GetEquTokenAsync(dto);
+        }
+
+        /// <summary>
+        /// 生成24位国标码
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Create24DxCode")]
+        [LogDescription("生成24位国标码", BusinessType.OTHER, "Create24DxCode099", ReceiverTypeEnum.MES)]
+        public async Task<string> Create24DxCodeAsync(GenerateDxSfcDto dto)
+        {
+            if (IS_DEBUG)
+            {
+                return "token";
+            }
+
+            return await _fitTogether.Create24GbCodeAsync(dto);
         }
     }
 }

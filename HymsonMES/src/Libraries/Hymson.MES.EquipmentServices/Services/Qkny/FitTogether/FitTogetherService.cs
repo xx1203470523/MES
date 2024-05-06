@@ -36,6 +36,8 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory;
 using Hymson.MES.CoreServices.Dtos.Manufacture;
 using Hymson.Localization.Services;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
 {
@@ -95,6 +97,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
+        /// 条码合并
+        /// </summary>
+        private readonly IManuMergeService _manuMergeService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public FitTogetherService(IEquEquipmentService equEquipmentService,
@@ -106,7 +113,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             IManuJzBindRecordService manuJzBindRecordService,
             IManuSfcProduceService manuSfcProduceService,
             IWhMaterialInventoryService whMaterialInventoryService,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IManuMergeService manuMergeService)
         {
             _equEquipmentService = equEquipmentService;
             _manuPassStationService = manuPassStationService;
@@ -118,6 +126,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             _manuSfcProduceService = manuSfcProduceService;
             _whMaterialInventoryService = whMaterialInventoryService;
             _localizationService = localizationService;
+            _manuMergeService = manuMergeService;
         }
 
         /// <summary>
@@ -288,6 +297,37 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
 
             List<string> sfcList = sfcObjList.Select(m => m.SFC).ToList();
             return sfcList;
+        }
+
+        /// <summary>
+        /// 生成24位国标电芯码
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<string> Create24GbCodeAsync(GenerateDxSfcDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
+            //2. 查询极组信息
+            ManuJzBindQuery query = new ManuJzBindQuery();
+            query.JzSfc = dto.Sfc;
+            query.SiteId = equResModel.SiteId;
+            var jzModel = await _manuJzBindService.GetByJzSfcAsync(query);
+            List<string> jzSfcList = new List<string>() { jzModel.JzSfc1, jzModel.JzSfc2 };
+
+            ManuMergeRequestDto param = new ManuMergeRequestDto();
+            param.Barcodes = jzSfcList;
+            param.SiteId = equResModel.SiteId;
+            param.UserName = dto.EquipmentCode;
+            //获取国标条码
+            if (param.Barcodes == null || !param.Barcodes.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+            else
+            {
+                return await _manuMergeService.MergeAsync(param, param.UserName);
+            }
         }
 
         /// <summary>

@@ -1,12 +1,10 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.AgvTaskRecord;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.Qkny;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
@@ -14,27 +12,21 @@ using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Qkny;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Services.Qkny;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
-using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.LoadPoint.View;
-using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
-using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.MES.EquipmentServices.Dtos;
-using Hymson.MES.EquipmentServices.Dtos.Manufacture.ProductionProcess;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
-using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ToolBindMaterial;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment;
@@ -45,21 +37,9 @@ using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
 using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
 using Hymson.MES.EquipmentServices.Services.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory;
-using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
 using Hymson.MES.Services.Dtos.AgvTaskRecord;
-using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
-using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
-using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
-using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Dtos.EquProcessParamRecord;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
-using Hymson.MES.Services.Dtos.EquToolLifeRecord;
-using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
-using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
-using Hymson.MES.Services.Dtos.ManuFeedingCompletedZjyjRecord;
-using Hymson.MES.Services.Dtos.ManuFeedingNoProductionRecord;
-using Hymson.MES.Services.Dtos.ManuFeedingTransferRecord;
-using Hymson.MES.Services.Dtos.ManuFillingDataRecord;
 using Hymson.MES.Services.Services.AgvTaskRecord;
 using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Services.EquEquipmentAlarm;
@@ -109,46 +89,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
-        /// 设备验证
-        /// </summary>
-        private readonly IEquEquipmentVerifyRepository _equEquipmentVerifyRepository;
-
-        /// <summary>
-        /// 登录记录
-        /// </summary>
-        private readonly IEquEquipmentLoginRecordService _equEquipmentLoginRecordService;
-
-        /// <summary>
-        /// 最新信息
-        /// </summary>
-        private readonly IManuEuqipmentNewestInfoService _manuEuqipmentNewestInfoService;
-
-        /// <summary>
-        /// 心跳记录
-        /// </summary>
-        private readonly IEquEquipmentHeartRecordService _equEquipmentHeartRecordService;
-
-        /// <summary>
-        /// 状态上报
-        /// </summary>
-        private readonly IManuEquipmentStatusTimeService _manuEquipmentStatusTimeService;
-
-        /// <summary>
-        /// 报警
-        /// </summary>
-        private readonly IEquEquipmentAlarmService _equEquipmentAlarmService;
-
-        /// <summary>
-        /// CCD文件上传
-        /// </summary>
-        private readonly ICcdFileUploadCompleteRecordService _ccdFileUploadCompleteRecordService;
-
-        /// <summary>
-        /// 开机参数
-        /// </summary>
-        private readonly IProcEquipmentGroupParamService _procEquipmentGroupParamService;
-
-        /// <summary>
         /// 工单
         /// </summary>
         private readonly IPlanWorkOrderService _planWorkOrderService;
@@ -164,19 +104,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuFeedingService _manuFeedingService;
 
         /// <summary>
-        /// 上料点关联资源
-        /// </summary>
-        private readonly IProcLoadPointLinkResourceRepository _procLoadPointLinkResourceRepository;
-
-        /// <summary>
         /// AGV任务记录
         /// </summary>
         private readonly IAgvTaskRecordService _agvTaskRecordService;
-
-        /// <summary>
-        /// 配方
-        /// </summary>
-        private readonly IProcFormulaService _procFormulaService;
 
         /// <summary>
         /// 设备过程参数
@@ -219,54 +149,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IWhMaterialInventoryService _whMaterialInventoryService;
 
         /// <summary>
-        /// 上料完成记录(制胶匀浆)
-        /// </summary>
-        private readonly IManuFeedingCompletedZjyjRecordService _manuFeedingCompletedZjyjRecordService;
-
-        /// <summary>
-        /// 批次转移
-        /// </summary>
-        private readonly IManuFeedingTransferRecordService _manuFeedingTransferRecordService;
-
-        /// <summary>
-        /// 设备投料非生产投料
-        /// </summary>
-        private readonly IManuFeedingNoProductionRecordService _manuFeedingNoProductionRecordService;
-
-        /// <summary>
-        /// 补液数据上报
-        /// </summary>
-        private readonly IManuFillingDataRecordService _manuFillingDataRecordService;
-
-        /// <summary>
         /// 载具
         /// </summary>
         private readonly IInteVehicleService _inteVehicleService;
-
-        /// <summary>
-        /// 通用接口
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
-        /// <summary>
-        /// NG记录
-        /// </summary>
-        private readonly IManuProductNgRecordRepository _manuProductNgRecordRepository;
-
-        /// <summary>
-        /// 生产服务
-        /// </summary>
-        private readonly IManufactureService _manufactureService;
-
-        /// <summary>
-        /// 工装夹具寿命
-        /// </summary>
-        private readonly IEquToolLifeRecordService _equToolLifeRecordService;
-
-        /// <summary>
-        /// 分选规则
-        /// </summary>
-        private readonly IProcSortingRuleService _procSortingRuleService;
 
         /// <summary>
         /// 条码
@@ -302,21 +187,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
-            IEquEquipmentVerifyRepository equEquipmentVerifyRepository,
-            IEquEquipmentLoginRecordService equEquipmentLoginRecordService,
-            IManuEuqipmentNewestInfoService manuEuqipmentNewestInfoService,
-            IEquEquipmentHeartRecordService equEquipmentHeartRecordService,
-            IManuEquipmentStatusTimeService manuEquipmentStatusTimeService,
-            IEquEquipmentAlarmService equEquipmentAlarmService,
-            ICcdFileUploadCompleteRecordService ccdFileUploadCompleteRecordService,
-            IProcEquipmentGroupParamService procEquipmentGroupParamService,
             IPlanWorkOrderService planWorkOrderService,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IManuFeedingService manuFeedingService,
-            IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository,
             IAgvTaskRecordService agvTaskRecordService,
             IEquProcessParamRecordService equProcessParamRecordService,
-            IProcFormulaService procFormulaService,
             IManuCreateBarcodeService manuCreateBarcodeService,
             IManuSfcProduceService manuSfcProduceService,
             IManuSfcService manuSfcServicecs,
@@ -324,16 +199,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuPassStationService manuPassStationService,
             IProcLoadPointService procLoadPointService,
             IWhMaterialInventoryService whMaterialInventoryService,
-            IManuFeedingCompletedZjyjRecordService manuFeedingCompletedZjyjRecordService,
-            IManuFeedingTransferRecordService manuFeedingTransferRecordService,
-            IManuFeedingNoProductionRecordService manuFeedingNoProductionRecordService,
-            IManuFillingDataRecordService manuFillingDataRecordService,
             IInteVehicleService inteVehicleService,
-            IManuCommonService manuCommonService,
-            IManuProductNgRecordRepository manuProductNgRecordRepository,
-            IManufactureService manufactureService,
-            IEquToolLifeRecordService equToolLifeRecordService,
-            IProcSortingRuleService procSortingRuleService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
@@ -343,21 +209,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
-            _equEquipmentVerifyRepository = equEquipmentVerifyRepository;
-            _equEquipmentLoginRecordService = equEquipmentLoginRecordService;
-            _manuEuqipmentNewestInfoService = manuEuqipmentNewestInfoService;
-            _equEquipmentHeartRecordService = equEquipmentHeartRecordService;
-            _manuEquipmentStatusTimeService = manuEquipmentStatusTimeService;
-            _equEquipmentAlarmService = equEquipmentAlarmService;
-            _ccdFileUploadCompleteRecordService = ccdFileUploadCompleteRecordService;
-            _procEquipmentGroupParamService = procEquipmentGroupParamService;
             _planWorkOrderService = planWorkOrderService;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _manuFeedingService = manuFeedingService;
-            _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
             _agvTaskRecordService = agvTaskRecordService;
             _equProcessParamRecordService = equProcessParamRecordService;
-            _procFormulaService = procFormulaService;
             _manuCreateBarcodeService = manuCreateBarcodeService;
             _manuSfcProduceService = manuSfcProduceService;
             _manuSfcServicecs = manuSfcServicecs;
@@ -365,24 +221,15 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuPassStationService = manuPassStationService;
             _procLoadPointService = procLoadPointService;
             _whMaterialInventoryService = whMaterialInventoryService;
-            _manuFeedingCompletedZjyjRecordService = manuFeedingCompletedZjyjRecordService;
-            _manuFeedingTransferRecordService = manuFeedingTransferRecordService;
-            _manuFeedingNoProductionRecordService = manuFeedingNoProductionRecordService;
-            _manuFillingDataRecordService = manuFillingDataRecordService;
             _inteVehicleService = inteVehicleService;
-            _manuCommonService = manuCommonService;
-            _manuProductNgRecordRepository = manuProductNgRecordRepository;
-            _manufactureService = manufactureService;
-            _equToolLifeRecordService = equToolLifeRecordService;
-            _procSortingRuleService = procSortingRuleService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuToolingBindRepository = manuToolingBindRepository;
             _equEquipmentService = equEquipmentService;
+            _manuDowngradingRepository = manuDowngradingRepository;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
-            _manuDowngradingRepository = manuDowngradingRepository;
         }
 
 

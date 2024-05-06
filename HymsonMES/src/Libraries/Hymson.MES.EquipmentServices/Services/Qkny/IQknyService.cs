@@ -1,7 +1,9 @@
-﻿using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
+﻿using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ToolBindMaterial;
+using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using System;
