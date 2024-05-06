@@ -48,5 +48,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
         /// <param name="query"></param>
         /// <returns></returns>
         Task<List<EquEquipmentResAllView>> GetMultEquResAllAsync(MultEquResAllQuery query);
+
+        /// <summary>
+        /// 获取设备token
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<string> GetEquTokenAsync(QknyBaseDto dto);
     }
 }

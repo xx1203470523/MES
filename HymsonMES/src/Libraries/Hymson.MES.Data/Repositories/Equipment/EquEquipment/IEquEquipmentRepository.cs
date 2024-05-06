@@ -162,6 +162,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         Task<IEnumerable<EquEquipmentEntity>> GetBySiteIdAsync(EquQuery query);
 
+        /// <summary>
+        /// 获取设备列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<string> GetEquTokenSqlAsync(EquResAllQuery query);
+
         #endregion
     }
 }

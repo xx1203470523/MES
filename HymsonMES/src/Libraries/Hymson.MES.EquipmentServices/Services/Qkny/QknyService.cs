@@ -1145,6 +1145,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
+        /// 获取设备token
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<string> GetEquTokenAsync(QknyBaseDto dto)
+        {
+            return await _equEquipmentService.GetEquTokenAsync(dto);
+        }
+
+        /// <summary>
         /// 获取设备资源对应的基础信息
         /// </summary>
         /// <param name="param"></param>

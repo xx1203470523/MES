@@ -121,5 +121,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
             return list.ToList(); ;
         }
 
+        /// <summary>
+        /// 获取设备token
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<string> GetEquTokenAsync(QknyBaseDto dto)
+        {
+            EquResAllQuery query = new EquResAllQuery() { EquipmentCode = dto.EquipmentCode };
+            return await _equEquipmentRepository.GetEquTokenSqlAsync(query);
+        }
+
     }
 }

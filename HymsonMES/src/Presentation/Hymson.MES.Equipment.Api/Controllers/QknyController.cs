@@ -13,6 +13,7 @@ using Hymson.MES.EquipmentServices.Services.Qkny.Formation;
 using Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -1354,5 +1355,23 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _qknyService.SortingOutboundAsync(dto);
         }
 
+        /// <summary>
+        /// 获取设备Token054
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetEquToken")]
+        [LogDescription("获取设备Token", BusinessType.OTHER, "GetEquToken054", ReceiverTypeEnum.MES)]
+        [AllowAnonymous]
+        public async Task<string> GetEquTokenAsync(QknyBaseDto dto)
+        {
+            if (IS_DEBUG)
+            {
+                return "token";
+            }
+
+            return await _qknyService.GetEquTokenAsync(dto);
+        }
     }
 }
