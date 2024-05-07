@@ -31,6 +31,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// 版本
         /// </summary>
         public string? Version { get; set; }
+
+        /// <summary>
+        /// 工单id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
         /// <summary>
         /// 状态
         /// </summary>

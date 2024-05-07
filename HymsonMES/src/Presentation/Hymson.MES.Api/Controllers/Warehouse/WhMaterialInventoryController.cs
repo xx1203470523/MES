@@ -1,5 +1,4 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.Web.Framework.Attributes;
@@ -202,6 +201,20 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.BarcodeSplitAdjustAsync(adjustDto);
 
+        }
+
+
+        /// <summary>
+        /// 物料合并
+        /// </summary>
+        /// <param name="adjustDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("barcodeMergeAdjust")]
+        [LogDescription("物料合并", BusinessType.INSERT)]
+        public async Task<string> BarcodeMergeAdjustAsync(MaterialBarCodeMergeAdjust adjustDto)
+        {
+            return await _whMaterialInventoryService.BarcodeMergeAdjustAsync(adjustDto);
         }
     }
 }
