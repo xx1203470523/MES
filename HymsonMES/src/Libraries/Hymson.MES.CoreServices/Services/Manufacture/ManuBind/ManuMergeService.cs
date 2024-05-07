@@ -207,8 +207,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     CreatedBy = updateName,
                     UpdatedBy = updateName
                 };
-
-                var sfcStepEntity = new ManuSfcStepEntity
+                //下达 step
+                var sfcStepEntity_create = new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = param.SiteId,
@@ -221,8 +221,27 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     ResourceId = firstsfcproduce.ResourceId,
                     Qty = firstsfcproduce.Qty,
                     ProcedureId = firstsfcproduce.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.SfcMergeAdd,
-                    CurrentStatus = SfcStatusEnum.Activity,
+                    Operatetype = ManuSfcStepTypeEnum.Create,
+                    CurrentStatus = SfcStatusEnum.lineUp,
+                    CreatedBy = updateName,
+                    UpdatedBy = updateName
+                };
+                // 进站step
+                var sfcStepEntity_instation = new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = param.SiteId,
+                    SFC = targetSFC,
+                    ProductId = firstsfcproduce.ProductId,
+                    WorkOrderId = firstsfcproduce.WorkOrderId,
+                    ProductBOMId = firstsfcproduce.ProductBOMId,
+                    WorkCenterId = firstsfcproduce.WorkCenterId,
+                    EquipmentId = firstsfcproduce.EquipmentId,
+                    ResourceId = firstsfcproduce.ResourceId,
+                    Qty = firstsfcproduce.Qty,
+                    ProcedureId = firstsfcproduce.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.InStock,
+                    CurrentStatus = SfcStatusEnum.lineUp,
                     CreatedBy = updateName,
                     UpdatedBy = updateName
                 };
@@ -265,8 +284,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 await _manuSfcRepository.InsertAsync(sfcEntity);
                 await _manuSfcInfoRepository.InsertAsync(sfcInfoEntity);
                 await _manuSfcProduceRepository.InsertAsync(sfcProduceEntity);
-                await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
-                if(manuSfcCirculationEntitys.Any())
+                await _manuSfcStepRepository.InsertAsync(sfcStepEntity_create);
+                await _manuSfcStepRepository.InsertAsync(sfcStepEntity_instation);
+                if (manuSfcCirculationEntitys.Any())
                     await _manuSfcCirculationRepository.InsertRangeAsync(manuSfcCirculationEntitys);
                 trans.Complete();
                 return targetSFC;
