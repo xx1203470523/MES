@@ -83,6 +83,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("OperatorLogin")]
         [LogDescription("操作员登录001", BusinessType.OTHER, "OperatorLoginMes001", ReceiverTypeEnum.MES)]
+        [AllowAnonymous]
         public async Task OperatorLoginAsync(OperationLoginDto dto)
         {
             if (IS_DEBUG == true)
