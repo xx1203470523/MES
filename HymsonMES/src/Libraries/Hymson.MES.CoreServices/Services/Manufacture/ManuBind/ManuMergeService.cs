@@ -227,24 +227,24 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     UpdatedBy = updateName
                 };
                 // 进站step
-                var sfcStepEntity_instation = new ManuSfcStepEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = param.SiteId,
-                    SFC = targetSFC,
-                    ProductId = firstsfcproduce.ProductId,
-                    WorkOrderId = firstsfcproduce.WorkOrderId,
-                    ProductBOMId = firstsfcproduce.ProductBOMId,
-                    WorkCenterId = firstsfcproduce.WorkCenterId,
-                    EquipmentId = firstsfcproduce.EquipmentId,
-                    ResourceId = firstsfcproduce.ResourceId,
-                    Qty = firstsfcproduce.Qty,
-                    ProcedureId = firstsfcproduce.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.InStock,
-                    CurrentStatus = SfcStatusEnum.lineUp,
-                    CreatedBy = updateName,
-                    UpdatedBy = updateName
-                };
+                //var sfcStepEntity_instation = new ManuSfcStepEntity
+                //{
+                //    Id = IdGenProvider.Instance.CreateId(),
+                //    SiteId = param.SiteId,
+                //    SFC = targetSFC,
+                //    ProductId = firstsfcproduce.ProductId,
+                //    WorkOrderId = firstsfcproduce.WorkOrderId,
+                //    ProductBOMId = firstsfcproduce.ProductBOMId,
+                //    WorkCenterId = firstsfcproduce.WorkCenterId,
+                //    EquipmentId = firstsfcproduce.EquipmentId,
+                //    ResourceId = firstsfcproduce.ResourceId,
+                //    Qty = firstsfcproduce.Qty,
+                //    ProcedureId = firstsfcproduce.ProcedureId,
+                //    Operatetype = ManuSfcStepTypeEnum.InStock,
+                //    CurrentStatus = SfcStatusEnum.lineUp,
+                //    CreatedBy = updateName,
+                //    UpdatedBy = updateName
+                //};
                 //流转记录
                 var manuSfcCirculationEntitys = new List<ManuSfcCirculationEntity>();
                 foreach (var item in param.Barcodes)
