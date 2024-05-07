@@ -285,7 +285,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 await _manuSfcInfoRepository.InsertAsync(sfcInfoEntity);
                 await _manuSfcProduceRepository.InsertAsync(sfcProduceEntity);
                 await _manuSfcStepRepository.InsertAsync(sfcStepEntity_create);
-                await _manuSfcStepRepository.InsertAsync(sfcStepEntity_instation);
+               // await _manuSfcStepRepository.InsertAsync(sfcStepEntity_instation);
                 if (manuSfcCirculationEntitys.Any())
                     await _manuSfcCirculationRepository.InsertRangeAsync(manuSfcCirculationEntitys);
                 trans.Complete();
