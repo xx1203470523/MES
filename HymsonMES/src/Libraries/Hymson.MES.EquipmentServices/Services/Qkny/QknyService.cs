@@ -14,6 +14,7 @@ using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
+using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.CoreServices.Services.Qkny;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -184,6 +185,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IEquEquipmentService _equEquipmentService;
 
         /// <summary>
+        /// 参数收集
+        /// </summary>
+        private readonly IManuProductParameterService _manuProductParameterService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -206,7 +212,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuToolingBindRepository manuToolingBindRepository,
             IManuDowngradingRepository manuDowngradingRepository,
             IEquEquipmentService equEquipmentService,
-            AbstractValidator<OperationLoginDto> validationOperationLoginDto)
+            AbstractValidator<OperationLoginDto> validationOperationLoginDto,
+            IManuProductParameterService manuProductParameterService)
         {
             _equEquipmentRepository = equEquipmentRepository;
             _planWorkOrderService = planWorkOrderService;
@@ -230,6 +237,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuDowngradingRepository = manuDowngradingRepository;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
+            _manuProductParameterService = manuProductParameterService;
         }
 
 
@@ -654,30 +662,26 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                 outReqBo.OutStationUnqualifiedList = unCodeList;
             }
             outBo.OutStationRequestBos = new List<OutStationRequestBo>() { outReqBo };
-            //2.2 出站参数
-            List<EquProductParamRecordSaveDto> saveDtoList = new List<EquProductParamRecordSaveDto>();
-            foreach (var item in dto.ParamList)
+            //2.2 产品过程参数
+            var parameterBo = new ProductProcessParameterBo
             {
-                EquProductParamRecordSaveDto saveDto = new EquProductParamRecordSaveDto();
-                saveDto.ParamCode = item.ParamCode;
-                saveDto.ParamValue = item.ParamValue;
-                saveDto.CollectionTime = item.CollectionTime;
-                saveDtoList.Add(saveDto);
-            }
-            saveDtoList.ForEach(m =>
-            {
-                m.SiteId = equResModel.SiteId;
-                m.Sfc = dto.Sfc;
-                m.EquipmentId = equResModel.EquipmentId;
-                m.CreatedOn = HymsonClock.Now();
-                m.CreatedBy = dto.EquipmentCode;
-                m.UpdatedOn = m.CreatedOn;
-                m.UpdatedBy = m.CreatedBy;
-            });
+                SiteId = equResModel.SiteId,
+                UserName = equResModel.EquipmentCode,
+                Time = HymsonClock.Now(),
+                ProcedureId = equResModel.ProcedureId,
+                ResourceId = equResModel.ResId,
+                SFCs = new[] { dto.Sfc },
+                Parameters = dto.ParamList.Select(x => new ProductParameterBo
+                {
+                    ParameterCode = x.ParamCode,
+                    ParameterValue = x.ParamValue,
+                    CollectionTime = x.CollectionTime
+                })
+            };
             //3. 出站
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
-            await _equProductParamRecordService.AddMultAsync(saveDtoList);
+            await _manuProductParameterService.ProductProcessCollectAsync(parameterBo);
             trans.Complete();
         }
 
@@ -729,7 +733,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             outBo.ProcedureId = equResModel.ProcedureId;
             outBo.UserName = equResModel.EquipmentCode;
             List<OutStationRequestBo> outStationRequestBos = new();
-            List<EquProductParamRecordSaveDto> saveDtoList = new List<EquProductParamRecordSaveDto>();
             foreach (var item in dto.SfcList)
             {
                 //出站数据
@@ -749,34 +752,32 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                     outStationRequestBo.OutStationUnqualifiedList = item.NgList.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s });
                 }
                 outStationRequestBos.Add(outStationRequestBo);
-
-                //出站参数
-                List<EquProductParamRecordSaveDto> curSfcParamList = new List<EquProductParamRecordSaveDto>();
-                foreach (var paramItem in item.ParamList)
-                {
-                    EquProductParamRecordSaveDto saveDto = new EquProductParamRecordSaveDto();
-                    saveDto.ParamCode = paramItem.ParamCode;
-                    saveDto.ParamValue = paramItem.ParamValue;
-                    saveDto.CollectionTime = paramItem.CollectionTime;
-                    curSfcParamList.Add(saveDto);
-                }
-                curSfcParamList.ForEach(m =>
-                {
-                    m.SiteId = equResModel.SiteId;
-                    m.Sfc = item.Sfc;
-                    m.EquipmentId = equResModel.EquipmentId;
-                    m.CreatedOn = HymsonClock.Now();
-                    m.CreatedBy = dto.EquipmentCode;
-                    m.UpdatedOn = m.CreatedOn;
-                    m.UpdatedBy = m.CreatedBy;
-                });
-                saveDtoList.AddRange(curSfcParamList);
             }
             outBo.OutStationRequestBos = outStationRequestBos;
+
+            //产品过程参数
+            ProductParameterCollectBo parameterCollectBo = new()
+            {
+                SiteId = equResModel.SiteId,
+                UserName = equResModel.EquipmentCode,
+                Time = HymsonClock.Now(),
+                ProcedureId = equResModel.ProcedureId,
+                ResourceId = equResModel.ResId,
+                SFCList = dto.SfcList.Select(x => new ProductParameterCollectInfo
+                {
+                    SFC = x.Sfc,
+                    Parameters = x.ParamList.Select(z => new ProductParameterBo
+                    {
+                        ParameterCode = z.ParamCode,
+                        ParameterValue = z.ParamValue,
+                        CollectionTime = z.CollectionTime
+                    })
+                })
+            };
             //3. 出站
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             var outResult = await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
-            await _equProductParamRecordService.AddMultAsync(saveDtoList);
+            await _manuProductParameterService.ProductProcessCollectAsync(parameterCollectBo);
             trans.Complete();
             //4. 返回
             List<OutboundMoreReturnDto> resultList = new List<OutboundMoreReturnDto>();

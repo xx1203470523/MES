@@ -152,7 +152,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
             var errorParameter = new List<string>();
             foreach (var item in equipmentProductProcessParameters)
             {
-                var parameterEntity = parameters.FirstOrDefault(x => x.ParameterCode == item.ParameterCode);
+                var parameterEntity = parameters.FirstOrDefault(x => item.ParameterCode.Equals(x.ParameterCode, StringComparison.OrdinalIgnoreCase));
                 if (parameterEntity == null)
                 {
                     errorParameter.Add(item.ParameterCode);
@@ -173,7 +173,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
 
             if (errorParameter.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19601)).WithData("ParameterCodes", string.Join(",", errorParameter));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19606)).WithData("ParameterCodes", string.Join(",", errorParameter));
             }
 
             await _manuEquipmentParameterService.InsertRangeAsync(list);
