@@ -902,6 +902,10 @@
         public const string MES15320 = "条码【{sfcs}】已不存在";
         public const string MES15321 = "条码【{sfc}】缺失步骤信息，无法查询到开始时间";
         public const string MES15322 = "载具内没有条码";
+
+        public const string MES15330 = "条码不存在";
+        public const string MES15331 = "条码库存不足"; 
+        public const string MES15332 = "请选择操作对象";
         #endregion
 
         #region 质量录入 15400

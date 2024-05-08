@@ -74,6 +74,17 @@ namespace Hymson.MES.Core.Enums
         /// 物料合并
         /// </summary>
         [Description("物料合并")]
-        MaterialBarCodeMerge = 13
+        MaterialBarCodeMerge = 13,
+        /// <summary>
+        /// 物料锁定
+        /// </summary>
+        [Description("物料锁定")]
+        MaterialBarCodeLock = 15,
+
+        /// <summary>
+        /// 物料解锁
+        /// </summary>
+        [Description("物料解锁")]
+        MaterialBarCodeUnLock = 16 
     }
 }

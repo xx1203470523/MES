@@ -9,6 +9,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -149,6 +150,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 操作类型
         /// </summary>
         public QualityLockEnum OperationType { get; set; }
+
+        /// <summary>
+        /// 操作对象
+        /// </summary>
+        public QualityLockObjectEnum OperationObject { get; set; } 
 
         /// <summary>
         /// 将来锁，锁定的工序id
