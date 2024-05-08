@@ -38,6 +38,11 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         public string ParamCode { get; set; } = "";
 
         /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParamName { get; set; } = "";
+
+        /// <summary>
         /// 参数值
         /// </summary>
         public string ParamValue { get; set; } = "";

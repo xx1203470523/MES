@@ -445,7 +445,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationGetRecipeListDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 获取数据
             ProcEquipmentGroupParamEquProductQuery query = new ProcEquipmentGroupParamEquProductQuery();
             query.EquipmentId = equResModel.EquipmentId;
@@ -493,7 +493,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
                     RecipeParamDto param = new RecipeParamDto();
                     param.ParamUpper = item.MaxValue == null ? "" : item.MaxValue.ToString();
                     param.ParamLower = item.MinValue == null ? "" : item.MinValue.ToString();
+                    param.ParamValue = item.CenterValue == null ? "" : item.CenterValue.ToString();
                     param.ParamCode = item.ParameterCode;
+                    param.ParamName = item.ParameterName;
                     result.ParamList.Add(param);
                 }
             }

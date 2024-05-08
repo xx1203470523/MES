@@ -343,7 +343,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 根据编码获取激活的数据
         /// </summary>
         const string GetDetailByCodeSql = @"
-            select t1.Code, t1.Version, t1.CreatedOn, t1.UpdatedOn, t2.`MaxValue` ,t2.`MinValue` ,t2.ParamId ,t3.ParameterCode ,t3.ParameterName 
+            select t1.Code, t1.Version, t1.CreatedOn, t1.UpdatedOn, t2.CenterValue, t2.`MaxValue` ,t2.`MinValue` ,t2.ParamId ,t3.ParameterCode ,t3.ParameterName 
             from proc_equipment_group_param t1
             left join proc_equipment_group_param_detail t2 on t1.Id = t2.RecipeId and t2.IsDeleted = 0
             left join proc_parameter t3 on t3.Id = t2.ParamId and t3.IsDeleted = 0
