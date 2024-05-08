@@ -84,17 +84,17 @@ namespace Hymson.MES.CoreServices.Services.Parameter
             foreach (var parameter in bo.Parameters)
             {
                 var parameterEntity = parameterEntities.FirstOrDefault(x => parameter.ParameterCode.Equals(x.ParameterCode, StringComparison.OrdinalIgnoreCase));
-                if (parameterEntity == null)
-                {
-                    errorParameter.Add(parameter.ParameterCode);
-                    continue;
-                }
+                //if (parameterEntity == null)
+                //{
+                //    errorParameter.Add(parameter.ParameterCode);
+                //    continue;
+                //}
 
                 list.AddRange(bo.SFCs.Select(SFC => new ManuProductParameterEntity
                 {
                     ProcedureId = bo.ProcedureId,
                     SFC = SFC,
-                    ParameterId = parameterEntity.Id,
+                    ParameterId = parameterEntity?.Id ?? 0,
                     ParameterValue = parameter.ParameterValue,
                     CollectionTime = parameter.CollectionTime,
                     SiteId = bo.SiteId,
@@ -132,15 +132,15 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                 SiteId = bo.SiteId,
                 Codes = parameterCodes
             });
-            if (parameterEntities == null || !parameterEntities.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19606)).WithData("ParameterCodes", string.Join(",", parameterCodes));
-            }
-            var noExistCodes = parameterCodes.Except(parameterEntities.Select(x => x.ParameterCode.ToUpper()));
-            if (noExistCodes != null && noExistCodes.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19606)).WithData("ParameterCodes", string.Join(",", noExistCodes));
-            }
+            //if (parameterEntities == null || !parameterEntities.Any())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19606)).WithData("ParameterCodes", string.Join(",", parameterCodes));
+            //}
+            //var noExistCodes = parameterCodes.Except(parameterEntities.Select(x => x.ParameterCode.ToUpper()));
+            //if (noExistCodes != null && noExistCodes.Any())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19606)).WithData("ParameterCodes", string.Join(",", noExistCodes));
+            //}
 
             List<ManuProductParameterEntity> list = new();
 
