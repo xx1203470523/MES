@@ -22,5 +22,13 @@ namespace Hymson.MES.Data.Repositories.Parameter
         /// <param name="sequence"></param>
         /// <returns></returns>
         string PrepareEquipmentParameterBySequenceTableSql(int sequence);
+
+        /// <summary>
+        /// 获取表名
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="equipmentId"></param>
+        /// <returns></returns>
+        Task<string> GetParamTableName(long siteId, long equipmentId);
     }
 }
