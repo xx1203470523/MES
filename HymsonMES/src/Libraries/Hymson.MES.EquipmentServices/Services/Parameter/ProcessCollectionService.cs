@@ -7,11 +7,13 @@ using Hymson.MES.CoreServices.Dtos.Parameter;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.EquipmentServices.Dtos.Parameter;
 using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
+using System.Net.NetworkInformation;
 
 namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
 {
@@ -51,6 +53,16 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
         private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
+        /// 参数仓储
+        /// </summary>
+        private readonly IManuEquipmentParameterRepository _manuEquipmentParameterRepository;
+
+        /// <summary>
+        /// 参数仓储
+        /// </summary>
+        private readonly IManuProductParameterRepository _manuProductParameterRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentEquipment"></param>
@@ -59,12 +71,16 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
         /// <param name="procParameterRepository"></param>
         /// <param name="manuEquipmentParameterService"></param>
         /// <param name="equEquipmentRepository"></param>
+        /// <param name="manuEquipmentParameterRepository"></param>
+        /// <param name="manuProductParameterRepository"></param>
         public ProcessCollectionService(ICurrentEquipment currentEquipment,
             IManuCommonService manuCommonService,
             IManuProductParameterService manuProductParameterService,
             IProcParameterRepository procParameterRepository,
             IManuEquipmentParameterService manuEquipmentParameterService,
-            IEquEquipmentRepository equEquipmentRepository)
+            IEquEquipmentRepository equEquipmentRepository,
+            IManuEquipmentParameterRepository manuEquipmentParameterRepository,
+            IManuProductParameterRepository manuProductParameterRepository)
         {
             _currentEquipment = currentEquipment;
             _manuCommonService = manuCommonService;
@@ -72,6 +88,8 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
             _procParameterRepository = procParameterRepository;
             _manuEquipmentParameterService = manuEquipmentParameterService;
             _equEquipmentRepository = equEquipmentRepository;
+            _manuEquipmentParameterRepository = manuEquipmentParameterRepository;
+            _manuProductParameterRepository = manuProductParameterRepository;
         }
 
 
@@ -179,5 +197,23 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
             await _manuEquipmentParameterService.InsertRangeAsync(list);
         }
 
+        /// <summary>
+        /// 获取参数表名
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<List<string>> GetParamTableNameAsync(GetParamNameDto dto)
+        {
+            if(dto.SiteId == 0)
+            {
+                dto.SiteId = 42874561778253824;
+            }
+            List<string> resultList = new List<string>();
+            var name = await _manuEquipmentParameterRepository.GetParamTableName(dto.SiteId, dto.EquipmentId);
+            var nameList = _manuProductParameterRepository.GetParamTableName(dto.SiteId, dto.ProcedureId, dto.Sfc);
+            resultList.AddRange(nameList);
+            resultList.Add(name);
+            return resultList;
+        }
     }
 }

@@ -1,7 +1,9 @@
-﻿using Hymson.MES.EquipmentServices.Dtos.Parameter;
+﻿using Hymson.MES.EquipmentServices;
+using Hymson.MES.EquipmentServices.Dtos.Parameter;
 using Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection;
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Equipment.Api.Controllers
@@ -56,5 +58,18 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _processCollectionService.EquipmentCollectionAsync(request);
         }
 
+        /// <summary>
+        /// 获取参数名
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetParamTableName")]
+        [LogDescription("获取参数名", BusinessType.OTHER, "GetParamName", ReceiverTypeEnum.MES)]
+        [AllowAnonymous]
+        public async Task<List<string>> GetParamNameAsync(GetParamNameDto dto)
+        {
+            return await _processCollectionService.GetParamTableNameAsync(dto);
+        }
     }
 }

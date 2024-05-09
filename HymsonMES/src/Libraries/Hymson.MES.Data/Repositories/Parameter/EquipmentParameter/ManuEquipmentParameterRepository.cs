@@ -66,6 +66,19 @@ namespace Hymson.MES.Data.Repositories.Parameter
             return createTableSql;
         }
 
+        /// <summary>
+        /// 获取表名
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="equipmentId"></param>
+        /// <returns></returns>
+        public async Task<string> GetParamTableName(long siteId, long equipmentId)
+        {
+            var key = CalculateCrc32($"{siteId}{equipmentId}");
+
+            return $"{EquipmentParameter.EquipmentParameterPrefix}{key % _parameterOptions.ParameterDelivery}";
+        }
+
         #region 内部方法
         /// <summary>
         /// 更具设备编码获取表名

@@ -215,6 +215,23 @@ namespace Hymson.MES.Data.Repositories.Parameter
             return createTableSql;
         }
 
+        /// <summary>
+        /// 获取参数表名
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="procedureId"></param>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public List<string> GetParamTableName(long siteId, long procedureId, string sfc)
+        {
+            List<string> sfcList = new List<string>
+            {
+                GetTableNameBySFC(siteId, sfc),
+                GetTableNameByProcedureId(siteId,procedureId)
+            };
+            return sfcList;
+        }
+
         #region 内部方法
         /// <summary>
         /// 更具SFC获取表名
