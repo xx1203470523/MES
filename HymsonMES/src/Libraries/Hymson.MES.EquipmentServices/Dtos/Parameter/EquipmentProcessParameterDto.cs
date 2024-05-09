@@ -37,6 +37,11 @@
         public long EquipmentId { get; set; }
 
         /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; } = string.Empty;
+
+        /// <summary>
         /// 条码
         /// </summary>
         public string Sfc { get; set; } = "";
@@ -45,5 +50,10 @@
         /// 工序ID
         /// </summary>
         public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; } = string.Empty;
     }
   }
