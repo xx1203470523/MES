@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
@@ -157,6 +158,13 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 {
                     var beforeNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
                     var afterNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
+
+                    // 流转类型为消耗，特殊处理
+                    if (item.CirculationType == SfcCirculationTypeEnum.Consume)
+                    {
+                        // 将beforeNode和afterNode的值互换
+                        (afterNode, beforeNode) = (beforeNode, afterNode);
+                    }
 
                     if (beforeNode == null)
                     {
@@ -348,6 +356,13 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 {
                     var beforeNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
                     var afterNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
+
+                    // 流转类型为消耗，特殊处理
+                    if (item.CirculationType == SfcCirculationTypeEnum.Consume)
+                    {
+                        // 将beforeNode和afterNode的值互换
+                        (afterNode, beforeNode) = (beforeNode, afterNode);
+                    }
 
                     if (beforeNode == null)
                     {
