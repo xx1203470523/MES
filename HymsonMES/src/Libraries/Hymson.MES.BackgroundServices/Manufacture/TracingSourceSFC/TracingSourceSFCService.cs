@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
@@ -156,25 +157,35 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 foreach (var item in manuSfcCirculationList)
                 {
                     var beforeNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
+                    var beforeSFCEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
+
                     var afterNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
+                    var afterSFCEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
+
+                    // 流转类型为消耗，特殊处理
+                    if (item.CirculationType == SfcCirculationTypeEnum.Consume)
+                    {
+                        // 将beforeNode和afterNode的值互换
+                        (afterNode, beforeNode) = (beforeNode, afterNode);
+                        (afterSFCEntity, beforeSFCEntity) = (beforeSFCEntity, afterSFCEntity);
+                    }
 
                     if (beforeNode == null)
                     {
-                        var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
-                        if (sfcEntity == null) continue;
+                        if (beforeSFCEntity == null) continue;
 
-                        if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
-                        var sfcInfoEntity = sfcInfoDict[sfcEntity.Id];
+                        if (!sfcInfoDict.ContainsKey(beforeSFCEntity.Id)) continue;
+                        var sfcInfoEntity = sfcInfoDict[beforeSFCEntity.Id];
 
                         if (!productDict.ContainsKey(sfcInfoEntity.ProductId)) continue;
                         var beforeProductEntity = productDict[sfcInfoEntity.ProductId];
 
                         beforeNode = new ManuSFCNodeEntity
                         {
-                            Id = sfcEntity.Id,
-                            SiteId = sfcEntity.SiteId,
+                            Id = beforeSFCEntity.Id,
+                            SiteId = beforeSFCEntity.SiteId,
                             ProductId = sfcInfoEntity.ProductId,
-                            SFC = sfcEntity.SFC,
+                            SFC = beforeSFCEntity.SFC,
                             Name = beforeProductEntity.MaterialName,
                             CreatedBy = user,
                             UpdatedBy = user
@@ -183,21 +194,20 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
                     if (afterNode == null)
                     {
-                        var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
-                        if (sfcEntity == null) continue;
+                        if (afterSFCEntity == null) continue;
 
-                        if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
-                        var sfcInfoEntity = sfcInfoDict[sfcEntity.Id];
+                        if (!sfcInfoDict.ContainsKey(afterSFCEntity.Id)) continue;
+                        var sfcInfoEntity = sfcInfoDict[afterSFCEntity.Id];
 
                         if (!productDict.ContainsKey(sfcInfoEntity.ProductId)) continue;
                         var afterProductEntity = productDict[sfcInfoEntity.ProductId];
 
                         afterNode = new ManuSFCNodeEntity
                         {
-                            Id = sfcEntity.Id,
-                            SiteId = sfcEntity.SiteId,
+                            Id = afterSFCEntity.Id,
+                            SiteId = afterSFCEntity.SiteId,
                             ProductId = sfcInfoEntity.ProductId,
-                            SFC = sfcEntity.SFC,
+                            SFC = afterSFCEntity.SFC,
                             Name = afterProductEntity.MaterialName,
                             CreatedBy = user,
                             UpdatedBy = user
@@ -347,25 +357,35 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 foreach (var item in manuSfcCirculationList)
                 {
                     var beforeNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
+                    var beforeSFCEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
+
                     var afterNode = nodeEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
+                    var afterSFCEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
+
+                    // 流转类型为消耗，特殊处理
+                    if (item.CirculationType == SfcCirculationTypeEnum.Consume)
+                    {
+                        // 将beforeNode和afterNode的值互换
+                        (afterNode, beforeNode) = (beforeNode, afterNode);
+                        (afterSFCEntity, beforeSFCEntity) = (beforeSFCEntity, afterSFCEntity);
+                    }
 
                     if (beforeNode == null)
                     {
-                        var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
-                        if (sfcEntity == null) continue;
+                        if (beforeSFCEntity == null) continue;
 
-                        if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
-                        var sfcInfoEntity = sfcInfoDict[sfcEntity.Id];
+                        if (!sfcInfoDict.ContainsKey(beforeSFCEntity.Id)) continue;
+                        var sfcInfoEntity = sfcInfoDict[beforeSFCEntity.Id];
 
                         if (!productDict.ContainsKey(sfcInfoEntity.ProductId)) continue;
                         var beforeProductEntity = productDict[sfcInfoEntity.ProductId];
 
                         beforeNode = new ManuSFCNodeEntity
                         {
-                            Id = sfcEntity.Id,
-                            SiteId = sfcEntity.SiteId,
+                            Id = beforeSFCEntity.Id,
+                            SiteId = beforeSFCEntity.SiteId,
                             ProductId = sfcInfoEntity.ProductId,
-                            SFC = sfcEntity.SFC,
+                            SFC = beforeSFCEntity.SFC,
                             Name = beforeProductEntity.MaterialName,
                             CreatedBy = user,
                             UpdatedBy = user
@@ -374,21 +394,20 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
                     if (afterNode == null)
                     {
-                        var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
-                        if (sfcEntity == null) continue;
+                        if (afterSFCEntity == null) continue;
 
-                        if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
-                        var sfcInfoEntity = sfcInfoDict[sfcEntity.Id];
+                        if (!sfcInfoDict.ContainsKey(afterSFCEntity.Id)) continue;
+                        var sfcInfoEntity = sfcInfoDict[afterSFCEntity.Id];
 
                         if (!productDict.ContainsKey(sfcInfoEntity.ProductId)) continue;
                         var afterProductEntity = productDict[sfcInfoEntity.ProductId];
 
                         afterNode = new ManuSFCNodeEntity
                         {
-                            Id = sfcEntity.Id,
-                            SiteId = sfcEntity.SiteId,
+                            Id = afterSFCEntity.Id,
+                            SiteId = afterSFCEntity.SiteId,
                             ProductId = sfcInfoEntity.ProductId,
-                            SFC = sfcEntity.SFC,
+                            SFC = afterSFCEntity.SFC,
                             Name = afterProductEntity.MaterialName,
                             CreatedBy = user,
                             UpdatedBy = user
