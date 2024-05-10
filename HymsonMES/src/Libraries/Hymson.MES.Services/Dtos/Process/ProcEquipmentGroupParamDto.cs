@@ -219,14 +219,34 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? Code { get; set; }
 
         /// <summary>
+        /// 参数集名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string? MaterialCode { get; set; }
 
         /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName { get; set; }
+
+        /// <summary>
         /// 工序编码
         /// </summary>
         public string? ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string? ProcedureName { get; set; }
+
+        /// <summary>
+        /// 参数组类型;1、开机参数 2、设备过程参数
+        /// </summary>
+        public EquipmentGroupParamTypeEnum? Type { get; set; }
     }
 
     /// <summary>

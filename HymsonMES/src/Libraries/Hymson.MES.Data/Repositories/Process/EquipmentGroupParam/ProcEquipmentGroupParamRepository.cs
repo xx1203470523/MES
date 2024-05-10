@@ -107,10 +107,27 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("m.MaterialCode LIKE @MaterialCode");
             }
 
+            if (!string.IsNullOrWhiteSpace(query.MaterialName))
+            {
+                query.MaterialName = $"%{query.MaterialName}%";
+                sqlBuilder.Where("m.MaterialName LIKE @MaterialName");
+            }
+
             if (!string.IsNullOrWhiteSpace(query.ProcedureCode))
             {
                 query.ProcedureCode = $"%{query.ProcedureCode}%";
                 sqlBuilder.Where("p.Code LIKE @ProcedureCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.ProcedureName))
+            {
+                query.ProcedureName = $"%{query.ProcedureName}%";
+                sqlBuilder.Where("p.Name LIKE @ProcedureName");
+            }
+
+            if (query.Type.HasValue)
+            {
+                sqlBuilder.Where(" egp.Type = @Type ");
             }
 
             var offSet = (query.PageIndex - 1) * query.PageSize;
