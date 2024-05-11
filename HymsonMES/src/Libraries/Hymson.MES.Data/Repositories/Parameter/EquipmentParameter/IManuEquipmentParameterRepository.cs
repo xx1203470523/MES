@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Domain.Parameter;
+﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Parameter;
 
 namespace Hymson.MES.Data.Repositories.Parameter
 {
@@ -22,5 +23,12 @@ namespace Hymson.MES.Data.Repositories.Parameter
         /// <param name="sequence"></param>
         /// <returns></returns>
         string PrepareEquipmentParameterBySequenceTableSql(int sequence);
+
+        /// <summary>
+        /// 根据设备Id获取参数信息
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquipmentParameterEntity>> GetParametesByEqumentIdEntitiesAsync(ManuEquipmentParameterPagedQuery pagedQuery);
     }
 }

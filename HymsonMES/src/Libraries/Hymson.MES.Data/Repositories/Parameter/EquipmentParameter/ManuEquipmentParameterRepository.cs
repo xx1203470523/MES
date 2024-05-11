@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Force.Crc32;
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
@@ -64,6 +65,52 @@ namespace Hymson.MES.Data.Repositories.Parameter
             var destinationTableName = $"{EquipmentParameter.EquipmentParameterPrefix}{sequence}";
             string createTableSql = $"CREATE TABLE `{destinationTableName}` LIKE `{EquipmentParameter.EquipmentProcedureParameterTemplateName}`;";
             return createTableSql;
+        }
+
+        /// <summary>
+        /// 根据设备Id获取参数信息
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<EquipmentParameterEntity>> GetParametesByEqumentIdEntitiesAsync(ManuEquipmentParameterPagedQuery pagedQuery)
+        {
+            var equipmentId = pagedQuery.EquipmentId??0;
+            var tableName = GetTableNameByEquipmentId(pagedQuery.SiteId, equipmentId);
+
+            var sqlBuilder = new SqlBuilder();
+            // WHERE EquipmentId=@EquipmentId  AND SiteId=@SiteId AND IsDeleted=0
+            string getByEquipmentSql = $"SELECT Id, SiteId, EquipmentId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted FROM {tableName} /**where**/ LIMIT @Offset,@Rows ";
+            string getByEquipmentCountSql = $"select count(1) from {tableName} /**where**/";
+            var templateData = sqlBuilder.AddTemplate(getByEquipmentSql);
+            var templateCount = sqlBuilder.AddTemplate(getByEquipmentCountSql);
+
+            pagedQuery.EquipmentId= equipmentId;
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("EquipmentId = @EquipmentId");
+            if (pagedQuery.ParameterId.HasValue)
+            {
+                sqlBuilder.Where("ParameterId=@ParameterId ");
+            }
+
+            //限定时间
+            if (pagedQuery.CreatedOn != null && pagedQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { DateStart = pagedQuery.CreatedOn[0], DateEnd = pagedQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where(" CreatedOn >= @DateStart AND CreatedOn < @DateEnd ");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
+
+            using var conn = GetMESParamterDbConnection();
+            var entitiesTask = conn.QueryAsync<EquipmentParameterEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var entities = await entitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<EquipmentParameterEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         #region 内部方法
