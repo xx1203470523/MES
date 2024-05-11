@@ -3,12 +3,15 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Sequences;
@@ -45,19 +48,29 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// 物料
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
+        /// <summary>
+        /// 条码
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+        /// <summary>
+        /// 条码信息
+        /// </summary>
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="inteCodeRulesRepository"></param>
-        /// <param name="inteCodeRulesMakeRepository"></param>
-        public ManuGenerateBarcodeService(
-            IInteCodeRulesRepository inteCodeRulesRepository,
+        public ManuGenerateBarcodeService(IInteCodeRulesRepository inteCodeRulesRepository,
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
             ISequenceService sequenceService,
-            IInteTimeWildcardRepository inteTimeWildcardRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IInteWorkCenterRepository inteWorkCenterRepository,
+            IInteTimeWildcardRepository inteTimeWildcardRepository,
+            ILocalizationService localizationService,
+            IProcMaterialRepository procMaterialRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository,
             ITracingSourceCoreService tracingSourceCoreService,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository)
         {
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
@@ -68,6 +81,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _tracingSourceCoreService = tracingSourceCoreService;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
         }
 
         /// <summary>
@@ -108,10 +123,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 StartNumber = codeRule.StartNumber,
                 CodeMode = codeRule.CodeMode,
                 SiteId = param.SiteId,
-                Sfcs   =param.Sfcs,
+                Sfcs = param.Sfcs,
                 ProductId = param.ProductId,
                 WorkOrderId = param.WorkOrderId,
-
+                InteWorkCenterId = param.InteWorkCenterId,
             });
             var list = new List<string>();
             foreach (var barcode in barcodes)
@@ -253,7 +268,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                             rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.Diaphragm) });
                             break;
                         case GenerateBarcodeWildcard.PositivePlate:
-                            rules.Add(new List<string> { await GenerateMaterialTypeAsync(bo, GenerateBarcodeWildcard.PositivePlate) });
+                            rules.Add(new List<string> { await GeneratePositiveInfo(bo) });
                             break;
                         case GenerateBarcodeWildcard.ElectrodeState:
                             rules.Add(new List<string> { await GenerateElectrodeStateAsync(bo) });
@@ -283,6 +298,75 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         #region 内部方法
 
         /// <summary>
+        /// 生成正极片生产信息
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private async Task<string> GeneratePositiveInfo(BarCodeSerialNumberBo bo)
+        {
+            if (bo.IsTest) return "PPPP";
+            if (bo.Sfcs == null || !bo.Sfcs.Any())
+            {
+                return string.Empty;
+            }
+            var year = "";
+            var month = "";
+            var orderType = "";
+            var lineCode = "";
+            bool isFound = false;
+            foreach (var sfc in bo.Sfcs)
+            {
+                //追溯
+                var manuSFCNodeSourceEntities = await _tracingSourceCoreService.OriginalSourceAsync(new Data.Repositories.Common.Query.EntityBySFCQuery
+                {
+                    SFC = sfc,
+                    SiteId = bo.SiteId,
+                });
+                //关联物料信息，查询是什么类型的物料
+                var productIds = manuSFCNodeSourceEntities.Select(x => x.ProductId);
+                var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(productIds);
+                //查询正极片生产信息
+                var positiveMaterialIds = procMaterialEntities.Where(x => x.MaterialType == MaterialTypeEnum.PositivePlate).Select(x => x.Id);
+                var positiveSfcs = manuSFCNodeSourceEntities.Where(x => positiveMaterialIds.Contains(x.ProductId)).Select(x => x.SFC);
+                if (positiveSfcs == null || !positiveSfcs.Any())
+                {
+                    continue;
+                }
+                //条码表
+                var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery { SiteId = bo.SiteId, SFCs = positiveSfcs });
+                //条码信息表
+                var positiveSfcInfos = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
+                if (positiveSfcInfos == null || !positiveSfcInfos.Any())
+                {
+                    continue;
+                }
+                var positiveSfcInfo = positiveSfcInfos.OrderBy(x => x.Id).First();
+                year = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Year, positiveSfcInfo.CreatedOn);
+                month = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Month, positiveSfcInfo.CreatedOn);
+                //正极片工单信息
+                var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(positiveSfcInfo.WorkOrderId.GetValueOrDefault());
+                if (workOrderEntity != null)
+                {
+                    orderType = MappingElectrodeState(workOrderEntity.Type);
+                    //正极片线体信息
+                    var workCenterEntity = await _inteWorkCenterRepository.GetByIdAsync(workOrderEntity.WorkCenterId.GetValueOrDefault());
+                    lineCode = workCenterEntity.LineCoding ?? "";
+                    isFound = true;
+                    break;
+                }
+
+                if (isFound) break;
+            }
+            if (!isFound)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16217)).WithData("Barcode", string.Join(',', bo.Sfcs));
+            }
+
+            return $"{year}{month}{orderType}{lineCode}";
+        }
+
+        /// <summary>
         /// 生成条码物料类型相关数据
         /// </summary>
         /// <param name="bo"></param>
@@ -293,8 +377,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
 
             if (bo.IsTest)
             {
-                ///因为是动态生成，在前端测试时用ZZZZ占位
-                return "ZZZZ";
+                ///因为是动态生成，在前端测试时用Z占位
+                return "Z";
             }
             else
             {
@@ -316,6 +400,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             {
                 return string.Empty;
             }
+            var materialTypeEnum = SelectMaterialType(wildcard) ?? throw new Exception("找不到对应的物料类型");
+
             string productModel = "";
             bool isFound = false;
             foreach (var sfc in bo.Sfcs)
@@ -330,12 +416,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(productIds);
                 foreach (var procMaterialEntity in procMaterialEntities)
                 {
-                    var  materialTypeEnum= SelectMaterialType(wildcard);
-                    if (materialTypeEnum==null)
-                    {
-                        throw new Exception("找不到对应的物料类型");
-                    }
-                    if (procMaterialEntity.MaterialType == materialTypeEnum)
+                    if (procMaterialEntity.MaterialType == materialTypeEnum && !string.IsNullOrWhiteSpace(procMaterialEntity.ProductModel))
                     {
                         productModel = procMaterialEntity.ProductModel ?? string.Empty;
                         isFound = true;
@@ -343,7 +424,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                     }
                 }
                 if (isFound) break;
-
+            }
+            if (!isFound)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16216)).WithData("Barcode", string.Join(',', bo.Sfcs)).WithData("MaterialTypeEnum", materialTypeEnum.GetDescription());
             }
 
             return productModel;
@@ -378,17 +462,13 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 ///因为是动态生成，在前端测试时用X占位
                 return "X";
             }
-            else
+            var inteWorkCenterEntity = await _inteWorkCenterRepository.GetByIdAsync(bo.InteWorkCenterId.GetValueOrDefault())
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16214)).WithData("LineId", bo.InteWorkCenterId.GetValueOrDefault());
+            if (string.IsNullOrWhiteSpace(inteWorkCenterEntity.LineCoding))
             {
-                if (!bo.InteWorkCenterId.HasValue)
-                {
-                    return string.Empty;
-                }
-                var inteWorkCenterEntity = await _inteWorkCenterRepository.GetByIdAsync(bo.InteWorkCenterId.Value);
-                if (inteWorkCenterEntity == null)
-                    return string.Empty;
-                return inteWorkCenterEntity.LineCoding ?? string.Empty;
+                throw new CustomerValidationException(nameof(ErrorCode.MES16215)).WithData("Code", inteWorkCenterEntity.Code);
             }
+            return inteWorkCenterEntity.LineCoding ?? string.Empty;
         }
 
         /// <summary>
@@ -401,8 +481,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
 
             if (bo.IsTest)
             {
-                ///因为是动态生成，在前端测试时用YY占位
-                return "YY";
+                ///因为是动态生成，在前端测试时用Y占位
+                return "Y";
             }
             else
             {
@@ -410,9 +490,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 {
                     return string.Empty;
                 }
-                var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(bo.WorkOrderId.Value);
+                var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(bo.WorkOrderId.GetValueOrDefault());
                 if (planWorkOrderEntity == null)
-                    return string.Empty;
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16218)).WithData("WorkOrderId", bo.WorkOrderId.GetValueOrDefault());
+                }
                 return MappingElectrodeState(planWorkOrderEntity.Type);
             }
         }
@@ -439,11 +521,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// <returns></returns>
         private async Task<string> GenerateBatterySpecificationsAsync(BarCodeSerialNumberBo bo)
         {
-            //if (bo.CodeType != CodeRuleCodeTypeEnum.ProcessControlSeqCode)
-            //    return string.Empty;
-            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(bo.ProductId);
-            if (procMaterialEntity == null)
-                return string.Empty;
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(bo.ProductId) 
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16212)).WithData("MaterialId", bo.ProductId);
+            if (string.IsNullOrWhiteSpace(procMaterialEntity.ProductModel))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16213)).WithData("MaterialCode", procMaterialEntity.MaterialCode);
+            }
             return procMaterialEntity.ProductModel ?? string.Empty;
         }
         /// <summary>
@@ -452,11 +535,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// <param name="bo"></param>
         /// <param name="timeWildcardTypeEnum"></param>
         /// <returns></returns>
-        private async Task<string> GenerateSingleDateAsync(BarCodeSerialNumberBo bo, TimeWildcardTypeEnum timeWildcardTypeEnum)
+        private async Task<string> GenerateSingleDateAsync(BarCodeSerialNumberBo bo, TimeWildcardTypeEnum timeWildcardTypeEnum, DateTime? dateTime = null)
         {
             var result = string.Empty;
             #region 查询年月日的通配
-            var currentTime = HymsonClock.Now();
+            var currentTime = dateTime == null ? HymsonClock.Now() : dateTime.Value;
             var timeWildcards = await _inteTimeWildcardRepository.GetAllAsync(bo.SiteId);
             if (timeWildcardTypeEnum == TimeWildcardTypeEnum.Year)
             {

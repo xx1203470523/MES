@@ -1153,6 +1153,13 @@
         public const string MES16209 = "线别必须维护自定义值，请查看【编码规则维护】";
         public const string MES16210 = "线别配置值【{Value}】异常，格式为【线体编码:设定值】，例如【L001:1;L002:2】，请查看【编码规则维护】";
         public const string MES16211 = "未上报线体信息";
+        public const string MES16212 = "物料【{MaterialId}】不存在";
+        public const string MES16213 = "物料【{MaterialCode}】产品型号未维护";
+        public const string MES16214 = "工作中心【{LineId}】不存在";
+        public const string MES16215 = "工作中心【{Code}】线体编码未维护";
+        public const string MES16216 = "条码【{Barcode}】对应【{MaterialTypeEnum}】追溯信息不存在或对应物料产品型号未维护";
+        public const string MES16217 = "条码【{Barcode}】对应正极片生产信息不存在或未正确配置相关信息，请检查数据";
+        public const string MES16218 = "工单【{WorkOrderId}】不存在";
         #endregion
 
         #region 生产通用 MES16300
@@ -1279,6 +1286,7 @@
         public const string MES16509 = "工序不在工艺路线上。";
         public const string MES16510 = "工序不存在。";
         public const string MES16511 = "资源编码{Code}未与线体绑定";
+        public const string MES16512 = "电芯码【{SFC}】生成错误，长度必须为24位";
         #endregion
 
         #region 在制品移除添加 16600

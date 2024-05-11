@@ -69,6 +69,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>  
         public decimal? MinValue { get; set; } // 假设是decimal类型，根据实际情况可以修改  
 
+        /// <summary>
+        /// 设定值
+        /// </summary>
+        public decimal? CenterValue { get; set; }
+
         /// <summary>  
         /// 参数ID  
         /// </summary>  

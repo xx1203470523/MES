@@ -6,6 +6,7 @@
  *build datetime: 2023-08-02 01:48:35
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -30,10 +31,28 @@ namespace Hymson.MES.Data.Repositories.Process
         public string? MaterialCode { get; set; }
 
         /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName { get; set; }
+
+        /// <summary>
         /// 工序编码
         /// </summary>
         public string? ProcedureCode { get; set; }
 
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string? ProcedureName { get; set; }
+
+        /// <summary>
+        /// 参数组类型;1、开机参数 2、设备过程参数
+        /// </summary>
+        public EquipmentGroupParamTypeEnum? Type { get; set; }
+
+        /// <summary>
+        /// 站点ID
+        /// </summary>
         public long SiteId { get; set; }
     }
 }

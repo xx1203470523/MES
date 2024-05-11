@@ -278,7 +278,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             ManuSfcProduceBySfcsQuery sfcQuery = new ManuSfcProduceBySfcsQuery();
             sfcQuery.SiteId = param.SiteId;
             sfcQuery.Sfcs = sfcList;
-            var sfcProductList = (await _manuSfcProduceRepository.GetListBySfcsAsync(sfcQuery)).ToList(); ;
+            var sfcProductList = (await _manuSfcProduceRepository.GetListBySfcsAsync(sfcQuery)).ToList();
             if (sfcProductList == null || sfcProductList.Count == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45112));

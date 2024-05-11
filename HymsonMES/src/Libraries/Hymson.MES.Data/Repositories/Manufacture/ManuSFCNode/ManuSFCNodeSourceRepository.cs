@@ -29,6 +29,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAsync(IEnumerable<ManuSFCNodeSourceEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteSql, entities);
+        }
+
+        /// <summary>
         /// 查询树数据的List
         /// </summary>
         /// <param name="query"></param>
@@ -93,6 +104,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_source /**where**/  ";
 
 #if DM
+        const string InsertsSql = "INSERT INTO manu_sfc_node_source(`Id`, CirculationId, `NodeId`, `SourceId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @SourceId, @CreatedBy, @CreatedOn, @SiteId) ";
+#else
+        const string InsertsSql = "REPLACE INTO manu_sfc_node_source(`Id`, CirculationId, `NodeId`, `SourceId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @SourceId, @CreatedBy, @CreatedOn, @SiteId) ";
+#endif
+
+        const string DeleteSql = "DELETE FROM manu_sfc_node_source WHERE NodeId = @NodeId AND SourceId = @SourceId; ";
+
+#if DM
         const string GetTreeEntitiesSql = @"WITH RECURSIVE CTE (CirculationId, NodeId, SourceId) AS (
               SELECT CirculationId, NodeId, SourceId
               FROM manu_sfc_node_source
@@ -104,7 +123,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             )
             SELECT * FROM CTE;";
 
-        const string InsertsSql = "MERGE INTO manu_sfc_node_source t " +
+        const string MergeSql = "MERGE INTO manu_sfc_node_source t " +
             "USING (SELECT @NodeId AS NodeId, @SourceId AS SourceId FROM dual) s " +
             "ON (t.NodeId = s.NodeId AND t.SourceId = s.SourceId) " +
             "WHEN MATCHED THEN " +
@@ -129,7 +148,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             )
                             SELECT * FROM CTE;";
 
-        const string InsertsSql = "REPLACE INTO manu_sfc_node_source(`Id`, CirculationId, `NodeId`, `SourceId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @SourceId, @CreatedBy, @CreatedOn, @SiteId) ";
 #endif
 
     }

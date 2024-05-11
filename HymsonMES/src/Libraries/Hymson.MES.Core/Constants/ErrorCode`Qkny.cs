@@ -228,7 +228,7 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 载具中条码系统不存在
         /// </summary>
-        public const string MES45112 = "载具在条码系统不存在";
+        public const string MES45112 = "载具中条码在系统中不存在";
 
         /// <summary>
         /// 载具中条码数量和数据库中不匹配

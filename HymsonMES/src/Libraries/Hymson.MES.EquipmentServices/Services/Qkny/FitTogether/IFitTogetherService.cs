@@ -55,5 +55,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         /// <param name="dto"></param>
         /// <returns></returns>
         Task CollingPolarAsync(CollingPolarDto dto);
+
+        /// <summary>
+        /// 生成24位国标电芯码
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<string> Create24GbCodeAsync(GenerateDxSfcDto dto);
     }
 }

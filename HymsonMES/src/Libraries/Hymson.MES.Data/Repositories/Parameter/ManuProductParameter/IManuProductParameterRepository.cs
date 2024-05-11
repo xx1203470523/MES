@@ -66,5 +66,13 @@ namespace Hymson.MES.Data.Repositories.Parameter
         /// <returns></returns>
         string PrepareProductParameterProcedureIdTableSql(long siteId, long procedureId);
 
+        /// <summary>
+        /// 获取参数表名
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="procedureId"></param>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        List<string> GetParamTableName(long siteId, long procedureId, string sfc);
     }
 }

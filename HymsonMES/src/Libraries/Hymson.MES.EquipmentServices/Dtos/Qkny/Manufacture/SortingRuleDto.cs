@@ -11,6 +11,9 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
     /// </summary>
     public record SortingRuleDto : QknyBaseDto
     {
-
+        /// <summary>
+        /// 电芯条码
+        /// </summary>
+        public string Sfc { get; set; } = string.Empty;
     }
 }

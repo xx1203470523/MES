@@ -22,5 +22,12 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <param name="bo"></param>
         /// <returns></returns>
         Task<int> ProductProcessCollectAsync(ProductProcessParameterBo bo);
+
+        /// <summary>
+        /// 参数采集（产品过程参数）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<int> ProductProcessCollectAsync(ProductParameterCollectBo bo);
     }
 }

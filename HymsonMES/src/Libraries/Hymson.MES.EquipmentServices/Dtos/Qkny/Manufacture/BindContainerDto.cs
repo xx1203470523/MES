@@ -20,6 +20,12 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// 托盘条码列表
         /// </summary>
         public List<ContainerSfcDto> ContainerSfcList { get; set; } = new List<ContainerSfcDto>();
+
+        /// <summary>
+        /// 操作类型
+        /// 0-无操作 1-进站 2-出站 3-进出站
+        /// </summary>
+        public int OperationType { get; set; } = 0;
     }
 
     /// <summary>

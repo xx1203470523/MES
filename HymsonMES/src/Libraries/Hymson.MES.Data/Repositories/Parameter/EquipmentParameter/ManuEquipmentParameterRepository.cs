@@ -68,6 +68,19 @@ namespace Hymson.MES.Data.Repositories.Parameter
         }
 
         /// <summary>
+        /// 获取表名
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="equipmentId"></param>
+        /// <returns></returns>
+        public async Task<string> GetParamTableName(long siteId, long equipmentId)
+        {
+            var key = CalculateCrc32($"{siteId}{equipmentId}");
+
+            return $"{EquipmentParameter.EquipmentParameterPrefix}{key % _parameterOptions.ParameterDelivery}";
+        }
+
+   /// <summary>
         /// 根据设备Id获取参数信息
         /// </summary>
         /// <param name="pagedQuery"></param>
@@ -112,7 +125,6 @@ namespace Hymson.MES.Data.Repositories.Parameter
             var totalCount = await totalCountTask;
             return new PagedInfo<EquipmentParameterEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
         #region 内部方法
         /// <summary>
         /// 更具设备编码获取表名

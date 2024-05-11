@@ -29,6 +29,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAsync(IEnumerable<ManuSFCNodeDestinationEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteSql, entities);
+        }
+
+        /// <summary>
         /// 查询树数据的List
         /// </summary>
         /// <param name="query"></param>
@@ -93,6 +104,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_destination /**where**/  ";
 
 #if DM
+        const string InsertsSql = "INSERT INTO manu_sfc_node_destination(`Id`, CirculationId, `NodeId`, `DestinationId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @DestinationId, @CreatedBy, @CreatedOn, @SiteId) ";
+#else
+        const string InsertsSql = "REPLACE INTO manu_sfc_node_destination(`Id`, CirculationId, `NodeId`, `DestinationId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @DestinationId, @CreatedBy, @CreatedOn, @SiteId) ";
+#endif
+
+        const string DeleteSql = "DELETE FROM manu_sfc_node_destination WHERE NodeId = @NodeId AND DestinationId = @DestinationId; ";
+
+#if DM
         const string GetTreeEntitiesSql = @"WITH RECURSIVE CTE (CirculationId, NodeId, DestinationId) AS (
               SELECT CirculationId, NodeId, DestinationId
               FROM manu_sfc_node_destination
@@ -104,7 +123,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             )
             SELECT * FROM CTE;";
 
-        const string InsertsSql = "MERGE INTO manu_sfc_node_destination t " +
+        const string MergeSql = "MERGE INTO manu_sfc_node_destination t " +
             "USING (SELECT @NodeId AS NodeId, @DestinationId AS DestinationId FROM dual) s " +
             "ON (t.NodeId = s.NodeId AND t.DestinationId = s.DestinationId) " +
             "WHEN MATCHED THEN " +
@@ -129,7 +148,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             )
                             SELECT * FROM CTE;";
 
-        const string InsertsSql = "REPLACE INTO manu_sfc_node_destination(`Id`, CirculationId, `NodeId`, `DestinationId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @DestinationId, @CreatedBy, @CreatedOn, @SiteId) ";
 #endif
 
     }

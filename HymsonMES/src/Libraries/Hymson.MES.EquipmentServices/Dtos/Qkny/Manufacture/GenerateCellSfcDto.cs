@@ -21,4 +21,15 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// </summary>
         public int Qty { get; set; } = 10;
     }
+
+    /// <summary>
+    /// 电芯码下发
+    /// </summary>
+    public record GenerateDxSfcDto : QknyBaseDto
+    {
+        /// <summary>
+        /// 极组条码
+        /// </summary>
+        public string Sfc { get; set; } = string.Empty;
+    }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
@@ -26,6 +27,7 @@ namespace Hymson.MES.Equipment.Api
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
+            MemoryCacheExtensions.EnableCache = false;
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.

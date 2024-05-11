@@ -36,6 +36,10 @@ using Hymson.MES.Services.Dtos.EquProcessParamRecord;
 using Hymson.MES.Services.Services.EquProcessParamRecord;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Services.EquProductParamRecord;
+using Hymson.MES.Services.Services.EquOpenParamRecord;
+using Hymson.MES.Services.Dtos.EquOpenParamRecord;
+using Hymson.MES.CoreServices.Services.Parameter;
+using Hymson.MES.CoreServices.Bos.Parameter;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
 {
@@ -164,6 +168,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         private readonly IEquProductParamRecordService _equProductParamRecordService;
 
         /// <summary>
+        /// 开机参数
+        /// </summary>
+        private readonly IEquOpenParamRecordService _equOpenParamRecordService;
+
+        /// <summary>
+        /// 参数收集
+        /// </summary>
+        private readonly IManuProductParameterService _manuProductParameterService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public EquCommonService(
@@ -179,6 +193,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             IProcEquipmentGroupParamService procEquipmentGroupParamService,
             IEquProcessParamRecordService equProcessParamRecordService,
             IEquProductParamRecordService equProductParamRecordService,
+            IEquOpenParamRecordService equOpenParamRecordService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto,
             AbstractValidator<HeartbeatDto> validationHeartbeatDto,
             AbstractValidator<StateDto> validationStateDto,
@@ -189,7 +204,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             AbstractValidator<GetRecipeDetailDto> validationGetRecipeDetailDto,
             AbstractValidator<RecipeDto> validationRecipeDto,
             AbstractValidator<EquipmentProcessParamDto> validationEquipmentProcessParamDto,
-            AbstractValidator<ProductParamDto> validationProductParamDto)
+            AbstractValidator<ProductParamDto> validationProductParamDto,
+            IManuProductParameterService manuProductParameterService)
         {
             _equEquipmentService = equEquipmentService;
             _equEquipmentVerifyRepository = equEquipmentVerifyRepository;
@@ -203,6 +219,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             _procEquipmentGroupParamService = procEquipmentGroupParamService;
             _equProcessParamRecordService = equProcessParamRecordService;
             _equProductParamRecordService = equProductParamRecordService;
+            _equOpenParamRecordService = equOpenParamRecordService;
             //验证器
             _validationOperationLoginDto = validationOperationLoginDto;
             _validationHeartbeatDto = validationHeartbeatDto;
@@ -215,6 +232,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             _validationRecipeDto = validationRecipeDto;
             _validationEquipmentProcessParamDto = validationEquipmentProcessParamDto;
             _validationProductParamDto = validationProductParamDto;
+            _manuProductParameterService = manuProductParameterService;
         }
 
         /// <summary>
@@ -428,7 +446,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         }
 
         /// <summary>
-        /// 获取开机参数列表
+        /// 获取开机参数列表007
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -436,7 +454,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationGetRecipeListDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 获取数据
             ProcEquipmentGroupParamEquProductQuery query = new ProcEquipmentGroupParamEquProductQuery();
             query.EquipmentId = equResModel.EquipmentId;
@@ -456,7 +474,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         }
 
         /// <summary>
-        /// 获取开机参数明细
+        /// 获取开机参数明细008
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -484,7 +502,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
                     RecipeParamDto param = new RecipeParamDto();
                     param.ParamUpper = item.MaxValue == null ? "" : item.MaxValue.ToString();
                     param.ParamLower = item.MinValue == null ? "" : item.MinValue.ToString();
+                    param.ParamValue = item.CenterValue == null ? "" : item.CenterValue.ToString();
                     param.ParamCode = item.ParameterCode;
+                    param.ParamName = item.ParameterName;
                     result.ParamList.Add(param);
                 }
             }
@@ -493,7 +513,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         }
 
         /// <summary>
-        /// 开机参数校验
+        /// 开机参数校验009
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -501,7 +521,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationRecipeDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 参数上下限校验
             //暂不加
             //3. 版本校验
@@ -511,6 +531,31 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             query.Version = dto.Version;
             query.MaterialCode = dto.ProductCode;
             var entity = await _procEquipmentGroupParamService.GetEntityByCodeVersion(query);
+            //4. 记录
+            List<EquOpenParamRecordSaveDto> saveDtoList = new List<EquOpenParamRecordSaveDto>();
+            foreach (var item in dto.ParamList)
+            {
+                EquOpenParamRecordSaveDto saveDto = new EquOpenParamRecordSaveDto();
+                saveDto.ParamCode = item.ParamCode;
+                saveDto.ParamValue = item.ParamValue;
+                saveDtoList.Add(saveDto);
+            }
+            long bitchId = IdGenProvider.Instance.CreateId();
+            saveDtoList.ForEach(m =>
+            {
+                m.SiteId = equResModel.SiteId;
+                m.EquipmentId = equResModel.EquipmentId;
+                m.CreatedOn = HymsonClock.Now();
+                m.CreatedBy = dto.EquipmentCode;
+                m.UpdatedOn = m.CreatedOn;
+                m.UpdatedBy = m.CreatedBy;
+                m.CollectionTime = m.CreatedOn;
+                m.BatchId = bitchId;
+                m.RecipeId = entity.Id;
+            });
+
+            //5. 数据库操作
+            await _equOpenParamRecordService.AddMultAsync(saveDtoList);
         }
 
         /// <summary>
@@ -556,33 +601,27 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             await _validationProductParamDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
-            //2. 出站参数
-            List<EquProductParamRecordSaveDto> saveDtoList = new List<EquProductParamRecordSaveDto>();
-            foreach (var item in dto.SfcList)
+            //2. 产品过程参数
+            ProductParameterCollectBo parameterCollectBo = new()
             {
-                List<EquProductParamRecordSaveDto> sfcParamList = new List<EquProductParamRecordSaveDto>();
-                foreach (var sfcItem in item.ParamList)
+                SiteId = equResModel.SiteId,
+                UserName = equResModel.EquipmentCode,
+                Time = HymsonClock.Now(),
+                ProcedureId = equResModel.ProcedureId,
+                ResourceId = equResModel.ResId,
+                SFCList = dto.SfcList.Select(x => new ProductParameterCollectInfo
                 {
-                    EquProductParamRecordSaveDto saveDto = new EquProductParamRecordSaveDto();
-                    saveDto.ParamCode = sfcItem.ParamCode;
-                    saveDto.ParamValue = sfcItem.ParamValue;
-                    saveDto.CollectionTime = sfcItem.CollectionTime;
-                    sfcParamList.Add(saveDto);
-                }
-                sfcParamList.ForEach(m =>
-                {
-                    m.SiteId = equResModel.SiteId;
-                    m.Sfc = item.Sfc;
-                    m.EquipmentId = equResModel.EquipmentId;
-                    m.CreatedOn = HymsonClock.Now();
-                    m.CreatedBy = dto.EquipmentCode;
-                    m.UpdatedOn = m.CreatedOn;
-                    m.UpdatedBy = m.CreatedBy;
-                });
-                saveDtoList.AddRange(sfcParamList);
-            }
-            //3. 出站
-            await _equProductParamRecordService.AddMultAsync(saveDtoList);
+                    SFC = x.Sfc,
+                    Parameters = x.ParamList.Select(z => new ProductParameterBo
+                    {
+                        ParameterCode = z.ParamCode,
+                        ParameterValue = z.ParamValue,
+                        CollectionTime = z.CollectionTime
+                    })
+                })
+            };
+
+            await _manuProductParameterService.ProductProcessCollectAsync(parameterCollectBo);
         }
 
         /// <summary>
@@ -593,18 +632,26 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         /// <returns></returns>
         public async Task ProductParamSameMultSfcAsync(ProductParamSameMultSfcDto dto)
         {
-            await ProductParamAsync(new ProductParamDto
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            //2. 产品过程参数
+            var parameterBo = new ProductProcessParameterBo
             {
-                EquipmentCode = dto.EquipmentCode,
-                ResourceCode = dto.ResourceCode,
-                LocalTime = dto.LocalTime,
-                SfcList = dto.SfcList.Select(item => new ProductParamSfcDto
+                SiteId = equResModel.SiteId,
+                UserName = equResModel.EquipmentCode,
+                Time = HymsonClock.Now(),
+                ProcedureId = equResModel.ProcedureId,
+                ResourceId = equResModel.ResId,
+                SFCs = dto.SfcList,
+                Parameters = dto.ParamList.Select(x => new ProductParameterBo
                 {
-                    Sfc = item,
-                    ParamList = dto.ParamList,
-                }).ToList()
-            });
+                    ParameterCode = x.ParamCode,
+                    ParameterValue = x.ParamValue,
+                    CollectionTime = x.CollectionTime
+                })
+            };
 
+            await _manuProductParameterService.ProductProcessCollectAsync(parameterBo);
         }
 
 

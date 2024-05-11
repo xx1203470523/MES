@@ -83,20 +83,20 @@ namespace Hymson.MES.CoreServices.Services.Parameter
 
             foreach (var parameter in bo.Parameters)
             {
-                var parameterEntity = parameterEntities.FirstOrDefault(x => x.ParameterCode == parameter.ParameterCode);
-                if (parameterEntity == null)
-                {
-                    errorParameter.Add(parameter.ParameterCode);
-                    continue;
-                }
+                var parameterEntity = parameterEntities.FirstOrDefault(x => parameter.ParameterCode.Equals(x.ParameterCode, StringComparison.OrdinalIgnoreCase));
+                //if (parameterEntity == null)
+                //{
+                //    errorParameter.Add(parameter.ParameterCode);
+                //    continue;
+                //}
 
                 list.AddRange(bo.SFCs.Select(SFC => new ManuProductParameterEntity
                 {
                     ProcedureId = bo.ProcedureId,
                     SFC = SFC,
-                    ParameterId = parameterEntity.Id,
+                    ParameterId = parameterEntity?.Id ?? 0,
                     ParameterValue = parameter.ParameterValue,
-                    CollectionTime = bo.Time,
+                    CollectionTime = parameter.CollectionTime,
                     SiteId = bo.SiteId,
                     CreatedBy = bo.UserName,
                     UpdatedBy = bo.UserName,
@@ -108,8 +108,58 @@ namespace Hymson.MES.CoreServices.Services.Parameter
 
             if (errorParameter.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19601))
+                throw new CustomerValidationException(nameof(ErrorCode.MES19606))
                     .WithData("ParameterCodes", string.Join(",", errorParameter));
+            }
+
+            using var trans = TransactionHelper.GetTransactionScope();
+            var row = await _manuProductParameterRepository.InsertRangeAsync(list);
+            trans.Complete();
+            return row;
+        }
+
+        /// <summary>
+        /// 参数采集（产品过程参数）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<int> ProductProcessCollectAsync(ProductParameterCollectBo bo)
+        {
+            //校验参数是否存在
+            var parameterCodes = bo.SFCList.SelectMany(x => x.Parameters).Select(x => x.ParameterCode.ToUpper()).Distinct();
+            var parameterEntities = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
+            {
+                SiteId = bo.SiteId,
+                Codes = parameterCodes
+            });
+            //if (parameterEntities == null || !parameterEntities.Any())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19606)).WithData("ParameterCodes", string.Join(",", parameterCodes));
+            //}
+            //var noExistCodes = parameterCodes.Except(parameterEntities.Select(x => x.ParameterCode.ToUpper()));
+            //if (noExistCodes != null && noExistCodes.Any())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19606)).WithData("ParameterCodes", string.Join(",", noExistCodes));
+            //}
+
+            List<ManuProductParameterEntity> list = new();
+
+            foreach (var item in bo.SFCList)
+            {
+                list.AddRange(item.Parameters.Select(parameter => new ManuProductParameterEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = bo.SiteId,
+                    ProcedureId = bo.ProcedureId,
+                    SFC = item.SFC,
+                    ParameterId = parameterEntities.FirstOrDefault(x => parameter.ParameterCode.Equals(x.ParameterCode, StringComparison.OrdinalIgnoreCase))?.Id ?? 0,
+                    ParameterValue = parameter.ParameterValue,
+                    CollectionTime = parameter.CollectionTime,
+                    CreatedBy = bo.UserName,
+                    UpdatedBy = bo.UserName,
+                    CreatedOn = bo.Time,
+                    UpdatedOn = bo.Time
+                }));
             }
 
             using var trans = TransactionHelper.GetTransactionScope();

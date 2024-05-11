@@ -1,7 +1,9 @@
-﻿using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
+﻿using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ToolBindMaterial;
+using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -135,5 +137,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task SortingOutboundAsync(SortingOutboundDto dto);
+
+        /// <summary>
+        /// 获取设备token
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<string> GetEquTokenAsync(QknyBaseDto dto);
     }
 }

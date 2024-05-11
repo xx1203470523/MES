@@ -238,7 +238,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 var stepEntity = new ManuSfcStepEntity
                 {
                     // 插入 manu_sfc_step 状态为出站（默认值）
-                    Operatetype = ManuSfcStepTypeEnum.OutStock,
+                    Operatetype = ManuSfcStepTypeEnum.Storeup,
                     CurrentStatus = currentStatus,
                     AfterOperationStatus = sfcProduceEntity.Status,
                     Id = IdGenProvider.Instance.CreateId(),

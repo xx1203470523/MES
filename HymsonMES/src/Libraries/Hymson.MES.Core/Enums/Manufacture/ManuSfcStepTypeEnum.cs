@@ -253,6 +253,12 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 让步接收
         /// </summary>
         [Description("让步接收")]
-        Compromise = 47
+        Compromise = 47,
+
+        /// <summary>
+        /// 让步接收
+        /// </summary>
+        [Description("入库存")]
+        Storeup = 48
     }
 }
