@@ -123,5 +123,12 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="adjustDto"></param>
         /// <returns></returns>
         Task<string> BarcodeSplitAdjustAsync(MaterialBarCodeSplitAdjustDto adjustDto);
+
+        /// <summary>
+        /// 物料合并
+        /// </summary>
+        /// <param name="adjustDto"></param>
+        /// <returns></returns>
+        Task<string> BarcodeMergeAdjustAsync(MaterialBarCodeMergeAdjust adjustDto);
     }
 }

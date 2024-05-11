@@ -112,9 +112,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select(@" wmi.Id, wmi.MaterialBarCode,wmi.Batch, wmi.QuantityResidue,wmi.DueDate,wmi.Source,wmi.CreatedOn,wmi.Status,
-                                pm.Unit, pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName");
+                                pm.Unit, pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName,pwo.OrderCode as WorkOrderCode");
             sqlBuilder.LeftJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
             sqlBuilder.LeftJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
+            sqlBuilder.LeftJoin(" plan_work_order pwo ON  pwo.Id= wmi.WorkOrderId");
             sqlBuilder.Where(" wmi.IsDeleted = 0");
             sqlBuilder.Where(" wmi.SiteId=@SiteId");
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
@@ -124,6 +125,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                 whMaterialInventoryPagedQuery.Batch = whMaterialInventoryPagedQuery.Batch;
                 sqlBuilder.Where(" wmi.Batch = @Batch");
             }
+            if (whMaterialInventoryPagedQuery.WorkOrderId.HasValue)
+            {
+                whMaterialInventoryPagedQuery.WorkOrderId = whMaterialInventoryPagedQuery.WorkOrderId;
+                sqlBuilder.Where(" wmi.WorkOrderId = @WorkOrderId");
+            }            
+
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialBarCode))
             {
                 whMaterialInventoryPagedQuery.MaterialBarCode = $"%{whMaterialInventoryPagedQuery.MaterialBarCode}%";

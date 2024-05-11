@@ -854,6 +854,7 @@
 
         public const string MES15125 = " 拆分数量不能为空";
         public const string MES15126 = "待拆分数量不能大于原始数量";
+        public const string MES15127 = "物料码只有一条，无法进行合并操作";
         #endregion
 
         #region 物料台账 15200

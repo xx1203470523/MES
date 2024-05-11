@@ -73,6 +73,10 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 批次
         /// </summary>
         public string? Batch { get; set; }
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string? WorkOrderCode { get; set; }
 
         /// <summary>
         /// 数量（剩余）
@@ -456,6 +460,10 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public IEnumerable<string>? MaterialBarCodes { get; set; }
         /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string? MaterialCode { get; set; } = "";
@@ -554,5 +562,27 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+    }
+
+    /// <summary>
+    /// 物料合并
+    /// </summary>
+    public record MaterialBarCodeMergeAdjust : BaseEntityDto
+    {
+        /// <summary>
+        /// 待合并的条码
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
+
+        /// <summary>
+        /// 指定合条码
+        /// </summary>
+        public string? MergeSFC { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
     }
 }
