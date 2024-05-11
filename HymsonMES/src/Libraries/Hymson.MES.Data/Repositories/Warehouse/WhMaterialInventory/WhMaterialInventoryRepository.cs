@@ -129,6 +129,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                 whMaterialInventoryPagedQuery.MaterialBarCode = $"%{whMaterialInventoryPagedQuery.MaterialBarCode}%";
                 sqlBuilder.Where(" wmi.MaterialBarCode like @MaterialBarCode");
             }
+            if (whMaterialInventoryPagedQuery.MaterialBarCodes != null && whMaterialInventoryPagedQuery.MaterialBarCodes.Any())
+            {
+                sqlBuilder.Where(" wmi.MaterialBarCode IN @MaterialBarCodes");
+            }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialCode))
             {
                 whMaterialInventoryPagedQuery.MaterialCode = $"%{whMaterialInventoryPagedQuery.MaterialCode}%";
@@ -263,8 +267,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> UpdatePointByBarCodeRangeAsync(IEnumerable<UpdateStatusByBarCodeCommand> commands)
         {
+
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpPointByBarCodeSql, commands);
+
         }
 
         /// <summary>
@@ -276,6 +282,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpQuantityByBarCodeSql, commands);
+        }
+
+
+        /// <summary>
+        /// 更新状态（批量--不操作数量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns> 
+        public async Task<int> UpdateStatusByBarCodesAsync(IEnumerable<UpdateStatusByBarCodeCommand> commands)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpStatusByBarCodeSql, commands);
         }
 
         /// <summary>
@@ -505,8 +523,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateReduceQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue - @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
 #endif
 
-
+         
         const string UpPointByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpStatusByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET QuantityResidue = 0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE SiteId = @SiteId AND MaterialBarCode IN @BarCodeList";
         const string UpdateWhMaterialInventoryEmptyByIdSql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id = @Id ";

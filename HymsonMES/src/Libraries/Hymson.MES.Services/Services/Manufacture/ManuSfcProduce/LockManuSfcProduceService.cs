@@ -898,7 +898,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 //更新库存状态
-                await _whMaterialInventoryRepository.UpdatePointByBarCodeRangeAsync(updateStatusByBarCodeList);
+                await _whMaterialInventoryRepository.UpdateStatusByBarCodesAsync(updateStatusByBarCodeList);
 
                 //添加台账
                 await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookList);
@@ -909,7 +909,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     //物料库存状态
                     if (updateStatusByBarCodeRelationList.Any())
                     {
-                        await _whMaterialInventoryRepository.UpdatePointByBarCodeRangeAsync(updateStatusByBarCodeRelationList);
+                        await _whMaterialInventoryRepository.UpdateStatusByBarCodesAsync(updateStatusByBarCodeRelationList);
                     }
 
                     //添加台账
@@ -1099,7 +1099,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 //更新库存状态
-                await _whMaterialInventoryRepository.UpdatePointByBarCodeRangeAsync(updateStatusByBarCodeList);
+                await _whMaterialInventoryRepository.UpdateStatusByBarCodesAsync(updateStatusByBarCodeList);
 
                 //添加台账
                 await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookList);
