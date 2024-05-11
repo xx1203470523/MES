@@ -135,6 +135,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     Sfcs = param.Barcodes,
                     ProductId = productId,
                     WorkOrderId = workorderId,
+                    InteWorkCenterId = firstsfcproduce.WorkCenterId,
                     UserName = updateName,
 
                 });
@@ -146,7 +147,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 {
                     targetSFC = barcodes.First();
                 }
-                
+
+                if (targetSFC.Length != 24)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16512)).WithData("SFC", targetSFC);
+                }
               
                 using var trans = TransactionHelper.GetTransactionScope();
                 
@@ -201,7 +206,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     ProductBOMId = firstsfcproduce.ProductBOMId,
                     Qty = firstsfcproduce.Qty,
                     ProcedureId = firstsfcproduce.Id,
-                    Status = SfcStatusEnum.Activity,
+                    Status = SfcStatusEnum.lineUp,
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
                     CreatedBy = updateName,
