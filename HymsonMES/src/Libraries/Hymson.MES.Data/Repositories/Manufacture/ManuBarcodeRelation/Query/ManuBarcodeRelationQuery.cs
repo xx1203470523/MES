@@ -23,4 +23,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         /// </summary>
         public TrueOrFalseEnum? IsDisassemble { get; set; }
     }
+
+    /// <summary>
+    /// 组件配置表 查询参数
+    /// </summary>
+    public class ManuComponentBarcodeRelationQuery
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 是否拆解(0:未拆解，1：拆解)
+        /// </summary>
+        public SFCCirculationReportTypeEnum IsDisassemble { get; set; }
+    }
 }

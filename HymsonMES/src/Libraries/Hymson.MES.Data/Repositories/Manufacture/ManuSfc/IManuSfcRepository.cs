@@ -55,6 +55,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcView>> GetManuSfcInfoEntitiesAsync(ManuSfcStatusQuery param);
 
         /// <summary>
+        /// 查询所有条码信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcView>> GetAllManuSfcInfoEntitiesAsync(ManuSfcStatusQuery param);
+
+        /// <summary>
         /// 批量更新条码状态
         /// </summary>
         /// <param name="manuSfcInfoEntity"></param>

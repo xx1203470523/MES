@@ -279,4 +279,116 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long CirculationMainProductId { get; set; }
         public string CirculationBarCode { get; set; }
     }
+
+    /// <summary>
+    /// 组件配置信息
+    /// </summary>
+    public class InProductDismantleComponentDto
+    {
+        /// <summary>
+        /// 组件信息
+        /// </summary>
+        public List<InProductDismantleInfoDto> InProductDismantleInfoDtos { get; set; }
+
+        /// <summary>
+        /// 物料主信息
+        /// </summary>
+        public ManuProcMaterialViewDto ManuProcMaterial { get; set; }
+    }
+
+    public class InProductDismantleInfoDto
+    {
+        /// <summary>
+        /// Bom详情表id
+        /// </summary>
+        public long BomDetailId { get; set; }
+
+        /// <summary>
+        /// 用量
+        /// </summary>
+        public decimal Usages { get; set; }
+
+        /// <summary>
+        /// 已装配数量
+        /// </summary>
+        public decimal AssembleCount { get; set; }
+
+        /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 数据收集方式
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// bom描述信息
+        /// </summary>
+        public string BomRemark { get; set; }
+
+        /// <summary>
+        /// 组件信息
+        /// </summary>
+        public List<ManuSfcChildCirculationDto> Children { get; set; }
+    }
+
+
+    /// <summary>
+    /// 组件配置物料返回实体
+    /// </summary>
+    public class ManuProcMaterialViewDto
+    {
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 物料条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+    }
 }
