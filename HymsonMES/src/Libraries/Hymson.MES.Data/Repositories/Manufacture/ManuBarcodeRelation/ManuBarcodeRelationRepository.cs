@@ -115,6 +115,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<IEnumerable<ManuBarCodeRelationEntity>> GetEntitiesAsync(ManuBarcodeRelationQuery query)
         {
             var sqlBuilder = new SqlBuilder();
+
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted = 0");
+
+            if (query.InputBarCodes != null && query.InputBarCodes.Any())
+            {
+                sqlBuilder.Where("InputBarCode IN @InputBarCodes");
+            }
+            if (query.IsDisassemble.HasValue)
+            {
+                sqlBuilder.Where("IsDisassemble=@IsDisassemble");
+            }
+
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuBarCodeRelationEntity>(template.RawSql, query);

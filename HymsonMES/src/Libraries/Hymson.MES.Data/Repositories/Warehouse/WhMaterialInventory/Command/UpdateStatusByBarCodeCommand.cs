@@ -19,6 +19,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command
         public decimal Quantity { get; set; }
 
         /// <summary>
+        /// 数量（上料/卸料）
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
         /// ID集合（备件）
         /// </summary>
         public WhMaterialInventoryStatusEnum Status { get; set; }

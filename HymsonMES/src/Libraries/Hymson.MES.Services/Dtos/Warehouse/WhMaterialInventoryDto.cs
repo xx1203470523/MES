@@ -454,6 +454,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 物料条码
         /// </summary>
         public string? MaterialBarCode { get; set; }
+
+        /// <summary>
+        /// 物料条码(多个)
+        /// </summary>
+        public IEnumerable<string>? MaterialBarCodes { get; set; }
         /// <summary>
         /// 工单Id
         /// </summary>
@@ -512,7 +517,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     /// <summary>
     /// 修改外部来源的库存
     /// </summary>
-    public class OutsideWhMaterialInventoryModifyDto 
+    public class OutsideWhMaterialInventoryModifyDto
     {
         public long Id { get; set; }
 

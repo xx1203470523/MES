@@ -163,6 +163,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 
         private readonly IInteVehicleRepository _inteVehicleRepository;
 
+
+        /// <summary>
+        /// 条码信息表  仓储
+        /// </summary> 
+        private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
+
+        /// <summary>
+        /// 条码流转信息表  仓储
+        /// </summary> 
+        private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
+
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -221,7 +233,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,
             IManuDowngradingRepository manuDowngradingRepository,
             IManuSfcScrapRepository manuSfcScrapRepository, IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
-            IInteVehicleRepository inteVehicleRepository)
+            IInteVehicleRepository inteVehicleRepository, IManuSfcCirculationRepository manuSfcCirculationRepository, IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -252,6 +264,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
             _inteVehicleRepository = inteVehicleRepository;
+            _manuSfcCirculationRepository = manuSfcCirculationRepository;
+            _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
         }
 
         /// <summary>
