@@ -532,7 +532,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
          
         const string UpPointByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
-        const string UpStatusByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpStatusByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode = @BarCode; ";
         const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET QuantityResidue = 0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE SiteId = @SiteId AND MaterialBarCode IN @BarCodeList";
         const string UpdateWhMaterialInventoryEmptyByIdSql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id = @Id ";

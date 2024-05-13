@@ -735,6 +735,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                             {
                                 BarCode = item.OutputBarCode,
                                 Status = WhMaterialInventoryStatusEnum.Locked,
+                                SiteId = siteId,
                                 UpdatedBy = _currentUser.UserName,
                                 UpdatedOn = HymsonClock.Now()
                             };
@@ -861,6 +862,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 {
                     BarCode = item.MaterialBarCode,
                     Status = WhMaterialInventoryStatusEnum.Locked,
+                    SiteId = siteId,
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 };
@@ -1062,6 +1064,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 {
                     BarCode = item.MaterialBarCode,
                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                    SiteId = siteId,
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 };
