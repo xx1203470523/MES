@@ -898,23 +898,19 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 try
                 {
-                    //MANUSFC
+                    //更新其它SFC MANUSFC
                     if (updateSFCOtherCommand != null)
                     {
-                        var row = await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(updateSFCOtherCommand);
-                        if (row == 0)
-                        {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES12832));
-                        }
+                        await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(updateSFCOtherCommand);
                     }
-
+                    //更新指定SFC
                     if (updateSFCSpecifyCommand.SFCs != null)
                     {
-                        var row = await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(updateSFCSpecifyCommand);
-                        if (row == 0)
-                        {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES12832));
-                        }
+                        await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(updateSFCSpecifyCommand);
+                        //if (row == 0)
+                        //{
+                        //    throw new CustomerValidationException(nameof(ErrorCode.MES12832));
+                        //}
                     }
 
                     //INVENTORY UPDATE
