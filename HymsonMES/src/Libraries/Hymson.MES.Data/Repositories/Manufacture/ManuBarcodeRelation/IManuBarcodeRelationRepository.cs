@@ -80,5 +80,26 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<PagedInfo<ManuBarCodeRelationEntity>> GetPagedListAsync(ManuBarcodeRelationPagedQuery pagedQuery);
 
+
+        /// <summary>
+        /// 根据条码获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuBarCodeRelationEntity>> GetSfcMoudulesAsync(ManuComponentBarcodeRelationQuery query);
+
+        /// <summary>
+        /// 查询条码
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuBarCodeRelationEntity>> GetManuBarCodeRelationEntitiesAsync(ManuSfcProduceQuery query);
+
+        /// <summary>
+        /// 条码关系拆解
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> ManuBarCodeRelationUpdateAsync(DManuBarCodeRelationCommand command);
     }
 }

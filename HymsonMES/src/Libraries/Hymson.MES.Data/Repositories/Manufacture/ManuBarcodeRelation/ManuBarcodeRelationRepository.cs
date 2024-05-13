@@ -1,6 +1,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
@@ -162,6 +163,70 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return new PagedInfo<ManuBarCodeRelationEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+
+        /// <summary>
+        /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuBarCodeRelationEntity>> GetSfcMoudulesAsync(ManuComponentBarcodeRelationQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted = 0");
+
+            if (!string.IsNullOrWhiteSpace(query.Sfc))
+            {
+                sqlBuilder.Where("OutputBarCode = @Sfc");
+            }
+
+            if (query.IsDisassemble == SFCCirculationReportTypeEnum.Activity || query.IsDisassemble == SFCCirculationReportTypeEnum.Remove)
+            {
+                sqlBuilder.Where("IsDisassemble = @IsDisassemble");
+            }
+
+            sqlBuilder.AddParameters(query);
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuBarCodeRelationEntity>(templateData.RawSql, templateData.Parameters);
+        }
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuBarCodeRelationEntity>> GetManuBarCodeRelationEntitiesAsync(ManuSfcProduceQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted = 0");
+
+            if (query.Sfcs != null && query.Sfcs.Any())
+            {
+                sqlBuilder.Where("OutputBarCode in @Sfcs");
+            }
+            using var conn = GetMESDbConnection();
+            var manuSfcProduceEntities = await conn.QueryAsync<ManuBarCodeRelationEntity>(template.RawSql, query);
+            return manuSfcProduceEntities;
+        }
+
+        /// <summary>
+        /// 条码关系表拆解移除
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> ManuBarCodeRelationUpdateAsync(DManuBarCodeRelationCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DisassemblyUpdateSql, command);
+        }
     }
 
 
@@ -185,6 +250,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetByIdSql = @"SELECT * FROM manu_barcode_relation WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_barcode_relation WHERE Id IN @Ids ";
+
+        const string DisassemblyUpdateSql = "UPDATE manu_barcode_relation SET " +
+          "RelationType = @RelationType, IsDisassemble = @IsDisassemble," +
+          "DisassembledBy = @UserId, DisassembledOn = @UpdatedOn, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id = @Id AND IsDisassemble <> @IsDisassemble ";
 
     }
 }
