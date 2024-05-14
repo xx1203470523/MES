@@ -108,6 +108,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
         /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParameterName { get; set; }
+
+        /// <summary>
         /// 参数单位
         /// </summary>
         public string? ParameterUnit { get; set; }
