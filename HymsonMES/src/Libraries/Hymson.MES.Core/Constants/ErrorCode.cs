@@ -561,6 +561,18 @@
         public const string MES12128 = "存在已被其他产线关联的资源{ResourceCodes}！";
         #endregion
 
+
+        #region 设备点检 模板12200
+        public const string MES12200 = "设备点检模板错误";
+        public const string MES12201 = "模板{Code}已启用，不允许删除"; 
+        #endregion
+
+
+        #region 设备点检 计划12300 
+        public const string MES12300 = "设备点检计划错误";
+
+        #endregion
+
         #region 编码规则 12400
         public const string MES12400 = "代码规则维护错误";
         public const string MES12401 = "代码规则中同样物料Id[{productId}],编码类型已经存在";

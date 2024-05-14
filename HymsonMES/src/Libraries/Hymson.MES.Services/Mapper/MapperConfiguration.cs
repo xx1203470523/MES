@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.EquSpotcheckTemplate;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
@@ -27,6 +28,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.Inte;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
@@ -68,6 +70,7 @@ using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseRegion.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseShelf.Query;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.MES.Services.Dtos.Inte;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -241,6 +244,14 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSparePartsSaveDto, EquSparePartsEntity>();
             CreateMap<EquSparePartsPagedQueryDto, EquSparePartsPagedQuery>();
             CreateMap<EquSparePartsEntity, EquSparePartsDto>();
+            #endregion
+
+
+            #region EquSpotcheckTemplate
+            CreateMap<EquSpotcheckTemplateCreateDto, EquSpotcheckTemplateEntity>();
+            CreateMap<EquSpotcheckTemplateModifyDto, EquSpotcheckTemplateEntity>();
+            CreateMap<EquSpotcheckTemplatePagedQueryDto, EquSpotcheckTemplatePagedQuery>();
+            CreateMap<EquSpotcheckTemplateEntity, EquSpotcheckTemplateDto>();
             #endregion
 
         }
