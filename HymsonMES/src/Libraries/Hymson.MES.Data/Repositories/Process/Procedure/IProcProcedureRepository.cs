@@ -136,5 +136,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<ProcProcedureEntity> GetEntitieAsync(ProcProcedureQuery query);
 
+        /// <summary>
+        /// 根据资源类型ID获取工序Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureEntity>> GetProcProcedureByResourceTypeIdAsync(long resourceTypeId);
+
     }
 }
