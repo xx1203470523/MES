@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Force.Crc32;
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
@@ -230,6 +231,79 @@ namespace Hymson.MES.Data.Repositories.Parameter
                 GetTableNameByProcedureId(siteId,procedureId)
             };
             return sfcList;
+        }
+
+        /// <summary>
+        /// 根据工序或者条码分页查询产品参数
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuProductParameterEntity>> GetParametesEntitiesAsync(ManuProductParameterPagedQuery pagedQuery)
+        {
+            var procedureId = pagedQuery.ProcedureId ?? 0;
+            var sfc = pagedQuery.Sfc ?? "";
+            var tableName = "";
+            if (procedureId > 0)
+            {
+                tableName = GetTableNameByProcedureId(pagedQuery.SiteId, procedureId);
+            }
+            else
+            {
+                tableName = GetTableNameBySFC(pagedQuery.SiteId, sfc);
+            }
+
+            var sqlBuilder = new SqlBuilder();
+            string getByEquipmentSql = $"SELECT Id, SiteId, SFC, ProcedureId,ParameterId,ParameterValue,CollectionTime,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM {tableName} /**where**/ order by Id DESC LIMIT @Offset,@Rows ";
+            string getByEquipmentCountSql = $"select count(1) from {tableName} /**where**/";
+            var templateData = sqlBuilder.AddTemplate(getByEquipmentSql);
+            var templateCount = sqlBuilder.AddTemplate(getByEquipmentCountSql);
+
+            pagedQuery.ProcedureId = procedureId;
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            //工序
+            if (procedureId > 0)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
+            }
+
+            //条码
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Sfc))
+            {
+                sqlBuilder.Where("SFC=@SFC");
+            }
+
+            //参数
+            if (pagedQuery.ParameterId.HasValue)
+            {
+                sqlBuilder.Where("ParameterId=@ParameterId ");
+            }
+
+            //条码列表
+            if (pagedQuery.Sfcs != null && pagedQuery.Sfcs.Any())
+            {
+                sqlBuilder.Where("Sfc in @Sfcs ");
+            }
+
+            //限定时间
+            if (pagedQuery.CollectionTimeRange != null && pagedQuery.CollectionTimeRange.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { DateStart = pagedQuery.CollectionTimeRange[0], DateEnd = pagedQuery.CollectionTimeRange[1] });
+                sqlBuilder.Where(" CollectionTime>= @DateStart AND CollectionTime<@DateEnd ");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
+
+            using var conn = GetMESParamterDbConnection();
+            var entitiesTask = conn.QueryAsync<ManuProductParameterEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var entities = await entitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuProductParameterEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         #region 内部方法

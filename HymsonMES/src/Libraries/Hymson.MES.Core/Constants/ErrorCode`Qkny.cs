@@ -337,6 +337,7 @@ namespace Hymson.MES.Core.Constants
         /// 产品过程参数不能为空
         /// </summary>
         public const string MES45220 = "产品过程参数不能为空";
+        public const string MES45221 = "工序和产品序列码二者不能同时为空";
 
         #endregion
 

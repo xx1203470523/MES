@@ -80,24 +80,24 @@ namespace Hymson.MES.Data.Repositories.Parameter
             return $"{EquipmentParameter.EquipmentParameterPrefix}{key % _parameterOptions.ParameterDelivery}";
         }
 
-   /// <summary>
+        /// <summary>
         /// 根据设备Id获取参数信息
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         public async Task<PagedInfo<EquipmentParameterEntity>> GetParametesByEqumentIdEntitiesAsync(ManuEquipmentParameterPagedQuery pagedQuery)
         {
-            var equipmentId = pagedQuery.EquipmentId??0;
+            var equipmentId = pagedQuery.EquipmentId ?? 0;
             var tableName = GetTableNameByEquipmentId(pagedQuery.SiteId, equipmentId);
 
             var sqlBuilder = new SqlBuilder();
             // WHERE EquipmentId=@EquipmentId  AND SiteId=@SiteId AND IsDeleted=0
-            string getByEquipmentSql = $"SELECT Id, SiteId, EquipmentId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted FROM {tableName} /**where**/ LIMIT @Offset,@Rows ";
+            string getByEquipmentSql = $"SELECT Id, SiteId, EquipmentId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted FROM {tableName} /**where**/ order by Id DESC LIMIT @Offset,@Rows ";
             string getByEquipmentCountSql = $"select count(1) from {tableName} /**where**/";
             var templateData = sqlBuilder.AddTemplate(getByEquipmentSql);
             var templateCount = sqlBuilder.AddTemplate(getByEquipmentCountSql);
 
-            pagedQuery.EquipmentId= equipmentId;
+            pagedQuery.EquipmentId = equipmentId;
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("EquipmentId = @EquipmentId");
@@ -109,7 +109,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
             //限定时间
             if (pagedQuery.CreatedOn != null && pagedQuery.CreatedOn.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { DateStart = pagedQuery.CreatedOn[0], DateEnd = pagedQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.AddParameters(new { DateStart = pagedQuery.CreatedOn[0], DateEnd = pagedQuery.CreatedOn[1] });
                 sqlBuilder.Where(" CreatedOn >= @DateStart AND CreatedOn < @DateEnd ");
             }
 
@@ -125,6 +125,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
             var totalCount = await totalCountTask;
             return new PagedInfo<EquipmentParameterEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
+
         #region 内部方法
         /// <summary>
         /// 更具设备编码获取表名

@@ -103,16 +103,8 @@ namespace Hymson.MES.Services.Services.Report
                 throw new CustomerValidationException(nameof(ErrorCode.MES12601));
             }
 
-            ////获取到条码的产品参数信息
-            //var sfcs = new List<string>();
-            //var parameterBySfcQuery = new ManuProductParameterBySfcQuery
-            //{
-            //    SiteId = _currentSite.SiteId ?? 0,
-            //    SFCs = sfcs
-            //};
-            //var parameterList = await _productParameterRepository.GetProductParameterBySFCEntitiesAsync(parameterBySfcQuery);
-
             var siteId = _currentSite.SiteId ?? 0;
+            //获取设备的参数信息
             var parameterQuery = new ManuEquipmentParameterPagedQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
