@@ -1,29 +1,24 @@
-using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.Core.Search;
 using Hymson.Authentication;
-using Hymson.Authentication.JwtBearer;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Services.Equipment.EquEquipment;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace Hymson.MES.Services.Services.Report
 {
     /// <summary>
-    /// 服务（设备过程参数报表） 
+    /// 服务（设备开机参数报表） 
     /// </summary>
-    public class EquProcessParameterReportService : IEquProcessParameterReportService
+    public class EquStartupParameterReportService : IEquStartupParameterReportService
     {
         /// <summary>
         /// 当前用户
@@ -50,7 +45,10 @@ namespace Hymson.MES.Services.Services.Report
 
         private readonly IManuEquipmentParameterRepository _equipmentParameterRepository;
 
+        private readonly IEquOpenParamRecordRepository _paramRecordRepository;
+
         private readonly IEquEquipmentRepository _equipmentRepository;
+
         private readonly IProcParameterRepository _parameterRepository;
         private readonly IProcResourceRepository _resourceRepository;
         private readonly IProcResourceEquipmentBindRepository _equipmentBindRepository;
@@ -58,10 +56,11 @@ namespace Hymson.MES.Services.Services.Report
         /// <summary>
         /// 构造函数
         /// </summary>
-        public EquProcessParameterReportService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public EquStartupParameterReportService(ICurrentUser currentUser, ICurrentSite currentSite,
                IInteWorkCenterRepository inteWorkCenterRepository,
                IProcProcedureRepository procProcedureRepository,
                IManuEquipmentParameterRepository equipmentParameterRepository,
+               IEquOpenParamRecordRepository paramRecordRepository,
                IEquEquipmentRepository equipmentRepository,
                IProcParameterRepository parameterRepository,
                IProcResourceRepository resourceRepository,
@@ -72,6 +71,7 @@ namespace Hymson.MES.Services.Services.Report
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _procProcedureRepository = procProcedureRepository;
             _equipmentParameterRepository = equipmentParameterRepository;
+            _paramRecordRepository = paramRecordRepository;
             _equipmentRepository = equipmentRepository;
             _parameterRepository = parameterRepository;
             _resourceRepository = resourceRepository;
@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquProcessParameterReportDto>> GetPagedListAsync(EquProcessParameterReportPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquStartupParameterReportDto>> GetPagedListAsync(EquStartupParameterReportPagedQueryDto pagedQueryDto)
         {
             //选择时间与设备编号显示数据
             if (pagedQueryDto.CreatedOn == null || pagedQueryDto.CreatedOn.Length < 2)
@@ -97,7 +97,7 @@ namespace Hymson.MES.Services.Services.Report
 
             var siteId = _currentSite.SiteId ?? 0;
             //获取设备的参数信息
-            var parameterQuery = new ManuEquipmentParameterPagedQuery
+            var parameterQuery = new EquOpenParamRecordPagedQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 CreatedOn = pagedQueryDto.CreatedOn,
@@ -106,16 +106,15 @@ namespace Hymson.MES.Services.Services.Report
                 PageIndex = pagedQueryDto.PageIndex,
                 PageSize = pagedQueryDto.PageSize
             };
-            var pagedInfo = await _equipmentParameterRepository.GetParametesByEqumentIdEntitiesAsync(parameterQuery);
-
-            var listDto = new List<EquProcessParameterReportDto>();
+            var pagedInfo = await _paramRecordRepository.GetPagedListAsync(parameterQuery);
+            var listDto = new List<EquStartupParameterReportDto>();
             if (pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                return new PagedInfo<EquProcessParameterReportDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+                return new PagedInfo<EquStartupParameterReportDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
             }
 
-            var equipmentId = pagedQueryDto.EquipmentId;
-            var parameterIds = pagedInfo.Data.Select(x => x.ParameterId).Distinct().ToList();
+            var equipmentId = pagedQueryDto.EquipmentId??0;
+            var parameterIds = pagedInfo.Data.Select(x => x.ParamId.GetValueOrDefault()).Distinct().ToList();
 
             //设备
             var equipmentEntity = await _equipmentRepository.GetByIdAsync(equipmentId);
@@ -150,8 +149,8 @@ namespace Hymson.MES.Services.Services.Report
             {
                 var resTypeId = resourceEntity?.ResTypeId ?? 0;
                 var procedureEntity = procedureEntities.FirstOrDefault(y => y.ResourceTypeId == resTypeId);
-                var parameterEntity = parameterEntities.FirstOrDefault(x => x.Id == item.ParameterId);
-                var equParameterDto = new EquProcessParameterReportDto
+                var parameterEntity = parameterEntities.FirstOrDefault(x => x.Id == item.ParamId);
+                var equParameterDto = new EquStartupParameterReportDto
                 {
                     WorkCenterName = workCenterEntity?.Name ?? "",
                     ProcedureCode = procedureEntity?.Code ?? "",
@@ -163,14 +162,15 @@ namespace Hymson.MES.Services.Services.Report
                     ParameterCode = parameterEntity?.ParameterCode ?? "",
                     ParameterName = parameterEntity?.ParameterName ?? "",
                     ParameterUnit = parameterEntity?.ParameterUnit ?? "",
-                    ParameterValue = item.ParameterValue,
+                    ParameterValue = item.ParamValue,
                     CollectionTime = item.CollectionTime,
-                    CreatedOn = item.CreatedOn
+                    CreatedOn = item.CreatedOn,
+                    BatchId = item.BatchId
                 };
 
                 listDto.Add(equParameterDto);
             }
-            return new PagedInfo<EquProcessParameterReportDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<EquStartupParameterReportDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
     }
