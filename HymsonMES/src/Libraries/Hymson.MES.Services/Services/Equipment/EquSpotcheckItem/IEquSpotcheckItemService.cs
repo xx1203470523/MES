@@ -20,7 +20,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(EquSpotcheckItemSaveDto saveDto);
+        Task<int> ModifyAsync(EquSpotcheckItemUpdateDto saveDto);
 
         /// <summary>
         /// 删除

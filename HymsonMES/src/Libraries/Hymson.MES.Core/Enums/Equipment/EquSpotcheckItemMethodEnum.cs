@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
+
 
 namespace Hymson.MES.Core.Enums.Equipment
 {
@@ -22,7 +18,7 @@ namespace Hymson.MES.Core.Enums.Equipment
         /// 量测
         /// </summary>
         [Description("量测")]
-        Measuration = 2,
+        Quantify = 2,
         
 
     }

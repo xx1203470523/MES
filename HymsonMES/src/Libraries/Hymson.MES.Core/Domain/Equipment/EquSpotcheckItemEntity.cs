@@ -15,22 +15,22 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检项目编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 点检项目名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
         /// <summary>
         /// 数值类型;文本/数值
         /// </summary>
-        public DataTypeEnum DataType { get; set; } = DataTypeEnum.Text;
+        public DataTypeEnum? DataType { get; set; } = DataTypeEnum.Text;
 
         /// <summary>
         /// 点检方式
@@ -40,7 +40,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 作业方法
         /// </summary>
-        public string CheckMethod { get; set; }
+        public string? CheckMethod { get; set; }
 
         /// <summary>
         /// 单位ID;inte_unit表的Id
@@ -50,22 +50,22 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 操作内容
         /// </summary>
-        public string OperationContent { get; set; }
+        public string? OperationContent { get; set; }
 
         /// <summary>
         /// 部件
         /// </summary>
-        public string Components { get; set; }
+        public string? Components { get; set; }
 
         /// <summary>
         /// 描述;项目描述
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         
     }

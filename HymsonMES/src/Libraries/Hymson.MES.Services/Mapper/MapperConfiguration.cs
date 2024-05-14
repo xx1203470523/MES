@@ -243,6 +243,15 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSparePartsEntity, EquSparePartsDto>();
             #endregion
 
+            #region 设备点检
+            CreateMap<EquSpotcheckItemSaveDto, EquSpotcheckItemEntity>();
+            CreateMap<EquSpotcheckItemPagedQueryDto, EquSpotcheckItemPagedQuery>();
+
+            CreateMap<EquSpotcheckItemEntity, EquSpotcheckItemDto>();
+            CreateMap<EquSpotcheckItemUpdateDto, EquSpotcheckItemEntity>();
+
+            #endregion
+
         }
 
         /// <summary>

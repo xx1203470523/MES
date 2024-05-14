@@ -56,7 +56,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task UpdateAsync([FromBody] EquSpotcheckItemSaveDto saveDto)
+        public async Task UpdateAsync([FromBody] EquSpotcheckItemUpdateDto saveDto)
         {
              await _equSpotcheckItemService.ModifyAsync(saveDto);
         }

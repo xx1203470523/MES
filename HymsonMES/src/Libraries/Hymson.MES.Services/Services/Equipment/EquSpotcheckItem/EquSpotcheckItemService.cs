@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -40,19 +41,26 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly IEquSpotcheckItemRepository _equSpotcheckItemRepository;
 
         /// <summary>
+        /// 单位
+        /// </summary>
+        private readonly IInteUnitRepository _inteUnitRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equSpotcheckItemRepository"></param>
-        public EquSpotcheckItemService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSpotcheckItemSaveDto> validationSaveRules, 
-            IEquSpotcheckItemRepository equSpotcheckItemRepository)
+        public EquSpotcheckItemService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSpotcheckItemSaveDto> validationSaveRules,
+            IEquSpotcheckItemRepository equSpotcheckItemRepository,
+            IInteUnitRepository inteUnitRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _equSpotcheckItemRepository = equSpotcheckItemRepository;
+            _inteUnitRepository = inteUnitRepository;
         }
 
 
@@ -91,20 +99,22 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquSpotcheckItemSaveDto saveDto)
+        public async Task<int> ModifyAsync(EquSpotcheckItemUpdateDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
             var entity = saveDto.ToEntity<EquSpotcheckItemEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
+            entity.SiteId = _currentSite.SiteId;
 
             return await _equSpotcheckItemRepository.UpdateAsync(entity);
+
         }
 
         /// <summary>
@@ -137,12 +147,15 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquSpotcheckItemDto?> QueryByIdAsync(long id) 
+        public async Task<EquSpotcheckItemDto?> QueryByIdAsync(long id)
         {
-           var equSpotcheckItemEntity = await _equSpotcheckItemRepository.GetByIdAsync(id);
-           if (equSpotcheckItemEntity == null) return null;
-           
-           return equSpotcheckItemEntity.ToModel<EquSpotcheckItemDto>();
+            var equSpotcheckItemEntity = await _equSpotcheckItemRepository.GetByIdAsync(id);
+            if (equSpotcheckItemEntity == null) return null;
+            var inteUnitEntity = await _inteUnitRepository.GetByIdAsync(equSpotcheckItemEntity.UnitId.GetValueOrDefault());
+
+            var dto = equSpotcheckItemEntity.ToModel<EquSpotcheckItemDto>();
+            dto.Unit = inteUnitEntity.Code;
+            return dto;
         }
 
         /// <summary>
