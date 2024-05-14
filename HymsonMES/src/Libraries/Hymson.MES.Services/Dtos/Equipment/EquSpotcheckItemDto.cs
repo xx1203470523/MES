@@ -30,17 +30,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
     public record EquSpotcheckItemSaveDto : BaseEntityDto
     {
 
-       /// <summary>
+        /// <summary>
         /// 点检项目编码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 点检项目名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
@@ -55,54 +55,54 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public EquSpotcheckItemMethodEnum? CheckType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 作业方法
         /// </summary>
         public string? CheckMethod { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 单位ID;inte_unit表的Id
         /// </summary>
         public long? UnitId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 操作内容
         /// </summary>
         public string? OperationContent { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 部件
         /// </summary>
         public string? Components { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述;项目描述
         /// </summary>
         public string? Remark { get; set; }
 
 
 
-       ///// <summary>
-       // /// 最后修改人
-       // /// </summary>
-       // public string UpdatedBy { get; set; }
+        ///// <summary>
+        // /// 最后修改人
+        // /// </summary>
+        // public string UpdatedBy { get; set; }
 
-       ///// <summary>
-       // /// 修改时间
-       // /// </summary>
-       // public DateTime? UpdatedOn { get; set; }
+        ///// <summary>
+        // /// 修改时间
+        // /// </summary>
+        // public DateTime? UpdatedOn { get; set; }
 
-       ///// <summary>
-       // /// 是否逻辑删除
-       // /// </summary>
-       // public long IsDeleted { get; set; }
+        ///// <summary>
+        // /// 是否逻辑删除
+        // /// </summary>
+        // public long IsDeleted { get; set; }
 
-       ///// <summary>
-       // /// 站点Id
-       // /// </summary>
-       // public long SiteId { get; set; }
+        ///// <summary>
+        // /// 站点Id
+        // /// </summary>
+        // public long SiteId { get; set; }
 
-       
+
     }
 
     /// <summary>
@@ -115,17 +115,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 点检项目编码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 点检项目名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
@@ -140,12 +140,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public EquSpotcheckItemMethodEnum? CheckType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 作业方法
         /// </summary>
         public string CheckMethod { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 单位ID;inte_unit表的Id
         /// </summary>
         public long? UnitId { get; set; }
@@ -160,52 +160,64 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public string OperationContent { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 部件
         /// </summary>
         public string Components { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述;项目描述
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 
     /// <summary>
     /// 设备点检项目分页Dto
     /// </summary>
-    public class EquSpotcheckItemPagedQueryDto : PagerInfo { }
+    public class EquSpotcheckItemPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string? Name { get; set; }
+
+    }
 
 }

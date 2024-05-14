@@ -135,6 +135,16 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
+            {
+                sqlBuilder.Where("Name = @Name");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
+            {
+                sqlBuilder.Where("Code = @Code");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
