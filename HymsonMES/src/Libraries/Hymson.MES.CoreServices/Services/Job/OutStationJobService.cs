@@ -565,10 +565,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (data.IsLastProcedure)
             {
                 if (data.Count == 1)
-                {                   
+                {
                     var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
                     if (SFCProduceEntity != null)
-                    {              
+                    {
                         responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18226),
                         data.Type.GetDescription(),
                         data.Code);
@@ -706,6 +706,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 // 条码状态为"完成"
                 manuSfcEntity.Status = SfcStatusEnum.Complete;
+                sfcProduceEntity.Status = SfcStatusEnum.Complete;
 
                 stepEntity.Operatetype = responseBo.ProcessRouteType == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
 
