@@ -56,5 +56,24 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquSpotcheckTemplateDto> QueryEquSpotcheckTemplateByIdAsync(long id);
+
+        #region 关联信息
+
+        /// <summary>
+        /// 获取模板关联信息（项目）
+        /// </summary>
+        /// <param name="spotCheckTemplateIds"></param>
+        /// <returns></returns>
+        Task<List<GetItemRelationListDto>> QueryItemRelationListAsync(IEnumerable<long> spotCheckTemplateIds);
+
+
+        /// <summary>
+        /// 获取模板关联信息（设备组）
+        /// </summary>
+        /// <param name="spotCheckTemplateIds"></param>
+        /// <returns></returns>
+        Task<List<QueryEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync(IEnumerable<long> spotCheckTemplateIds);
+
+        #endregion
     }
 }

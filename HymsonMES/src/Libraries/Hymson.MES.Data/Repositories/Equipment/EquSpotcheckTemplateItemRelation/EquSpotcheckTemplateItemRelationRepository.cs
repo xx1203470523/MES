@@ -124,6 +124,16 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquSpotcheckTemplateItemRelationEntitiesSqlTemplate);
+
+            sqlBuilder.Where("est.IsDeleted=0");
+            sqlBuilder.Where("est.SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (equSpotcheckTemplateItemRelationQuery.SpotCheckTemplateIds != null && equSpotcheckTemplateItemRelationQuery.SpotCheckTemplateIds.Any())
+            {
+                sqlBuilder.Where("SpotCheckTemplateId IN @SpotCheckTemplateIds");
+            }
+
             using var conn = GetMESDbConnection();
             var equSpotcheckTemplateItemRelationEntities = await conn.QueryAsync<EquSpotcheckTemplateItemRelationEntity>(template.RawSql, equSpotcheckTemplateItemRelationQuery);
             return equSpotcheckTemplateItemRelationEntities;
@@ -147,8 +157,17 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<EquSpotcheckTemplateItemRelationEntity> equSpotcheckTemplateItemRelationEntitys)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, equSpotcheckTemplateItemRelationEntitys);
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(InsertsSql, equSpotcheckTemplateItemRelationEntitys);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
         }
 
         /// <summary>

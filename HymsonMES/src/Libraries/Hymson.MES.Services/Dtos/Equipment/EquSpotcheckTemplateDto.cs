@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Equipment;
 
 namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
 {
@@ -34,7 +35,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 版本
@@ -90,11 +91,11 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// 点检模板编码
         /// </summary>
         public string Code { get; set; }
-
+         
         /// <summary>
         /// 点检模板名称
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; }  
 
         /// <summary>
         /// 状态
@@ -195,7 +196,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// 设备组编码
         /// </summary>
         public string? EquipmentGroupCode { get; set; }
-         
+
         /// <summary>
         /// 设备组名称
         /// </summary>
@@ -250,5 +251,104 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// </summary>
         public long EquipmentGroupId { get; set; }
     }
+
+
+    /// <summary>
+    /// 设备点检模板与项目关系Dto
+    /// </summary>
+    public record GetItemRelationListDto
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 点检项目ID;equ_spotcheck_item的Id
+        /// </summary>
+        public long SpotCheckItemId { get; set; }
+
+        /// <summary>
+        /// 点检模板ID
+        /// </summary>
+        public long SpotCheckTemplateId { get; set; }
+
+        /// <summary>
+        /// 点检项目Code
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 点检项目名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public string? Components { get; set; }
+        /// <summary>
+        /// 点检方式
+        /// </summary>
+        public EquSpotcheckItemMethodEnum? CheckType { get; set; }
+
+        /// <summary>
+        /// 点检方法
+        /// </summary>
+        public string? CheckMethod { get; set; }
+
+        /// <summary>
+        /// 数据类型
+        /// </summary>
+        public DataTypeEnum? DataType { get; set; }
+
+        /// <summary>
+        /// 规格下限
+        /// </summary>
+        public decimal? LowerLimit { get; set; }
+
+        /// <summary>
+        /// 规格值（规格中心）
+        /// </summary>
+        public decimal? Center { get; set; }
+
+        /// <summary>
+        /// 规格上限
+        /// </summary>
+        public decimal? UpperLimit { get; set; }
+    }
+
+
+    /// <summary>
+    /// 设备点检模板与项目关系Dto
+    /// </summary>
+    public record QueryEquipmentGroupRelationListDto
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 点检模板ID
+        /// </summary>
+        public long SpotCheckTemplateId { get; set; }
+
+        /// <summary>
+        /// 设备组ID;equ_equipment_group的Id
+        /// </summary>
+        public long EquipmentGroupId { get; set; }
+
+        /// <summary>
+        /// 设备组编码
+        /// </summary>
+        public string? EquipmentGroupCode { get; set; }
+
+        /// <summary>
+        /// 设备组名称
+        /// </summary>
+        public string? EquipmentGroupName { get; set; }
+    }
+
     #endregion
 }

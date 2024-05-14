@@ -22,7 +22,7 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckTemplate
         /// 点检模板编码
         /// </summary>
         public string Code { get; set; }
-
+         
        /// <summary>
         /// 点检模板名称
         /// </summary>

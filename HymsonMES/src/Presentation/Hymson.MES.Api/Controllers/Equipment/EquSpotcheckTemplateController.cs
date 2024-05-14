@@ -5,6 +5,7 @@
  *builder:  pengxin
  *build datetime: 2024-05-13 03:06:41
  */
+using Elastic.Clients.Elasticsearch;
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.MES.Services.Services.EquSpotcheckTemplate;
@@ -100,6 +101,30 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckTemplate
             await _equSpotcheckTemplateService.DeletesEquSpotcheckTemplateAsync(ids);
         }
 
+
+        /// <summary>
+        /// 获取模板关联信息（项目）
+        /// </summary>
+        /// <param name="spotCheckTemplateIds"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getitem")]
+        public async Task<List<GetItemRelationListDto>> QueryItemRelationListAsync(IEnumerable<long> spotCheckTemplateIds)
+        {
+            return await _equSpotcheckTemplateService.QueryItemRelationListAsync(spotCheckTemplateIds);
+        }
+
+        /// <summary>
+        /// 获取模板关联信息（设备组）
+        /// </summary>
+        /// <param name="spotCheckTemplateIds"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getgroup")]
+        public async Task<List<QueryEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync(IEnumerable<long> spotCheckTemplateIds)
+        {
+            return await _equSpotcheckTemplateService.QueryEquipmentGroupRelationListAsync(spotCheckTemplateIds);
+        }
         #endregion
     }
 }

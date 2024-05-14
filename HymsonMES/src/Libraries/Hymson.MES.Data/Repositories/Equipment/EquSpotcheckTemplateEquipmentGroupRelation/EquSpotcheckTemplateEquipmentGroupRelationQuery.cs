@@ -13,5 +13,14 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
     /// </summary>
     public class EquSpotcheckTemplateEquipmentGroupRelationQuery
     {
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 模板IDs
+        /// </summary>
+        public IEnumerable<long>? SpotCheckTemplateIds { get; set; }
     }
 }

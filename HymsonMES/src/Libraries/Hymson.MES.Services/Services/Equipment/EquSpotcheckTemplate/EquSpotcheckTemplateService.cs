@@ -18,6 +18,8 @@ using Hymson.MES.Core.Domain.EquSpotcheckTemplateEquipmentGroupRelation;
 using Hymson.MES.Core.Domain.EquSpotcheckTemplateItemRelation;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelation;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation;
@@ -25,6 +27,8 @@ using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Collections.Generic;
+using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
@@ -43,16 +47,22 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         private readonly IEquSpotcheckTemplateRepository _equSpotcheckTemplateRepository;
         private readonly IEquSpotcheckTemplateItemRelationRepository _equSpotcheckTemplateItemRelationRepository;
         private readonly IEquSpotcheckTemplateEquipmentGroupRelationRepository _equSpotcheckTemplateEquipmentGroupRelationRepository;
+        private readonly IEquSpotcheckItemRepository _equSpotcheckItemRepository;
+        private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
         private readonly AbstractValidator<EquSpotcheckTemplateCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquSpotcheckTemplateModifyDto> _validationModifyRules;
 
-        public EquSpotcheckTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, AbstractValidator<EquSpotcheckTemplateCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckTemplateModifyDto> validationModifyRules)
+        public EquSpotcheckTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, AbstractValidator<EquSpotcheckTemplateCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckTemplateModifyDto> validationModifyRules, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _equSpotcheckTemplateRepository = equSpotcheckTemplateRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _equSpotcheckItemRepository = equSpotcheckItemRepository;
+            _equEquipmentGroupRepository = equEquipmentGroupRepository;
+            _equSpotcheckTemplateItemRelationRepository = equSpotcheckTemplateItemRelationRepository;
+            _equSpotcheckTemplateEquipmentGroupRelationRepository = equSpotcheckTemplateEquipmentGroupRelationRepository;
         }
 
         /// <summary>
@@ -86,7 +96,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                 var groupRelation = new EquSpotcheckTemplateEquipmentGroupRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    EquipmentGroupId = item.EquipmentGroupId,
+                    EquipmentGroupId = item.Id,
                     SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
 
                     IsDeleted = 0,
@@ -109,14 +119,14 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                     SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
                     Center = item.Center,
                     LowerLimit = item.LowerLimit,
-                    SpotCheckItemId = item.SpotCheckItemId,
+                    SpotCheckItemId = item.Id,
                     UpperLimit = item.UpperLimit,
 
-                    IsDeleted = 0,
+                    //IsDeleted = 0,
                     CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName,
+                    //UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
-                    UpdatedOn = HymsonClock.Now(),
+                    //UpdatedOn = HymsonClock.Now(),
                 };
 
                 relationList.Add(relation);
@@ -131,6 +141,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             await _equSpotcheckTemplateRepository.InsertAsync(equSpotcheckTemplateEntity);
 
             trans.Complete();
+
         }
 
         /// <summary>
@@ -348,5 +359,93 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             }
             return null;
         }
+
+
+
+        #region 关联信息
+        /// <summary>
+        /// 获取模板关联信息（项目）
+        /// </summary>
+        /// <param name="spotCheckTemplateIds"></param>
+        /// <returns></returns>
+        public async Task<List<GetItemRelationListDto>> QueryItemRelationListAsync(IEnumerable<long> spotCheckTemplateIds)
+        {
+            var equSpotcheckTemplateItemRelations = await _equSpotcheckTemplateItemRelationRepository.GetEquSpotcheckTemplateItemRelationEntitiesAsync(new EquSpotcheckTemplateItemRelationQuery
+            {
+                SpotCheckTemplateIds = spotCheckTemplateIds,
+                SiteId = _currentSite.SiteId
+            });
+
+            List<GetItemRelationListDto> list = new();
+            if (equSpotcheckTemplateItemRelations != null && equSpotcheckTemplateItemRelations.Any())
+            {
+                var spotCheckItemIds = equSpotcheckTemplateItemRelations.Select(it => it.SpotCheckItemId).ToArray();
+                var equSpotcheckItems = await _equSpotcheckItemRepository.GetByIdsAsync(spotCheckItemIds);
+
+                foreach (var item in equSpotcheckTemplateItemRelations)
+                {
+                    var equSpotcheckItem = equSpotcheckItems.FirstOrDefault(it => it.Id == item.SpotCheckItemId);
+                    GetItemRelationListDto itemRelation = new()
+                    {
+                        Id = item.Id,
+                        SpotCheckItemId = item.SpotCheckItemId,
+                        SpotCheckTemplateId = item.SpotCheckTemplateId,
+                        Center = item.Center,
+                        LowerLimit = item.LowerLimit,
+                        UpperLimit = item.UpperLimit,
+                        CheckMethod = equSpotcheckItem?.CheckMethod,
+                        CheckType = equSpotcheckItem?.CheckType,
+                        Code = equSpotcheckItem?.Code,
+                        Name = equSpotcheckItem?.Name,
+                        Components = equSpotcheckItem?.Components,
+                        DataType = equSpotcheckItem?.DataType
+                    };
+
+                    list.Add(itemRelation);
+                }
+
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// 获取模板关联信息（设备组）
+        /// </summary>
+        /// <param name="spotCheckTemplateIds"></param>
+        /// <returns></returns>
+        public async Task<List<QueryEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync(IEnumerable<long> spotCheckTemplateIds)
+        {
+            var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetEquSpotcheckTemplateEquipmentGroupRelationEntitiesAsync(new EquSpotcheckTemplateEquipmentGroupRelationQuery
+            {
+                SpotCheckTemplateIds = spotCheckTemplateIds,
+                SiteId = _currentSite.SiteId
+            });
+
+            List<QueryEquipmentGroupRelationListDto> list = new();
+            if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
+            {
+                var equipmentGroupIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
+                var equSpotcheckItems = await _equEquipmentGroupRepository.GetByIdsAsync(equipmentGroupIds);
+
+                foreach (var item in equSpotcheckTemplateEquipmentGroupRelations)
+                {
+                    var equSpotcheckItem = equSpotcheckItems.FirstOrDefault(it => it.Id == item.EquipmentGroupId);
+                    QueryEquipmentGroupRelationListDto groupRelation = new()
+                    {
+                        Id = item.Id,
+                        EquipmentGroupId = item.EquipmentGroupId,
+                        SpotCheckTemplateId = item.SpotCheckTemplateId,
+                        EquipmentGroupCode = equSpotcheckItem?.EquipmentGroupCode,
+                        EquipmentGroupName = equSpotcheckItem?.EquipmentGroupName,
+                    };
+
+                    list.Add(groupRelation);
+                }
+            }
+
+            return list;
+        }
+        #endregion
     }
 }

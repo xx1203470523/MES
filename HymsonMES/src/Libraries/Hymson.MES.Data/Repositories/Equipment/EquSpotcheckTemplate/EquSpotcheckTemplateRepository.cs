@@ -82,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.LeftJoin("equ_spotcheck_template_equipment_group_relation relation ON est.Id=relation.SpotCheckTemplateId");
-            sqlBuilder.LeftJoin("equ_equipment_group  group ON relation.EquipmentGroupId=group.Id");
+            sqlBuilder.LeftJoin("equ_equipment_group  egroup ON relation.EquipmentGroupId=egroup.Id");
             sqlBuilder.Where("est.IsDeleted=0");
             sqlBuilder.Where("est.SiteId = @SiteId");
             sqlBuilder.Select("est.*");
@@ -105,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
             //设备组
             if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQuery.EquipmentGroupCode))
             {
-                sqlBuilder.Where("group.EquipmentGroupCode=@EquipmentGroupCode");
+                sqlBuilder.Where("egroup.EquipmentGroupCode=@EquipmentGroupCode");
             }
             if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQuery.EquipmentGroupName))
             {

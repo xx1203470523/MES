@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.EquSpotcheckTemplateEquipmentGroupRelation;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -122,6 +123,16 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquSpotcheckTemplateEquipmentGroupRelationEntitiesSqlTemplate);
+
+            sqlBuilder.Where("est.IsDeleted=0");
+            sqlBuilder.Where("est.SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (equSpotcheckTemplateEquipmentGroupRelationQuery.SpotCheckTemplateIds != null && equSpotcheckTemplateEquipmentGroupRelationQuery.SpotCheckTemplateIds.Any())
+            {
+                sqlBuilder.Where("SpotCheckTemplateId IN @SpotCheckTemplateIds");
+            }
+
             using var conn = GetMESDbConnection();
             var equSpotcheckTemplateEquipmentGroupRelationEntities = await conn.QueryAsync<EquSpotcheckTemplateEquipmentGroupRelationEntity>(template.RawSql, equSpotcheckTemplateEquipmentGroupRelationQuery);
             return equSpotcheckTemplateEquipmentGroupRelationEntities;
