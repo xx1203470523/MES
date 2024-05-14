@@ -29,6 +29,7 @@ using Hymson.MES.CoreServices.Bos.Common;
 using System.Net.NetworkInformation;
 using Hymson.MES.Core.Domain.Process;
 using System.Security.Policy;
+using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -635,6 +636,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             var whMaterialStandingbookEntities = new List<WhMaterialStandingbookEntity>();
             for (int i = 1; i <= 2; i++)
             {
+                //var orgisfc = i == 1 ? oldWhMEntirty.MaterialBarCode : newSplitSFC;
+                //var newsfc = i == 1 ? newSplitSFC : oldWhMEntirty.MaterialBarCode;
                 var standingbook = new WhMaterialStandingbookEntity
                 {
                     MaterialCode = procMaterialEntitity?.MaterialCode ?? "",
@@ -652,7 +655,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedOn = HymsonClock.Now(),
-                    //Remark=""
+                    Remark = $"拆分前条码{oldWhMEntirty.MaterialBarCode},拆分后{newSplitSFC}"
                 };
 
                 whMaterialStandingbookEntities.Add(standingbook);
@@ -805,6 +808,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 UpdatedOn = HymsonClock.Now()
             };
 
+            var inputBarcodeSingle = new WhMaterialInventoryEntity();
             if (adjustDto.MergeSFC != null)
             {
                 //SFC及SFC信息
@@ -824,6 +828,12 @@ namespace Hymson.MES.Services.Services.Warehouse
                     UpdatedOn = HymsonClock.Now()
                 };
 
+                inputBarcodeSingle = standbookList.Where(w => w.QuantityResidue != 0).FirstOrDefault();
+
+            }
+            else
+            {
+                inputBarcodeSingle = newSFCEntity;
                 //台账
                 standbookList.Add(newSFCEntity);
             }
@@ -833,7 +843,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             //物料台账
             var whMaterialStandingbookEntities = new List<WhMaterialStandingbookEntity>();
 
-            var inputBarcodeSingle = standbookList.Where(w => w.QuantityResidue != 0).FirstOrDefault();
+
 
             foreach (var entity in standbookList)
             {
@@ -856,7 +866,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedOn = HymsonClock.Now(),
-                    //Remark=""
+                    Remark = $"合并前条码:{entity.MaterialBarCode},合并后:{inputBarcodeSingle.MaterialBarCode}"
                 };
 
                 whMaterialStandingbookEntities.Add(standingbook);
@@ -945,6 +955,16 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
 
             return returnSFC;
+        }
+
+        /// <summary>
+        /// 拆分合并条码的验证
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        public async Task<bool> MergeAdjustVerifySfcAsync(string[] sfcs)
+        {
+            return true;
         }
 
         /// <summary>
