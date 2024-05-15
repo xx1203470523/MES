@@ -97,5 +97,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         /// <param name="dto"></param>
         /// <returns></returns>
         Task ProductParamSameMultSfcAsync(ProductParamSameMultSfcDto dto);
+
+        /// <summary>
+        /// 设备文件上传055
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task EquFileUploadAsync(EquFileUploadDto dto);
     }
 }

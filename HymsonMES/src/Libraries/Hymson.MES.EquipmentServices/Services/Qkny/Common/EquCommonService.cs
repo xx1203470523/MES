@@ -40,6 +40,7 @@ using Hymson.MES.Services.Services.EquOpenParamRecord;
 using Hymson.MES.Services.Dtos.EquOpenParamRecord;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.CoreServices.Bos.Parameter;
+using Hymson.Minio;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
 {
@@ -178,6 +179,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         private readonly IManuProductParameterService _manuProductParameterService;
 
         /// <summary>
+        /// 文件上传
+        /// </summary>
+        private readonly IMinioService _minioService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public EquCommonService(
@@ -205,7 +211,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             AbstractValidator<RecipeDto> validationRecipeDto,
             AbstractValidator<EquipmentProcessParamDto> validationEquipmentProcessParamDto,
             AbstractValidator<ProductParamDto> validationProductParamDto,
-            IManuProductParameterService manuProductParameterService)
+            IManuProductParameterService manuProductParameterService,
+            IMinioService minioService)
         {
             _equEquipmentService = equEquipmentService;
             _equEquipmentVerifyRepository = equEquipmentVerifyRepository;
@@ -233,6 +240,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             _validationEquipmentProcessParamDto = validationEquipmentProcessParamDto;
             _validationProductParamDto = validationProductParamDto;
             _manuProductParameterService = manuProductParameterService;
+            _minioService = minioService;
         }
 
         /// <summary>
@@ -654,6 +662,50 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             await _manuProductParameterService.ProductProcessCollectAsync(parameterBo);
         }
 
+        /// <summary>
+        /// 设备文件上传055
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task EquFileUploadAsync(EquFileUploadDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+
+            //文件列表
+            var fileList = dto.FormCollection.Files;
+            if (fileList == null || !fileList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45290));
+            }
+
+            List<CcdFileUploadCompleteRecordSaveDto> saveDtoList = new();
+
+            foreach (var file in fileList)
+            {
+                //上传
+                using var stream = file.OpenReadStream();
+                var uploadResult = await _minioService.PutObjectAsync(file.FileName, stream, file.ContentType);
+
+                saveDtoList.Add(new CcdFileUploadCompleteRecordSaveDto
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = equResModel.SiteId,
+                    EquipmentId = equResModel.EquipmentId,
+                    Sfc = dto.Sfc,
+                    SfcIsPassed = dto.Passed,
+                    Uri = uploadResult.AbsoluteUrl,
+                    UriIsPassed = dto.Passed,
+                    CreatedBy = equResModel.EquipmentCode,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = equResModel.EquipmentCode,
+                    UpdatedOn = HymsonClock.Now()
+                });
+            }
+
+            //保存
+            await _ccdFileUploadCompleteRecordService.AddMultAsync(saveDtoList);
+        }
 
     }
 }
