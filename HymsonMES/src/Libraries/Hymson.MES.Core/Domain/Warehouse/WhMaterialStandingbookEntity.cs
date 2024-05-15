@@ -60,6 +60,11 @@ namespace Hymson.MES.Core.Domain.Warehouse
         public string Unit { get; set; }
 
         /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
         /// 流转类型;物料接收/物料退料/物料加载
         /// </summary>
         public WhMaterialInventoryTypeEnum Type { get; set; }

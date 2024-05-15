@@ -130,5 +130,12 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="adjustDto"></param>
         /// <returns></returns>
         Task<string> BarcodeMergeAdjustAsync(MaterialBarCodeMergeAdjust adjustDto);
+
+        /// <summary>
+        /// 合并拆分条码的验证
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task<bool> MergeAdjustVerifySfcAsync(string[] sfcs);
     }
 }
