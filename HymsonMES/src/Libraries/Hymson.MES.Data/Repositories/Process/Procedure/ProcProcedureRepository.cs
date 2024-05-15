@@ -409,6 +409,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(template.RawSql, template.Parameters);
         }
+
+        /// <summary>
+        /// 根据资源类型ID获取工序Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcedureEntity>> GetProcProcedureByResourceTypeIdAsync(long resourceTypeId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcProcedureEntity>(GetProcProcedureByResourceIdSql, new { ResourceTypeId = resourceTypeId });
+        }
     }
 
     /// <summary>
@@ -437,5 +448,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateStatusSql = "UPDATE `proc_procedure` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
         const string GetEntitiesSqlTemplate = "SELECT * FROM `proc_procedure` /**where**/ ";
+        const string GetProcProcedureByResourceIdSql = "SELECT * FROM proc_procedure WHERE IsDeleted = 0 AND ResourceTypeId = @ResourceTypeId";
     }
 }
