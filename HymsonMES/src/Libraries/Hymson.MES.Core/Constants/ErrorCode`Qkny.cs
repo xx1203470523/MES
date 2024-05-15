@@ -382,5 +382,11 @@ namespace Hymson.MES.Core.Constants
         public const string MES45281 = "条码库存不存在，不允许绑定！【{Barcode}】";
 
         #endregion
+
+        #region 文件上传
+
+        public const string MES45290 = "上传文件信息不存在";
+
+        #endregion
     }
 }

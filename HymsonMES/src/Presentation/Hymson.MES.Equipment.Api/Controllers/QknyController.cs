@@ -1393,5 +1393,24 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
             return await _fitTogether.Create24GbCodeAsync(dto);
         }
+
+        /// <summary>
+        /// 设备文件上传055
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("EquFileUpload")]
+        [LogDescription("设备文件上传055", BusinessType.OTHER, "EquFileUpload055", ReceiverTypeEnum.MES)]
+        public async Task EquFileUploadAsync([FromForm]EquFileUploadDto dto)
+        {
+            if (IS_DEBUG)
+            {
+                return;
+            }
+
+            await _equCommonService.EquFileUploadAsync(dto);
+        }
+
     }
 }
