@@ -725,6 +725,8 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             //处理父条码
             var qty = oldWhMEntirty.Sum(x => x.QuantityResidue);
+            if (qty <= 0) throw new CustomerValidationException(nameof(ErrorCode.MES15128));
+
             string returnSFC = string.Empty;
 
             var updateSFCSpecifyCommand = new UpdateStatusAndQtyBySfcsCommand();
@@ -735,8 +737,15 @@ namespace Hymson.MES.Services.Services.Warehouse
             //物料台账列表
             var standbookList = oldWhMEntirty.ToList();
 
+            bool IsMergeSFC = false;
+            
+            if(adjustDto.MergeSFC != null || !string.IsNullOrWhiteSpace(adjustDto.MergeSFC))
+            {
+                IsMergeSFC = true;
+            }
+
             //指定父条码
-            if (adjustDto.MergeSFC != null)
+            if (IsMergeSFC)
             {
                 returnSFC = adjustDto.MergeSFC;
                 var newEntity = oldWhMEntirty.Where(w => w.MaterialBarCode == adjustDto.MergeSFC).FirstOrDefault();
@@ -809,7 +818,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
 
             var inputBarcodeSingle = new WhMaterialInventoryEntity();
-            if (adjustDto.MergeSFC != null)
+            if (IsMergeSFC)
             {
                 //SFC及SFC信息
                 var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
