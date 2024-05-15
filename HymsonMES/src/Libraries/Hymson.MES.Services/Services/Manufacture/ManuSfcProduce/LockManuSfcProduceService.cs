@@ -724,6 +724,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 foreach (var item in manuBarCodeRelations)
                 {
                     var procMaterial = outputBarCodeMaterials.FirstOrDefault(it => it.Id == item.OutputBarCodeMaterialId);
+                    bool isManu = false;
                     //有库存直接锁库存
                     if (outputBarCodeInventorys != null && outputBarCodeInventorys.Any())
                     {
@@ -766,9 +767,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                             };
                             whMaterialStandingbookRelationList.Add(whMaterialStandingbookEntity);
                         }
+                        else
+                        {
+                            isManu = true;
+                        }
                     }
                     //没有库存锁在制
-                    else
+                    if (isManu)
                     {
                         //条码
                         var manuSfcRelation = manuSfcRelations.Where(it => it.SFC == item.OutputBarCode).FirstOrDefault();
