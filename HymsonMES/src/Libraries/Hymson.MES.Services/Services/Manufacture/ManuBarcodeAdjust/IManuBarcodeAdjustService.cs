@@ -1,7 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Services.Dtos.Manufacture;
-using System.ComponentModel.DataAnnotations;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -53,26 +51,25 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task<ManuSfcAboutInfoViewDto?> GetSfcAboutInfoByMarkingSfcAsync(string sfc);
 
         /// <summary>
-        /// 合并条码
-        /// </summary>
-        /// <param name="adjustDto"></param>
-        /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
-        Task<string> BarcodeMergeAdjustAsync(ManuBarcodeMergeAdjust adjustDto);
-
-        /// <summary>
         /// 条码拆分
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="splitDto"></param>
         /// <returns></returns>
-        Task<string> BarcodeSplitAdjustAsync(ManuBarcodeSplitAdjustDto param);
+        Task<string> BarCodeSplitAsync(ManuBarCodeSplitRequestDto splitDto);
+
+        /// <summary>
+        /// 合并条码
+        /// </summary>
+        /// <param name="mergeDto"></param>
+        /// <returns></returns>
+        Task<string> BarCodeMergeAsync(ManuBarCodeMergeRequestDto mergeDto);
 
         /// <summary>
         /// 更改条码数量
         /// </summary>
         /// <param name="adjustDto"></param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
         Task BarcodeQtyAdjustAsync(ManuBarcodeQtyAdjustDto adjustDto);
+
     }
 }
