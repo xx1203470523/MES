@@ -195,7 +195,7 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 设备无产出条码
         /// </summary>
-        public const string MES45090 = "设备无产出条码";
+        public const string MES45090 = "条码在系统中不存在";
 
         /// <summary>
         /// 条码是NG状态
@@ -283,6 +283,11 @@ namespace Hymson.MES.Core.Constants
         /// 工单对应型号没有对应的分选规则
         /// </summary>
         public const string MES45160 = "工单对应型号没有对应的分选规则";
+
+        /// <summary>
+        /// 产品型号在系统中不存在
+        /// </summary>
+        public const string MES45161 = "产品型号在系统中不存在";
 
         #endregion
 

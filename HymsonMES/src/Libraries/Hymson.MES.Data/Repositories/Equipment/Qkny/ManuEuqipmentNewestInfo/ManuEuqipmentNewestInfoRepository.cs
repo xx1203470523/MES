@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.ManuEuqipmentNewestInfoEntity;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.Qkny.ManuEuqipmentNewestInfo.View;
 using Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo.Query;
 using Microsoft.Extensions.Options;
 
@@ -164,6 +165,16 @@ namespace Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo
             return new PagedInfo<ManuEuqipmentNewestInfoEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 获取List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuEquipmentNewestInfoView>> GetListAsync(ManuEuqipmentNewestInfoSiteQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuEquipmentNewestInfoView>(GetBySiteIdSql, new { SiteId = query.SiteId });
+        }
     }
 
 
@@ -192,5 +203,17 @@ namespace Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo
         const string GetByIdSql = @"SELECT * FROM manu_euqipment_newest_info WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_euqipment_newest_info WHERE Id IN @Ids ";
 
+        /// <summary>
+        /// 获取站点下的所有数据
+        /// </summary>
+        const string GetBySiteIdSql = @"
+            select t1.EquipmentId, t1.HeartUpdatedOn, t1.Status, t1.StatusUpdatedOn, t2.EquipmentName, t2.EquipmentCode
+            from manu_euqipment_newest_info t1
+            inner join equ_equipment t2 on t1.EquipmentId = t2.Id and t2.IsDeleted = 0
+            where t1.IsDeleted = 0
+            and t1.Status <> ''
+            and t1.Heart <> ''
+            and t1.SiteId = @SiteId
+        ";
     }
 }

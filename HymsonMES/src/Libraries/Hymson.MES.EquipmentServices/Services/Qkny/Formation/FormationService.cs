@@ -8,6 +8,7 @@ using Hymson.MES.CoreServices.Dtos.Qkny;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Qkny;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -85,6 +86,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         private readonly IProcSortingRuleService _procSortingRuleService;
 
         /// <summary>
+        /// 物料
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public FormationService(IEquEquipmentService equEquipmentService,
@@ -95,7 +101,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             IManuPassStationService manuPassStationService,
             IEquProductParamRecordService equProductParamRecordService,
             IPlanWorkOrderService planWorkOrderService,
-            IProcSortingRuleService procSortingRuleService)
+            IProcSortingRuleService procSortingRuleService,
+            IProcMaterialRepository procMaterialRepository)
         {
             _equEquipmentService = equEquipmentService;
             _manuFillingDataRecordService = manuFillingDataRecordService;
@@ -106,6 +113,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             _equProductParamRecordService = equProductParamRecordService;
             _planWorkOrderService = planWorkOrderService;
             _procSortingRuleService = procSortingRuleService;
+            _procMaterialRepository = procMaterialRepository;
         }
 
         /// <summary>
@@ -430,14 +438,31 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             //2. 查询激活的工单
             //PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
 
-            ManuSfcProduceBySfcQuery sfcQuery = new ManuSfcProduceBySfcQuery();
-            sfcQuery.Sfc = dto.Sfc;
-            sfcQuery.SiteId = equResModel.SiteId;
-            var sfcInfo = await _manuSfcProduceService.GetBySFCAsync(sfcQuery);
+            long productId = 0;
+            if (string.IsNullOrEmpty(dto.ProductCode) == true)
+            {
+                ManuSfcProduceBySfcQuery sfcQuery = new ManuSfcProduceBySfcQuery();
+                sfcQuery.Sfc = dto.Sfc;
+                sfcQuery.SiteId = equResModel.SiteId;
+                var sfcInfo = await _manuSfcProduceService.GetBySFCAsync(sfcQuery);
+                productId = sfcInfo.ProductId;
+            }
+            else
+            {
+                EntityByCodeQuery matQuery = new EntityByCodeQuery();
+                matQuery.Site = equResModel.SiteId;
+                matQuery.Code = dto.ProductCode;
+                var dbMaterial = await _procMaterialRepository.GetByCodeAsync(matQuery);
+                if(dbMaterial == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45161));
+                }
+                productId = dbMaterial!.Id;
+            }
 
             //3. 查询分选规则
             ProcSortRuleDetailEquQuery query = new ProcSortRuleDetailEquQuery();
-            query.MaterialId = sfcInfo.ProductId;
+            query.MaterialId = productId;
             var resultList = (await _procSortingRuleService.GetSortRuleDetailAsync(query)).ToList();
             return resultList!;
         }

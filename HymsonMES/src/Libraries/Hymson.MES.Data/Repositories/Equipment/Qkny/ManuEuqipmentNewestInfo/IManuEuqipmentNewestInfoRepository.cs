@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.ManuEuqipmentNewestInfoEntity;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.Qkny.ManuEuqipmentNewestInfo.View;
 using Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo.Query;
 
 namespace Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo
@@ -80,5 +81,11 @@ namespace Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo
         /// <returns></returns>
         Task<PagedInfo<ManuEuqipmentNewestInfoEntity>> GetPagedListAsync(ManuEuqipmentNewestInfoPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 获取List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuEquipmentNewestInfoView>> GetListAsync(ManuEuqipmentNewestInfoSiteQuery query);
     }
 }

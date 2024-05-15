@@ -15,5 +15,10 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// 电芯条码
         /// </summary>
         public string Sfc { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 产品型号
+        /// </summary>
+        public string ProductCode { get; set;} = string.Empty;
     }
 }

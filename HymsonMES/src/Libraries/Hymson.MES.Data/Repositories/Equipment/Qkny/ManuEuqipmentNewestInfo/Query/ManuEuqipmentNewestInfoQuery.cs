@@ -10,4 +10,15 @@ namespace Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo.Query
         /// </summary>
         public long EquipmentId { get; set; }
     }
+
+    /// <summary>
+    /// 设备最新信息站点查询
+    /// </summary>
+    public class ManuEuqipmentNewestInfoSiteQuery
+    {
+        /// <summary>
+        /// 设备id
+        /// </summary>
+        public long SiteId { get; set; }
+    }
 }

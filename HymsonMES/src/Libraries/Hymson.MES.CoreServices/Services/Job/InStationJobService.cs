@@ -1,4 +1,5 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using Google.Protobuf.WellKnownTypes;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
@@ -13,6 +14,7 @@ using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using IdGen;
 using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Job
@@ -59,6 +61,16 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
+        /// 当前时间
+        /// </summary>
+        public DateTime curDate;
+
+        /// <summary>
+        /// id标识
+        /// </summary>
+        public long TimeId;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
@@ -83,8 +95,25 @@ namespace Hymson.MES.CoreServices.Services.Job
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _localizationService = localizationService;
+            curDate = DateTime.Now;
+            TimeId = IdGenProvider.Instance.CreateId();
         }
 
+        /// <summary>
+        /// 写日志
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="type">1-开始 2-结束</param>
+        private void WriteLog(string message)
+        {
+            //最小毫秒数，低于这个则不记录
+            int minMilliSeconds = 50;
+
+            DateTime now = DateTime.Now;
+            int total = (int)((now - curDate).TotalMilliseconds);
+            _logger.LogWarning($"进站{TimeId}:时间:{total}:{message}");
+            curDate = DateTime.Now;
+        }
 
         /// <summary>
         /// 参数校验
@@ -107,12 +136,15 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
 
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new JobRelationBo
+            WriteLog($"before-GetJobRelationJobByProcedureIdOrResourceIdAsync-开始");
+            var result = await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new JobRelationBo
             {
                 ProcedureId = commonBo.ProcedureId,
                 ResourceId = commonBo.ResourceId,
                 LinkPoint = ResourceJobLinkPointEnum.BeforeStart
             });
+            WriteLog($"before-GetJobRelationJobByProcedureIdOrResourceIdAsync-结束");
+            return result;
         }
 
         /// <summary>
@@ -129,6 +161,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
 
+            WriteLog($"GetDataBaseValueAsync-开始");
+
             // 获取生产条码信息
             var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any())
@@ -136,9 +170,14 @@ namespace Hymson.MES.CoreServices.Services.Job
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
             }
 
+            WriteLog($"GetDataBaseValueAsync-结束");
+            WriteLog($"GetProcedureEntityByIdAsync-开始");
+
             // 进站工序信息
             var currentProcedureEntity = await _masterDataService.GetProcedureEntityByIdAsync(commonBo.ProcedureId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
+
+            WriteLog($"GetProcedureEntityByIdAsync-结束");
 
             // 遍历所有条码
             var responseBos = new List<InStationResponseBo>();
@@ -151,12 +190,16 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 单条码返回值
                 InStationResponseBo responseBo = new();
 
+                WriteLog($"IsFirstProcedureAsync-开始");
+
                 // 检查是否首工序
                 responseBo.IsFirstProcedure = await commonBo.Proxy.GetValueAsync(_masterDataService.IsFirstProcedureAsync, new ManuRouteProcedureBo
                 {
                     ProcessRouteId = sfcProduceEntity.ProcessRouteId,
                     ProcedureId = commonBo.ProcedureId
                 });
+
+                WriteLog($"IsFirstProcedureAsync-结束");
 
                 // 检查是否测试工序
                 if (currentProcedureEntity.Type == ProcedureTypeEnum.Test)
@@ -267,8 +310,12 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (obj is not InStationResponseSummaryBo data) return responseBo;
             if (data.SFCProduceEntities == null || !data.SFCProduceEntities.Any()) return responseBo;
 
+            WriteLog($"UpdateProduceInStationSFCAsync-开始");
+
             // 更改状态（在制品），如果状态一致，这里会直接返回0
             responseBo.Rows += await _manuSfcProduceRepository.UpdateProduceInStationSFCAsync(data.UpdateProduceInStationSFCCommands);
+
+            WriteLog($"UpdateProduceInStationSFCAsync-结束");
 
             // 未更新到数据，事务回滚
             if (responseBo.Rows != data.UpdateProduceInStationSFCCommands.Count())
@@ -289,9 +336,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                 _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities)
             };
 
+            WriteLog($"WhenAll-开始");
             // 等待所有任务完成
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
+
+            WriteLog($"WhenAll-结束");
 
             // 后面的代码是面板业务
             if (data.Source != RequestSourceEnum.Panel) return responseBo;
@@ -303,19 +353,23 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 面板需要的提示信息
             if (data.Count == 1)
             {
+                WriteLog($"GetResource-开始");
                 responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18224),
                     data.Type.GetDescription(),
                     data.Code,
                     data.ProcedureCode,
                     data.Status.GetDescription());
+                WriteLog($"GetResource-结束");
             }
             else if (data.Count > 1)
             {
+                WriteLog($"GetResource-开始");
                 responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18225),
                     data.Count,
                     data.Type.GetDescription(),
                     data.ProcedureCode,
                     data.Status.GetDescription());
+                WriteLog($"GetResource-结束");
             }
 
             return responseBo;
@@ -331,12 +385,15 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
 
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new JobRelationBo
+            WriteLog($"after-GetJobRelationJobByProcedureIdOrResourceIdAsync-开始");
+            var result = await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new JobRelationBo
             {
                 ProcedureId = commonBo.ProcedureId,
                 ResourceId = commonBo.ResourceId,
                 LinkPoint = ResourceJobLinkPointEnum.AfterStart
             });
+            WriteLog($"after-GetJobRelationJobByProcedureIdOrResourceIdAsync-结束");
+            return result;
         }
 
     }
