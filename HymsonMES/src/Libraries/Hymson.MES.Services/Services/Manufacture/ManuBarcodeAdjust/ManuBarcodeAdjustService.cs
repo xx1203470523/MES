@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 验证器
         /// </summary>
-        private readonly AbstractValidator<ManuBarcodeSplitAdjustDto> _validationManuBarcodeSplitAdjustRules;
+        private readonly AbstractValidator<ManuBarCodeSplitRequestDto> _validationManuBarcodeSplitAdjustRules;
 
         /// <summary>
         /// 构造函数
@@ -120,7 +120,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuSfcStepRepository manuSfcStepRepository, IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuContainerPackRepository manuContainerPackRepository,
-            AbstractValidator<ManuBarcodeSplitAdjustDto> validationManuBarcodeSplitAdjustRules)
+            AbstractValidator<ManuBarCodeSplitRequestDto> validationManuBarcodeSplitAdjustRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -786,7 +786,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<string> BarCodeSplitAdjustAsync(ManuBarcodeSplitAdjustDto param)
         {
-            await _validationManuBarcodeSplitAdjustRules.ValidateAndThrowAsync(param);
+            //await _validationManuBarcodeSplitAdjustRules.ValidateAndThrowAsync(param);
 
             #region 数据准备
             var manuSfcEntityTask = _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
