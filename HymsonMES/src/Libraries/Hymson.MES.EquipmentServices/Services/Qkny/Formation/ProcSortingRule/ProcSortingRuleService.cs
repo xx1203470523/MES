@@ -35,34 +35,50 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.ProcSortingRule
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcSortRuleDetailEquDto>> GetSortRuleDetailAsync(ProcSortRuleDetailEquQuery param)
+        public async Task<List<ProcSortRuleDto>> GetSortRuleDetailAsync(ProcSortRuleDetailEquQuery param)
         {
             var dbList = await _procSortingRuleRepository.GetSortRuleDetailAsync(param);
             if(dbList.IsNullOrEmpty() == true)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45160));
             }
-            List<ProcSortRuleDetailEquDto> resultList = new List<ProcSortRuleDetailEquDto>();
-            foreach(var item in  dbList)
+
+            List<ProcSortRuleDto> resultList = new List<ProcSortRuleDto>();
+
+            var groupNameList = dbList.Select(m => m.Grade).Distinct().ToList();
+            foreach (var groupItem in groupNameList) //遍历每个挡位，每个挡位下会有多个规则
             {
-                ProcSortRuleDetailEquDto model = new ProcSortRuleDetailEquDto();
-                model.SortRuleCode = item.Code;
-                model.SortRuleName = item.Name;
-                model.ParameterCode = item.ParameterCode;
-                model.ParameterName = item.ParameterName;
-                model.MinValue = item.MinValue;
-                model.MinContainingType = item.MinContainingType;
-                model.MaxValue = item.MaxValue;
-                model.MaxContainingType = item.MaxContainingType;
-                model.Rating = item.Rating;
-                model.Serial = item.Serial;
-                model.ParameterValue = item.ParameterValue;
-                model.Grade = item.Grade;
-                model.ProcedureCode = item.ProcedureCode;
+                ProcSortRuleDto ruleDto = new ProcSortRuleDto();
+                ruleDto.Grade = groupItem;
 
-                resultList.Add(model);
+                var groupIdList = dbList.Where(m => m.Grade == groupItem).Select(m => m.GradeId).Distinct().ToList();
+                foreach (var groupId in groupIdList) //遍历每个挡位的规则（一个规则可能包含多个条件）
+                {
+                    var groupDbList = dbList.Where(m => m.GradeId == groupId).ToList();
+                    List<ProcSortRuleDetailEquDto> groupList = new List<ProcSortRuleDetailEquDto>();
+                    foreach (var item in groupDbList)
+                    {
+                        ProcSortRuleDetailEquDto model = new ProcSortRuleDetailEquDto();
+                        model.SortRuleCode = item.Code;
+                        model.SortRuleName = item.Name;
+                        model.ParameterCode = item.ParameterCode;
+                        model.ParameterName = item.ParameterName;
+                        model.MinValue = item.MinValue;
+                        model.MinContainingType = item.MinContainingType;
+                        model.MaxValue = item.MaxValue;
+                        model.MaxContainingType = item.MaxContainingType;
+                        model.Rating = item.Rating;
+                        model.Serial = item.Serial;
+                        model.ParameterValue = item.ParameterValue;
+                        model.Grade = item.Grade;
+                        model.ProcedureCode = item.ProcedureCode;
+
+                        groupList.Add(model);
+                    }
+                    ruleDto.RuleList.Add(groupList);
+                }
+                resultList.Add(ruleDto);
             }
-
             return resultList;
         }
     }

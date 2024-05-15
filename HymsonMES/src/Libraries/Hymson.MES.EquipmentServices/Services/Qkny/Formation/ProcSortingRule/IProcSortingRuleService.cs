@@ -19,6 +19,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.ProcSortingRule
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcSortRuleDetailEquDto>> GetSortRuleDetailAsync(ProcSortRuleDetailEquQuery param);
+        Task<List<ProcSortRuleDto>> GetSortRuleDetailAsync(ProcSortRuleDetailEquQuery param);
     }
 }

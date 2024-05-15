@@ -79,6 +79,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
                 data.Add("Name", pagedQueryDto.Requestor);
             }
 
+            if (pagedQueryDto?.RequestorCode != null)
+            {
+                data.Add("Code", pagedQueryDto.RequestorCode);
+            }
+
             if (pagedQueryDto?.Responsetor != null)
             {
                 data.Add("ReceiverType", pagedQueryDto.Responsetor);
@@ -112,6 +117,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
                 InterfaceCode = entry.InterfaceCode ?? entry.Data["Path"],
                 InterfaceName = entry.Message,
                 Requestor = entry.Data.ContainsKey("Name") ? entry.Data["Name"] : string.Empty,
+                RequestorCode = entry.Data.ContainsKey("Code") ? entry.Data["Code"] : string.Empty,
                 Responsetor = entry.Data.ContainsKey("ReceiverType") ? entry.Data["ReceiverType"] : string.Empty,
                 RequestTime = entry.Data.ContainsKey("RequestTime") ? entry.Data["RequestTime"] : string.Empty,
                 ResponseTime = entry.Data.ContainsKey("ResponseTime") ? entry.Data["ResponseTime"] : string.Empty,

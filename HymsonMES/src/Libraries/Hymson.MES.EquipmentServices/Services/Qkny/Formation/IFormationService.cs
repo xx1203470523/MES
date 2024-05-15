@@ -74,6 +74,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<List<ProcSortRuleDetailEquDto>> SortingRuleAsync(SortingRuleDto dto);
+        Task<List<ProcSortRuleDto>> SortingRuleAsync(SortingRuleDto dto);
     }
 }

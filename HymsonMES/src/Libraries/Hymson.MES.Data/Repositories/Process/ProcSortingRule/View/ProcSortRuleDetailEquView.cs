@@ -42,5 +42,10 @@ namespace Hymson.MES.Data.Repositories.Process.ProcSortingRule.View
         /// 挡位
         /// </summary>
         public string Grade { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 挡位ID
+        /// </summary>
+        public long GradeId { get; set; }
     }
 }

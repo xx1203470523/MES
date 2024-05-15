@@ -20,6 +20,11 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// 数量
         /// </summary>
         public int Qty { get; set; } = 10;
+
+        /// <summary>
+        /// 极组条码
+        /// </summary>
+        public string Sfc { get; set; } = string.Empty;
     }
 
     /// <summary>

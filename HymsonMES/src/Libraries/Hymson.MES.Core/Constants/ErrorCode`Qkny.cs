@@ -282,7 +282,7 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 工单对应型号没有对应的分选规则
         /// </summary>
-        public const string MES45160 = "工单对应型号没有对应的分选规则";
+        public const string MES45160 = "对应型号下没有启用的分选规则";
 
         /// <summary>
         /// 产品型号在系统中不存在

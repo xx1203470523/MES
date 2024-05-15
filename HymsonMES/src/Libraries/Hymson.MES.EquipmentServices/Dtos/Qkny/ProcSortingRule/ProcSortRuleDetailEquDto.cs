@@ -77,4 +77,26 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.ProcSortingRule
         /// </summary>
         public string Grade { get; set;} = string.Empty;
     }
+
+    /// <summary>
+    /// 分选规则详情
+    /// </summary>
+    public class ProcSortRuleDto
+    {
+        /// <summary>
+        /// 规则列表
+        /// </summary>
+        public List<List<ProcSortRuleDetailEquDto>> RuleList { get; set; } = new List<List<ProcSortRuleDetailEquDto>>();
+        
+        /// <summary>
+        /// 挡位
+        /// </summary>
+        public string Grade { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int Order { get; set;} = 0;
+    }
+
 }

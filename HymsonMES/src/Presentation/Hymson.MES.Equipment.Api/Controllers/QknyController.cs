@@ -892,7 +892,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("GenerateCellSfc")]
         [LogDescription("电芯码下发033", BusinessType.OTHER, "GenerateCellSfc033", ReceiverTypeEnum.MES)]
-        public async Task<List<string>> GenerateCellSfcAsync(GenerateCellSfcDto dto)
+        public async Task<string> GenerateCellSfcAsync(GenerateDxSfcDto dto)
         {
             //TODO
             //1. 生成条码进行下发
@@ -900,18 +900,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
             if (IS_DEBUG == true)
             {
-                List<string> sfcList = new List<string>();
-                for (var i = 0; i < dto.Qty; ++i)
-                {
-                    sfcList.Add($"SFC00{i + 1}");
-                }
+                //List<string> sfcList = new List<string>();
+                //for (var i = 0; i < dto.Qty; ++i)
+                //{
+                //    sfcList.Add($"SFC00{i + 1}");
+                //}
 
                 //string sfc = "SFC001";
 
-                return sfcList;
+                return "sfc001";
             }
 
-            return await _fitTogether.GenerateCellSfcAsync(dto);
+            return await _fitTogether.Create24GbCodeAsync(dto);
+            //return await _fitTogether.GenerateCellSfcAsync(dto);
         }
 
         /// <summary>
@@ -1173,7 +1174,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("SortingRule")]
         [LogDescription("分选规则045", BusinessType.OTHER, "SortingRule045", ReceiverTypeEnum.MES)]
-        public async Task<List<ProcSortRuleDetailEquDto>> SortingRuleAsync(SortingRuleDto dto)
+        public async Task<List<ProcSortRuleDto>> SortingRuleAsync(SortingRuleDto dto)
         {
             if (IS_DEBUG == true)
             {
@@ -1192,7 +1193,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                     sortList.Add(sortModel);
                 }
 
-                return sortList;
+                //return sortList;
             }
 
             return await _formationService.SortingRuleAsync(dto);

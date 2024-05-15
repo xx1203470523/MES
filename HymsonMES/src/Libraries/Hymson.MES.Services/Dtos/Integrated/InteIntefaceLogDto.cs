@@ -38,6 +38,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string? Requestor { get; set; }
 
         /// <summary>
+        /// 请求方编码
+        /// </summary>
+        public string? RequestorCode { get; set; }
+
+        /// <summary>
         /// 接收方
         /// </summary>
         public string? Responsetor { get; set; }
@@ -112,6 +117,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 请求方
         /// </summary>
         public string? Requestor { get; set; }
+
+        /// <summary>
+        /// 请求方编码
+        /// </summary>
+        public string? RequestorCode { get; set; }
 
         /// <summary>
         /// 接收方

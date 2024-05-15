@@ -431,7 +431,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<List<ProcSortRuleDetailEquDto>> SortingRuleAsync(SortingRuleDto dto)
+        public async Task<List<ProcSortRuleDto>> SortingRuleAsync(SortingRuleDto dto)
         {
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
