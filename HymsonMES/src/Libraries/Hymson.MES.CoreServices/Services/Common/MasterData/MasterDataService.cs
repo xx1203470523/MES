@@ -1443,6 +1443,7 @@ namespace Hymson.MES.CoreServices.Services.Common
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
                     ProductId = sfcProduceEntity.ProductId,
                     CirculationBarCode = feeding.BarCode,
+                    CirculationWorkOrderId = feeding.WorkOrderId,
                     CirculationProductId = currentBo.MaterialId,
                     CirculationMainProductId = mainMaterialBo.MaterialId,
                     CirculationQty = consume,

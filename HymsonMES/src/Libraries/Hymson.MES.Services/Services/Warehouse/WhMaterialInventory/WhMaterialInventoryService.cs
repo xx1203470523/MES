@@ -1,5 +1,4 @@
 using FluentValidation;
-using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -7,14 +6,10 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
@@ -437,50 +432,51 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES15122)).WithData("materialBarCode", oldWhMIEntirty.MaterialBarCode).WithData("status", _localizationService.GetResource($"{typeof(WhMaterialInventoryStatusEnum).FullName}.{oldWhMIEntirty.Status.ToString()}"));
             }
 
-            var whMaterialInventoryEntity = new WhMaterialInventoryEntity();
-            whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
-            whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
+            var whMaterialInventoryEntity = new WhMaterialInventoryEntity
+            {
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
 
-            whMaterialInventoryEntity.Id = modifyDto.Id;
-            whMaterialInventoryEntity.MaterialId = modifyDto.MaterialId;
-            whMaterialInventoryEntity.QuantityResidue = modifyDto.QuantityResidue;
-            whMaterialInventoryEntity.Batch = modifyDto.Batch;
-            whMaterialInventoryEntity.SupplierId = modifyDto.SupplierId;
-
+                Id = modifyDto.Id,
+                MaterialId = modifyDto.MaterialId,
+                QuantityResidue = modifyDto.QuantityResidue,
+                Batch = modifyDto.Batch,
+                SupplierId = modifyDto.SupplierId
+            };
 
             #region  处理得到记录
-            //查询到物料信息
+            // 查询到物料信息
             var materialInfo = await _procMaterialRepository.GetByIdAsync(modifyDto.MaterialId);
 
-            var whMaterialStandingbookEntity = new WhMaterialStandingbookEntity();
-            whMaterialStandingbookEntity.MaterialCode = materialInfo.MaterialCode;
-            whMaterialStandingbookEntity.MaterialName = materialInfo.MaterialName;
-            whMaterialStandingbookEntity.MaterialVersion = materialInfo.Version ?? "";
-            whMaterialStandingbookEntity.Unit = materialInfo.Unit ?? "";
+            var whMaterialStandingbookEntity = new WhMaterialStandingbookEntity
+            {
+                MaterialCode = materialInfo.MaterialCode,
+                MaterialName = materialInfo.MaterialName,
+                MaterialVersion = materialInfo.Version ?? "",
+                Unit = materialInfo.Unit ?? "",
 
-            whMaterialStandingbookEntity.MaterialBarCode = oldWhMIEntirty.MaterialBarCode;
-            whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.InventoryModify;
-            whMaterialStandingbookEntity.Source = MaterialInventorySourceEnum.InventoryModify;
-            whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
+                MaterialBarCode = oldWhMIEntirty.MaterialBarCode,
+                Type = WhMaterialInventoryTypeEnum.InventoryModify,
+                Source = MaterialInventorySourceEnum.InventoryModify,
+                SiteId = _currentSite.SiteId ?? 0,
 
-            whMaterialStandingbookEntity.Batch = whMaterialInventoryEntity.Batch;
-            whMaterialStandingbookEntity.Quantity = whMaterialInventoryEntity.QuantityResidue;
-            whMaterialStandingbookEntity.SupplierId = whMaterialInventoryEntity.SupplierId;
+                Batch = whMaterialInventoryEntity.Batch,
+                Quantity = whMaterialInventoryEntity.QuantityResidue,
+                SupplierId = whMaterialInventoryEntity.SupplierId,
 
-            whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
-            whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;
-            whMaterialStandingbookEntity.UpdatedBy = _currentUser.UserName;
-            whMaterialStandingbookEntity.CreatedOn = HymsonClock.Now();
-            whMaterialStandingbookEntity.UpdatedOn = HymsonClock.Now();
+                Id = IdGenProvider.Instance.CreateId(),
+                CreatedBy = _currentUser.UserName,
+                UpdatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedOn = HymsonClock.Now()
+            };
             #endregion
 
-            using (var trans = TransactionHelper.GetTransactionScope())
-            {
-                await _whMaterialInventoryRepository.UpdateOutsideWhMaterilInventoryAsync(whMaterialInventoryEntity);
+            using var trans = TransactionHelper.GetTransactionScope();
+            await _whMaterialInventoryRepository.UpdateOutsideWhMaterilInventoryAsync(whMaterialInventoryEntity);
 
-                await _whMaterialStandingbookRepository.InsertAsync(whMaterialStandingbookEntity);
-                trans.Complete();
-            }
+            await _whMaterialStandingbookRepository.InsertAsync(whMaterialStandingbookEntity);
+            trans.Complete();
         }
 
     }

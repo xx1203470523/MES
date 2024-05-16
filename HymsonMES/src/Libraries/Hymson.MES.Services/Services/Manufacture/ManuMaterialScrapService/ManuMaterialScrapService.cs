@@ -293,7 +293,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                 var materialEntity = materialList.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
 
                 // 新增 wh_material_standingbook
-                WhMaterialStandingbookEntity whMaterialStandingbookEntity = new WhMaterialStandingbookEntity
+                WhMaterialStandingbookEntity whMaterialStandingbookEntity = new()
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     MaterialCode = materialEntity.MaterialCode ?? "",
@@ -316,7 +316,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                 whMaterialStandingbookEntities.Add(whMaterialStandingbookEntity);
                 //记录报废信息
                 // 新增 wh_material_inventory_scrap
-                WhMaterialInventoryScrapEntity whMaterialInventoryScrap = new WhMaterialInventoryScrapEntity
+                WhMaterialInventoryScrapEntity whMaterialInventoryScrap = new()
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SupplierId = whMaterialInventoryEntity.SupplierId,
@@ -346,41 +346,39 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
             }
 
             //入库
-            using (var trans = TransactionHelper.GetTransactionScope())
+            using var trans = TransactionHelper.GetTransactionScope();
+            //1、修改条码表可用数量、报废数量
+            if (manuSFCPartialScrapByIdCommandList != null && manuSFCPartialScrapByIdCommandList.Any())
             {
-                //1、修改条码表可用数量、报废数量
-                if (manuSFCPartialScrapByIdCommandList != null && manuSFCPartialScrapByIdCommandList.Any())
+                var row = await _manuSfcRepository.PartialScrapmanuSFCByIdAsync(manuSFCPartialScrapByIdCommandList);
+                if (row != manuSFCPartialScrapByIdCommandList.Count())
                 {
-                    var row = await _manuSfcRepository.PartialScrapmanuSFCByIdAsync(manuSFCPartialScrapByIdCommandList);
-                    if (row != manuSFCPartialScrapByIdCommandList.Count())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15449));
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15449));
                 }
-
-                //4.插入台账记录
-                if (whMaterialStandingbookEntities != null && whMaterialStandingbookEntities.Any())
-                {
-                    await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
-                }
-
-                //5.修改库存数据
-                if (scrapPartialWhMaterialInventoryEmptyByIdCommandList != null && scrapPartialWhMaterialInventoryEmptyByIdCommandList.Any())
-                {
-                    var row = await _whMaterialInventoryRepository.ScrapPartialWhMaterialInventoryByIdAsync(scrapPartialWhMaterialInventoryEmptyByIdCommandList);
-                    if (row != scrapPartialWhMaterialInventoryEmptyByIdCommandList.Count())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15449));
-                    }
-                }
-
-                //6.插入报废表
-                if (manuSfcScrapEntities != null && manuSfcScrapEntities.Any())
-                {
-                    await _whMaterialInventoryScrapRepository.InsertAsync(manuSfcScrapEntities);
-                }
-                trans.Complete();
             }
+
+            //4.插入台账记录
+            if (whMaterialStandingbookEntities != null && whMaterialStandingbookEntities.Any())
+            {
+                await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
+            }
+
+            //5.修改库存数据
+            if (scrapPartialWhMaterialInventoryEmptyByIdCommandList != null && scrapPartialWhMaterialInventoryEmptyByIdCommandList.Any())
+            {
+                var row = await _whMaterialInventoryRepository.ScrapPartialWhMaterialInventoryByIdAsync(scrapPartialWhMaterialInventoryEmptyByIdCommandList);
+                if (row != scrapPartialWhMaterialInventoryEmptyByIdCommandList.Count())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15449));
+                }
+            }
+
+            //6.插入报废表
+            if (manuSfcScrapEntities != null && manuSfcScrapEntities.Any())
+            {
+                await _whMaterialInventoryScrapRepository.InsertAsync(manuSfcScrapEntities);
+            }
+            trans.Complete();
         }
 
         /// <summary>
