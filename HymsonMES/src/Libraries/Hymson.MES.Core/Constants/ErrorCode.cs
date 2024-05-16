@@ -857,6 +857,7 @@
         public const string MES15127 = "物料码只有一条，无法进行合并操作";
         public const string MES15128 = "物料总数为0,不需要合并！";
         public const string MES15129 = "未查到条码库存信息";
+        public const string MES15130 = "新生成的条码{sfc}在物料仓已存在，请设置更复杂的合并编码规则";
         #endregion
 
         #region 物料台账 15200
