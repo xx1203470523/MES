@@ -557,6 +557,15 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES16200));
             }
 
+            //查询到库存的信息
+            var getNewSplitSFCEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                BarCode = newSplitSFC
+            });
+
+            if (getNewSplitSFCEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES15130)).WithData("sfc", newSplitSFC);
+
             //SFC及SFC信息
             var manuSfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
             {
