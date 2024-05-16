@@ -80,6 +80,7 @@ namespace Hymson.MES.Services.Services.EquProcessParamRecord
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     EquipmentId = m.EquipmentId,
+                    Location = m.Location,
                     ParamCode = m.ParamCode,
                     ParamValue = m.ParamValue,
                     ParamId = paramList.Where(p => p.ParameterCode == m.ParamCode).FirstOrDefault()?.Id,

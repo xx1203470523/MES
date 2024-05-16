@@ -16,6 +16,11 @@ namespace Hymson.MES.Core.Domain.EquProcessParamRecord
         public long EquipmentId { get; set; }
 
         /// <summary>
+        /// 位置号
+        /// </summary>
+        public string Location { get; set; }
+
+        /// <summary>
         /// 参数Id
         /// </summary>
         public long? ParamId { get; set; }

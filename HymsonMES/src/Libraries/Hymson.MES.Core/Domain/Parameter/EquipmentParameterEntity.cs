@@ -23,6 +23,11 @@ namespace Hymson.MES.Core.Domain.Parameter
         public long EquipmentId { get; set; }
 
         /// <summary>
+        /// 位置号
+        /// </summary>
+        public string Location { get; set; }
+
+        /// <summary>
         /// 参数Id
         /// </summary>
         public long ParameterId { get; set; }
@@ -30,7 +35,7 @@ namespace Hymson.MES.Core.Domain.Parameter
         /// <summary>
         /// 参数值
         /// </summary>
-        public string ParameterValue { get; set; }    
+        public string ParameterValue { get; set; }
 
         /// <summary>
         /// 采集时间

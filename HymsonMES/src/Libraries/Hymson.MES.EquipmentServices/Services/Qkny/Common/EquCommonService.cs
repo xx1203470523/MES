@@ -1,46 +1,42 @@
-﻿using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Enums.Qkny;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
-using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
-using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
-using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
-using Hymson.Snowflake;
-using Hymson.Utils.Tools;
-using Hymson.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
-using FluentValidation;
-using Hymson.MES.Data.Repositories.Equipment;
+﻿using FluentValidation;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
-using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
-using Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment;
-using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
-using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
-using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
-using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
-using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
-using Hymson.MES.Services.Services.EquEquipmentAlarm;
-using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
-using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
-using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
-using Hymson.MES.Services.Dtos.EquToolLifeRecord;
-using Hymson.MES.Services.Services.EquToolLifeRecord;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
-using Hymson.MES.Services.Dtos.EquProcessParamRecord;
-using Hymson.MES.Services.Services.EquProcessParamRecord;
-using Hymson.MES.Services.Dtos.EquProductParamRecord;
-using Hymson.MES.Services.Services.EquProductParamRecord;
-using Hymson.MES.Services.Services.EquOpenParamRecord;
-using Hymson.MES.Services.Dtos.EquOpenParamRecord;
-using Hymson.MES.CoreServices.Services.Parameter;
+using Hymson.MES.Core.Enums.Qkny;
 using Hymson.MES.CoreServices.Bos.Parameter;
+using Hymson.MES.CoreServices.Services.Parameter;
+using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.EquipmentServices.Dtos.Parameter;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection;
+using Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment;
+using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
+using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
+using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
+using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
+using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Dtos.EquOpenParamRecord;
+using Hymson.MES.Services.Dtos.EquProcessParamRecord;
+using Hymson.MES.Services.Dtos.EquToolLifeRecord;
+using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
+using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
+using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
+using Hymson.MES.Services.Services.EquEquipmentAlarm;
+using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
+using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Services.EquOpenParamRecord;
+using Hymson.MES.Services.Services.EquProcessParamRecord;
+using Hymson.MES.Services.Services.EquProductParamRecord;
+using Hymson.MES.Services.Services.EquToolLifeRecord;
+using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
+using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
 using Hymson.Minio;
+using Hymson.Snowflake;
+using Hymson.Utils;
+using Hymson.Utils.Tools;
+using System.Transactions;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
 {
@@ -179,6 +175,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         private readonly IManuProductParameterService _manuProductParameterService;
 
         /// <summary>
+        /// 参数采集
+        /// </summary>
+        private readonly IProcessCollectionService _processCollectionService;
+
+        /// <summary>
         /// 文件上传
         /// </summary>
         private readonly IMinioService _minioService;
@@ -212,7 +213,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             AbstractValidator<EquipmentProcessParamDto> validationEquipmentProcessParamDto,
             AbstractValidator<ProductParamDto> validationProductParamDto,
             IManuProductParameterService manuProductParameterService,
-            IMinioService minioService)
+            IMinioService minioService,
+            IProcessCollectionService processCollectionService)
         {
             _equEquipmentService = equEquipmentService;
             _equEquipmentVerifyRepository = equEquipmentVerifyRepository;
@@ -241,6 +243,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             _validationProductParamDto = validationProductParamDto;
             _manuProductParameterService = manuProductParameterService;
             _minioService = minioService;
+            _processCollectionService = processCollectionService;
         }
 
         /// <summary>
@@ -590,13 +593,29 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             {
                 m.SiteId = equResModel.SiteId;
                 m.EquipmentId = equResModel.EquipmentId;
+                m.Location = dto.Location;
                 m.CreatedOn = HymsonClock.Now();
                 m.CreatedBy = dto.EquipmentCode;
                 m.UpdatedOn = m.CreatedOn;
                 m.UpdatedBy = m.CreatedBy;
             });
+            EquipmentProcessParameterCollectDto parameterCollectDto = new()
+            {
+                SiteId = equResModel.SiteId,
+                EquipmentId = equResModel.EquipmentId,
+                Location = dto.Location,
+                Parameters = dto.ParamList.Select(x => new EquipmentProcessParameterDto
+                {
+                    ParameterCode = x.ParamCode,
+                    ParameterValue = x.ParamValue,
+                    CollectionTime = x.CollectionTime
+                })
+            };
             //3. 数据操作
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             await _equProcessParamRecordService.AddMultAsync(saveDtoList);
+            await _processCollectionService.EquipmentCollectionAsync(parameterCollectDto);
+            trans.Complete();
         }
 
         /// <summary>

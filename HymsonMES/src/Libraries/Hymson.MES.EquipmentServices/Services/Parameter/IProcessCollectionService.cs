@@ -22,6 +22,13 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
         Task EquipmentCollectionAsync(IEnumerable<EquipmentProcessParameterDto> request);
 
         /// <summary>
+        /// 设备参数采集
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task EquipmentCollectionAsync(EquipmentProcessParameterCollectDto dto);
+
+        /// <summary>
         /// 获取参数表名
         /// </summary>
         /// <param name="dto"></param>

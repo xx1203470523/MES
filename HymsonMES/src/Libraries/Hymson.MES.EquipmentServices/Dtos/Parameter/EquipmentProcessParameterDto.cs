@@ -3,7 +3,7 @@
     /// <summary>
     /// 设备过程参数
     /// </summary>
-    public  class EquipmentProcessParameterDto
+    public class EquipmentProcessParameterDto
     {
         /// <summary>
         /// 参数编码
@@ -56,4 +56,35 @@
         /// </summary>
         public string ProcedureCode { get; set; } = string.Empty;
     }
-  }
+
+    /// <summary>
+    /// 设备过程参数采集DTO
+    /// </summary>
+    public class EquipmentProcessParameterCollectDto
+    {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 位置号
+        /// </summary>
+        public string Location { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 参数列表
+        /// </summary>
+        public IEnumerable<EquipmentProcessParameterDto> Parameters { get; set; } = new List<EquipmentProcessParameterDto>();
+    }
+}

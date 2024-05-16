@@ -98,7 +98,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
             _equEquipmentRepository = equEquipmentRepository;
             _manuEquipmentParameterRepository = manuEquipmentParameterRepository;
             _manuProductParameterRepository = manuProductParameterRepository;
-            _procProcedureRepository = procProcedureRepository; 
+            _procProcedureRepository = procProcedureRepository;
         }
 
 
@@ -207,13 +207,58 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
         }
 
         /// <summary>
+        /// 参数采集（设备）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task EquipmentCollectionAsync(EquipmentProcessParameterCollectDto dto)
+        {
+            var parameters = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
+            {
+                SiteId = dto.SiteId,
+                Codes = dto.Parameters.Select(x => x.ParameterCode)
+            });
+
+            var list = new List<EquipmentParameterDto>();
+            var errorParameter = new List<string>();
+            foreach (var item in dto.Parameters)
+            {
+                var parameterEntity = parameters.FirstOrDefault(x => item.ParameterCode.Equals(x.ParameterCode, StringComparison.OrdinalIgnoreCase));
+                //TODO 暂时屏蔽校验
+                //if (parameterEntity == null)
+                //{
+                //    errorParameter.Add(item.ParameterCode);
+                //    continue;
+                //}
+                list.Add(new EquipmentParameterDto
+                {
+                    SiteId = dto.SiteId,
+                    EquipmentId = dto.EquipmentId,
+                    Location = dto.Location,
+                    ParameterId = parameterEntity?.Id ?? 0,
+                    ParameterValue = item.ParameterValue,
+                    CollectionTime = item.CollectionTime,
+                    UserName = dto.EquipmentCode,
+                    Date = HymsonClock.Now()
+                });
+            }
+
+            if (errorParameter.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19606)).WithData("ParameterCodes", string.Join(",", errorParameter));
+            }
+
+            await _manuEquipmentParameterService.InsertRangeAsync(list);
+        }
+
+        /// <summary>
         /// 获取参数表名
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         public async Task<List<string>> GetParamTableNameAsync(GetParamNameDto dto)
         {
-            if(dto.SiteId == 0)
+            if (dto.SiteId == 0)
             {
                 dto.SiteId = 42874561778253824;
             }

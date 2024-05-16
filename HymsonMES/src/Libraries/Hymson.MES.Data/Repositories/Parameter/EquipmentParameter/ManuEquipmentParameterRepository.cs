@@ -5,7 +5,6 @@ using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-
 using System.Text;
 using static Dapper.SqlMapper;
 
@@ -40,13 +39,13 @@ namespace Hymson.MES.Data.Repositories.Parameter
                 }
                 dic[tableName].Add(entity);
             }
-            using var conn = GetMESDbConnection();
+            using var conn = GetMESParamterDbConnection();
 
             // 插入数据
             List<Task<int>> tasks = new();
             foreach (var dicItem in dic)
             {
-                string insertSql = $"INSERT INTO {dicItem.Key}(`Id`, `SiteId`, `EquipmentId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId,@EquipmentId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
+                string insertSql = $"INSERT INTO {dicItem.Key}(`Id`, `SiteId`, `EquipmentId`, `Location`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId,@EquipmentId, @Location, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
                 tasks.Add(conn.ExecuteAsync(insertSql, dicItem.Value));
             }
             var result = await Task.WhenAll(tasks);
@@ -92,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
 
             var sqlBuilder = new SqlBuilder();
             // WHERE EquipmentId=@EquipmentId  AND SiteId=@SiteId AND IsDeleted=0
-            string getByEquipmentSql = $"SELECT Id, SiteId, EquipmentId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted FROM {tableName} /**where**/ order by Id DESC LIMIT @Offset,@Rows ";
+            string getByEquipmentSql = $"SELECT Id, SiteId, EquipmentId, Location, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted FROM {tableName} /**where**/ order by Id DESC LIMIT @Offset,@Rows ";
             string getByEquipmentCountSql = $"select count(1) from {tableName} /**where**/";
             var templateData = sqlBuilder.AddTemplate(getByEquipmentSql);
             var templateCount = sqlBuilder.AddTemplate(getByEquipmentCountSql);
