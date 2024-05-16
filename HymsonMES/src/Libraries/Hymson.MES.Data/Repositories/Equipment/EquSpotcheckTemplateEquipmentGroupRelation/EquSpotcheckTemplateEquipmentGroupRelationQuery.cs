@@ -23,4 +23,21 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
         /// </summary>
         public IEnumerable<long>? SpotCheckTemplateIds { get; set; }
     }
+
+
+    /// <summary>
+    /// 设备点检模板与设备组关系 查询参数
+    /// </summary>
+    public class GetByTemplateIdAndGroupIdQuery
+    {
+        /// <summary>
+        /// 模板IDs
+        /// </summary>
+        public long? SpotCheckTemplateId { get; set; }
+
+        /// <summary>
+        /// 模板IDs
+        /// </summary>
+        public IEnumerable<long>? EquipmentGroupIds { get; set; }
+    }
 }

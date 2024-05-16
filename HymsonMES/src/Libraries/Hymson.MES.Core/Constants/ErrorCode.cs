@@ -564,7 +564,9 @@
 
         #region 设备点检 模板12200
         public const string MES12200 = "设备点检模板错误";
-        public const string MES12201 = "模板{Code}已启用，不允许删除"; 
+        public const string MES12201 = "模板{Code}已启用，不允许删除";
+        public const string MES12202 = "模板【{Code}】，版本【{Version}】已存在";
+        public const string MES12203 = "设备组【{Code}】已绑定模板";
         #endregion
 
 
@@ -917,7 +919,7 @@
         public const string MES15322 = "载具内没有条码";
 
         public const string MES15330 = "条码不存在";
-        public const string MES15331 = "条码库存不足"; 
+        public const string MES15331 = "条码库存不足";
         public const string MES15332 = "请选择操作对象";
         #endregion
 
@@ -2058,7 +2060,7 @@
         public const string MES19983 = "已启用状态的检验单不允许被删除！";
 
 
-        public const string MES19987 = "非新建状态不允许删除！"; 
+        public const string MES19987 = "非新建状态不允许删除！";
         public const string MES19988 = "当前物料已存在启用的检验项目！";
         #endregion
 

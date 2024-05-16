@@ -16,12 +16,29 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
         /// <summary>
         /// 站点
         /// </summary>
-        public long? SiteId { get; set; } 
-        
+        public long? SiteId { get; set; }
+
         /// <summary>
         /// 模板IDs
         /// </summary>
         public IEnumerable<long>? SpotCheckTemplateIds { get; set; }
 
+    }
+
+    /// <summary>
+    /// 设备点检模板与项目关系 查询参数
+    /// </summary>
+    public class GetByTemplateIdAndItemIdQuery
+    {
+
+        /// <summary>
+        /// 模板IDs
+        /// </summary>
+        public long SpotCheckTemplateId { get; set; }
+
+        /// <summary>
+        /// 项目ID
+        /// </summary>
+        public IEnumerable<long>? SpotCheckItemIds { get; set; } 
     }
 }

@@ -60,6 +60,20 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
             return await conn.QueryFirstOrDefaultAsync<EquSpotcheckTemplateEntity>(GetByIdSql, new { Id = id });
         }
 
+
+
+        /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<EquSpotcheckTemplateEntity> GetByCodeAsync(EquSpotcheckTemplateQuery param) 
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquSpotcheckTemplateEntity>(GetByCodeSql, param);
+        }
+
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -210,6 +224,10 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `Code`, `Name`, `Status`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `equ_spotcheck_template`  WHERE Id IN @Ids ";
+
+        const string GetByCodeSql = @"SELECT  
+                               `Id`, `Code`, `Name`, `Status`, `Version`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                            FROM `equ_spotcheck_template`  WHERE SiteId=@SiteId AND Code = @Code AND Version=@Version AND IsDeleted=0  ";
         #endregion
     }
 }

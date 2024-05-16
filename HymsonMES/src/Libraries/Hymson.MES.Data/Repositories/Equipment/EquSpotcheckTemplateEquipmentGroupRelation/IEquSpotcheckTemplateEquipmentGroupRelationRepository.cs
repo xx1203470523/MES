@@ -60,14 +60,19 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
         /// <returns></returns>
         Task<int> DeletesAsync(DeleteCommand param);
 
-
         /// <summary>
         /// 批量删除（物理删除）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesByIdsAsync(IEnumerable<long> spotCheckTemplateIds);
+        Task<int> DeletesBySpotCheckTemplateIdsAsync(IEnumerable<long> spotCheckTemplateIds);
 
+        /// <summary>
+        /// 批量删除（物理删除）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns> 
+        Task<int> DeletesByTemplateIdAndGroupIdsAsync(GetByTemplateIdAndGroupIdQuery spotCheckTemplateIds);
 
         /// <summary>
         /// 根据ID获取数据
@@ -82,6 +87,21 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<EquSpotcheckTemplateEquipmentGroupRelationEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据IDs批量获取数据(组合)
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns> 
+        Task<IEnumerable<EquSpotcheckTemplateEquipmentGroupRelationEntity>> GetByTemplateIdAndGroupIdAsync(GetByTemplateIdAndGroupIdQuery param);
+
+
+        /// <summary>
+        /// 根据GroupId批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns> 
+        Task<IEnumerable<EquSpotcheckTemplateEquipmentGroupRelationEntity>> GetByGroupIdAsync(IEnumerable<long> groupIdSql);
 
         /// <summary>
         /// 获取List

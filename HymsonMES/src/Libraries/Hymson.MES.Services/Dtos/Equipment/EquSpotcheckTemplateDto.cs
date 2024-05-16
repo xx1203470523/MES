@@ -9,6 +9,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
+using Hymson.MES.Services.Dtos.Qual;
 
 namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
 {
@@ -35,7 +36,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// <summary>
         /// 状态
         /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
         /// <summary>
         /// 版本
@@ -88,19 +89,24 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
     {
 
         /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 点检模板编码
         /// </summary>
         public string Code { get; set; }
-         
+
         /// <summary>
         /// 点检模板名称
         /// </summary>
-        public string Name { get; set; }  
+        public string Name { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
         /// <summary>
         /// 版本
@@ -147,7 +153,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// <summary>
         /// 状态
         /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
         /// <summary>
         /// 版本
@@ -203,20 +209,38 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         public string? EquipmentGroupName { get; set; }
     }
 
+    /// <summary>
+    /// 删除数据
+    /// </summary>
+    public record EquSpotcheckTemplateDeleteDto
+    {
+        /// <summary>
+        /// 要删除的组
+        /// </summary>
+        public IEnumerable<long> Ids { get; set; }
+    }
+
     #region 关系子表
     /// <summary>
     /// 设备点检模板与项目关系Dto
     /// </summary>
     public record EquSpotcheckTemplateItemRelationDto
     {
+
         /// <summary>
         /// Id
         /// </summary>
         public long Id { get; set; }
+
         /// <summary>
         /// 点检项目ID;equ_spotcheck_item的Id
         /// </summary>
         public long SpotCheckItemId { get; set; }
+        
+        /// <summary>
+        /// 点检模板
+        /// </summary>
+        public long SpotCheckTemplateId { get; set; }
 
         /// <summary>
         /// 规格下限
@@ -250,6 +274,11 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// 设备组ID;equ_equipment_group的Id
         /// </summary>
         public long EquipmentGroupId { get; set; }
+        
+        /// <summary>
+        /// 设备组ID;equ_equipment_group的Id
+        /// </summary>
+        public long SpotCheckTemplateId { get; set; } 
     }
 
 
@@ -348,7 +377,24 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// 设备组名称
         /// </summary>
         public string? EquipmentGroupName { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? Remark { get; set; }
     }
 
+
+    /// <summary>
+    /// 设备点检模板与项目关系 查询参数
+    /// </summary> 
+    public record GetEquSpotcheckTemplateItemRelationDto
+    {
+        /// <summary>
+        /// 模板IDs
+        /// </summary>
+        public IEnumerable<long> SpotCheckTemplateIds { get; set; }
+
+    }
     #endregion
 }

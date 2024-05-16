@@ -56,11 +56,24 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesByIdsAsync(IEnumerable<long> spotCheckTemplateIds)
+        public async Task<int> DeleteBySpotCheckTemplateIdsAsync(IEnumerable<long> spotCheckTemplateIds)
+        {
+            using var conn = GetMESDbConnection(); 
+            return await conn.ExecuteAsync(DeleteBySpotCheckTemplateIdsSql, new { SpotCheckTemplateIds = spotCheckTemplateIds });
+        }
+
+
+        /// <summary>
+        /// 批量删除（物理删除）
+        /// </summary>  
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesByTemplateIdAndItemIdsAsync(GetByTemplateIdAndItemIdQuery param)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesBySpotCheckTemplateIdSql, spotCheckTemplateIds);
+            return await conn.ExecuteAsync(DeletesByTemplateIdAndItemIdsSql, param);
         }
+
 
         /// <summary>
         /// 根据ID获取数据
@@ -83,6 +96,19 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquSpotcheckTemplateItemRelationEntity>(GetByIdsSql, new { Ids = ids });
         }
+
+
+        /// <summary>
+        /// 根据ID获取数据（组合）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquSpotcheckTemplateItemRelationEntity>> GetByTemplateIdAndItemIdSqlAsync(GetByTemplateIdAndItemIdQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquSpotcheckTemplateItemRelationEntity>(GetByTemplateIdAndItemIdSql, param);
+        }
+
 
         /// <summary>
         /// 分页查询
@@ -125,8 +151,6 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquSpotcheckTemplateItemRelationEntitiesSqlTemplate);
 
-            sqlBuilder.Where("est.IsDeleted=0");
-            sqlBuilder.Where("est.SiteId = @SiteId");
             sqlBuilder.Select("*");
 
             if (equSpotcheckTemplateItemRelationQuery.SpotCheckTemplateIds != null && equSpotcheckTemplateItemRelationQuery.SpotCheckTemplateIds.Any())
@@ -157,17 +181,8 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<EquSpotcheckTemplateItemRelationEntity> equSpotcheckTemplateItemRelationEntitys)
         {
-            try
-            {
-                using var conn = GetMESDbConnection();
-                return await conn.ExecuteAsync(InsertsSql, equSpotcheckTemplateItemRelationEntitys);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertsSql, equSpotcheckTemplateItemRelationEntitys);
         }
 
         /// <summary>
@@ -208,11 +223,12 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
         const string InsertsSql = "INSERT INTO `equ_spotcheck_template_item_relation`(  `SpotCheckTemplateId`, `SpotCheckItemId`, `LowerLimit`, `Center`, `UpperLimit`, `CreatedBy`, `CreatedOn`) VALUES (   @SpotCheckTemplateId, @SpotCheckItemId, @LowerLimit, @Center, @UpperLimit, @CreatedBy, @CreatedOn )  ";
 
         const string UpdateSql = "UPDATE `equ_spotcheck_template_item_relation` SET   SpotCheckTemplateId = @SpotCheckTemplateId, SpotCheckItemId = @SpotCheckItemId, LowerLimit = @LowerLimit, Center = @Center, UpperLimit = @UpperLimit, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_spotcheck_template_item_relation` SET   SpotCheckTemplateId = @SpotCheckTemplateId, SpotCheckItemId = @SpotCheckItemId, LowerLimit = @LowerLimit, Center = @Center, UpperLimit = @UpperLimit, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `equ_spotcheck_template_item_relation` SET   SpotCheckTemplateId = @SpotCheckTemplateId, SpotCheckItemId = @SpotCheckItemId, LowerLimit = @LowerLimit, Center = @Center, UpperLimit = @UpperLimit, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn  WHERE  SpotCheckTemplateId = @SpotCheckTemplateId AND SpotCheckItemId=@SpotCheckItemId ";
 
         const string DeleteSql = "UPDATE `equ_spotcheck_template_item_relation` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `equ_spotcheck_template_item_relation` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
-        const string DeletesBySpotCheckTemplateIdSql = "DELETE FROM `equ_spotcheck_template_item_relation`  WHERE SpotCheckTemplateId IN @SpotCheckTemplateIds";
+        const string DeletesByTemplateIdAndItemIdsSql = "DELETE FROM `equ_spotcheck_template_item_relation`  WHERE SpotCheckTemplateId = @SpotCheckTemplateId AND SpotCheckItemId IN @SpotCheckItemIds";
+        const string DeleteBySpotCheckTemplateIdsSql = "DELETE FROM `equ_spotcheck_template_item_relation`  WHERE SpotCheckTemplateId IN @SpotCheckTemplateIds";
 
         const string GetByIdSql = @"SELECT 
                                `SpotCheckTemplateId`, `SpotCheckItemId`, `LowerLimit`, `Center`, `UpperLimit`, `CreatedBy`, `CreatedOn`
@@ -220,6 +236,10 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
         const string GetByIdsSql = @"SELECT 
                                           `SpotCheckTemplateId`, `SpotCheckItemId`, `LowerLimit`, `Center`, `UpperLimit`, `CreatedBy`, `CreatedOn`
                             FROM `equ_spotcheck_template_item_relation`  WHERE Id IN @Ids ";
+
+        const string GetByTemplateIdAndItemIdSql = @"SELECT  
+                                          `SpotCheckTemplateId`, `SpotCheckItemId`, `LowerLimit`, `Center`, `UpperLimit`, `CreatedBy`, `CreatedOn`
+                            FROM `equ_spotcheck_template_item_relation`  WHERE SpotCheckTemplateId = @SpotCheckTemplateId AND SpotCheckItemId IN @SpotCheckItemIds ";
         #endregion
     }
 }

@@ -92,38 +92,38 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckTemplate
         /// <summary>
         /// 删除（设备点检模板）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteEquSpotcheckTemplateAsync([FromBody] long[] ids)
+        public async Task DeleteEquSpotcheckTemplateAsync([FromBody] EquSpotcheckTemplateDeleteDto param)
         {
-            await _equSpotcheckTemplateService.DeletesEquSpotcheckTemplateAsync(ids);
+            await _equSpotcheckTemplateService.DeletesEquSpotcheckTemplateAsync(param);
         }
 
 
         /// <summary>
         /// 获取模板关联信息（项目）
         /// </summary>
-        /// <param name="spotCheckTemplateIds"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("getitem")]
-        public async Task<List<GetItemRelationListDto>> QueryItemRelationListAsync(IEnumerable<long> spotCheckTemplateIds)
+        public async Task<List<GetItemRelationListDto>> QueryItemRelationListAsync([FromQuery] GetEquSpotcheckTemplateItemRelationDto param)
         {
-            return await _equSpotcheckTemplateService.QueryItemRelationListAsync(spotCheckTemplateIds);
+            return await _equSpotcheckTemplateService.QueryItemRelationListAsync(param);
         }
 
         /// <summary>
         /// 获取模板关联信息（设备组）
         /// </summary>
-        /// <param name="spotCheckTemplateIds"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("getgroup")]
-        public async Task<List<QueryEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync(IEnumerable<long> spotCheckTemplateIds)
+        public async Task<List<QueryEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync([FromQuery] GetEquSpotcheckTemplateItemRelationDto param)
         {
-            return await _equSpotcheckTemplateService.QueryEquipmentGroupRelationListAsync(spotCheckTemplateIds);
+            return await _equSpotcheckTemplateService.QueryEquipmentGroupRelationListAsync(param);
         }
         #endregion
     }

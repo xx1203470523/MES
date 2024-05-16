@@ -81,6 +81,19 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(equSpotcheckTemplateCreateDto);
 
+
+            var equSpotcheckTemplate = await _equSpotcheckTemplateRepository.GetByCodeAsync(new EquSpotcheckTemplateQuery
+            {
+                Code = equSpotcheckTemplateCreateDto.Code,
+                Version = equSpotcheckTemplateCreateDto.Version,
+                SiteId = _currentSite.SiteId,
+            });
+
+            if (equSpotcheckTemplate != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12202)).WithData("Code", equSpotcheckTemplateCreateDto.Code).WithData("Version", equSpotcheckTemplateCreateDto.Version);
+            }
+
             //DTO转换实体
             var equSpotcheckTemplateEntity = equSpotcheckTemplateCreateDto.ToEntity<EquSpotcheckTemplateEntity>();
             equSpotcheckTemplateEntity.Id = IdGenProvider.Instance.CreateId();
@@ -90,7 +103,17 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             equSpotcheckTemplateEntity.UpdatedOn = HymsonClock.Now();
             equSpotcheckTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
 
+
             List<EquSpotcheckTemplateEquipmentGroupRelationEntity> groupRelationList = new();
+            var eGroupIds = equSpotcheckTemplateCreateDto.groupRelationDto.Select(it => it.Id).ToArray();
+            var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
+            if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
+            {
+                var groupRelationIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
+                var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
+                var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
+            }
             foreach (var item in equSpotcheckTemplateCreateDto.groupRelationDto)
             {
                 var groupRelation = new EquSpotcheckTemplateEquipmentGroupRelationEntity
@@ -122,11 +145,11 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                     SpotCheckItemId = item.Id,
                     UpperLimit = item.UpperLimit,
 
-                    //IsDeleted = 0,
+                    IsDeleted = 0,
                     CreatedBy = _currentUser.UserName,
-                    //UpdatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
-                    //UpdatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now(),
                 };
 
                 relationList.Add(relation);
@@ -157,16 +180,17 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesEquSpotcheckTemplateAsync(long[] ids)
+        public async Task<int> DeletesEquSpotcheckTemplateAsync(EquSpotcheckTemplateDeleteDto param)
         {
-            var templateList = await _equSpotcheckTemplateRepository.GetByIdsAsync(ids);
+            var ids = param.Ids;
+            var templateList = await _equSpotcheckTemplateRepository.GetByIdsAsync(ids.ToArray());
 
             var codeEnabiles = "";
             foreach (var item in templateList)
             {
-                if (item.Status == SysDataStatusEnum.Enable)
+                if (item.Status == DisableOrEnableEnum.Enable)
                 {
                     codeEnabiles += item.Code + ",";
                 }
@@ -178,9 +202,9 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             }
 
             int row = 0;
-            var trans = TransactionHelper.GetTransactionScope();
-            await _equSpotcheckTemplateItemRelationRepository.DeletesByIdsAsync(ids);
-            await _equSpotcheckTemplateEquipmentGroupRelationRepository.DeletesByIdsAsync(ids);
+            using var trans = TransactionHelper.GetTransactionScope();
+            await _equSpotcheckTemplateItemRelationRepository.DeleteBySpotCheckTemplateIdsAsync(ids);
+            await _equSpotcheckTemplateEquipmentGroupRelationRepository.DeletesBySpotCheckTemplateIdsAsync(ids);
 
             row += await _equSpotcheckTemplateRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
             trans.Complete();
@@ -238,109 +262,78 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
 
             //DTO转换实体
             var equSpotcheckTemplateEntity = equSpotcheckTemplateModifyDto.ToEntity<EquSpotcheckTemplateEntity>();
+            equSpotcheckTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
+            equSpotcheckTemplateEntity.CreatedBy = _currentUser.UserName;
+            equSpotcheckTemplateEntity.CreatedOn = HymsonClock.Now();
+
             equSpotcheckTemplateEntity.UpdatedBy = _currentUser.UserName;
             equSpotcheckTemplateEntity.UpdatedOn = HymsonClock.Now();
 
+            List<long> SpotCheckItemIds = new()
+            {
+                equSpotcheckTemplateEntity.Id
+            };
+
             List<EquSpotcheckTemplateItemRelationEntity> addRelation = new();
-            List<EquSpotcheckTemplateItemRelationEntity> editRelation = new();
-            long[] deleteRelation = Array.Empty<long>();
+
             if (equSpotcheckTemplateModifyDto.relationDto != null && equSpotcheckTemplateModifyDto.relationDto.Any())
             {
-                var relationIds = equSpotcheckTemplateModifyDto.relationDto.Select(it => it.Id).ToArray();
-                var relationList = await _equSpotcheckTemplateItemRelationRepository.GetByIdsAsync(relationIds);
-
-                if (relationList != null && relationList.Any())
-                {
-                    deleteRelation = relationList.Select(it => it.Id).Where(it => !it.Equals(relationIds)).ToArray();
-                }
-
                 foreach (var item in equSpotcheckTemplateModifyDto.relationDto)
                 {
-                    var relation = relationList?.Where(it => it.Id == item.Id).FirstOrDefault();
-                    if (relation != null)
+                    addRelation.Add(new EquSpotcheckTemplateItemRelationEntity
                     {
-                        relation.UpperLimit = item.UpperLimit;
-                        relation.Center = item.Center;
-                        relation.LowerLimit = item.LowerLimit;
-                        relation.UpdatedBy = _currentUser.UserName;
-                        relation.UpdatedOn = HymsonClock.Now();
-                        editRelation.Add(relation);
-                    }
-                    else
-                    {
-                        addRelation.Add(new EquSpotcheckTemplateItemRelationEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
-                            Center = item.Center,
-                            LowerLimit = item.LowerLimit,
-                            SpotCheckItemId = item.SpotCheckItemId,
-                            UpperLimit = item.UpperLimit,
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
+                        Center = item.Center,
+                        LowerLimit = item.LowerLimit,
+                        SpotCheckItemId = item.SpotCheckItemId == 0 ? item.Id : item.SpotCheckItemId,
+                        UpperLimit = item.UpperLimit,
 
-                            IsDeleted = 0,
-                            CreatedBy = _currentUser.UserName,
-                            UpdatedBy = _currentUser.UserName,
-                            CreatedOn = HymsonClock.Now(),
-                            UpdatedOn = HymsonClock.Now()
-                        });
-                    }
+                        IsDeleted = 0,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now()
+                    });
                 }
             }
-
 
 
             List<EquSpotcheckTemplateEquipmentGroupRelationEntity> addGroupRelation = new();
-            List<EquSpotcheckTemplateEquipmentGroupRelationEntity> editGroupRelation = new();
-            long[] deleteGroupRelation = Array.Empty<long>();
-            if (equSpotcheckTemplateModifyDto.groupRelationDto != null && equSpotcheckTemplateModifyDto.groupRelationDto.Any())
+
+            var eGroupIds = equSpotcheckTemplateModifyDto.groupRelationDto.Select(it => it.Id).ToArray();
+            var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
+            if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
             {
-                var groupRelationIds = equSpotcheckTemplateModifyDto.groupRelationDto.Select(it => it.Id).ToArray();
-                var groupRelationList = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByIdsAsync(groupRelationIds);
-
-                if (groupRelationList != null && groupRelationList.Any())
+                var groupRelationIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
+                var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
+                var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
+            }
+            foreach (var item in equSpotcheckTemplateModifyDto.groupRelationDto)
+            {
+                addGroupRelation.Add(new EquSpotcheckTemplateEquipmentGroupRelationEntity
                 {
-                    deleteGroupRelation = groupRelationList.Select(it => it.Id).Where(it => !it.Equals(groupRelationIds)).ToArray();
-                }
+                    Id = IdGenProvider.Instance.CreateId(),
+                    EquipmentGroupId = item.EquipmentGroupId == 0 ? item.Id : item.EquipmentGroupId,
+                    SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
 
-                foreach (var item in equSpotcheckTemplateModifyDto.groupRelationDto)
-                {
-                    var groupRelation = groupRelationList?.Where(it => it.Id == item.Id).FirstOrDefault();
-                    if (groupRelation != null)
-                    {
-                        groupRelation.EquipmentGroupId = item.EquipmentGroupId;
-                        groupRelation.UpdatedBy = _currentUser.UserName;
-                        groupRelation.UpdatedOn = HymsonClock.Now();
-                        editGroupRelation.Add(groupRelation);
-                    }
-                    else
-                    {
-                        addGroupRelation.Add(new EquSpotcheckTemplateEquipmentGroupRelationEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            EquipmentGroupId = item.EquipmentGroupId,
-                            SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
-
-                            IsDeleted = 0,
-                            CreatedBy = _currentUser.UserName,
-                            UpdatedBy = _currentUser.UserName,
-                            CreatedOn = HymsonClock.Now(),
-                            UpdatedOn = HymsonClock.Now(),
-                        });
-                    }
-                }
+                    IsDeleted = 0,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now(),
+                });
             }
 
-
-            var trans = TransactionHelper.GetTransactionScope();
+            using var trans = TransactionHelper.GetTransactionScope();
             await _equSpotcheckTemplateRepository.UpdateAsync(equSpotcheckTemplateEntity);
 
-            await _equSpotcheckTemplateItemRelationRepository.UpdatesAsync(editRelation);
+            await _equSpotcheckTemplateItemRelationRepository.DeleteBySpotCheckTemplateIdsAsync(SpotCheckItemIds);
             await _equSpotcheckTemplateItemRelationRepository.InsertsAsync(addRelation);
-            await _equSpotcheckTemplateItemRelationRepository.DeletesByIdsAsync(deleteRelation);
 
-            await _equSpotcheckTemplateEquipmentGroupRelationRepository.UpdatesAsync(editGroupRelation);
+            await _equSpotcheckTemplateEquipmentGroupRelationRepository.DeletesBySpotCheckTemplateIdsAsync(SpotCheckItemIds);
             await _equSpotcheckTemplateEquipmentGroupRelationRepository.InsertsAsync(addGroupRelation);
-            await _equSpotcheckTemplateEquipmentGroupRelationRepository.DeletesByIdsAsync(deleteGroupRelation);
 
             trans.Complete();
         }
@@ -366,13 +359,13 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         /// <summary>
         /// 获取模板关联信息（项目）
         /// </summary>
-        /// <param name="spotCheckTemplateIds"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<List<GetItemRelationListDto>> QueryItemRelationListAsync(IEnumerable<long> spotCheckTemplateIds)
+        public async Task<List<GetItemRelationListDto>> QueryItemRelationListAsync(GetEquSpotcheckTemplateItemRelationDto param)
         {
             var equSpotcheckTemplateItemRelations = await _equSpotcheckTemplateItemRelationRepository.GetEquSpotcheckTemplateItemRelationEntitiesAsync(new EquSpotcheckTemplateItemRelationQuery
             {
-                SpotCheckTemplateIds = spotCheckTemplateIds,
+                SpotCheckTemplateIds = param.SpotCheckTemplateIds,
                 SiteId = _currentSite.SiteId
             });
 
@@ -412,13 +405,13 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         /// <summary>
         /// 获取模板关联信息（设备组）
         /// </summary>
-        /// <param name="spotCheckTemplateIds"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<List<QueryEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync(IEnumerable<long> spotCheckTemplateIds)
+        public async Task<List<QueryEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync(GetEquSpotcheckTemplateItemRelationDto param)
         {
             var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetEquSpotcheckTemplateEquipmentGroupRelationEntitiesAsync(new EquSpotcheckTemplateEquipmentGroupRelationQuery
             {
-                SpotCheckTemplateIds = spotCheckTemplateIds,
+                SpotCheckTemplateIds = param.SpotCheckTemplateIds,
                 SiteId = _currentSite.SiteId
             });
 
@@ -438,6 +431,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                         SpotCheckTemplateId = item.SpotCheckTemplateId,
                         EquipmentGroupCode = equSpotcheckItem?.EquipmentGroupCode,
                         EquipmentGroupName = equSpotcheckItem?.EquipmentGroupName,
+                        Remark = equSpotcheckItem?.Remark,
                     };
 
                     list.Add(groupRelation);

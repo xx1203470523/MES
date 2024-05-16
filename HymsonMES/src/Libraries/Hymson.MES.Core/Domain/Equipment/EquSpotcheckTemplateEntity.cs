@@ -31,7 +31,7 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckTemplate
        /// <summary>
         /// 状态
         /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
        /// <summary>
         /// 版本

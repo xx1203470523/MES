@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
         /// <param name="equSpotcheckTemplateEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(EquSpotcheckTemplateEntity equSpotcheckTemplateEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
         /// <param name="equSpotcheckTemplateEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquSpotcheckTemplateEntity equSpotcheckTemplateEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +66,16 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquSpotcheckTemplateEntity> GetByIdAsync(long id);
-    
+
+
+        /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<EquSpotcheckTemplateEntity> GetByCodeAsync(EquSpotcheckTemplateQuery param);
+
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -80,7 +89,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
         /// <param name="equSpotcheckTemplateQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<EquSpotcheckTemplateEntity>> GetEquSpotcheckTemplateEntitiesAsync(EquSpotcheckTemplateQuery equSpotcheckTemplateQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

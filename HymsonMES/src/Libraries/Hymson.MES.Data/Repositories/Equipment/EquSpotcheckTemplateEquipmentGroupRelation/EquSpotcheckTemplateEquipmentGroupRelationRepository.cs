@@ -20,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
     /// <summary>
     /// 设备点检模板与设备组关系仓储
     /// </summary>
-    public partial class EquSpotcheckTemplateEquipmentGroupRelationRepository :BaseRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository
+    public partial class EquSpotcheckTemplateEquipmentGroupRelationRepository : BaseRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository
     {
 
-        public EquSpotcheckTemplateEquipmentGroupRelationRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public EquSpotcheckTemplateEquipmentGroupRelationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -55,10 +55,21 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesByIdsAsync(IEnumerable<long> spotCheckTemplateIds)
+        public async Task<int> DeletesBySpotCheckTemplateIdsAsync(IEnumerable<long> spotCheckTemplateIds)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesBySpotCheckTemplateIdSql, spotCheckTemplateIds);
+            return await conn.ExecuteAsync(DeletesBySpotCheckTemplateIdSql, new { SpotCheckTemplateIds = spotCheckTemplateIds });
+        }
+
+        /// <summary>
+        /// 批量删除（物理删除）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns> 
+        public async Task<int> DeletesByTemplateIdAndGroupIdsAsync(GetByTemplateIdAndGroupIdQuery spotCheckTemplateIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeletesByTemplateIdAndGroupIdsSql, spotCheckTemplateIds);
         }
 
         /// <summary>
@@ -69,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
         public async Task<EquSpotcheckTemplateEquipmentGroupRelationEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<EquSpotcheckTemplateEquipmentGroupRelationEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<EquSpotcheckTemplateEquipmentGroupRelationEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -77,10 +88,33 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquSpotcheckTemplateEquipmentGroupRelationEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquSpotcheckTemplateEquipmentGroupRelationEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquSpotcheckTemplateEquipmentGroupRelationEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<EquSpotcheckTemplateEquipmentGroupRelationEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+
+        /// <summary>
+        /// 根据IDs批量获取数据(组合)
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns> 
+        public async Task<IEnumerable<EquSpotcheckTemplateEquipmentGroupRelationEntity>> GetByTemplateIdAndGroupIdAsync(GetByTemplateIdAndGroupIdQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquSpotcheckTemplateEquipmentGroupRelationEntity>(GetByTemplateIdAndGroupIdSql, param);
+        }
+
+        /// <summary>
+        /// 根据GroupId批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns> 
+        public async Task<IEnumerable<EquSpotcheckTemplateEquipmentGroupRelationEntity>> GetByGroupIdAsync(IEnumerable<long> groupIdSql)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquSpotcheckTemplateEquipmentGroupRelationEntity>(GetByGroupIdSql, new { EquipmentGroupIds = groupIdSql });
         }
 
         /// <summary>
@@ -100,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (equSpotcheckTemplateEquipmentGroupRelationPagedQuery.PageIndex - 1) * equSpotcheckTemplateEquipmentGroupRelationPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = equSpotcheckTemplateEquipmentGroupRelationPagedQuery.PageSize });
@@ -124,8 +158,6 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquSpotcheckTemplateEquipmentGroupRelationEntitiesSqlTemplate);
 
-            sqlBuilder.Where("est.IsDeleted=0");
-            sqlBuilder.Where("est.SiteId = @SiteId");
             sqlBuilder.Select("*");
 
             if (equSpotcheckTemplateEquipmentGroupRelationQuery.SpotCheckTemplateIds != null && equSpotcheckTemplateEquipmentGroupRelationQuery.SpotCheckTemplateIds.Any())
@@ -198,18 +230,29 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelatio
         const string InsertsSql = "INSERT INTO `equ_spotcheck_template_equipment_group_relation`(  `SpotCheckTemplateId`, `EquipmentGroupId`, `CreatedBy`, `CreatedOn`) VALUES (   @SpotCheckTemplateId, @EquipmentGroupId, @CreatedBy, @CreatedOn )  ";
 
         const string UpdateSql = "UPDATE `equ_spotcheck_template_equipment_group_relation` SET   SpotCheckTemplateId = @SpotCheckTemplateId, EquipmentGroupId = @EquipmentGroupId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_spotcheck_template_equipment_group_relation` SET   SpotCheckTemplateId = @SpotCheckTemplateId, EquipmentGroupId = @EquipmentGroupId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `equ_spotcheck_template_equipment_group_relation` SET   SpotCheckTemplateId = @SpotCheckTemplateId, EquipmentGroupId = @EquipmentGroupId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn  WHERE  SpotCheckTemplateId=@SpotCheckTemplateId AND EquipmentGroupId=@EquipmentGroupId ";
 
         const string DeleteSql = "UPDATE `equ_spotcheck_template_equipment_group_relation` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `equ_spotcheck_template_equipment_group_relation` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
-        const string DeletesBySpotCheckTemplateIdSql = "DELETE FROM `equ_spotcheck_template_equipment_group_relation` WHERE SpotCheckTemplateId IN @SpotCheckTemplateIds";
-         
+        const string DeletesBySpotCheckTemplateIdSql = "DELETE FROM `equ_spotcheck_template_equipment_group_relation` WHERE  SpotCheckTemplateId IN @SpotCheckTemplateIds";
+
+        const string DeletesByTemplateIdAndGroupIdsSql = "DELETE FROM `equ_spotcheck_template_equipment_group_relation` WHERE  SpotCheckTemplateId=@SpotCheckTemplateId AND EquipmentGroupId IN @EquipmentGroupIds ";
+
+
         const string GetByIdSql = @"SELECT 
                                `SpotCheckTemplateId`, `EquipmentGroupId`, `CreatedBy`, `CreatedOn`
                             FROM `equ_spotcheck_template_equipment_group_relation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
                                           `SpotCheckTemplateId`, `EquipmentGroupId`, `CreatedBy`, `CreatedOn`
                             FROM `equ_spotcheck_template_equipment_group_relation`  WHERE Id IN @Ids ";
+
+        const string GetByTemplateIdAndGroupIdSql = @"SELECT  
+                                          `SpotCheckTemplateId`, `EquipmentGroupId`, `CreatedBy`, `CreatedOn`
+                            FROM `equ_spotcheck_template_equipment_group_relation`  WHERE  SpotCheckTemplateId=@SpotCheckTemplateId AND EquipmentGroupId IN @EquipmentGroupIds ";
+
+        const string GetByGroupIdSql = @"SELECT   
+                                          `SpotCheckTemplateId`, `EquipmentGroupId`, `CreatedBy`, `CreatedOn`
+                            FROM `equ_spotcheck_template_equipment_group_relation`  WHERE  EquipmentGroupId IN @EquipmentGroupIds ";
         #endregion
     }
 }

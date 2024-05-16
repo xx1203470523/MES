@@ -13,5 +13,18 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
     /// </summary>
     public class EquSpotcheckTemplateQuery
     {
+        /// <summary>
+        /// CODE
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long? SiteId { get; set; }
     }
 }
