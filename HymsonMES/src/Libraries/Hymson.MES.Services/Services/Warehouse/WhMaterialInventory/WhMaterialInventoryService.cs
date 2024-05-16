@@ -743,6 +743,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 BarCodes = adjustDto.SFCs
             });
 
+            oldWhMEntirty = oldWhMEntirty.Where(x => x.Status == WhMaterialInventoryStatusEnum.ToBeUsed);
+
             if (oldWhMEntirty.Count() == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15129));
@@ -810,6 +812,16 @@ namespace Hymson.MES.Services.Services.Warehouse
 
                 //新条码编码
                 var newSplitSFC = await GeneratewhSfcAdjustAsync(CodeRuleCodeTypeEnum.WhSfcMergeAdjust, newSFCEntity.SiteId, newSFCEntity.CreatedBy);
+
+                //查询到库存的信息
+                var getNewSplitSFCEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    BarCode = newSplitSFC
+                });
+
+                if(getNewSplitSFCEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES15130)).WithData("sfc", newSplitSFC);
+
                 returnSFC = newSplitSFC;
                 newSFCEntity.MaterialBarCode = newSplitSFC;
                 newSFCEntity.QuantityResidue = qty;
@@ -819,9 +831,9 @@ namespace Hymson.MES.Services.Services.Warehouse
                 {
                     var updateQuantityRangeCommand = new UpdateQuantityRangeCommand
                     {
-                        Status = entity.Status,
+                        Status = WhMaterialInventoryStatusEnum.Locked,
                         BarCode = entity.MaterialBarCode,
-                        QuantityResidue = entity.QuantityResidue,
+                        QuantityResidue = 0,
                         UpdatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now()
                     };
