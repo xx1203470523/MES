@@ -243,9 +243,9 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string MaterialBarCode { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 数量（剩余）
@@ -308,7 +308,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     /// </summary>
     public record WhMaterialInventoryListCreateDto : BaseEntityDto
     {
-
         /// <summary>
         /// 来源
         /// </summary>
@@ -318,9 +317,9 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public long MaterialId { get; set; }
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
         /// <summary>
         /// 物料条码
         /// </summary>
@@ -504,7 +503,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     /// <summary>
     /// 修改外部来源的库存
     /// </summary>
-    public class OutsideWhMaterialInventoryModifyDto 
+    public class OutsideWhMaterialInventoryModifyDto
     {
         public long Id { get; set; }
 
@@ -519,9 +518,9 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public decimal QuantityResidue { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 供应商ID

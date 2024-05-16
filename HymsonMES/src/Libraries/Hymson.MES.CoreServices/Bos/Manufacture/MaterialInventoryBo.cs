@@ -45,15 +45,14 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public decimal QuantityResidue { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 供应商ID
         /// </summary>
         public long SupplierId { get; set; }
-
 
         /// <summary>
         /// 物料版本
@@ -69,5 +68,6 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 有效期/到期日
         /// </summary>
         public DateTime? DueDate { get; set; }
+
     }
 }

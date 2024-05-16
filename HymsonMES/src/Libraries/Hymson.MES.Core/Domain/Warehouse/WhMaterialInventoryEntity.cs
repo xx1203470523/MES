@@ -28,9 +28,9 @@ namespace Hymson.MES.Core.Domain.Warehouse
         public string MaterialBarCode { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 数量（剩余 不包含报废数量）

@@ -7,12 +7,6 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Core.Domain.Warehouse
 {
@@ -45,9 +39,9 @@ namespace Hymson.MES.Core.Domain.Warehouse
         public string MaterialBarCode { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 数量
