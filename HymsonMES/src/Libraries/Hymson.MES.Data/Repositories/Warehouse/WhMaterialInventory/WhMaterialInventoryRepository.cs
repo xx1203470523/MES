@@ -393,6 +393,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 按实际传入更新库存
+        /// </summary>
+        /// <param name="updateQuantityCommand"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQuantityResidueRangeAsync(IEnumerable<UpdateQuantityRangeCommand> updateQuantityCommand)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateQuantityResidueRangeSql, updateQuantityCommand);
+        }
+        
+
+        /// <summary>
         /// 更新库存数量(减少库存)
         /// </summary>
         /// <param name="Command"></param>
@@ -527,7 +539,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateIncreaseQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue + @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateReduceQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue - @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateReduceQuantityResidueWithCheckSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue - @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode AND QuantityResidue = @QuantityOriginal; ";
+        
         const string UpdateReduceQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue - @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        /// <summary>
+        /// 按实际传入
+        /// </summary>
+        const string UpdateQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=@QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
 #endif
 
          
