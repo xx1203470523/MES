@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 物料台账    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  pengxin
- *build datetime: 2023-03-13 10:03:28
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 
@@ -41,7 +34,7 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// <summary>
         /// 批次号
         /// </summary>
-        public string? Batch { get; set; }
+        public string Batch { get; set; } = "";
 
         /// <summary>
         /// 数量
