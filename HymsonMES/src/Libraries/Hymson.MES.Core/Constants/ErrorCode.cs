@@ -856,6 +856,7 @@
         public const string MES15126 = "待拆分数量不能大于原始数量";
         public const string MES15127 = "物料码只有一条，无法进行合并操作";
         public const string MES15128 = "物料总数为0,不需要合并！";
+        public const string MES15129 = "未查到条码库存信息";
         #endregion
 
         #region 物料台账 15200
