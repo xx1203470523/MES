@@ -743,6 +743,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                 BarCodes = adjustDto.SFCs
             });
 
+            if(oldWhMEntirty.Count() == 0) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15129));
+            }
+
             //处理父条码
             var qty = oldWhMEntirty.Sum(x => x.QuantityResidue);
             if (qty <= 0) throw new CustomerValidationException(nameof(ErrorCode.MES15128));
@@ -891,6 +895,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     SiteId = _currentSite.SiteId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
                     Batch = entity.Batch ?? string.Empty,
+                    SupplierId=entity.SupplierId,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
