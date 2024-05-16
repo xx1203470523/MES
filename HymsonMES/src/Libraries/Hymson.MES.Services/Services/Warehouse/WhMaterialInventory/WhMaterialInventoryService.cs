@@ -743,7 +743,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 BarCodes = adjustDto.SFCs
             });
 
-            if(oldWhMEntirty.Count() == 0) {
+            if (oldWhMEntirty.Count() == 0)
+            {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15129));
             }
 
@@ -850,16 +851,19 @@ namespace Hymson.MES.Services.Services.Warehouse
                     SFC = oldWhMEntirty.FirstOrDefault()!.MaterialBarCode,
                     SiteId = _currentSite.SiteId ?? 0,
                 });
-
-                updateSFCSpecifyCommand = new UpdateStatusAndQtyBySfcsCommand()
+                if (manuSfcEntity != null)
                 {
-                    SiteId = _currentSite.SiteId,
-                    SFCs = oldWhMEntirty.Where(w => w.MaterialBarCode == adjustDto.MergeSFC).Select(s => s.MaterialBarCode),
-                    Status = manuSfcEntity.Status,
-                    Qty = qty,
-                    UpdatedBy = _currentUser.UserName,
-                    UpdatedOn = HymsonClock.Now()
-                };
+                    updateSFCSpecifyCommand = new UpdateStatusAndQtyBySfcsCommand()
+                    {
+                        SiteId = _currentSite.SiteId,
+                        SFCs = oldWhMEntirty.Where(w => w.MaterialBarCode == adjustDto.MergeSFC).Select(s => s.MaterialBarCode),
+                        Status = manuSfcEntity.Status,
+                        Qty = qty,
+                        UpdatedBy = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now()
+                    };
+                }
+
 
                 inputBarcodeSingle = standbookList.Where(w => w.QuantityResidue != 0).FirstOrDefault();
 
@@ -895,7 +899,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     SiteId = _currentSite.SiteId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
                     Batch = entity.Batch ?? string.Empty,
-                    SupplierId=entity.SupplierId,
+                    SupplierId = entity.SupplierId,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
@@ -960,11 +964,11 @@ namespace Hymson.MES.Services.Services.Warehouse
                     //INVENTORY UPDATE
                     if (updateInventoryCommands != null)
                     {
-                        await _whMaterialInventoryRepository.UpdateReduceQuantityResidueRangeAsync(updateInventoryCommands);
+                        await _whMaterialInventoryRepository.UpdateQuantityResidueRangeAsync(updateInventoryCommands);
                     }
 
                     //INVENTORY INSERT
-                    if (newSFCEntity != null)
+                    if (newSFCEntity != null && newSFCEntity.Id != 0)
                     {
                         await _whMaterialInventoryRepository.InsertAsync(newSFCEntity);
                     }
