@@ -790,7 +790,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 foreach (var entity in oldWhMEntirty)
                 {
                     decimal residueqty = 0;
-                    var status = WhMaterialInventoryStatusEnum.Locked;
+                    var status = WhMaterialInventoryStatusEnum.Invalid;
                     if (entity.MaterialBarCode == adjustDto.MergeSFC)
                     {
                         residueqty = qty;
@@ -840,7 +840,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 {
                     var updateQuantityRangeCommand = new UpdateQuantityRangeCommand
                     {
-                        Status = WhMaterialInventoryStatusEnum.Locked,
+                        Status = WhMaterialInventoryStatusEnum.Invalid,
                         BarCode = entity.MaterialBarCode,
                         QuantityResidue = 0,
                         UpdatedBy = _currentUser.UserName,
