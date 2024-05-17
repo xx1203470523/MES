@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 设备参数组详情    验证规则 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-08-02 02:08:48
- */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Process;

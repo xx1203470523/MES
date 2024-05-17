@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquOpenParamRecordEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquOpenParamRecordEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquOpenParamRecordEntity>(GetByIdsSql, new { Ids = ids });
@@ -137,12 +137,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             if (pagedQuery.EquipmentId.HasValue)
             {
-                sqlBuilder.Where("EquipmentId=@EquipmentId ");
+                sqlBuilder.Where("EquipmentId = @EquipmentId ");
             }
 
             if (pagedQuery.ParameterId.HasValue)
             {
-                sqlBuilder.Where("ParameterId=@ParameterId ");
+                sqlBuilder.Where("ParamId = @ParameterId ");
             }
 
             //限定时间
