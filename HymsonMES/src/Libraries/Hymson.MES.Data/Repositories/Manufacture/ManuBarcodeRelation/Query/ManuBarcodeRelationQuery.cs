@@ -44,6 +44,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         /// 是否拆解(0:未拆解，1：拆解)
         /// </summary>
         public SFCCirculationReportTypeEnum IsDisassemble { get; set; }
+
+        /// <summary>
+        /// Bom明细表ID
+        /// </summary>
+
+        public long? BomMainMaterialId { get; set; }
     }
 
     /// <summary>
