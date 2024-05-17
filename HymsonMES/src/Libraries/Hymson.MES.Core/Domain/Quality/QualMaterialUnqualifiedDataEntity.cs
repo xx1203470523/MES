@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
@@ -18,17 +19,17 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 不良状态;1、打开 2、关闭
         /// </summary>
-        public bool UnqualifiedStatus { get; set; }
+        public QualMaterialUnqualifiedStatusEnum UnqualifiedStatus { get; set; }
 
         /// <summary>
         /// 不良备注
         /// </summary>
-        public string UnqualifiedRemark { get; set; }
+        public string? UnqualifiedRemark { get; set; } = "";
 
         /// <summary>
         /// 处置结果;1、放行 2、退料
         /// </summary>
-        public bool? DisposalResult { get; set; }
+        public QualMaterialDisposalResultEnum? DisposalResult { get; set; }
 
         /// <summary>
         /// 处置时间
@@ -43,8 +44,6 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long SiteId { get; set; }
-
-        
+        public long SiteId { get; set; }    
     }
 }

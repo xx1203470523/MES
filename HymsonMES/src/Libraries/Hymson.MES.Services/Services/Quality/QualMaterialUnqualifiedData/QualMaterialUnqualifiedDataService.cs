@@ -6,12 +6,15 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -38,6 +41,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// 仓储接口（车间物料不良记录）
         /// </summary>
         private readonly IQualMaterialUnqualifiedDataRepository _qualMaterialUnqualifiedDataRepository;
+        private readonly IQualMaterialUnqualifiedDataDetailRepository _unqualifiedDataDetailRepository;
 
         /// <summary>
         /// 构造函数
@@ -46,15 +50,18 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="qualMaterialUnqualifiedDataRepository"></param>
-        public QualMaterialUnqualifiedDataService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<QualMaterialUnqualifiedDataSaveDto> validationSaveRules, 
-            IQualMaterialUnqualifiedDataRepository qualMaterialUnqualifiedDataRepository)
+        /// <param name="unqualifiedDataDetailRepository"></param>
+        public QualMaterialUnqualifiedDataService(ICurrentUser currentUser, ICurrentSite currentSite,
+            AbstractValidator<QualMaterialUnqualifiedDataSaveDto> validationSaveRules,
+            IQualMaterialUnqualifiedDataRepository qualMaterialUnqualifiedDataRepository,
+            IQualMaterialUnqualifiedDataDetailRepository unqualifiedDataDetailRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _qualMaterialUnqualifiedDataRepository = qualMaterialUnqualifiedDataRepository;
+            _unqualifiedDataDetailRepository = unqualifiedDataDetailRepository;
         }
-
 
         /// <summary>
         /// 创建
@@ -96,7 +103,7 @@ namespace Hymson.MES.Services.Services.Quality
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
@@ -124,6 +131,18 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            if (ids.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10102));
+            }
+
+            var entitys = await _qualMaterialUnqualifiedDataRepository.GetByIdsAsync(ids);
+            if(entitys.Any(x=>x.UnqualifiedStatus== QualMaterialUnqualifiedStatusEnum.Close))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15901));
+            }
+
+            //删除后，同时解除物料条码的库存锁定状态
             return await _qualMaterialUnqualifiedDataRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
@@ -137,12 +156,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualMaterialUnqualifiedDataDto?> QueryByIdAsync(long id) 
+        public async Task<QualMaterialUnqualifiedDataDto?> QueryByIdAsync(long id)
         {
-           var qualMaterialUnqualifiedDataEntity = await _qualMaterialUnqualifiedDataRepository.GetByIdAsync(id);
-           if (qualMaterialUnqualifiedDataEntity == null) return null;
-           
-           return qualMaterialUnqualifiedDataEntity.ToModel<QualMaterialUnqualifiedDataDto>();
+            var qualMaterialUnqualifiedDataEntity = await _qualMaterialUnqualifiedDataRepository.GetByIdAsync(id);
+            if (qualMaterialUnqualifiedDataEntity == null) return null;
+
+            return qualMaterialUnqualifiedDataEntity.ToModel<QualMaterialUnqualifiedDataDto>();
         }
 
         /// <summary>
@@ -150,16 +169,36 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualMaterialUnqualifiedDataDto>> GetPagedListAsync(QualMaterialUnqualifiedDataPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<QualMaterialUnqualifiedDataViewDto>> GetPagedListAsync(QualMaterialUnqualifiedDataPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<QualMaterialUnqualifiedDataPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _qualMaterialUnqualifiedDataRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<QualMaterialUnqualifiedDataDto>());
-            return new PagedInfo<QualMaterialUnqualifiedDataDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
+            var dtos = new List<QualMaterialUnqualifiedDataViewDto>();
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                return new PagedInfo<QualMaterialUnqualifiedDataViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            }
 
+            foreach (var item in pagedInfo.Data)
+            {
+                dtos.Add(new QualMaterialUnqualifiedDataViewDto
+                {
+                    Id = item.Id,
+                    MaterialBarCode = item.MaterialBarCode,
+                    QuantityResidue = item.QuantityResidue,
+                    MaterialCode = item.MaterialCode + "/" + item.Version,
+                    MaterialName = item.MaterialName,
+                    UnqualifiedCode = item.UnqualifiedCode,
+                    UnqualifiedStatus = item.UnqualifiedStatus,
+                    DisposalResult = item.DisposalResult,
+                    DisposalTime = item.DisposalTime,
+                    CreatedOn = item.CreatedOn
+                });
+            }
+            return new PagedInfo<QualMaterialUnqualifiedDataViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
     }
 }

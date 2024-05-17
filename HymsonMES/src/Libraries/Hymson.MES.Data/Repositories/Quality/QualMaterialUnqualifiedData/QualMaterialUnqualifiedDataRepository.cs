@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualMaterialUnqualifiedDataEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualMaterialUnqualifiedDataEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualMaterialUnqualifiedDataEntity>(GetByIdsSql, new { Ids = ids });
@@ -125,15 +125,65 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualMaterialUnqualifiedDataEntity>> GetPagedListAsync(QualMaterialUnqualifiedDataPagedQuery pagedQuery)
+        public async Task<PagedInfo<QualMaterialUnqualifiedDataView>> GetPagedListAsync(QualMaterialUnqualifiedDataPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+
+            sqlBuilder.Select("wmi.MaterialBarCode,wmi.QuantityResidue,wmi.MaterialId,pm.MaterialCode,pm.Version,pm.MaterialName,quc.UnqualifiedCode,mud.UnqualifiedStatus\r\n ,mud.CreatedOn,mud.DisposalResult,mud.DisposalTime,mud.Id ");
+            
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            sqlBuilder.LeftJoin("wh_material_inventory wmi on wmi.Id=mud.MaterialInventoryId");
+            sqlBuilder.LeftJoin("proc_material pm on pm.Id=wmi.MaterialId");
+            sqlBuilder.LeftJoin("qual_material_unqualified_data_detail mudd on mudd.MaterialUnqualifiedDataId=mud.Id");
+            sqlBuilder.LeftJoin("qual_unqualified_group qug on qug.Id=mudd.UnqualifiedGroupId");
+            sqlBuilder.LeftJoin("qual_unqualified_code quc on quc.Id=mudd.UnqualifiedCodeId");
+
+            sqlBuilder.OrderBy("mud.Id DESC");
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialBarCode))
+            {
+                pagedQuery.MaterialBarCode = $"%{pagedQuery.MaterialBarCode}%";
+                sqlBuilder.Where("wmi.MaterialBarCode LIKE @MaterialBarCode");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialCode))
+            {
+                pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
+                sqlBuilder.Where("pm.MaterialCode LIKE @MaterialCode");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.UnqualifiedGroup))
+            {
+                pagedQuery.UnqualifiedGroup = $"%{pagedQuery.UnqualifiedGroup}%";
+                sqlBuilder.Where("qug.UnqualifiedGroup LIKE @UnqualifiedGroup");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.UnqualifiedCode))
+            {
+                pagedQuery.UnqualifiedCode = $"%{pagedQuery.UnqualifiedCode}%";
+                sqlBuilder.Where("quc.UnqualifiedCode LIKE @UnqualifiedCode");
+            }
+
+            if (pagedQuery.UnqualifiedStatus.HasValue)
+            {
+                sqlBuilder.Where("mud.UnqualifiedStatus = @UnqualifiedStatus");
+            }
+
+            if (pagedQuery.DisposalResult.HasValue)
+            {
+                sqlBuilder.Where("mud.DisposalResult = @DisposalResult");
+            }
+            if (pagedQuery.CreatedOn != null && pagedQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.CreatedOn[0], CreatedOnEnd = pagedQuery.CreatedOn[1] });
+                sqlBuilder.Where(" mud.CreatedOn >= @CreatedOnStart AND mud.CreatedOn < @CreatedOnEnd ");
+            }
+            if (pagedQuery.DisposalTime != null && pagedQuery.DisposalTime.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { DisposalTimeStart = pagedQuery.DisposalTime[0], DisposalTimeEnd = pagedQuery.DisposalTime[1] });
+                sqlBuilder.Where(" mud.DisposalTime>=@DisposalTimeStart AND mud.DisposalTime <@DisposalTimeEnd ");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -141,13 +191,12 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<QualMaterialUnqualifiedDataEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<QualMaterialUnqualifiedDataView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<QualMaterialUnqualifiedDataEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<QualMaterialUnqualifiedDataView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
     }
 
 
@@ -156,8 +205,8 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualMaterialUnqualifiedDataRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_material_unqualified_data /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_material_unqualified_data /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_material_unqualified_data mud /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_material_unqualified_data mud /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_material_unqualified_data /**where**/  ";
 
         const string InsertSql = "INSERT INTO qual_material_unqualified_data(  `Id`, `MaterialInventoryId`, `UnqualifiedStatus`, `UnqualifiedRemark`, `DisposalResult`, `DisposalTime`, `DisposalRemark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @MaterialInventoryId, @UnqualifiedStatus, @UnqualifiedRemark, @DisposalResult, @DisposalTime, @DisposalRemark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";

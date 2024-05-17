@@ -78,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualMaterialUnqualifiedDataEntity>> GetPagedListAsync(QualMaterialUnqualifiedDataPagedQuery pagedQuery);
+        Task<PagedInfo<QualMaterialUnqualifiedDataView>> GetPagedListAsync(QualMaterialUnqualifiedDataPagedQuery pagedQuery);
 
     }
 }

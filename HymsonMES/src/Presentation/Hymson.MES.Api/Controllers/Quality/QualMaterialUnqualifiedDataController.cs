@@ -91,7 +91,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<QualMaterialUnqualifiedDataDto>> QueryPagedListAsync([FromQuery] QualMaterialUnqualifiedDataPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<QualMaterialUnqualifiedDataViewDto>> QueryPagedListAsync([FromQuery] QualMaterialUnqualifiedDataPagedQueryDto pagedQueryDto)
         {
             return await _qualMaterialUnqualifiedDataService.GetPagedListAsync(pagedQueryDto);
         }

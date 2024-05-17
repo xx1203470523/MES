@@ -48,7 +48,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualMaterialUnqualifiedDataDto>> GetPagedListAsync(QualMaterialUnqualifiedDataPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<QualMaterialUnqualifiedDataViewDto>> GetPagedListAsync(QualMaterialUnqualifiedDataPagedQueryDto pagedQueryDto);
 
     }
 }
