@@ -916,7 +916,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     Quantity = entity.QuantityResidue,
 
                     Type = WhMaterialInventoryTypeEnum.MaterialBarCodeMerge,
-                    Source = MaterialInventorySourceEnum.ManualEntry,
+                    Source = MaterialInventorySourceEnum.Merge,
                     SiteId = _currentSite.SiteId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
                     Batch = entity.Batch ?? string.Empty,
