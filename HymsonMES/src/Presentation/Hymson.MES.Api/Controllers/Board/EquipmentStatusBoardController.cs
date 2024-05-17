@@ -36,6 +36,10 @@ namespace Hymson.MES.Api.Controllers.Board
         [Route("GetEquNewestInfoList")]
         public async Task<List<ManuEquipmentNewestInfoView>> GetEquNewestInfoList([FromQuery]EquipmentNewestInfoQueryDto queryDto)
         {
+            if(queryDto.SiteId == 0)
+            {
+                queryDto.SiteId = 42874561778253824;
+            }
             EquipmentNewestInfoQueryDto query = new EquipmentNewestInfoQueryDto() { SiteId = queryDto.SiteId };
             var dataList = await _equipmentStatusService.GetEquNewestInfoList(query);
 

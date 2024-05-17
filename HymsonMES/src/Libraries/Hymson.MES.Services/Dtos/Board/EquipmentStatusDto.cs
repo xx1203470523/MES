@@ -18,6 +18,6 @@ namespace Hymson.MES.Services.Dtos.Board
         /// <summary>
         /// 站点id
         /// </summary>
-        public long SiteId { get; set; }
+        public long SiteId { get; set; } = 0;
     }
 }

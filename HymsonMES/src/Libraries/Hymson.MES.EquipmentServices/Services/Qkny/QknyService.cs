@@ -484,6 +484,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                     consumeSfcList.Add(consumeSfc);
                 }
             }
+            //NG代码
+            List<OutStationUnqualifiedBo> ngList = new List<OutStationUnqualifiedBo>();
+            if (dto.NgList != null && dto.NgList.Count > 0)
+            {
+                foreach (var item in dto.NgList)
+                {
+                    ngList.Add(new OutStationUnqualifiedBo() { UnqualifiedCode = item.NgCode, UnqualifiedQty = item.Qty });
+                }
+            }
+
             //进出站数据
             SFCOutStationBo outBo = new SFCOutStationBo();
             outBo.SiteId = equResModel.SiteId;
@@ -497,6 +507,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             outReqBo.QualifiedQty = dto.OkQty;
             outReqBo.UnQualifiedQty = dto.NgQty;
             outReqBo.ConsumeList = consumeSfcList;
+            outReqBo.OutStationUnqualifiedList = ngList;
             outBo.OutStationRequestBos = new List<OutStationRequestBo>() { outReqBo };
             //步骤记录
             ManuSfcStepEntity sfcStep = new ManuSfcStepEntity()

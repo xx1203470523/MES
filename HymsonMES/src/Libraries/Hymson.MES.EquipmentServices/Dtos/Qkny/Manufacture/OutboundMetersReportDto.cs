@@ -47,6 +47,26 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// 参数列表
         /// </summary>
         public List<QknyParamBaseDto> ParamList { get; set; } = new List<QknyParamBaseDto>();
+
+        /// <summary>
+        /// NG信息
+        /// </summary>
+        public List<NgInfoListDto> NgList { get; set; } = new List<NgInfoListDto>();
     }
 
+    /// <summary>
+    /// NG信息
+    /// </summary>
+    public class NgInfoListDto
+    {
+        /// <summary>
+        /// ng代码
+        /// </summary>
+        public string NgCode { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal? Qty { get; set; }
+    }
 }
