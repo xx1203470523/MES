@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -57,6 +58,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 删除时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 拆分步骤表Id
+        /// </summary>
+        public long DisassembledSfcStepId { get; set; }
     }
 
     /// <summary>
@@ -85,6 +91,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 删除时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 拆分步骤表Id
+        /// </summary>
+        public long DisassembledSfcStepId {  get; set; }
     }
 
 }
