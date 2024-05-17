@@ -790,7 +790,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 foreach (var entity in oldWhMEntirty)
                 {
                     decimal residueqty = 0;
-                    var status = WhMaterialInventoryStatusEnum.Locked;
+                    var status = WhMaterialInventoryStatusEnum.Invalid;
                     if (entity.MaterialBarCode == adjustDto.MergeSFC)
                     {
                         residueqty = qty;
@@ -840,7 +840,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 {
                     var updateQuantityRangeCommand = new UpdateQuantityRangeCommand
                     {
-                        Status = WhMaterialInventoryStatusEnum.Locked,
+                        Status = WhMaterialInventoryStatusEnum.Invalid,
                         BarCode = entity.MaterialBarCode,
                         QuantityResidue = 0,
                         UpdatedBy = _currentUser.UserName,
@@ -915,8 +915,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialBarCode = entity.MaterialBarCode,
                     Quantity = entity.QuantityResidue,
 
-                    Type = WhMaterialInventoryTypeEnum.MaterialBarCodeSplit,
-                    Source = MaterialInventorySourceEnum.Disassembly,
+                    Type = WhMaterialInventoryTypeEnum.MaterialBarCodeMerge,
+                    Source = MaterialInventorySourceEnum.ManualEntry,
                     SiteId = _currentSite.SiteId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
                     Batch = entity.Batch ?? string.Empty,
@@ -1043,11 +1043,11 @@ namespace Hymson.MES.Services.Services.Warehouse
             });
             if (codeRules == null || !codeRules.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES13617));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15131)).WithData("type", type.GetDescription());
             }
             if (codeRules.Count() > 1)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES13618));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15132)).WithData("type",type.GetDescription());
             }
 
             var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new CoreServices.Bos.Manufacture.ManuGenerateBarcode.GenerateBarcodeBo

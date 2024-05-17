@@ -1,5 +1,6 @@
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums;
+using Org.BouncyCastle.Cms;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.Query
 {
@@ -43,5 +44,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         /// 是否拆解(0:未拆解，1：拆解)
         /// </summary>
         public SFCCirculationReportTypeEnum IsDisassemble { get; set; }
+    }
+
+    /// <summary>
+    /// 查询实体
+    /// </summary>
+    public class ManuComponentBarcodeRelationLocationQuery
+    {
+        /// <summary>
+        /// 工厂
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 条码（产品序列码）
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 位置号
+        /// </summary>
+        public string Location { get; set; }
+
     }
 }
