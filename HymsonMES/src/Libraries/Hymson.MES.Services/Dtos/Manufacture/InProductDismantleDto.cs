@@ -391,4 +391,21 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string Sfc { get; set; }
 
     }
+
+    /// <summary>
+    /// 条码关系存储id
+    /// </summary>
+    public class InProductDismantleBusinessContent
+    {
+        /// <summary>
+        /// Bom明细Id
+        /// </summary>
+        public long BomMainMaterialId { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long BomId { get; set; }
+        
+    }
 }

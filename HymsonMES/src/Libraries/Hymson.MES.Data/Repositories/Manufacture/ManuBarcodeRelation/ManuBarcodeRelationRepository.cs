@@ -166,6 +166,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
 
+
         /// <summary>
         /// 根据SFC获取数据
         /// </summary>
@@ -185,16 +186,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("OutputBarCode = @Sfc");
             }
 
-            if (query.IsDisassemble == SFCCirculationReportTypeEnum.Activity || query.IsDisassemble == SFCCirculationReportTypeEnum.Remove)
+            if (query.IsDisassemble == SFCCirculationReportTypeEnum.Activity)
             {
-                sqlBuilder.Where("IsDisassemble = @IsDisassemble");
+                sqlBuilder.Where("IsDisassemble = 0");
             }
 
+            if (query.IsDisassemble == SFCCirculationReportTypeEnum.Remove)
+            {
+                sqlBuilder.Where("IsDisassemble = 1");
+            }
+            if (query.BomMainMaterialId.HasValue)
+            {
+                sqlBuilder.Where("BusinessContent->>'$.BomMainMaterialId' = @BomMainMaterialId");
+            }
             sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuBarCodeRelationEntity>(templateData.RawSql, templateData.Parameters);
         }
+
 
         /// <summary>
         /// 查询List
@@ -229,6 +239,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DisassemblyUpdateSql, command);
         }
+
+        /// <summary>
+        /// 根据Location查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuBarCodeRelationEntity>> GetByLocationAsync(ManuComponentBarcodeRelationLocationQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuBarCodeRelationEntity>(GetByLocationSql, query);
+        }
+
+        /// <summary>
+        /// 条码关系表拆解移除
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DisassemblyUpdateAsync(DisassemBarCodeRelationblyCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DisassemblyUpdateSql, command);
+        }
     }
 
 
@@ -254,8 +286,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT * FROM manu_barcode_relation WHERE Id IN @Ids ";
 
         const string DisassemblyUpdateSql = "UPDATE manu_barcode_relation SET " +
-          "RelationType = @RelationType, IsDisassemble = @IsDisassemble," +
+          "IsDisassemble = @IsDisassemble," +
           "DisassembledBy = @UserId, DisassembledOn = @UpdatedOn, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id = @Id AND IsDisassemble <> @IsDisassemble ";
 
+        const string GetByLocationSql = @"SELECT * FROM manu_barcode_relation WHERE SiteId = @SiteId AND InputBarCode = @SFC AND InputBarCodeLocation = @Location ";
     }
 }

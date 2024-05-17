@@ -101,5 +101,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> ManuBarCodeRelationUpdateAsync(DManuBarCodeRelationCommand command);
+
+        /// <summary>
+        /// 根据Location查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuBarCodeRelationEntity>> GetByLocationAsync(ManuComponentBarcodeRelationLocationQuery query);
+
+        /// <summary>
+        /// 条码关系表拆解移除
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DisassemblyUpdateAsync(DisassemBarCodeRelationblyCommand command);
     }
 }
