@@ -71,9 +71,9 @@ namespace Hymson.MES.Core.Domain.Equipment
         public decimal? LowerLimit { get; set; }
 
         /// <summary>
-        /// 规格值（规格中心）;值来源于点检模板
+        /// 参考值（规格中心）;值来源于点检模板
         /// </summary>
-        public decimal? Center { get; set; }
+        public decimal? ReferenceValue { get; set; }
 
         /// <summary>
         /// 规格上限;值来源于点检模板
