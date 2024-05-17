@@ -196,6 +196,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("IsDisassemble = 1");
             }
 
+            if (!string.IsNullOrWhiteSpace(query.BomMainMaterialId))
+            {
+                sqlBuilder.Where("BusinessContent->>'$.BomMainMaterialId' = @BomMainMaterialId");
+            }
             sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
@@ -247,6 +251,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuBarCodeRelationEntity>(GetByLocationSql, query);
         }
+
+        /// <summary>
+        /// 条码关系表拆解移除
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DisassemblyUpdateAsync(DisassemBarCodeRelationblyCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DisassemblyUpdateSql, command);
+        }
     }
 
 
@@ -259,11 +274,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_barcode_relation /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_barcode_relation /**where**/  ";
 
-        const string InsertSql = "INSERT INTO manu_barcode_relation(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `InputBarcode`, `InputBarcodeLocation`, `InputBarcodeMaterialId`, `InputBarcodeWorkorderId`, `InputQty`, `OutputBarcode`, `OutputBarcodeMaterialId`, `OutputBarcodeWorkorderId`, `OutputBarcodeMode`, `RelationType`, `BusinessContent`, `IsDisassemble`, `DisassembledBy`, `DisassembledOn`, `SubstituteId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @InputBarcode, @InputBarcodeLocation, @InputBarcodeMaterialId, @InputBarcodeWorkorderId, @InputQty, @OutputBarcode, @OutputBarcodeMaterialId, @OutputBarcodeWorkorderId, @OutputBarcodeMode, @RelationType, @BusinessContent, @IsDisassemble, @DisassembledBy, @DisassembledOn, @SubstituteId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO manu_barcode_relation(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `InputBarcode`, `InputBarcodeLocation`, `InputBarcodeMaterialId`, `InputBarcodeWorkorderId`, `InputQty`, `OutputBarcode`, `OutputBarcodeMaterialId`, `OutputBarcodeWorkorderId`, `OutputBarcodeMode`, `RelationType`, `BusinessContent`, `IsDisassemble`, `DisassembledBy`, `DisassembledOn`, `SubstituteId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @InputBarcode, @InputBarcodeLocation, @InputBarcodeMaterialId, @InputBarcodeWorkorderId, @InputQty, @OutputBarcode, @OutputBarcodeMaterialId, @OutputBarcodeWorkorderId, @OutputBarcodeMode, @RelationType, @BusinessContent, @IsDisassemble, @DisassembledBy, @DisassembledOn, @SubstituteId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO manu_barcode_relation(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `InputBarcode`, `InputBarcodeLocation`, `InputBarcodeMaterialId`, `InputBarcodeWorkorderId`, `InputQty`, `OutputBarcode`, `OutputBarcodeMaterialId`, `OutputBarcodeWorkorderId`, `OutputBarcodeMode`, `RelationType`, `BusinessContent`, `IsDisassemble`, `DisassembledBy`, `DisassembledOn`, `SubstituteId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `DisassembledSfcStepId`) VALUES (  @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @InputBarcode, @InputBarcodeLocation, @InputBarcodeMaterialId, @InputBarcodeWorkorderId, @InputQty, @OutputBarcode, @OutputBarcodeMaterialId, @OutputBarcodeWorkorderId, @OutputBarcodeMode, @RelationType, @BusinessContent, @IsDisassemble, @DisassembledBy, @DisassembledOn, @SubstituteId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO manu_barcode_relation(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `InputBarcode`, `InputBarcodeLocation`, `InputBarcodeMaterialId`, `InputBarcodeWorkorderId`, `InputQty`, `OutputBarcode`, `OutputBarcodeMaterialId`, `OutputBarcodeWorkorderId`, `OutputBarcodeMode`, `RelationType`, `BusinessContent`, `IsDisassemble`, `DisassembledBy`, `DisassembledOn`, `SubstituteId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `DisassembledSfcStepId`) VALUES (  @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @InputBarcode, @InputBarcodeLocation, @InputBarcodeMaterialId, @InputBarcodeWorkorderId, @InputQty, @OutputBarcode, @OutputBarcodeMaterialId, @OutputBarcodeWorkorderId, @OutputBarcodeMode, @RelationType, @BusinessContent, @IsDisassemble, @DisassembledBy, @DisassembledOn, @SubstituteId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE manu_barcode_relation SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, InputBarcode = @InputBarcode, InputBarcodeLocation = @InputBarcodeLocation, InputBarcodeMaterialId = @InputBarcodeMaterialId, InputBarcodeWorkorderId = @InputBarcodeWorkorderId, InputQty = @InputQty, OutputBarcode = @OutputBarcode, OutputBarcodeMaterialId = @OutputBarcodeMaterialId, OutputBarcodeWorkorderId = @OutputBarcodeWorkorderId, OutputBarcodeMode = @OutputBarcodeMode, RelationType = @RelationType, BusinessContent = @BusinessContent, IsDisassemble = @IsDisassemble, DisassembledBy = @DisassembledBy, DisassembledOn = @DisassembledOn, SubstituteId = @SubstituteId, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE manu_barcode_relation SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, InputBarcode = @InputBarcode, InputBarcodeLocation = @InputBarcodeLocation, InputBarcodeMaterialId = @InputBarcodeMaterialId, InputBarcodeWorkorderId = @InputBarcodeWorkorderId, InputQty = @InputQty, OutputBarcode = @OutputBarcode, OutputBarcodeMaterialId = @OutputBarcodeMaterialId, OutputBarcodeWorkorderId = @OutputBarcodeWorkorderId, OutputBarcodeMode = @OutputBarcodeMode, RelationType = @RelationType, BusinessContent = @BusinessContent, IsDisassemble = @IsDisassemble, DisassembledBy = @DisassembledBy, DisassembledOn = @DisassembledOn, SubstituteId = @SubstituteId, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE manu_barcode_relation SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, InputBarcode = @InputBarcode, InputBarcodeLocation = @InputBarcodeLocation, InputBarcodeMaterialId = @InputBarcodeMaterialId, InputBarcodeWorkorderId = @InputBarcodeWorkorderId, InputQty = @InputQty, OutputBarcode = @OutputBarcode, OutputBarcodeMaterialId = @OutputBarcodeMaterialId, OutputBarcodeWorkorderId = @OutputBarcodeWorkorderId, OutputBarcodeMode = @OutputBarcodeMode, RelationType = @RelationType, BusinessContent = @BusinessContent, IsDisassemble = @IsDisassemble, DisassembledBy = @DisassembledBy, DisassembledOn = @DisassembledOn, SubstituteId = @SubstituteId, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, DisassembledSfcStepId = @DisassembledSfcStepId WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE manu_barcode_relation SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, InputBarcode = @InputBarcode, InputBarcodeLocation = @InputBarcodeLocation, InputBarcodeMaterialId = @InputBarcodeMaterialId, InputBarcodeWorkorderId = @InputBarcodeWorkorderId, InputQty = @InputQty, OutputBarcode = @OutputBarcode, OutputBarcodeMaterialId = @OutputBarcodeMaterialId, OutputBarcodeWorkorderId = @OutputBarcodeWorkorderId, OutputBarcodeMode = @OutputBarcodeMode, RelationType = @RelationType, BusinessContent = @BusinessContent, IsDisassemble = @IsDisassemble, DisassembledBy = @DisassembledBy, DisassembledOn = @DisassembledOn, SubstituteId = @SubstituteId, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, DisassembledSfcStepId = @DisassembledSfcStepId WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE manu_barcode_relation SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE manu_barcode_relation SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -272,8 +287,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT * FROM manu_barcode_relation WHERE Id IN @Ids ";
 
         const string DisassemblyUpdateSql = "UPDATE manu_barcode_relation SET " +
-          "RelationType = @RelationType, IsDisassemble = @IsDisassemble," +
-          "DisassembledBy = @UserId, DisassembledOn = @UpdatedOn, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id = @Id AND IsDisassemble <> @IsDisassemble ";
+          "IsDisassemble = @IsDisassemble," +
+          "DisassembledBy = @UserId, DisassembledOn = @UpdatedOn, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn, DisassembledSfcStepId = @DisassembledSfcStepId WHERE Id = @Id AND IsDisassemble <> @IsDisassemble ";
 
         const string GetByLocationSql = @"SELECT * FROM manu_barcode_relation WHERE SiteId = @SiteId AND InputBarCode = @SFC AND InputBarCodeLocation = @Location ";
     }

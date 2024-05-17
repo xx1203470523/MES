@@ -112,6 +112,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string Remark { get; set; }
 
-
+        /// <summary>
+        /// 拆分步骤表Id
+        /// </summary>
+        public long DisassembledSfcStepId { get; set; }
     }
 }
