@@ -513,7 +513,8 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             using var trans = TransactionHelper.GetTransactionScope();
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntities);
             await _manuSfcStepNgRepository.InsertsAsync(manuSfcStepNgs);
-            await _procParameterRepository.InsertsAsync(procParameterEntities);
+            //2024-05-17 参数新增改成忽略新增
+            await _procParameterRepository.InsertIgnoresAsync(procParameterEntities);
             await _manuProductParameterRepository.InsertsAsync(entities);
             await _manuSfcSummaryRepository.InsertOrUpdateRangeAsync(manuSfcSummaryList);
             trans.Complete();
