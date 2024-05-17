@@ -99,7 +99,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 是否可疑
         /// </summary>
-        public bool? IsSuspicious { get; set; }
+        public TrueOrFalseEnum? IsSuspicious { get; set; }
 
         /// <summary>
         /// 复投次数;复投次数

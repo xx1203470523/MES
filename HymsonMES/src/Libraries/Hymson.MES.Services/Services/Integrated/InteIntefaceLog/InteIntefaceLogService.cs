@@ -58,7 +58,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             }
             else
             {
-                if(string.IsNullOrWhiteSpace(queryType)) throw new CustomerValidationException(nameof(ErrorCode.MES10138));
+                if (string.IsNullOrWhiteSpace(queryType)) throw new CustomerValidationException(nameof(ErrorCode.MES10138));
                 logDataPagedQuery.Type = queryType;
             }
 
@@ -119,8 +119,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
                 Requestor = entry.Data.ContainsKey("Name") ? entry.Data["Name"] : string.Empty,
                 RequestorCode = entry.Data.ContainsKey("Code") ? entry.Data["Code"] : string.Empty,
                 Responsetor = entry.Data.ContainsKey("ReceiverType") ? entry.Data["ReceiverType"] : string.Empty,
-                RequestTime = entry.Data.ContainsKey("RequestTime") ? entry.Data["RequestTime"] : string.Empty,
-                ResponseTime = entry.Data.ContainsKey("ResponseTime") ? entry.Data["ResponseTime"] : string.Empty,
+                RequestTime = entry.Data.ContainsKey("RequestTime") ? ConverToIncludeSeconds(entry.Data["RequestTime"]) : string.Empty,
+                ResponseTime = entry.Data.ContainsKey("ResponseTime") ? ConverToIncludeSeconds(entry.Data["ResponseTime"]) : string.Empty,
                 Cost = entry.Data.ContainsKey("Cost") ? entry.Data["Cost"] : string.Empty,
                 Ip = entry.Data.ContainsKey("Ip") ? entry.Data["Ip"] : string.Empty,
                 Method = entry.Data["Method"],
@@ -137,5 +137,22 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             return dto;
         }
 
+        /// <summary>
+        /// 转成包含到毫秒的时间
+        /// </summary>
+        /// <param name="_time"></param>
+        /// <returns></returns>
+        private string ConverToIncludeSeconds(string _time)
+        {
+            string formattedDateTime = _time;
+            if (!string.IsNullOrEmpty(_time))
+            {
+                if (DateTime.TryParse(_time, out DateTime requestDateTime))
+                {
+                    formattedDateTime = requestDateTime.ToString("MM-dd HH:mm:ss.fff");
+                }
+            }
+            return formattedDateTime;
+        }
     }
 }
