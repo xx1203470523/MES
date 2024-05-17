@@ -1,7 +1,7 @@
 #! /bin/bash
 PublishEnvironment=Release
 timestamp=$(date +%Y%m%d%H%M%S)
-serviceName=hymson-mes-backgroundtasks-battery-test
+serviceName=hymson-mes-backgroundtasks-test
 registryUrl=harbor.xnebula.com/new-energy
 imageName=hymson.mes.backgroundtasks
 docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.BackgroundTasks/Dockerfile .
@@ -15,5 +15,6 @@ docker service create \
   --env DOTNET_ENVIRONMENT=Staging \
   --env TZ="Asia/Shanghai" \
   --env SERVICE_NAME={{.Service.Name}} \
+  --hostname="{{.Node.ID}}-{{.Service.Name}}"\
    --mount type=volume,src=hymsonvolume,dst=/logs \
   $registryUrl/$imageName:$timestamp
