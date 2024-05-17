@@ -915,8 +915,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialBarCode = entity.MaterialBarCode,
                     Quantity = entity.QuantityResidue,
 
-                    Type = WhMaterialInventoryTypeEnum.MaterialBarCodeSplit,
-                    Source = MaterialInventorySourceEnum.Disassembly,
+                    Type = WhMaterialInventoryTypeEnum.MaterialBarCodeMerge,
+                    Source = MaterialInventorySourceEnum.ManualEntry,
                     SiteId = _currentSite.SiteId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
                     Batch = entity.Batch ?? string.Empty,
@@ -1043,11 +1043,11 @@ namespace Hymson.MES.Services.Services.Warehouse
             });
             if (codeRules == null || !codeRules.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES13617));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15131)).WithData("type", type.GetDescription());
             }
             if (codeRules.Count() > 1)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES13618));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15132)).WithData("type",type.GetDescription());
             }
 
             var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new CoreServices.Bos.Manufacture.ManuGenerateBarcode.GenerateBarcodeBo
