@@ -75,16 +75,16 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
             try
             {
 
-           
-            await SetEquInfoAsync(equipmentCode);
-            await _outBoundService.OutBoundAsync(new OutBoundDto
-            {
-                ResourceCode = resourceCode,
-                Passed = 1,
-                LocalTime = HymsonClock.Now(),
-                SFC = "ES01B20020048202310040042",
-                ParamList = outBoundParams.ToArray()
-            });
+
+                await SetEquInfoAsync(equipmentCode);
+                await _outBoundService.OutBoundAsync(new OutBoundDto
+                {
+                    ResourceCode = resourceCode,
+                    Passed = 1,
+                    LocalTime = HymsonClock.Now(),
+                    SFC = "ES01B20020048202310040042",
+                    ParamList = outBoundParams.ToArray()
+                });
 
             }
             catch (Exception ex)
@@ -131,6 +131,36 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
                 ResourceCode = resourceCode,
                 LocalTime = HymsonClock.Now(),
                 SFCs = sfcs.ToArray()
+
+            });
+            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// 出站测试
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task OutBoundTestAsync2()
+        {
+            string resourceCode = "YTLPACK01ER012";
+            string equipmentCode = "YTLPACK01AE028";
+            string prefix = "YTLSMTEST";
+            List<OutBoundParam> param = new();
+
+            OutBoundSFCDto sFCDto = new OutBoundSFCDto()
+            {
+                SFC = prefix,
+                Passed = 1,
+                ParamList = param.ToArray()
+            };
+
+            await SetEquInfoAsync(equipmentCode);
+            await _outBoundService.OutBoundMoreAsync(new OutBoundMoreDto
+            {
+                ResourceCode = resourceCode,
+                LocalTime = HymsonClock.Now(),
+                SFCs = new OutBoundSFCDto[] { sFCDto }
 
             });
             Assert.IsTrue(true);
