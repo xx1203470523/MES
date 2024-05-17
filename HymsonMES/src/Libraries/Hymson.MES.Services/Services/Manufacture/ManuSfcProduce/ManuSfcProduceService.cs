@@ -22,6 +22,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -35,6 +36,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
+using System.Security.Policy;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
@@ -2017,5 +2019,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 
             return new PagedInfo<ManuUpdateViewDto>(manuSfcProduceDtos, pagedInfo!.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
+
+
+
     }
 }

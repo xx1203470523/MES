@@ -17,6 +17,7 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 using System.Security.Policy;
 using System.Text.Json;
 
@@ -1118,6 +1119,38 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             #endregion
         }
 
+
+
+
+        ///// <summary>
+        ///// 根据查询条件获取分页数据
+        ///// </summary>
+        ///// <param name="manuSfcProducePagedQueryDto"></param>
+        ///// <returns></returns> 
+        //public async Task<List<ManuSfcProduceViewDto>> GetSFCPageListAsync(InstantLockDto param)
+        //{
+
+        //    var sfcs = param.Sfcs.Distinct();
+        //    var siteId = _currentSite.SiteId ?? 0;
+
+        //    List<ManuSfcProduceViewDto> sfcList = new();
+
+        //    var manuBarCodeRelations = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery { InputBarCodes = sfcs, IsDisassemble = TrueOrFalseEnum.No, SiteId = siteId });
+        //    if (manuBarCodeRelations == null || !manuBarCodeRelations.Any())
+        //    {
+        //        return sfcList;
+        //    }
+        //    foreach (var item in manuBarCodeRelations)
+        //    {
+        //        ManuSfcProduceViewDto sfcEntity= new() 
+        //        {
+        //              Sfc= item.OutputBarCode,
+
+        //        };
+        //    }
+
+
+        //}
         #endregion
 
     }
