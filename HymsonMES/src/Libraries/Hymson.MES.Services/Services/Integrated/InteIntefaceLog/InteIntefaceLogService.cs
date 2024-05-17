@@ -6,7 +6,6 @@ using Hymson.MES.Core.Enums.Integrated;
 using Hymson.Logging;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Elastic.Transport;
 
 namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 {
