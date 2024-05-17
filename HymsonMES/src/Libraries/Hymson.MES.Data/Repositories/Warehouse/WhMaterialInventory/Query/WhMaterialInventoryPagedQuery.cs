@@ -32,6 +32,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// </summary>
         public string? MaterialCode { get; set; }
         /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialName { get; set; }
+        /// <summary>
         /// 版本
         /// </summary>
         public string? Version { get; set; }
@@ -44,6 +48,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// 状态
         /// </summary>
         public WhMaterialInventoryStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 状态s
+        /// </summary>
+        public IEnumerable<WhMaterialInventoryStatusEnum>? Statuss { get; set; } 
 
         /// <summary>
         /// 站点id

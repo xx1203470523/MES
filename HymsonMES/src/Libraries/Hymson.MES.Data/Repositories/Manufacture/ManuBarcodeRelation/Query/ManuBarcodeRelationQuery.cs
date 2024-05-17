@@ -49,7 +49,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         /// Bom明细表ID
         /// </summary>
 
-        public long? BomMainMaterialId { get; set; }
+        public string? BomMainMaterialId { get; set; }
     }
 
     /// <summary>
