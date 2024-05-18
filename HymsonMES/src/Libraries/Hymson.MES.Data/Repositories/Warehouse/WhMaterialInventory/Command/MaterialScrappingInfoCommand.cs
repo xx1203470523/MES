@@ -72,9 +72,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command
         public decimal ScrapQuantity { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } = "";
 
         /// <summary>
         /// 工序ID
@@ -146,9 +146,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command
         public string? Version { get; set; }
         
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } = "";
 
         /// <summary>
         /// 单位

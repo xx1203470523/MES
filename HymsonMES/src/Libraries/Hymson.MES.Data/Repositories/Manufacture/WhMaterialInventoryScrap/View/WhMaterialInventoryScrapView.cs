@@ -62,9 +62,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture.WhMaterialInventoryScrap.View
         public string Version { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } = "";
 
         /// <summary>
         /// 单位

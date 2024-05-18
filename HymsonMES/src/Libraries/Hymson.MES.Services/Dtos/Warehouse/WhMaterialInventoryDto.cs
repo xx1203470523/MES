@@ -70,9 +70,9 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string MaterialBarCode { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } = "";
 
         /// <summary>
         /// 数量（剩余）
@@ -154,9 +154,9 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string MaterialBarCode { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } = "";
 
         /// <summary>
         /// 数量（剩余）
@@ -378,9 +378,9 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string MaterialBarCode { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } = "";
 
         /// <summary>
         /// 数量（剩余）
@@ -442,7 +442,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     public class WhMaterialInventoryPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
         public decimal? Batch { get; set; } = 0;
         /// <summary>

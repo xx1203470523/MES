@@ -42,9 +42,9 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string MaterialBarCode { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } = "";
 
         /// <summary>
         /// 数量
@@ -139,9 +139,9 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string MaterialBarCode { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } = "";
 
         /// <summary>
         /// 数量
@@ -227,9 +227,9 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string MaterialBarCode { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } = "";
 
         /// <summary>
         /// 数量
@@ -294,9 +294,9 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string? MaterialBarCode { get; set; }
 
         /// <summary>
-        /// 批次
+        /// 批次号
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } = "";
 
         /// <summary>
         /// 物料编码

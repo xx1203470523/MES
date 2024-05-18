@@ -118,7 +118,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.Where(" wmi.SiteId=@SiteId");
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
 
-            if (whMaterialInventoryPagedQuery.Batch > 0)
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Batch))
             {
                 whMaterialInventoryPagedQuery.Batch = whMaterialInventoryPagedQuery.Batch;
                 sqlBuilder.Where(" wmi.Batch = @Batch");

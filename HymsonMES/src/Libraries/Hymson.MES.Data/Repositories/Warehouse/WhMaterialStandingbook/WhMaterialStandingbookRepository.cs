@@ -83,7 +83,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.OrderBy(" CreatedOn DESC");
             sqlBuilder.Where("SiteId=@SiteId");
 
-            if (whMaterialStandingbookPagedQuery.Batch > 0)
+            if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.Batch))
             {
                 whMaterialStandingbookPagedQuery.Batch = whMaterialStandingbookPagedQuery.Batch;
                 sqlBuilder.Where("Batch = @Batch");
