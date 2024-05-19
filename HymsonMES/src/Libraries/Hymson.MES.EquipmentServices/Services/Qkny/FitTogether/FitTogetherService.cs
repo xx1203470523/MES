@@ -308,27 +308,23 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         public async Task<string> Create24GbCodeAsync(GenerateDxSfcDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             //2. 查询极组信息
             ManuJzBindQuery query = new ManuJzBindQuery();
             query.JzSfc = dto.Sfc;
             query.SiteId = equResModel.SiteId;
             var jzModel = await _manuJzBindService.GetByJzSfcAsync(query);
-            List<string> jzSfcList = new List<string>() { jzModel.JzSfc1, jzModel.JzSfc2 };
-
-            ManuMergeRequestDto param = new ManuMergeRequestDto();
-            param.Barcodes = jzSfcList;
+            //生成电芯码参数
+            CreateCellBarcodeBo param = new CreateCellBarcodeBo();
+            param.Barcodes = new[] { jzModel.JzSfc1, jzModel.JzSfc2 };
             param.SiteId = equResModel.SiteId;
             param.UserName = dto.EquipmentCode;
-            //获取国标条码
-            if (param.Barcodes == null || !param.Barcodes.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            }
-            else
-            {
-                return await _manuMergeService.MergeAsync(param, param.UserName);
-            }
+            param.ProcedureId = equResModel.ProcedureId;
+            param.EquipmentId = equResModel.EquipmentId;
+            param.ResourceId = equResModel.ResId;
+            param.ProcedureId = equResModel.ProcedureId;
+
+            return await _manuCreateBarcodeService.CreateCellBarCodeBySfcAsync(param);
         }
 
         /// <summary>

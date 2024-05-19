@@ -51,5 +51,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// <param name="param"></param>
         /// <returns></returns>
         Task<List<ManuSfcEntity>> CreateCellBarCodeAsync(CreateBarcodeByResourceCode param);
+
+        /// <summary>
+        /// 根据极组码生成电芯码
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<string> CreateCellBarCodeBySfcAsync(CreateCellBarcodeBo bo);
     }
 }
