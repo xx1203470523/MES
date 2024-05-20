@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Services.ManuJzBind
             var dbModel = await _manuJzBindRepository.GetByJzSfcAsync(query);
             if(dbModel == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45270));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45270)).WithData("SFC", query.JzSfc);
             }
 
             return dbModel;

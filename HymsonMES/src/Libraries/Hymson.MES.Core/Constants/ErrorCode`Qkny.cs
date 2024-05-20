@@ -367,7 +367,7 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 极组条码不存在绑定记录
         /// </summary>
-        public const string MES45270 = "极组条码不存在绑定记录";
+        public const string MES45270 = "极组条码【{SFC}】不存在绑定记录";
 
         /// <summary>
         /// 极组条码没有绑定的电芯
