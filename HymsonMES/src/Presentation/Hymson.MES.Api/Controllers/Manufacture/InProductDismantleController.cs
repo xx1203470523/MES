@@ -33,7 +33,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpGet]
         [Route("mainMaterials")]
-        public async Task<List<InProductDismantleDto>> GetProcBomDetailAsync([FromQuery] InProductDismantleQueryDto queryDto)
+        public async Task<InProductDismantleComponentDto> GetProcBomDetailAsync([FromQuery] InProductDismantleQueryDto queryDto)
         {
             return await _inProductDismantleService.GetProcBomDetailAsync(queryDto);
         }

@@ -262,6 +262,64 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DisassemblyUpdateSql, command);
         }
+
+
+        /// <summary>
+        /// 组件使用报告 分页查询
+        /// </summary>
+        /// <param name="manuSfcCirculationPagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuBarCodeRelationEntity>> GetReportPagedInfoAsync(ComUsageReportPagedQuery queryParam)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Where(" IsDeleted=0 ");
+            sqlBuilder.Select("*");
+
+            sqlBuilder.Where(" IsDisassemble=0 "); //筛选出未拆解的
+
+            sqlBuilder.Where(" SiteId=@SiteId ");
+
+            if (queryParam.CirculationProductId.HasValue)
+            {
+                sqlBuilder.Where(" InputBarCodeMaterialId=@CirculationProductId ");
+            }
+
+            if (queryParam.CreatedOn != null && queryParam.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = queryParam.CreatedOn[0], CreatedOnEnd = queryParam.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where(" CreatedOn >= @CreatedOnStart AND CreatedOn < @CreatedOnEnd ");
+            }
+
+            if (!string.IsNullOrEmpty(queryParam.CirculationBarCode))
+            {
+                sqlBuilder.Where(" InputBarCode=@CirculationBarCode ");
+            }
+
+            if (queryParam.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where(" ProcedureId=@ProcedureId ");
+            }
+
+            if (queryParam.ResourceId.HasValue)
+            {
+                sqlBuilder.Where(" ResourceId=@ResourceId ");
+            }
+
+
+            var offSet = (queryParam.PageIndex - 1) * queryParam.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = queryParam.PageSize });
+            sqlBuilder.AddParameters(queryParam);
+
+            using var conn = GetMESDbConnection();
+            var manuSfcCirculationEntitiesTask = conn.QueryAsync<ManuBarCodeRelationEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var manuSfcCirculationEntities = await manuSfcCirculationEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuBarCodeRelationEntity>(manuSfcCirculationEntities, queryParam.PageIndex, queryParam.PageSize, totalCount);
+        }
     }
 
 
