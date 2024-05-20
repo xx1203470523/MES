@@ -10,6 +10,7 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.BackgroundServices.Manufacture
 {
@@ -18,6 +19,11 @@ namespace Hymson.MES.BackgroundServices.Manufacture
     /// </summary>
     public class WorkOrderStatisticService : IWorkOrderStatisticService
     {
+        /// <summary>
+        /// 日志服务接口
+        /// </summary>
+        private readonly ILogger<WorkOrderStatisticService> _logger;
+
         /// <summary>
         /// 服务接口（水位）
         /// </summary>
@@ -41,15 +47,18 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="waterMarkService"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuWorkOrderSFCRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
-        public WorkOrderStatisticService(IWaterMarkService waterMarkService,
+        public WorkOrderStatisticService(ILogger<WorkOrderStatisticService> logger,
+            IWaterMarkService waterMarkService,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuWorkOrderSFCRepository manuWorkOrderSFCRepository,
             IPlanWorkOrderRepository planWorkOrderRepository)
         {
+            _logger = logger;
             _waterMarkService = waterMarkService;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuWorkOrderSFCRepository = manuWorkOrderSFCRepository;
@@ -71,7 +80,11 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 StartWaterMarkId = waterMarkId,
                 Rows = limitCount
             });
-            if (manuSfcStepList == null || !manuSfcStepList.Any()) return;
+            if (manuSfcStepList == null || !manuSfcStepList.Any())
+            {
+                _logger.LogDebug($"工单统计 -> 没有新产生的的步骤数据！waterMarkId:{waterMarkId}");
+                return;
+            }
 
             var user = $"{BusinessKey.WorkOrderStatistic}作业";
 
