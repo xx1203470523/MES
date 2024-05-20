@@ -1,15 +1,11 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class WhMaterialInventoryPageListView : WhMaterialInventoryEntity
     {
         /// <summary>

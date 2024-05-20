@@ -1,15 +1,12 @@
 ﻿using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.BackgroundServices.Manufacture.Productionstatistic
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProductionstatisticService : IProductionstatisticService
     {
-
         /// <summary>
         /// 统计服务
         /// </summary>
@@ -29,7 +26,8 @@ namespace Hymson.MES.BackgroundServices.Manufacture.Productionstatistic
         /// <returns></returns>
         public async Task ExecuteAsync()
         {
-          await  _manuSfcSummaryService.ExecutStatisticAsync("AUTO");
+            await _manuSfcSummaryService.ExecutStatisticAsync("AUTO");
         }
+
     }
 }
