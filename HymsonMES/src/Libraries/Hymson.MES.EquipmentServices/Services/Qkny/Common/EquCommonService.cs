@@ -444,16 +444,35 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             //2. 添加记录
-            EquToolLifeRecordSaveDto saveDto = new EquToolLifeRecordSaveDto();
-            saveDto.EquipmentId = equResModel.EquipmentId;
-            saveDto.ToolCode = dto.ToolCode;
-            saveDto.ToolLife = dto.UsedLife;
-            saveDto.CreatedBy = dto.EquipmentCode;
-            saveDto.CreatedOn = HymsonClock.Now();
-            saveDto.UpdatedBy = dto.EquipmentCode;
-            saveDto.UpdatedOn = saveDto.CreatedOn;
+            List<EquToolLifeRecordSaveDto> saveDtos = new();
+            if (!string.IsNullOrWhiteSpace(dto.ToolCode))
+            {
+                EquToolLifeRecordSaveDto saveDto = new EquToolLifeRecordSaveDto();
+                saveDto.EquipmentId = equResModel.EquipmentId;
+                saveDto.ToolCode = dto.ToolCode;
+                saveDto.ToolLife = dto.UsedLife;
+                saveDto.CreatedBy = dto.EquipmentCode;
+                saveDto.CreatedOn = HymsonClock.Now();
+                saveDto.UpdatedBy = dto.EquipmentCode;
+                saveDto.UpdatedOn = saveDto.CreatedOn;
+
+                saveDtos.Add(saveDto);
+            }
+            if (dto.ToolLifes != null && dto.ToolLifes.Any())
+            {
+                saveDtos.AddRange(dto.ToolLifes.Select(item => new EquToolLifeRecordSaveDto
+                {
+                    EquipmentId = equResModel.EquipmentId,
+                    ToolCode = item.ToolCode,
+                    ToolLife = item.UsedLife,
+                    CreatedBy = dto.EquipmentCode,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = dto.EquipmentCode,
+                    UpdatedOn = HymsonClock.Now()
+                }));
+            }
             //3 数据库操作
-            await _equToolLifeRecordService.AddAsync(saveDto);
+            await _equToolLifeRecordService.AddRangeAsync(saveDtos);
         }
 
         /// <summary>

@@ -24,8 +24,18 @@ namespace Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny.Common
             RuleFor(x => x.EquipmentCode).NotEmpty().Must(list => list.Any()).WithErrorCode(ErrorCode.MES45002);
             //资源编码不能为空
             RuleFor(x => x.ResourceCode).NotEmpty().Must(list => list.Any()).WithErrorCode(ErrorCode.MES45003);
-            //资源编码不能为空
-            RuleFor(x => x.ToolCode).NotEmpty().Must(list => list.Any()).WithErrorCode(ErrorCode.MES45200);
+            //工装编码不能为空
+            When(x => x.ToolLifes == null || !x.ToolLifes.Any(), () =>
+            {
+                RuleFor(x => x.ToolCode).NotEmpty().Must(list => list.Any()).WithErrorCode(ErrorCode.MES45200);
+            });
+            When(x => x.ToolLifes != null && x.ToolLifes.Any(), () =>
+            {
+                RuleForEach(x => x.ToolLifes).ChildRules(c =>
+                {
+                    c.RuleFor(z => z.ToolCode).NotEmpty().WithErrorCode(ErrorCode.MES45200);
+                });
+            });
         }
     }
 }
