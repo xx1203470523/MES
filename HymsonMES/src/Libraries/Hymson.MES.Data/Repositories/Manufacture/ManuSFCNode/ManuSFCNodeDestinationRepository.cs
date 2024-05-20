@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -24,8 +25,61 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<ManuSFCNodeDestinationEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
+            var sqlBuilder = new StringBuilder(InsertSql);
+            foreach (var e in entities)
+            {
+                sqlBuilder.Append($"({e.Id}, {e.CirculationId}, {e.NodeId}, {e.DestinationId}, '{e.CreatedBy}', '{e.CreatedOn}', {e.SiteId}),");
+            }
+
+            // 移除最后一个逗号
+            sqlBuilder.Length--;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(sqlBuilder.ToString());
+
+            /*
+            // 使用StringBuilder来构建VALUES后面的括号集合
+            var valuesBuilder = new StringBuilder();
+            var parameters = new DynamicParameters();
+
+            foreach (var e in entities)
+            {
+                // 使用参数化查询的占位符
+                valuesBuilder.Append($"({e.Id}, @{e.Id}CirculationId, @{e.Id}NodeId, @{e.Id}DestinationId, @{e.Id}CreatedBy, @{e.Id}CreatedOn, @{e.Id}SiteId),");
+
+                // 构建每个对象的参数化值
+                parameters.Add($"@{e.Id}CirculationId", e.CirculationId);
+                parameters.Add($"@{e.Id}NodeId", e.NodeId);
+                parameters.Add($"@{e.Id}DestinationId", e.DestinationId);
+                parameters.Add($"@{e.Id}CreatedBy", e.CreatedBy);
+                parameters.Add($"@{e.Id}CreatedOn", e.CreatedOn);
+                parameters.Add($"@{e.Id}SiteId", e.SiteId);
+            }
+
+            // 移除最后一个逗号
+            valuesBuilder.Length--;
+
+            // 将构建的VALUES集合添加到SQL语句中
+            sqlBuilder.Append(valuesBuilder);
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(sqlBuilder.ToString(), parameters);
+            */
+        }
+
+        /// <summary>
+        /// 新增（批量）
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> ReplaceRangeAsync(IEnumerable<ManuSFCNodeDestinationEntity> entities)
+        {
+            if (entities == null || !entities.Any()) return 0;
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(ReplaceSql, entities);
         }
 
         /// <summary>
@@ -35,8 +89,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeleteAsync(IEnumerable<ManuSFCNodeDestinationEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
+            // 拼接删除SQL
+            var stringBuilder = new StringBuilder();
+            foreach (var item in entities)
+            {
+                stringBuilder.AppendFormat(DeleteSql, item.NodeId, item.DestinationId);
+            }
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeleteSql, entities);
+            return await conn.ExecuteAsync(stringBuilder.ToString());
         }
 
         /// <summary>
@@ -101,15 +164,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuSFCNodeDestinationRepository
     {
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_destination /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/
+            FROM manu_sfc_node_destination /**where**/  ";
 
-#if DM
-        const string InsertsSql = "INSERT INTO manu_sfc_node_destination(`Id`, CirculationId, `NodeId`, `DestinationId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @DestinationId, @CreatedBy, @CreatedOn, @SiteId) ";
-#else
-        const string InsertsSql = "REPLACE INTO manu_sfc_node_destination(`Id`, CirculationId, `NodeId`, `DestinationId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @DestinationId, @CreatedBy, @CreatedOn, @SiteId) ";
-#endif
+        const string InsertSql = "INSERT INTO manu_sfc_node_destination (`Id`, `CirculationId`, `NodeId`, `DestinationId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES ";
+        const string ReplaceSql = "REPLACE INTO manu_sfc_node_destination (`Id`, CirculationId, `NodeId`, `DestinationId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @DestinationId, @CreatedBy, @CreatedOn, @SiteId) ";
 
-        const string DeleteSql = "DELETE FROM manu_sfc_node_destination WHERE NodeId = @NodeId AND DestinationId = @DestinationId; ";
+        const string DeleteSql = "DELETE FROM manu_sfc_node_destination WHERE NodeId = {0} AND DestinationId = {1}; ";
 
 #if DM
         const string GetTreeEntitiesSql = @"WITH RECURSIVE CTE (CirculationId, NodeId, DestinationId) AS (

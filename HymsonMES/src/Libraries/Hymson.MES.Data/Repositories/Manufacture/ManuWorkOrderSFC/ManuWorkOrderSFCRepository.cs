@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -23,10 +24,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities)
+        public async Task<int> IgnoreRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(IgnoreSql, entities);
         }
 
         /// <summary>
@@ -47,10 +48,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeleteRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities)
         {
-            using var conn = GetMESDbConnection();
+            if (entities == null || !entities.Any()) return 0;
 
+            // 拼接删除SQL
+            var stringBuilder = new StringBuilder();
+            foreach (var item in entities)
+            {
+                // AND Status = @Status 不加状态是为了删除对应条码所有记录
+                stringBuilder.AppendFormat(DeleteSql, item.SiteId, item.WorkOrderId, item.SFC.Replace("'", "''"));
+            }
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(stringBuilder.ToString());
+
+            /*
+            using var conn = GetMESDbConnection();
             // AND Status = @Status 不加状态是为了删除对应条码所有记录
             return await conn.ExecuteAsync(DeletesSql, entities);
+            */
         }
 
         /// <summary>
@@ -77,6 +92,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuWorkOrderSFCRepository
     {
+        const string IgnoreSql = "INSERT IGNORE manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+
 #if DM
         const string InsertsSql = "MERGE INTO manu_workorder_sfc t " +
             "USING (SELECT @WorkOrderId AS WorkOrderId, @SFC AS SFC FROM dual) s " +
@@ -99,11 +116,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
               "INSERT (Id, SiteId, WorkOrderId, SFC, Status, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn) " +
               "VALUES (@Id, @SiteId, s.WorkOrderId, s.SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn); ";
 #else
-        const string InsertsSql = "INSERT IGNORE manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+
         const string ReplacesSql = "REPLACE INTO manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
 #endif
 
-        const string DeletesSql = "DELETE FROM manu_workorder_sfc WHERE SiteId = @SiteId AND WorkOrderId = @WorkOrderId AND SFC = @SFC";
+        const string DeleteSql = "DELETE FROM manu_workorder_sfc WHERE SiteId = {0} AND WorkOrderId = {1} AND SFC = '{2}'; ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_workorder_sfc /**where**/  ";
 
     }

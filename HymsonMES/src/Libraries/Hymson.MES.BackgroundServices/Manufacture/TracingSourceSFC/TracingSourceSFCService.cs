@@ -6,8 +6,10 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.BackgroundServices.Manufacture
 {
@@ -16,6 +18,11 @@ namespace Hymson.MES.BackgroundServices.Manufacture
     /// </summary>
     public class TracingSourceSFCService : ITracingSourceSFCService
     {
+        /// <summary>
+        /// 日志服务接口
+        /// </summary>
+        private readonly ILogger<TracingSourceSFCService> _logger;
+
         /// <summary>
         /// 服务接口（水位）
         /// </summary>
@@ -64,12 +71,17 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="waterMarkService"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
-        public TracingSourceSFCService(IWaterMarkService waterMarkService,
+        /// <param name="manuSFCNodeRepository"></param>
+        /// <param name="manuSFCNodeSourceRepository"></param>
+        /// <param name="manuSFCNodeDestinationRepository"></param>
+        public TracingSourceSFCService(ILogger<TracingSourceSFCService> logger,
+            IWaterMarkService waterMarkService,
             IProcMaterialRepository procMaterialRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
@@ -78,6 +90,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             IManuSFCNodeSourceRepository manuSFCNodeSourceRepository,
             IManuSFCNodeDestinationRepository manuSFCNodeDestinationRepository)
         {
+            _logger = logger;
             _waterMarkService = waterMarkService;
             _procMaterialRepository = procMaterialRepository;
             _manuSfcRepository = manuSfcRepository;
@@ -109,7 +122,11 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     StartWaterMarkTime = startWaterMarkTime,
                     Rows = limitCount
                 });
-                if (manuSfcCirculationList == null || !manuSfcCirculationList.Any()) return;
+                if (manuSfcCirculationList == null || !manuSfcCirculationList.Any())
+                {
+                    _logger.LogDebug($"没有需要处理的流转数据！waterMarkId:{waterMarkId},startWaterMarkTime:{startWaterMarkTime}");
+                    return;
+                }
 
                 var user = $"{BusinessKey.TracingSourceSFC}作业";
 
@@ -255,13 +272,13 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 using var trans = TransactionHelper.GetTransactionScope();
 
                 // 保存节点信息
-                rows += await _manuSFCNodeRepository.InsertRangeAsync(nodeEntities);
+                rows += await _manuSFCNodeRepository.IgnoreRangeAsync(nodeEntities);
 
                 // 保存节点的来源信息
-                rows += await _manuSFCNodeSourceRepository.InsertRangeAsync(nodeSourceEntities);
+                rows += await _manuSFCNodeSourceRepository.ReplaceRangeAsync(nodeSourceEntities);
 
                 // 保存节点的去向信息
-                rows += await _manuSFCNodeDestinationRepository.InsertRangeAsync(nodeDestinationEntities);
+                rows += await _manuSFCNodeDestinationRepository.ReplaceRangeAsync(nodeDestinationEntities);
 
                 // 更新水位
                 var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
@@ -304,9 +321,14 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     StartWaterMarkTime = startWaterMarkTime,
                     Rows = limitCount
                 });
-                if (manuSfcCirculationList == null || !manuSfcCirculationList.Any()) return;
+                if (manuSfcCirculationList == null || !manuSfcCirculationList.Any())
+                {
+                    _logger.LogDebug($"没有需要处理的流转数据！waterMarkId:{waterMarkId},startWaterMarkTime:{startWaterMarkTime}");
+                    return;
+                }
 
                 var user = $"{BusinessKey.TracingSourceSFC}作业";
+                var time = HymsonClock.Now();
 
                 // 通过站点ID分组
                 var manuSfcCirculationSiteIdDict = manuSfcCirculationList.ToLookup(x => x.SiteId).ToDictionary(d => d.Key, d => d);
@@ -388,7 +410,9 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                             SFC = beforeSFCEntity.SFC,
                             Name = beforeProductEntity.MaterialName,
                             CreatedBy = user,
-                            UpdatedBy = user
+                            CreatedOn = time,
+                            UpdatedBy = user,
+                            UpdatedOn = time
                         };
                     }
 
@@ -410,7 +434,9 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                             SFC = afterSFCEntity.SFC,
                             Name = afterProductEntity.MaterialName,
                             CreatedBy = user,
-                            UpdatedBy = user
+                            CreatedOn = time,
+                            UpdatedBy = user,
+                            UpdatedOn = time
                         };
                     }
 
@@ -435,7 +461,9 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                                 NodeId = afterNode.Id,
                                 SourceId = beforeNode.Id,
                                 CreatedBy = user,
-                                UpdatedBy = user
+                                CreatedOn = time,
+                                UpdatedBy = user,
+                                UpdatedOn = time
                             });
                         }
 
@@ -450,7 +478,9 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                                 NodeId = beforeNode.Id,
                                 DestinationId = afterNode.Id,
                                 CreatedBy = user,
-                                UpdatedBy = user
+                                CreatedOn = time,
+                                UpdatedBy = user,
+                                UpdatedOn = time
                             });
                         }
                     }
@@ -460,7 +490,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 }
 
                 var rows = 0;
-                using var trans = TransactionHelper.GetTransactionScope(timeout: 180);
+                using var trans = TransactionHelper.GetTransactionScope(timeout: 60);
 
                 // 保存节点信息
                 rows += await _manuSFCNodeRepository.DeleteAsync(nodeEntities.Select(x => x.Id));

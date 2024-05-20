@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.BackgroundServices.Manufacture;
+using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
@@ -42,7 +43,8 @@ namespace Hymson.MES.BackgroundTasks.Manufacture
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "条码追溯出错:");
+                var date = HymsonClock.Now();
+                _logger.LogError(ex, $"{date}条码追溯出错:");
             }
         }
 

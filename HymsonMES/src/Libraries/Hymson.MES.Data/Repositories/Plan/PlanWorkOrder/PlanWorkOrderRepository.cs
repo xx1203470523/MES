@@ -7,6 +7,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -410,36 +411,22 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <summary>
         /// 更新数量（投入数量）
         /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateInputQtyByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateInputQtySql, param);
-        }
-
-        /// <summary>
-        /// 更新数量（投入数量）
-        /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
         public async Task<int> UpdateInputQtyByWorkOrderIdsAsync(IEnumerable<UpdateQtyByWorkOrderIdCommand>? commands)
         {
             if (commands == null || !commands.Any()) return 0;
 
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateInputQtySql, commands);
-        }
+            // 拼接删除SQL
+            var stringBuilder = new StringBuilder();
+            foreach (var item in commands)
+            {
+                // 可以参照 ManuSFCNodeRepository 的 InsertRangeAsync 改为参数化
+                stringBuilder.AppendFormat(UpdateInputQtySql, item.Qty, item.UpdatedBy.Replace("'", "''"), item.UpdatedOn, item.WorkOrderId);
+            }
 
-        /// <summary>
-        /// 更新数量（完工数量）
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateFinishProductQuantityByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param)
-        {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, param);
+            return await conn.ExecuteAsync(stringBuilder.ToString());
         }
 
         /// <summary>
@@ -451,8 +438,16 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             if (commands == null || !commands.Any()) return 0;
 
+            // 拼接删除SQL
+            var stringBuilder = new StringBuilder();
+            foreach (var item in commands)
+            {
+                // 可以参照 ManuSFCNodeRepository 的 InsertRangeAsync 改为参数化
+                stringBuilder.AppendFormat(UpdateFinishProductQuantitySql, item.Qty, item.UpdatedBy.Replace("'", "''"), item.UpdatedOn, item.WorkOrderId);
+            }
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, commands);
+            return await conn.ExecuteAsync(stringBuilder.ToString());
         }
 
         #region 工单记录表
@@ -547,21 +542,21 @@ namespace Hymson.MES.Data.Repositories.Plan
 #if DM
         const string UpdatePassDownQuantitySql = "UPDATE plan_work_order_record SET PassDownQuantity = IFNULL(PassDownQuantity, 0) + CAST(@PassDownQuantity AS DECIMAL), UpdatedBy = @UserName, UpdatedOn = @UpdateDate WHERE WorkOrderId = @WorkOrderId AND IFNULL(PassDownQuantity, 0) <= CAST(@PlanQuantity AS DECIMAL) - CAST(@PassDownQuantity AS DECIMAL) AND IsDeleted = 0";
         const string UpdateFinishProductQuantitySql = "UPDATE plan_work_order_record SET " +
-            "FinishProductQuantity = (CASE WHEN FinishProductQuantity IS NULL THEN 0 ELSE FinishProductQuantity END) + CAST(@Qty AS DECIMAL), " +
-            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
+            "FinishProductQuantity = (CASE WHEN FinishProductQuantity IS NULL THEN 0 ELSE FinishProductQuantity END) + CAST({0} AS DECIMAL), " +
+            "UpdatedBy = '{1}', UpdatedOn = '{2}' WHERE IsDeleted = 0 AND WorkOrderId = {3};";
         const string UpdateInputQtySql = "UPDATE plan_work_order_record SET " +
-            "InputQty = (CASE WHEN InputQty IS NULL THEN 0 ELSE InputQty END) + CAST(@Qty AS DECIMAL), " +
-            "RealStart = (CASE WHEN RealStart IS NULL THEN @UpdatedOn ELSE RealStart END), " +
-            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
+            "InputQty = (CASE WHEN InputQty IS NULL THEN 0 ELSE InputQty END) + CAST({0} AS DECIMAL), " +
+            "RealStart = (CASE WHEN RealStart IS NULL THEN '{2}' ELSE RealStart END), " +
+            "UpdatedBy = '{1}', UpdatedOn = '{2}' WHERE IsDeleted = 0 AND WorkOrderId = {3};";
 #else
         const string UpdatePassDownQuantitySql = "UPDATE plan_work_order_record SET PassDownQuantity = IFNULL(PassDownQuantity, 0) + @PassDownQuantity, UpdatedBy = @UserName, UpdatedOn = @UpdateDate WHERE WorkOrderId = @WorkOrderId AND IFNULL(PassDownQuantity, 0) <= @PlanQuantity - @PassDownQuantity AND IsDeleted = 0";
         const string UpdateFinishProductQuantitySql = "UPDATE plan_work_order_record SET " +
-            "FinishProductQuantity = (CASE WHEN FinishProductQuantity IS NULL THEN 0 ELSE FinishProductQuantity END) + @Qty, " +
-            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
+            "FinishProductQuantity = (CASE WHEN FinishProductQuantity IS NULL THEN 0 ELSE FinishProductQuantity END) + {0}, " +
+            "UpdatedBy = '{1}', UpdatedOn = '{2}' WHERE IsDeleted = 0 AND WorkOrderId = {3};";
         const string UpdateInputQtySql = "UPDATE plan_work_order_record SET " +
-            "InputQty = (CASE WHEN InputQty IS NULL THEN 0 ELSE InputQty END) + @Qty, " +
-            "RealStart = (CASE WHEN RealStart IS NULL THEN @UpdatedOn ELSE RealStart END), " +
-            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
+            "InputQty = (CASE WHEN InputQty IS NULL THEN 0 ELSE InputQty END) + {0}, " +
+            "RealStart = (CASE WHEN RealStart IS NULL THEN '{2}' ELSE RealStart END), " +
+            "UpdatedBy = '{1}', UpdatedOn = '{2}' WHERE IsDeleted = 0 AND WorkOrderId = {3};";
 #endif
 
 

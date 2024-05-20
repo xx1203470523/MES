@@ -311,13 +311,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     tasks.Add(manuSfcProduceDeleteSfcProduceBusinessBySfcInfoIdTask);
 
                     // 更新完工数量
-                    var planWorkOrderUpdateFinishProductQuantityByWorkOrderIdTask = _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
-                    {
+                    var planWorkOrderUpdateFinishProductQuantityByWorkOrderIdTask = _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdsAsync(new UpdateQtyByWorkOrderIdCommand[] {new() {
                         UpdatedBy = sfcProduceEntity.UpdatedBy,
                         UpdatedOn = sfcProduceEntity.UpdatedOn,
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
                         Qty = 1,
-                    });
+                    } });
                     tasks.Add(planWorkOrderUpdateFinishProductQuantityByWorkOrderIdTask);
 
                     // 更新状态
