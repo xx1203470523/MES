@@ -191,17 +191,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             //查询条码表信息
             var sfcList = await _manuSfcRepository.GetAllManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = new List<string> { queryDto.Sfc } });
             if (!sfcList.Any()) return bomDetailViews;
-
-            // 查询组件信息
-            var manuSfcCirculations = await _manuBarCodeRelationRepository.GetSfcMoudulesAsync(new ManuComponentBarcodeRelationQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                Sfc = queryDto.Sfc,
-                IsDisassemble = queryDto.Type
-            });
-
-            if (!manuSfcCirculations.Any() && queryDto.Type != SFCCirculationReportTypeEnum.Whole) return bomDetailViews;
-
             // 查询bom
             var bomId = sfcList.Select(x => x.ProductBOMId);
             var bominfos = await _procBomRepository.GetByIdsAsync(bomId.OfType<long>());
@@ -221,13 +210,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 procProcedures = (await _procProcedureRepository.GetByIdsAsync(procedureIds)).ToList();
             }
-
             // 产品Id
             var procMaterials = sfcList.Select(x => x.ProductId);
-
-            // 组件物料
-            var manuBarCodeMaterialIds = manuSfcCirculations.Select(x => x.InputBarCodeMaterialId).Distinct();
-
             var materialIds = new List<long>();
             // Bom表中的物料ID
             var bomMaterialIds = bomDetails.Select(item => item.MaterialId).Distinct();
@@ -239,10 +223,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 materialIds.AddRange(procMaterials);
             }
-            if (manuBarCodeMaterialIds.Any())
-            {
-                materialIds.AddRange(manuBarCodeMaterialIds.OfType<long>());
-            }
+         
             // 查询产品信息
             var procMaterialList = new List<ProcMaterialEntity>();
             var manuProcMaterial = new ManuProcMaterialViewDto();
@@ -262,6 +243,26 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Version = procMaterialInfo?.Version ?? ""
                 };
             }
+            // 查询组件信息
+            var manuSfcCirculations = await _manuBarCodeRelationRepository.GetSfcMoudulesAsync(new ManuComponentBarcodeRelationQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfc = queryDto.Sfc,
+                IsDisassemble = queryDto.Type
+            });
+
+            if (!manuSfcCirculations.Any() && queryDto.Type != SFCCirculationReportTypeEnum.Whole)
+            {
+                // 组件物料
+                var manuBarCodeMaterialIds = manuSfcCirculations.Select(x => x.InputBarCodeMaterialId).Distinct();
+                if (manuBarCodeMaterialIds.Any())
+                {
+                    materialIds.AddRange(manuBarCodeMaterialIds.OfType<long>());
+                }
+                bomDetailViews.ManuProcMaterial = manuProcMaterial;
+                return bomDetailViews;
+            }
+              
             //查询资源信息
             var procResources = await GetComponentResourcesAsync(manuSfcCirculations);
 
