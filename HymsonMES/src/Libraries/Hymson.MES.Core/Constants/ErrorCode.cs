@@ -1021,6 +1021,7 @@
         public const string MES19146 = "条码：{SFCS}状态为不合格，不允许绑定，请先通过不良复判功能确认不合格状态!";
         public const string MES19147 = "条码：{SFC}存在Ng，请先判定不合格状态!";
         public const string MES19148 = "条码：{SFC}在制状态不处于{ProcedureName}工序排队中，请检查在制状态!";
+        public const string MES19149 = "条码：{SFCS}在制状态不处于{ProcedureName}工序生产中，请检查在制状态!";
 
         #endregion
 

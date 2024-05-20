@@ -25,6 +25,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据资源类型Id查询工序
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ProcProcedureEntity> GetByResTypeId(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(GetByResTypeIdSql, new { Id = id });
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="query"></param>
@@ -249,6 +260,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT * FROM `proc_procedure`  WHERE Id IN @ids and IsDeleted=0  ";
         const string GetByCodeSql = @"SELECT * FROM `proc_procedure`  WHERE Code = @Code and SiteId=@SiteId LIMIT 1";
         const string GetByCodesSql = @"SELECT * FROM `proc_procedure`  WHERE Code in @Codes and SiteId=@SiteId ";
+        const string GetByResTypeIdSql = @"SELECT * FROM `proc_procedure`  WHERE ResourceTypeId = @Id ";
 
         const string GetProcProdureByResourceIdSql = "SELECT P.* FROM proc_procedure P INNER JOIN  proc_resource R ON R.ResTypeId = P.ResourceTypeId  WHERE R.IsDeleted = 0 AND P.IsDeleted = 0 AND R.SiteId = @SiteId AND P.SiteId = @SiteId AND R.Id = @ResourceId";
     }

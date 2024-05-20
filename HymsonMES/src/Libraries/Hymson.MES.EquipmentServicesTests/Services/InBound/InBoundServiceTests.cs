@@ -60,8 +60,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
         [TestMethod()]
         public async Task InBoundTestAsync()
         {
-            string resourceCode = "QAEMZY002";
-            string equipmentCode = "QAEM002";
+            string resourceCode = "QAEMZY003";
+            string equipmentCode = "QAEMSBBH003";
             string prefix = "AAATESTSFC230809";
 
             await SetEquInfoAsync(equipmentCode);

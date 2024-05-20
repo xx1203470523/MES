@@ -17,6 +17,13 @@ namespace Hymson.MES.Data.Repositories.Process
     public interface IProcProcedureRepository
     {
         /// <summary>
+        /// 根据资源类型获取工序
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity> GetByResTypeId(long id);
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procProcedurePagedQuery"></param>

@@ -237,6 +237,22 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                                             .Contains(w.SFC) && w.IsPassingStation != true);
                 if (outBoundMoreSfcs.Any())
                     throw new CustomerValidationException(nameof(ErrorCode.MES19127)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
+
+                //2024-05-20
+                //已进站条码需要校验在制工序和进站工序是否一致（避免设备重复请求）
+                //根据资源找到关联工序
+                var resourceEntity = await _procResourceRepository.GetByIdAsync(procResource.Id);
+                var resourceBindProcedureEntity = await _procProcedureRepository.GetByResTypeId(resourceEntity.ResTypeId);
+
+                var noProcedureDatas = sfcProduceList.Where(a => a.ProcedureId != resourceBindProcedureEntity.Id);
+
+                if (noProcedureDatas.Any())
+                {
+                    string SFCs = string.Join(",", noProcedureDatas.Select(a => a.SFC));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19149)).WithData("SFCS", SFCs)
+                        .WithData("ProcedureName", resourceBindProcedureEntity.Name);
+                }
+
             }
             //已经进站条码不允许过站
             if (sfcProduceList.Any())
@@ -248,6 +264,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 if (outBoundMoreSfcs.Any())
                     throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
+
+            //进展条码
+
             //保存条码当前所在工序,出站条码去一个即可
             var currentProcedureId = sfcProduceList.First().ProcedureId;
 
