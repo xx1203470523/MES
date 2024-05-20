@@ -14,5 +14,12 @@ namespace Hymson.MES.Services.Services.EquToolLifeRecord
         /// <param name="saveDto"></param>
         /// <returns></returns>
         Task<int> AddAsync(EquToolLifeRecordSaveDto saveDto);
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        Task<int> AddRangeAsync(IEnumerable<EquToolLifeRecordSaveDto> saveDto);
     }
 }

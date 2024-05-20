@@ -46,7 +46,7 @@ namespace Hymson.MES.Services.Services.EquToolLifeRecord
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equToolLifeRecordRepository"></param>
-        public EquToolLifeRecordService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquToolLifeRecordSaveDto> validationSaveRules, 
+        public EquToolLifeRecordService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquToolLifeRecordSaveDto> validationSaveRules,
             IEquToolLifeRecordRepository equToolLifeRecordRepository)
         {
             _currentUser = currentUser;
@@ -68,6 +68,25 @@ namespace Hymson.MES.Services.Services.EquToolLifeRecord
 
             // 保存
             return await _equToolLifeRecordRepository.InsertAsync(entity);
+        }
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        public async Task<int> AddRangeAsync(IEnumerable<EquToolLifeRecordSaveDto> saveDto)
+        {
+            // DTO转换实体
+            var entities = saveDto.Select(item =>
+            {
+                var entity = item.ToEntity<EquToolLifeRecordEntity>();
+                entity.Id = IdGenProvider.Instance.CreateId();
+                return entity;
+            });
+
+            // 保存
+            return await _equToolLifeRecordRepository.InsertRangeAsync(entities);
         }
     }
 }
