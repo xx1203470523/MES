@@ -186,6 +186,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("OutputBarCode = @Sfc");
             }
 
+            if (!string.IsNullOrWhiteSpace(query.InputBarCode))
+            {
+                sqlBuilder.Where("InputBarCode = @InputBarCode");
+            }
+
+
             if (query.IsDisassemble == SFCCirculationReportTypeEnum.Activity)
             {
                 sqlBuilder.Where("IsDisassemble = 0");

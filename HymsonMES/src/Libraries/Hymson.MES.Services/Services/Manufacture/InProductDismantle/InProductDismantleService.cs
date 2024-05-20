@@ -1248,7 +1248,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuBarCodeRelations = await _manuBarCodeRelationRepository.GetSfcMoudulesAsync(new ManuComponentBarcodeRelationQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Sfc = replaceDto.Sfc,
+                InputBarCode = replaceDto.CirculationBarCode,
                 IsDisassemble = SFCCirculationReportTypeEnum.Activity,
                 BomMainMaterialId = replaceDto.BomDetailId.ToString(),
             });
