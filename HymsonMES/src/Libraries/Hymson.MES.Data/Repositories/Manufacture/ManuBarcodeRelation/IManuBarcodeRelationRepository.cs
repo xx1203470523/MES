@@ -115,5 +115,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DisassemblyUpdateAsync(DisassemBarCodeRelationblyCommand command);
+
+        /// <summary>
+        /// 组件使用报告 分页查询
+        /// </summary>
+        /// <param name="manuSfcCirculationPagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuBarCodeRelationEntity>> GetReportPagedInfoAsync(ComUsageReportPagedQuery queryParam);
     }
 }

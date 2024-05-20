@@ -30,23 +30,25 @@ namespace Hymson.MES.Services.Services.Report
         private readonly IExcelService _excelService;
         private readonly IMinioService _minioService;
         private readonly ILocalizationService _localizationService;
+        private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="planWorkOrderRepository"></param> 
-        /// /// <param name="procMaterialRepository"></param> 
-        ///  <param name="excelService"></param> 
-        /// <param name="circulationRepository"></param> 
-        /// <param name="localizationService"></param> 
-        /// <param name="minioService"></param> 
-        public ComUsageReportService(ICurrentUser currentUser, ICurrentSite currentSite,  IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IManuSfcCirculationRepository circulationRepository, IExcelService excelService, IMinioService minioService, ILocalizationService localizationService)
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="circulationRepository"></param>
+        /// <param name="excelService"></param>
+        /// <param name="minioService"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="manuBarCodeRelationRepository"></param>
+        public ComUsageReportService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IManuSfcCirculationRepository circulationRepository, IExcelService excelService, IMinioService minioService, ILocalizationService localizationService, IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-
+            _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procMaterialRepository = procMaterialRepository;
             _circulationRepository = circulationRepository;
@@ -63,8 +65,8 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<PagedInfo<ComUsageReportViewDto>> GetComUsagePageListAsync(ComUsageReportPagedQueryDto param)
         {
             var pagedQuery = param.ToQuery<ComUsageReportPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId.Value;
-            var pagedInfo = await _circulationRepository.GetReportPagedInfoAsync(pagedQuery);
+            pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
+            var pagedInfo = await _manuBarCodeRelationRepository.GetReportPagedInfoAsync(pagedQuery);
 
             List<ComUsageReportViewDto> listDto = new List<ComUsageReportViewDto>();
 
@@ -73,31 +75,31 @@ namespace Hymson.MES.Services.Services.Report
                 return new PagedInfo<ComUsageReportViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
             }
 
-            var circulationProductIds = pagedInfo.Data.Select(x => x.CirculationProductId).Distinct().ToList();
-            var productIds = pagedInfo.Data.Select(x => x.ProductId).Distinct().ToList();
+            var circulationProductIds = pagedInfo.Data.Select(x => x.InputBarCodeMaterialId).Distinct().ToList();
+            var productIds = pagedInfo.Data.Select(x => x.OutputBarCodeMaterialId).Distinct().ToList();
 
             //合并 成 materialIds
-            circulationProductIds.AddRange(productIds);
+            circulationProductIds.AddRange(productIds.OfType<long>());
             var materialIds = circulationProductIds.ToArray();
             var materials = await _procMaterialRepository.GetByIdsAsync(materialIds);
 
-            var workOrderIds = pagedInfo.Data.Select(x => x.WorkOrderId).Distinct().ToArray();
-            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+            //var workOrderIds = pagedInfo.Data.Select(x => x.WorkOrderId).Distinct().ToArray();
+            //var workOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
 
             foreach (var item in pagedInfo.Data)
             {
-                var product = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
-                var circulationProduct= materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.CirculationProductId) : null;
+                var product = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.OutputBarCodeMaterialId) : null;
+                var circulationProduct = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.InputBarCodeMaterialId) : null;
 
-                var workOrder = materials != null && materials.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
+                //var workOrder = materials != null && materials.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
 
                 listDto.Add(new ComUsageReportViewDto()
                 {
-                    SFC = item.SFC,
+                    SFC = item.OutputBarCode,
                     ProductCodeVersion = product != null ? product.MaterialCode + "/" + product.Version : "",
-                    OrderCode= workOrder!=null? workOrder.OrderCode : "",
-                    CirculationBarCode=item.CirculationBarCode,
-                    CirculationProductCodeVersion= circulationProduct != null ? circulationProduct.MaterialCode + "/" + circulationProduct.Version : "",
+                    //  OrderCode= workOrder!=null? workOrder.OrderCode : "",
+                    CirculationBarCode = item.InputBarCode,
+                    CirculationProductCodeVersion = circulationProduct != null ? circulationProduct.MaterialCode + "/" + circulationProduct.Version : "",
                 });
             }
 
