@@ -30,14 +30,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var sqlBuilder = new StringBuilder(InsertSql);
             foreach (var e in entities)
             {
-                sqlBuilder.Append($"({e.Id}, {e.CirculationId}, {e.NodeId}, {e.DestinationId}, '{e.CreatedBy}', '{e.CreatedOn}', {e.SiteId}),");
+                sqlBuilder.Append($"({e.Id}, {e.CirculationId}, {e.NodeId}, {e.DestinationId}, @User, @Time, {e.SiteId}),");
             }
 
             // 移除最后一个逗号
             sqlBuilder.Length--;
 
+            // 前面做了非空和数据量判断，所以这里直接取第一个元素
+            var first = entities.First();
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(sqlBuilder.ToString());
+            return await conn.ExecuteAsync(sqlBuilder.ToString(), new { User = first.CreatedBy, Time = first.CreatedOn });
 
             /*
             // 使用StringBuilder来构建VALUES后面的括号集合

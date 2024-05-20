@@ -124,7 +124,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 });
                 if (manuSfcCirculationList == null || !manuSfcCirculationList.Any())
                 {
-                    _logger.LogDebug($"没有需要处理的流转数据！waterMarkId:{waterMarkId},startWaterMarkTime:{startWaterMarkTime}");
+                    _logger.LogDebug($"条码追溯 -> 没有新产生的的流转数据！waterMarkId:{waterMarkId},startWaterMarkTime:{startWaterMarkTime}");
                     return;
                 }
 
@@ -323,7 +323,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 });
                 if (manuSfcCirculationList == null || !manuSfcCirculationList.Any())
                 {
-                    _logger.LogDebug($"没有需要处理的流转数据！waterMarkId:{waterMarkId},startWaterMarkTime:{startWaterMarkTime}");
+                    _logger.LogDebug($"条码追溯 -> 没有新产生的的流转数据！waterMarkId:{waterMarkId},startWaterMarkTime:{startWaterMarkTime}");
                     return;
                 }
 

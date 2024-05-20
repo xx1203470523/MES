@@ -24,6 +24,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, entities);
+        }
+
+        /// <summary>
+        /// 新增（批量）
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
         public async Task<int> IgnoreRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities)
         {
             using var conn = GetMESDbConnection();
@@ -92,7 +103,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuWorkOrderSFCRepository
     {
-        const string IgnoreSql = "INSERT IGNORE manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+        const string InsertSql = "INSERT INTO manu_workorder_sfc (`Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+        const string IgnoreSql = "INSERT IGNORE manu_workorder_sfc (`Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
 
 #if DM
         const string InsertsSql = "MERGE INTO manu_workorder_sfc t " +

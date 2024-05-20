@@ -422,7 +422,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             foreach (var item in commands)
             {
                 // 可以参照 ManuSFCNodeRepository 的 InsertRangeAsync 改为参数化
-                stringBuilder.AppendFormat(UpdateInputQtySql, item.Qty, item.UpdatedBy.Replace("'", "''"), item.UpdatedOn, item.WorkOrderId);
+                stringBuilder.AppendFormat(UpdateInputQtySql, item.Qty, item.UpdatedBy.Replace("'", "''"), item.UpdatedOn?.ToString("yyyy-MM-dd HH:mm:ss"), item.WorkOrderId);
             }
 
             using var conn = GetMESDbConnection();
@@ -443,7 +443,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             foreach (var item in commands)
             {
                 // 可以参照 ManuSFCNodeRepository 的 InsertRangeAsync 改为参数化
-                stringBuilder.AppendFormat(UpdateFinishProductQuantitySql, item.Qty, item.UpdatedBy.Replace("'", "''"), item.UpdatedOn, item.WorkOrderId);
+                stringBuilder.AppendFormat(UpdateFinishProductQuantitySql, item.Qty, item.UpdatedBy.Replace("'", "''"), item.UpdatedOn?.ToString("yyyy-MM-dd HH:mm:ss"), item.WorkOrderId);
             }
 
             using var conn = GetMESDbConnection();

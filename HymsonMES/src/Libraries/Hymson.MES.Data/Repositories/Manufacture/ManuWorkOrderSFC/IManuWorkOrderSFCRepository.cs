@@ -13,6 +13,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
+        Task<int> InsertRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities);
+
+        /// <summary>
+        /// 新增（批量）
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
         Task<int> IgnoreRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities);
 
         /// <summary>
