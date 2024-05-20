@@ -26,8 +26,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<ManuWorkOrderSFCEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
+            var sqlBuilder = new StringBuilder(InsertSql);
+            foreach (var e in entities)
+            {
+                sqlBuilder.Append($"({e.Id}, {e.SiteId}, {e.WorkOrderId}, '{e.SFC}', {e.Status}, @User, @Time, @User, @Time),");
+            }
+
+            // 移除最后一个逗号
+            sqlBuilder.Length--;
+
+            // 前面做了非空和数据量判断，所以这里直接取第一个元素
+            var first = entities.First();
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, entities);
+            return await conn.ExecuteAsync(sqlBuilder.ToString(), new { User = first.CreatedBy, Time = first.CreatedOn });
         }
 
         /// <summary>
@@ -103,7 +117,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuWorkOrderSFCRepository
     {
-        const string InsertSql = "INSERT INTO manu_workorder_sfc (`Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
+        const string InsertSql = "INSERT INTO manu_workorder_sfc (`Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES ";
         const string IgnoreSql = "INSERT IGNORE manu_workorder_sfc (`Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
 
 #if DM
