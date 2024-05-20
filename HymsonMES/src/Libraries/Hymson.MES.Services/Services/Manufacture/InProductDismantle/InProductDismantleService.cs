@@ -1752,9 +1752,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             //外部获取批次数量
             decimal qty = 0;
             var material = await _procMaterialRepository.GetByIdAsync(productId);
-            if(material.Batch == null)
+            if (material != null && material.Batch != null)
             {
-                qty =string.IsNullOrEmpty(material.Batch) ? 0 : decimal.Parse(material.Batch);
+                qty = string.IsNullOrEmpty(material.Batch) ? 0 : decimal.Parse(material.Batch);
             }
             return qty;
         }
