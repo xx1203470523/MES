@@ -909,7 +909,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             using var trans = TransactionHelper.GetTransactionScope();
 
             // 记录step信息
-            //rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+            rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
 
             // 添加条码关系表信息
             rows += await _manuBarCodeRelationRepository.InsertAsync(manuBarCodeRelation);
