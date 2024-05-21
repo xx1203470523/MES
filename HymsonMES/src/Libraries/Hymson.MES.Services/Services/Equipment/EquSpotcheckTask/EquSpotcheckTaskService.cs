@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -8,10 +9,16 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using MySqlX.XDevAPI.Common;
+using System.Collections.Generic;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -40,6 +47,11 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly IEquSpotcheckTaskRepository _equSpotcheckTaskRepository;
 
         /// <summary>
+        /// 仓储（设备注册）
+        /// </summary>
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -47,12 +59,13 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="validationSaveRules"></param>
         /// <param name="equSpotcheckTaskRepository"></param>
         public EquSpotcheckTaskService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSpotcheckTaskSaveDto> validationSaveRules, 
-            IEquSpotcheckTaskRepository equSpotcheckTaskRepository)
+            IEquSpotcheckTaskRepository equSpotcheckTaskRepository, IEquEquipmentRepository equEquipmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _equSpotcheckTaskRepository = equSpotcheckTaskRepository;
+            _equEquipmentRepository = equEquipmentRepository;
         }
 
 
@@ -154,11 +167,73 @@ namespace Hymson.MES.Services.Services.Equipment
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquSpotcheckTaskPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
+            // 转换设备编码变为taskid
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
+            {
+                var equipmenEntities = await _equEquipmentRepository.GetByCodeAsync(new Data.Repositories.Common.Query.EntityByCodeQuery
+                {
+                    Site = pagedQuery.SiteId,
+                    Code = pagedQuery.EquipmentCode,
+                });
+                if (equipmenEntities != null) pagedQuery.EquipmentId = equipmenEntities.Id;
+                else pagedQuery.EquipmentId = default;
+            }
+
+            // 将不合格处理方式转换为检验单ID
+            //if (pagedQueryDto.HandMethod.HasValue)
+            //{
+            //    var unqualifiedHandEntities = await _qualFqcOrderUnqualifiedHandleRepository.GetEntitiesAsync(new QualFqcOrderUnqualifiedHandleQuery
+            //    {
+            //        SiteId = pagedQuery.SiteId,
+            //        HandMethod = pagedQueryDto.HandMethod
+            //    });
+            //    if (unqualifiedHandEntities != null && unqualifiedHandEntities.Any()) pagedQuery.FQCOrderIds = unqualifiedHandEntities.Select(s => s.FQCOrderId);
+            //    else pagedQuery.FQCOrderIds = Array.Empty<long>();
+            //}
+
+            var result = new PagedInfo<EquSpotcheckTaskDto>(Enumerable.Empty<EquSpotcheckTaskDto>(), pagedQuery.PageIndex, pagedQuery.PageSize);
+
             var pagedInfo = await _equSpotcheckTaskRepository.GetPagedListAsync(pagedQuery);
 
-            // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquSpotcheckTaskDto>());
-            return new PagedInfo<EquSpotcheckTaskDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            if (pagedInfo.Data != null && pagedInfo.Data.Any())
+            {
+                result.Data = pagedInfo.Data.Select(s => s.ToModel<EquSpotcheckTaskDto>());
+                result.TotalCount = pagedInfo.TotalCount;
+
+                var resultEquipmentIds = result.Data.Select(m => m.EquipmentId.GetValueOrDefault());
+                try
+                {
+                    var equipmenEntities = await _equEquipmentRepository.GetByIdAsync(resultEquipmentIds);
+
+                    result.Data = result.Data.Select(m =>
+                    {
+                        var equipmentEntity = equipmenEntities.FirstOrDefault(e => e.Id == m.EquipmentId);
+                        if (equipmentEntity != null)
+                        {
+                            m.EquipmentCode = equipmentEntity.EquipmentCode;
+                            m.EquipmentName = equipmentEntity.EquipmentName;
+                            m.Location = equipmentEntity.Location;
+                        }
+                        return m;
+                    });
+                }catch(Exception ex) { }
+
+
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 查询点检单明细项数据
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TaskItemInfoView>> querySnapshotItemAsync(SpotcheckTaskSnapshotItemQueryDto requestDto)
+        {
+            IEnumerable<TaskItemInfoView> info = null;
+            return info;
         }
 
     }

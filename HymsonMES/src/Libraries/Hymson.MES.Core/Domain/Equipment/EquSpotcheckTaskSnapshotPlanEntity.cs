@@ -5,8 +5,8 @@ namespace Hymson.MES.Core.Domain.Equipment
     /// <summary>
     /// 数据实体（设备点检快照任务计划）   
     /// equ_spotcheck_task_snapshot_plan
-    /// @author JAM
-    /// @date 2024-05-15 01:56:55
+    /// @author User
+    /// @date 2024-05-20 07:40:53
     /// </summary>
     public class EquSpotcheckTaskSnapshotPlanEntity : BaseEntity
     {
@@ -23,12 +23,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检计划编码
         /// </summary>
-        public string Code { get; set; }
+        public string PlanCode { get; set; }
 
         /// <summary>
         /// 点检计划名称
         /// </summary>
-        public string Name { get; set; }
+        public string PlanName { get; set; }
 
         /// <summary>
         /// 版本
@@ -58,22 +58,22 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检类型;周/日
         /// </summary>
-        public bool Type { get; set; }
+        public bool PlanType { get; set; }
 
         /// <summary>
         /// 点检计划状态
         /// </summary>
-        public bool Status { get; set; }
+        public bool PlanStatus { get; set; }
 
         /// <summary>
         /// 开始时间（计划）
         /// </summary>
-        public DateTime? BeginTime { get; set; }
+        public DateTime? PlanBeginTime { get; set; }
 
         /// <summary>
         /// 结束时间（计划）
         /// </summary>
-        public DateTime? EndTime { get; set; }
+        public DateTime? PlanEndTime { get; set; }
 
         /// <summary>
         /// 是否跳过节假日

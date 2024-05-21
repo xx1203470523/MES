@@ -250,6 +250,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSpotcheckItemEntity, EquSpotcheckItemDto>();
             CreateMap<EquSpotcheckItemUpdateDto, EquSpotcheckItemEntity>();
 
+            //index
+            CreateMap<EquSpotcheckTaskPagedQueryDto, EquSpotcheckTaskPagedQuery>();
+            CreateMap<EquSpotcheckTaskUnionPlanEntity, EquSpotcheckTaskDto>();
+
             #endregion
 
         }

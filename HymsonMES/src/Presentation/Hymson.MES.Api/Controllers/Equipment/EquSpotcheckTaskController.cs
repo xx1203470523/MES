@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Equipment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -94,6 +95,18 @@ namespace Hymson.MES.Api.Controllers.Equipment
         public async Task<PagedInfo<EquSpotcheckTaskDto>> QueryPagedListAsync([FromQuery] EquSpotcheckTaskPagedQueryDto pagedQueryDto)
         {
             return await _equSpotcheckTaskService.GetPagedListAsync(pagedQueryDto);
+        }
+
+
+        /// <summary>
+        /// 查询点检单明细项数据
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("snapshot")]
+        public async Task<IEnumerable<TaskItemInfoView>> querySnapshotItemAsync([FromQuery] SpotcheckTaskSnapshotItemQueryDto requestDto)
+        {
+            return await _equSpotcheckTaskService.querySnapshotItemAsync(requestDto);
         }
 
     }

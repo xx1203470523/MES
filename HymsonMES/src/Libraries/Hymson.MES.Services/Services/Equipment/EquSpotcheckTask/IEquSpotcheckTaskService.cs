@@ -50,5 +50,12 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         Task<PagedInfo<EquSpotcheckTaskDto>> GetPagedListAsync(EquSpotcheckTaskPagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 查询点检单明细项数据
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TaskItemInfoView>> querySnapshotItemAsync(SpotcheckTaskSnapshotItemQueryDto pagedQueryDto);
+
     }
 }
