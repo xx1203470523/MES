@@ -117,6 +117,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuDowngradingRecordEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+            if (manuDowngradingRecordQuery.SFCStepId.HasValue)
+            {
+                sqlBuilder.Where("SFCStepId=@SFCStepId");
+            }
             using var conn = GetMESDbConnection();
             var manuDowngradingRecordEntities = await conn.QueryAsync<ManuDowngradingRecordEntity>(template.RawSql, manuDowngradingRecordQuery);
             return manuDowngradingRecordEntities;
@@ -180,8 +186,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_downgrading_record` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_downgrading_record`(  `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, Remark) VALUES (   @Id, @SiteId, @SFC, @Grade, @IsCancellation, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted , @Remark)  ";
-        const string InsertsSql = "INSERT INTO `manu_downgrading_record`(  `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, Remark) VALUES (   @Id, @SiteId, @SFC, @Grade, @IsCancellation, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark )  ";
+        const string InsertSql = "INSERT INTO `manu_downgrading_record`(  `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, Remark, SFCStepId) VALUES (   @Id, @SiteId, @SFC, @Grade, @IsCancellation, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted , @Remark, @SFCStepId)  ";
+        const string InsertsSql = "INSERT INTO `manu_downgrading_record`(  `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, Remark, SFCStepId) VALUES (   @Id, @SiteId, @SFC, @Grade, @IsCancellation, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark , @SFCStepId)  ";
 
         const string UpdateSql = "UPDATE `manu_downgrading_record` SET   SiteId = @SiteId, SFC = @SFC, Grade = @Grade, IsCancellation = @IsCancellation, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark=@Remark  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_downgrading_record` SET   SiteId = @SiteId, SFC = @SFC, Grade = @Grade, IsCancellation = @IsCancellation, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted ,Remark=@Remark  WHERE Id = @Id ";
@@ -195,6 +201,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, Remark
                             FROM `manu_downgrading_record`  WHERE Id IN @Ids ";
+        const string GetBySFCStepIdSql = @"SELECT 
+                                          `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, Remark
+                            FROM `manu_downgrading_record`  WHERE SFCStepId = @SFCStepId ";
         #endregion
     }
 }

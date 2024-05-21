@@ -31,6 +31,7 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 using System.Transactions;
 using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
@@ -521,6 +522,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     WorkOrderId = item.WorkOrderId,
                     WorkCenterId = isProduce ? sfcProduces?.FirstOrDefault()?.WorkCenterId : null,
                     ProductBOMId = isProduce ? sfcProduces?.FirstOrDefault()?.ProductBOMId : workOrders?.FirstOrDefault(x => x.Id == item.WorkOrderId)?.ProductBOMId,
+                    ProcessRouteId = isProduce ? sfcProduces?.FirstOrDefault()?.ProcessRouteId : workOrders?.FirstOrDefault(x => x.Id == item.WorkOrderId)?.ProcessRouteId,
                     ProcedureId = isProduce ? sfcProduces?.FirstOrDefault()?.ProcedureId : null,
                     Qty = item.Qty,
                     EquipmentId = isProduce ? sfcProduces?.FirstOrDefault()?.EquipmentId : null,
@@ -675,6 +677,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProductId = oneManuSfc.ProductId,
                 WorkOrderId = oneManuSfc.WorkOrderId,
                 ProductBOMId = isProduce ? sfcProduces?.FirstOrDefault()?.ProductBOMId : workOrders?.FirstOrDefault(x => x.Id == oneManuSfc.WorkOrderId)?.ProductBOMId,
+                ProcessRouteId = isProduce ? sfcProduces?.FirstOrDefault()?.ProcessRouteId : workOrders?.FirstOrDefault(x => x.Id == oneManuSfc.WorkOrderId)?.ProcessRouteId,
                 WorkCenterId = isProduce ? sfcProduces?.FirstOrDefault()?.WorkCenterId : null,
                 Qty = qty,
                 ProcedureId = isProduce ? sfcProduces?.FirstOrDefault()?.ProcedureId : null,
@@ -879,6 +882,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 WorkOrderId = manuSfcInfoEntity?.WorkOrderId ?? 0,
                 WorkCenterId = manuSfcProduceEntity?.WorkCenterId,
                 ProductBOMId = manuSfcProduceEntity?.ProductBOMId,
+                ProcessRouteId = manuSfcProduceEntity?.ProcessRouteId,
                 ProcedureId = manuSfcProduceEntity?.ProcedureId,
                 Qty = manuSfcEntity.Qty,
                 Operatetype = ManuSfcStepTypeEnum.Split,
@@ -996,6 +1000,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 WorkOrderId = manuSfcInfo.WorkOrderId ?? 0,
                 WorkCenterId = manuSfcProduceEntity?.WorkCenterId,
                 ProductBOMId = manuSfcProduceEntity?.ProductBOMId,
+                ProcessRouteId = manuSfcProduceEntity?.ProcessRouteId,
                 ProcedureId = manuSfcProduceEntity?.ProcedureId,
                 Qty = param.Qty,
                 Operatetype = ManuSfcStepTypeEnum.SplitCreate,
@@ -1234,6 +1239,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProductId = manuSfcAboutInfoView.ProductId,
                 WorkOrderId = manuSfcAboutInfoView.WorkOrderId,
                 ProductBOMId = isProduce ? sfcProduces?.FirstOrDefault()?.ProductBOMId : workOrder?.ProductBOMId,
+                ProcessRouteId = isProduce ? sfcProduces?.FirstOrDefault()?.ProcessRouteId : workOrder?.ProcessRouteId,
                 WorkCenterId = isProduce ? sfcProduces?.FirstOrDefault()?.WorkCenterId : null,
                 Qty = adjustDto.Qty,
                 ResourceId = isProduce ? sfcProduces?.FirstOrDefault()?.ResourceId : null,

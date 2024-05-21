@@ -333,6 +333,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                         WorkOrderId = sfcInfoEntity.WorkOrderId ?? 0,
                         WorkCenterId = manuSfcProduceInfoEntity?.WorkCenterId,
                         ProductBOMId = manuSfcProduceInfoEntity?.ProductBOMId,
+                        ProcessRouteId = manuSfcProduceInfoEntity?.ProcessRouteId,
                         Qty = sfcEntity.Qty,
                         ScrapQty = sfcEntity.ScrapQty,
                         EquipmentId = manuSfcProduceInfoEntity?.EquipmentId,

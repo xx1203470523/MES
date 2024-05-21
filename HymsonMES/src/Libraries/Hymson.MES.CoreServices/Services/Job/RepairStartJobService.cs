@@ -4,6 +4,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
@@ -338,6 +339,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
                     WorkCenterId = sfcProduceEntity.WorkCenterId,
                     ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcessRouteId= sfcProduceEntity.ProcessRouteId,
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
                     EquipmentId = sfcProduceEntity.EquipmentId,

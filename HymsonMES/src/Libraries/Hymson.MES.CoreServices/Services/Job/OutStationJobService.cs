@@ -4,6 +4,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
@@ -707,6 +708,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 WorkOrderId = sfcProduceEntity.WorkOrderId,
                 WorkCenterId = sfcProduceEntity.WorkCenterId,
                 ProductBOMId = sfcProduceEntity.ProductBOMId,
+                ProcessRouteId= sfcProduceEntity.ProcessRouteId,
                 SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                 Qty = sfcProduceEntity.Qty,
                 VehicleCode = requestBo.VehicleCode,
@@ -909,6 +911,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 WorkOrderId = sfcProduceEntity.WorkOrderId,
                 WorkCenterId = sfcProduceEntity.WorkCenterId,
                 ProductBOMId = sfcProduceEntity.ProductBOMId,
+                ProcessRouteId= sfcProduceEntity.ProcessRouteId,
                 SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                 Qty = sfcProduceEntity.Qty,
                 VehicleCode = requestBo.VehicleCode,
@@ -1263,6 +1266,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 WorkOrderId = sfcProduceEntity.WorkOrderId,
                 WorkCenterId = sfcProduceEntity.WorkCenterId,
                 ProductBOMId = sfcProduceEntity.ProductBOMId,
+                ProcessRouteId= sfcProduceEntity.ProcessRouteId,
                 SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                 Qty = sfcProduceEntity.Qty,
                 VehicleCode = requestBo.VehicleCode,

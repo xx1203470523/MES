@@ -34,6 +34,7 @@ using Hymson.EventBus.Abstractions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.Core.Constants.Process;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -273,6 +274,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 WorkOrderId = planWorkOrderEntity.Id,
                 ProductBOMId = planWorkOrderEntity.ProductBOMId,
                 WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+                ProcessRouteId= planWorkOrderEntity.ProcessRouteId,
                 Qty = qty,
                 ProcedureId = procedureId,
                 Operatetype = ManuSfcStepTypeEnum.Create,

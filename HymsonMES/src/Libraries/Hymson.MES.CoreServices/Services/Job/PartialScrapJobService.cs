@@ -5,6 +5,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
@@ -285,6 +286,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         WorkOrderId = manuSfcProduce.WorkOrderId,
                         WorkCenterId = manuSfcProduce?.WorkCenterId,
                         ProductBOMId = manuSfcProduce?.ProductBOMId,
+                        ProcessRouteId= manuSfcProduce?.ProcessRouteId,
                         Qty = sfcEntity.Qty,
                         ScrapQty = unqualifiedBo.UnqualifiedQty,
                         EquipmentId = manuSfcProduce?.EquipmentId,

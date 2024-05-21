@@ -773,8 +773,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 BarCodes = manuSfcs
             });
 
-
-
             var manuSfcEntities = await manuSfcEntitiesTask;
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
             var sfcPackList = await sfcPackListTask;
@@ -891,6 +889,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     WorkOrderId = manuSfcInfoEntity?.WorkOrderId ?? 0,
                     WorkCenterId = manuSfcProduceEntity?.WorkCenterId,
                     ProductBOMId = manuSfcProduceEntity?.ProductBOMId,
+                    ProcessRouteId = manuSfcProduceEntity?.ProcessRouteId,
                     Qty = manuSfcEntity.Qty,
                     EquipmentId = manuSfcProduceEntity?.EquipmentId,
                     ResourceId = manuSfcProduceEntity?.ResourceId,
@@ -1459,6 +1458,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     WorkOrderId = item.WorkOrderId,
                     WorkCenterId = item.WorkCenterId,
                     ProductBOMId = item.ProductBOMId,
+                    ProcessRouteId = item?.ProcessRouteId,
                     Qty = item.Qty,
                     EquipmentId = item.EquipmentId,
                     ResourceId = item.ResourceId,

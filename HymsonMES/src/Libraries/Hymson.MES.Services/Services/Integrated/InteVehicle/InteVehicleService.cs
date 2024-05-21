@@ -591,7 +591,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
                 bool materialgroupcheck = false;
                 var bargroup = inteVehicleTypeVerifyEntities.Where(v => v.Type == Core.Enums.Integrated.VehicleTypeVerifyTypeEnum.MaterialGroup).ToList();
-              
+
                 if (!bargroup.Any(v => v.VerifyId == material.GroupId))
                 {
                     materialgroupcheck = false;
@@ -748,6 +748,7 @@ namespace Hymson.MES.Services.Services.Integrated
                             ProductId = manuSfcProduceEntity.ProductId,
                             WorkOrderId = manuSfcProduceEntity.WorkOrderId,
                             ProductBOMId = manuSfcProduceEntity.ProductBOMId,
+                            ProcessRouteId = manuSfcProduceEntity.ProcessRouteId,
                             WorkCenterId = manuSfcProduceEntity.WorkCenterId,
                             Qty = 1,
                             ProcedureId = manuSfcProduceEntity.ProcedureId,
@@ -870,6 +871,7 @@ namespace Hymson.MES.Services.Services.Integrated
                                 ProductId = manuSfcProduceEntity.ProductId,
                                 WorkOrderId = manuSfcProduceEntity.WorkOrderId,
                                 ProductBOMId = manuSfcProduceEntity.ProductBOMId,
+                                ProcessRouteId = manuSfcProduceEntity.ProcessRouteId,
                                 WorkCenterId = manuSfcProduceEntity.WorkCenterId,
                                 Qty = 1,
                                 //EquipmentId = manuSfcProduceEntity.EquipmentId,
@@ -1016,14 +1018,15 @@ namespace Hymson.MES.Services.Services.Integrated
             var manuSfcProduceEntities = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery { Sfcs = sfcs, SiteId = _currentSite.SiteId ?? 0 });
 
             var materialEntities = new List<ProcMaterialEntity>();
-            var workOrderEntities=new List<PlanWorkOrderEntity>();
+            var workOrderEntities = new List<PlanWorkOrderEntity>();
             var whMaterialInventoryEntities = new List<WhMaterialInventoryEntity>();
             //如果在制品条码为空，则去物料库存查询，现在托盘可以绑定在制品和物料库存
             if (manuSfcProduceEntities == null || !manuSfcProduceEntities.Any())
             {
                 //获取物料库存
-                whMaterialInventoryEntities = (await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery { BarCodes= sfcs ,SiteId= _currentSite.SiteId ?? 0 }))?.ToList();
-                if (whMaterialInventoryEntities == null || !whMaterialInventoryEntities.Any()) { 
+                whMaterialInventoryEntities = (await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery { BarCodes = sfcs, SiteId = _currentSite.SiteId ?? 0 }))?.ToList();
+                if (whMaterialInventoryEntities == null || !whMaterialInventoryEntities.Any())
+                {
                     return result;
                 }
 
@@ -1031,10 +1034,11 @@ namespace Hymson.MES.Services.Services.Integrated
                 var materialIds = whMaterialInventoryEntities.Select(a => a.MaterialId).Distinct();
                 materialEntities = (await _procMaterialRepository.GetByIdsAsync(materialIds))?.ToList();
             }
-            else {
+            else
+            {
                 //获取物料信息
                 var materialIds = manuSfcProduceEntities.Select(a => a.ProductId).Distinct();
-                materialEntities =(await _procMaterialRepository.GetByIdsAsync(materialIds))?.ToList();
+                materialEntities = (await _procMaterialRepository.GetByIdsAsync(materialIds))?.ToList();
 
                 //获取工单信息
                 var workOrderIds = manuSfcProduceEntities.Select(a => a.WorkOrderId).Distinct();
@@ -1075,7 +1079,8 @@ namespace Hymson.MES.Services.Services.Integrated
                     model.MaterialVersion = materialEntity?.Version;
                     model.Unit = materialEntity?.Unit;
                 }
-                else {
+                else
+                {
                     var materialEntity = materialEntities?.FirstOrDefault(a => a.Id == manuSfcProduceEntity.ProductId);
                     model.MaterialCode = materialEntity?.MaterialCode;
                     model.MaterialName = materialEntity?.MaterialName;

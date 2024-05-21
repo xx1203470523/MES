@@ -119,6 +119,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuFacePlateRepairEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Select("*");
+            if (manuFacePlateRepairQuery.SfcStepId.HasValue)
+            {
+                sqlBuilder.Where("SfcStepId=@SfcStepId");
+            }
             using var conn = GetMESDbConnection();
             var manuFacePlateRepairEntities = await conn.QueryAsync<ManuFacePlateRepairEntity>(template.RawSql, manuFacePlateRepairQuery);
             return manuFacePlateRepairEntities;
@@ -261,8 +268,51 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateDetailsSql, manuSfcRepairDetailEntities);
         }
-        #endregion
 
+        /// <summary>
+        /// 获取维修记录详情
+        /// TODO  两个仓储共同使用  暂时使用  by wangkeming
+        /// </summary>
+        /// <param name="manuFacePlateRepairQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcRepairDetailEntity>> GetManuSfcRepairDetailEntitiesAsync(ManuSfcRepairDetailQuery manuSfcRepairDetailQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetManuSfcRepairDetailEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Select("*");
+            if (manuSfcRepairDetailQuery.SfcRepairIds!=null&&manuSfcRepairDetailQuery.SfcRepairIds.Any())
+            {
+                sqlBuilder.Where("SfcRepairId IN @SfcRepairIds");
+            }
+            using var conn = GetMESDbConnection();
+            var manuFacePlateRepairEntities = await conn.QueryAsync<ManuSfcRepairDetailEntity>(template.RawSql, manuSfcRepairDetailQuery);
+            return manuFacePlateRepairEntities;
+        }
+
+        /// <summary>
+        /// 获取维修记录
+        /// TODO  两个仓储共同使用  暂时使用  by wangkeming
+        /// </summary>
+        /// <param name="manuFacePlateRepairQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcRepairRecordEntity>> GetManuSfcRepairRecordEntitiesAsync(ManuSfcRepairRecordQuery manuSfcRepairRecordQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetManuSfcRepairRecordEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Select("*");
+            if (manuSfcRepairRecordQuery.SfcStepId.HasValue)
+            {
+                sqlBuilder.Where("SfcStepId=@SfcStepId");
+            }
+            using var conn = GetMESDbConnection();
+            var manuFacePlateRepairEntities = await conn.QueryAsync<ManuSfcRepairRecordEntity>(template.RawSql, manuSfcRepairRecordQuery);
+            return manuFacePlateRepairEntities;
+        }
+        #endregion
     }
 
     public partial class ManuFacePlateRepairRepository
@@ -297,8 +347,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateByFacePlateIdSql = "UPDATE `manu_face_plate_Repair` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,IsShowProductList = @IsShowProductList, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  ,IsShowActivityList=@IsShowActivityList WHERE FacePlateId = @FacePlateId ";
 
         //维修记录
-        const string InsertRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted , @SfcStepId )  ";
+        const string InsertsRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted  ,@SfcStepId)  ";
         const string GetManuSfcRepairBySFCSql = "SELECT * FROM manu_sfc_repair_record WHERE SiteId=@SiteId AND SFC=@SFC ";
 
 
@@ -309,6 +359,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetManuSfcRepairDetailSql = "SELECT `Id`, `SiteId`, `SfcRepairId`, `ProductBadId`, `RepairMethod`, `CauseAnalyse`, `IsClose`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted` FROM manu_sfc_repair_detail WHERE IsDeleted=0 AND SiteId=@SiteId AND  ProductBadId IN @ProductBadId";
 
+        const string GetManuSfcRepairRecordEntitiesSqlTemplate = "SELECT \r\n                                            /**select**/\r\n                                           FROM `manu_sfc_repair_record` /**where**/ ";
+        const string GetManuSfcRepairDetailEntitiesSqlTemplate = "SELECT \r\n                                            /**select**/\r\n                                           FROM `manu_sfc_repair_detail` /**where**/ ";
         #endregion
     }
 }
