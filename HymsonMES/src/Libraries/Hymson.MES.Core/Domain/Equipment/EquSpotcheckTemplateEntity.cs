@@ -41,7 +41,7 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckTemplate
        /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
        /// <summary>
         /// 站点Id

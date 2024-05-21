@@ -3,7 +3,7 @@
  *
  *describe: 设备点检计划仓储类 | 代码由框架生成
  *builder:  pengxin
- *build datetime: 2024-05-16 02:14:30
+ *build datetime: 2024-05-20 04:05:45
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.EquSpotcheckPlan;

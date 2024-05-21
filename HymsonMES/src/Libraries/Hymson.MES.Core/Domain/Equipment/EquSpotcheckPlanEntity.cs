@@ -66,7 +66,7 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckPlan
         /// <summary>
         /// 是否跳过节假日;日历中的休息日
         /// </summary>
-        public bool? IsSkipHoliday { get; set; }
+        public TrueOrFalseEnum? IsSkipHoliday { get; set; }
 
         /// <summary>
         /// 首次执行时间;首次执行时间需在开始-结束时间范围内
@@ -96,7 +96,7 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckPlan
         /// <summary>
         /// Corn表达式
         /// </summary>
-        public string CornExpression { get; set; }
+        public string? CornExpression { get; set; }
 
         /// <summary>
         /// 描述

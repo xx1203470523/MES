@@ -116,7 +116,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 模板与项目

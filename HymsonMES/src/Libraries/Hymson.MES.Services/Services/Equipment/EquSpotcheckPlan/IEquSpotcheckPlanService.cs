@@ -56,5 +56,18 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquSpotcheckPlanDto> QueryEquSpotcheckPlanByIdAsync(long id);
+
+
+        #region 关联信息
+
+        /// <summary>
+        /// 获取模板关联信息（项目）
+        /// </summary>
+        /// <param name="spotCheckPlanId"></param>
+        /// <returns></returns>
+        Task<List<QueryEquRelationListDto>> QueryEquRelationListAsync(long spotCheckPlanId);
+
+        #endregion
+
     }
 }

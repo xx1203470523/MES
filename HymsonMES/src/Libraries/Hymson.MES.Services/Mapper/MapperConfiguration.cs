@@ -138,10 +138,12 @@ namespace Hymson.MES.Services.Mapper
             #region EquEquipment
             CreateMap<EquEquipmentSaveDto, EquEquipmentEntity>();
             CreateMap<EquEquipmentPagedQueryDto, EquEquipmentPagedQuery>();
+            CreateMap<EquEquipmentSpotcheckRelationPagedQueryDto, EquEquipmentSpotcheckRelationPagedQuery>();
 
             CreateMap<EquEquipmentEntity, EquEquipmentDto>();
             CreateMap<EquEquipmentEntity, EquEquipmentListDto>();
             CreateMap<EquEquipmentPageView, EquEquipmentListDto>();
+            CreateMap<GetEquSpotcheckPlanEquipmentRelationPageView, GetEquSpotcheckPlanEquipmentRelationListDto>();
 
             CreateMap<EquInspectionItemPagedQueryDto, EquInspectionItemPagedQuery>();
             CreateMap<EquInspectionItemSaveDto, EquInspectionItemEntity>();
@@ -277,6 +279,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSpotcheckPlanEntity, EquSpotcheckPlanDto>();
 
             CreateMap<EquSpotcheckPlanDto, EquSpotcheckPlanEntity>();
+            CreateMap<EquSpotcheckPlanEntity, EquSpotcheckPlanDto>();
             #endregion
 
         }

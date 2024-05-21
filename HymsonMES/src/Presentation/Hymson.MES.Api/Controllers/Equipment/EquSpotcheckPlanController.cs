@@ -65,6 +65,17 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckPlan
         }
 
         /// <summary>
+        /// 查询详情（设备点检计划）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("equRelation/{id}")] 
+        public async Task<List<QueryEquRelationListDto>> QueryEquRelationListAsync(long id)
+        {
+            return await _equSpotcheckPlanService.QueryEquRelationListAsync(id); 
+        }
+
+        /// <summary>
         /// 添加（设备点检计划）
         /// </summary>
         /// <param name="parm"></param>

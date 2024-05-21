@@ -3,7 +3,7 @@
  *
  *describe: 设备点检计划 仓储类 | 代码由框架生成
  *builder:  pengxin
- *build datetime: 2024-05-16 02:14:30
+ *build datetime: 2024-05-20 04:05:45
  */
 
 using Dapper;
@@ -110,6 +110,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
             //    sqlBuilder.Where("EquipmentName=@EquipmentName");
             //}
 
+
             var offSet = (equSpotcheckPlanPagedQuery.PageIndex - 1) * equSpotcheckPlanPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = equSpotcheckPlanPagedQuery.PageSize });
@@ -193,20 +194,20 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
                                             /**select**/
                                            FROM `equ_spotcheck_plan` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_spotcheck_plan`(  `Id`, `Code`, `Name`, `Version`, `ExecutorIds`, `LeaderIds`, `Type`, `Status`, `BeginTime`, `EndTime`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Version, @ExecutorIds, @LeaderIds, @Type, @Status, @BeginTime, @EndTime, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `equ_spotcheck_plan`(  `Id`, `Code`, `Name`, `Version`, `ExecutorIds`, `LeaderIds`, `Type`, `Status`, `BeginTime`, `EndTime`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Version, @ExecutorIds, @LeaderIds, @Type, @Status, @BeginTime, @EndTime, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `equ_spotcheck_plan`(  `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`) VALUES (   @Id, @Code, @Name, @Version, @Type, @Status, @BeginTime, @EndTime, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ExecutorIds, @LeaderIds )  ";
+        const string InsertsSql = "INSERT INTO `equ_spotcheck_plan`(  `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`) VALUES (   @Id, @Code, @Name, @Version, @Type, @Status, @BeginTime, @EndTime, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ExecutorIds, @LeaderIds )  ";
 
-        const string UpdateSql = "UPDATE `equ_spotcheck_plan` SET   Code = @Code, Name = @Name, Version = @Version, ExecutorIds = @ExecutorIds, LeaderIds = @LeaderIds, Type = @Type, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_spotcheck_plan` SET   Code = @Code, Name = @Name, Version = @Version, ExecutorIds = @ExecutorIds, LeaderIds = @LeaderIds, Type = @Type, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_spotcheck_plan` SET   Code = @Code, Name = @Name, Version = @Version, Type = @Type, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn   WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `equ_spotcheck_plan` SET   Code = @Code, Name = @Name, Version = @Version, Type = @Type, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `equ_spotcheck_plan` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `equ_spotcheck_plan` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `Code`, `Name`, `Version`, `ExecutorIds`, `LeaderIds`, `Type`, `Status`, `BeginTime`, `EndTime`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                               `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
                             FROM `equ_spotcheck_plan`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `Code`, `Name`, `Version`, `ExecutorIds`, `LeaderIds`, `Type`, `Status`, `BeginTime`, `EndTime`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                                          `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
                             FROM `equ_spotcheck_plan`  WHERE Id IN @Ids ";
         #endregion
     }

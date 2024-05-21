@@ -39,12 +39,12 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 点检执行人;用户中心UserId集合
         /// </summary>
-        public string ExecutorIds { get; set; }
+        public string? ExecutorIds { get; set; }
 
         /// <summary>
         /// 点检负责人;用户中心UserId集合
         /// </summary>
-        public string LeaderIds { get; set; }
+        public string? LeaderIds { get; set; }
 
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 是否跳过节假日;日历中的休息日
         /// </summary>
-        public bool? IsSkipHoliday { get; set; }
+        public TrueOrFalseEnum? IsSkipHoliday { get; set; }
 
         /// <summary>
         /// 首次执行时间;首次执行时间需在开始-结束时间范围内
@@ -79,24 +79,9 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         public DateTime? FirstExecuteTime { get; set; }
 
         /// <summary>
-        /// 循环周期（月）
+        /// 循环周期
         /// </summary>
-        public int? CycleMonth { get; set; }
-
-        /// <summary>
-        /// 循环周期（天）
-        /// </summary>
-        public int? CycleDay { get; set; }
-
-        /// <summary>
-        /// 循环周期（小时）
-        /// </summary>
-        public int? CycleHour { get; set; }
-
-        /// <summary>
-        /// 循环周期（分钟）
-        /// </summary>
-        public int? CycleMinute { get; set; }
+        public int? Cycle { get; set; }
 
         /// <summary>
         /// 完成时间（小时）
@@ -201,7 +186,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 是否跳过节假日;日历中的休息日
         /// </summary>
-        public bool? IsSkipHoliday { get; set; }
+        public TrueOrFalseEnum? IsSkipHoliday { get; set; }
 
         /// <summary>
         /// 首次执行时间;首次执行时间需在开始-结束时间范围内
@@ -209,24 +194,9 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         public DateTime? FirstExecuteTime { get; set; }
 
         /// <summary>
-        /// 循环周期（月）
+        /// 循环周期
         /// </summary>
-        public int? CycleMonth { get; set; }
-
-        /// <summary>
-        /// 循环周期（天）
-        /// </summary>
-        public int? CycleDay { get; set; }
-
-        /// <summary>
-        /// 循环周期（小时）
-        /// </summary>
-        public int? CycleHour { get; set; }
-
-        /// <summary>
-        /// 循环周期（分钟）
-        /// </summary>
-        public int? CycleMinute { get; set; }
+        public int? Cycle { get; set; }
 
         /// <summary>
         /// 完成时间（小时）
@@ -297,7 +267,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 是否跳过节假日;日历中的休息日
         /// </summary>
-        public bool? IsSkipHoliday { get; set; }
+        public TrueOrFalseEnum? IsSkipHoliday { get; set; }
 
         /// <summary>
         /// 首次执行时间;首次执行时间需在开始-结束时间范围内
@@ -307,22 +277,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 循环周期（月）
         /// </summary>
-        public int? CycleMonth { get; set; }
-
-        /// <summary>
-        /// 循环周期（天）
-        /// </summary>
-        public int? CycleDay { get; set; }
-
-        /// <summary>
-        /// 循环周期（小时）
-        /// </summary>
-        public int? CycleHour { get; set; }
-
-        /// <summary>
-        /// 循环周期（分钟）
-        /// </summary>
-        public int? CycleMinute { get; set; }
+        public int? Cycle { get; set; }
 
         /// <summary>
         /// 完成时间（小时）
@@ -353,17 +308,17 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 点检计划编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 点检计划名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
         /// <summary>
         /// 点检计划状态
@@ -373,22 +328,22 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 设备编码 
         /// </summary>
-        public string EquipmentCode { get; set; }
+        public string? EquipmentCode { get; set; }
 
         /// <summary>
         /// 设备名称 
         /// </summary>
-        public string EquipmentName { get; set; }
+        public string? EquipmentName { get; set; }
 
         /// <summary>
         /// 点检执行人;用户中心UserId集合
         /// </summary>
-        public string ExecutorIds { get; set; }
+        public string? ExecutorIds { get; set; }
 
         /// <summary>
         /// 点检负责人;用户中心UserId集合
         /// </summary>
-        public string LeaderIds { get; set; }
+        public string? LeaderIds { get; set; }
     }
 
 
@@ -399,6 +354,12 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
     /// </summary>
     public record EquRelatedDto
     {
+
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 计划
         /// </summary>
@@ -407,12 +368,60 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 模板
         /// </summary>
-        public long SpotCheckTemplateId { get; set; }
+        public long TemplateId { get; set; } 
 
         /// <summary>
         /// 设备
         /// </summary>
         public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 执行人
+        /// </summary>
+        public string? ExecutorIds { get; set; }
+
+        /// <summary>
+        /// 责任人
+        /// </summary>
+        public string? LeaderIds { get; set; }
+    }
+
+    public record QueryEquRelationListDto
+    {
+        /// <summary>
+        /// 计划
+        /// </summary>
+        public long SpotCheckPlanId { get; set; }
+
+
+        /// <summary>
+        /// 模板
+        /// </summary>
+        public long TemplateId { get; set; }
+
+        /// <summary>
+        /// 模板
+        /// </summary>
+        public string TemplateCode { get; set; }
+
+        /// <summary>
+        /// 模板
+        /// </summary>
+        public string TemplateVersion { get; set; }
+
+        /// <summary>
+        /// 设备
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 设备
+        /// </summary>
+        public string EquipmentCode { get; set; }
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string EquipmentName { get; set; }
 
         /// <summary>
         /// 执行人

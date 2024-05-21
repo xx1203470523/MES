@@ -15,9 +15,13 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.EquSpotcheckPlan;
 using Hymson.MES.Core.Domain.EquSpotcheckPlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.EquSpotcheckPlan;
 using Hymson.MES.Data.Repositories.EquSpotcheckPlanEquipmentRelation;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation;
 using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
+using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -40,10 +44,13 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// </summary>
         private readonly IEquSpotcheckPlanRepository _equSpotcheckPlanRepository;
         private readonly IEquSpotcheckPlanEquipmentRelationRepository _equSpotcheckPlanEquipmentRelationRepository;
+        private readonly IEquSpotcheckTemplateRepository _equSpotcheckTemplateRepository;
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+
         private readonly AbstractValidator<EquSpotcheckPlanCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquSpotcheckPlanModifyDto> _validationModifyRules;
 
-        public EquSpotcheckPlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckPlanRepository equSpotcheckPlanRepository, AbstractValidator<EquSpotcheckPlanCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckPlanModifyDto> validationModifyRules, IEquSpotcheckPlanEquipmentRelationRepository equSpotcheckPlanEquipmentRelationRepository)
+        public EquSpotcheckPlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckPlanRepository equSpotcheckPlanRepository, AbstractValidator<EquSpotcheckPlanCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckPlanModifyDto> validationModifyRules, IEquSpotcheckPlanEquipmentRelationRepository equSpotcheckPlanEquipmentRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquEquipmentRepository equEquipmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -51,6 +58,8 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _equSpotcheckPlanEquipmentRelationRepository = equSpotcheckPlanEquipmentRelationRepository;
+            _equSpotcheckTemplateRepository = equSpotcheckTemplateRepository;
+            _equEquipmentRepository = equEquipmentRepository;
         }
 
         /// <summary>
@@ -85,9 +94,9 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             {
                 EquSpotcheckPlanEquipmentRelationEntity equSpotcheckPlanEquipmentRelation = new()
                 {
-                    EquipmentId = item.EquipmentId,
+                    EquipmentId = item.Id,
                     SpotCheckPlanId = equSpotcheckPlanEntity.Id,
-                    SpotCheckTemplateId = item.SpotCheckTemplateId,
+                    SpotCheckTemplateId = item.TemplateId,
 
                     Id = IdGenProvider.Instance.CreateId(),
                     CreatedBy = _currentUser.UserName,
@@ -98,8 +107,6 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                 equSpotcheckPlanEquipmentRelationList.Add(equSpotcheckPlanEquipmentRelation);
             }
 
-            try
-            {
             using var trans = TransactionHelper.GetTransactionScope();
 
             //入库
@@ -107,12 +114,6 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             await _equSpotcheckPlanEquipmentRelationRepository.InsertsAsync(equSpotcheckPlanEquipmentRelationList);
 
             trans.Complete();
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
 
         }
 
@@ -211,9 +212,11 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             {
                 EquSpotcheckPlanEquipmentRelationEntity equSpotcheckPlanEquipmentRelation = new()
                 {
-                    EquipmentId = item.EquipmentId,
+                    EquipmentId = item.Id,
                     SpotCheckPlanId = equSpotcheckPlanModifyDto.Id,
-                    SpotCheckTemplateId = item.SpotCheckTemplateId,
+                    SpotCheckTemplateId = item.TemplateId,
+                    ExecutorIds = item.ExecutorIds,
+                    LeaderIds = item.LeaderIds,
 
                     Id = IdGenProvider.Instance.CreateId(),
                     CreatedBy = _currentUser.UserName,
@@ -250,5 +253,63 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             }
             return null;
         }
+
+        /// <summary>
+        /// 生成
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task GenerateAsync(long id)
+        {
+            var equSpotcheckPlanEntity = await _equSpotcheckPlanRepository.GetByIdAsync(id);
+            var equSpotcheckPlanEquipmentRelationEntity = await _equSpotcheckPlanEquipmentRelationRepository.GetBySpotCheckPlanIdsAsync(id);
+
+
+
+
+        }
+
+        #region 关联信息
+        /// <summary>
+        /// 获取模板关联信息（项目）
+        /// </summary>
+        /// <param name="spotCheckPlanId"></param>
+        /// <returns></returns>
+        public async Task<List<QueryEquRelationListDto>> QueryEquRelationListAsync(long spotCheckPlanId)
+        {
+            var equSpotcheckPlanEquipmentRelations = await _equSpotcheckPlanEquipmentRelationRepository.GetBySpotCheckPlanIdsAsync(spotCheckPlanId);
+
+            List<QueryEquRelationListDto> list = new();
+            if (equSpotcheckPlanEquipmentRelations != null && equSpotcheckPlanEquipmentRelations.Any())
+            {
+                var spotCheckItemIds = equSpotcheckPlanEquipmentRelations.Select(it => it.SpotCheckPlanId).ToArray();
+                var equSpotcheckTemplates = await _equSpotcheckTemplateRepository.GetByIdsAsync(spotCheckItemIds);
+                var equipmentIds = equSpotcheckPlanEquipmentRelations.Select(it => it.EquipmentId).ToArray();
+                var equipments = await _equEquipmentRepository.GetByIdAsync(equipmentIds);
+
+                foreach (var item in equSpotcheckPlanEquipmentRelations)
+                {
+                    var equSpotcheckTemplate = equSpotcheckTemplates.FirstOrDefault(it => it.Id == item.SpotCheckPlanId);
+                    var equipment = equipments.FirstOrDefault(it => it.Id == item.EquipmentId);
+                    QueryEquRelationListDto itemRelation = new()
+                    {
+                        SpotCheckPlanId = spotCheckPlanId,
+                        TemplateId = item.SpotCheckTemplateId,
+                        TemplateCode = equSpotcheckTemplate?.Code ?? "",
+                        TemplateVersion = equSpotcheckTemplate?.Version ?? "",
+                        EquipmentId = item.EquipmentId,
+                        EquipmentCode = equipment?.EquipmentCode ?? "",
+                        EquipmentName = equipment?.EquipmentName ?? "",
+                        ExecutorIds = item?.ExecutorIds,
+                        LeaderIds = item?.LeaderIds,
+                    };
+
+                    list.Add(itemRelation);
+                }
+            }
+
+            return list;
+        }
+        #endregion
     }
 }
