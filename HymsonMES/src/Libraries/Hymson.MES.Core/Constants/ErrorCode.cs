@@ -2088,8 +2088,9 @@
         public const string MES15807 = "只能删除待检验状态的数据";
         #endregion
 
-        #region 设备点检 15900
+        #region 设备点检执行 15900
         public const string MES15901 = "不良已关闭，不允许删除!";
+        public const string MES15902 = "有检验值是为空！";
         #endregion
     }
 }

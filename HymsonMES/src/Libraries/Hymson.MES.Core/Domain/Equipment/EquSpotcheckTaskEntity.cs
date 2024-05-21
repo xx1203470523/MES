@@ -15,7 +15,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long? SiteId { get; set; }
+        public long SiteId { get; set; }
 
         /// <summary>
         /// 点检任务编码
@@ -40,12 +40,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 状态;1:待处理、2:处理中、3:待审核、4:已关闭
         /// </summary>
-        public bool Status { get; set; }
+        public EquSpotcheckTaskStautusEnum? Status { get; set; }
 
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public bool? IsQualified { get; set; }
+        public TrueOrFalseEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 描述

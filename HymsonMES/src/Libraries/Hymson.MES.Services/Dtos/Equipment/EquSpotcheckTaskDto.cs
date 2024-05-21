@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
+using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -141,7 +143,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 不合格处理方式;1-通过；2-不通过
         /// </summary>
-        public SpotcheckTaskProcessedEnum? HandMethod { get; set; }
+        public EquSpotcheckTaskProcessedEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 处理人
@@ -189,7 +191,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 处理结果 不合格处理方式;1-通过；2-不通过
         /// </summary>
-        public SpotcheckTaskProcessedEnum? HandMethod { get; set; }
+        public EquSpotcheckTaskProcessedEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 计划开始时间  时间范围  数组
@@ -318,6 +320,87 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 规格上限;值来源于点检模板
         /// </summary>
         public decimal? UpperLimit { get; set; }
+
+    }
+
+
+    /// <summary>
+    ///点检单项更新保存
+    /// </summary>
+    public record SpotcheckTaskItemSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 任务id
+        /// </summary>
+        public long SpotCheckTaskId { get; set; }
+
+        /// <summary>
+        /// 样品参数
+        /// </summary>
+        public IEnumerable<SpotcheckTaskItemDetailDto> Details { get; set; }
+
+    }
+
+    public record SpotcheckTaskItemDetailDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 检验值
+        /// </summary>
+        public string? InspectionValue { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 参数附件
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
+
+    }
+
+    /// <summary>
+    /// 完成Dto
+    /// </summary>
+    public record SpotcheckTaskCompleteDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+    }
+
+    /// <summary>
+    /// 处理结果完成Dto
+    /// </summary>
+    public record SpotcheckTaskCloseDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long SpotCheckTaskId { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式
+        /// </summary>
+        public EquSpotcheckTaskProcessedEnum HandMethod { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
 
     }
 

@@ -39,7 +39,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long? SiteId { get; set; }
+        public long SiteId { get; set; }
 
         
     }

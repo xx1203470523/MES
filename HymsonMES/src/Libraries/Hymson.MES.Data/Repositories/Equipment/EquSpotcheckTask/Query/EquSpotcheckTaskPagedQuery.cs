@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// <summary>
         /// 处理结果 不合格处理方式;1-通过；2-不通过
         /// </summary>
-        public SpotcheckTaskProcessedEnum? HandMethod { get; set; }
+        public EquSpotcheckTaskProcessedEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 计划开始时间  时间范围  数组
