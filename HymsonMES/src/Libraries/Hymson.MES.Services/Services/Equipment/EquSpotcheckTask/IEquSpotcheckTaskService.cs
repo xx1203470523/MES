@@ -55,7 +55,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<IEnumerable<TaskItemInfoView>> querySnapshotItemAsync(SpotcheckTaskSnapshotItemQueryDto pagedQueryDto);
+        Task<IEnumerable<TaskItemUnionSnapshotView>> querySnapshotItemAsync(SpotcheckTaskSnapshotItemQueryDto pagedQueryDto);
 
     }
 }

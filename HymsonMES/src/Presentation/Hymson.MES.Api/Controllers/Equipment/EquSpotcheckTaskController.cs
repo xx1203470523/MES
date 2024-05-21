@@ -104,7 +104,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="requestDto"></param>
         /// <returns></returns>
         [HttpGet("snapshot")]
-        public async Task<IEnumerable<TaskItemInfoView>> querySnapshotItemAsync([FromQuery] SpotcheckTaskSnapshotItemQueryDto requestDto)
+        public async Task<IEnumerable<TaskItemUnionSnapshotView>> querySnapshotItemAsync([FromQuery] SpotcheckTaskSnapshotItemQueryDto requestDto)
         {
             return await _equSpotcheckTaskService.querySnapshotItemAsync(requestDto);
         }

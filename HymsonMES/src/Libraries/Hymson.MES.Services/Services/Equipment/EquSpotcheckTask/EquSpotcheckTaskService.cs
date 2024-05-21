@@ -51,6 +51,9 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         private readonly IEquEquipmentRepository _equEquipmentRepository;
 
+        private readonly IEquSpotcheckTaskItemRepository _equSpotcheckTaskItemRepository;
+        private readonly IEquSpotcheckTaskSnapshotItemRepository _equSpotcheckTaskSnapshotItemRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -59,13 +62,18 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="validationSaveRules"></param>
         /// <param name="equSpotcheckTaskRepository"></param>
         public EquSpotcheckTaskService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSpotcheckTaskSaveDto> validationSaveRules,
-            IEquSpotcheckTaskRepository equSpotcheckTaskRepository, IEquEquipmentRepository equEquipmentRepository)
+            IEquSpotcheckTaskRepository equSpotcheckTaskRepository,
+            IEquEquipmentRepository equEquipmentRepository,
+            IEquSpotcheckTaskItemRepository equSpotcheckTaskItemRepository,
+            IEquSpotcheckTaskSnapshotItemRepository equSpotcheckTaskSnapshotItemRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _equSpotcheckTaskRepository = equSpotcheckTaskRepository;
             _equEquipmentRepository = equEquipmentRepository;
+            _equSpotcheckTaskItemRepository = equSpotcheckTaskItemRepository;
+            _equSpotcheckTaskSnapshotItemRepository = equSpotcheckTaskSnapshotItemRepository;
         }
 
 
@@ -240,10 +248,47 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<TaskItemInfoView>> querySnapshotItemAsync(SpotcheckTaskSnapshotItemQueryDto requestDto)
+        public async Task<IEnumerable<TaskItemUnionSnapshotView>> querySnapshotItemAsync(SpotcheckTaskSnapshotItemQueryDto requestDto)
         {
-            IEnumerable<TaskItemInfoView> info = null;
-            return info;
+            var taskitem = await _equSpotcheckTaskItemRepository.GetEntitiesAsync(new EquSpotcheckTaskItemQuery { SpotCheckTaskId = requestDto.SpotCheckTaskId });
+            var taskitemSnap = await _equSpotcheckTaskSnapshotItemRepository.GetEntitiesAsync(new EquSpotcheckTaskSnapshotItemQuery { SpotCheckTaskId = requestDto.SpotCheckTaskId });
+
+            //var result = taskitem.Select(x => x.ToModel<TaskItemUnionSnapshotView>());
+            //result = taskitemSnap.Select(x => x.ToModel<TaskItemUnionSnapshotView>());
+
+            var result = from a in taskitem
+                         join b in taskitemSnap on a.SpotCheckItemSnapshotId equals b.Id
+                         select new TaskItemUnionSnapshotView
+                         {
+                             Id=a.Id,
+                             SpotCheckTaskId=a.SpotCheckTaskId,
+                             SpotCheckItemSnapshotId = b.Id,
+
+                             // 映射其他属性
+                             InspectionValue = a.InspectionValue,
+                             IsQualified = a.IsQualified,
+                             Remark = a.Remark,
+                             SiteId = a.SiteId,
+
+                             //snapshot
+                             Code = b.Code,
+                             Name = b.Name,
+                             Status = b.Status,
+                             DataType = b.DataType,
+                             CheckType = b.CheckType,
+                             CheckMethod = b.CheckMethod,
+                             UnitId = b.UnitId,
+                             Unit = "",
+                             OperationContent = b.OperationContent,
+                             Components = b.Components,
+                             LowerLimit = b.LowerLimit,
+                             ReferenceValue = b.ReferenceValue,
+                             UpperLimit = b.UpperLimit
+
+                         };
+
+            //IEnumerable<TaskItemUnionSnapshotView> info = null;
+            return result;
         }
 
     }
