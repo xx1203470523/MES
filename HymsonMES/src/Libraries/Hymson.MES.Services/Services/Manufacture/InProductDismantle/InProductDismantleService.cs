@@ -233,7 +233,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 materialIds.AddRange(procMaterials);
             }
-         
+
             // 查询产品信息
             var procMaterialList = new List<ProcMaterialEntity>();
             var manuProcMaterial = new ManuProcMaterialViewDto();
@@ -272,7 +272,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 bomDetailViews.ManuProcMaterial = manuProcMaterial;
                 return bomDetailViews;
             }
-              
+
             //查询资源信息
             var procResources = await GetComponentResourcesAsync(manuSfcCirculations);
 
@@ -306,9 +306,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
 
                 var assembleCount = 0M;
-               
+
                 var listCirculations = manuSfcCirculations.Where(a => a.OutputBarCode == queryDto.Sfc).ToList();
-              
+
                 foreach (var circulation in listCirculations)
                 {
                     var inProductDismantleBusiness = circulation.BusinessContent.ToDeserialize<InProductDismantleBusinessContent>();
@@ -644,7 +644,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var inventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
             {
                 SiteId = circulationEntity.SiteId,
-                BarCode = circulationEntity.OutputBarCode
+                BarCode = circulationEntity.InputBarCode
             });
             var command = new DManuBarCodeRelationCommand
             {
@@ -657,7 +657,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
             var quantityCommand = new UpdateQuantityCommand
             {
-                BarCode = circulationEntity.OutputBarCode,
+                BarCode = circulationEntity.InputBarCode,
                 QuantityResidue = circulationEntity.InputQty,
                 UpdatedBy = _currentUser.UserName
             };
@@ -721,19 +721,19 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuBarCodeRelations = await _manuBarCodeRelationRepository.GetSfcMoudulesAsync(new ManuComponentBarcodeRelationQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Sfc = addDto.Sfc,
+                // Sfc = addDto.Sfc,
                 IsDisassemble = SFCCirculationReportTypeEnum.Activity,
                 BomMainMaterialId = addDto.BomDetailId.ToString(),
             });
-           
+
             //查询bom明细
             var bomDetailEntity = await _procBomDetailRepository.GetByIdAsync(addDto.BomDetailId);
-            var remainQty = bomDetailEntity?.Usages - manuBarCodeRelations.Sum(item => item.InputQty) ?? 0;
+            var remainQty = bomDetailEntity?.Usages - manuBarCodeRelations.Where(x => x.OutputBarCode == addDto.Sfc).Sum(item => item.InputQty) ?? 0;
             if (remainQty <= 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16615));
             }
-          
+
             var circulationQty = 0m;
             var whMaterialInventory = new WhMaterialInventoryEntity();
             MaterialSerialNumberEnum? serialNumber = null;
@@ -760,7 +760,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var isCorrect = await _manuCommonOldService.CheckBarCodeByMaskCodeRuleAsync(addDto.CirculationBarCode, addDto.CirculationProductId ?? 0);
                     if (!isCorrect) throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", addDto.CirculationBarCode);
 
-                    circulationQty = await GetOutsideQtyAsync(addDto.CirculationProductId.Value);
+                    circulationQty = await GetOutsideQtyAsync(addDto.CirculationProductId ?? 0);
                     if (circulationQty < 1)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16610)).WithData("barCode", addDto.CirculationBarCode);
@@ -864,10 +864,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 内部的不允许重复绑定
             if (serialNumber == MaterialSerialNumberEnum.Inside || serialNumber == MaterialSerialNumberEnum.Outside)
             {
-                var flag = IsBarCodeComponentRepetAsync(addDto.CirculationBarCode, manuBarCodeRelations.ToList());
-                if (flag)
+                var manuBarCodeRelationEntity = IsBarCodeComponentRepetAsync(addDto.CirculationBarCode, manuBarCodeRelations.ToList());
+                if (manuBarCodeRelationEntity != null)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16601)).WithData("CirculationBarCode", addDto.CirculationBarCode).WithData("SFC", addDto.Sfc);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16601)).WithData("CirculationBarCode", addDto.CirculationBarCode).WithData("SFC", manuBarCodeRelationEntity.OutputBarCode);
                 }
             }
 
@@ -917,7 +917,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         .WithData("BarCode", string.Join(',', manuSfcCirculationEntities.Select(s => s.InputBarCode)));
                 }
             }
-            
+
             var type = !addDto.IsAssemble ? ManuSfcStepTypeEnum.Add : ManuSfcStepTypeEnum.Assemble;
             var sfcStepEntity = CreateBarCodeRelationSFCStepEntity(manuBarCodeRelation, type, "");
             #endregion
@@ -944,7 +944,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             trans.Complete();
         }
-       
+
         /// <summary>
         /// 在制品拆解添加组件
         /// </summary>
@@ -1209,6 +1209,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
+            if (replaceDto.CirculationBarCode.ToUpper() == replaceDto.OldCirculationBarCode.ToUpper())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16620));
+            }
+
             // 获取条码列表
             var sfcList = await _manuSfcRepository.GetAllManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = new List<string> { replaceDto.Sfc } });
             if (sfcList == null || !sfcList.Any())
@@ -1314,9 +1319,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                         SiteId = _currentSite.SiteId,
                         BarCode = replaceDto.CirculationBarCode
                     });
+
                     if (whMaterialInventory == null)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16603)).WithData("barCode", replaceDto.CirculationBarCode);
+                    }
+
+                    if (whMaterialInventory.Status == WhMaterialInventoryStatusEnum.InUse || whMaterialInventory.Status == WhMaterialInventoryStatusEnum.Locked)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15122)).WithData("materialBarCode", whMaterialInventory.MaterialBarCode).WithData("status", _localizationService.GetResource($"{typeof(WhMaterialInventoryStatusEnum).FullName}.{whMaterialInventory.Status.ToString()}"));
                     }
 
                     //扫描的产品需要与选择的产品一致
@@ -1348,6 +1359,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (whMaterialInventory == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16603)).WithData("barCode", replaceDto.CirculationBarCode);
+                }
+
+                if (whMaterialInventory.Status == WhMaterialInventoryStatusEnum.InUse || whMaterialInventory.Status == WhMaterialInventoryStatusEnum.Locked)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15122)).WithData("materialBarCode", whMaterialInventory.MaterialBarCode).WithData("status", _localizationService.GetResource($"{typeof(WhMaterialInventoryStatusEnum).FullName}.{whMaterialInventory.Status.ToString()}"));
                 }
 
                 replaceDto.CirculationProductId = whMaterialInventory.MaterialId;
@@ -1386,10 +1402,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             //内部的不允许重复绑定
             if (serialNumber == MaterialSerialNumberEnum.Inside || serialNumber == MaterialSerialNumberEnum.Outside)
             {
-                var flag = IsBarCodeComponentRepetAsync(replaceDto.CirculationBarCode, manuBarCodeRelations.ToList());
-                if (flag)
+                var manuBarCodeRelationEntity = IsBarCodeComponentRepetAsync(replaceDto.CirculationBarCode, manuBarCodeRelations.ToList());
+                if (manuBarCodeRelationEntity != null)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16601)).WithData("CirculationBarCode", replaceDto.CirculationBarCode).WithData("SFC", replaceDto.Sfc);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16601)).WithData("CirculationBarCode", replaceDto.CirculationBarCode).WithData("SFC", manuBarCodeRelationEntity.OutputBarCode);
                 }
             }
             #endregion
@@ -1432,7 +1448,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 OutputBarCode = replaceDto?.Sfc.ToUpperInvariant() ?? "",//主条码
                 OutputBarCodeMaterialId = replaceDto?.CirculationMainProductId,
                 InputBarCode = replaceDto?.CirculationBarCode.ToUpperInvariant() ?? "",//添加的条码
-                InputBarCodeMaterialId = manuSfcProduce.ProductId,
+                InputBarCodeMaterialId = bomDetailEntity?.MaterialId ?? 0,
                 InputBarCodeLocation = replaceDto?.Location ?? "",
                 IsDisassemble = TrueOrFalseEnum.No,
                 InputQty = circulationQty,
@@ -1806,17 +1822,18 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="circulationBarCode"></param>
         /// <param name="circulationEntities"></param>
         /// <returns></returns>
-        private static bool IsBarCodeComponentRepetAsync(string circulationBarCode, List<ManuBarCodeRelationEntity> circulationEntities)
+        private static ManuBarCodeRelationEntity? IsBarCodeComponentRepetAsync(string circulationBarCode, List<ManuBarCodeRelationEntity> circulationEntities)
         {
+            ManuBarCodeRelationEntity? entity = null;
             if (circulationEntities.Any())
             {
-                var entity = circulationEntities.FirstOrDefault(item => item.InputBarCode.ToUpperInvariant() == circulationBarCode.ToUpperInvariant());
+                entity = circulationEntities.FirstOrDefault(item => item.InputBarCode.ToUpperInvariant() == circulationBarCode.ToUpperInvariant());
                 if (entity != null)
                 {
-                    return true;
+                    return entity;
                 }
             }
-            return false;
+            return entity;
         }
 
 
