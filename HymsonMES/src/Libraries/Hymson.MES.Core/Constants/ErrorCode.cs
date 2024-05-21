@@ -1315,6 +1315,7 @@
         public const string MES16617 = "条码已报废,不可再执行当前操作!";
         public const string MES16618 = "组件条码{barCode}的数据收集方式与主物料数据收集方式冲突!";
         public const string MES16619 = "当前条码【{Current}】的位置号【{Location}】已被【{BarCode}】使用！";
+        public const string MES16620 = "不能填写相同的条码进行替换!";
         #endregion
 
         #region 容器包装 MES 16700
