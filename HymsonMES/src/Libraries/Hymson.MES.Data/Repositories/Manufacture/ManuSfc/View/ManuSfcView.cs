@@ -53,9 +53,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public SfcStatusEnum Status { get; set; }
 
         /// <summary>
-        /// 是否在用
+        /// 是否使用
         /// </summary>
-        public long? IsUsed { get; set; }
+        public YesOrNoEnum IsUsed { get; set; } = YesOrNoEnum.No;
 
         /// <summary>
         /// manu_sfc_info 表 id

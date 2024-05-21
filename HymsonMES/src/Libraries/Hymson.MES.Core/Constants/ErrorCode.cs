@@ -851,6 +851,15 @@
         public const string MES15122 = " 物料条码{materialBarCode}状态{status},不允许执行该操作！";
         public const string MES15123 = " 不允许操作非原材料库存！";
         public const string MES15124 = " 没有查询到对应库存数据";
+
+        public const string MES15125 = " 拆分数量不能为空";
+        public const string MES15126 = "待拆分数量不能大于原始数量";
+        public const string MES15127 = "物料码只有一条，无法进行合并操作";
+        public const string MES15128 = "物料总数为0,不需要合并！";
+        public const string MES15129 = "未查到条码库存信息";
+        public const string MES15130 = "新生成的条码{sfc}在物料仓已存在，请设置更复杂的编码规则";
+        public const string MES15131 = "{type}编码规则未维护！";
+        public const string MES15132 = "{type}编码规则被维护多条！";
         #endregion
 
         #region 物料台账 15200
@@ -899,6 +908,10 @@
         public const string MES15320 = "条码【{sfcs}】已不存在";
         public const string MES15321 = "条码【{sfc}】缺失步骤信息，无法查询到开始时间";
         public const string MES15322 = "载具内没有条码";
+
+        public const string MES15330 = "条码不存在";
+        public const string MES15331 = "条码库存不足"; 
+        public const string MES15332 = "请选择操作对象";
         #endregion
 
         #region 质量录入 15400
@@ -1907,6 +1920,7 @@
 
         public const string MES19227 = "{ReceiptNum}收货单重复";
         public const string MES19228 = "{ShipmentNum}出货单重复";
+        public const string MES19229 = "客户SiteId与当前保存信息不一致！";
         #endregion
 
         #region 发布记录 19300 

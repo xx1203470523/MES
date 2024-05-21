@@ -26,6 +26,12 @@ namespace Hymson.MES.Core.Enums
         /// 报废
         /// </summary>
         [Description("报废")]
-        Scrap = 4
+        Scrap = 4,
+
+        /// <summary>
+        /// 无效
+        /// </summary>
+        [Description("无效")]
+        Invalid = 5
     }
 }

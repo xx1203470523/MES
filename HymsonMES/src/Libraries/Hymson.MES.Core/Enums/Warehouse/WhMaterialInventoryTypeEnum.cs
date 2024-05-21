@@ -64,6 +64,27 @@ namespace Hymson.MES.Core.Enums
         /// 取消报废
         /// </summary>
         [Description("取消报废")]
-        CancelScrapping = 11
+        CancelScrapping = 11,
+        /// <summary>
+        /// 物料拆分
+        /// </summary>
+        [Description("物料拆分")]
+        MaterialBarCodeSplit = 12,
+        /// <summary>
+        /// 物料合并
+        /// </summary>
+        [Description("物料合并")]
+        MaterialBarCodeMerge = 13,
+        /// <summary>
+        /// 物料锁定
+        /// </summary>
+        [Description("物料锁定")]
+        MaterialBarCodeLock = 15,
+
+        /// <summary>
+        /// 物料解锁
+        /// </summary>
+        [Description("物料解锁")]
+        MaterialBarCodeUnLock = 16 
     }
 }

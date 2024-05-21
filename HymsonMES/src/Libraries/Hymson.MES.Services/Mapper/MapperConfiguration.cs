@@ -581,6 +581,14 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcConversionFactorModifyDto, ProcConversionFactorEntity>();
             #endregion
 
+            #region PrintSetup
+            CreateMap<AddPrintSetupDto, ProcPrintSetupEntity>();
+            CreateMap<ProcProcedureView, ProcPrintSetupViewDto>();
+            CreateMap<ProcPrintSetupPagedQueryDto, IProcPrintSetupPagedQuery>();
+            CreateMap<ProcPrintSetupView, ProcPrintSetupViewDto>();
+            CreateMap<ProcPrintSetupModifyDto, ProcPrintSetupEntity>();
+            #endregion
+
             #region LoadPointLink
             CreateMap<ProcLoadPointLinkMaterialCreateDto, ProcLoadPointLinkMaterialEntity>();
             CreateMap<ProcLoadPointLinkMaterialModifyDto, ProcLoadPointLinkMaterialEntity>();
@@ -771,6 +779,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhMaterialInventoryPageListView, WhMaterialInventoryPageListViewDto>();
 
             CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDetailDto>();
+            CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryEntity>();
             #endregion
 
             #region WhMaterialStandingbook

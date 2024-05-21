@@ -6,6 +6,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
@@ -111,9 +112,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select(@" wmi.Id, wmi.MaterialBarCode,wmi.Batch, wmi.QuantityResidue,wmi.DueDate,wmi.Source,wmi.CreatedOn,wmi.Status,
-                                pm.Unit, pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName");
+                                pm.Unit, pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName,pwo.OrderCode as WorkOrderCode");
             sqlBuilder.LeftJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
             sqlBuilder.LeftJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
+            sqlBuilder.LeftJoin(" plan_work_order pwo ON  pwo.Id= wmi.WorkOrderId");
             sqlBuilder.Where(" wmi.IsDeleted = 0");
             sqlBuilder.Where(" wmi.SiteId=@SiteId");
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
@@ -123,15 +125,30 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                 whMaterialInventoryPagedQuery.Batch = whMaterialInventoryPagedQuery.Batch;
                 sqlBuilder.Where(" wmi.Batch = @Batch");
             }
+            if (whMaterialInventoryPagedQuery.WorkOrderId.HasValue)
+            {
+                whMaterialInventoryPagedQuery.WorkOrderId = whMaterialInventoryPagedQuery.WorkOrderId;
+                sqlBuilder.Where(" wmi.WorkOrderId = @WorkOrderId");
+            }
+
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialBarCode))
             {
                 whMaterialInventoryPagedQuery.MaterialBarCode = $"%{whMaterialInventoryPagedQuery.MaterialBarCode}%";
                 sqlBuilder.Where(" wmi.MaterialBarCode like @MaterialBarCode");
             }
+            if (whMaterialInventoryPagedQuery.MaterialBarCodes != null && whMaterialInventoryPagedQuery.MaterialBarCodes.Any())
+            {
+                sqlBuilder.Where(" wmi.MaterialBarCode IN @MaterialBarCodes");
+            }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialCode))
             {
                 whMaterialInventoryPagedQuery.MaterialCode = $"%{whMaterialInventoryPagedQuery.MaterialCode}%";
                 sqlBuilder.Where(" pm.MaterialCode like @MaterialCode");
+            }
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialName))
+            {
+                whMaterialInventoryPagedQuery.MaterialName = $"%{whMaterialInventoryPagedQuery.MaterialName}%";
+                sqlBuilder.Where(" pm.MaterialName like @MaterialName");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Version))
             {
@@ -142,6 +159,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             {
                 //Enum.GetValues(whMaterialInventoryPagedQuery.Status)
                 sqlBuilder.Where(" wmi.Status=@Status");
+            }
+            if (whMaterialInventoryPagedQuery.Statuss != null && whMaterialInventoryPagedQuery.Statuss.Any())
+            {
+                //Enum.GetValues(whMaterialInventoryPagedQuery.Status)
+                sqlBuilder.Where(" wmi.Status IN @Statuss");
             }
             if (whMaterialInventoryPagedQuery.CreatedOnRange != null && whMaterialInventoryPagedQuery.CreatedOnRange.Length >= 2)
             {
@@ -159,12 +181,16 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.AddParameters(whMaterialInventoryPagedQuery);
 
             using var conn = GetMESDbConnection();
+
             var whMaterialInventoryEntitiesTask = conn.QueryAsync<WhMaterialInventoryPageListView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var whMaterialInventoryEntities = await whMaterialInventoryEntitiesTask;
             var totalCount = await totalCountTask;
+
             var pageList = new PagedInfo<WhMaterialInventoryPageListView>(whMaterialInventoryEntities, whMaterialInventoryPagedQuery.PageIndex, whMaterialInventoryPagedQuery.PageSize, totalCount);
             return pageList;
+
+
         }
 
         /// <summary>
@@ -258,8 +284,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> UpdatePointByBarCodeRangeAsync(IEnumerable<UpdateStatusByBarCodeCommand> commands)
         {
+
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpPointByBarCodeSql, commands);
+
         }
 
         /// <summary>
@@ -271,6 +299,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpQuantityByBarCodeSql, commands);
+        }
+
+
+        /// <summary>
+        /// 更新状态（批量--不操作数量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns> 
+        public async Task<int> UpdateStatusByBarCodesAsync(IEnumerable<UpdateStatusByBarCodeCommand> commands)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpStatusByBarCodeSql, commands);
         }
 
         /// <summary>
@@ -361,6 +401,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateReduceQuantityResidueRangeSql, updateQuantityCommand);
         }
+
+        /// <summary>
+        /// 按实际传入更新库存
+        /// </summary>
+        /// <param name="updateQuantityCommand"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQuantityResidueRangeAsync(IEnumerable<UpdateQuantityRangeCommand> updateQuantityCommand)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateQuantityResidueRangeSql, updateQuantityCommand);
+        }
+        
 
         /// <summary>
         /// 更新库存数量(减少库存)
@@ -497,11 +549,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateIncreaseQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue + @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateReduceQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue - @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateReduceQuantityResidueWithCheckSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue - @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode AND QuantityResidue = @QuantityOriginal; ";
+        
         const string UpdateReduceQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue - @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        /// <summary>
+        /// 按实际传入
+        /// </summary>
+        const string UpdateQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=@QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
 #endif
 
 
         const string UpPointByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpStatusByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode = @BarCode; ";
         const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET QuantityResidue = 0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE SiteId = @SiteId AND MaterialBarCode IN @BarCodeList";
         const string UpdateWhMaterialInventoryEmptyByIdSql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id = @Id ";

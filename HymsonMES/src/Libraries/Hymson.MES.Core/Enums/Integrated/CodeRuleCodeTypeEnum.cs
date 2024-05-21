@@ -40,6 +40,18 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// FQC
         /// </summary>
         [Description("环境检测")]
-        Environment = 6
+        Environment = 6,
+
+        /// <summary>
+        /// 物料拆分
+        /// </summary>
+        [Description("物料拆分")]
+        WhSfcSplitAdjust = 7,
+
+        /// <summary>
+        /// 物料拆分
+        /// </summary>
+        [Description("物料合并")]
+        WhSfcMergeAdjust = 8,
     }
 }

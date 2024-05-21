@@ -364,6 +364,30 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return list;
         }
 
+
+        /// <summary>
+        /// 查询所有条码信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcView>> GetAllManuSfcInfoEntitiesAsync(ManuSfcStatusQuery param)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetAllManuSfcInfoEntitiesSqlTemplate);
+            //sqlBuilder.Select("*");
+            sqlBuilder.Where("sfc.SiteId=@SiteId ");
+            if (param.Sfcs != null && param.Sfcs.Any())
+            {
+                sqlBuilder.Where("sfc.SFC in @Sfcs");
+            }
+            if (param.Statuss != null && param.Statuss.Any())
+            {
+                sqlBuilder.Where("sfc.Status in @Statuss");
+            }
+            using var conn = GetMESDbConnection();
+            var list = await conn.QueryAsync<ManuSfcView>(template.RawSql, param);
+            return list;
+        }
         /// <summary>
         /// 新增
         /// </summary>
@@ -635,6 +659,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             info.Id AS SFCInfoId, info.WorkOrderId ,info.ProductId,info.ProcessRouteId ,info.ProductBOMId  ,info.IsUsed  
                                         FROM manu_sfc sfc 
                                         LEFT JOIN  manu_sfc_info info on sfc.Id =info.SfcId  and info.IsUsed =1
+                                            /**where**/  ";
+
+        const string GetAllManuSfcInfoEntitiesSqlTemplate = @"SELECT 
+                                            sfc.Id ,sfc.SiteId ,sfc.SFC ,sfc.Qty ,sfc.Status ,
+                                            info.Id AS SFCInfoId, info.WorkOrderId ,info.ProductId,info.ProcessRouteId ,info.ProductBOMId  ,info.IsUsed  
+                                        FROM manu_sfc sfc 
+                                        LEFT JOIN  manu_sfc_info info on sfc.Id =info.SfcId 
                                             /**where**/  ";
 
         const string InsertSql = "INSERT INTO `manu_sfc`(`Id`, `SiteId`, `SFC`, Type, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SFC, @Type, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

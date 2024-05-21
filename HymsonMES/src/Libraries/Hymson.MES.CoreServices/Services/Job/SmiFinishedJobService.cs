@@ -408,6 +408,5 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             return await Task.FromResult<IEnumerable<JobBo>?>(default);
         }
-
     }
 }

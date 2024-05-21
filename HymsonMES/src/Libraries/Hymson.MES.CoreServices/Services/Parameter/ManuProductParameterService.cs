@@ -41,6 +41,8 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -51,12 +53,13 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         public ManuProductParameterService(IManuCommonService manuCommonService,
             IManuProductParameterRepository manuProductParameterRepository,
             IProcParameterRepository procParameterRepository,
-            IProcProcedureRepository procProcedureRepository, IManuSfcProduceRepository manuSfcProduceRepository)
+            IProcProcedureRepository procProcedureRepository, IManuSfcProduceRepository manuSfcProduceRepository, IManuSfcStepRepository manuSfcStepRepository)
         {
             _manuCommonService = manuCommonService;
             _manuProductParameterRepository = manuProductParameterRepository;
             _procParameterRepository = procParameterRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
         }
 
 
@@ -90,35 +93,37 @@ namespace Hymson.MES.CoreServices.Services.Parameter
             });
 
             //TODO  BO结构很奇怪  在不破坏原有逻辑上修改  bywangkeming
-            var manuSfcStepEntities= manuSfcProduceEntities.Select(x => new ManuSfcStepEntity
+            var manuSfcStepEntities = new List<ManuSfcStepEntity>();
+            foreach (var item in manuSfcProduceEntities)
             {
-                // 插入 manu_sfc_step 状态为出站（默认值）
-                Operatetype = ManuSfcStepTypeEnum.OutStock,
-                CurrentStatus = x.Status,
-                AfterOperationStatus = x.Status,
-                Id = IdGenProvider.Instance.CreateId(),
-                SFC = x.SFC,
-                ProductId = x.ProductId,
-                WorkOrderId = x.WorkOrderId,
-                WorkCenterId = x.WorkCenterId,
-                ProductBOMId = x.ProductBOMId,
-                ProcessRouteId = x.ProcessRouteId,
-                SFCInfoId = x.BarCodeInfoId,
-                Qty = x.Qty,
-                //VehicleCode = x.VehicleCode,
-                ProcedureId = x.ProcedureId,
-                ResourceId = x.ResourceId,
-                EquipmentId = x.EquipmentId,
-                OperationProcedureId = bo.ProcedureId,
-                OperationResourceId = bo.ResourceId,
-                //OperationEquipmentId = bo.EquipmentId,
-                SiteId = bo.SiteId,
-                CreatedBy = bo.UserName,
-                CreatedOn = bo.Time,
-                UpdatedBy = bo.UserName,
-                UpdatedOn = bo.Time
-
-            });
+                manuSfcStepEntities.Add(new ManuSfcStepEntity
+                {
+                    Operatetype = ManuSfcStepTypeEnum.ParameterCollect,
+                    CurrentStatus = item.Status,
+                    AfterOperationStatus = item.Status,
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SFC = item.SFC,
+                    ProductId = item.ProductId,
+                    WorkOrderId = item.WorkOrderId,
+                    WorkCenterId = item.WorkCenterId,
+                    ProductBOMId = item.ProductBOMId,
+                    ProcessRouteId = item.ProcessRouteId,
+                    SFCInfoId = item.BarCodeInfoId,
+                    Qty = item.Qty,
+                    //VehicleCode = x.VehicleCode,
+                    ProcedureId = item.ProcedureId,
+                    ResourceId = item.ResourceId,
+                    EquipmentId = item.EquipmentId,
+                    OperationProcedureId = bo.ProcedureId,
+                    OperationResourceId = bo.ResourceId,
+                    //OperationEquipmentId = bo.EquipmentId,
+                    SiteId = bo.SiteId,
+                    CreatedBy = bo.UserName,
+                    CreatedOn = bo.Time,
+                    UpdatedBy = bo.UserName,
+                    UpdatedOn = bo.Time
+                });
+            }
 
             var parameterEntities = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
             {
@@ -142,7 +147,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                 {
                     ProcedureId = bo.ProcedureId,
                     SFC = SFC,
-                    SfcstepId= manuSfcStepEntities.FirstOrDefault(x=>x.SFC== SFC)?.Id,
+                    SfcstepId = manuSfcStepEntities.FirstOrDefault(x => x.SFC == SFC)?.Id,
                     ParameterId = parameterEntity.Id,
                     ParameterValue = parameter.ParameterValue,
                     CollectionTime = bo.Time,
@@ -160,7 +165,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                 throw new CustomerValidationException(nameof(ErrorCode.MES19601))
                     .WithData("ParameterCodes", string.Join(",", errorParameter));
             }
-
+            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntities);
             using var trans = TransactionHelper.GetTransactionScope();
             var row = await _manuProductParameterRepository.InsertRangeAsync(list);
             trans.Complete();

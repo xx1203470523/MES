@@ -55,9 +55,46 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
     /// <summary>
+    /// 条码拆分
+    /// </summary>
+    public record ManuBarCodeSplitRequestDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 待拆分的数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+    }
+
+    /// <summary>
     /// 条码合并
     /// </summary>
     public record ManuBarcodeMergeAdjust : BaseEntityDto 
+    {
+        /// <summary>
+        /// 待合并的条码
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+    }
+
+    /// <summary>
+    /// 条码合并
+    /// </summary>
+    public record ManuBarCodeMergeRequestDto : BaseEntityDto
     {
         /// <summary>
         /// 待合并的条码

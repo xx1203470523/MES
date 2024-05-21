@@ -38,4 +38,18 @@ namespace Hymson.MES.Services.Validators.Warehouse
 
         }
     }
+
+    /// <summary>
+    /// 物料拆分验证
+    /// </summary>
+    internal class WhMaterialBarCodeSplitAdjustValidator : AbstractValidator<MaterialBarCodeSplitAdjustDto>
+    {
+        public WhMaterialBarCodeSplitAdjustValidator()
+        {
+            RuleFor(x => x.SFC).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15203));
+            RuleFor(x => x.Qty).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15125));
+        }
+    }
+
+    
 }

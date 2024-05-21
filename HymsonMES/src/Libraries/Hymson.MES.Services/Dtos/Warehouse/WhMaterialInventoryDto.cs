@@ -72,7 +72,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string? WorkOrderCode { get; set; }
 
         /// <summary>
         /// 数量（剩余）
@@ -156,7 +160,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 数量（剩余）
@@ -320,7 +324,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
         /// <summary>
         /// 物料条码
         /// </summary>
@@ -450,10 +454,23 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 物料条码
         /// </summary>
         public string? MaterialBarCode { get; set; }
+
+        /// <summary>
+        /// 物料条码(多个)
+        /// </summary>
+        public IEnumerable<string>? MaterialBarCodes { get; set; }
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
         /// <summary>
         /// 物料编码
         /// </summary>
         public string? MaterialCode { get; set; } = "";
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialName { get; set; }
         /// <summary>
         /// 版本
         /// </summary>
@@ -462,6 +479,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 状态
         /// </summary>
         public WhMaterialInventoryStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 状态s
+        /// </summary>
+        public IEnumerable<WhMaterialInventoryStatusEnum>? Statuss { get; set; }
 
 
         #region 添加 库存修改功能时添加 karl
@@ -504,7 +526,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     /// <summary>
     /// 修改外部来源的库存
     /// </summary>
-    public class OutsideWhMaterialInventoryModifyDto 
+    public class OutsideWhMaterialInventoryModifyDto
     {
         public long Id { get; set; }
 
@@ -521,11 +543,55 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 供应商ID
         /// </summary>
         public long SupplierId { get; set; }
+    }
+
+
+    /// <summary>
+    /// 条码拆分
+    /// </summary>
+    public record MaterialBarCodeSplitAdjustDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 待拆分的数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+    }
+
+    /// <summary>
+    /// 物料合并
+    /// </summary>
+    public record MaterialBarCodeMergeAdjust : BaseEntityDto
+    {
+        /// <summary>
+        /// 待合并的条码
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
+
+        /// <summary>
+        /// 指定合条码
+        /// </summary>
+        public string? MergeSFC { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
     }
 }

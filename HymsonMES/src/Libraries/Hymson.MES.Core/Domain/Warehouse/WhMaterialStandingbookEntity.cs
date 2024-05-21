@@ -47,7 +47,7 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 数量
@@ -58,6 +58,11 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// 单位;来自物料模块的计量单位
         /// </summary>
         public string Unit { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 流转类型;物料接收/物料退料/物料加载

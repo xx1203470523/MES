@@ -31,6 +31,13 @@ namespace Hymson.MES.Services.Services.Warehouse
         Task<WhMaterialInventoryDto?> QueryWhMaterialInventoryByBarCodeAsync(string barCode);
 
         /// <summary>
+        /// 获取条码信息
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        Task<WhMaterialInventoryPageListViewDto?> QueryWhMaterialBarCodeAsync(string barCode);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="whMaterialInventoryCreateDto"></param>
@@ -109,5 +116,26 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         Task UpdateOutsideWhMaterialInventoryAsync(OutsideWhMaterialInventoryModifyDto modifyDto);
+
+        /// <summary>
+        /// 条码拆分
+        /// </summary>
+        /// <param name="adjustDto"></param>
+        /// <returns></returns>
+        Task<string> BarcodeSplitAdjustAsync(MaterialBarCodeSplitAdjustDto adjustDto);
+
+        /// <summary>
+        /// 物料合并
+        /// </summary>
+        /// <param name="adjustDto"></param>
+        /// <returns></returns>
+        Task<string> BarcodeMergeAdjustAsync(MaterialBarCodeMergeAdjust adjustDto);
+
+        /// <summary>
+        /// 合并拆分条码的验证
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task<bool> MergeAdjustVerifySfcAsync(string[] sfcs);
     }
 }

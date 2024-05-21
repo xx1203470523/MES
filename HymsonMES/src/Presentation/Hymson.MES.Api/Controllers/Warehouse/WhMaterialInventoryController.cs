@@ -65,6 +65,17 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         }
 
         /// <summary>
+        /// 物料拆分与合并条码查询
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        [HttpGet("getbarCode/{barCode}")]
+        public async Task<WhMaterialInventoryPageListViewDto?> QueryWhMaterialBarCodeAsync(string barCode)
+        {
+            return await _whMaterialInventoryService.QueryWhMaterialBarCodeAsync(barCode);
+        }
+
+        /// <summary>
         /// 添加（物料库存）
         /// </summary>
         /// <param name="parm"></param>
@@ -118,6 +129,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             await _whMaterialInventoryService.DeletesWhMaterialInventoryAsync(ids);
         }
+
         /// <summary>
         /// 查询物料与供应商
         /// </summary>
@@ -128,7 +140,6 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.GetMaterialAndSupplierByMateialCodeIdAsync(id);
         }
-
 
         /// <summary>
         /// 来源外部的数据分页查询列表（物料库存）
@@ -172,10 +183,49 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [HttpPost]
         [Route("updateOutsideWhMaterialInventory")]
         [LogDescription("修改外部来源库存", BusinessType.UPDATE)]
-        //[PermissionDescription("wh:materialInventory:updateOutsideWhMaterialInventory")]
         public async Task UpdateOutsideWhMaterialInventoryAsync(OutsideWhMaterialInventoryModifyDto modifyDto) 
         {
             await _whMaterialInventoryService.UpdateOutsideWhMaterialInventoryAsync(modifyDto);
+        }
+
+        
+        /// <summary>
+        /// 物料条码拆分
+        /// </summary>
+        /// <param name="adjustDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("barcodeSplitAdjust")]
+        [LogDescription("条码拆分", BusinessType.INSERT)]
+        public async Task<string> BarcodeSplitAdjustAsync(MaterialBarCodeSplitAdjustDto adjustDto)
+        {
+            return await _whMaterialInventoryService.BarcodeSplitAdjustAsync(adjustDto);
+
+        }
+
+
+        /// <summary>
+        /// 物料合并
+        /// </summary>
+        /// <param name="adjustDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("barcodeMergeAdjust")]
+        [LogDescription("物料合并", BusinessType.INSERT)]
+        public async Task<string> BarcodeMergeAdjustAsync(MaterialBarCodeMergeAdjust adjustDto)
+        {
+            return await _whMaterialInventoryService.BarcodeMergeAdjustAsync(adjustDto);
+        }
+
+        /// <summary>
+        /// 验证条码 拆分合并
+        /// </summary>
+        /// <param name="sfcs"></param>
+        [HttpPost("mergeAdjustVerifySfcs")]
+        [LogDescription("验证条码", BusinessType.INSERT)]
+        public async Task<bool> MergeAdjustVerifySfcsAsync(string[] sfcs)
+        {
+            return await _whMaterialInventoryService.MergeAdjustVerifySfcAsync(sfcs);
         }
     }
 }

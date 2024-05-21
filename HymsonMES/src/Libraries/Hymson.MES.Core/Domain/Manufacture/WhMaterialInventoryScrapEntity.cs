@@ -35,7 +35,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 台账id

@@ -96,6 +96,16 @@ namespace Hymson.MES.Services.Services.WhShipment
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
+            //验证客户siteid
+            if (saveDto.CustomerId != default)
+            {
+                var customEntity = await _inteCustomRepository.GetByIdAsync(saveDto.CustomerId);
+                if(customEntity != null)
+                {
+                    if(customEntity.SiteId!=saveDto.SiteId) throw new CustomerValidationException(nameof(ErrorCode.MES19229));
+                }
+            }
+
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
@@ -154,18 +164,19 @@ namespace Hymson.MES.Services.Services.WhShipment
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                try { 
-                await _whShipmentRepository.InsertAsync(entity);
-                //先删除 DETAIL
-                //await _whShipmentRepository.DeletesDetailByIdAsync(new long[] { entity.Id });
-                //先删除 BARCORDS
-                //await _whShipmentRepository.DeletesBarcodeByDetailIdAsync(new long[] { entity.Id });
+                try
+                {
+                    await _whShipmentRepository.InsertAsync(entity);
+                    //先删除 DETAIL
+                    //await _whShipmentRepository.DeletesDetailByIdAsync(new long[] { entity.Id });
+                    //先删除 BARCORDS
+                    //await _whShipmentRepository.DeletesBarcodeByDetailIdAsync(new long[] { entity.Id });
 
-                if (details.Any())
-                    await _whShipmentRepository.InsertRangeAsync(details);
+                    if (details.Any())
+                        await _whShipmentRepository.InsertRangeAsync(details);
 
-                if (barcods.Any())
-                    await _whShipmentRepository.InsertRangeAsync(barcods);
+                    if (barcods.Any())
+                        await _whShipmentRepository.InsertRangeAsync(barcods);
                 }
                 catch (Exception ex) { }
                 ts.Complete();
@@ -268,7 +279,7 @@ namespace Hymson.MES.Services.Services.WhShipment
             var pagedQuery = pagedQueryDto.ToQuery<WhShipmentPagedQuery>();
             if (!pagedQuery.SiteId.HasValue)
             {
-                pagedQuery.SiteId = _currentSite.SiteId??0;
+                pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             }
             if (qualOqcOrderEntities != null && qualOqcOrderEntities.Any())
             {
@@ -297,17 +308,19 @@ namespace Hymson.MES.Services.Services.WhShipment
         public async Task<IEnumerable<WhShipmentSupplierMaterialViewDto>> QueryShipmentSupplierMaterialAsync(WhShipmentQueryDto whShipmentQueryDto)
         {
             var query = new WhShipmentQuery();
-            if (whShipmentQueryDto.Id != null) {
+            if (whShipmentQueryDto.Id != null)
+            {
                 query.ShipmentId = whShipmentQueryDto.Id;
             }
 
-            if (!string.IsNullOrWhiteSpace(whShipmentQueryDto.ShipmentNum)) {
-                query.ShipmentNumNoLike=whShipmentQueryDto.ShipmentNum;
+            if (!string.IsNullOrWhiteSpace(whShipmentQueryDto.ShipmentNum))
+            {
+                query.ShipmentNumNoLike = whShipmentQueryDto.ShipmentNum;
             }
 
             //获取出货单
             var whShipmentEntity = await _whShipmentRepository.GetEntityAsync(query);
-            if (whShipmentEntity==null)
+            if (whShipmentEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17800));
             }
@@ -316,20 +329,23 @@ namespace Hymson.MES.Services.Services.WhShipment
             var inteCustomEntity = await _inteCustomRepository.GetByIdAsync(whShipmentEntity.CustomerId);
 
             //获取出货详情
-            var whShipmentDetailEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { ShipmentId = whShipmentEntity.Id,SiteId=_currentSite.SiteId??0 });
-            if (whShipmentDetailEntities == null || !whShipmentDetailEntities.Any()) {
+            var whShipmentDetailEntities = await _whShipmentMaterialRepository.GetEntitiesAsync(new WhShipmentMaterialQuery { ShipmentId = whShipmentEntity.Id, SiteId = _currentSite.SiteId ?? 0 });
+            if (whShipmentDetailEntities == null || !whShipmentDetailEntities.Any())
+            {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17801));
             }
 
             //获取物料
             var materialIds = whShipmentDetailEntities.Select(a => a.MaterialId).Distinct();
-            var procMaterialEntities =await _procMaterialRepository.GetByIdsAsync(materialIds);
-            if (procMaterialEntities == null || !procMaterialEntities.Any()) {
+            var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
+            if (procMaterialEntities == null || !procMaterialEntities.Any())
+            {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17802));
             }
 
             var result = new List<WhShipmentSupplierMaterialViewDto>();
-            foreach (var item in whShipmentDetailEntities) {
+            foreach (var item in whShipmentDetailEntities)
+            {
 
                 //var qualOqcOrderEntity = qualOqcOrderEntities.FirstOrDefault(a => a.ShipmentMaterialId == item.Id);
                 //if (qualOqcOrderEntity == null) 
@@ -339,12 +355,13 @@ namespace Hymson.MES.Services.Services.WhShipment
                 var model = new WhShipmentSupplierMaterialViewDto();
 
                 var procMaterialEntity = procMaterialEntities.Where(a => a.Id == item.MaterialId).FirstOrDefault();
-                if (procMaterialEntity == null) {
+                if (procMaterialEntity == null)
+                {
                     throw new CustomerValidationException(nameof(ErrorCode.MES17802));
                 }
 
-                model.MaterialCode= procMaterialEntity.MaterialCode;
-                model.MaterialName= procMaterialEntity.MaterialName;
+                model.MaterialCode = procMaterialEntity.MaterialCode;
+                model.MaterialName = procMaterialEntity.MaterialName;
                 model.Qty = item.Qty;
                 model.Version = procMaterialEntity.Version;
                 model.CustomCode = inteCustomEntity?.Code;

@@ -113,28 +113,26 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <summary>
         /// 条码拆分
         /// </summary>
-        /// <param name="adjustDto"></param>
+        /// <param name="splitDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("barcodeSplitAdjust")]
+        [HttpPost("barcodeSplitAdjust")]
         [LogDescription("条码拆分", BusinessType.INSERT)]
-        public async Task<string> BarcodeSplitAdjustAsync(ManuBarcodeSplitAdjustDto adjustDto)
+        public async Task<string> BarCodeSplitAsync(ManuBarCodeSplitRequestDto splitDto)
         {
-            return await _manuBarcodeAdjustService.BarcodeSplitAdjustAsync(adjustDto);
+            return await _manuBarcodeAdjustService.BarCodeSplitAsync(splitDto);
 
         }
 
         /// <summary>
         /// 条码合并
         /// </summary>
-        /// <param name="adjustDto"></param>
+        /// <param name="mergeDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("barcodeMergeAdjust")]
+        [HttpPost("barcodeMergeAdjust")]
         [LogDescription("条码合并", BusinessType.INSERT)]
-        public async Task<string> BarcodeMergeAdjustAsync(ManuBarcodeMergeAdjust adjustDto)
+        public async Task<string> BarCodeMergeAsync(ManuBarCodeMergeRequestDto mergeDto)
         {
-            return await _manuBarcodeAdjustService.BarcodeMergeAdjustAsync(adjustDto);
+            return await _manuBarcodeAdjustService.BarCodeMergeAsync(mergeDto);
         }
     }
 }

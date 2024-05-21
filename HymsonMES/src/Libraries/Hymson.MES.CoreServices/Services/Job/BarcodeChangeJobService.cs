@@ -153,7 +153,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 decimal qty = 0;
 
                 var materialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
-                qty = materialEntity.Batch ?? 0;
+                qty = string.IsNullOrEmpty(materialEntity.Batch) ? 0 : decimal.Parse(materialEntity.Batch);
                 var now = HymsonClock.Now();
                 //如果在制已经生成 跳过该条码的数据组装
                 var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()

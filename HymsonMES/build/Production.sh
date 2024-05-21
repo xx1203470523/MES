@@ -1,22 +1,15 @@
 #! /bin/bash
-PublishEnvironment=Production
-timestamp=$(date +%Y%m%d%H%M%S)
-serviceName=hymson-mes-battery-api-prod
-registryUrl=harbor.xnebula.com/new-energy
-imageName=hymson.mes.api
-docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Api/Dockerfile .
-docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
-docker push $registryUrl/$imageName:$timestamp
+serviceName=hymson-mes-api-prod
 docker service rm $serviceName
 docker service create \
   --with-registry-auth \
   --name $serviceName \
   --mode global \
-  --publish mode=host,published=30723,target=80 \
-  --env ASPNETCORE_ENVIRONMENT=Staging \
+  --publish mode=host,published=30223,target=80 \
+  --env ASPNETCORE_ENVIRONMENT=Production \
   --env TZ="Asia/Shanghai" \
   --env SERVICE_CHECK_HTTP=/health \
   --env SERVICE_NAME={{.Service.Name}} \
   --hostname="{{.Node.ID}}-{{.Service.Name}}"\
    --mount type=volume,src=hymsonvolume,dst=/logs \
-  $registryUrl/$imageName:$timestamp
+   harbor.xnebula.com/new-energy/hymson.mes.api:20231109014106

@@ -108,7 +108,9 @@ namespace Hymson.MES.Services.Services.Plan
             await _validationCreateRules.ValidateAndThrowAsync(planSfcInfoCreateDto);
             var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(planSfcInfoCreateDto.WorkOrderId);
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
-            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)
+
+            var batchQty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
+            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && batchQty == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
@@ -290,7 +292,7 @@ namespace Hymson.MES.Services.Services.Plan
                         validationFailures.Add(validationFailure);
                     }
 
-                    qty = procMaterialEntity.Batch ?? 0;
+                    qty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
                     if (qty <= 0)
                     {
                         var validationFailure = new ValidationFailure();
@@ -361,7 +363,8 @@ namespace Hymson.MES.Services.Services.Plan
             await _validationModifyRules.ValidateAndThrowAsync(param);
             var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(param.WorkOrderId);
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
-            if (param.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)
+            var batchQty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
+            if (param.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && batchQty == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
@@ -424,7 +427,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16122)).WithData("sfc", param.SFC);
                 }
-                qty = procMaterialEntity.Batch ?? 0;
+                qty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
                 if (qty <= 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16610)).WithData("sfc", param.SFC);

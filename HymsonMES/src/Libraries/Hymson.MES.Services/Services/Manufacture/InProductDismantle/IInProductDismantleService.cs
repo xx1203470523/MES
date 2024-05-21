@@ -14,7 +14,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        Task<List<InProductDismantleDto>> GetProcBomDetailAsync(InProductDismantleQueryDto queryDto);
+        Task<InProductDismantleComponentDto> GetProcBomDetailAsync(InProductDismantleQueryDto queryDto);
 
         /// <summary>
         /// 在制品移除

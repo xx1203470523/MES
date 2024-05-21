@@ -105,6 +105,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 供应商编码
         /// </summary>
         public string SupplierCode { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
     }
 
 
