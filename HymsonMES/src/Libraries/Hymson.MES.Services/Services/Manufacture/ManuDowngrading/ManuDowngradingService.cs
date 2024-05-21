@@ -113,10 +113,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 验证对应的sfc 是否符合要求：如是否存在,是否锁定或者报废 
-            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery 
-            { 
-                SiteId = _currentSite.SiteId ??0,
-                Sfcs = manuDowngradingSaveDto.Sfcs 
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfcs = manuDowngradingSaveDto.Sfcs
             });
 
             var noFindSfcs = new List<string>();
@@ -194,6 +194,30 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             foreach (var item in manuDowngradingSaveDto.Sfcs)
             {
+
+
+                //条码步骤记录
+                var sfcInfo = sfcList.FirstOrDefault(x => x.SFC == item);
+                var sfcProduce = sfcProduces.FirstOrDefault(x => x.SFC == item);
+                var stepEntity = new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = item,
+                    ProductId = sfcInfo?.ProductId ?? 0,
+                    WorkOrderId = sfcInfo?.WorkOrderId ?? 0,
+                    ProductBOMId = sfcProduce?.ProductBOMId,
+                    ProcessRouteId = sfcProduce?.ProcessRouteId,
+                    WorkCenterId = sfcProduce?.WorkCenterId ?? 0,
+                    Qty = sfcProduce?.Qty ?? 0,
+                    ProcedureId = sfcProduce?.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.EnterDowngrading,
+                    CurrentStatus = sfcProduce?.Status ?? 0,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                };
+                manuSfcStepList.Add(stepEntity);
+
                 //记录
                 var rocordEntity = new ManuDowngradingRecordEntity()
                 {
@@ -201,7 +225,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Grade = manuDowngradingSaveDto.Grade,
                     IsCancellation = ManuDowngradingRecordTypeEnum.Entry,
                     Remark = manuDowngradingSaveDto.Remark,
-
+                    SFCStepId= stepEntity.Id,
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = _currentUser.UserName,
@@ -210,27 +234,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     UpdatedOn = HymsonClock.Now(),
                 };
                 addRecordEntitys.Add(rocordEntity);
-
-                //条码步骤记录
-                var sfcInfo = sfcList.FirstOrDefault(x => x.SFC == item);
-                var sfcProduce = sfcProduces.FirstOrDefault(x => x.SFC == item);
-                manuSfcStepList.Add(new ManuSfcStepEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
-                    SFC = item,
-                    ProductId = sfcInfo?.ProductId ?? 0,
-                    WorkOrderId = sfcInfo?.WorkOrderId ?? 0,
-                    ProductBOMId = sfcProduce?.ProductBOMId,
-                    WorkCenterId = sfcProduce?.WorkCenterId ?? 0,
-                    Qty = sfcProduce?.Qty ?? 0,
-                    ProcedureId = sfcProduce?.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.EnterDowngrading,
-                    CurrentStatus = sfcProduce?.Status ?? 0,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
-                });
-
 
                 //新增/更改 sfc对应的降级等级
                 var currentDowngrading = downgradings.FirstOrDefault(x => x.SFC == item);
@@ -321,7 +324,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             #region 验证对应的sfc 是否符合要求：如是否存在,是否锁定或者报废 
-            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery {SiteId = _currentSite.SiteId ?? 0, Sfcs = manuDowngradingSaveRemoveDto.Sfcs });
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = manuDowngradingSaveRemoveDto.Sfcs });
 
             var noFindSfcs = new List<string>();
             foreach (var item in manuDowngradingSaveRemoveDto.Sfcs)
@@ -392,6 +395,31 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             foreach (var item in manuDowngradingSaveRemoveDto.Sfcs)
             {
+            
+
+                //条码步骤记录
+                var sfcInfo = sfcList.FirstOrDefault(x => x.SFC == item);
+                var sfcProduce = sfcProduces.FirstOrDefault(x => x.SFC == item);
+
+                var stepEntity = new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = item,
+                    ProductId = sfcInfo?.ProductId ?? 0,
+                    WorkOrderId = sfcInfo?.WorkOrderId ?? 0,
+                    ProductBOMId = sfcProduce?.ProductBOMId,
+                    ProcessRouteId = sfcProduce?.ProcessRouteId,
+                    WorkCenterId = sfcProduce?.WorkCenterId ?? 0,
+                    Qty = sfcProduce?.Qty ?? 0,
+                    ProcedureId = sfcProduce?.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.RemoveDowngrading,
+                    CurrentStatus = sfcProduce?.Status ?? 0,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                };
+                manuSfcStepList.Add(stepEntity);
+
                 //记录
                 var rocordEntity = new ManuDowngradingRecordEntity()
                 {
@@ -399,7 +427,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Grade = "",
                     IsCancellation = ManuDowngradingRecordTypeEnum.Remove,
                     Remark = manuDowngradingSaveRemoveDto.Remark,
-
+                    SFCStepId= stepEntity.Id,
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = _currentUser.UserName,
@@ -408,26 +436,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     UpdatedOn = HymsonClock.Now(),
                 };
                 addRecordEntitys.Add(rocordEntity);
-
-                //条码步骤记录
-                var sfcInfo = sfcList.FirstOrDefault(x => x.SFC == item);
-                var sfcProduce = sfcProduces.FirstOrDefault(x => x.SFC == item);
-                manuSfcStepList.Add(new ManuSfcStepEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
-                    SFC = item,
-                    ProductId = sfcInfo?.ProductId ?? 0,
-                    WorkOrderId = sfcInfo?.WorkOrderId ?? 0,
-                    ProductBOMId = sfcProduce?.ProductBOMId,
-                    WorkCenterId = sfcProduce?.WorkCenterId ?? 0,
-                    Qty = sfcProduce?.Qty ?? 0,
-                    ProcedureId = sfcProduce?.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.RemoveDowngrading,
-                    CurrentStatus = sfcProduce?.Status ?? 0,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName
-                });
 
                 //删除
                 var currentDowngrading = downgradings.FirstOrDefault(x => x.SFC == item);

@@ -31,5 +31,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 拦截工序Id
         /// </summary>
         public long? InterceptOperationId { get; set; }
+
+        /// <summary>
+        /// 条码步骤表
+        /// </summary>
+        public long? SfcStepId { get; set; }
+
+
+        /// <summary>
+        /// 关闭步骤表id
+        /// </summary>
+        public long? CloseSfcStepId { get; set; }
+
+        /// <summary>
+        /// 复判步骤表id
+        /// </summary>
+        public long? ReJudgmentSfcStepId { get; set; }
     }
 }

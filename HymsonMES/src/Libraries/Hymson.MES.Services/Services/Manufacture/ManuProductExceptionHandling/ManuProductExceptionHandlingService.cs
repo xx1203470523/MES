@@ -366,6 +366,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
                         WorkCenterId = sfcProduceEntity.WorkCenterId,
                         ProductBOMId = sfcProduceEntity.ProductBOMId,
+                        ProcessRouteId = sfcProduceEntity.ProcessRouteId,
                         SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                         Qty = sfcProduceEntity.Qty,
                         VehicleCode = "", // 这里要赋值？
@@ -717,6 +718,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
                         WorkCenterId = sfcProduceEntity.WorkCenterId,
                         ProductBOMId = sfcProduceEntity.ProductBOMId,
+                        ProcessRouteId = sfcProduceEntity.ProcessRouteId,
                         SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                         Qty = sfcProduceEntity.Qty,
                         VehicleCode = "", // 这里要赋值？
@@ -1294,6 +1296,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
                         WorkCenterId = sfcProduceEntity.WorkCenterId,
                         ProductBOMId = sfcProduceEntity.ProductBOMId,
+                        ProcessRouteId = sfcProduceEntity.ProcessRouteId,
                         SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                         Qty = sfcProduceEntity.Qty,
                         VehicleCode = "", // 这里要赋值？
@@ -2066,6 +2069,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
                     WorkCenterId = sfcProduceEntity.WorkCenterId,
                     ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcessRouteId = sfcProduceEntity.ProcessRouteId,
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
                     EquipmentId = sfcProduceEntity.EquipmentId,
@@ -2248,6 +2252,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
                     WorkCenterId = sfcProduceEntity.WorkCenterId,
                     ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcessRouteId = sfcProduceEntity.ProcessRouteId,
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
                     EquipmentId = sfcProduceEntity.EquipmentId,

@@ -1113,6 +1113,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 WorkOrderId = sfc.WorkOrderId,
                 WorkCenterId = sfc.WorkCenterId,
                 ProductBOMId = sfc.ProductBOMId,
+                ProcessRouteId = sfc.ProcessRouteId,
                 Qty = sfc.Qty,
                 EquipmentId = sfc.EquipmentId,
                 ResourceId = sfc.ResourceId,

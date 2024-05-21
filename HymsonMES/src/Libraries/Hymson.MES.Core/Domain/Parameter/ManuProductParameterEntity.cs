@@ -41,5 +41,10 @@ namespace Hymson.MES.Core.Domain.Parameter
         /// 采集时间
         /// </summary>
         public DateTime CollectionTime { get; set; }
+
+        /// <summary>
+        ///步骤表id
+        /// </summary>
+        public long?  SfcstepId { get; set; }
     }
 }

@@ -1271,7 +1271,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //}
             //查询bom明细
             var bomDetailEntity = await _procBomDetailRepository.GetByIdAsync(replaceDto.BomDetailId);
-            var remainQty = bomDetailEntity?.Usages - manuBarCodeRelations.Sum(item => item.InputQty) ?? 0;
+            var remainQty = bomDetailEntity?.Usages - manuBarCodeRelations.Where(x => x.OutputBarCode == replaceDto.Sfc).Sum(item => item.InputQty) ?? 0;
 
             var circulationQty = 0m;
             var whMaterialInventory = new WhMaterialInventoryEntity();
@@ -2107,6 +2107,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 WorkOrderId = sfc.WorkOrderId,
                 WorkCenterId = sfc.WorkCenterId,
                 ProductBOMId = sfc.ProductBOMId,
+                ProcessRouteId = sfc.ProcessRouteId,
                 Qty = sfc.Qty,
                 EquipmentId = sfc.EquipmentId,
                 ResourceId = sfc.ResourceId,

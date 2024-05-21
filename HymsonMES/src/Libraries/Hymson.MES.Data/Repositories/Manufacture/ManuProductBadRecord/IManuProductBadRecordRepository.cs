@@ -28,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductBadRecordEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<ManuProductBadRecordEntity>> GetByIdsAsync(IEnumerable<long>  ids);
 
         /// <summary>
         ///根据步骤Id获取数据

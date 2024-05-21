@@ -652,6 +652,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                 ProductId = manuSfcInfo.ProductId,
                 WorkOrderId = manuSfcInfo.WorkOrderId,
                 ProductBOMId = planEntity.ProductBOMId,
+                ProcessRouteId = planEntity.ProcessRouteId,
                 WorkCenterId = equResModel.LineId,
                 Qty = dto.OkQty,
                 ResourceId = equResModel.ResId,

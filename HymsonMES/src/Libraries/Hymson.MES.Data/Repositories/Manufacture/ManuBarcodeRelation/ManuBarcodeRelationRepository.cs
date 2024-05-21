@@ -118,10 +118,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<IEnumerable<ManuBarCodeRelationEntity>> GetEntitiesAsync(ManuBarcodeRelationQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
-            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             if (query.InputBarCodes != null && query.InputBarCodes.Any())
             {
@@ -131,8 +131,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("IsDisassemble=@IsDisassemble");
             }
+            if (query.DisassembledSfcStepId.HasValue)
+            {
+                sqlBuilder.Where("DisassembledSfcStepId=@DisassembledSfcStepId");
+            }
+            if (query.InputSfcStepId.HasValue)
+            {
+                sqlBuilder.Where("BusinessContent->>'$.InputSFCStepId'=@InputSfcStepId");
+            }
 
-            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            if (query.OutputSfcStepId.HasValue)
+            {
+                sqlBuilder.Where("BusinessContent->>'$.OutputSFCStepId'=@OutputSfcStepId");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuBarCodeRelationEntity>(template.RawSql, query);
         }

@@ -2,6 +2,7 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
@@ -142,6 +143,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                                 ProductId = manuSfcProduceEntity.ProductId,
                                 WorkOrderId = manuSfcProduceEntity.WorkOrderId,
                                 ProductBOMId = manuSfcProduceEntity.ProductBOMId,
+                                ProcessRouteId= manuSfcProduceEntity.ProcessRouteId,
                                 WorkCenterId = manuSfcProduceEntity.WorkCenterId,
                                 Qty = 1,
                                 EquipmentId = vehicleBo.EquipmentId,
@@ -215,6 +217,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                             ProductId = manuSfcProduceEntity.ProductId,
                             WorkOrderId = manuSfcProduceEntity.WorkOrderId,
                             ProductBOMId = manuSfcProduceEntity.ProductBOMId,
+                            ProcessRouteId= manuSfcProduceEntity.ProcessRouteId,
                             WorkCenterId = manuSfcProduceEntity.WorkCenterId,
                             Qty = 1,
                             ProcedureId = manuSfcProduceEntity.ProcedureId,
