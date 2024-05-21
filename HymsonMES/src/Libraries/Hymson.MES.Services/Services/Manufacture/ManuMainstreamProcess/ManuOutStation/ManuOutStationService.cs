@@ -181,6 +181,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 WorkOrderId = sfcProduceEntity.WorkOrderId,
                 WorkCenterId = sfcProduceEntity.WorkCenterId,
                 ProductBOMId = sfcProduceEntity.ProductBOMId,
+                ProcessRouteId = sfcProduceEntity?.ProcessRouteId,
                 ProcedureId = sfcProduceEntity.ProcedureId,
                 Qty = sfcProduceEntity.Qty,
                 EquipmentId = sfcProduceEntity.EquipmentId,

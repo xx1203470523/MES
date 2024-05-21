@@ -15,6 +15,7 @@ using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Net;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {

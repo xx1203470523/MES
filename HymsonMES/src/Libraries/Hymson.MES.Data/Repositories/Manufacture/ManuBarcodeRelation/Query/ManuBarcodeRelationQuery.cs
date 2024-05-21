@@ -23,6 +23,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         /// 是否拆解(0:未拆解，1：拆解)
         /// </summary>
         public TrueOrFalseEnum? IsDisassemble { get; set; }
+        /// <summary>
+        /// 产出步骤表
+        /// </summary>
+        public long? OutputSfcStepId { get; set; }
+
+        /// <summary>
+        /// 投入条码表
+        /// </summary>
+        public long? InputSfcStepId { get; set; }
+
+
+        /// <summary>
+        /// 投入条码表
+        /// </summary>
+        public long? DisassembledSfcStepId { get; set; }
     }
 
     /// <summary>

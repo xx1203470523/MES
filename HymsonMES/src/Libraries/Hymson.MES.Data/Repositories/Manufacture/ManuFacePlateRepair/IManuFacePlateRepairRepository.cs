@@ -157,6 +157,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateDetailsAsync(List<ManuSfcRepairDetailEntity> manuSfcRepairDetailEntities);
 
+        /// <summary>
+        /// 获取维修详情
+        /// </summary>
+        /// <param name="manuSfcRepairDetailQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcRepairDetailEntity>> GetManuSfcRepairDetailEntitiesAsync(ManuSfcRepairDetailQuery manuSfcRepairDetailQuery);
+        
+        /// <summary>
+        /// 获取维修记录
+        /// </summary>
+        /// <param name="manuFacePlateRepairQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcRepairRecordEntity>> GetManuSfcRepairRecordEntitiesAsync(ManuSfcRepairRecordQuery manuSfcRepairRecordQuery);
         #endregion
     }
 }

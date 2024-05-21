@@ -103,6 +103,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcStepEntity>> GetInStationStepsBySFCAsync(EntityBySFCQuery query);
 
         /// <summary>
+        /// 获取SFC的进站步骤
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+         Task<IEnumerable<ManuSfcStepEntity>> GetStepsBySFCAsync(EntityBySFCQuery query);
+
+        /// <summary>
         /// 获取SFC的出站步骤
         /// </summary>
         /// <param name="query"></param>

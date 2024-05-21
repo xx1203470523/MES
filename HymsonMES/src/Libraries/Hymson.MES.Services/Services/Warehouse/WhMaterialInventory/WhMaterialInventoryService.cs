@@ -937,7 +937,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                     ProcedureId = null,
                     ResourceId = null,
                     EquipmentId = null,
-
                     InputBarCode = inputBarcodeSingle.MaterialBarCode,
                     InputBarCodeLocation = string.Empty,
                     InputBarCodeMaterialId = inputBarcodeSingle.MaterialId,

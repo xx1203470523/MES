@@ -13,5 +13,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuDowngradingRecordQuery
     {
+
+        /// <summary>
+        /// 步骤id
+        /// </summary>
+        public long? SFCStepId { get; set; }
+
     }
 }

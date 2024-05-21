@@ -87,6 +87,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public DateTime? CloseOn { get; set; }
 
         /// <summary>
+        /// 关闭步骤表id
+        /// </summary>
+        public long? CloseSfcStepId { get; set; }
+
+        /// <summary>
         /// 复判人
         /// </summary>
         public string? ReJudgmentBy { get; set; }

@@ -79,7 +79,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("confirmSubmit")]
         [LogDescription("确认提交", BusinessType.OTHER)]
         public async Task ConfirmSubmitManuFacePlateRepairAsync([FromBody] ManuFacePlateRepairConfirmSubmitDto confirmSubmitDto)
-        {
+        { 
             await _manuFacePlateRepairService.ConfirmSubmitManuFacePlateRepairAsync(confirmSubmitDto);
         }
 

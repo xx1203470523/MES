@@ -22,6 +22,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Core.Constants.Process;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -39,11 +40,11 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         public VehicleUnBindJobService(IInteVehiceFreightStackRepository inteVehiceFreightStackRepository
             , IInteVehicleRepository inteVehicleRepository
-            ,IManuSfcStepRepository  manuSfcStepRepository
-            ,IManuSfcProduceRepository manuSfcProduceRepository
-            ,IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository
-            ,IInteVehicleFreightRepository inteVehicleFreightRepository) 
-        { 
+            , IManuSfcStepRepository manuSfcStepRepository
+            , IManuSfcProduceRepository manuSfcProduceRepository
+            , IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository
+            , IInteVehicleFreightRepository inteVehicleFreightRepository)
+        {
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
@@ -82,7 +83,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (stackEntities.Any())
             {
                 var grouplist = stackEntities.GroupBy(s => s.LocationId).ToList();
-                
+
                 //把条码按位置分组后，进行解盘
                 foreach (var groupitem in grouplist)
                 {
@@ -98,7 +99,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                             Sfc = item1.BarCode,
                             SiteId = jobRequest.SiteId
                         });
-                        if(manuSfcProduceEntity != null)
+                        if (manuSfcProduceEntity != null)
                         {
                             var inteVehicleFreightRecordEntity = new InteVehicleFreightRecordEntity()
                             {
@@ -127,6 +128,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                                 ProductId = manuSfcProduceEntity.ProductId,
                                 WorkOrderId = manuSfcProduceEntity.WorkOrderId,
                                 ProductBOMId = manuSfcProduceEntity.ProductBOMId,
+                                ProcessRouteId = manuSfcProduceEntity.ProcessRouteId,
                                 WorkCenterId = manuSfcProduceEntity.WorkCenterId,
                                 Qty = 1,
                                 EquipmentId = vehicleBo.EquipmentId,
@@ -142,9 +144,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                             };
                             responseBo.StepList.Add(msse);
                         }
-                        
+
                     }
-                   
+
                 }
             }
             return responseBo;
@@ -158,12 +160,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                 return responseBo;
             }
 
-            responseBo.Rows += await _inteVehiceFreightStackRepository.DeletesAsync(data.Items.Select(d=>d.Id).ToArray());
+            responseBo.Rows += await _inteVehiceFreightStackRepository.DeletesAsync(data.Items.Select(d => d.Id).ToArray());
             responseBo.Rows += await _inteVehicleFreightRecordRepository.InsertsAsync(data.Records);
             responseBo.Rows += await _manuSfcStepRepository.InsertRangeAsync(data.StepList);
             //入库
             await _inteVehicleFreightRepository.UpdatesAsync(data.Locations);
-           
+
             return responseBo;
         }
 
@@ -179,7 +181,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
             var vehicleBo = jobRequestBo.VehicleBo;
             if (vehicleBo == null) return;
-            if (!vehicleBo.SFCs.Any()) 
+            if (!vehicleBo.SFCs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18622));
             }

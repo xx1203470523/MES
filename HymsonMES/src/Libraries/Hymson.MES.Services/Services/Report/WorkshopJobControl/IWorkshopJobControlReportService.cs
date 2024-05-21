@@ -38,6 +38,13 @@ namespace Hymson.MES.Services.Services.Report
         Task<WorkshopJobControlStepReportDto> GetSfcInOutInfoAsync(string sfc);
 
         /// <summary>
+        ///获取步骤详情
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<StepDetailDto> GetStepDetailAsync(StepQueryDto query);
+
+        /// <summary>
         /// 根据SFC分页获取条码步骤信息
         /// </summary>
         /// <param name="queryParam"></param>
