@@ -2,6 +2,7 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -121,6 +122,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
 
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -140,6 +147,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuBarCodeRelationRepository"></param>
+        /// <param name="localizationService"></param>
         public InProductDismantleService(ICurrentUser currentUser, ICurrentSite currentSite,
             IMasterDataService masterDataService,
             IProcBomRepository procBomRepository,
@@ -154,7 +162,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuSfcProduceRepository manuSfcProduceRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IManuSfcRepository manuSfcRepository, IManuBarCodeRelationRepository manuBarCodeRelationRepository)
+            IManuSfcRepository manuSfcRepository, IManuBarCodeRelationRepository manuBarCodeRelationRepository,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -173,6 +182,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -701,7 +711,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //}
 
             //报废的不能操作
-            if (manuSfcProduce.Status == SfcStatusEnum.Scrapping)
+            if (manuSfcProduce.Status == SfcStatusEnum.Invalid)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
             }
@@ -774,6 +784,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16603)).WithData("barCode", addDto.CirculationBarCode);
                     }
+                    if (whMaterialInventory.Status == WhMaterialInventoryStatusEnum.InUse || whMaterialInventory.Status == WhMaterialInventoryStatusEnum.Locked)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15122)).WithData("materialBarCode", whMaterialInventory.MaterialBarCode).WithData("status", _localizationService.GetResource($"{typeof(WhMaterialInventoryStatusEnum).FullName}.{whMaterialInventory.Status.ToString()}"));
+                    }
 
                     //扫描的产品需要与选择的产品一致
                     if (whMaterialInventory.MaterialId != addDto.CirculationProductId.Value)
@@ -810,7 +824,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16603)).WithData("barCode", addDto.CirculationBarCode);
                 }
-
+                if (whMaterialInventory.Status == WhMaterialInventoryStatusEnum.InUse || whMaterialInventory.Status == WhMaterialInventoryStatusEnum.Locked)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15122)).WithData("materialBarCode", whMaterialInventory.MaterialBarCode).WithData("status", _localizationService.GetResource($"{typeof(WhMaterialInventoryStatusEnum).FullName}.{whMaterialInventory.Status.ToString()}"));
+                }
                 addDto.CirculationProductId = whMaterialInventory.MaterialId;
 
                 //根据选择的产品去找类型
@@ -909,7 +926,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             using var trans = TransactionHelper.GetTransactionScope();
 
             // 记录step信息
-            //rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+            rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
 
             // 添加条码关系表信息
             rows += await _manuBarCodeRelationRepository.InsertAsync(manuBarCodeRelation);
@@ -1231,7 +1248,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuBarCodeRelations = await _manuBarCodeRelationRepository.GetSfcMoudulesAsync(new ManuComponentBarcodeRelationQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Sfc = replaceDto.Sfc,
+                InputBarCode = replaceDto.CirculationBarCode,
                 IsDisassemble = SFCCirculationReportTypeEnum.Activity,
                 BomMainMaterialId = replaceDto.BomDetailId.ToString(),
             });
@@ -1752,9 +1769,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             //外部获取批次数量
             decimal qty = 0;
             var material = await _procMaterialRepository.GetByIdAsync(productId);
-            if(material.Batch == null)
+            if (material != null && material.Batch != null)
             {
-                qty =string.IsNullOrEmpty(material.Batch) ? 0 : decimal.Parse(material.Batch);
+                qty = string.IsNullOrEmpty(material.Batch) ? 0 : decimal.Parse(material.Batch);
             }
             return qty;
         }
