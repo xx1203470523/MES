@@ -243,6 +243,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSparePartsEntity, EquSparePartsDto>();
             #endregion
 
+            #region EquipmentFaultType
+            CreateMap<EquEquipmentFaultTypeEntity, EquipmentFaultTypeDto>();
+            CreateMap<EQualUnqualifiedGroupCreateDto, EquEquipmentFaultTypeEntity>();
+            CreateMap<EQualUnqualifiedGroupModifyDto, EquEquipmentFaultTypeEntity>();
+            CreateMap<EquipmentFaultTypePagedQueryDto, EquipmentFaultTypePagedQuery>();
+            #endregion
+
         }
 
         /// <summary>
