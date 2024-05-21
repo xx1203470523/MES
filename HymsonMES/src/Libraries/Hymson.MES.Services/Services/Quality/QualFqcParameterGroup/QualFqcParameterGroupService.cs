@@ -1,6 +1,3 @@
-using AutoMapper.Execution;
-using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -10,25 +7,16 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Qual;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services;
-using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-
-using OfficeOpenXml;
-using System.Reflection;
-using System.Security.Policy;
-using System.Text;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -279,6 +267,12 @@ namespace Hymson.MES.Services.Services.Quality
             scope.Complete();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
         public async Task<QualFqcParameterGroupOutputDto> GetOneAsync(QualFqcParameterGroupQueryDto queryDto)
         {
             var qualFqcInspectionItemEntity = await _qualFqcParameterGroupRepository.GetByIdAsync(queryDto.Id);
@@ -305,6 +299,12 @@ namespace Hymson.MES.Services.Services.Quality
             return result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="createDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
         public async Task CreateAsync(QualFqcParameterGroupDto createDto)
         {
             await _validationSaveRules.ValidateAndThrowAsync(createDto);
@@ -351,6 +351,13 @@ namespace Hymson.MES.Services.Services.Quality
             var detailCommands = Enumerable.Empty<QualFqcParameterGroupDetailEntity>();
             if (createDto.qualFqcParameterGroupDetailDtos != null && createDto.qualFqcParameterGroupDetailDtos.Any())
             {
+                // 判断是否存在重复的参数项目
+                var parameterGroupIds = createDto.qualFqcParameterGroupDetailDtos.Select(m => m.ParameterGroupId);
+                if (parameterGroupIds.Count() != parameterGroupIds.Distinct().Count())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19957));
+                }
+
                 detailCommands = createDto.qualFqcParameterGroupDetailDtos.Select(m =>
                 {
                     var detailCommand = new QualFqcParameterGroupDetailEntity()
@@ -393,6 +400,12 @@ namespace Hymson.MES.Services.Services.Quality
             scope.Complete();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="updateDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
         public async Task ModifyAsync(QualFqcParameterGroupUpdateDto updateDto)
         {
             await _validationUpdateRules.ValidateAndThrowAsync(updateDto);
@@ -449,6 +462,13 @@ namespace Hymson.MES.Services.Services.Quality
             var detailCommands = Enumerable.Empty<QualFqcParameterGroupDetailEntity>();
             if (updateDto.qualFqcParameterGroupDetailDtos != null && updateDto.qualFqcParameterGroupDetailDtos.Any())
             {
+                // 判断是否存在重复的参数项目
+                var parameterGroupIds = updateDto.qualFqcParameterGroupDetailDtos.Select(m => m.ParameterGroupId);
+                if (parameterGroupIds.Count() != parameterGroupIds.Distinct().Count())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19957));
+                }
+
                 detailCommands = updateDto.qualFqcParameterGroupDetailDtos.Select(m =>
                 {
                     var detailCommand = new QualFqcParameterGroupDetailEntity()
@@ -523,5 +543,6 @@ namespace Hymson.MES.Services.Services.Quality
             };
             await _qualFqcParameterGroupRepository.UpdateStatusAsync(param);
         }
+
     }
 }

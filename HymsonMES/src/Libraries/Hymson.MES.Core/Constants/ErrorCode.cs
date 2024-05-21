@@ -2017,6 +2017,7 @@
         public const string MES19954 = "检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19955 = "检验项目编码重复，数据新增失败";
         public const string MES19956 = "客户{customCode}物料{materialCode}检验项目版本{version}已存在，不允许重复添加！";
+        public const string MES19957 = "参数项目有重复，请检查！";
         #endregion 
 
 
@@ -2045,7 +2046,7 @@
         public const string MES19983 = "已启用状态的检验单不允许被删除！";
 
 
-        public const string MES19987 = "非新建状态不允许删除！"; 
+        public const string MES19987 = "非新建状态不允许删除！";
         public const string MES19988 = "当前物料已存在启用的检验项目！";
         #endregion
 
