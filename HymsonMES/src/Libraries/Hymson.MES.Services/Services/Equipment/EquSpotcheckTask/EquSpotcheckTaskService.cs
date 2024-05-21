@@ -1,4 +1,3 @@
-using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -11,14 +10,11 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MySqlX.XDevAPI.Common;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -55,6 +51,11 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly IEquSpotcheckTaskSnapshotItemRepository _equSpotcheckTaskSnapshotItemRepository;
 
         /// <summary>
+        /// 单位
+        /// </summary>
+        private readonly IInteUnitRepository _inteUnitRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -65,7 +66,8 @@ namespace Hymson.MES.Services.Services.Equipment
             IEquSpotcheckTaskRepository equSpotcheckTaskRepository,
             IEquEquipmentRepository equEquipmentRepository,
             IEquSpotcheckTaskItemRepository equSpotcheckTaskItemRepository,
-            IEquSpotcheckTaskSnapshotItemRepository equSpotcheckTaskSnapshotItemRepository)
+            IEquSpotcheckTaskSnapshotItemRepository equSpotcheckTaskSnapshotItemRepository,
+            IInteUnitRepository inteUnitRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -74,6 +76,7 @@ namespace Hymson.MES.Services.Services.Equipment
             _equEquipmentRepository = equEquipmentRepository;
             _equSpotcheckTaskItemRepository = equSpotcheckTaskItemRepository;
             _equSpotcheckTaskSnapshotItemRepository = equSpotcheckTaskSnapshotItemRepository;
+            _inteUnitRepository = inteUnitRepository;
         }
 
 
@@ -251,44 +254,77 @@ namespace Hymson.MES.Services.Services.Equipment
         public async Task<IEnumerable<TaskItemUnionSnapshotView>> querySnapshotItemAsync(SpotcheckTaskSnapshotItemQueryDto requestDto)
         {
             var taskitem = await _equSpotcheckTaskItemRepository.GetEntitiesAsync(new EquSpotcheckTaskItemQuery { SpotCheckTaskId = requestDto.SpotCheckTaskId });
-            var taskitemSnap = await _equSpotcheckTaskSnapshotItemRepository.GetEntitiesAsync(new EquSpotcheckTaskSnapshotItemQuery { SpotCheckTaskId = requestDto.SpotCheckTaskId });
+            var spotCheckItemSnapshotIds = taskitem.Select(e => e.SpotCheckItemSnapshotId);
+            if (!spotCheckItemSnapshotIds.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            }
+            var taskitemSnap = await _equSpotcheckTaskSnapshotItemRepository.GetEntitiesAsync(new EquSpotcheckTaskSnapshotItemQuery { Id = spotCheckItemSnapshotIds });
+            //单位
+            var unitIds = taskitemSnap.Where(x => x.UnitId.HasValue).Select(x => x.UnitId!.Value);
+            var inteUnitEntitys = await _inteUnitRepository.GetByIdsAsync(unitIds);
+            var unitDic = inteUnitEntitys.ToDictionary(x => x.Id, x => x.Code);
 
-            //var result = taskitem.Select(x => x.ToModel<TaskItemUnionSnapshotView>());
-            //result = taskitemSnap.Select(x => x.ToModel<TaskItemUnionSnapshotView>());
+            List<TaskItemUnionSnapshotView> outViews = new();
 
-            var result = from a in taskitem
-                         join b in taskitemSnap on a.SpotCheckItemSnapshotId equals b.Id
-                         select new TaskItemUnionSnapshotView
-                         {
-                             Id=a.Id,
-                             SpotCheckTaskId=a.SpotCheckTaskId,
-                             SpotCheckItemSnapshotId = b.Id,
+            //var result = from a in taskitem
+            //             join b in taskitemSnap on a.SpotCheckItemSnapshotId equals b.Id
+            //             select new TaskItemUnionSnapshotView
+            //             {
+            //                 Id = a.Id,
+            //                 SpotCheckTaskId = a.SpotCheckTaskId,
+            //                 SpotCheckItemSnapshotId = b.Id,
 
-                             // 映射其他属性
-                             InspectionValue = a.InspectionValue,
-                             IsQualified = a.IsQualified,
-                             Remark = a.Remark,
-                             SiteId = a.SiteId,
+            //                 // 映射其他属性
+            //                 InspectionValue = a.InspectionValue,
+            //                 IsQualified = a.IsQualified,
+            //                 Remark = a.Remark,
+            //                 SiteId = a.SiteId,
 
-                             //snapshot
-                             Code = b.Code,
-                             Name = b.Name,
-                             Status = b.Status,
-                             DataType = b.DataType,
-                             CheckType = b.CheckType,
-                             CheckMethod = b.CheckMethod,
-                             UnitId = b.UnitId,
-                             Unit = "",
-                             OperationContent = b.OperationContent,
-                             Components = b.Components,
-                             LowerLimit = b.LowerLimit,
-                             ReferenceValue = b.ReferenceValue,
-                             UpperLimit = b.UpperLimit
+            //                 //snapshot
+            //                 Code = b.Code,
+            //                 Name = b.Name,
+            //                 Status = b.Status,
+            //                 DataType = b.DataType,
+            //                 CheckType = b.CheckType,
+            //                 CheckMethod = b.CheckMethod,
+            //                 UnitId = b.UnitId,
+            //                 Unit = "",
+            //                 OperationContent = b.OperationContent,
+            //                 Components = b.Components,
+            //                 LowerLimit = b.LowerLimit,
+            //                 ReferenceValue = b.ReferenceValue,
+            //                 UpperLimit = b.UpperLimit
 
-                         };
+            //             };
 
-            //IEnumerable<TaskItemUnionSnapshotView> info = null;
-            return result;
+            try
+            {
+                foreach (var item in taskitem)
+                {
+                    var snap = taskitemSnap.Where(x => x.Id == item.SpotCheckItemSnapshotId).FirstOrDefault();
+                    if (snap != null)
+                    {
+                        var oneView = snap.ToModel<TaskItemUnionSnapshotView>();
+                        oneView = item.ToCombineMap(oneView);
+                        //处理单位
+                        if (snap.UnitId.HasValue)
+                        {
+                            unitDic.TryGetValue(snap.UnitId ?? 0, out var unitCode);
+                            if(unitCode != null)
+                            {
+                                oneView.Unit = unitCode;
+                            }
+                            
+                        }
+                        outViews.Add(oneView);
+                    }
+
+                }
+            }
+            catch (Exception ex) { }
+
+            return outViews;
         }
 
     }

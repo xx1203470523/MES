@@ -14,7 +14,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检任务ID;equ_spotcheck_task表的Id
         /// </summary>
-        public long SpotCheckTaskId { get; set; }
+        public long? SpotCheckTaskId { get; set; }
 
         /// <summary>
         /// 点检项目快照ID;equ_spotcheck_item_snapshot表的Id
@@ -24,7 +24,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 检验值
         /// </summary>
-        public string InspectionValue { get; set; }
+        public string? InspectionValue { get; set; }
 
         /// <summary>
         /// 是否合格;(0-否 1-是)
@@ -34,12 +34,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         
     }
