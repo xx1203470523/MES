@@ -58,7 +58,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equSpotcheckTaskRepository"></param>
-        public EquSpotcheckTaskService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSpotcheckTaskSaveDto> validationSaveRules, 
+        public EquSpotcheckTaskService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSpotcheckTaskSaveDto> validationSaveRules,
             IEquSpotcheckTaskRepository equSpotcheckTaskRepository, IEquEquipmentRepository equEquipmentRepository)
         {
             _currentUser = currentUser;
@@ -109,7 +109,7 @@ namespace Hymson.MES.Services.Services.Equipment
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
@@ -150,12 +150,21 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquSpotcheckTaskDto?> QueryByIdAsync(long id) 
+        public async Task<EquSpotcheckTaskDto?> QueryByIdAsync(long id)
         {
-           var equSpotcheckTaskEntity = await _equSpotcheckTaskRepository.GetByIdAsync(id);
-           if (equSpotcheckTaskEntity == null) return null;
-           
-           return equSpotcheckTaskEntity.ToModel<EquSpotcheckTaskDto>();
+            var equSpotcheckTaskEntity = await _equSpotcheckTaskRepository.GeUnionByIdAsync(id);
+            if (equSpotcheckTaskEntity == null) return null;
+
+            var result = equSpotcheckTaskEntity.ToModel<EquSpotcheckTaskDto>();
+
+            var equipmenEntity = await _equEquipmentRepository.GetByIdAsync(result.EquipmentId.GetValueOrDefault());
+
+            result.StatusText = result.Status.GetDescription();
+            result.IsQualifiedText = result.IsQualified.GetDescription();
+            result.EquipmentCode = equipmenEntity.EquipmentCode;
+            result.Location = equipmenEntity.Location;
+
+            return result;
         }
 
         /// <summary>
@@ -180,7 +189,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 else pagedQuery.EquipmentId = default;
             }
 
-            // 将不合格处理方式转换为检验单ID
+            // 将不合格处理方式转换为点检单ID
             //if (pagedQueryDto.HandMethod.HasValue)
             //{
             //    var unqualifiedHandEntities = await _qualFqcOrderUnqualifiedHandleRepository.GetEntitiesAsync(new QualFqcOrderUnqualifiedHandleQuery
@@ -217,7 +226,8 @@ namespace Hymson.MES.Services.Services.Equipment
                         }
                         return m;
                     });
-                }catch(Exception ex) { }
+                }
+                catch (Exception ex) { }
 
 
             }

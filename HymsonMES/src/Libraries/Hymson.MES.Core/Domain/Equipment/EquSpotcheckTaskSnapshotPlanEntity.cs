@@ -23,12 +23,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检计划编码
         /// </summary>
-        public string PlanCode { get; set; }
+        public string Code { get; set; }
 
         /// <summary>
         /// 点检计划名称
         /// </summary>
-        public string PlanName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// 版本
@@ -58,22 +58,22 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检类型;周/日
         /// </summary>
-        public bool PlanType { get; set; }
+        public bool Type { get; set; }
 
         /// <summary>
         /// 点检计划状态
         /// </summary>
-        public bool PlanStatus { get; set; }
+        public bool Status { get; set; }
 
         /// <summary>
         /// 开始时间（计划）
         /// </summary>
-        public DateTime? PlanBeginTime { get; set; }
+        public DateTime? BeginTime { get; set; }
 
         /// <summary>
         /// 结束时间（计划）
         /// </summary>
-        public DateTime? PlanEndTime { get; set; }
+        public DateTime? EndTime { get; set; }
 
         /// <summary>
         /// 是否跳过节假日

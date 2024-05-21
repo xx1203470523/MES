@@ -96,6 +96,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return await conn.QueryFirstOrDefaultAsync<EquSpotcheckTaskEntity>(GetByIdSql, new { Id = id });
         }
 
+        public async Task<EquSpotcheckTaskUnionPlanEntity> GeUnionByIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquSpotcheckTaskUnionPlanEntity>(GetUnionByIdSql, new { Id = id });
+        }
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -130,7 +136,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("st.*,stsp.PlanCode,stsp.PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.PlanType,stsp.PlanBeginTime,stsp.PlanEndTime");
+            sqlBuilder.Select("st.*,stsp.Code PlanCode,stsp.Name PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.Type PlanType,stsp.PlanBeginTime,stsp.PlanEndTime");
             sqlBuilder.OrderBy("st.UpdatedOn DESC");
             sqlBuilder.Where("st.IsDeleted = 0");
             sqlBuilder.Where("st.SiteId = @SiteId");
@@ -185,8 +191,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string DeleteSql = "UPDATE equ_spotcheck_task SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE equ_spotcheck_task SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM equ_spotcheck_task WHERE Id = @Id ";
+        const string GetByIdSql = @"SELECT * FROM equ_spotcheck_task WHERE Id = @Id ";     
         const string GetByIdsSql = @"SELECT * FROM equ_spotcheck_task WHERE Id IN @Ids ";
+
+        const string GetUnionByIdSql = @"SELECT st.*,stsp.Code as PlanCode,stsp.Name as PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.Type as PlanType,stsp.PlanBeginTime,stsp.PlanEndTime
+                                            FROM equ_spotcheck_task st
+                                            LEFT JOIN equ_spotcheck_task_snapshot_plan stsp on st.Id=stsp.SpotCheckTaskId
+                                            WHERE st.IsDeleted = 0 AND st.Id = @Id ";
 
     }
 }

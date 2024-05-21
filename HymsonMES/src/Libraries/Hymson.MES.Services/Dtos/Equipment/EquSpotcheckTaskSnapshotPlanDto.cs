@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -60,7 +61,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
        /// <summary>
         /// 点检类型;周/日
         /// </summary>
-        public bool Type { get; set; }
+        public EquipmentSpotcheckTypeEnum? Type { get; set; }
 
        /// <summary>
         /// 点检计划状态
@@ -90,7 +91,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
        /// <summary>
         /// 周期;月、天、小时、分钟
         /// </summary>
-        public bool Cycle { get; set; }
+        public int? Cycle { get; set; }
 
        /// <summary>
         /// 完成时间（小时）
