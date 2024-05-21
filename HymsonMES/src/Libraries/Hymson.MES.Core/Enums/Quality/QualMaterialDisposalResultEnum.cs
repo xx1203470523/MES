@@ -8,11 +8,11 @@ namespace Hymson.MES.Core.Enums.Quality
         /// 打开
         /// </summary>
         [Description("放行")]
-        Open = 1,
+        Release= 1,
         /// <summary>
         /// 关闭
         /// </summary>
         [Description("退料")]
-        Close = 2
+        Compromis = 2
     }
 }

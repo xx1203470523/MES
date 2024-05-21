@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Microsoft.Extensions.Options;
 
@@ -116,6 +117,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+
+            if (query.MaterialUnqualifiedDataId.HasValue)
+            {
+                sqlBuilder.Where(" MaterialUnqualifiedDataId=@MaterialUnqualifiedDataId ");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualMaterialUnqualifiedDataDetailEntity>(template.RawSql, query);
         }
@@ -148,6 +155,17 @@ namespace Hymson.MES.Data.Repositories.Quality
             return new PagedInfo<QualMaterialUnqualifiedDataDetailEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByDataIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByDataIdSql, new { DataId = id });
+        }
+
     }
 
 
@@ -171,6 +189,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string GetByIdSql = @"SELECT * FROM qual_material_unqualified_data_detail WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_material_unqualified_data_detail WHERE Id IN @Ids ";
+        const string DeleteByDataIdSql = "delete from `qual_material_unqualified_data_detail` WHERE MaterialUnqualifiedDataId=@DataId ";
 
     }
 }

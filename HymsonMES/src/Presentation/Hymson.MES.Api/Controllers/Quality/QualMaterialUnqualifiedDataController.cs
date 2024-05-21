@@ -46,7 +46,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [Route("create")]
         public async Task AddAsync([FromBody] QualMaterialUnqualifiedDataSaveDto saveDto)
         {
-             await _qualMaterialUnqualifiedDataService.CreateAsync(saveDto);
+            await _qualMaterialUnqualifiedDataService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -58,7 +58,19 @@ namespace Hymson.MES.Api.Controllers.Quality
         [Route("update")]
         public async Task UpdateAsync([FromBody] QualMaterialUnqualifiedDataSaveDto saveDto)
         {
-             await _qualMaterialUnqualifiedDataService.ModifyAsync(saveDto);
+            await _qualMaterialUnqualifiedDataService.ModifyAsync(saveDto);
+        }
+
+        /// <summary>
+        /// 处置（车间物料不良记录）
+        /// </summary>
+        /// <param name="disposalDto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("disposal")]
+        public async Task DisposalAsync([FromBody] QualMaterialUnqualifiedDataDisposalDto disposalDto)
+        {
+            await _qualMaterialUnqualifiedDataService.DisposalAsync(disposalDto);
         }
 
         /// <summary>

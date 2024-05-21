@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualMaterialUnqualifiedDataDetailQuery
     {
-    
+        /// <summary>
+        /// 不良Id
+        /// </summary>
+        public long? MaterialUnqualifiedDataId { get; set; }
     }
 }

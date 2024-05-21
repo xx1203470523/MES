@@ -72,6 +72,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns> 
+         Task<int> UpdateStatusByIdsAsync(UpdateStatusByIdCommand command);
+
+        /// <summary>
+        /// 更新状态（批量--不操作数量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns> 
         Task<int> UpdateStatusByBarCodesAsync(IEnumerable<UpdateStatusByBarCodeCommand> commands);
 
         /// <summary>

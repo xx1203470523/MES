@@ -87,6 +87,30 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
         }
 
         /// <summary>
+        /// 查询物料组关联的不合格组列表
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedGroupDto>> GetListByMaterialGroupIddAsync([FromQuery] QualUnqualifiedGroupQueryDto queryDto)
+        {
+            var query = new QualUnqualifiedGroupQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                MaterialGroupId = queryDto.MaterialGroupId
+            };
+            var list = await _qualUnqualifiedGroupRepository.GetListByMaterialGroupIddAsync(query);
+
+            //实体到DTO转换 装载数据
+            var unqualifiedGroupDtos = new List<QualUnqualifiedGroupDto>();
+            foreach (var entity in list)
+            {
+                var groupDto = entity.ToModel<QualUnqualifiedGroupDto>();
+                unqualifiedGroupDtos.Add(groupDto);
+            }
+            return unqualifiedGroupDtos;
+        }
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="param"></param>

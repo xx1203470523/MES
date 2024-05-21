@@ -1085,6 +1085,10 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            #region 车间物料不良录入
+            CreateMap<QualMaterialUnqualifiedDataPagedQueryDto, QualMaterialUnqualifiedDataPagedQuery>();
+            #endregion
+
         }
 
         /// <summary>

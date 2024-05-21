@@ -13,14 +13,21 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(QualMaterialUnqualifiedDataSaveDto saveDto);
+        Task CreateAsync(QualMaterialUnqualifiedDataSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(QualMaterialUnqualifiedDataSaveDto saveDto);
+        Task ModifyAsync(QualMaterialUnqualifiedDataSaveDto saveDto);
+
+        /// <summary>
+        /// 处置
+        /// </summary>
+        /// <param name="disposalDto"></param>
+        /// <returns></returns>
+        Task DisposalAsync(QualMaterialUnqualifiedDataDisposalDto disposalDto);
 
         /// <summary>
         /// 删除

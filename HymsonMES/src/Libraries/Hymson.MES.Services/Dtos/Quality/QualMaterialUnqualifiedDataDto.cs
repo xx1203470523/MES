@@ -63,71 +63,58 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record QualMaterialUnqualifiedDataSaveDto : BaseEntityDto
     {
         /// <summary>
-        /// 
+        /// 主键Id
         /// </summary>
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料库存Id;wh_material_inventory的Id
         /// </summary>
         public long MaterialInventoryId { get; set; }
 
-       /// <summary>
-        /// 不良状态;1、打开 2、关闭
-        /// </summary>
-        public bool UnqualifiedStatus { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 不良备注
         /// </summary>
-        public string UnqualifiedRemark { get; set; }
+        public string UnqualifiedRemark { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public IEnumerable<QualMaterialUnqualifiedDataDetailSaveDto> DetailDtos { get; set; }
+    }
+
+    public record QualMaterialUnqualifiedDataDetailSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 不合格代码组ID;qual_unqualified_group的Id
+        /// </summary>
+        public long UnqualifiedGroupId { get; set; }
+
+        /// <summary>
+        /// 不合格代码ID;qual_unqualified_code的Id
+        /// </summary>
+        public long UnqualifiedCodeId { get; set; }
+    }
+
+    /// <summary>
+    /// 车间物料不良记录新处置Dto
+    /// </summary>
+    public record QualMaterialUnqualifiedDataDisposalDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 处置结果;1、放行 2、退料
         /// </summary>
-        public bool? DisposalResult { get; set; }
+        public QualMaterialDisposalResultEnum DisposalResult { get; set; }
 
-       /// <summary>
-        /// 处置时间
-        /// </summary>
-        public DateTime? DisposalTime { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 处置备注
         /// </summary>
-        public string DisposalRemark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-       
+        public string DisposalRemark { get; set; } = "";
     }
 
     /// <summary>
@@ -136,71 +123,78 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record QualMaterialUnqualifiedDataDto : BaseEntityDto
     {
         /// <summary>
-        /// 
+        /// 主键Id
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料库存Id;wh_material_inventory的Id
         /// </summary>
         public long MaterialInventoryId { get; set; }
 
-       /// <summary>
-        /// 不良状态;1、打开 2、关闭
+        /// <summary>
+        /// 物料条码
         /// </summary>
-        public bool UnqualifiedStatus { get; set; }
+        public string MaterialBarCode { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal QuantityResidue { get; set; }
+
+        /// <summary>
+        /// 物料(编码/版本)
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
         /// 不良备注
         /// </summary>
         public string UnqualifiedRemark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 处置结果;1、放行 2、退料
         /// </summary>
-        public bool? DisposalResult { get; set; }
+        public QualMaterialDisposalResultEnum? DisposalResult { get; set; }
 
-       /// <summary>
-        /// 处置时间
-        /// </summary>
-        public DateTime? DisposalTime { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 处置备注
         /// </summary>
         public string DisposalRemark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
-        /// 最后修改人
+        /// <summary>
+        /// 不合格组和不合格代码
         /// </summary>
-        public string UpdatedBy { get; set; }
+        public IEnumerable<QualMaterialUnqualifiedDetailDataDto> Details { get; set; }
+    }
 
-       /// <summary>
-        /// 修改时间
+
+    public record QualMaterialUnqualifiedDetailDataDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 不合格组名称
         /// </summary>
-        public DateTime UpdatedOn { get; set; }
+        public string UnqualifiedGroupName { get; set; }
 
-       /// <summary>
-        /// 是否逻辑删除
+        /// <summary>
+        /// 不合格代码名称
         /// </summary>
-        public long IsDeleted { get; set; }
-
-       /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-       
+        public string UnqualifiedCodeName { get; set; }
     }
 
     /// <summary>

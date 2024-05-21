@@ -39,7 +39,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 处置备注
         /// </summary>
-        public string DisposalRemark { get; set; }
+        public string DisposalRemark { get; set; } = "";
 
         /// <summary>
         /// 站点Id

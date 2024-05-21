@@ -5,16 +5,24 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Org.BouncyCastle.Crypto;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -42,25 +50,32 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IQualMaterialUnqualifiedDataRepository _qualMaterialUnqualifiedDataRepository;
         private readonly IQualMaterialUnqualifiedDataDetailRepository _unqualifiedDataDetailRepository;
+        private readonly IWhMaterialInventoryRepository _inventoryRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IQualUnqualifiedGroupRepository _unqualifiedGroupRepository;
+        private readonly IQualUnqualifiedCodeRepository _unqualifiedCodeRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="validationSaveRules"></param>
-        /// <param name="qualMaterialUnqualifiedDataRepository"></param>
-        /// <param name="unqualifiedDataDetailRepository"></param>
         public QualMaterialUnqualifiedDataService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<QualMaterialUnqualifiedDataSaveDto> validationSaveRules,
             IQualMaterialUnqualifiedDataRepository qualMaterialUnqualifiedDataRepository,
-            IQualMaterialUnqualifiedDataDetailRepository unqualifiedDataDetailRepository)
+            IQualMaterialUnqualifiedDataDetailRepository unqualifiedDataDetailRepository,
+            IWhMaterialInventoryRepository inventoryRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IQualUnqualifiedGroupRepository unqualifiedGroupRepository,
+            IQualUnqualifiedCodeRepository unqualifiedCodeRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _qualMaterialUnqualifiedDataRepository = qualMaterialUnqualifiedDataRepository;
             _unqualifiedDataDetailRepository = unqualifiedDataDetailRepository;
+            _inventoryRepository = inventoryRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _unqualifiedGroupRepository = unqualifiedGroupRepository;
+            _unqualifiedCodeRepository = unqualifiedCodeRepository;
         }
 
         /// <summary>
@@ -68,13 +83,20 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(QualMaterialUnqualifiedDataSaveDto saveDto)
+        public async Task CreateAsync(QualMaterialUnqualifiedDataSaveDto saveDto)
         {
+            #region 验证数据
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            }
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+
+            //验证条码的数量、状态以及是否有打开的
+            #endregion 
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -83,14 +105,48 @@ namespace Hymson.MES.Services.Services.Quality
             // DTO转换实体
             var entity = saveDto.ToEntity<QualMaterialUnqualifiedDataEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
+            entity.UnqualifiedStatus = QualMaterialUnqualifiedStatusEnum.Open;
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
-            // 保存
-            return await _qualMaterialUnqualifiedDataRepository.InsertAsync(entity);
+            var detailEntities = new List<QualMaterialUnqualifiedDataDetailEntity>();
+            //记录详情
+            foreach (var detail in saveDto.DetailDtos)
+            {
+                detailEntities.Add(new QualMaterialUnqualifiedDataDetailEntity
+                {
+                    MaterialUnqualifiedDataId = entity.Id,
+                    UnqualifiedGroupId = detail.UnqualifiedGroupId,
+                    UnqualifiedCodeId = detail.UnqualifiedCodeId,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn
+                });
+            }
+
+            //更改库存为锁定状态
+            var updateStatusCommand = new UpdateStatusByIdCommand
+            {
+                Status = WhMaterialInventoryStatusEnum.Locked,
+                Ids = new[] { saveDto.MaterialInventoryId }
+            };
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                // 保存
+                await _qualMaterialUnqualifiedDataRepository.InsertAsync(entity);
+
+                //保存详情
+                if (detailEntities.Any())
+                {
+                    await _unqualifiedDataDetailRepository.InsertRangeAsync(detailEntities);
+                }
+
+                //更改条码状态为锁定状态
+                await _inventoryRepository.UpdateStatusByIdsAsync(updateStatusCommand);
+            }
         }
 
         /// <summary>
@@ -98,20 +154,109 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(QualMaterialUnqualifiedDataSaveDto saveDto)
+        public async Task ModifyAsync(QualMaterialUnqualifiedDataSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            }
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            var entityOld = await _qualMaterialUnqualifiedDataRepository.GetByIdAsync(saveDto?.Id ?? 0);
+            if (entityOld == null)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES10104));
+            }
+
             // DTO转换实体
             var entity = saveDto.ToEntity<QualMaterialUnqualifiedDataEntity>();
-            entity.UpdatedBy = _currentUser.UserName;
+            entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = HymsonClock.Now();
 
-            return await _qualMaterialUnqualifiedDataRepository.UpdateAsync(entity);
+            var detailEntities = new List<QualMaterialUnqualifiedDataDetailEntity>();
+            //记录详情
+            foreach (var detail in saveDto.DetailDtos)
+            {
+                detailEntities.Add(new QualMaterialUnqualifiedDataDetailEntity
+                {
+                    MaterialUnqualifiedDataId = entity.Id,
+                    UnqualifiedGroupId = detail.UnqualifiedGroupId,
+                    UnqualifiedCodeId = detail.UnqualifiedCodeId,
+                    CreatedBy = _currentUser.UserName,
+                    CreatedOn = updatedOn
+                });
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                // 保存
+                await _qualMaterialUnqualifiedDataRepository.InsertAsync(entity);
+
+                //删除之前的数据
+                await _unqualifiedDataDetailRepository.DeleteByDataIdAsync(entity.Id);
+
+                //保存详情
+                if (detailEntities.Any())
+                {
+                    await _unqualifiedDataDetailRepository.InsertRangeAsync(detailEntities);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 处置
+        /// </summary>
+        /// <param name="disposalDto"></param>
+        /// <returns></returns>
+        public async Task DisposalAsync(QualMaterialUnqualifiedDataDisposalDto disposalDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            }
+
+            var entityOld = await _qualMaterialUnqualifiedDataRepository.GetByIdAsync(disposalDto?.Id ?? 0);
+            if (entityOld == null)
+            {
+                throw new BusinessException(nameof(ErrorCode.MES10104));
+            }
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            entityOld.UnqualifiedStatus = QualMaterialUnqualifiedStatusEnum.Close;
+            entityOld.DisposalResult = disposalDto.DisposalResult;
+            entityOld.DisposalRemark = disposalDto.DisposalRemark;
+            entityOld.DisposalTime = updatedOn;
+            entityOld.UpdatedBy = updatedBy;
+            entityOld.UpdatedOn = updatedOn;
+
+            var updateStatusCommand = new UpdateStatusByIdCommand
+            {
+                Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                Ids = new[] { entityOld.MaterialInventoryId }
+            };
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                // 保存
+                await _qualMaterialUnqualifiedDataRepository.UpdateAsync(entityOld);
+
+                //如果处置方式为放行解锁，若处置方式为退料不解锁
+                if (disposalDto.DisposalResult == QualMaterialDisposalResultEnum.Release)
+                {
+                    await _inventoryRepository.UpdateStatusByIdsAsync(updateStatusCommand);
+                }
+            }
         }
 
         /// <summary>
@@ -137,18 +282,32 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             var entitys = await _qualMaterialUnqualifiedDataRepository.GetByIdsAsync(ids);
-            if(entitys.Any(x=>x.UnqualifiedStatus== QualMaterialUnqualifiedStatusEnum.Close))
+            if (entitys.Any(x => x.UnqualifiedStatus == QualMaterialUnqualifiedStatusEnum.Close))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15901));
             }
 
-            //删除后，同时解除物料条码的库存锁定状态
-            return await _qualMaterialUnqualifiedDataRepository.DeletesAsync(new DeleteCommand
+            var inventoryIds = entitys.Select(x => x.MaterialInventoryId).ToArray();
+            var rows = 0;
+            var updateStatusCommand = new UpdateStatusByIdCommand
             {
-                Ids = ids,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+                Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                Ids = inventoryIds
+            };
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                //删除后同时解除物料条码的库存锁定状态
+                rows += await _inventoryRepository.UpdateStatusByIdsAsync(updateStatusCommand);
+
+                rows += await _qualMaterialUnqualifiedDataRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = ids,
+                    DeleteOn = HymsonClock.Now(),
+                    UserId = _currentUser.UserName
+                });
+            }
+            return rows;
         }
 
         /// <summary>
@@ -158,10 +317,61 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<QualMaterialUnqualifiedDataDto?> QueryByIdAsync(long id)
         {
-            var qualMaterialUnqualifiedDataEntity = await _qualMaterialUnqualifiedDataRepository.GetByIdAsync(id);
-            if (qualMaterialUnqualifiedDataEntity == null) return null;
+            var dataEntity = await _qualMaterialUnqualifiedDataRepository.GetByIdAsync(id);
+            if (dataEntity == null)
+            {
+                return null;
+            }
 
-            return qualMaterialUnqualifiedDataEntity.ToModel<QualMaterialUnqualifiedDataDto>();
+            var inventoryEntity = await _inventoryRepository.GetByIdAsync(dataEntity.MaterialInventoryId);
+
+            var procMaterialEntity = new ProcMaterialEntity();
+            if (inventoryEntity != null)
+            {
+                procMaterialEntity = await _procMaterialRepository.GetByIdAsync(inventoryEntity.MaterialId);
+            }
+
+            var qualMaterial = new QualMaterialUnqualifiedDataDto
+            {
+                Id = dataEntity.Id,
+                MaterialInventoryId = dataEntity.MaterialInventoryId,
+                MaterialBarCode = inventoryEntity?.MaterialBarCode ?? "",
+                QuantityResidue = inventoryEntity?.QuantityResidue ?? 0,
+                MaterialCode = procMaterialEntity.MaterialCode + "/" + procMaterialEntity.Version,
+                MaterialName = procMaterialEntity.MaterialName,
+                UnqualifiedRemark = dataEntity.UnqualifiedRemark ?? "",
+                DisposalRemark = dataEntity.DisposalRemark ?? "",
+                DisposalResult = dataEntity.DisposalResult,
+                Details = new List<QualMaterialUnqualifiedDetailDataDto>()
+            };
+
+            //查询关联的不合格代码组和不合格代码
+            var details = new List<QualMaterialUnqualifiedDetailDataDto>();
+            var qualMaterialUnqualifieds = await _unqualifiedDataDetailRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataDetailQuery
+            {
+                MaterialUnqualifiedDataId = procMaterialEntity.Id
+            });
+            if (qualMaterialUnqualifieds != null && qualMaterialUnqualifieds.Any())
+            {
+                var groupIds = qualMaterialUnqualifieds.Select(x => x.UnqualifiedGroupId).Distinct().ToArray();
+                var codeIds = qualMaterialUnqualifieds.Select(x => x.UnqualifiedCodeId).Distinct().ToArray();
+
+                var unqualifiedGroupEntities = await _unqualifiedGroupRepository.GetByIdsAsync(groupIds);
+                var unqualifiedCodeEntities = await _unqualifiedCodeRepository.GetByIdsAsync(codeIds);
+
+                foreach (var entity in qualMaterialUnqualifieds)
+                {
+                    var group= unqualifiedGroupEntities.FirstOrDefault(x => x.Id== entity.UnqualifiedGroupId);
+                    var code = unqualifiedCodeEntities.FirstOrDefault(x => x.Id == entity.UnqualifiedCodeId);
+                    details.Add(new QualMaterialUnqualifiedDetailDataDto
+                    {
+                        UnqualifiedGroupName= group?.UnqualifiedGroup??""+"/"+ group?.UnqualifiedGroupName ?? "",
+                        UnqualifiedCodeName = code?.UnqualifiedCode ?? "" + "/" + code?.UnqualifiedCodeName ?? "",
+                    });
+                }
+                qualMaterial.Details = details;
+            }
+            return qualMaterial;
         }
 
         /// <summary>

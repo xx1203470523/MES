@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         public async Task<int> UpdateRangeAsync(IEnumerable<QualMaterialUnqualifiedDataEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
         /// <summary>
@@ -133,8 +133,8 @@ namespace Hymson.MES.Data.Repositories.Quality
 
             sqlBuilder.Select("wmi.MaterialBarCode,wmi.QuantityResidue,wmi.MaterialId,pm.MaterialCode,pm.Version,pm.MaterialName,quc.UnqualifiedCode,mud.UnqualifiedStatus\r\n ,mud.CreatedOn,mud.DisposalResult,mud.DisposalTime,mud.Id ");
             
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Where("mud.IsDeleted=0");
+            sqlBuilder.Where("mud.SiteId=@SiteId");
 
             sqlBuilder.LeftJoin("wh_material_inventory wmi on wmi.Id=mud.MaterialInventoryId");
             sqlBuilder.LeftJoin("proc_material pm on pm.Id=wmi.MaterialId");
@@ -212,8 +212,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string InsertSql = "INSERT INTO qual_material_unqualified_data(  `Id`, `MaterialInventoryId`, `UnqualifiedStatus`, `UnqualifiedRemark`, `DisposalResult`, `DisposalTime`, `DisposalRemark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @MaterialInventoryId, @UnqualifiedStatus, @UnqualifiedRemark, @DisposalResult, @DisposalTime, @DisposalRemark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
         const string InsertsSql = "INSERT INTO qual_material_unqualified_data(  `Id`, `MaterialInventoryId`, `UnqualifiedStatus`, `UnqualifiedRemark`, `DisposalResult`, `DisposalTime`, `DisposalRemark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @MaterialInventoryId, @UnqualifiedStatus, @UnqualifiedRemark, @DisposalResult, @DisposalTime, @DisposalRemark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE qual_material_unqualified_data SET   MaterialInventoryId = @MaterialInventoryId, UnqualifiedStatus = @UnqualifiedStatus, UnqualifiedRemark = @UnqualifiedRemark, DisposalResult = @DisposalResult, DisposalTime = @DisposalTime, DisposalRemark = @DisposalRemark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_material_unqualified_data SET   MaterialInventoryId = @MaterialInventoryId, UnqualifiedStatus = @UnqualifiedStatus, UnqualifiedRemark = @UnqualifiedRemark, DisposalResult = @DisposalResult, DisposalTime = @DisposalTime, DisposalRemark = @DisposalRemark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_material_unqualified_data SET   MaterialInventoryId = @MaterialInventoryId, UnqualifiedStatus = @UnqualifiedStatus, UnqualifiedRemark = @UnqualifiedRemark, DisposalResult = @DisposalResult, DisposalTime = @DisposalTime, DisposalRemark = @DisposalRemark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_material_unqualified_data SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_material_unqualified_data SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
