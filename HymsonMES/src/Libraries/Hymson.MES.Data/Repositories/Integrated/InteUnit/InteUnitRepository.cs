@@ -108,6 +108,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
             return await conn.QueryAsync<InteUnitEntity>(GetByIdsSql, new { Ids = ids });
         }
 
+        public async Task<IEnumerable<InteUnitEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteUnitEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        
+
         /// <summary>
         /// 根据Code查询对象
         /// </summary>

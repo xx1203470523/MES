@@ -46,6 +46,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string SupplierName { get; set; }
 
         /// <summary>
+        /// 物料组ID
+        /// </summary>
+
+        public long GroupId { get; set; }
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; }

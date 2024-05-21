@@ -62,7 +62,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
+        /// <summary>
+        /// 关联的不合格组Id
+        /// </summary>
+        public IEnumerable<long>? UnqualifiedGroupIds { get; set; }
     }
 
 
@@ -100,6 +103,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 物料集合
         /// </summary>
         public IEnumerable<string>? DynamicList { get; set; }
+
+        /// <summary>
+        /// 关联的不合格组Id
+        /// </summary>
+        public IEnumerable<long>? UnqualifiedGroupIds { get; set; }
     }
 
     /// <summary>
@@ -127,6 +135,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public IEnumerable<string>? DynamicList { get; set; }
 
+        /// <summary>
+        /// 关联的不合格组Id
+        /// </summary>
+        public IEnumerable<long>? UnqualifiedGroupIds { get; set; }
     }
 
     /// <summary>

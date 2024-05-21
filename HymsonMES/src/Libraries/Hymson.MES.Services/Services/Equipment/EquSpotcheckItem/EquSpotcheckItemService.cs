@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -11,8 +12,10 @@ using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -76,6 +79,16 @@ namespace Hymson.MES.Services.Services.Equipment
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+
+            var Entitys = await _equSpotcheckItemRepository.GetEntitiesAsync(new EquSpotcheckItemQuery
+            {
+                Code = saveDto.Code,
+                SiteId = _currentSite.SiteId ?? 0
+            });
+            if (Entitys.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10405)).WithData("Code", saveDto.Code);
+            }
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -169,9 +182,35 @@ namespace Hymson.MES.Services.Services.Equipment
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equSpotcheckItemRepository.GetPagedListAsync(pagedQuery);
 
+
+
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquSpotcheckItemDto>());
-            return new PagedInfo<EquSpotcheckItemDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            //var result = new PagedInfo<EquSpotcheckItemDto>(Enumerable.Empty<EquSpotcheckItemDto>(), pagedInfo.PageIndex, pagedInfo.PageSize);
+
+            var result = new PagedInfo<EquSpotcheckItemDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+
+            if (result.Data.Any())
+            {
+                var unitIds = result.Data.Select(m => m.UnitId.GetValueOrDefault());
+                if (unitIds.Any())
+                {
+                    var unitEntitys = await _inteUnitRepository.GetByIdsAsync(unitIds.Distinct()!);
+
+                    result.Data = result.Data.Select(s =>
+                    {
+                        var unit = unitEntitys.FirstOrDefault(f => f.Id == s.UnitId);
+                        if (unit != null)
+                        {
+                            s.Unit = unit.Code;
+                        }
+                        return s;
+                    });
+                }
+
+            }
+
+            return result;
         }
 
     }

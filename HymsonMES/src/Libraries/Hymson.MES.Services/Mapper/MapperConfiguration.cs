@@ -258,6 +258,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSpotcheckItemEntity, EquSpotcheckItemDto>();
             CreateMap<EquSpotcheckItemUpdateDto, EquSpotcheckItemEntity>();
 
+            //index
+            CreateMap<EquSpotcheckTaskPagedQueryDto, EquSpotcheckTaskPagedQuery>();
+            CreateMap<EquSpotcheckTaskUnionPlanEntity, EquSpotcheckTaskDto>();
+
             #endregion
 
 
@@ -1113,6 +1117,10 @@ namespace Hymson.MES.Services.Mapper
 
 
 
+            #endregion
+
+            #region 车间物料不良录入
+            CreateMap<QualMaterialUnqualifiedDataPagedQueryDto, QualMaterialUnqualifiedDataPagedQuery>();
             #endregion
 
         }
