@@ -27,23 +27,23 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
     /// </summary>
     public class EquEquipmentFaultTypeService : IEquEquipmentFaultTypeService
     {
-        private readonly IEquipmentFaultTypeRepository _qualUnqualifiedGroupRepository;
+        private readonly IEquipmentFaultTypeRepository _equipmentFaultTypeRepository;
         private readonly AbstractValidator<EQualUnqualifiedGroupCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EQualUnqualifiedGroupModifyDto> _validationModifyRules;
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 不合格代码组服务
+        /// 设备故障类型服务
         /// </summary>
-        /// <param name="qualUnqualifiedGroupRepository"></param>
+        /// <param name="equipmentFaultTypeRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         /// /// <param name="currentUser"></param>
         /// /// <param name="currentSite"></param>
-        public EquEquipmentFaultTypeService(IEquipmentFaultTypeRepository qualUnqualifiedGroupRepository, AbstractValidator<EQualUnqualifiedGroupCreateDto> validationCreateRules, AbstractValidator<EQualUnqualifiedGroupModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite)
+        public EquEquipmentFaultTypeService(IEquipmentFaultTypeRepository equipmentFaultTypeRepository, AbstractValidator<EQualUnqualifiedGroupCreateDto> validationCreateRules, AbstractValidator<EQualUnqualifiedGroupModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite)
         {
-            _qualUnqualifiedGroupRepository = qualUnqualifiedGroupRepository;
+            _equipmentFaultTypeRepository = equipmentFaultTypeRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _currentUser = currentUser;
@@ -57,37 +57,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
         /// <returns></returns>
         public async Task<PagedInfo<EquipmentFaultTypeDto>> GetPageListAsync(EquipmentFaultTypePagedQueryDto param)
         {
-            var qualUnqualifiedGroupPagedQuery = param.ToQuery<EQualUnqualifiedGroupPagedQuery>();
-            qualUnqualifiedGroupPagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _qualUnqualifiedGroupRepository.GetPagedInfoAsync(qualUnqualifiedGroupPagedQuery);
+            var equipmentFaultTypePagedQuery = param.ToQuery<EquipmentFaultTypePagedQuery>();
+            equipmentFaultTypePagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _equipmentFaultTypeRepository.GetPagedInfoAsync(equipmentFaultTypePagedQuery);
 
             //实体到DTO转换 装载数据
             List<EquipmentFaultTypeDto> qualUnqualifiedGroupDtos = PrepareQualUnqualifiedGroupDtos(pagedInfo);
             return new PagedInfo<EquipmentFaultTypeDto>(qualUnqualifiedGroupDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 查询工序下的不合格组列表
-        /// </summary>
-        /// <param name="queryDto"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<EquipmentFaultTypeDto>> GetListByProcedureIdAsync([FromQuery] EQualUnqualifiedGroupQueryDto queryDto)
-        {
-            var query = new EQualUnqualifiedGroupQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                ProcedureId = queryDto.ProcedureId
-            };
-            var list = await _qualUnqualifiedGroupRepository.GetListByProcedureIdAsync(query);
-
-            //实体到DTO转换 装载数据
-            var unqualifiedGroupDtos = new List<EquipmentFaultTypeDto>();
-            foreach (var entity in list)
-            {
-                var groupDto = entity.ToModel<EquipmentFaultTypeDto>();
-                unqualifiedGroupDtos.Add(groupDto);
-            }
-            return unqualifiedGroupDtos;
         }
 
         /// <summary>
@@ -103,7 +79,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
             //await _validationCreateRules.ValidateAndThrowAsync(param);
 
             //判断设备故障类型Code是否重复
-            var qualUnqualifiedGroupEntity = await _qualUnqualifiedGroupRepository.GetByCodeAsync(new QualUnqualifiedGroupByCodeQuery { Code = param.Code, Site = _currentSite.SiteId ?? 0 });
+            var qualUnqualifiedGroupEntity = await _equipmentFaultTypeRepository.GetByCodeAsync(new QualUnqualifiedGroupByCodeQuery { Code = param.Code, Site = _currentSite.SiteId ?? 0 });
             if (qualUnqualifiedGroupEntity != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11206)).WithData("code", param.Code);
@@ -116,12 +92,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
             qualUnqualifiedGroupEntity.UpdatedBy = userId;
             qualUnqualifiedGroupEntity.SiteId = _currentSite.SiteId ?? 0;
             //故障现象
-            List<EQualUnqualifiedCodeGroupRelation> qualUnqualifiedCodeGroupRelationlist = new List<EQualUnqualifiedCodeGroupRelation>();
+            List<EquipmentFaultTypesPhenomenonRelation> qualUnqualifiedCodeGroupRelationlist = new List<EquipmentFaultTypesPhenomenonRelation>();
             if (param.UnqualifiedCodeIds != null && param.UnqualifiedCodeIds.Any())
             {
                 foreach (var item in param.UnqualifiedCodeIds)
                 {
-                    qualUnqualifiedCodeGroupRelationlist.Add(new EQualUnqualifiedCodeGroupRelation
+                    qualUnqualifiedCodeGroupRelationlist.Add(new EquipmentFaultTypesPhenomenonRelation
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
@@ -152,16 +128,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
 
             using var ts = TransactionHelper.GetTransactionScope();
             //插入设备故障类型数据
-            await _qualUnqualifiedGroupRepository.InsertAsync(qualUnqualifiedGroupEntity);
+            await _equipmentFaultTypeRepository.InsertAsync(qualUnqualifiedGroupEntity);
             //插入设备故障类型关联故障现象
             if (qualUnqualifiedCodeGroupRelationlist != null && qualUnqualifiedCodeGroupRelationlist.Any())
             {
-                await _qualUnqualifiedGroupRepository.InsertQualUnqualifiedCodeGroupRelationRangAsync(qualUnqualifiedCodeGroupRelationlist);
+                await _equipmentFaultTypeRepository.InsertQualUnqualifiedCodeGroupRelationRangAsync(qualUnqualifiedCodeGroupRelationlist);
             }
             //插入设备故障类型关联设备组
             if (qualUnqualifiedGroupProcedureRelationList != null && qualUnqualifiedGroupProcedureRelationList.Any())
             {
-                await _qualUnqualifiedGroupRepository.InsertQualUnqualifiedGroupProcedureRelationRangAsync(qualUnqualifiedGroupProcedureRelationList);
+                await _equipmentFaultTypeRepository.InsertQualUnqualifiedGroupProcedureRelationRangAsync(qualUnqualifiedGroupProcedureRelationList);
             }
             ts.Complete();
             return qualUnqualifiedGroupEntity.Id;
@@ -178,14 +154,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
-            var entitys = await _qualUnqualifiedGroupRepository.GetByIdsAsync(ids);
+            var entitys = await _equipmentFaultTypeRepository.GetByIdsAsync(ids);
             if (entitys != null && entitys.Any(a => a.Status != DisableOrEnableEnum.Disable))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10135));
             }
 
             var userId = _currentUser.UserName;
-            return await _qualUnqualifiedGroupRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
+            return await _equipmentFaultTypeRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
         }
 
         /// <summary>
@@ -194,24 +170,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
         private static List<EquipmentFaultTypeDto> PrepareQualUnqualifiedGroupDtos(PagedInfo<EquEquipmentFaultTypeEntity> pagedInfo)
-        {       
-            try
+        {
+            var qualUnqualifiedGroupDtos = new List<EquipmentFaultTypeDto>();
+            foreach (var qualUnqualifiedGroupEntity in pagedInfo.Data)
             {
-                var qualUnqualifiedGroupDtos = new List<EquipmentFaultTypeDto>();
-                foreach (var qualUnqualifiedGroupEntity in pagedInfo.Data)
-                {
-                    var qualUnqualifiedGroupDto = qualUnqualifiedGroupEntity.ToModel<EquipmentFaultTypeDto>();
-                    qualUnqualifiedGroupDtos.Add(qualUnqualifiedGroupDto);
-                }
-
-                return qualUnqualifiedGroupDtos;
-
+                var qualUnqualifiedGroupDto = qualUnqualifiedGroupEntity.ToModel<EquipmentFaultTypeDto>();
+                qualUnqualifiedGroupDtos.Add(qualUnqualifiedGroupDto);
             }
-            catch (Exception ex)
-            {
 
-                throw;
-            }
+            return qualUnqualifiedGroupDtos;
         }
 
         /// <summary>
@@ -230,12 +197,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
             qualUnqualifiedGroupEntity.UpdatedBy = userId;
             qualUnqualifiedGroupEntity.UpdatedOn = HymsonClock.Now();
             //设备故障现象
-            List<EQualUnqualifiedCodeGroupRelation> qualUnqualifiedCodeGroupRelationlist = new List<EQualUnqualifiedCodeGroupRelation>();
+            List<EquipmentFaultTypesPhenomenonRelation> qualUnqualifiedCodeGroupRelationlist = new List<EquipmentFaultTypesPhenomenonRelation>();
             if (param.UnqualifiedCodeIds != null && param.UnqualifiedCodeIds.Any())
             {
                 foreach (var item in param.UnqualifiedCodeIds)
                 {
-                    qualUnqualifiedCodeGroupRelationlist.Add(new EQualUnqualifiedCodeGroupRelation
+                    qualUnqualifiedCodeGroupRelationlist.Add(new EquipmentFaultTypesPhenomenonRelation
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
@@ -267,20 +234,20 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
             }
             //先删在插入
             using var ts = TransactionHelper.GetTransactionScope();
-            await _qualUnqualifiedGroupRepository.UpdateAsync(qualUnqualifiedGroupEntity);
+            await _equipmentFaultTypeRepository.UpdateAsync(qualUnqualifiedGroupEntity);
 
-            await _qualUnqualifiedGroupRepository.RealDelteQualUnqualifiedCodeGroupRelationAsync(param.Id);
+            await _equipmentFaultTypeRepository.RealDelteQualUnqualifiedCodeGroupRelationAsync(param.Id);
             //更新故障现象
             if (qualUnqualifiedCodeGroupRelationlist != null && qualUnqualifiedCodeGroupRelationlist.Any())
             {
-                await _qualUnqualifiedGroupRepository.InsertQualUnqualifiedCodeGroupRelationRangAsync(qualUnqualifiedCodeGroupRelationlist);
+                await _equipmentFaultTypeRepository.InsertQualUnqualifiedCodeGroupRelationRangAsync(qualUnqualifiedCodeGroupRelationlist);
             }
             //更新设备组
-            await _qualUnqualifiedGroupRepository.RealDelteQualUnqualifiedGroupProcedureRelationAsync(param.Id);
+            await _equipmentFaultTypeRepository.RealDelteQualUnqualifiedGroupProcedureRelationAsync(param.Id);
             //不合格组关联工序
             if (qualUnqualifiedGroupProcedureRelationList != null && qualUnqualifiedGroupProcedureRelationList.Any())
             {
-                await _qualUnqualifiedGroupRepository.InsertQualUnqualifiedGroupProcedureRelationRangAsync(qualUnqualifiedGroupProcedureRelationList);
+                await _equipmentFaultTypeRepository.InsertQualUnqualifiedGroupProcedureRelationRangAsync(qualUnqualifiedGroupProcedureRelationList);
             }
             ts.Complete();
         }
@@ -292,7 +259,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
         /// <returns></returns>
         public async Task<EquipmentFaultTypeDto> QueryQualUnqualifiedGroupByIdAsync(long id)
         {
-            var qualUnqualifiedGroupEntity = await _qualUnqualifiedGroupRepository.GetByIdAsync(id);
+            var qualUnqualifiedGroupEntity = await _equipmentFaultTypeRepository.GetByIdAsync(id);
 
             if (qualUnqualifiedGroupEntity != null)
             {
@@ -310,16 +277,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<List<EQualUnqualifiedGroupCodeRelationDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id)
+        public async Task<List<EquipmentFaultTypePhenomenonRelationDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id)
         {
-            var qualUnqualifiedCodeGroupRelationList = await _qualUnqualifiedGroupRepository.GetQualUnqualifiedCodeGroupRelationAsync(id);
-            var qualUnqualifiedGroupCodeRelationList = new List<EQualUnqualifiedGroupCodeRelationDto>();
+            var qualUnqualifiedCodeGroupRelationList = await _equipmentFaultTypeRepository.GetQualUnqualifiedCodeGroupRelationAsync(id);
+            var qualUnqualifiedGroupCodeRelationList = new List<EquipmentFaultTypePhenomenonRelationDto>();
             if (qualUnqualifiedCodeGroupRelationList != null && qualUnqualifiedCodeGroupRelationList.Any())
             {
 
                 foreach (var item in qualUnqualifiedCodeGroupRelationList)
                 {
-                    qualUnqualifiedGroupCodeRelationList.Add(new EQualUnqualifiedGroupCodeRelationDto()
+                    qualUnqualifiedGroupCodeRelationList.Add(new EquipmentFaultTypePhenomenonRelationDto()
                     {
                         Id = item.Id,
                         CreatedBy = item.CreatedBy,
@@ -337,16 +304,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<List<EQualUnqualifiedGroupProcedureRelationDto>> GetQualUnqualifiedCodeProcedureRelationByIdAsync(long id)
+        public async Task<List<EquipmentFaultTypeEquipmentGroupRelationDto>> GetQualUnqualifiedCodeProcedureRelationByIdAsync(long id)
         {
-            var qualUnqualifiedCodeProcedureRelationList = await _qualUnqualifiedGroupRepository.GetQualUnqualifiedCodeProcedureRelationAsync(id);
-            var qualUnqualifiedGroupProcedureRelationList = new List<EQualUnqualifiedGroupProcedureRelationDto>();
+            var qualUnqualifiedCodeProcedureRelationList = await _equipmentFaultTypeRepository.GetQualUnqualifiedCodeProcedureRelationAsync(id);
+            var qualUnqualifiedGroupProcedureRelationList = new List<EquipmentFaultTypeEquipmentGroupRelationDto>();
             if (qualUnqualifiedCodeProcedureRelationList != null && qualUnqualifiedCodeProcedureRelationList.Any())
             {
 
                 foreach (var item in qualUnqualifiedCodeProcedureRelationList)
                 {
-                    qualUnqualifiedGroupProcedureRelationList.Add(new EQualUnqualifiedGroupProcedureRelationDto()
+                    qualUnqualifiedGroupProcedureRelationList.Add(new EquipmentFaultTypeEquipmentGroupRelationDto()
                     {
                         Id = item.Id,
                         CreatedBy = item.CreatedBy,

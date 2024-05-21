@@ -4,11 +4,11 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Data.Repositories.Equipment
 {
     /// <summary>   
-    /// 不合格代码组分页参数
+    /// 设备故障类型分页查询
     /// @author wangkeming
     /// @date 2023-02-11 04:45:25
     /// </summary>
-    public class EQualUnqualifiedGroupPagedQuery : PagerInfo
+    public class EquipmentFaultTypePagedQuery : PagerInfo
     {
         // <summary>
         /// 工厂
@@ -27,7 +27,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
 
         /// <summary>
-        /// 装态
+        /// 状态
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
     }

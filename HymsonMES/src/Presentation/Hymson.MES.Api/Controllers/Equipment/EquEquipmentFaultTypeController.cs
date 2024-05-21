@@ -34,30 +34,18 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<EquipmentFaultTypeDto>> QueryPagedQualUnqualifiedGroupAsync([FromQuery] EquipmentFaultTypePagedQueryDto parm)
+        public async Task<PagedInfo<EquipmentFaultTypeDto>> QueryPagedEquipmentFaultTypeAsync([FromQuery] EquipmentFaultTypePagedQueryDto parm)
         {
             return await _equEquipmentFaultTypeService.GetPageListAsync(parm);
         }
 
         /// <summary>
-        /// 获取分页数据
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        [Route("listByProcedure")]
-        [HttpGet]
-        public async Task<IEnumerable<EquipmentFaultTypeDto>> GetListByProcedureIdAsync([FromQuery] EQualUnqualifiedGroupQueryDto query)
-        {
-            return await _equEquipmentFaultTypeService.GetListByProcedureIdAsync(query);
-        }
-
-        /// <summary>
-        /// 查询详情（设备故障类型）
+        /// 查询详情（通过ID查询设备故障类型）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquipmentFaultTypeDto> QueryQualUnqualifiedGroupByIdAsync(long id)
+        public async Task<EquipmentFaultTypeDto> QueryEquipmentFaultTypeByIdAsync(long id)
         {
             return await _equEquipmentFaultTypeService.QueryQualUnqualifiedGroupByIdAsync(id);
         }
@@ -68,7 +56,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}/unqualifiedCodeList")]
-        public async Task<List<EQualUnqualifiedGroupCodeRelationDto>> QueryQualUnqualifiedCodeGroupRelationByIdAsync(long id)
+        public async Task<List<EquipmentFaultTypePhenomenonRelationDto>> QueryQualUnqualifiedCodeGroupRelationByIdAsync(long id)
         {
             return await _equEquipmentFaultTypeService.GetQualUnqualifiedCodeGroupRelationByIdAsync(id);
         }
@@ -79,7 +67,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}/procedureList")]
-        public async Task<List<EQualUnqualifiedGroupProcedureRelationDto>> QueryQualUnqualifiedCodeProcedureRelationpByIdAsync(long id)
+        public async Task<List<EquipmentFaultTypeEquipmentGroupRelationDto>> QueryQualUnqualifiedCodeProcedureRelationpByIdAsync(long id)
         {
             return await _equEquipmentFaultTypeService.GetQualUnqualifiedCodeProcedureRelationByIdAsync(id);
         }

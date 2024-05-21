@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 namespace Hymson.MES.Data.Repositories.Equipment
 {
     /// <summary>
-    /// 不合格组仓储
+    /// 设备故障类型仓储
     /// @author wangkeming
     /// @date 2023-02-11 04:45:25
     /// </summary>
@@ -20,13 +20,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
         }
 
-        #region 不合格代码组
+        #region 设备故障类型
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentFaultTypeEntity>> GetPagedInfoAsync(EQualUnqualifiedGroupPagedQuery param)
+        public async Task<PagedInfo<EquEquipmentFaultTypeEntity>> GetPagedInfoAsync(EquipmentFaultTypePagedQuery param)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -73,26 +73,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
-        /// 查询List
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<EquEquipmentFaultTypeEntity>> GetListByProcedureIdAsync(EQualUnqualifiedGroupQuery param)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            sqlBuilder.Select("ug.*");
-            sqlBuilder.Where("ug.IsDeleted=0");
-            sqlBuilder.Where($"ug.SiteId =@SiteId");
-            sqlBuilder.LeftJoin("qual_unqualified_group_procedure_relation pr on ug.Id =pr.UnqualifiedGroupId ");
-            sqlBuilder.Where("pr.ProcedureId=@ProcedureId");
-
-            using var conn = GetMESDbConnection();
-            var qualUnqualifiedGroupEntities = await conn.QueryAsync<EquEquipmentFaultTypeEntity>(template.RawSql, param);
-            return qualUnqualifiedGroupEntities;
-        }
-
-        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -115,7 +95,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
-        /// 新增
+        /// 新增（设备故障类型表）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
@@ -135,17 +115,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
-        /// 批量新增
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task<int> InsertRangAsync(List<EquEquipmentFaultTypeEntity> param)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, param);
-        }
-
-        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="param"></param>
@@ -154,17 +123,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, param);
-        }
-
-        /// <summary>
-        /// 批量更新
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateRangAsync(List<EquEquipmentFaultTypeEntity> param)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, param);
         }
 
         /// <summary>
@@ -190,73 +148,44 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
         #endregion
 
-        #region 不合格组关联不合格代码
+        #region 设备故障类型关联故障现象
         /// <summary>
-        /// 插入不合格代码组关联不合格代码
+        /// 插入设备故障类型与现象关系
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> InsertQualUnqualifiedCodeGroupRelationRangAsync(List<EQualUnqualifiedCodeGroupRelation> param)
+        public async Task<int> InsertQualUnqualifiedCodeGroupRelationRangAsync(List<EquipmentFaultTypesPhenomenonRelation> param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertQualUnqualifiedCodeGroupRelationSql, param);
         }
 
         /// <summary>
-        /// 删除不合格组关联不合格代码
+        /// 删除设备故障类型关联现象
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public async Task<int> RealDelteQualUnqualifiedCodeGroupRelationAsync(long id)
         {
-            try
-            {
-                using var conn = GetMESDbConnection();
-                return await conn.ExecuteAsync(DelteQualUnqualifiedCodeGroupRelationSql, new { UnqualifiedGroupId = id });
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        
-        }
-
-        /// <summary>
-        /// 删除不合格组关联不合格代码
-        /// </summary>
-        /// <param name="unqualifiedCodeId"></param>
-        /// <returns></returns>
-        public async Task<int> RealDelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdAsync(long unqualifiedCodeId)
-        {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdSql, new { UnqualifiedCodeId = unqualifiedCodeId });
+            return await conn.ExecuteAsync(DelteQualUnqualifiedCodeGroupRelationSql, new { UnqualifiedGroupId = id });
         }
         #endregion
 
-        #region 不合格组关联工序
+        #region 设备故障类型关联设备组
         /// <summary>
-        /// 插入不合格代码组关联工序
+        /// 插入设备故障类型关联设备组
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         public async Task<int> InsertQualUnqualifiedGroupProcedureRelationRangAsync(List<EQualUnqualifiedGroupProcedureRelation> param)
         {
-            try
-            {
-                using var conn = GetMESDbConnection();
-                return await conn.ExecuteAsync(InsertQualUnqualifiedGroupProcedureRelationSql, param);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-            
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertQualUnqualifiedGroupProcedureRelationSql, param);
         }
 
         /// <summary>
-        /// 删除不合格组关联工序
+        /// 删除设备故障类型关联设备组
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -268,7 +197,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         #endregion    
 
         /// <summary>
-        /// 获取设备故障类型关联设备故障现象表
+        /// 获取设备故障类型关联（现象表）
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
@@ -279,23 +208,14 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
-        /// 获取设备故障类型关联设备组关系表
+        /// 获取设备故障类型关联（设备组关系表）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public async Task<IEnumerable<EquipmentFaultEquipmentGroupRelationView>> GetQualUnqualifiedCodeProcedureRelationAsync(long id)
         {
-            try
-            {
-                using var conn = GetMESDbConnection();
-                return await conn.QueryAsync<EquipmentFaultEquipmentGroupRelationView>(GetQualUnqualifiedCodeProcedureRelationSqlTemplate, new { Id = id });
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquipmentFaultEquipmentGroupRelationView>(GetQualUnqualifiedCodeProcedureRelationSqlTemplate, new { Id = id });
         }
     }
 
@@ -303,7 +223,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_fault_type` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_fault_type` /**where**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT    /**select**/  FROM `qual_unqualified_group` ug  /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/  ";
         const string GetByIdSql = @"SELECT 
                                Id, SiteId, Code, Name, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, Status
                                 FROM `equ_fault_type`  WHERE Id = @Id  AND IsDeleted=0 ";
@@ -317,19 +236,16 @@ namespace Hymson.MES.Data.Repositories.Equipment
                                                                         FROM equ_fault_type_phenomenon_relation EFTPR    LEFT JOIN   equ_fault_phenomenon EFP on EFP.Id = EFTPR. FaultPhenomenonId AND EFP.IsDeleted = 0 
                                                                         WHERE EFTPR.FaultTypeId=@Id";
         const string InsertSql = "INSERT INTO `equ_fault_type`(  `Id`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )    ";
-        const string InsertsSql = "INSERT INTO `qual_unqualified_group`(  `Id`, `SiteId`, `UnqualifiedGroup`, `UnqualifiedGroupName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @UnqualifiedGroup, @UnqualifiedGroupName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertQualUnqualifiedCodeGroupRelationSql = @"INSERT INTO `equ_fault_type_phenomenon_relation`(`FaultTypeId`, `FaultPhenomenonId`, `CreatedBy`, `CreatedOn`) 
                                                                    VALUES (@FaultTypeId, @FaultPhenomenonId, @CreatedBy, @CreatedOn)";
         const string InsertQualUnqualifiedGroupProcedureRelationSql = @"INSERT INTO `equ_fault_type_equipment_group_relation`(`FaultTypeId`, `EquipmentGroupId`, `CreatedBy`, `CreatedOn`) 
                                                                         VALUES(@FaultTypeId, @EquipmentGroupId, @CreatedBy, @CreatedOn) ";
         const string UpdateSql = "UPDATE `equ_fault_type`  SET     Status = @Status, Name = @Name, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `qual_unqualified_group` SET    UnqualifiedGroupName = @UnqualifiedGroupName, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `equ_fault_type` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0 ";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `equ_fault_type`  WHERE Id IN @ids ";
         const string DelteQualUnqualifiedCodeGroupRelationSql = "DELETE  FROM equ_fault_type_phenomenon_relation WHERE  FaultTypeId = @UnqualifiedGroupId ";
-        const string DelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdSql = "DELETE  FROM equ_fault_type_equipment_group_relation WHERE  FaultTypeId = @UnqualifiedCodeId";
         const string RealDelteQualUnqualifiedGroupProcedureRelationSql = "DELETE  FROM equ_fault_type_equipment_group_relation WHERE  FaultTypeId = @UnqualifiedGroupId ";
     }
 }

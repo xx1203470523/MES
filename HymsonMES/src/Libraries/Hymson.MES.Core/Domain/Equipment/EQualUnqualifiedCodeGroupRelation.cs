@@ -7,7 +7,7 @@ namespace Hymson.MES.Core.Domain.Equipment
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class EQualUnqualifiedCodeGroupRelation : BaseEntity
+    public class EquipmentFaultTypesPhenomenonRelation : BaseEntity
     {
         /// <summary>
         /// 描述 :所属站点代码 

@@ -21,25 +21,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> InsertAsync(EquEquipmentFaultTypeEntity param);
 
         /// <summary>
-        /// 批量新增
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        Task<int> InsertRangAsync(List<EquEquipmentFaultTypeEntity> param);
-
-        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquEquipmentFaultTypeEntity param);
-
-        /// <summary>
-        /// 批量更新 
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        Task<int> UpdateRangAsync(List<EquEquipmentFaultTypeEntity> param);
 
         /// <summary>
         /// 批量删除
@@ -63,18 +49,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<IEnumerable<ProcPrintSetupEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
-        /// 获取List
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        Task<IEnumerable<EquEquipmentFaultTypeEntity>> GetListByProcedureIdAsync(EQualUnqualifiedGroupQuery param);
-
-        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentFaultTypeEntity>> GetPagedInfoAsync(EQualUnqualifiedGroupPagedQuery param);
+        Task<PagedInfo<EquEquipmentFaultTypeEntity>> GetPagedInfoAsync(EquipmentFaultTypePagedQuery param);
 
         /// <summary>
         /// 根据编码获取数据
@@ -84,42 +63,35 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<EquEquipmentFaultTypeEntity> GetByCodeAsync(QualUnqualifiedGroupByCodeQuery param);
 
         /// <summary>
-        /// 插入不合格代码组关联不合格代码
+        /// 插入设备故障类型与现象关系
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> InsertQualUnqualifiedCodeGroupRelationRangAsync(List<EQualUnqualifiedCodeGroupRelation> param);
+        Task<int> InsertQualUnqualifiedCodeGroupRelationRangAsync(List<EquipmentFaultTypesPhenomenonRelation> param);
 
         /// <summary>
-        /// 删除不合格代码组关联不合格代码
+        /// 删除设备故障类型关联现象
         /// </summary>
         /// <param name="groupId"></param>
         /// <returns></returns>
         Task<int> RealDelteQualUnqualifiedCodeGroupRelationAsync(long id);
 
         /// <summary>
-        /// 删除不合格组关联不合格代码
-        /// </summary>
-        /// <param name="unqualifiedCodeId"></param>
-        /// <returns></returns>
-        Task<int> RealDelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdAsync(long unqualifiedCodeId);
-
-        /// <summary>
-        /// 插入不合格组关联工序
+        /// 插入设备故障类型关联设备组
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         Task<int> InsertQualUnqualifiedGroupProcedureRelationRangAsync(List<EQualUnqualifiedGroupProcedureRelation> param);
 
         /// <summary>
-        /// 删除不合格组关联工序
+        /// 删除设备故障类型关联设备组
         /// </summary>
         /// <param name="groupId"></param>
         /// <returns></returns>
         Task<int> RealDelteQualUnqualifiedGroupProcedureRelationAsync(long id);
 
         /// <summary>
-        /// 获取设备故障类型关联故障现象关系表
+        /// 获取设备故障类型关联设备组
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

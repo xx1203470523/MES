@@ -247,7 +247,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquEquipmentFaultTypeEntity, EquipmentFaultTypeDto>();
             CreateMap<EQualUnqualifiedGroupCreateDto, EquEquipmentFaultTypeEntity>();
             CreateMap<EQualUnqualifiedGroupModifyDto, EquEquipmentFaultTypeEntity>();
-            CreateMap<EquipmentFaultTypePagedQueryDto, EQualUnqualifiedGroupPagedQuery>();
+            CreateMap<EquipmentFaultTypePagedQueryDto, EquipmentFaultTypePagedQuery>();
             #endregion
 
         }

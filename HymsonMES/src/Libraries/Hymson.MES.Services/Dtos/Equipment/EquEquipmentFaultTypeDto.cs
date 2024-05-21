@@ -63,11 +63,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 不合格关联不合格代码
+    /// 设备故障关联现象
     /// @author wangkeming
     /// @date 2023-02-11 04:45:25
     /// </summary>
-    public record EQualUnqualifiedGroupCodeRelationDto
+    public record EquipmentFaultTypePhenomenonRelationDto
     {
         /// <summary>
         /// 主键id
@@ -137,11 +137,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 不合格组关联工序
+    /// 设备故障关联设备组
     /// @author wangkeming
     /// @date 2023-02-11 04:45:25
     /// </summary>
-    public record EQualUnqualifiedGroupProcedureRelationDto
+    public record EquipmentFaultTypeEquipmentGroupRelationDto
     {
         /// <summary>
         /// 主键id

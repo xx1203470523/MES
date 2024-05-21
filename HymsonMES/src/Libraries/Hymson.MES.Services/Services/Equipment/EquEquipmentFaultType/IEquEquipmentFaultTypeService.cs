@@ -19,13 +19,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
         Task<PagedInfo<EquipmentFaultTypeDto>> GetPageListAsync(EquipmentFaultTypePagedQueryDto param);
 
         /// <summary>
-        /// 查询工序下的设备故障类型
-        /// </summary>
-        /// <param name="queryDto"></param>
-        /// <returns></returns>
-        Task<IEnumerable<EquipmentFaultTypeDto>> GetListByProcedureIdAsync([FromQuery] EQualUnqualifiedGroupQueryDto queryDto);
-
-        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="param"></param>
@@ -58,13 +51,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<List<EQualUnqualifiedGroupCodeRelationDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id);
+        Task<List<EquipmentFaultTypePhenomenonRelationDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id);
 
         /// <summary>
         /// 获取设备故障类型关联设备组
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<List<EQualUnqualifiedGroupProcedureRelationDto>> GetQualUnqualifiedCodeProcedureRelationByIdAsync(long id);
+        Task<List<EquipmentFaultTypeEquipmentGroupRelationDto>> GetQualUnqualifiedCodeProcedureRelationByIdAsync(long id);
     }
 }
