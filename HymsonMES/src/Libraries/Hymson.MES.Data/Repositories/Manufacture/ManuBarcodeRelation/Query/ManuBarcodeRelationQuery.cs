@@ -50,6 +50,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         /// </summary>
 
         public string? BomMainMaterialId { get; set; }
+
+        /// <summary>
+        /// 产出条码
+        /// </summary>
+        public string InputBarCode { get; set; }
     }
 
     /// <summary>
