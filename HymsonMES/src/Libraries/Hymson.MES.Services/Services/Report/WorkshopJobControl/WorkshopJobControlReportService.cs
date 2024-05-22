@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Services.Dtos.Report;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -374,6 +375,7 @@ namespace Hymson.MES.Services.Services.Report
                 Remark = beforeStepEntity.Remark,
                 SFCInfoId = beforeStepEntity.SFCInfoId,
                 VehicleCode = beforeStepEntity.VehicleCode,
+                CreatedBy = beforeStepEntity.CreatedBy,
             };
 
             await StepAssignment(stepDetailDto.BeforeStepDDto);
@@ -491,7 +493,7 @@ namespace Hymson.MES.Services.Services.Report
                         stepDetailDto.ExtendedProperties = reJudgmentManuProductBadRecordEntities.Select(x => new ExtendedPropertieDto
                         {
                             Field = qualUnqualifiedCodeEntities?.FirstOrDefault(o => o.Id == x.UnqualifiedId)?.UnqualifiedCode ?? "",
-                            FieldValue = x.ReJudgmentResult.ToString()
+                            FieldValue = _localizationService.GetResource("Hymson.MES.Core.Enums.Manufacture.ProductBadDisposalResultEnum." + x.ReJudgmentResult)
                         }
                         );
                     }
@@ -539,7 +541,7 @@ namespace Hymson.MES.Services.Services.Report
                     });
                     if (manuDowngradingRecordEntities != null && manuDowngradingRecordEntities.Any())
                     {
-                        manuDowngradingRecordEntities.Select(x => new ExtendedPropertieDto
+                        stepDetailDto.ExtendedProperties = manuDowngradingRecordEntities.Select(x => new ExtendedPropertieDto
                         {
                             Field = x.Grade,
                         });
@@ -585,6 +587,8 @@ namespace Hymson.MES.Services.Services.Report
                         }
                     }
                     break;
+                //case ManuSfcStepTypeEnum.InstantLock:
+                //case ManuSfcStepTypeEnum.FutureLock:
                 case ManuSfcStepTypeEnum.Add:
                 case ManuSfcStepTypeEnum.Split:
                     var manuBarCodeRelationEnties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
@@ -611,6 +615,8 @@ namespace Hymson.MES.Services.Services.Report
                     });
                     break;
                 case ManuSfcStepTypeEnum.SfcMerge:
+                case ManuSfcStepTypeEnum.SplitCreate:
+                case ManuSfcStepTypeEnum.SfcMergeAdd:
                     var SfcMergeManuBarCodeRelationEnties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
                     {
                         OutputSfcStepId = beforeStepEntity.Id,

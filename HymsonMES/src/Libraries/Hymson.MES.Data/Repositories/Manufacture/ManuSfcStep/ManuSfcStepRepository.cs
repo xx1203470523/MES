@@ -410,7 +410,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             byte[] bytes = Encoding.UTF8.GetBytes(input);
             return Crc32Algorithm.Compute(bytes);
         }
-        #endregion
+        #endregion  
 
     }
 
