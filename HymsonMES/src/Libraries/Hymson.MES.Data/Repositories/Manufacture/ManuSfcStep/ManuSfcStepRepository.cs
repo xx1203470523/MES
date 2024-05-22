@@ -365,7 +365,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 var tableName = PrepareTableName(manuSfcStepEntity, false);
                 if (!keyValuePairs.TryAdd(tableName, new List<ManuSfcStepEntity>() { manuSfcStepEntity }))
                 {
-                    keyValuePairs[tableName].Append(manuSfcStepEntity);
+                    keyValuePairs[tableName]=  keyValuePairs[tableName].Append(manuSfcStepEntity).ToList();
                 }
             }
             return keyValuePairs;
