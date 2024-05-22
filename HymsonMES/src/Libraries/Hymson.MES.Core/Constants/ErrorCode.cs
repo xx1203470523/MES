@@ -572,6 +572,11 @@
 
         #region 设备点检 计划12300 
         public const string MES12300 = "设备点检计划错误";
+        public const string MES12301 = "请维护检验的项目明细";
+        public const string MES12302 = "请维护计划明细";
+        public const string MES12303 = "未到首次执行时间，暂不执行";
+        public const string MES12304 = "请维护执行时间/执行类型/执行周期";
+        public const string MES12305 = "编码【{Code}】,版本【{Version}】已存在"; 
 
         #endregion
 

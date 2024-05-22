@@ -276,18 +276,20 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = EE.WorkCenterShopId");
+            sqlBuilder.LeftJoin("proc_resource_equipment_bind preb ON preb.EquipmentId = EE.Id");
+            sqlBuilder.LeftJoin("inte_work_center_resource_relation iwcrr ON iwcrr.ResourceId = preb.ResourceId");
+            sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = iwcrr.WorkCenterId");
             sqlBuilder.LeftJoin("equ_equipment_group eeg ON eeg.Id = EE.EquipmentGroupId");
             sqlBuilder.LeftJoin("equ_spotcheck_template_equipment_group_relation estegr ON estegr.EquipmentGroupId = eeg.Id");
             sqlBuilder.LeftJoin("equ_spotcheck_template est ON est.Id = estegr.SpotCheckTemplateId");
-            sqlBuilder.Select("EE.*,IWC.Name as WorkCenterShopName,IWC.Code as WorkCenterShopCode,eeg.EquipmentGroupCode,est.Id as TemplateId,est.Code as TemplateCode,est.Version as TemplateVersion");
+            sqlBuilder.LeftJoin("equ_operation_permissions eop ON eop.EquipmentId = EE.Id");
+            sqlBuilder.Select("EE.*,EE.Id as EquipmentId,IWC.Name as WorkCenterShopName,IWC.Code as WorkCenterCode,eeg.EquipmentGroupCode,est.Id as TemplateId,est.Code as TemplateCode,est.Version as TemplateVersion,eop.ExecutorIds,eop.LeaderIds");
             sqlBuilder.Where("EE.IsDeleted = 0");
             sqlBuilder.Where("EE.SiteId = @SiteId");
             sqlBuilder.OrderBy("EE.UpdatedOn DESC");
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
             {
-                pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
-                sqlBuilder.Where("EE.EquipmentCode LIKE @EquipmentCode");
+                sqlBuilder.Where("EE.EquipmentCode = @EquipmentCode");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentName))
@@ -298,8 +300,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterCode))
             {
-                pagedQuery.WorkCenterCode = $"%{pagedQuery.WorkCenterCode}%";
-                sqlBuilder.Where("IWC.Code LIKE @WorkCenterCode");
+                sqlBuilder.Where("IWC.Code = @WorkCenterCode");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Location))
@@ -310,8 +311,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode)) 
             {
-                pagedQuery.EquipmentGroupCode = $"%{pagedQuery.EquipmentGroupCode}%";
-                sqlBuilder.Where("eeg.EquipmentGroupCode LIKE @EquipmentGroupCode");
+                sqlBuilder.Where("eeg.EquipmentGroupCode = @EquipmentGroupCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterCode))
+            {
+                sqlBuilder.Where("IWC.Code = @WorkCenterCode");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;

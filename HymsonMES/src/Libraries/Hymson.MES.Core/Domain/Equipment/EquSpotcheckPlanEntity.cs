@@ -46,7 +46,7 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckPlan
         /// <summary>
         /// 点检类型;周/日
         /// </summary>
-        public EquipmentSpotcheckTypeEnum Type { get; set; }
+        public EquipmentSpotcheckTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 点检计划状态

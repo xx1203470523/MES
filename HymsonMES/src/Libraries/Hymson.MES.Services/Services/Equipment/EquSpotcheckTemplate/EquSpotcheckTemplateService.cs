@@ -18,7 +18,9 @@ using Hymson.MES.Core.Domain.EquSpotcheckTemplateEquipmentGroupRelation;
 using Hymson.MES.Core.Domain.EquSpotcheckTemplateItemRelation;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelation;
@@ -49,10 +51,11 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         private readonly IEquSpotcheckTemplateEquipmentGroupRelationRepository _equSpotcheckTemplateEquipmentGroupRelationRepository;
         private readonly IEquSpotcheckItemRepository _equSpotcheckItemRepository;
         private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
         private readonly AbstractValidator<EquSpotcheckTemplateCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquSpotcheckTemplateModifyDto> _validationModifyRules;
 
-        public EquSpotcheckTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, AbstractValidator<EquSpotcheckTemplateCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckTemplateModifyDto> validationModifyRules, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository)
+        public EquSpotcheckTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, AbstractValidator<EquSpotcheckTemplateCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckTemplateModifyDto> validationModifyRules, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository, IEquEquipmentRepository equEquipmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -63,6 +66,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             _equEquipmentGroupRepository = equEquipmentGroupRepository;
             _equSpotcheckTemplateItemRelationRepository = equSpotcheckTemplateItemRelationRepository;
             _equSpotcheckTemplateEquipmentGroupRelationRepository = equSpotcheckTemplateEquipmentGroupRelationRepository;
+            _equEquipmentRepository = equEquipmentRepository;
         }
 
         /// <summary>
@@ -220,6 +224,40 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         {
             var equSpotcheckTemplatePagedQuery = equSpotcheckTemplatePagedQueryDto.ToQuery<EquSpotcheckTemplatePagedQuery>();
             equSpotcheckTemplatePagedQuery.SiteId = _currentSite.SiteId;
+
+            if (equSpotcheckTemplatePagedQueryDto.EquipmentId.HasValue)
+            {
+                var equEquipment = await _equEquipmentRepository.GetByIdAsync(equSpotcheckTemplatePagedQueryDto.EquipmentId ?? 0);
+                if (equEquipment != null)
+                {
+                    List<long> equGroupEquipmentIds = new()
+                    {
+                        equEquipment.EquipmentGroupId
+                    };
+                    var equSpotcheckTemplateEquipmentGroups = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
+                    if (equSpotcheckTemplateEquipmentGroups != null && equSpotcheckTemplateEquipmentGroups.Any())
+                    {
+                        equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds = equSpotcheckTemplateEquipmentGroups.Select(it => it.SpotCheckTemplateId).ToList();
+                    }
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQueryDto.EquipmentGroupCode))
+            {
+                var equGroupEquipment = await _equEquipmentGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Code = equSpotcheckTemplatePagedQueryDto.EquipmentGroupCode, Site = _currentSite.SiteId });
+                if (equGroupEquipment != null)
+                {
+                    List<long> equGroupEquipmentIds = new()
+                    {
+                        equGroupEquipment.Id
+                    };
+                    var equSpotcheckTemplateEquipmentGroups = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
+                    if (equSpotcheckTemplateEquipmentGroups != null && equSpotcheckTemplateEquipmentGroups.Any())
+                    {
+                        equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds = equSpotcheckTemplateEquipmentGroups.Select(it => it.SpotCheckTemplateId).ToList();
+                    }
+                }
+
+            }
             var pagedInfo = await _equSpotcheckTemplateRepository.GetPagedInfoAsync(equSpotcheckTemplatePagedQuery);
 
             //实体到DTO转换 装载数据

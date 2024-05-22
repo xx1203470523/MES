@@ -69,10 +69,10 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckPlan
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("equRelation/{id}")] 
+        [HttpGet("equRelation/{id}")]
         public async Task<List<QueryEquRelationListDto>> QueryEquRelationListAsync(long id)
         {
-            return await _equSpotcheckPlanService.QueryEquRelationListAsync(id); 
+            return await _equSpotcheckPlanService.QueryEquRelationListAsync(id);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckPlan
         [Route("create")]
         public async Task AddEquSpotcheckPlanAsync([FromBody] EquSpotcheckPlanCreateDto parm)
         {
-             await _equSpotcheckPlanService.CreateEquSpotcheckPlanAsync(parm);
+            await _equSpotcheckPlanService.CreateEquSpotcheckPlanAsync(parm);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckPlan
         [Route("update")]
         public async Task UpdateEquSpotcheckPlanAsync([FromBody] EquSpotcheckPlanModifyDto parm)
         {
-             await _equSpotcheckPlanService.ModifyEquSpotcheckPlanAsync(parm);
+            await _equSpotcheckPlanService.ModifyEquSpotcheckPlanAsync(parm);
         }
 
         /// <summary>
@@ -106,11 +106,22 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckPlan
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteEquSpotcheckPlanAsync([FromBody] long[] ids)
+        public async Task DeleteEquSpotcheckPlanAsync([FromBody] DeletesDto param) 
         {
-            await _equSpotcheckPlanService.DeletesEquSpotcheckPlanAsync(ids);
+            await _equSpotcheckPlanService.DeletesEquSpotcheckPlanAsync(param);
         }
 
+        /// <summary>
+        /// 添加（生成点检任务）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("generate")]
+        public async Task GenerateEquSpotcheckTaskAsync([FromBody] GenerateDto parm)
+        {
+            await _equSpotcheckPlanService.GenerateEquSpotcheckTaskAsync(parm);
+        }
         #endregion
     }
 }

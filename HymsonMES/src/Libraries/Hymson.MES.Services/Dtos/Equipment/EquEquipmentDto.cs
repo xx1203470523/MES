@@ -366,6 +366,14 @@ namespace Hymson.MES.Services.Dtos.Equipment
     public record GetEquSpotcheckPlanEquipmentRelationListDto : EquEquipmentListDto
     {
         /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long EquipmentId { get; set; }
+        /// <summary>
+        /// 工作中心编码 
+        /// </summary>
+        public string WorkCenterCode { get; set; }
+        /// <summary>
         /// 设备组
         /// </summary>
         public string EquipmentGroupCode { get; set; }
@@ -381,6 +389,15 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 模板版本
         /// </summary>
         public string TemplateVersion { get; set; }
+
+        /// <summary>
+        /// 执行人
+        /// </summary>
+        public string ExecutorIds { get; set; }
+        /// <summary>
+        /// 责任人
+        /// </summary>
+        public string LeaderIds { get; set; }
 
     }
 

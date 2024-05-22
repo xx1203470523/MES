@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -58,12 +59,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检类型;周/日
         /// </summary>
-        public bool Type { get; set; }
+        public EquipmentSpotcheckTypeEnum Type { get; set; }
 
         /// <summary>
         /// 点检计划状态
         /// </summary>
-        public bool Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
         /// <summary>
         /// 开始时间（计划）
@@ -78,7 +79,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 是否跳过节假日
         /// </summary>
-        public bool? IsSkipHoliday { get; set; }
+        public TrueOrFalseEnum? IsSkipHoliday { get; set; }
 
         /// <summary>
         /// 首次执行时间;首次执行时间需在开始-结束时间范围内
@@ -88,7 +89,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 周期;月、天、小时、分钟
         /// </summary>
-        public bool Cycle { get; set; }
+        public int Cycle { get; set; }
 
         /// <summary>
         /// 完成时间（小时）

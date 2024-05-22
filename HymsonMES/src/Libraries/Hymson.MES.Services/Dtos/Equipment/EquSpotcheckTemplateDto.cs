@@ -207,6 +207,16 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// 设备组名称
         /// </summary>
         public string? EquipmentGroupName { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string? EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long? EquipmentId { get; set; }
     }
 
     /// <summary>

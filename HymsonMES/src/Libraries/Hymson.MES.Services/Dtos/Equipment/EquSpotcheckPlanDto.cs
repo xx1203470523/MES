@@ -346,6 +346,33 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         public string? LeaderIds { get; set; }
     }
 
+    /// <summary>
+    /// 设备点检计划更新Dto
+    /// </summary>
+    public record GenerateDto
+    {
+        /// <summary>
+        /// 计划ID
+        /// </summary>
+        public long SpotCheckPlanId { get; set; }
+
+        /// <summary>
+        /// 计划ID
+        /// </summary>
+        public int? ExecType { get; set; } = 0;
+    }
+
+
+    /// <summary>
+    /// 设备点检计划更新Dto
+    /// </summary>
+    public record DeletesDto
+    {
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public IEnumerable<long> Ids { get; set; } 
+    }
 
     #region  关联信息
 
@@ -368,7 +395,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 模板
         /// </summary>
-        public long TemplateId { get; set; } 
+        public long TemplateId { get; set; }
 
         /// <summary>
         /// 设备

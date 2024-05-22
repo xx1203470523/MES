@@ -44,5 +44,20 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
         /// 设备组名称
         /// </summary>
         public string? EquipmentGroupName { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string? EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
+        /// 模板IDs
+        /// </summary>
+        public IEnumerable<long>? SpotCheckTemplateIds { get; set; }
     }
 }

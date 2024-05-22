@@ -67,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquSpotcheckTemplateEntity> GetByCodeAsync(EquSpotcheckTemplateQuery param) 
+        public async Task<EquSpotcheckTemplateEntity> GetByCodeAsync(EquSpotcheckTemplateQuery param)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquSpotcheckTemplateEntity>(GetByCodeSql, param);
@@ -95,12 +95,14 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.LeftJoin("equ_spotcheck_template_equipment_group_relation relation ON est.Id=relation.SpotCheckTemplateId");
-            sqlBuilder.LeftJoin("equ_equipment_group  egroup ON relation.EquipmentGroupId=egroup.Id");
+
+            //sqlBuilder.LeftJoin("equ_spotcheck_template_equipment_group_relation relation ON relation.SpotCheckTemplateId=est.Id");
+            //sqlBuilder.LeftJoin("equ_equipment_group egroup ON egroup.Id=relation.EquipmentGroupId");
+            //sqlBuilder.LeftJoin("equ_equipment ee ON ee.EquipmentGroupId=egroup.Id");
+            sqlBuilder.Select("est.*");
             sqlBuilder.Where("est.IsDeleted=0");
             sqlBuilder.Where("est.SiteId = @SiteId");
-            sqlBuilder.Select("est.*");
-
+            sqlBuilder.GroupBy("est.*");
             if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQuery.Code))
             {
                 sqlBuilder.Where("est.Code=@Code");
@@ -111,20 +113,28 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
                 sqlBuilder.Where("est.Name=@Name");
             }
 
+            if (equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds != null && equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds.Any())
+            {
+                sqlBuilder.Where("est.Id IN @SpotCheckTemplateIds");
+            }
+
             if (equSpotcheckTemplatePagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("est.Status=@Status");
             }
 
-            //设备组
-            if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQuery.EquipmentGroupCode))
-            {
-                sqlBuilder.Where("egroup.EquipmentGroupCode=@EquipmentGroupCode");
-            }
-            if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQuery.EquipmentGroupName))
-            {
-                sqlBuilder.Where("group.EquipmentGroupName=@EquipmentGroupName");
-            }
+            //if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQuery.EquipmentGroupCode))
+            //{
+            //    sqlBuilder.Where("egroup.EquipmentGroupCode=@EquipmentGroupCode");
+            //}
+            //if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQuery.EquipmentCode))
+            //{
+            //    sqlBuilder.Where("ee.EquipmentCode=@EquipmentCode");
+            //}
+            //if (equSpotcheckTemplatePagedQuery.EquipmentId.HasValue)
+            //{
+            //    sqlBuilder.Where("ee.Id=@EquipmentId");
+            //}
 
             var offSet = (equSpotcheckTemplatePagedQuery.PageIndex - 1) * equSpotcheckTemplatePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -137,6 +147,8 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
             var equSpotcheckTemplateEntities = await equSpotcheckTemplateEntitiesTask;
             var totalCount = await totalCountTask;
             return new PagedInfo<EquSpotcheckTemplateEntity>(equSpotcheckTemplateEntities, equSpotcheckTemplatePagedQuery.PageIndex, equSpotcheckTemplatePagedQuery.PageSize, totalCount);
+
+
         }
 
         /// <summary>

@@ -42,6 +42,7 @@
 
   <ItemGroup>
     <Folder Include="Options\" />
+    <Folder Include="Services\Equipment\" />
   </ItemGroup>
 
 </Project>
