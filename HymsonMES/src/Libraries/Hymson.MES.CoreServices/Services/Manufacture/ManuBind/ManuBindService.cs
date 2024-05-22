@@ -495,7 +495,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SiteId = param.SiteId,
                 Ids = deleteIds
             };
-
+                
             using var trans = TransactionHelper.GetTransactionScope();
             if (isCreate)
             {

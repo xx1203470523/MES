@@ -126,6 +126,16 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 工单
         /// </summary>
         public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 作业编码
+        /// </summary>
+        public string JobOrAssemblyCode { get; set; }
+
+        /// <summary>
+        /// 作业名称
+        /// </summary>
+        public JobOrAssemblyNameEnum JobOrAssemblyName { get; set; }
     }
 
     public class SFCRelationDto
@@ -155,5 +165,25 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 字段值
         /// </summary>
         public string? FieldValue { get; set; }
+    }
+
+    public class GetManuSfcStepTypeJobOrAssemblyNameDto
+    {
+
+        /// <summary>
+        /// 字段
+        /// </summary>
+        public ManuSfcStepTypeEnum Key { get; set; }
+
+        /// <summary>
+        /// 作业编码
+        /// </summary>
+        public string JobOrAssemblyCode { get; set; }
+
+        /// <summary>
+        /// 作业名称
+        /// </summary>
+        public JobOrAssemblyNameEnum JobOrAssemblyName { get; set; }
+
     }
 }

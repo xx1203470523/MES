@@ -1,4 +1,3 @@
-using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -6,13 +5,11 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
+using Hymson.MES.Core.Attribute.Manufacture;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
@@ -20,11 +17,8 @@ using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Services.Dtos.Report;
-using System.Reflection.Emit;
-using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -331,12 +325,24 @@ namespace Hymson.MES.Services.Services.Report
         /// <returns></returns>
         public async Task<StepDetailDto> GetStepDetailAsync(StepQueryDto query)
         {
+            //for (int index = 0; index < 2048; index++)
+            //{
+            //    await _manuProductParameterRepository.PrepareProductParameterSFCTable(index);
+            //}
+            //var procProcedureEntities1 = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery { });
+
+            //foreach (var item in procProcedureEntities1)
+            //{
+            //    await _manuProductParameterRepository.PrepareProductParameterProcedureIdTable(item.SiteId, item.Id);
+            //}
+
             var stepDetailDto = new StepDetailDto();
             var manuSfcStepEntities = await _manuSfcStepRepository.GetStepsBySFCAsync(new EntityBySFCQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 SFC = query.SFC
             });
+
             var beforeStepEntity = manuSfcStepEntities.FirstOrDefault(x => x.Id == query.SFCStepId);
             if (beforeStepEntity == null)
             {
@@ -445,6 +451,13 @@ namespace Hymson.MES.Services.Services.Report
                 };
             }
             await StepAssignment(stepDetailDto.AfterStepDDto);
+            var manuSfcStepTypeobOrAssemblys = GetManuSfcStepTypeobOrAssemblys();
+            var manuSfcStepTypeobOrAssembly = manuSfcStepTypeobOrAssemblys.FirstOrDefault(x => x.Key == beforeStepEntity.Operatetype);
+            if (manuSfcStepTypeobOrAssembly != null)
+            {
+                stepDetailDto.AfterStepDDto.JobOrAssemblyCode = manuSfcStepTypeobOrAssembly.JobOrAssemblyCode;
+                stepDetailDto.AfterStepDDto.JobOrAssemblyName = manuSfcStepTypeobOrAssembly.JobOrAssemblyName;
+            }
             switch (beforeStepEntity.Operatetype)
             {
                 case ManuSfcStepTypeEnum.Create:
@@ -576,7 +589,7 @@ namespace Hymson.MES.Services.Services.Report
                 case ManuSfcStepTypeEnum.Split:
                     var manuBarCodeRelationEnties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
                     {
-                        OutputSfcStepId = beforeStepEntity.Id,
+                        InputSfcStepId = beforeStepEntity.Id,
                         SiteId = _currentSite.SiteId ?? 0,
                     });
                     stepDetailDto.SequenceCodeHistories = manuBarCodeRelationEnties.Select(x => new SFCRelationDto
@@ -600,7 +613,7 @@ namespace Hymson.MES.Services.Services.Report
                 case ManuSfcStepTypeEnum.SfcMerge:
                     var SfcMergeManuBarCodeRelationEnties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
                     {
-                        InputSfcStepId = beforeStepEntity.Id,
+                        OutputSfcStepId = beforeStepEntity.Id,
                         SiteId = _currentSite.SiteId ?? 0,
                     });
                     stepDetailDto.SequenceCodeHistories = SfcMergeManuBarCodeRelationEnties.Select(x => new SFCRelationDto
@@ -665,6 +678,43 @@ namespace Hymson.MES.Services.Services.Report
             stepDto.ResourceCode = procResourceEntity?.ResCode ?? "";
             stepDto.ResourceName = procResourceEntity?.ResName ?? "";
             stepDto.OrderCode = planWorkOrderEntity?.OrderCode ?? "";
+        }
+
+        /// <summary>
+        /// 使用切面来获取
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<GetManuSfcStepTypeJobOrAssemblyNameDto> GetManuSfcStepTypeobOrAssemblys()
+        {
+            var list = new List<GetManuSfcStepTypeJobOrAssemblyNameDto>();
+
+            // 获取枚举类型
+            Type enumType = typeof(ManuSfcStepTypeEnum);
+
+            // 遍历枚举值
+            foreach (var enumValue in Enum.GetValues(enumType))
+            {
+                if (enumValue == null) continue;
+                // 获取枚举字段
+                var field = enumType.GetField(enumValue.ToString());
+
+                if (field == null) continue;
+
+                // 获取枚举值上的 ManuSfcStepOperationTypeAttrribute 特性
+                var manuSfcStepOperationTypeAttributes = field.GetCustomAttributes(typeof(ManuSfcStepOperationTypeAttrribute), false);
+                var manuSfcStepOperationTypeAttribute = manuSfcStepOperationTypeAttributes.Length > 0 ? ((ManuSfcStepOperationTypeAttrribute)manuSfcStepOperationTypeAttributes[0]) : null;
+                if (manuSfcStepOperationTypeAttribute != null)
+                {
+                    list.Add(new GetManuSfcStepTypeJobOrAssemblyNameDto
+                    {
+                        Key = (ManuSfcStepTypeEnum)enumValue,
+                        JobOrAssemblyCode = manuSfcStepOperationTypeAttribute.JobOrAssemblyCode,
+                        JobOrAssemblyName = manuSfcStepOperationTypeAttribute.JobOrAssemblyName
+                    });
+                }
+            }
+
+            return list;
         }
     }
 }
