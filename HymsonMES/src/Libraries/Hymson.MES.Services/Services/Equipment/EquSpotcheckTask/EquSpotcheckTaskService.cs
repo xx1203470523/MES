@@ -7,7 +7,6 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -15,17 +14,14 @@ using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Linq;
-using System.Net.Mail;
-using Hymson.MES.CoreServices.Bos.Quality;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.CoreServices.Bos.Equment;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
+using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -91,25 +87,40 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         private readonly IEquSpotcheckTaskProcessedRepository _equSpotcheckTaskProcessedRepository;
 
+        /// <summary>
+        /// 单据附件
+        /// </summary>
+        private readonly IEquSpotcheckTaskAttachmentRepository _equSpotcheckTaskAttachmentRepository;
+
+
 
 
 
         /// <summary>
-        /// 构造函数
+        /// 
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equSpotcheckTaskRepository"></param>
+        /// <param name="equEquipmentRepository"></param>
+        /// <param name="equSpotcheckTaskItemRepository"></param>
+        /// <param name="equSpotcheckTaskSnapshotItemRepository"></param>
+        /// <param name="inteUnitRepository"></param>
+        /// <param name="inteAttachmentRepository"></param>
+        /// <param name="equSpotcheckTaskItemAttachmentRepository"></param>
+        /// <param name="equSpotcheckTaskOperationRepository"></param>
+        /// <param name="equSpotcheckTaskProcessedRepository"></param>
         public EquSpotcheckTaskService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSpotcheckTaskSaveDto> validationSaveRules,
             IEquSpotcheckTaskRepository equSpotcheckTaskRepository,
             IEquEquipmentRepository equEquipmentRepository,
             IEquSpotcheckTaskItemRepository equSpotcheckTaskItemRepository,
             IEquSpotcheckTaskSnapshotItemRepository equSpotcheckTaskSnapshotItemRepository,
-            IInteUnitRepository inteUnitRepository, IInteAttachmentRepository inteAttachmentRepository, 
-            IEquSpotcheckTaskItemAttachmentRepository equSpotcheckTaskItemAttachmentRepository, 
+            IInteUnitRepository inteUnitRepository, IInteAttachmentRepository inteAttachmentRepository,
+            IEquSpotcheckTaskItemAttachmentRepository equSpotcheckTaskItemAttachmentRepository,
             IEquSpotcheckTaskOperationRepository equSpotcheckTaskOperationRepository,
-            IEquSpotcheckTaskProcessedRepository equSpotcheckTaskProcessedRepository)
+            IEquSpotcheckTaskProcessedRepository equSpotcheckTaskProcessedRepository,
+            IEquSpotcheckTaskAttachmentRepository equSpotcheckTaskAttachmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -121,8 +132,9 @@ namespace Hymson.MES.Services.Services.Equipment
             _inteUnitRepository = inteUnitRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _equSpotcheckTaskItemAttachmentRepository = equSpotcheckTaskItemAttachmentRepository;
-            _equSpotcheckTaskOperationRepository= equSpotcheckTaskOperationRepository;
+            _equSpotcheckTaskOperationRepository = equSpotcheckTaskOperationRepository;
             _equSpotcheckTaskProcessedRepository = equSpotcheckTaskProcessedRepository;
+            _equSpotcheckTaskAttachmentRepository = equSpotcheckTaskAttachmentRepository;
         }
 
 
@@ -216,8 +228,8 @@ namespace Hymson.MES.Services.Services.Equipment
 
             var equipmenEntity = await _equEquipmentRepository.GetByIdAsync(result.EquipmentId.GetValueOrDefault());
 
-            result.StatusText = result.Status.GetDescription();
-            result.IsQualifiedText = result.IsQualified.GetDescription();
+            result.StatusText = result.Status?.GetDescription() ?? string.Empty;
+            result.IsQualifiedText = result.IsQualified?.GetDescription() ?? string.Empty;
             result.EquipmentCode = equipmenEntity.EquipmentCode;
             result.Location = equipmenEntity.Location;
 
@@ -292,6 +304,61 @@ namespace Hymson.MES.Services.Services.Equipment
             return result;
         }
 
+
+
+        /// <summary>
+        /// 更改检验单状态（点击执行检验）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> OperationOrderAsync(EquSpotcheckTaskOrderOperationStatusDto requestDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            //单据状态
+            var entity = await _equSpotcheckTaskRepository.GetByIdAsync(requestDto.OrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            // 检查当前操作类型是否已经执行过
+            if (entity.Status != EquSpotcheckTaskStautusEnum.WaitInspect) return default;
+            switch (entity.Status)
+            {
+                case EquSpotcheckTaskStautusEnum.WaitInspect:
+                    // 继续接下来的操作
+                    break;
+                case EquSpotcheckTaskStautusEnum.Completed:
+                case EquSpotcheckTaskStautusEnum.Closed:
+                    throw new CustomerValidationException(nameof(ErrorCode.MES11914))
+                        .WithData("Status", $"{InspectionStatusEnum.Completed.GetDescription()}/{InspectionStatusEnum.Closed.GetDescription()}");
+                case EquSpotcheckTaskStautusEnum.Inspecting:
+                default: return default;
+            }
+
+            // 更改状态
+            switch (requestDto.OperationType)
+            {
+                case EquSpotcheckOperationTypeEnum.Start:
+                    entity.Status = EquSpotcheckTaskStautusEnum.Inspecting;
+                    break;
+                case EquSpotcheckOperationTypeEnum.Complete:
+                    entity.Status = entity.IsQualified == TrueOrFalseEnum.Yes ? EquSpotcheckTaskStautusEnum.Closed : EquSpotcheckTaskStautusEnum.Completed;
+                    break;
+                case EquSpotcheckOperationTypeEnum.Close:
+                    entity.Status = EquSpotcheckTaskStautusEnum.Closed;
+                    break;
+                default:
+                    break;
+            }
+
+            // 保存
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await CommonOperationAsync(entity, EquSpotcheckOperationTypeEnum.Start);
+            trans.Complete();
+            return rows;
+        }
+
         /// <summary>
         /// 查询点检单明细项数据
         /// </summary>
@@ -310,6 +377,23 @@ namespace Hymson.MES.Services.Services.Equipment
             var unitIds = taskitemSnap.Where(x => x.UnitId.HasValue).Select(x => x.UnitId!.Value);
             var inteUnitEntitys = await _inteUnitRepository.GetByIdsAsync(unitIds);
             var unitDic = inteUnitEntitys.ToDictionary(x => x.Id, x => x.Code);
+
+            // 查询检验单下面的所有样本附件
+            var itemAttachmentEntities = await _equSpotcheckTaskItemAttachmentRepository.GetEntitiesAsync(new EquSpotcheckTaskItemAttachmentQuery
+            {
+                SpotCheckTaskId = requestDto.SpotCheckTaskId
+            });
+
+            // 附件集合
+            Dictionary<long, IGrouping<long, EquSpotcheckTaskItemAttachmentEntity>> itemAttachmentDic = new();
+            IEnumerable<InteAttachmentEntity> interAttachmentEntities = Array.Empty<InteAttachmentEntity>();
+
+            if (itemAttachmentEntities.Any())
+            {
+                itemAttachmentDic = itemAttachmentEntities.ToLookup(w => w.SpotCheckTaskItemId).ToDictionary(d => d.Key, d => d);
+                interAttachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(itemAttachmentEntities.Select(s => s.AttachmentId));
+            }
+
 
             List<TaskItemUnionSnapshotView> outViews = new();
 
@@ -353,6 +437,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     {
                         var oneView = snap.ToModel<TaskItemUnionSnapshotView>();
                         oneView = item.ToCombineMap(oneView);
+
                         //处理单位
                         if (snap.UnitId.HasValue)
                         {
@@ -363,6 +448,15 @@ namespace Hymson.MES.Services.Services.Equipment
                             }
 
                         }
+
+                        // 填充附件
+                        if (interAttachmentEntities != null && itemAttachmentDic.TryGetValue(item.Id, out var detailAttachmentEntities))
+                        {
+                            oneView.Attachments = PrepareAttachmentBaseDtos(detailAttachmentEntities, interAttachmentEntities);
+                        }
+                        else oneView.Attachments = Array.Empty<InteAttachmentBaseDto>();
+
+
                         outViews.Add(oneView);
                     }
 
@@ -371,6 +465,13 @@ namespace Hymson.MES.Services.Services.Equipment
             catch (Exception ex) { }
 
             return outViews;
+        }
+
+        public async Task<PagedInfo<TaskItemUnionSnapshotView>> QueryItemPagedListAsync(SpotcheckTaskItemPagedQueryDto dto)
+        {
+            var result = new PagedInfo<TaskItemUnionSnapshotView>(Enumerable.Empty<TaskItemUnionSnapshotView>(), dto.PageIndex, dto.PageSize);
+            result.Data = await querySnapshotItemAsync(new SpotcheckTaskSnapshotItemQueryDto { SpotCheckTaskId = dto.SpotCheckTaskId });
+            return result;
         }
 
 
@@ -488,13 +589,18 @@ namespace Hymson.MES.Services.Services.Equipment
             return rows;
         }
 
-
+        /// <summary>
+        /// 点检完成
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
         public async Task<int> CompleteOrderAsync(SpotcheckTaskCompleteDto requestDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // FQC检验单
+            //单据
             var entity = await _equSpotcheckTaskRepository.GetByIdAsync(requestDto.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
@@ -640,6 +746,135 @@ namespace Hymson.MES.Services.Services.Equipment
             });
             return rows;
         }
+
+        /// <summary>
+        /// 保存检验单附件
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> SaveAttachmentAsync(SpotcheckTaskSaveAttachmentDto requestDto)
+        {
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            //单据
+            var entity = await _equSpotcheckTaskRepository.GetByIdAsync(requestDto.OrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES11714));
+
+            if (!requestDto.Attachments.Any()) return 0;
+
+            List<InteAttachmentEntity> inteAttachmentEntities = new();
+            List<EquSpotcheckTaskAttachmentEntity> orderAttachmentEntities = new();
+            foreach (var attachment in requestDto.Attachments)
+            {
+                var attachmentId = IdGenProvider.Instance.CreateId();
+                inteAttachmentEntities.Add(new InteAttachmentEntity
+                {
+                    Id = attachmentId,
+                    Name = attachment.Name,
+                    Path = attachment.Path,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn,
+                    SiteId = entity.SiteId,
+                });
+
+                orderAttachmentEntities.Add(new EquSpotcheckTaskAttachmentEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = entity.SiteId,
+                    SpotCheckTaskId = requestDto.OrderId,
+                    AttachmentId = attachmentId,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                });
+            }
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _inteAttachmentRepository.InsertRangeAsync(inteAttachmentEntities);
+            rows += await _equSpotcheckTaskAttachmentRepository.InsertRangeAsync(orderAttachmentEntities);
+            trans.Complete();
+            return rows;
+        }
+
+        /// <summary>
+        /// 删除检验单附件
+        /// </summary>
+        /// <param name="orderAttachmentId"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAttachmentByIdAsync(long orderAttachmentId)
+        {
+            var attachmentEntity = await _equSpotcheckTaskAttachmentRepository.GetByIdAsync(orderAttachmentId);
+            if (attachmentEntity == null) return default;
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _inteAttachmentRepository.DeleteAsync(attachmentEntity.AttachmentId);
+            rows += await _equSpotcheckTaskAttachmentRepository.DeleteAsync(attachmentEntity.Id);
+            trans.Complete();
+            return rows;
+        }
+
+
+        /// <summary>
+        /// 查询单据附件
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteAttachmentBaseDto>> QueryOrderAttachmentListByIdAsync(long orderId)
+        {
+            var orderAttachments = await _equSpotcheckTaskAttachmentRepository.GetByOrderIdAsync(orderId);
+            if (orderAttachments == null) return Array.Empty<InteAttachmentBaseDto>();
+
+            var attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(orderAttachments.Select(s => s.AttachmentId));
+            if (attachmentEntities == null) return Array.Empty<InteAttachmentBaseDto>();
+
+            return PrepareAttachmentBaseDtos(orderAttachments, attachmentEntities);
+        }
+
+        /// <summary>
+        /// 转换成附近DTO
+        /// </summary>
+        /// <param name="linkAttachments"></param>
+        /// <param name="attachmentEntities"></param>
+        /// <returns></returns>
+        private static IEnumerable<InteAttachmentBaseDto> PrepareAttachmentBaseDtos(IEnumerable<dynamic> linkAttachments, IEnumerable<InteAttachmentEntity> attachmentEntities)
+        {
+            List<InteAttachmentBaseDto> dtos = new();
+            foreach (var item in linkAttachments)
+            {
+                var dto = new InteAttachmentBaseDto
+                {
+                    Id = item.Id,
+                    AttachmentId = item.AttachmentId
+                };
+
+                var attachmentEntity = attachmentEntities.FirstOrDefault(f => f.Id == item.AttachmentId);
+                if (attachmentEntity == null)
+                {
+                    dto.Name = "附件不存在";
+                    dto.Path = "";
+                    dto.Url = "";
+                    dtos.Add(dto);
+                    continue;
+                }
+
+                dto.Id = item.Id;
+                dto.Name = attachmentEntity.Name;
+                dto.Path = attachmentEntity.Path;
+                dto.Url = attachmentEntity.Path;
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+
+
 
     }
 }

@@ -8,7 +8,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// <summary>
         /// 站点ID
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
         public long? SpotCheckTaskId { get; set; }
     }
 }

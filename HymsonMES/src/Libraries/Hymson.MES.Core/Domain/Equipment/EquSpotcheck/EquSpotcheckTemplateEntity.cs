@@ -8,7 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Core.Domain.EquSpotcheckTemplate
+namespace Hymson.MES.Core.Domain.Equipment.EquSpotcheck
 {
     /// <summary>
     /// 设备点检模板，数据实体对象   
@@ -22,32 +22,32 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckTemplate
         /// 点检模板编码
         /// </summary>
         public string Code { get; set; }
-         
-       /// <summary>
+
+        /// <summary>
         /// 点检模板名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 版本
         /// </summary>
         public string Version { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述
         /// </summary>
         public string? Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 }

@@ -1,6 +1,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
@@ -121,6 +122,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualFqcOrderAttachmentEntity>> GetByOrderIdAsync(long orderId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualFqcOrderAttachmentEntity>(GetByOrderIdSql, new { OrderId = orderId });
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
@@ -171,6 +183,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string GetByIdSql = @"SELECT * FROM equ_spotcheck_task_attachment WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM equ_spotcheck_task_attachment WHERE Id IN @Ids ";
+
+        const string GetByOrderIdSql = @"SELECT * FROM equ_spotcheck_task_attachment WHERE IsDeleted = 0 AND SpotCheckTaskId = @OrderId ";
 
     }
 }
