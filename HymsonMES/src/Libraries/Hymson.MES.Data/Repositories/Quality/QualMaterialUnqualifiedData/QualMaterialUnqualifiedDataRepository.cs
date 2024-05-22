@@ -116,6 +116,21 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.MaterialInventoryId.HasValue)
+            {
+                sqlBuilder.Where("MaterialInventoryId=@MaterialInventoryId");
+            }
+            if (query.MaterialInventoryId.HasValue)
+            {
+                sqlBuilder.Where("UnqualifiedStatus=@UnqualifiedStatus");
+            }
+            sqlBuilder.AddParameters(query);
+
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualMaterialUnqualifiedDataEntity>(template.RawSql, query);
         }

@@ -2076,6 +2076,10 @@
 
         #region 设备点检 15900
         public const string MES15901 = "不良已关闭，不允许删除!";
+        public const string MES15902 = "物料条码不存在!";
+        public const string MES15903= "物料条码不可用!";
+        public const string MES15904= "物料条码库存数量为0!";
+        public const string MES15905= "物料条码已录入不良且未进行不良处置!";
         #endregion
     }
 }

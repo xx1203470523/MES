@@ -54,7 +54,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 处置时间
         /// </summary>
         public DateTime? DisposalTime { get; set; }
-
     }
 
     /// <summary>
@@ -133,6 +132,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long MaterialInventoryId { get; set; }
 
         /// <summary>
+        /// 物料组Id
+        /// </summary>
+        public long MaterialGroupId { get; set; } = 0;
+
+        /// <summary>
         /// 物料条码
         /// </summary>
         public string MaterialBarCode { get; set; }
@@ -187,14 +191,29 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record QualMaterialUnqualifiedDetailDataDto : BaseEntityDto
     {
         /// <summary>
-        /// 不合格组名称
+        /// 不合格代码组Id
         /// </summary>
-        public string UnqualifiedGroupName { get; set; }
+        public long UnqualifiedGroupId { get; set; }
 
         /// <summary>
-        /// 不合格代码名称
+        /// 不合格组代码+"/"+不合格组名称
         /// </summary>
-        public string UnqualifiedCodeName { get; set; }
+        public string UnqualifiedGroupRemark { get; set; }
+
+        /// <summary>
+        /// 不合格代码Id
+        /// </summary>
+        public long UnqualifiedCodeId { get; set; }
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public string UnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不合格代码+"/"+不合格代码名称
+        /// </summary>
+        public string UnqualifiedCodeRemark { get; set; }
     }
 
     /// <summary>

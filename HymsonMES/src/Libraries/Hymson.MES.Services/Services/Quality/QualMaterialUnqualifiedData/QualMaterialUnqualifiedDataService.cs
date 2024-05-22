@@ -21,6 +21,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Org.BouncyCastle.Crypto;
 using System.Transactions;
 
@@ -96,21 +97,51 @@ namespace Hymson.MES.Services.Services.Quality
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             //验证条码的数量、状态以及是否有打开的
-            #endregion 
+            var inventoryEntity = await _inventoryRepository.GetByIdAsync(saveDto.MaterialInventoryId);
+            if (inventoryEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15902));
+            }
+
+            if (inventoryEntity.Status != WhMaterialInventoryStatusEnum.ToBeUsed)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15903));
+            }
+
+            if (inventoryEntity.QuantityResidue == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15904));
+            }
+
+            //物料条码是否已记录不良且不良状态为打开，若是，则报错：物料条码XXX已录入不良且未进行不良处置
+            var qualMaterials=await _qualMaterialUnqualifiedDataRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataQuery
+            {
+                SiteId=_currentSite.SiteId??0,
+                MaterialInventoryId = saveDto.MaterialInventoryId,
+                UnqualifiedStatus= QualMaterialUnqualifiedStatusEnum.Open
+            });
+            if(qualMaterials!=null && qualMaterials.Any()){
+                throw new CustomerValidationException(nameof(ErrorCode.MES15905));
+            }
+            #endregion
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<QualMaterialUnqualifiedDataEntity>();
-            entity.Id = IdGenProvider.Instance.CreateId();
-            entity.UnqualifiedStatus = QualMaterialUnqualifiedStatusEnum.Open;
-            entity.CreatedBy = updatedBy;
-            entity.CreatedOn = updatedOn;
-            entity.UpdatedBy = updatedBy;
-            entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            var entity = new QualMaterialUnqualifiedDataEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                MaterialInventoryId = saveDto.MaterialInventoryId,
+                UnqualifiedStatus = QualMaterialUnqualifiedStatusEnum.Open,
+                UnqualifiedRemark = saveDto.UnqualifiedRemark,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn,
+                SiteId = _currentSite.SiteId ?? 0
+            };
 
             var detailEntities = new List<QualMaterialUnqualifiedDataDetailEntity>();
             //记录详情
@@ -146,6 +177,7 @@ namespace Hymson.MES.Services.Services.Quality
 
                 //更改条码状态为锁定状态
                 await _inventoryRepository.UpdateStatusByIdsAsync(updateStatusCommand);
+                ts.Complete();
             }
         }
 
@@ -176,9 +208,9 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<QualMaterialUnqualifiedDataEntity>();
-            entity.UpdatedBy = updatedBy;
-            entity.UpdatedOn = HymsonClock.Now();
+            entityOld.UnqualifiedRemark = saveDto.UnqualifiedRemark;
+            entityOld.UpdatedBy = updatedBy;
+            entityOld.UpdatedOn = HymsonClock.Now();
 
             var detailEntities = new List<QualMaterialUnqualifiedDataDetailEntity>();
             //记录详情
@@ -186,7 +218,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 detailEntities.Add(new QualMaterialUnqualifiedDataDetailEntity
                 {
-                    MaterialUnqualifiedDataId = entity.Id,
+                    MaterialUnqualifiedDataId = entityOld.Id,
                     UnqualifiedGroupId = detail.UnqualifiedGroupId,
                     UnqualifiedCodeId = detail.UnqualifiedCodeId,
                     CreatedBy = _currentUser.UserName,
@@ -197,16 +229,17 @@ namespace Hymson.MES.Services.Services.Quality
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 // 保存
-                await _qualMaterialUnqualifiedDataRepository.InsertAsync(entity);
+                await _qualMaterialUnqualifiedDataRepository.UpdateAsync(entityOld);
 
                 //删除之前的数据
-                await _unqualifiedDataDetailRepository.DeleteByDataIdAsync(entity.Id);
+                await _unqualifiedDataDetailRepository.DeleteByDataIdAsync(entityOld.Id);
 
                 //保存详情
                 if (detailEntities.Any())
                 {
                     await _unqualifiedDataDetailRepository.InsertRangeAsync(detailEntities);
                 }
+                ts.Complete();
             }
         }
 
@@ -256,6 +289,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     await _inventoryRepository.UpdateStatusByIdsAsync(updateStatusCommand);
                 }
+                ts.Complete();
             }
         }
 
@@ -289,10 +323,13 @@ namespace Hymson.MES.Services.Services.Quality
 
             var inventoryIds = entitys.Select(x => x.MaterialInventoryId).ToArray();
             var rows = 0;
+            var updateOn = HymsonClock.Now();
             var updateStatusCommand = new UpdateStatusByIdCommand
             {
                 Status = WhMaterialInventoryStatusEnum.ToBeUsed,
-                Ids = inventoryIds
+                Ids = inventoryIds,
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = updateOn
             };
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -303,9 +340,10 @@ namespace Hymson.MES.Services.Services.Quality
                 rows += await _qualMaterialUnqualifiedDataRepository.DeletesAsync(new DeleteCommand
                 {
                     Ids = ids,
-                    DeleteOn = HymsonClock.Now(),
+                    DeleteOn = updateOn,
                     UserId = _currentUser.UserName
                 });
+                ts.Complete();
             }
             return rows;
         }
@@ -337,6 +375,7 @@ namespace Hymson.MES.Services.Services.Quality
                 MaterialInventoryId = dataEntity.MaterialInventoryId,
                 MaterialBarCode = inventoryEntity?.MaterialBarCode ?? "",
                 QuantityResidue = inventoryEntity?.QuantityResidue ?? 0,
+                MaterialGroupId = procMaterialEntity.GroupId,
                 MaterialCode = procMaterialEntity.MaterialCode + "/" + procMaterialEntity.Version,
                 MaterialName = procMaterialEntity.MaterialName,
                 UnqualifiedRemark = dataEntity.UnqualifiedRemark ?? "",
@@ -349,7 +388,7 @@ namespace Hymson.MES.Services.Services.Quality
             var details = new List<QualMaterialUnqualifiedDetailDataDto>();
             var qualMaterialUnqualifieds = await _unqualifiedDataDetailRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataDetailQuery
             {
-                MaterialUnqualifiedDataId = procMaterialEntity.Id
+                MaterialUnqualifiedDataId = qualMaterial.Id
             });
             if (qualMaterialUnqualifieds != null && qualMaterialUnqualifieds.Any())
             {
@@ -361,12 +400,15 @@ namespace Hymson.MES.Services.Services.Quality
 
                 foreach (var entity in qualMaterialUnqualifieds)
                 {
-                    var group= unqualifiedGroupEntities.FirstOrDefault(x => x.Id== entity.UnqualifiedGroupId);
+                    var group = unqualifiedGroupEntities.FirstOrDefault(x => x.Id == entity.UnqualifiedGroupId);
                     var code = unqualifiedCodeEntities.FirstOrDefault(x => x.Id == entity.UnqualifiedCodeId);
                     details.Add(new QualMaterialUnqualifiedDetailDataDto
                     {
-                        UnqualifiedGroupName= group?.UnqualifiedGroup??""+"/"+ group?.UnqualifiedGroupName ?? "",
-                        UnqualifiedCodeName = code?.UnqualifiedCode ?? "" + "/" + code?.UnqualifiedCodeName ?? "",
+                        UnqualifiedGroupId= group?.Id??0,
+                        UnqualifiedCodeId= code?.Id??0,
+                        UnqualifiedCode = code?.UnqualifiedCode??"",
+                        UnqualifiedGroupRemark = group!=null? group.UnqualifiedGroup  + "/" + group.UnqualifiedGroupName:"",
+                        UnqualifiedCodeRemark = code!=null? code.UnqualifiedCode + "/" + code.UnqualifiedCodeName:"",
                     });
                 }
                 qualMaterial.Details = details;
@@ -405,7 +447,8 @@ namespace Hymson.MES.Services.Services.Quality
                     UnqualifiedStatus = item.UnqualifiedStatus,
                     DisposalResult = item.DisposalResult,
                     DisposalTime = item.DisposalTime,
-                    CreatedOn = item.CreatedOn
+                    CreatedOn = item.CreatedOn,
+
                 });
             }
             return new PagedInfo<QualMaterialUnqualifiedDataViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
