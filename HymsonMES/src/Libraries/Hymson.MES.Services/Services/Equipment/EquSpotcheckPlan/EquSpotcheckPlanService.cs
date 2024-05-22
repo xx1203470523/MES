@@ -5,7 +5,6 @@
  *builder:  pengxin
  *build datetime: 2024-05-16 02:14:30
  */
-using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -13,10 +12,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Core.Domain.EquSpotcheckPlan;
-using Hymson.MES.Core.Domain.EquSpotcheckPlanEquipmentRelation;
-using Hymson.MES.Core.Domain.EquSpotcheckTemplateItemRelation;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -27,15 +23,9 @@ using Hymson.MES.Data.Repositories.EquSpotcheckPlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation;
 using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
-using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using OfficeOpenXml;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Reactive.Joins;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 {
@@ -424,6 +414,8 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
                 foreach (var thisEquSpotcheckItem in thisEquSpotcheckItems)
                 {
+
+                    var thisEquSpotcheckTemplateItemRelation = thisEquSpotcheckTemplateItemRelations.Where(it => it.SpotCheckItemId == thisEquSpotcheckItem.Id).FirstOrDefault();
                     EquSpotcheckTaskSnapshotItemEntity equSpotcheckTaskSnapshotItem = new()
                     {
                         SpotCheckTaskId = equSpotcheckTask.Id,
@@ -438,6 +430,9 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                         OperationContent = thisEquSpotcheckItem.OperationContent ?? "",
                         Components = thisEquSpotcheckItem.Components ?? "",
                         Remark = thisEquSpotcheckItem.Remark ?? "",
+                        ReferenceValue = thisEquSpotcheckTemplateItemRelation?.Center,
+                        UpperLimit = thisEquSpotcheckTemplateItemRelation?.UpperLimit,
+                        LowerLimit = thisEquSpotcheckTemplateItemRelation?.LowerLimit,
 
                         Id = IdGenProvider.Instance.CreateId(),
                         CreatedBy = _currentUser.UserName,
@@ -469,15 +464,23 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             }
             #endregion
 
+            try
+            {
+                using var trans = TransactionHelper.GetTransactionScope();
 
-            using var trans = TransactionHelper.GetTransactionScope();
+                await _equSpotcheckTaskRepository.InsertRangeAsync(equSpotcheckTaskList);
+                await _equSpotcheckTaskSnapshotPlanRepository.InsertRangeAsync(equSpotcheckTaskSnapshotPlanList);
+                await _equSpotcheckTaskSnapshotItemRepository.InsertRangeAsync(equSpotcheckTaskSnapshotItemList);
+                await _equSpotcheckTaskItemRepository.InsertRangeAsync(equSpotcheckTaskItemList);
 
-            await _equSpotcheckTaskRepository.InsertRangeAsync(equSpotcheckTaskList);
-            await _equSpotcheckTaskSnapshotPlanRepository.InsertRangeAsync(equSpotcheckTaskSnapshotPlanList);
-            await _equSpotcheckTaskSnapshotItemRepository.InsertRangeAsync(equSpotcheckTaskSnapshotItemList);
-            await _equSpotcheckTaskItemRepository.InsertRangeAsync(equSpotcheckTaskItemList);
+                trans.Complete();
+            }
+            catch (Exception ex)
+            {
 
-            trans.Complete();
+                throw;
+            }
+
 
         }
 
