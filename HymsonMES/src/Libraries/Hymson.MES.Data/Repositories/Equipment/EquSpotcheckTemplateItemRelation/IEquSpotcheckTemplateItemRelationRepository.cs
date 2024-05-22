@@ -6,7 +6,7 @@
  *build datetime: 2024-05-13 03:22:39
  */
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.EquSpotcheckTemplateItemRelation;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Data.Repositories.Common.Command;
 
 namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation

@@ -8,7 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Core.Domain.EquSpotcheckPlan
+namespace Hymson.MES.Core.Domain.Equipment.EquSpotcheck
 {
     /// <summary>
     /// 设备点检计划，数据实体对象   

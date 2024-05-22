@@ -213,6 +213,23 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
+    /// 检验单状态Dto
+    /// </summary>
+    public record EquSpotcheckTaskOrderOperationStatusDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public EquSpotcheckOperationTypeEnum OperationType { get; set; }
+
+    }
+
+    /// <summary>
     /// 点检任务项全部信息-执行时,
     /// </summary>
     public record TaskItemUnionSnapshotView : BaseEntityDto
@@ -321,6 +338,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public decimal? UpperLimit { get; set; }
 
+        /// <summary>
+        /// 附件集合
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+
     }
 
 
@@ -401,6 +423,40 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+    }
+
+    /// <summary>
+    /// 附件保存dto
+    /// </summary>
+    public record SpotcheckTaskSaveAttachmentDto
+    {
+        /// <summary>
+        /// 单据id
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
+        /// 检验单（附件）
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+
+    }
+
+    /// <summary>
+    /// 单据明细查询(处理结果查询分页)
+    /// </summary>
+    public class SpotcheckTaskItemPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long SpotCheckTaskId { get; set; }
+
+        /// <summary>
+        /// 项目编码
+        /// </summary>
+        public string? ItemCode { get; set; }
 
     }
 

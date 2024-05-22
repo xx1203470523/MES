@@ -2,7 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 
-namespace Hymson.MES.Core.Domain.Equipment
+namespace Hymson.MES.Core.Domain.Equipment.EquSpotcheck
 {
     /// <summary>
     /// 数据实体（设备点检快照任务项目）   
@@ -92,6 +92,6 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public long SiteId { get; set; }
 
-        
+
     }
 }

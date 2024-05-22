@@ -1,19 +1,24 @@
 using Hymson.Infrastructure;
 
-namespace Hymson.MES.Core.Domain.Equipment
+namespace Hymson.MES.Core.Domain.Equipment.EquSpotcheck
 {
     /// <summary>
-    /// 数据实体（设备点检任务附件）   
-    /// equ_spotcheck_task_attachment
+    /// 数据实体（设备点检任务项目附件）   
+    /// equ_spotcheck_task_item_attachment
     /// @author JAM
-    /// @date 2024-05-15 01:59:22
+    /// @date 2024-05-15 01:59:57
     /// </summary>
-    public class EquSpotcheckTaskAttachmentEntity : BaseEntity
+    public class EquSpotcheckTaskItemAttachmentEntity : BaseEntity
     {
         /// <summary>
         /// 点检任务ID;equ_spotcheck_task表的Id
         /// </summary>
         public long SpotCheckTaskId { get; set; }
+
+        /// <summary>
+        /// 点检任务项目ID;equ_spotcheck_task_item表的Id
+        /// </summary>
+        public long SpotCheckTaskItemId { get; set; }
 
         /// <summary>
         /// 附件Id;inte_attachment表的Id
@@ -30,6 +35,6 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public long SiteId { get; set; }
 
-        
+
     }
 }
