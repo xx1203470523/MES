@@ -464,23 +464,14 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             }
             #endregion
 
-            try
-            {
-                using var trans = TransactionHelper.GetTransactionScope();
+            using var trans = TransactionHelper.GetTransactionScope();
 
-                await _equSpotcheckTaskRepository.InsertRangeAsync(equSpotcheckTaskList);
-                await _equSpotcheckTaskSnapshotPlanRepository.InsertRangeAsync(equSpotcheckTaskSnapshotPlanList);
-                await _equSpotcheckTaskSnapshotItemRepository.InsertRangeAsync(equSpotcheckTaskSnapshotItemList);
-                await _equSpotcheckTaskItemRepository.InsertRangeAsync(equSpotcheckTaskItemList);
+            await _equSpotcheckTaskRepository.InsertRangeAsync(equSpotcheckTaskList);
+            await _equSpotcheckTaskSnapshotPlanRepository.InsertRangeAsync(equSpotcheckTaskSnapshotPlanList);
+            await _equSpotcheckTaskSnapshotItemRepository.InsertRangeAsync(equSpotcheckTaskSnapshotItemList);
+            await _equSpotcheckTaskItemRepository.InsertRangeAsync(equSpotcheckTaskItemList);
 
-                trans.Complete();
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-
+            trans.Complete();
 
         }
 
