@@ -9,5 +9,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 不良Id
         /// </summary>
         public long? MaterialUnqualifiedDataId { get; set; }
+
+        /// <summary>
+        /// 不良Id列表
+        /// </summary>
+        public IEnumerable<long>? MaterialUnqualifiedDataIds { get; set; }
     }
 }

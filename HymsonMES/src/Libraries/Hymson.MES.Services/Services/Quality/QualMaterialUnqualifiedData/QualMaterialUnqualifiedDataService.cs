@@ -114,13 +114,14 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             //物料条码是否已记录不良且不良状态为打开，若是，则报错：物料条码XXX已录入不良且未进行不良处置
-            var qualMaterials=await _qualMaterialUnqualifiedDataRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataQuery
+            var qualMaterials = await _qualMaterialUnqualifiedDataRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataQuery
             {
-                SiteId=_currentSite.SiteId??0,
+                SiteId = _currentSite.SiteId ?? 0,
                 MaterialInventoryId = saveDto.MaterialInventoryId,
-                UnqualifiedStatus= QualMaterialUnqualifiedStatusEnum.Open
+                UnqualifiedStatus = QualMaterialUnqualifiedStatusEnum.Open
             });
-            if(qualMaterials!=null && qualMaterials.Any()){
+            if (qualMaterials != null && qualMaterials.Any())
+            {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17505));
             }
             #endregion
@@ -404,11 +405,11 @@ namespace Hymson.MES.Services.Services.Quality
                     var code = unqualifiedCodeEntities.FirstOrDefault(x => x.Id == entity.UnqualifiedCodeId);
                     details.Add(new QualMaterialUnqualifiedDetailDataDto
                     {
-                        UnqualifiedGroupId= group?.Id??0,
-                        UnqualifiedCodeId= code?.Id??0,
-                        UnqualifiedCode = code?.UnqualifiedCode??"",
-                        UnqualifiedGroupRemark = group!=null? group.UnqualifiedGroup  + "/" + group.UnqualifiedGroupName:"",
-                        UnqualifiedCodeRemark = code!=null? code.UnqualifiedCode + "/" + code.UnqualifiedCodeName:"",
+                        UnqualifiedGroupId = group?.Id ?? 0,
+                        UnqualifiedCodeId = code?.Id ?? 0,
+                        UnqualifiedCode = code?.UnqualifiedCode ?? "",
+                        UnqualifiedGroupRemark = group != null ? group.UnqualifiedGroup + "/" + group.UnqualifiedGroupName : "",
+                        UnqualifiedCodeRemark = code != null ? code.UnqualifiedCode + "/" + code.UnqualifiedCodeName : "",
                     });
                 }
                 qualMaterial.Details = details;
@@ -434,8 +435,20 @@ namespace Hymson.MES.Services.Services.Quality
                 return new PagedInfo<QualMaterialUnqualifiedDataViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
             }
 
+            var dataIds = pagedInfo.Data.Select(x => x.Id).ToArray();
+            var detailEntities = await _unqualifiedDataDetailRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataDetailQuery
+            {
+                MaterialUnqualifiedDataIds = dataIds
+            });
+
+            var unqualifiedCodeIds = detailEntities.Select(x => x.UnqualifiedCodeId).Distinct().ToArray();
+            var unqualifiedCodeEntities = await _unqualifiedCodeRepository.GetByIdsAsync(unqualifiedCodeIds);
+
             foreach (var item in pagedInfo.Data)
             {
+                var unqualCodeIds = detailEntities.Where(x => x.MaterialUnqualifiedDataId == item.Id).Select(x => x.UnqualifiedCodeId).ToArray();
+                var qualUnqualifiedCodeNames = unqualifiedCodeEntities.Where(x => unqualCodeIds.Contains(x.Id)).Select(x => x.UnqualifiedCode).ToArray();
+                var qualUnqualifiedCodeName = string.Join(";", qualUnqualifiedCodeNames);
                 dtos.Add(new QualMaterialUnqualifiedDataViewDto
                 {
                     Id = item.Id,
@@ -443,7 +456,7 @@ namespace Hymson.MES.Services.Services.Quality
                     QuantityResidue = item.QuantityResidue,
                     MaterialCode = item.MaterialCode + "/" + item.Version,
                     MaterialName = item.MaterialName,
-                    //UnqualifiedCode = item.UnqualifiedCode,
+                    UnqualifiedCode = qualUnqualifiedCodeName,
                     UnqualifiedStatus = item.UnqualifiedStatus,
                     DisposalResult = item.DisposalResult,
                     DisposalTime = item.DisposalTime,
