@@ -1,5 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 
@@ -65,6 +67,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<EquSpotcheckTaskAttachmentEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据任务单据Id获取
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualFqcOrderAttachmentEntity>> GetByOrderIdAsync(long orderId);
 
         /// <summary>
         /// 获取List

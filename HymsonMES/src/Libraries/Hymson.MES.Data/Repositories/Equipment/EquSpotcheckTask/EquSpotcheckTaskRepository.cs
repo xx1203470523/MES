@@ -1,6 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
@@ -136,7 +136,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("st.*,stsp.Code PlanCode,stsp.Name PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.Type PlanType,stsp.PlanBeginTime,stsp.PlanEndTime");
+            sqlBuilder.Select("st.*,stsp.Code as PlanCode,stsp.Name as PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.Type as PlanType,stsp.BeginTime as PlanBeginTime,stsp.EndTime PlanEndTime");
             sqlBuilder.OrderBy("st.UpdatedOn DESC");
             sqlBuilder.Where("st.IsDeleted = 0");
             sqlBuilder.Where("st.SiteId = @SiteId");
@@ -150,7 +150,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             if (pagedQuery.PlanStartTime != null && pagedQuery.PlanStartTime.Length >= 2)
             {
                 sqlBuilder.AddParameters(new { PlanStartTimeStart = pagedQuery.PlanStartTime[0], PlanStartTimeEnd = pagedQuery.PlanStartTime[1].AddDays(1) });
-                sqlBuilder.Where("stsp.PlanBeginTime >= @PlanStartTimeStart AND stsp.PlanEndTime < @PlanStartTimeEnd");
+                sqlBuilder.Where("stsp.BeginTime >= @PlanStartTimeStart AND stsp.EndTime < @PlanStartTimeEnd");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
@@ -176,25 +176,21 @@ namespace Hymson.MES.Data.Repositories.Equipment
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_spotcheck_task st /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_spotcheck_task st /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-
-        //const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_spotcheck_task /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        //const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_spotcheck_task /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_spotcheck_task /**where**/  ";
 
-        const string InsertSql = "INSERT INTO equ_spotcheck_task(  `Id`, `SiteId`) VALUES (  @Id, @SiteId) ";
-        const string InsertsSql = "INSERT INTO equ_spotcheck_task(  `Id`, `SiteId`) VALUES (  @Id, @SiteId) ";
+        const string InsertSql = "INSERT INTO equ_spotcheck_task(  `Id`, `Code`, `Name`, `BeginTime`, `EndTime`, `Status`, `IsQualified`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @BeginTime, @EndTime, @Status, @IsQualified, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT INTO equ_spotcheck_task(  `Id`, `Code`, `Name`, `BeginTime`, `EndTime`, `Status`, `IsQualified`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @BeginTime, @EndTime, @Status, @IsQualified, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE equ_spotcheck_task SET   SiteId = @SiteId WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE equ_spotcheck_task SET   SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE equ_spotcheck_task SET   Code = @Code, Name = @Name, BeginTime = @BeginTime, EndTime = @EndTime, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE equ_spotcheck_task SET   Code = @Code, Name = @Name, BeginTime = @BeginTime, EndTime = @EndTime, Status = @Status, IsQualified = @IsQualified, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE equ_spotcheck_task SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE equ_spotcheck_task SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM equ_spotcheck_task WHERE Id = @Id ";     
+        const string GetByIdSql = @"SELECT * FROM equ_spotcheck_task WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM equ_spotcheck_task WHERE Id IN @Ids ";
 
-        const string GetUnionByIdSql = @"SELECT st.*,stsp.Code as PlanCode,stsp.Name as PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.Type as PlanType,stsp.PlanBeginTime,stsp.PlanEndTime
+        const string GetUnionByIdSql = @"SELECT st.*,stsp.Code as PlanCode,stsp.Name as PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.Type as PlanType,stsp.BeginTime PlanBeginTime,stsp.EndTime PlanEndTime
                                             FROM equ_spotcheck_task st
                                             LEFT JOIN equ_spotcheck_task_snapshot_plan stsp on st.Id=stsp.SpotCheckTaskId
                                             WHERE st.IsDeleted = 0 AND st.Id = @Id ";

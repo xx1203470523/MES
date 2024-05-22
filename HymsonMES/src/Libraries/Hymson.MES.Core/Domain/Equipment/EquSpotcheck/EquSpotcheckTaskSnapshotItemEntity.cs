@@ -2,13 +2,13 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 
-namespace Hymson.MES.Core.Domain.Equipment
+namespace Hymson.MES.Core.Domain.Equipment.EquSpotcheck
 {
     /// <summary>
     /// 数据实体（设备点检快照任务项目）   
     /// equ_spotcheck_task_snapshot_item
     /// @author JAM
-    /// @date 2024-05-15 01:59:07
+    /// @date 2024-05-21 02:08:20
     /// </summary>
     public class EquSpotcheckTaskSnapshotItemEntity : BaseEntity
     {
@@ -35,12 +35,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 状态
         /// </summary>
-        public DisableOrEnableEnum Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
         /// <summary>
         /// 数值类型;文本/数值
         /// </summary>
-        public DataTypeEnum DataType { get; set; }
+        public DataTypeEnum? DataType { get; set; }
 
         /// <summary>
         /// 点检方式
@@ -50,7 +50,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 作业方法
         /// </summary>
-        public string CheckMethod { get; set; }
+        public string? CheckMethod { get; set; }
 
         /// <summary>
         /// 单位ID;inte_unit表的Id
@@ -73,7 +73,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         public decimal? LowerLimit { get; set; }
 
         /// <summary>
-        /// 参考值（规格中心）;值来源于点检模板
+        /// 规格值（规格中心）;值来源于点检模板
         /// </summary>
         public decimal? ReferenceValue { get; set; }
 
@@ -92,6 +92,6 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public long SiteId { get; set; }
 
-        
+
     }
 }

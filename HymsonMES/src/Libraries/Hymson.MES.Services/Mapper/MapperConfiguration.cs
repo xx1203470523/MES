@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Core.Domain.EquSpotcheckPlan;
-using Hymson.MES.Core.Domain.EquSpotcheckTemplate;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
@@ -261,6 +260,9 @@ namespace Hymson.MES.Services.Mapper
             //index
             CreateMap<EquSpotcheckTaskPagedQueryDto, EquSpotcheckTaskPagedQuery>();
             CreateMap<EquSpotcheckTaskUnionPlanEntity, EquSpotcheckTaskDto>();
+            //item
+            CreateMap<EquSpotcheckTaskSnapshotItemEntity, TaskItemUnionSnapshotView>();
+            CreateMap<EquSpotcheckTaskItemEntity, TaskItemUnionSnapshotView>();
 
             #endregion
 

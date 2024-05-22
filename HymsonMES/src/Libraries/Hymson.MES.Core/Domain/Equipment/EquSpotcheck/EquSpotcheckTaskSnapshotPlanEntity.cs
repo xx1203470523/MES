@@ -1,23 +1,26 @@
-/*
- *creator: Karl
- *
- *describe: 设备点检计划    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  pengxin
- *build datetime: 2024-05-17 09:36:24
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Core.Domain.EquSpotcheckPlan
+namespace Hymson.MES.Core.Domain.Equipment.EquSpotcheck
 {
     /// <summary>
-    /// 设备点检计划，数据实体对象   
-    /// equ_spotcheck_plan
-    /// @author pengxin
-    /// @date 2024-05-17 09:36:24
+    /// 数据实体（设备点检快照任务计划）   
+    /// equ_spotcheck_task_snapshot_plan
+    /// @author User
+    /// @date 2024-05-20 07:40:53
     /// </summary>
-    public class EquSpotcheckPlanEntity : BaseEntity
+    public class EquSpotcheckTaskSnapshotPlanEntity : BaseEntity
     {
+        /// <summary>
+        /// 点检任务ID;equ_spotcheck_task表的Id
+        /// </summary>
+        public long SpotCheckTaskId { get; set; }
+
+        /// <summary>
+        /// 点检计划ID;equ_spotcheck_plan表的Id
+        /// </summary>
+        public long SpotCheckPlanId { get; set; }
+
         /// <summary>
         /// 点检计划编码
         /// </summary>
@@ -34,19 +37,29 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckPlan
         public string Version { get; set; }
 
         /// <summary>
+        /// 设备ID;equ_equipment表的Id
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 点检模板ID;equ_spotcheck_template表的Id
+        /// </summary>
+        public long SpotCheckTemplateId { get; set; }
+
+        /// <summary>
         /// 点检执行人;用户中心UserId集合
         /// </summary>
-        public string? ExecutorIds { get; set; }
+        public string ExecutorIds { get; set; }
 
         /// <summary>
         /// 点检负责人;用户中心UserId集合
         /// </summary>
-        public string? LeaderIds { get; set; }
+        public string LeaderIds { get; set; }
 
         /// <summary>
         /// 点检类型;周/日
         /// </summary>
-        public EquipmentSpotcheckTypeEnum? Type { get; set; }
+        public EquipmentSpotcheckTypeEnum Type { get; set; }
 
         /// <summary>
         /// 点检计划状态
@@ -64,7 +77,7 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckPlan
         public DateTime? EndTime { get; set; }
 
         /// <summary>
-        /// 是否跳过节假日;日历中的休息日
+        /// 是否跳过节假日
         /// </summary>
         public TrueOrFalseEnum? IsSkipHoliday { get; set; }
 
@@ -74,9 +87,9 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckPlan
         public DateTime? FirstExecuteTime { get; set; }
 
         /// <summary>
-        /// 循环周期 
+        /// 周期;月、天、小时、分钟
         /// </summary>
-        public int? Cycle { get; set; }
+        public int Cycle { get; set; }
 
         /// <summary>
         /// 完成时间（小时）
@@ -92,11 +105,6 @@ namespace Hymson.MES.Core.Domain.EquSpotcheckPlan
         /// 提前生成时间（分钟）
         /// </summary>
         public int? PreGeneratedMinute { get; set; }
-
-        /// <summary>
-        /// Corn表达式
-        /// </summary>
-        public string? CornExpression { get; set; }
 
         /// <summary>
         /// 描述

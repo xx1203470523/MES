@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
+using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -141,7 +143,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 不合格处理方式;1-通过；2-不通过
         /// </summary>
-        public SpotcheckTaskProcessedEnum? HandMethod { get; set; }
+        public EquSpotcheckTaskProcessedEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 处理人
@@ -189,7 +191,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 处理结果 不合格处理方式;1-通过；2-不通过
         /// </summary>
-        public SpotcheckTaskProcessedEnum? HandMethod { get; set; }
+        public EquSpotcheckTaskProcessedEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 计划开始时间  时间范围  数组
@@ -211,11 +213,251 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
+    /// 检验单状态Dto
+    /// </summary>
+    public record EquSpotcheckTaskOrderOperationStatusDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public EquSpotcheckOperationTypeEnum OperationType { get; set; }
+
+    }
+
+    /// <summary>
     /// 点检任务项全部信息-执行时,
     /// </summary>
-    public record TaskItemInfoView()
+    public record TaskItemUnionSnapshotView : BaseEntityDto
     {
-        
+        /// <summary>
+        /// SpotCheckItemId
+        /// </summary>
+        public long Id { get; set; }
+        /// <summary>
+        /// 点检任务ID;equ_spotcheck_task表的Id
+        /// </summary>
+        public long? SpotCheckTaskId { get; set; }
+
+        /// <summary>
+        /// 点检项目快照ID;equ_spotcheck_item_snapshot表的Id
+        /// </summary>
+        public long SpotCheckItemSnapshotId { get; set; }
+
+        /// <summary>
+        /// 检验值
+        /// </summary>
+        public string? InspectionValue { get; set; }
+
+        /// <summary>
+        /// 是否合格;(0-否 1-是)
+        /// </summary>
+        public TrueOrFalseEnum? IsQualified { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+
+        /// <summary>
+        /// 点检项目ID;equ_spotcheck_item的Id
+        /// </summary>
+        public long SpotCheckItemId { get; set; }
+
+        /// <summary>
+        /// 点检项目编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 点检项目名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
+
+        /// <summary>
+        /// 数值类型;文本/数值
+        /// </summary>
+        public DataTypeEnum? DataType { get; set; }
+
+        /// <summary>
+        /// 点检方式
+        /// </summary>
+        public EquSpotcheckItemMethodEnum? CheckType { get; set; }
+
+        /// <summary>
+        /// 作业方法
+        /// </summary>
+        public string? CheckMethod { get; set; }
+
+        /// <summary>
+        /// 单位ID;inte_unit表的Id
+        /// </summary>
+        public long? UnitId { get; set; }
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string? Unit { get; set; }
+
+        /// <summary>
+        /// 操作内容
+        /// </summary>
+        public string OperationContent { get; set; }
+
+        /// <summary>
+        /// 部件
+        /// </summary>
+        public string Components { get; set; }
+
+        /// <summary>
+        /// 规格下限;值来源于点检模板
+        /// </summary>
+        public decimal? LowerLimit { get; set; }
+
+        /// <summary>
+        /// 规格值（规格中心）;值来源于点检模板
+        /// </summary>
+        public decimal? ReferenceValue { get; set; }
+
+        /// <summary>
+        /// 规格上限;值来源于点检模板
+        /// </summary>
+        public decimal? UpperLimit { get; set; }
+
+        /// <summary>
+        /// 附件集合
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+
+    }
+
+
+    /// <summary>
+    ///点检单项更新保存
+    /// </summary>
+    public record SpotcheckTaskItemSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 任务id
+        /// </summary>
+        public long SpotCheckTaskId { get; set; }
+
+        /// <summary>
+        /// 样品参数
+        /// </summary>
+        public IEnumerable<SpotcheckTaskItemDetailDto> Details { get; set; }
+
+    }
+
+    public record SpotcheckTaskItemDetailDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 检验值
+        /// </summary>
+        public string? InspectionValue { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 参数附件
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto>? Attachments { get; set; }
+
+    }
+
+    /// <summary>
+    /// 完成Dto
+    /// </summary>
+    public record SpotcheckTaskCompleteDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+    }
+
+    /// <summary>
+    /// 处理结果完成Dto
+    /// </summary>
+    public record SpotcheckTaskCloseDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long SpotCheckTaskId { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式
+        /// </summary>
+        public EquSpotcheckTaskProcessedEnum HandMethod { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+    }
+
+    /// <summary>
+    /// 附件保存dto
+    /// </summary>
+    public record SpotcheckTaskSaveAttachmentDto
+    {
+        /// <summary>
+        /// 单据id
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
+        /// 检验单（附件）
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+
+    }
+
+    /// <summary>
+    /// 单据明细查询(处理结果查询分页)
+    /// </summary>
+    public class SpotcheckTaskItemPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long SpotCheckTaskId { get; set; }
+
+        /// <summary>
+        /// 项目编码
+        /// </summary>
+        public string? ItemCode { get; set; }
+
     }
 
 }

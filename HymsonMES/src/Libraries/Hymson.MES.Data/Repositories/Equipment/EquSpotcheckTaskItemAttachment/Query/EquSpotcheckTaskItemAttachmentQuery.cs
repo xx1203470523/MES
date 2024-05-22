@@ -5,6 +5,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
     /// </summary>
     public class EquSpotcheckTaskItemAttachmentQuery
     {
-    
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long? SiteId { get; set; }
+        public long? SpotCheckTaskId { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
@@ -116,6 +116,16 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+
+            if (query.SpotCheckTaskId.HasValue)
+            {
+                sqlBuilder.Where("SpotCheckTaskId = @SpotCheckTaskId");
+            }
+            sqlBuilder.AddParameters(query);
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquSpotcheckTaskItemEntity>(template.RawSql, query);
         }

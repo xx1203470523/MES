@@ -123,6 +123,10 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where(" MaterialUnqualifiedDataId=@MaterialUnqualifiedDataId ");
             }
+            if (query.MaterialUnqualifiedDataIds!=null && query.MaterialUnqualifiedDataIds.Any())
+            {
+                sqlBuilder.Where(" MaterialUnqualifiedDataId in @MaterialUnqualifiedDataIds ");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualMaterialUnqualifiedDataDetailEntity>(template.RawSql, query);
         }

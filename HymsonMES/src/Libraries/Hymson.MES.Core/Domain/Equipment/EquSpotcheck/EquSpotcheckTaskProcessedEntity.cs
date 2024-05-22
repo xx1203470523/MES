@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Equipment;
 
-namespace Hymson.MES.Core.Domain.Equipment
+namespace Hymson.MES.Core.Domain.Equipment.EquSpotcheck
 {
     /// <summary>
     /// 数据实体（设备点检任务结果处理）   
@@ -18,7 +19,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 不合格处理方式;1-通过；2-不通过
         /// </summary>
-        public bool? HandMethod { get; set; }
+        public EquSpotcheckTaskProcessedEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 处理人
@@ -40,6 +41,6 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public long SiteId { get; set; }
 
-        
+
     }
 }

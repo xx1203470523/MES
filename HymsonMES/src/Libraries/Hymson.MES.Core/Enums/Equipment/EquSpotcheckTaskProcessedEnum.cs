@@ -2,7 +2,7 @@
 
 namespace Hymson.MES.Core.Enums.Equipment
 {
-    public enum SpotcheckTaskProcessedEnum: sbyte
+    public enum EquSpotcheckTaskProcessedEnum: sbyte
     {
         /// <summary>
         /// 通过

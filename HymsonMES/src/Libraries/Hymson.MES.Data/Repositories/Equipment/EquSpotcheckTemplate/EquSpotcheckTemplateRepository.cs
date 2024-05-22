@@ -8,7 +8,7 @@
 
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.EquSpotcheckTemplate;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;

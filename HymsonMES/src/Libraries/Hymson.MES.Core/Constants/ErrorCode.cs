@@ -2093,8 +2093,18 @@
         public const string MES15807 = "只能删除待检验状态的数据";
         #endregion
 
-        #region 设备点检 15900
+        #region 设备点检执行 15900
         public const string MES15901 = "不良已关闭，不允许删除!";
+        public const string MES15902 = "有检验值是为空！";
+        #endregion
+
+        #region 设备点检 车间物料不良录入 17500
+        public const string MES17501 = "不良已关闭，不允许删除!";
+
+        public const string MES17502 = "物料条码不存在!";
+        public const string MES17503 = "物料条码不可用!";
+        public const string MES17504 = "物料条码库存数量为0!";
+        public const string MES17505 = "物料条码已录入不良且未进行不良处置!";
         #endregion
     }
 }
