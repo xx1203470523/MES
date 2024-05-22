@@ -5,8 +5,8 @@ namespace Hymson.MES.Core.Domain.Equipment
     /// <summary>
     /// 数据实体（设备点检快照任务计划）   
     /// equ_spotcheck_task_snapshot_plan
-    /// @author JAM
-    /// @date 2024-05-15 01:56:55
+    /// @author User
+    /// @date 2024-05-20 07:40:53
     /// </summary>
     public class EquSpotcheckTaskSnapshotPlanEntity : BaseEntity
     {

@@ -58,6 +58,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquSpotcheckTaskEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 获取任务两表信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<EquSpotcheckTaskUnionPlanEntity> GeUnionByIdAsync(long id);
     
         /// <summary>
         /// 根据IDs获取数据（批量）
@@ -78,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquSpotcheckTaskEntity>> GetPagedListAsync(EquSpotcheckTaskPagedQuery pagedQuery);
+        Task<PagedInfo<EquSpotcheckTaskUnionPlanEntity>> GetPagedListAsync(EquSpotcheckTaskPagedQuery pagedQuery);
 
     }
 }

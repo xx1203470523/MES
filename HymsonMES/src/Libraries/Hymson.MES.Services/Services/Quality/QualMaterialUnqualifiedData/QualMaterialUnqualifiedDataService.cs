@@ -100,17 +100,17 @@ namespace Hymson.MES.Services.Services.Quality
             var inventoryEntity = await _inventoryRepository.GetByIdAsync(saveDto.MaterialInventoryId);
             if (inventoryEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15902));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17502));
             }
 
             if (inventoryEntity.Status != WhMaterialInventoryStatusEnum.ToBeUsed)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15903));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17503));
             }
 
             if (inventoryEntity.QuantityResidue == 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15904));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17504));
             }
 
             //物料条码是否已记录不良且不良状态为打开，若是，则报错：物料条码XXX已录入不良且未进行不良处置
@@ -121,7 +121,7 @@ namespace Hymson.MES.Services.Services.Quality
                 UnqualifiedStatus= QualMaterialUnqualifiedStatusEnum.Open
             });
             if(qualMaterials!=null && qualMaterials.Any()){
-                throw new CustomerValidationException(nameof(ErrorCode.MES15905));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17505));
             }
             #endregion
 
@@ -318,7 +318,7 @@ namespace Hymson.MES.Services.Services.Quality
             var entitys = await _qualMaterialUnqualifiedDataRepository.GetByIdsAsync(ids);
             if (entitys.Any(x => x.UnqualifiedStatus == QualMaterialUnqualifiedStatusEnum.Close))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15901));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17501));
             }
 
             var inventoryIds = entitys.Select(x => x.MaterialInventoryId).ToArray();

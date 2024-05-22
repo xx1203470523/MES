@@ -114,5 +114,26 @@ namespace Hymson.MES.Services
             return AutoMapperConfiguration.Mapper.Map<TEntity>(source);
         }
 
+        /// <summary>
+        /// 两实体合并映射
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static TDestination ToCombineMap<TSource, TDestination>(this TSource source, TDestination destination)
+        where TSource : class
+        where TDestination : class
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            return AutoMapperConfiguration.Mapper.Map(source, destination);
+        }
+
     }
 }

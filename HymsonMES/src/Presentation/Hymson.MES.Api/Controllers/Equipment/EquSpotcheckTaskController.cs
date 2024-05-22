@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Equipment;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -94,6 +96,55 @@ namespace Hymson.MES.Api.Controllers.Equipment
         public async Task<PagedInfo<EquSpotcheckTaskDto>> QueryPagedListAsync([FromQuery] EquSpotcheckTaskPagedQueryDto pagedQueryDto)
         {
             return await _equSpotcheckTaskService.GetPagedListAsync(pagedQueryDto);
+        }
+
+
+        /// <summary>
+        /// 查询点检单明细项数据(执行-查询)
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpGet("snapshot")]
+        public async Task<IEnumerable<TaskItemUnionSnapshotView>> querySnapshotItemAsync([FromQuery] SpotcheckTaskSnapshotItemQueryDto requestDto)
+        {
+            return await _equSpotcheckTaskService.querySnapshotItemAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 保存明细项(执行-保存)
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("save")]
+        [LogDescription("保存明细项", BusinessType.OTHER)]
+        public async Task<long> SaveOrderAsync([FromBody] SpotcheckTaskItemSaveDto requestDto)
+        {
+            return await _equSpotcheckTaskService.SaveAndUpdateTaskItemAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 完成明细检验单(执行-完成)
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("complete")]
+        [LogDescription("完成检验单", BusinessType.OTHER)]
+        public async Task<long> CompleteOrderAsync(SpotcheckTaskCompleteDto requestDto)
+        {
+            return await _equSpotcheckTaskService.CompleteOrderAsync(requestDto);
+        }
+
+
+        /// <summary>
+        /// 结果处理(首页-处理)
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("close")]
+        [LogDescription("结果处理", BusinessType.OTHER)]
+        public async Task<long> CloseOrderAsync(SpotcheckTaskCloseDto requestDto)
+        {
+            return await _equSpotcheckTaskService.CloseOrderAsync(requestDto);
         }
 
     }
