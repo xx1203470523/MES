@@ -146,16 +146,16 @@ namespace Hymson.MES.Data.Repositories.Quality
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
 
-            sqlBuilder.Select("wmi.MaterialBarCode,wmi.QuantityResidue,wmi.MaterialId,pm.MaterialCode,pm.Version,pm.MaterialName,quc.UnqualifiedCode,mud.UnqualifiedStatus\r\n ,mud.CreatedOn,mud.DisposalResult,mud.DisposalTime,mud.Id ");
+            sqlBuilder.Select("wmi.MaterialBarCode,wmi.QuantityResidue,wmi.MaterialId,pm.MaterialCode,pm.Version,pm.MaterialName,mud.UnqualifiedStatus ,mud.CreatedOn,mud.DisposalResult,mud.DisposalTime,mud.Id ");
             
             sqlBuilder.Where("mud.IsDeleted=0");
             sqlBuilder.Where("mud.SiteId=@SiteId");
 
             sqlBuilder.LeftJoin("wh_material_inventory wmi on wmi.Id=mud.MaterialInventoryId");
             sqlBuilder.LeftJoin("proc_material pm on pm.Id=wmi.MaterialId");
-            sqlBuilder.LeftJoin("qual_material_unqualified_data_detail mudd on mudd.MaterialUnqualifiedDataId=mud.Id");
-            sqlBuilder.LeftJoin("qual_unqualified_group qug on qug.Id=mudd.UnqualifiedGroupId");
-            sqlBuilder.LeftJoin("qual_unqualified_code quc on quc.Id=mudd.UnqualifiedCodeId");
+            //sqlBuilder.LeftJoin("qual_material_unqualified_data_detail mudd on mudd.MaterialUnqualifiedDataId=mud.Id");
+            //sqlBuilder.LeftJoin("qual_unqualified_group qug on qug.Id=mudd.UnqualifiedGroupId");
+            //sqlBuilder.LeftJoin("qual_unqualified_code quc on quc.Id=mudd.UnqualifiedCodeId");
 
             sqlBuilder.OrderBy("mud.Id DESC");
 
@@ -169,16 +169,16 @@ namespace Hymson.MES.Data.Repositories.Quality
                 pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
                 sqlBuilder.Where("pm.MaterialCode LIKE @MaterialCode");
             }
-            if (!string.IsNullOrWhiteSpace(pagedQuery.UnqualifiedGroup))
-            {
-                pagedQuery.UnqualifiedGroup = $"%{pagedQuery.UnqualifiedGroup}%";
-                sqlBuilder.Where("qug.UnqualifiedGroup LIKE @UnqualifiedGroup");
-            }
-            if (!string.IsNullOrWhiteSpace(pagedQuery.UnqualifiedCode))
-            {
-                pagedQuery.UnqualifiedCode = $"%{pagedQuery.UnqualifiedCode}%";
-                sqlBuilder.Where("quc.UnqualifiedCode LIKE @UnqualifiedCode");
-            }
+            //if (!string.IsNullOrWhiteSpace(pagedQuery.UnqualifiedGroup))
+            //{
+            //    pagedQuery.UnqualifiedGroup = $"%{pagedQuery.UnqualifiedGroup}%";
+            //    sqlBuilder.Where("qug.UnqualifiedGroup LIKE @UnqualifiedGroup");
+            //}
+            //if (!string.IsNullOrWhiteSpace(pagedQuery.UnqualifiedCode))
+            //{
+            //    pagedQuery.UnqualifiedCode = $"%{pagedQuery.UnqualifiedCode}%";
+            //    sqlBuilder.Where("quc.UnqualifiedCode LIKE @UnqualifiedCode");
+            //}
 
             if (pagedQuery.UnqualifiedStatus.HasValue)
             {

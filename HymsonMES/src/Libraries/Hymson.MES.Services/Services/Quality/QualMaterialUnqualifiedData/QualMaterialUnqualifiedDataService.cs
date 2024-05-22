@@ -443,7 +443,7 @@ namespace Hymson.MES.Services.Services.Quality
                     QuantityResidue = item.QuantityResidue,
                     MaterialCode = item.MaterialCode + "/" + item.Version,
                     MaterialName = item.MaterialName,
-                    UnqualifiedCode = item.UnqualifiedCode,
+                    //UnqualifiedCode = item.UnqualifiedCode,
                     UnqualifiedStatus = item.UnqualifiedStatus,
                     DisposalResult = item.DisposalResult,
                     DisposalTime = item.DisposalTime,
