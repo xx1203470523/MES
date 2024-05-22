@@ -59,7 +59,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public string LeaderIds { get; set; }
 
        /// <summary>
-        /// 点检类型;周/日
+        /// 点检类型;天/小时
         /// </summary>
         public EquipmentSpotcheckTypeEnum? Type { get; set; }
 
@@ -202,7 +202,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public string LeaderIds { get; set; }
 
        /// <summary>
-        /// 点检类型;周/日
+        /// 点检类型;天/小时
         /// </summary>
         public bool PlanType { get; set; }
 

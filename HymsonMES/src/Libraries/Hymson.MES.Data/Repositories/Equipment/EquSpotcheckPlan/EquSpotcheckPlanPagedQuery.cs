@@ -41,6 +41,11 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
         public DisableOrEnableEnum? Status { get; set; }
 
         /// <summary>
+        /// 点检类型;天/小时
+        /// </summary>
+        public EquipmentSpotcheckTypeEnum? Type { get; set; }
+
+        /// <summary>
         /// 设备编码 
         /// </summary>
         public string EquipmentCode { get; set; }

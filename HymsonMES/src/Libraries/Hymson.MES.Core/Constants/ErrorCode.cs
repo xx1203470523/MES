@@ -577,6 +577,7 @@
         public const string MES12303 = "未到首次执行时间，暂不执行";
         public const string MES12304 = "请维护执行时间/执行类型/执行周期";
         public const string MES12305 = "编码【{Code}】,版本【{Version}】已存在"; 
+        public const string MES12306 = "请选择关联模板";
 
         #endregion
 

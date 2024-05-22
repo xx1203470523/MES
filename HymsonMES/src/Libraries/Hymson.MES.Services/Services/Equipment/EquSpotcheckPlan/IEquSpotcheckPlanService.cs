@@ -6,6 +6,7 @@
  *build datetime: 2024-05-16 02:14:30
  */
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
 using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
 
 namespace Hymson.MES.Services.Services.EquSpotcheckPlan
@@ -56,6 +57,15 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquSpotcheckPlanDto> QueryEquSpotcheckPlanByIdAsync(long id);
+
+
+        /// <summary>
+        /// 生成(Core)
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task GenerateEquSpotcheckTaskCoreAsync(GenerateDto param);
+
 
         /// <summary>
         /// 生成

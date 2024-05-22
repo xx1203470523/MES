@@ -113,6 +113,10 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
             {
                 sqlBuilder.Where("Status=@Status");
             }
+            if (equSpotcheckPlanPagedQuery.Type.HasValue)
+            {
+                sqlBuilder.Where("Type=@Type");
+            }
             //if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.EquipmentCode))
             //{
             //    sqlBuilder.Where("EquipmentCode=@EquipmentCode");

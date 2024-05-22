@@ -48,7 +48,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
 
 
         /// <summary>
-        /// 点检类型;周/日
+        /// 点检类型;天/小时
         /// </summary>
         public EquipmentSpotcheckTypeEnum Type { get; set; }
 
@@ -164,7 +164,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         public string Version { get; set; }
 
         /// <summary>
-        /// 点检类型;周/日
+        /// 点检类型;天/小时
         /// </summary>
         public EquipmentSpotcheckTypeEnum Type { get; set; }
 
@@ -245,7 +245,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         public string Version { get; set; }
 
         /// <summary>
-        /// 点检类型;周/日
+        /// 点检类型;天/小时
         /// </summary>
         public EquipmentSpotcheckTypeEnum Type { get; set; }
 
@@ -324,6 +324,11 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// 点检计划状态
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
+
+        /// <summary>
+        /// 点检类型;天/小时
+        /// </summary>
+        public EquipmentSpotcheckTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 设备编码 

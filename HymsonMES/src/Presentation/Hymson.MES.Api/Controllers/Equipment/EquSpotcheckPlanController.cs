@@ -120,7 +120,7 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckPlan
         [Route("generate")]
         public async Task GenerateEquSpotcheckTaskAsync([FromBody] GenerateDto parm)
         {
-            await _equSpotcheckPlanService.GenerateEquSpotcheckTaskAsync(parm);
+            await _equSpotcheckPlanService.GenerateEquSpotcheckTaskCoreAsync(parm); 
         }
         #endregion
     }

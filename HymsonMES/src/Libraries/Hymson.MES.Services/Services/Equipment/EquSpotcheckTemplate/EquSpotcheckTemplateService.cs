@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             equSpotcheckTemplateEntity.UpdatedOn = HymsonClock.Now();
             equSpotcheckTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
 
-
+                
             List<EquSpotcheckTemplateEquipmentGroupRelationEntity> groupRelationList = new();
             var eGroupIds = equSpotcheckTemplateCreateDto.groupRelationDto.Select(it => it.Id).ToArray();
             var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);

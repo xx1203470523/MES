@@ -15,6 +15,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
+using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -77,12 +78,16 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// 仓储接口（任务-项目） 
         /// </summary>  
         private readonly IEquSpotcheckTaskItemRepository _equSpotcheckTaskItemRepository;
+        /// <summary>
+        ///  IEquSpotcheckPlanCoreService
+        /// </summary>  
+        private readonly IEquSpotcheckPlanCoreService _equSpotcheckPlanCoreService;
 
 
         private readonly AbstractValidator<EquSpotcheckPlanCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquSpotcheckPlanModifyDto> _validationModifyRules;
 
-        public EquSpotcheckPlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckPlanRepository equSpotcheckPlanRepository, AbstractValidator<EquSpotcheckPlanCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckPlanModifyDto> validationModifyRules, IEquSpotcheckPlanEquipmentRelationRepository equSpotcheckPlanEquipmentRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquSpotcheckTaskSnapshotItemRepository equSpotcheckTaskSnapshotItemRepository, IEquSpotcheckTaskSnapshotPlanRepository equSpotcheckTaskSnapshotPlanRepository, IEquSpotcheckTaskRepository equSpotcheckTaskRepository, IEquSpotcheckTaskItemRepository equSpotcheckTaskItemRepository)
+        public EquSpotcheckPlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckPlanRepository equSpotcheckPlanRepository, AbstractValidator<EquSpotcheckPlanCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckPlanModifyDto> validationModifyRules, IEquSpotcheckPlanEquipmentRelationRepository equSpotcheckPlanEquipmentRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquSpotcheckTaskSnapshotItemRepository equSpotcheckTaskSnapshotItemRepository, IEquSpotcheckTaskSnapshotPlanRepository equSpotcheckTaskSnapshotPlanRepository, IEquSpotcheckTaskRepository equSpotcheckTaskRepository, IEquSpotcheckTaskItemRepository equSpotcheckTaskItemRepository, IEquSpotcheckPlanCoreService equSpotcheckPlanCoreService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -98,6 +103,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             _equSpotcheckTaskSnapshotPlanRepository = equSpotcheckTaskSnapshotPlanRepository;
             _equSpotcheckTaskRepository = equSpotcheckTaskRepository;
             _equSpotcheckTaskItemRepository = equSpotcheckTaskItemRepository;
+            _equSpotcheckPlanCoreService = equSpotcheckPlanCoreService;
         }
 
 
@@ -137,6 +143,10 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             foreach (var item in equSpotcheckPlanCreateDto.RelationDto)
             {
+                if (item.TemplateId == 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12306));
+                }
                 EquSpotcheckPlanEquipmentRelationEntity equSpotcheckPlanEquipmentRelation = new()
                 {
                     EquipmentId = item.Id == 0 ? item.EquipmentId : item.Id,
@@ -303,6 +313,16 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                 return equSpotcheckPlanEntity.ToModel<EquSpotcheckPlanDto>();
             }
             return null;
+        }
+
+        /// <summary>
+        /// 生成(Core)
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task GenerateEquSpotcheckTaskCoreAsync(GenerateDto param)
+        {
+            await _equSpotcheckPlanCoreService.GenerateEquSpotcheckTaskAsync(new GenerateEquSpotcheckTaskDto { SiteId = _currentSite.SiteId ?? 0, UserName = _currentUser.UserName, ExecType = param.ExecType, SpotCheckPlanId = param.SpotCheckPlanId, });
         }
 
         /// <summary>
