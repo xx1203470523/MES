@@ -220,7 +220,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                     EquSpotcheckTaskItemEntity equSpotcheckTaskItem = new()
                     {
                         SpotCheckTaskId = equSpotcheckTask.Id,
-                        SpotCheckItemSnapshotId = equSpotcheckTask.Id,
+                        SpotCheckItemSnapshotId = equSpotcheckTaskSnapshotItem.Id,
                         InspectionValue = "",
                         IsQualified = TrueOrFalseEnum.No,
                         Remark = equSpotcheckTaskSnapshotItem.Remark,

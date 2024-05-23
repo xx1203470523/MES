@@ -139,6 +139,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 结束时间（计划）
         /// </summary>
         public DateTime? PlanEndTime { get; set; }
+        /// <summary>
+        /// 点检类型
+        /// </summary>
+        public EquipmentSpotcheckTypeEnum? PlanType { get; set; }
+        public string? PlanTypeText { get; set; }
 
         /// <summary>
         /// 不合格处理方式;1-通过；2-不通过
@@ -149,6 +154,16 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 处理人
         /// </summary>
         public string? ProcessedBy { get; set; }
+
+        /// <summary>
+        /// 点检执行人;用户中心UserId集合
+        /// </summary>
+        public string? ExecutorIds { get; set; }
+
+        /// <summary>
+        /// 点检负责人;用户中心UserId集合
+        /// </summary>
+        public string? LeaderIds { get; set; }
 
     }
 

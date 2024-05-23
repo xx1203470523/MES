@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -25,6 +26,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
@@ -71,6 +73,7 @@ using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseRegion.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseShelf.Query;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Equipment.EquMaintenance;
 using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
 using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.MES.Services.Dtos.Inte;
@@ -263,6 +266,22 @@ namespace Hymson.MES.Services.Mapper
             //item
             CreateMap<EquSpotcheckTaskSnapshotItemEntity, TaskItemUnionSnapshotView>();
             CreateMap<EquSpotcheckTaskItemEntity, TaskItemUnionSnapshotView>();
+
+            #endregion
+
+            #region 设备保养
+            CreateMap<EquMaintenanceItemSaveDto, EquMaintenanceItemEntity>();
+            CreateMap<EquMaintenanceItemPagedQueryDto, EquMaintenanceItemPagedQuery>();
+
+            CreateMap<EquMaintenanceItemEntity, EquMaintenanceItemDto>();
+            CreateMap<EquMaintenanceItemUpdateDto, EquMaintenanceItemEntity>();
+
+            //task index
+            CreateMap<EquMaintenanceTaskPagedQueryDto, EquMaintenanceTaskPagedQuery>();
+            CreateMap<EquMaintenanceTaskUnionPlanEntity, EquMaintenanceTaskDto>();
+            //item
+            CreateMap<EquMaintenanceTaskSnapshotItemEntity, EquMaintenanceTaskItemUnionSnapshotView>();
+            CreateMap<EquMaintenanceTaskItemEntity, EquMaintenanceTaskItemUnionSnapshotView>();
 
             #endregion
 
