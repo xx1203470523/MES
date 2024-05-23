@@ -19,13 +19,19 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <returns></returns>
         Task<PagedInfo<ProcPrintSetupViewDto>> GetPageListAsync(ProcPrintSetupPagedQueryDto procConversionFactorPagedQueryDto);
 
-
         /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcPrintSetupDto> QueryProcPrintSetupByIdAsync(long id);
+
+        /// <summary>
+        /// 根据ID查询
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<ProcPrintSetupDto> QueryProcPrintSetupByMaterialIdAsync(long materialId);
 
         /// <summary>
         /// 新增
