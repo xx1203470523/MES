@@ -1287,6 +1287,7 @@
         public const string MES16510 = "工序不存在。";
         public const string MES16511 = "资源编码{Code}未与线体绑定";
         public const string MES16512 = "电芯码【{SFC}】生成错误，长度必须为24位";
+        public const string MES16513 = "条码【{SFC}】当前所在工序与设备工序不一致";
         #endregion
 
         #region 在制品移除添加 16600
