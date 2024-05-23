@@ -446,26 +446,22 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             command.SiteId = equResModel.SiteId;
             command.UpdatedBy = dto.EquipmentCode;
             command.UpdatedOn = HymsonClock.Now();
-            //产品参数
-            List<EquProductParamRecordSaveDto> saveDtoList = new List<EquProductParamRecordSaveDto>();
-            foreach (var item in dto.ParamList)
+            //产品过程参数
+            var parameterBo = new ProductProcessParameterBo
             {
-                EquProductParamRecordSaveDto saveDto = new EquProductParamRecordSaveDto();
-                saveDto.ParamCode = item.ParamCode;
-                saveDto.ParamValue = item.ParamValue;
-                saveDto.CollectionTime = item.CollectionTime;
-                saveDtoList.Add(saveDto);
-            }
-            saveDtoList.ForEach(m =>
-            {
-                m.SiteId = equResModel.SiteId;
-                m.Sfc = dto.Sfc;
-                m.EquipmentId = equResModel.EquipmentId;
-                m.CreatedOn = HymsonClock.Now();
-                m.CreatedBy = dto.EquipmentCode;
-                m.UpdatedOn = m.CreatedOn;
-                m.UpdatedBy = m.CreatedBy;
-            });
+                SiteId = equResModel.SiteId,
+                UserName = equResModel.EquipmentCode,
+                Time = HymsonClock.Now(),
+                ProcedureId = equResModel.ProcedureId,
+                ResourceId = equResModel.ResId,
+                SFCs = new[] { dto.Sfc },
+                Parameters = dto.ParamList.Select(x => new ProductParameterBo
+                {
+                    ParameterCode = x.ParamCode,
+                    ParameterValue = x.ParamValue,
+                    CollectionTime = x.CollectionTime
+                })
+            };
             //上料条码
             List<OutStationConsumeBo> consumeSfcList = new List<OutStationConsumeBo>();
             if (dto.OutputType == "1" || dto.OutputType == "2")
@@ -543,7 +539,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             await _manuSfcProduceService.UpdateQtyBySfcAsync(command);
             await _manuSfcServicecs.UpdateQtyBySfcAsync(command);
-            await _equProductParamRecordService.AddMultAsync(saveDtoList);
             int updateNum = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(updateQtyCommand);
             if (updateNum == 0)
             {
@@ -551,6 +546,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             }
             await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
             await _manuSfcStepRepository.InsertAsync(sfcStep);
+            await _manuProductParameterService.ProductProcessCollectAsync(parameterBo);
             trans.Complete();
         }
 
