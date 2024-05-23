@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
+using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -35,7 +36,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检方式
         /// </summary>
-        public EquSpotcheckItemMethodEnum? CheckType { get; set; }
+        public EquMaintenanceItemMethodEnum? CheckType { get; set; }
 
         /// <summary>
         /// 作业方法

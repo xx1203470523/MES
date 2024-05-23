@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
+using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateEquipmentGroupRelation;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateItemRelation;

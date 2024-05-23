@@ -12,10 +12,14 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem;
 using Hymson.MES.Data.Repositories.EquMaintenancePlan;
 using Hymson.MES.Data.Repositories.EquMaintenancePlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
@@ -52,39 +56,39 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         /// 设备点检模板与项目关系仓储接口
         /// </summary>
         private readonly IEquMaintenanceTemplateItemRelationRepository _EquMaintenanceTemplateItemRelationRepository;
-        ///// <summary>
-        ///// 仓储接口（设备点检项目）
-        ///// </summary>
-        //private readonly IEquMaintenanceItemRepository _EquMaintenanceItemRepository;
+        /// <summary>
+        /// 仓储接口（设备点检项目）
+        /// </summary>
+        private readonly IEquMaintenanceItemRepository _EquMaintenanceItemRepository;
 
-        ///// <summary>
-        ///// 仓储接口（项目快照）
-        ///// </summary> 
-        //private readonly IEquMaintenanceTaskSnapshotItemRepository _EquMaintenanceTaskSnapshotItemRepository;
+        /// <summary>
+        /// 仓储接口（项目快照）
+        /// </summary> 
+        private readonly IEquMaintenanceTaskSnapshotItemRepository _EquMaintenanceTaskSnapshotItemRepository;
 
-        ///// <summary>
-        ///// 仓储接口（计划快照）
-        ///// </summary>  
-        //private readonly IEquMaintenanceTaskSnapshotPlanRepository _EquMaintenanceTaskSnapshotPlanRepository;
+        /// <summary>
+        /// 仓储接口（计划快照）
+        /// </summary>  
+        private readonly IEquMaintenanceTaskSnapshotPlanRepository _EquMaintenanceTaskSnapshotPlanRepository;
 
-        ///// <summary>
-        ///// 仓储接口（任务） 
-        ///// </summary>  
-        //private readonly IEquMaintenanceTaskRepository _EquMaintenanceTaskRepository;
-        ///// <summary>
-        ///// 仓储接口（任务-项目） 
-        ///// </summary>  
-        //private readonly IEquMaintenanceTaskItemRepository _EquMaintenanceTaskItemRepository;
-        ///// <summary>
-        /////  IEquMaintenancePlanCoreService
-        ///// </summary>  
+        /// <summary>
+        /// 仓储接口（任务） 
+        /// </summary>  
+        private readonly IEquMaintenanceTaskRepository _EquMaintenanceTaskRepository;
+        /// <summary>
+        /// 仓储接口（任务-项目） 
+        /// </summary>  
+        private readonly IEquMaintenanceTaskItemRepository _EquMaintenanceTaskItemRepository;
+        /// <summary>
+        ///  IEquMaintenancePlanCoreService
+        /// </summary>  
         //private readonly IEquMaintenancePlanCoreService _EquMaintenancePlanCoreService;
 
 
         private readonly AbstractValidator<EquMaintenancePlanCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquMaintenancePlanModifyDto> _validationModifyRules;
 
-        public EquMaintenancePlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquMaintenancePlanRepository EquMaintenancePlanRepository, AbstractValidator<EquMaintenancePlanCreateDto> validationCreateRules, AbstractValidator<EquMaintenancePlanModifyDto> validationModifyRules, IEquMaintenancePlanEquipmentRelationRepository EquMaintenancePlanEquipmentRelationRepository, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository)
+        public EquMaintenancePlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquMaintenancePlanRepository EquMaintenancePlanRepository, AbstractValidator<EquMaintenancePlanCreateDto> validationCreateRules, AbstractValidator<EquMaintenancePlanModifyDto> validationModifyRules, IEquMaintenancePlanEquipmentRelationRepository EquMaintenancePlanEquipmentRelationRepository, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceItemRepository equMaintenanceItemRepository, IEquMaintenanceTaskSnapshotItemRepository equMaintenanceTaskSnapshotItemRepository, IEquMaintenanceTaskSnapshotPlanRepository equMaintenanceTaskSnapshotPlanRepository, IEquMaintenanceTaskRepository equMaintenanceTaskRepository, IEquMaintenanceTaskItemRepository equMaintenanceTaskItemRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -95,11 +99,11 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             _EquMaintenanceTemplateRepository = EquMaintenanceTemplateRepository;
             _equEquipmentRepository = equEquipmentRepository;
             _EquMaintenanceTemplateItemRelationRepository = EquMaintenanceTemplateItemRelationRepository;
-            //_EquMaintenanceItemRepository = EquMaintenanceItemRepository;
-            //_EquMaintenanceTaskSnapshotItemRepository = EquMaintenanceTaskSnapshotItemRepository;
-            //_EquMaintenanceTaskSnapshotPlanRepository = EquMaintenanceTaskSnapshotPlanRepository;
-            //_EquMaintenanceTaskRepository = EquMaintenanceTaskRepository;
-            //_EquMaintenanceTaskItemRepository = EquMaintenanceTaskItemRepository;
+            _EquMaintenanceItemRepository = equMaintenanceItemRepository;
+            _EquMaintenanceTaskSnapshotItemRepository = equMaintenanceTaskSnapshotItemRepository;
+            _EquMaintenanceTaskSnapshotPlanRepository = equMaintenanceTaskSnapshotPlanRepository;
+            _EquMaintenanceTaskRepository = equMaintenanceTaskRepository;
+            _EquMaintenanceTaskItemRepository = equMaintenanceTaskItemRepository;
             //_EquMaintenancePlanCoreService = EquMaintenancePlanCoreService;
         }
 

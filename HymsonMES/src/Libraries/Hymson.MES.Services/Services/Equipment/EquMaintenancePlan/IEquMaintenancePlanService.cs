@@ -6,7 +6,6 @@
  *build datetime: 2024-05-16 02:14:30
  */
 using Hymson.Infrastructure;
-using Hymson.MES.CoreServices.Services.EquMaintenancePlan;
 using Hymson.MES.Services.Dtos.EquMaintenancePlan;
 
 namespace Hymson.MES.Services.Services.EquMaintenancePlan

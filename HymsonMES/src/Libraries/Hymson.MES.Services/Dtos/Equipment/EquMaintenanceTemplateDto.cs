@@ -9,6 +9,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
+using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Hymson.MES.Services.Dtos.Qual;
 
 namespace Hymson.MES.Services.Dtos.EquMaintenanceTemplate
