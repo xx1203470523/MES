@@ -145,6 +145,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
                 sqlBuilder.Where("ParamId = @ParameterId ");
             }
 
+            //批次Id
+            if (pagedQuery.BatchId.HasValue)
+            {
+                sqlBuilder.Where("BatchId=@BatchId ");
+            }
+
             //限定时间
             if (pagedQuery.CreatedOn != null && pagedQuery.CreatedOn.Length >= 2)
             {
