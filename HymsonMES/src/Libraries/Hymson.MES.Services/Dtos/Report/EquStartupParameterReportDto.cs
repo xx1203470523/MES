@@ -98,6 +98,11 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 创建时间
         /// </summary>
         public DateTime[]? CreatedOn { get; set; }
+
+        /// <summary>
+        /// 批次Id
+        /// </summary>
+        public long? BatchId { get; set; }
     }
 
 }
