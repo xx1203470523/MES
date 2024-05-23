@@ -254,10 +254,10 @@ namespace Hymson.MES.Services.Dtos.Process
         public PrintSetupEnum Type { get; set; }
 
         /// <summary>
-        /// 描述:资源id proc_resource的Id
+        /// 描述:资源的Id
         /// 空值 : true  
         /// </summary>
-        public long? ResourceId { get; set; }
+        public long? ResTypeId { get; set; }
 
         /// <summary>
         /// 描述:程序名
@@ -293,6 +293,13 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 空值 : true  
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 描述 :类
+        /// 空值 : true
+        /// </summary>
+        public string? Class { get; set; }
+
         /// <summary>
         /// 状态;0 禁用 1、启用
         /// </summary>
@@ -323,6 +330,12 @@ namespace Hymson.MES.Services.Dtos.Process
         public string MaterialId { get; set; }
 
         /// <summary>
+        /// 描述:资源的Id
+        /// 空值 : true  
+        /// </summary>
+        public long? ResTypeId { get; set; }
+
+        /// <summary>
         /// 工序名
         /// 空值 : false  
         /// </summary>
@@ -335,7 +348,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public long LabelTemplateId { get; set; }
 
         /// <summary>
-        /// 转换系数状态
+        /// 状态
         /// </summary>  
         public DisableOrEnableEnum Status { get; set; }
 
