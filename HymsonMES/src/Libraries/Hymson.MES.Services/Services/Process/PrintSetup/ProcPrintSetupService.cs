@@ -277,6 +277,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             procPrintSetupEntity.BusinessType= AddPrintSetupDto.BusinessType;
             procPrintSetupEntity.LabelTemplateId = AddPrintSetupDto.LabelTemplateId;
             procPrintSetupEntity.Count=AddPrintSetupDto.Count;
+            procPrintSetupEntity.Class = AddPrintSetupDto.Class;
             procPrintSetupEntity.Id = IdGenProvider.Instance.CreateId();
             procPrintSetupEntity.CreatedBy = _currentUser.UserName;
             procPrintSetupEntity.UpdatedBy = _currentUser.UserName;

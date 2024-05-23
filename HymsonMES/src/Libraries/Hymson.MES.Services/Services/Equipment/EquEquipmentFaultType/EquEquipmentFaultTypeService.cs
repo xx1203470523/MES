@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
             var qualUnqualifiedGroupEntity = await _equipmentFaultTypeRepository.GetByCodeAsync(new QualUnqualifiedGroupByCodeQuery { Code = param.Code, Site = _currentSite.SiteId ?? 0 });
             if (qualUnqualifiedGroupEntity != null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11206)).WithData("code", param.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES11207)).WithData("code", param.Code);
             }
             var userId = _currentUser.UserName;
             //DTO转换实体
@@ -154,11 +154,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentFaultType
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
-            var entitys = await _equipmentFaultTypeRepository.GetByIdsAsync(ids);
-            if (entitys != null && entitys.Any(a => a.Status != DisableOrEnableEnum.Disable))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10135));
-            }
+            //var entitys = await _equipmentFaultTypeRepository.GetByIdsAsync(ids);
+            //if (entitys != null && entitys.Any(a => a.Status != DisableOrEnableEnum.Disable))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10135));
+            //}
 
             var userId = _currentUser.UserName;
             return await _equipmentFaultTypeRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
