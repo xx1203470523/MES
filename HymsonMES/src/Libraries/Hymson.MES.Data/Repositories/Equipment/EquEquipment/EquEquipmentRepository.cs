@@ -282,7 +282,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.LeftJoin("equ_equipment_group eeg ON eeg.Id = EE.EquipmentGroupId");
             sqlBuilder.LeftJoin("equ_spotcheck_template_equipment_group_relation estegr ON estegr.EquipmentGroupId = eeg.Id");
             sqlBuilder.LeftJoin("equ_spotcheck_template est ON est.Id = estegr.SpotCheckTemplateId");
-            sqlBuilder.LeftJoin("equ_operation_permissions eop ON eop.EquipmentId = EE.Id");
+            sqlBuilder.LeftJoin("equ_operation_permissions eop ON eop.EquipmentId = EE.Id AND Type=1");
             sqlBuilder.Select("EE.*,EE.Id as EquipmentId,IWC.Name as WorkCenterShopName,IWC.Code as WorkCenterCode,eeg.EquipmentGroupCode,est.Id as TemplateId,est.Code as TemplateCode,est.Version as TemplateVersion,eop.ExecutorIds,eop.LeaderIds");
             sqlBuilder.Where("EE.IsDeleted = 0");
             sqlBuilder.Where("EE.SiteId = @SiteId");
