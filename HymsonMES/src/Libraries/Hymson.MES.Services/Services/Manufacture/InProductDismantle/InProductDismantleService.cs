@@ -880,9 +880,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = addDto.ProcedureId,
                 ResourceId = addDto.ResourceId,
-                OutputBarCode = addDto.Sfc.ToUpperInvariant(),//主条码
+                OutputBarCode = addDto.Sfc,//主条码
                 OutputBarCodeMaterialId = manuSfcProduce.ProductId,
-                InputBarCode = addDto.CirculationBarCode.ToUpperInvariant(),//添加的条码
+                InputBarCode = addDto.CirculationBarCode,//添加的条码
                 InputBarCodeMaterialId = addDto.CirculationMainProductId ?? 0,
                 InputBarCodeLocation = addDto.Location ?? "",
                 IsDisassemble = TrueOrFalseEnum.No,
@@ -1135,11 +1135,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = addDto.ProcedureId,
                 ResourceId = addDto.ResourceId,
-                SFC = addDto.Sfc.ToUpperInvariant(),
+                SFC = addDto.Sfc,
                 Location = addDto.Location,
                 WorkOrderId = manuSfcProduce.WorkOrderId,
                 ProductId = manuSfcProduce.ProductId,
-                CirculationBarCode = addDto.CirculationBarCode.ToUpperInvariant(),
+                CirculationBarCode = addDto.CirculationBarCode,
                 CirculationProductId = addDto.CirculationProductId.Value,
                 CirculationMainProductId = addDto.CirculationMainProductId,
                 CirculationQty = circulationQty,
@@ -1445,9 +1445,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = replaceDto?.ProcedureId ?? 0,
                 ResourceId = replaceDto?.ResourceId,
-                OutputBarCode = replaceDto?.Sfc.ToUpperInvariant() ?? "",//主条码
+                OutputBarCode = replaceDto?.Sfc ?? "",//主条码
                 OutputBarCodeMaterialId = replaceDto?.CirculationMainProductId,
-                InputBarCode = replaceDto?.CirculationBarCode.ToUpperInvariant() ?? "",//添加的条码
+                InputBarCode = replaceDto?.CirculationBarCode ?? "",//添加的条码
                 InputBarCodeMaterialId = bomDetailEntity?.MaterialId ?? 0,
                 InputBarCodeLocation = replaceDto?.Location ?? "",
                 IsDisassemble = TrueOrFalseEnum.No,
@@ -1723,10 +1723,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = replaceDto.ProcedureId,
-                SFC = replaceDto.Sfc.ToUpperInvariant(),
+                SFC = replaceDto.Sfc,
                 WorkOrderId = manuSfcProduce.WorkOrderId,
                 ProductId = manuSfcProduce.ProductId,
-                CirculationBarCode = replaceDto.CirculationBarCode.ToUpperInvariant(),
+                CirculationBarCode = replaceDto.CirculationBarCode,
                 CirculationProductId = circulationProductId,
                 CirculationMainProductId = replaceDto.CirculationMainProductId,
                 CirculationQty = circulationQty,
@@ -1827,7 +1827,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             ManuBarCodeRelationEntity? entity = null;
             if (circulationEntities.Any())
             {
-                entity = circulationEntities.FirstOrDefault(item => item.InputBarCode.ToUpperInvariant() == circulationBarCode.ToUpperInvariant());
+                entity = circulationEntities.FirstOrDefault(item => item.InputBarCode == circulationBarCode);
                 if (entity != null)
                 {
                     return entity;
@@ -1847,7 +1847,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             if (circulationEntities.Any())
             {
-                var entity = circulationEntities.FirstOrDefault(item => item.CirculationBarCode.ToUpperInvariant() == circulationBarCode.ToUpperInvariant());
+                var entity = circulationEntities.FirstOrDefault(item => item.CirculationBarCode == circulationBarCode);
                 if (entity != null)
                 {
                     return true;
