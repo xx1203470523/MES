@@ -167,7 +167,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var inteUnitEntity = await _inteUnitRepository.GetByIdAsync(equSpotcheckItemEntity.UnitId.GetValueOrDefault());
 
             var dto = equSpotcheckItemEntity.ToModel<EquSpotcheckItemDto>();
-            dto.Unit = inteUnitEntity.Code;
+            dto.Unit = inteUnitEntity?.Code ?? string.Empty;
             return dto;
         }
 
@@ -182,11 +182,8 @@ namespace Hymson.MES.Services.Services.Equipment
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equSpotcheckItemRepository.GetPagedListAsync(pagedQuery);
 
-
-
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquSpotcheckItemDto>());
-            //var result = new PagedInfo<EquSpotcheckItemDto>(Enumerable.Empty<EquSpotcheckItemDto>(), pagedInfo.PageIndex, pagedInfo.PageSize);
 
             var result = new PagedInfo<EquSpotcheckItemDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
 

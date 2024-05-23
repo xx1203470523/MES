@@ -232,6 +232,7 @@ namespace Hymson.MES.Services.Services.Equipment
             result.IsQualifiedText = result.IsQualified?.GetDescription() ?? string.Empty;
             result.EquipmentCode = equipmenEntity.EquipmentCode;
             result.Location = equipmenEntity.Location;
+            result.PlanTypeText = result.PlanType?.GetDescription() ?? string.Empty;
 
             return result;
         }
@@ -280,12 +281,17 @@ namespace Hymson.MES.Services.Services.Equipment
                 result.TotalCount = pagedInfo.TotalCount;
 
                 var resultEquipmentIds = result.Data.Select(m => m.EquipmentId.GetValueOrDefault());
+                var resultIds = result.Data.Select(m => m.Id);
+
                 try
                 {
                     var equipmenEntities = await _equEquipmentRepository.GetByIdAsync(resultEquipmentIds);
 
+                    var processEntities = await _equSpotcheckTaskProcessedRepository.GetEntitiesAsync(new EquSpotcheckTaskProcessedQuery { SpotCheckTaskIds = resultIds });
+
                     result.Data = result.Data.Select(m =>
                     {
+                        //设备处理
                         var equipmentEntity = equipmenEntities.FirstOrDefault(e => e.Id == m.EquipmentId);
                         if (equipmentEntity != null)
                         {
@@ -293,6 +299,15 @@ namespace Hymson.MES.Services.Services.Equipment
                             m.EquipmentName = equipmentEntity.EquipmentName;
                             m.Location = equipmentEntity.Location;
                         }
+
+                        //处理结果
+                        var processEntity = processEntities.FirstOrDefault(e => e.SpotCheckTaskId == m.Id);
+                        if (processEntity != null)
+                        {
+                            m.HandMethod = processEntity.HandMethod;
+                            m.ProcessedBy = processEntity.ProcessedBy;
+                        }
+
                         return m;
                     });
                 }
@@ -372,7 +387,7 @@ namespace Hymson.MES.Services.Services.Equipment
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
-            var taskitemSnap = await _equSpotcheckTaskSnapshotItemRepository.GetEntitiesAsync(new EquSpotcheckTaskSnapshotItemQuery { Id = spotCheckItemSnapshotIds });
+            var taskitemSnap = await _equSpotcheckTaskSnapshotItemRepository.GetEntitiesAsync(new EquSpotcheckTaskSnapshotItemQuery { Ids = spotCheckItemSnapshotIds });
             //单位
             var unitIds = taskitemSnap.Where(x => x.UnitId.HasValue).Select(x => x.UnitId!.Value);
             var inteUnitEntitys = await _inteUnitRepository.GetByIdsAsync(unitIds);
@@ -713,6 +728,15 @@ namespace Hymson.MES.Services.Services.Equipment
             // 更新
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
+            if (operationType == EquSpotcheckOperationTypeEnum.Start)
+            {
+                entity.BeginTime = updatedOn;
+            }
+            else
+            {
+                entity.EndTime = updatedOn;
+            }
+
 
             var rows = 0;
             rows += await _equSpotcheckTaskRepository.UpdateAsync(entity);

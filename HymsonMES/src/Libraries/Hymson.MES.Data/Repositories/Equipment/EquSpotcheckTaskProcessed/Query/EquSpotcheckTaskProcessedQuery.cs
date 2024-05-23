@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
     /// </summary>
     public class EquSpotcheckTaskProcessedQuery
     {
-    
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public IEnumerable<long>? SpotCheckTaskIds { get; set; }
     }
 }

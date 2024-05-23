@@ -6,6 +6,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
     public class EquSpotcheckTaskSnapshotItemQuery
     {
         public long? SpotCheckTaskId { get; set; }
-        public IEnumerable<long>? Id { get; set; }
+        public IEnumerable<long>? Ids { get; set; }
     }
 }

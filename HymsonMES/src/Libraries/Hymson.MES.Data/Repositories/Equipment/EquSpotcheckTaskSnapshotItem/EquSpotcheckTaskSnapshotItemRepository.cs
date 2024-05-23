@@ -119,9 +119,9 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
-            if (query.Id != null && query.Id.Any())
+            if (query.Ids != null && query.Ids.Any())
             {
-                sqlBuilder.Where("Id IN @Id");
+                sqlBuilder.Where("Id IN @Ids");
             }
             sqlBuilder.AddParameters(query);
 

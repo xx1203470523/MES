@@ -132,7 +132,7 @@ namespace Hymson.MES.Core.Domain.Equipment.EquSpotcheck
         /// <summary>
         /// 点检类型;天/小时
         /// </summary>
-        public bool? PlanType { get; set; }
+        public EquipmentSpotcheckTypeEnum? PlanType { get; set; }
 
         /// <summary>
         /// 开始时间（计划）
