@@ -334,9 +334,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         /// <returns></returns>
         public async Task OutboundSfcPolarAsync(OutboundSfcPolarDto dto)
         {
-            //TODO
-            //添加清除极组在制品信息
-
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 查询极组信息
@@ -371,6 +368,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
                 outStationRequestBo.OutStationUnqualifiedList = dto.NgList.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s });
             }
             outStationRequestBos.Add(outStationRequestBo);
+            outBo.OutStationRequestBos = outStationRequestBos;
 
             //产品过程参数
             var parameterBo = new ProductProcessParameterBo
@@ -389,19 +387,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
                 })
             };
             #endregion
-
-            #region 极组出站数据
-            //foreach (var item in jzSfcList)
-            //{
-            //    var jzOutStationRequestBo = new OutStationRequestBo
-            //    {
-            //        SFC = item,
-            //        IsQualified = true,
-            //    };
-            //    outStationRequestBos.Add(jzOutStationRequestBo);
-            //}
-            #endregion
-            outBo.OutStationRequestBos = outStationRequestBos;
 
             //极组绑定数据更新
             UpdateSfcByIdCommand command = new UpdateSfcByIdCommand();
@@ -434,7 +419,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             await _manuJzBindRecordService.AddAsync(bindDto);
             await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
             await _manuProductParameterService.ProductProcessCollectAsync(parameterBo);
-            //await _manuSfcProduceService.DeletePhysicalRangeAsync(jzCommand);
+            await _manuSfcProduceService.DeletePhysicalRangeAsync(jzCommand);
             trans.Complete();
         }
 

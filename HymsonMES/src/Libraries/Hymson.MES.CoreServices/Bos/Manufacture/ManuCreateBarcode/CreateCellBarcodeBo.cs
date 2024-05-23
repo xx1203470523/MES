@@ -27,5 +27,10 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         /// 极组条码集合
         /// </summary>
         public IEnumerable<string> Barcodes { get; set; }
+
+        /// <summary>
+        /// 电芯码是否自动进站
+        /// </summary>
+        public bool IsInStock { get; set; } = true;
     }
 }
