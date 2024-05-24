@@ -182,9 +182,20 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcBomDetailEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted = 0");
+            if (query.ProcedureIds != null && query.ProcedureIds.Any())
+            {
+                sqlBuilder.Where(" ProcedureId IN @ProcedureIds");
+            }
+            if (query.MaterialIds != null && query.MaterialIds.Any())
+            {
+                sqlBuilder.Where(" MaterialId IN @MaterialIds");
+            }
+            sqlBuilder.AddParameters(query);
             using var conn = GetMESDbConnection();
-            var procBomDetailEntities = await conn.QueryAsync<ProcBomDetailEntity>(template.RawSql, query);
-            return procBomDetailEntities;
+            return await conn.QueryAsync<ProcBomDetailEntity>(template.RawSql, template.Parameters);
         }
 
         /// <summary>
