@@ -1,5 +1,3 @@
-using AutoMapper.Execution;
-using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -7,19 +5,15 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Qual;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services;
-using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
-using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Text;
@@ -65,6 +59,8 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         private readonly IInteCustomRepository _inteCustomRepository;
+
+
 
         /// <summary>
         /// 构造
