@@ -89,6 +89,7 @@
         public const string MES10239 = "消耗公差需为大于0整数！";
         public const string MES10240 = "消耗系数需大于0！";
         public const string MES10241 = "物料只能选择一条数据";
+        public const string MES10242 = "物料绑定的模板ID以存在";
         #endregion
 
         #region 资源 10300
@@ -393,6 +394,7 @@
         public const string MES11204 = "不合格组名称超过最大长度，不合格代码名称最大长度为60";
         public const string MES11205 = "说明超过最大长度，不合格代码备注最大长度为255";
         public const string MES11206 = "不合格组编码{code}已经存在";
+        public const string MES11207 = "设备故障类型编码{code}已经存在";
         #endregion
 
         #region 分选规则  11300

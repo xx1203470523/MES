@@ -54,6 +54,16 @@ namespace Hymson.MES.Api.Controllers
             return await _procPrintSetupService.QueryProcPrintSetupByIdAsync(id);
         }
 
+        /// <summary>
+        /// 查询详情（打印设置表）
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        [HttpGet("{materialId}/materialIdList")]
+        public async Task<ProcPrintSetupDto> QueryProcPrintSetupByMaterialIdAsync(long materialId)
+        {
+            return await _procPrintSetupService.QueryProcPrintSetupByMaterialIdAsync(materialId);
+        }
 
         /// <summary>
         /// 新增（打印设置表）
