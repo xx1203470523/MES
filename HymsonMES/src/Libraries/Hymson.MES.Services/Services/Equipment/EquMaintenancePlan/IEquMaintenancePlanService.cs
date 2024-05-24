@@ -66,13 +66,6 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         Task GenerateEquMaintenanceTaskCoreAsync(GenerateDto param);
 
 
-        /// <summary>
-        /// 生成
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        Task GenerateEquMaintenanceTaskAsync(GenerateDto param);
-
         #region 关联信息
 
         /// <summary>
