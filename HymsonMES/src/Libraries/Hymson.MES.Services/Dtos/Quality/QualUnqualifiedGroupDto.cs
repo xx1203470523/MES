@@ -256,5 +256,10 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 工序id
         /// </summary>
         public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 物料组IdId
+        /// </summary>
+        public long? MaterialGroupId { get; set; }
     }
 }

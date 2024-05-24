@@ -563,6 +563,26 @@
         public const string MES12128 = "存在已被其他产线关联的资源{ResourceCodes}！";
         #endregion
 
+
+        #region 设备点检 模板12200
+        public const string MES12200 = "设备点检模板错误";
+        public const string MES12201 = "模板{Code}已启用，不允许删除";
+        public const string MES12202 = "模板【{Code}】，版本【{Version}】已存在";
+        public const string MES12203 = "设备组【{Code}】已绑定模板";
+        #endregion
+
+
+        #region 设备点检 计划12300 
+        public const string MES12300 = "设备点检计划错误";
+        public const string MES12301 = "请维护检验的项目明细";
+        public const string MES12302 = "请维护计划明细";
+        public const string MES12303 = "未到首次执行时间，暂不执行";
+        public const string MES12304 = "请维护执行时间/执行类型/执行周期";
+        public const string MES12305 = "编码【{Code}】,版本【{Version}】已存在"; 
+        public const string MES12306 = "请选择关联模板";
+
+        #endregion
+
         #region 编码规则 12400
         public const string MES12400 = "代码规则维护错误";
         public const string MES12401 = "代码规则中同样物料Id[{productId}],编码类型已经存在";
@@ -912,7 +932,7 @@
         public const string MES15322 = "载具内没有条码";
 
         public const string MES15330 = "条码不存在";
-        public const string MES15331 = "条码库存不足"; 
+        public const string MES15331 = "条码库存不足";
         public const string MES15332 = "请选择操作对象";
         #endregion
 
@@ -2054,7 +2074,7 @@
         public const string MES19983 = "已启用状态的检验单不允许被删除！";
 
 
-        public const string MES19987 = "非新建状态不允许删除！"; 
+        public const string MES19987 = "非新建状态不允许删除！";
         public const string MES19988 = "当前物料已存在启用的检验项目！";
         #endregion
 
@@ -2080,6 +2100,20 @@
         public const string MES15805 = "请先录入点检任务结果！";
         public const string MES15806 = "点检任务中,重复配置点检项目！";
         public const string MES15807 = "只能删除待检验状态的数据";
+        #endregion
+
+        #region 设备点检执行 15900
+        public const string MES15901 = "不良已关闭，不允许删除!";
+        public const string MES15902 = "有检验值是为空！";
+        #endregion
+
+        #region 设备点检 车间物料不良录入 17500
+        public const string MES17501 = "不良已关闭，不允许删除!";
+
+        public const string MES17502 = "物料条码不存在!";
+        public const string MES17503 = "物料条码不可用!";
+        public const string MES17504 = "物料条码库存数量为0!";
+        public const string MES17505 = "物料条码已录入不良且未进行不良处置!";
         #endregion
     }
 }

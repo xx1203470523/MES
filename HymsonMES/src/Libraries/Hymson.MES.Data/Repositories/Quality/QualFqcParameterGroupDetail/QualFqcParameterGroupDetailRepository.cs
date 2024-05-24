@@ -86,6 +86,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 根据主表Id删除数据
+        /// </summary>
+        /// <param name="qualIqcInspectionItemId"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByMainIdAsync(long ParameterGroupId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByMainIdSql, new { ParameterGroupId = ParameterGroupId });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -201,6 +212,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string DeleteSql = "UPDATE qual_fqc_parameter_group_detail SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_fqc_parameter_group_detail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteByMainIdSql = "DELETE FROM `qual_fqc_parameter_group_detail` WHERE ParameterGroupId = @ParameterGroupId;";
 
         const string GetByIdSql = @"SELECT * FROM qual_fqc_parameter_group_detail WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_fqc_parameter_group_detail WHERE Id IN @Ids ";

@@ -9,6 +9,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using static Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query.EquEquipmentPagedQuery;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 {
@@ -262,6 +263,72 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 
             return new PagedInfo<EquEquipmentPageView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+        }
+
+
+        /// <summary>
+        /// pagedQuery(点检计划)
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<GetEquSpotcheckPlanEquipmentRelationPageView>> GetEquSpotcheckPlanEquipmentRelationListAsync(EquEquipmentSpotcheckRelationPagedQuery pagedQuery) 
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.LeftJoin("proc_resource_equipment_bind preb ON preb.EquipmentId = EE.Id");
+            sqlBuilder.LeftJoin("inte_work_center_resource_relation iwcrr ON iwcrr.ResourceId = preb.ResourceId");
+            sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = iwcrr.WorkCenterId");
+            sqlBuilder.LeftJoin("equ_equipment_group eeg ON eeg.Id = EE.EquipmentGroupId");
+            sqlBuilder.LeftJoin("equ_spotcheck_template_equipment_group_relation estegr ON estegr.EquipmentGroupId = eeg.Id");
+            sqlBuilder.LeftJoin("equ_spotcheck_template est ON est.Id = estegr.SpotCheckTemplateId");
+            sqlBuilder.LeftJoin("equ_operation_permissions eop ON eop.EquipmentId = EE.Id AND Type=1");
+            sqlBuilder.Select("EE.*,EE.Id as EquipmentId,IWC.Name as WorkCenterShopName,IWC.Code as WorkCenterCode,eeg.EquipmentGroupCode,est.Id as TemplateId,est.Code as TemplateCode,est.Version as TemplateVersion,eop.ExecutorIds,eop.LeaderIds");
+            sqlBuilder.Where("EE.IsDeleted = 0");
+            sqlBuilder.Where("EE.SiteId = @SiteId");
+            sqlBuilder.OrderBy("EE.UpdatedOn DESC");
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
+            {
+                sqlBuilder.Where("EE.EquipmentCode = @EquipmentCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentName))
+            {
+                pagedQuery.EquipmentName = $"%{pagedQuery.EquipmentName}%";
+                sqlBuilder.Where("EE.EquipmentName LIKE @EquipmentName");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterCode))
+            {
+                sqlBuilder.Where("IWC.Code = @WorkCenterCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Location))
+            {
+                pagedQuery.Location = $"%{pagedQuery.Location}%";
+                sqlBuilder.Where("EE.Location LIKE @Location");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode)) 
+            {
+                sqlBuilder.Where("eeg.EquipmentGroupCode = @EquipmentGroupCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterCode))
+            {
+                sqlBuilder.Where("IWC.Code = @WorkCenterCode");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
+
+            using var conn = GetMESDbConnection();
+            var entities = await conn.QueryAsync<GetEquSpotcheckPlanEquipmentRelationPageView>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+
+            return new PagedInfo<GetEquSpotcheckPlanEquipmentRelationPageView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }

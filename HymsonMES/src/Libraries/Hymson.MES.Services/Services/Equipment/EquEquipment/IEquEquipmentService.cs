@@ -38,6 +38,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         Task<PagedInfo<EquEquipmentListDto>> GetPagedListAsync(EquEquipmentPagedQueryDto pagedQueryDto);
 
+
+        /// <summary>
+        /// 分页查询列表（设备注册）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns> 
+        Task<PagedInfo<GetEquSpotcheckPlanEquipmentRelationListDto>> GetEquSpotcheckPlanEquipmentRelationListAsync(EquEquipmentSpotcheckRelationPagedQueryDto pagedQueryDto);
+
         /// <summary>
         /// 查询列表（设备注册）
         /// </summary>

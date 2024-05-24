@@ -84,6 +84,18 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         }
 
         /// <summary>
+        /// 分页查询列表（设备注册）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [Route("pageRelation")]
+        [HttpGet]
+        public async Task<PagedInfo<GetEquSpotcheckPlanEquipmentRelationListDto>> GetEquSpotcheckPlanEquipmentRelationListAsync([FromQuery] EquEquipmentSpotcheckRelationPagedQueryDto pagedQueryDto)
+        {
+            return await _equEquipmentService.GetEquSpotcheckPlanEquipmentRelationListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
         /// 查询详情（设备注册）
         /// </summary>
         /// <param name="id"></param>

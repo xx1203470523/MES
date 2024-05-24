@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
@@ -112,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select(@" wmi.Id, wmi.MaterialBarCode,wmi.Batch, wmi.QuantityResidue,wmi.DueDate,wmi.Source,wmi.CreatedOn,wmi.Status,
-                                pm.Unit, pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName,pwo.OrderCode as WorkOrderCode");
+                                pm.Unit,pm.GroupId,pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName,pwo.OrderCode as WorkOrderCode");
             sqlBuilder.LeftJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
             sqlBuilder.LeftJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
             sqlBuilder.LeftJoin(" plan_work_order pwo ON  pwo.Id= wmi.WorkOrderId");
@@ -311,6 +312,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpStatusByBarCodeSql, commands);
+        }
+
+        /// <summary>
+        /// 更新状态（批量--不操作数量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns> 
+        public async Task<int> UpdateStatusByIdsAsync(UpdateStatusByIdCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpStatusByIdsSql, command);
         }
 
         /// <summary>
@@ -560,6 +572,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
         const string UpPointByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpStatusByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode = @BarCode; ";
+        const string UpStatusByIdsSql = "UPDATE wh_material_inventory SET Status = @Status,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
         const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET QuantityResidue = 0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE SiteId = @SiteId AND MaterialBarCode IN @BarCodeList";
         const string UpdateWhMaterialInventoryEmptyByIdSql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id = @Id ";
