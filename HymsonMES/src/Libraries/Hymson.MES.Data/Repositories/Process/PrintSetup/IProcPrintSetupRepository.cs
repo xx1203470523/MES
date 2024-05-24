@@ -52,6 +52,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<ProcPrintSetupEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据materialId获取数据
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        Task<ProcPrintSetupEntity> GetByMaterialIdAsync(long materialId);
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>

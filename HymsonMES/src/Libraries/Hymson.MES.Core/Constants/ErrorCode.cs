@@ -89,6 +89,7 @@
         public const string MES10239 = "消耗公差需为大于0整数！";
         public const string MES10240 = "消耗系数需大于0！";
         public const string MES10241 = "物料只能选择一条数据";
+        public const string MES10242 = "物料绑定的模板ID以存在";
         #endregion
 
         #region 资源 10300
