@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -52,5 +53,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 供应商ID
         /// </summary>
         public long? CirculationMainSupplierId { get; set; }
+
+        /// <summary>
+        /// 产品序列码
+        /// </summary>
+        public string? Sfc { get; set; }
+
+        /// <summary>
+        /// 流转类型;1：拆分；2：合并；3：转换;4：消耗;5：拆解;6：组件添加 7.换件
+        /// </summary>
+        public SfcCirculationTypeEnum? CirculationType { get; set; }
     }
 }
