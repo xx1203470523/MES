@@ -514,7 +514,7 @@ namespace Hymson.MES.Data.Repositories.Plan
 
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
                           wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`, wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
-                          wor.InputQty, wor.FinishProductQuantity, wor.PassDownQuantity, wor.RealStart, wor.RealEnd,
+                          wor.InputQty, wor.FinishProductQuantity, wor.PassDownQuantity,wor.UnQualifiedQuantity, wor.RealStart, wor.RealEnd,
                           m.MaterialCode, m.MaterialName,m.Version AS MaterialVersion,
                           b.BomCode, b.Version AS BomVersion,
                           pr.`Code` AS ProcessRouteCode, pr.`Name` AS ProcessRouteName, pr.Version AS ProcessRouteVersion,
