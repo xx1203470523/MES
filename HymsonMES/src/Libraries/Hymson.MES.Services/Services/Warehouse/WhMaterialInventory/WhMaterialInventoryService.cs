@@ -186,7 +186,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             whMaterialInventoryPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _whMaterialInventoryRepository.GetPagedInfoAsync(whMaterialInventoryPagedQuery);
 
-            //实体到DTO转换 装载数据
+            // 实体到DTO转换 装载数据
             List<WhMaterialInventoryPageListViewDto> whMaterialInventoryDtos = PrepareWhMaterialInventoryDtos(pagedInfo);
             return new PagedInfo<WhMaterialInventoryPageListViewDto>(whMaterialInventoryDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
