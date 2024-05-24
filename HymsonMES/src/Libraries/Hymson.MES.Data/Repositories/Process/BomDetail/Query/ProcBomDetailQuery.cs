@@ -6,15 +6,19 @@ namespace Hymson.MES.Data.Repositories.Process
     public class ProcBomDetailQuery
     {
         /// <summary>
-        /// 工序ID
+        /// 工序Id
         /// </summary>
-        public long ProcedureId { get; set; }
+        public IEnumerable<long> ProcedureIds { get; set; }
 
         /// <summary>
         /// 物料ID
         /// </summary>
-        public long MaterialId { get; set; }
+        public IEnumerable<long> MaterialIds { get; set; }
 
+        /// <summary>
+        /// 工厂Id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 
 
