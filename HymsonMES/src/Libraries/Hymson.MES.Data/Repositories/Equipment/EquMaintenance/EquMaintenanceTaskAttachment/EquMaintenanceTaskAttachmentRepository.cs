@@ -107,10 +107,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return await conn.QueryAsync<EquMaintenanceTaskAttachmentEntity>(GetByIdsSql, new { Ids = ids });
         }
 
-        public async Task<IEnumerable<EquSpotcheckTaskAttachmentEntity>> GetByOrderIdAsync(long orderId)
+        public async Task<IEnumerable<EquMaintenanceTaskAttachmentEntity>> GetByOrderIdAsync(long orderId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquSpotcheckTaskAttachmentEntity>(GetByOrderIdSql, new { OrderId = orderId });
+            return await conn.QueryAsync<EquMaintenanceTaskAttachmentEntity>(GetByOrderIdSql, new { OrderId = orderId });
         }
 
         /// <summary>
