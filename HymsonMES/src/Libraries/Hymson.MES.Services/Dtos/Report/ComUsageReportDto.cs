@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using OfficeOpenXml.Attributes;
 
@@ -47,7 +48,12 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 流转类型;1：拆分；2：合并；3：转换;4：消耗;5：拆解;6：组件添加 7.换件
         /// </summary>
-        public SfcCirculationTypeEnum? CirculationType { get; set; }
+        public ManuBarCodeRelationTypeEnum? CirculationType { get; set; }
+
+        /// <summary>
+        /// 是否拆解(0:未拆解，1：拆解)
+        /// </summary>
+        public TrueOrFalseEnum? IsDisassemble { get; set; }
     }
 
     public class ComUsageReportViewDto
