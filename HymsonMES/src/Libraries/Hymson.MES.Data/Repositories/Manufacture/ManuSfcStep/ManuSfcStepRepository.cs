@@ -233,7 +233,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             foreach (var sfc in param.SFCs)
             {
-                var tableNameBySFC = PrepareTableName(param.SiteId, sfc,false);
+                var tableNameBySFC = PrepareTableName(param.SiteId, sfc, false);
                 if (!dic.ContainsKey(tableNameBySFC))
                 {
                     dic[tableNameBySFC] = new List<string>();
@@ -372,7 +372,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 var tableName = PrepareTableName(manuSfcStepEntity, false);
                 if (!keyValuePairs.TryAdd(tableName, new List<ManuSfcStepEntity>() { manuSfcStepEntity }))
                 {
-                    keyValuePairs[tableName].Append(manuSfcStepEntity);
+                    keyValuePairs[tableName] = keyValuePairs[tableName].Append(manuSfcStepEntity).AsList();
                 }
             }
             return keyValuePairs;

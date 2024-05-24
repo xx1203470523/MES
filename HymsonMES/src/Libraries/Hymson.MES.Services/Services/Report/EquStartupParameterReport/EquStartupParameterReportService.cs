@@ -103,6 +103,7 @@ namespace Hymson.MES.Services.Services.Report
                 CreatedOn = pagedQueryDto.CreatedOn,
                 ParameterId = pagedQueryDto.ParameterId,
                 EquipmentId = pagedQueryDto.EquipmentId,
+                BatchId = pagedQueryDto.BatchId,
                 PageIndex = pagedQueryDto.PageIndex,
                 PageSize = pagedQueryDto.PageSize
             };
