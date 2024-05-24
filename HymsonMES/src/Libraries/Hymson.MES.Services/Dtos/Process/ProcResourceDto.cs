@@ -35,6 +35,16 @@ namespace Hymson.MES.Services.Dtos.Process
         public long ResTypeId { get; set; }
 
         /// <summary>
+        /// 资源类型编码
+        /// </summary>
+        public string ResType { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 资源类型名称
+        /// </summary>
+        public string ResTypeName { get; set; } = string.Empty;
+
+        /// <summary>
         /// 描述 :说明 
         /// 空值 : true  
         /// </summary>
