@@ -639,7 +639,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // await VerifyLockOrRepairAsync(removeDto.Sfc, circulationEntity.ProcedureId ?? 0, manuSfcProduce.Id);
 
-            var sfcStepEntity = CreateBarCodeRelationSFCStepEntity(circulationEntity, ManuSfcStepTypeEnum.Disassembly, "");
+            var sfcStepEntity = CreateBarCodeRelationSFCStepEntity(circulationEntity, ManuSfcStepTypeEnum.Disassembly, manuSfcProduce, "");
 
             var inventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
             {
@@ -711,7 +711,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //}
 
             //报废的不能操作
-            if (manuSfcProduce.Status == SfcStatusEnum.Invalid)
+            if (manuSfcProduce.Status == SfcStatusEnum.Scrapping)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16617));
             }
@@ -919,7 +919,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var type = !addDto.IsAssemble ? ManuSfcStepTypeEnum.Add : ManuSfcStepTypeEnum.Assemble;
-            var sfcStepEntity = CreateBarCodeRelationSFCStepEntity(manuBarCodeRelation, type, "");
+            var sfcStepEntity = CreateBarCodeRelationSFCStepEntity(manuBarCodeRelation, type, manuSfcProduce, "");
             #endregion
 
             var rows = 0;
@@ -1412,7 +1412,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             #region 组装数据
             // 步骤表
-            var sfcStepEntity = CreateBarCodeRelationSFCStepEntity(circulationEntity, ManuSfcStepTypeEnum.Replace, "");
+            var sfcStepEntity = CreateBarCodeRelationSFCStepEntity(circulationEntity, ManuSfcStepTypeEnum.Replace, manuSfcProduce, "");
 
             var circulationProductId = whMaterialInventory.MaterialId;
             var command = new DisassemBarCodeRelationblyCommand
@@ -2128,7 +2128,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="type"></param>
         /// <param name="remark"></param>
         /// <returns></returns>
-        private ManuSfcStepEntity CreateBarCodeRelationSFCStepEntity(ManuBarCodeRelationEntity sfc, ManuSfcStepTypeEnum type, string remark = "")
+        private ManuSfcStepEntity CreateBarCodeRelationSFCStepEntity(ManuBarCodeRelationEntity sfc, ManuSfcStepTypeEnum type, ManuSfcView manuSfcView, string remark = "")
         {
             return new ManuSfcStepEntity
             {
@@ -2136,8 +2136,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SFC = sfc.OutputBarCode,
                 Qty = sfc.InputQty,
                 EquipmentId = sfc.EquipmentId,
+                ProductId = manuSfcView.ProductId,
+                WorkOrderId = manuSfcView.WorkOrderId,
+                ProductBOMId = manuSfcView.ProductBOMId,
                 ResourceId = sfc.ResourceId,
                 ProcedureId = sfc.ProcedureId,
+                CurrentStatus = manuSfcView.Status,
                 Operatetype = type,
                 Remark = remark,
                 SiteId = _currentSite.SiteId ?? 0,
