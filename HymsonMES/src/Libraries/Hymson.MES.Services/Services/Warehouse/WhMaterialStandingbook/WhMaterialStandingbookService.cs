@@ -105,19 +105,19 @@ namespace Hymson.MES.Services.Services.Warehouse
             var pagedInfo = await _whMaterialStandingbookRepository.GetPagedInfoAsync(whMaterialStandingbookPagedQuery);
 
             //查询供应商
-            var suppliers= await _whSupplierRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.SupplierId).ToArray());
+            var suppliers = await _whSupplierRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.SupplierId).ToArray());
 
             //实体到DTO转换 装载数据
             List<WhMaterialStandingbookDto> whMaterialStandingbookDtos = PrepareWhMaterialStandingbookDtos(pagedInfo);
 
             foreach (var item in whMaterialStandingbookDtos)
             {
-                if (item.SupplierId > 0) 
+                if (item.SupplierId > 0)
                 {
-                    item.SupplierCode = suppliers.FirstOrDefault(x => x.Id == item.SupplierId)?.Code??"";
+                    item.SupplierCode = suppliers.FirstOrDefault(x => x.Id == item.SupplierId)?.Code ?? "";
                 }
             }
-            
+
             return new PagedInfo<WhMaterialStandingbookDto>(whMaterialStandingbookDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -129,8 +129,10 @@ namespace Hymson.MES.Services.Services.Warehouse
         private static List<WhMaterialStandingbookDto> PrepareWhMaterialStandingbookDtos(PagedInfo<WhMaterialStandingbookEntity> pagedInfo)
         {
             var whMaterialStandingbookDtos = new List<WhMaterialStandingbookDto>();
+
             foreach (var whMaterialStandingbookEntity in pagedInfo.Data)
             {
+
                 var whMaterialStandingbookDto = whMaterialStandingbookEntity.ToModel<WhMaterialStandingbookDto>();
                 whMaterialStandingbookDtos.Add(whMaterialStandingbookDto);
             }

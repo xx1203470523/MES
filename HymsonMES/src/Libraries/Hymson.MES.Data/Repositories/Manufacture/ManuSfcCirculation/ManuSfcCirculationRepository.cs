@@ -317,19 +317,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetReportPagedInfoCountSqlTemplate);
             sqlBuilder.Where(" IsDeleted=0 ");
             sqlBuilder.Select("*");
-
             sqlBuilder.Where(" IsDisassemble=0 "); //筛选出未拆解的
-
             sqlBuilder.Where(" SiteId=@SiteId ");
-
-            //where sc.IsDeleted = 0
-            //    and sc.SiteId = ''
-            //    and sc.CirculationProductId = ''
-            //    and sc.CreatedOn BETWEEN '' and ''-- 查询 时间
-            //    and sc.CirculationBarCode like '%%'-- 查询组件车间作业 / 库存批次 
-            //    -- and-- 查询 供应商编码
-            //    and sc.ProcedureId = ''
-            //    and sc.ResourceId-- 查询资源
+            sqlBuilder.OrderBy("UpdatedOn DESC");
 
             if (queryParam.CirculationProductId.HasValue)
             {
@@ -360,6 +350,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (queryParam.CirculationMainSupplierId.HasValue)
             {
                 sqlBuilder.Where(" CirculationMainSupplierId=@CirculationMainSupplierId ");
+            }
+
+            if (!string.IsNullOrEmpty(queryParam.Sfc))
+            {
+                sqlBuilder.Where(" Sfc=@Sfc ");
+            }
+
+            if (queryParam.CirculationType.HasValue)
+            {
+                sqlBuilder.Where("CirculationType = @CirculationType");
             }
 
             var offSet = (queryParam.PageIndex - 1) * queryParam.PageSize;
@@ -409,8 +409,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 /**innerjoin**/ 
                 /**leftjoin**/ 
                 /**where**/ 
+                /**orderby**/
                 LIMIT @Offset,@Rows 
                 ";
-        const string GetReportPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_circulation` /**where**/ ";
+        const string GetReportPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_circulation` /**where**/ /**orderby**/";
     }
 }

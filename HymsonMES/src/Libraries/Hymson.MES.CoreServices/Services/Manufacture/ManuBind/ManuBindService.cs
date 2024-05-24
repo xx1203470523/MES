@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
@@ -211,6 +212,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                     WorkOrderId = planWorkOrderEntity.Id,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                    ProcessRouteId= planWorkOrderEntity.ProcessRouteId, 
                     ProcedureId = param.ProcedureId,
                     Qty = qty,
                     Operatetype = ManuSfcStepTypeEnum.InStock,
@@ -233,6 +235,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                     WorkOrderId = planWorkOrderEntity.Id,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                    ProcessRouteId=planWorkOrderEntity.ProcessRouteId,  
                     ProcedureId = param.ProcedureId,
                     Qty = qty,
                     Operatetype = ManuSfcStepTypeEnum.InStock,
@@ -432,6 +435,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                     WorkOrderId = itemManuSfcProduce.WorkOrderId,
                     WorkCenterId = itemManuSfcProduce.WorkCenterId,
                     ProductBOMId = itemManuSfcProduce.ProductBOMId,
+                    ProcessRouteId=itemManuSfcProduce.ProcessRouteId,   
                     ProcedureId = param.ProcedureId,//当前绑定条码所在工序
                     Qty = itemManuSfcProduce.Qty,
                     Operatetype = ManuSfcStepTypeEnum.BarcodeBinding,
@@ -454,6 +458,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                     WorkOrderId = itemManuSfcProduce.WorkOrderId,
                     WorkCenterId = itemManuSfcProduce.WorkCenterId,
                     ProductBOMId = itemManuSfcProduce.ProductBOMId,
+                    ProcessRouteId= itemManuSfcProduce.ProcessRouteId,
                     ProcedureId = param.ProcedureId,//当前绑定条码所在工序
                     Qty = itemManuSfcProduce.Qty,
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
@@ -490,7 +495,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SiteId = param.SiteId,
                 Ids = deleteIds
             };
-
+                
             using var trans = TransactionHelper.GetTransactionScope();
             if (isCreate)
             {
@@ -701,6 +706,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                     ProductId = itemwhMaterialInventory.MaterialId,
                     WorkOrderId = itemwhMaterialInventory.WorkOrderId ?? 0,
                     ProductBOMId = manuSfcProduceEntity.ProductBOMId,
+                    ProcessRouteId= manuSfcProduceEntity.ProcessRouteId,
                     ProcedureId = param.ProcedureId,
                     Qty = itemwhMaterialInventory.QuantityResidue,
                     Operatetype = ManuSfcStepTypeEnum.BarcodeBinding,
@@ -727,6 +733,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 ProductId = manuSfcProduceEntity.ProductId,
                 WorkOrderId = manuSfcProduceEntity.WorkOrderId,
                 ProductBOMId = manuSfcProduceEntity.ProductBOMId,
+                ProcessRouteId = manuSfcProduceEntity.ProcessRouteId,
                 ProcedureId = param.ProcedureId,
                 Qty = manuSfcProduceEntity.Qty,
                 Operatetype = ManuSfcStepTypeEnum.BarcodeBinding,
@@ -784,6 +791,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 ProductId = manuSfcProduceEntity.ProductId,
                 WorkOrderId = manuSfcProduceEntity.WorkOrderId,
                 ProductBOMId = manuSfcProduceEntity.ProductBOMId,
+                ProcessRouteId = manuSfcProduceEntity.ProcessRouteId,
                 ProcedureId = param.ProcedureId,
                 Qty = manuSfcProduceEntity.Qty,
                 Operatetype = ManuSfcStepTypeEnum.BarcodeBinding,
@@ -950,6 +958,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 ProductId = manuSfc.ProductId,
                 WorkOrderId = manuSfc.WorkOrderId ?? 0,
                 ProductBOMId = manuSfcProduceEntity?.ProductBOMId,
+                ProcessRouteId = manuSfcProduceEntity?.ProcessRouteId,
                 ProcedureId = param.ProcedureId,
                 Qty = sfc.Qty,
                 Operatetype = ManuSfcStepTypeEnum.BarcodeUnbinding,

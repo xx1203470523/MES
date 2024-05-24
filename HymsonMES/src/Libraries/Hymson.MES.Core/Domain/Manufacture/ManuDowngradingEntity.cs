@@ -34,6 +34,5 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 序号
         /// </summary>
         public int SerialNumber { get; set; } = 0;
-
     }
 }

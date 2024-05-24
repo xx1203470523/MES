@@ -89,6 +89,7 @@
         public const string MES10239 = "消耗公差需为大于0整数！";
         public const string MES10240 = "消耗系数需大于0！";
         public const string MES10241 = "物料只能选择一条数据";
+        public const string MES10242 = "物料绑定的模板ID以存在";
         #endregion
 
         #region 资源 10300
@@ -393,6 +394,7 @@
         public const string MES11204 = "不合格组名称超过最大长度，不合格代码名称最大长度为60";
         public const string MES11205 = "说明超过最大长度，不合格代码备注最大长度为255";
         public const string MES11206 = "不合格组编码{code}已经存在";
+        public const string MES11207 = "设备故障类型编码{code}已经存在";
         #endregion
 
         #region 分选规则  11300
@@ -875,6 +877,11 @@
         public const string MES15125 = " 拆分数量不能为空";
         public const string MES15126 = "待拆分数量不能大于原始数量";
         public const string MES15127 = "物料码只有一条，无法进行合并操作";
+        public const string MES15128 = "物料总数为0,不需要合并！";
+        public const string MES15129 = "未查到条码库存信息";
+        public const string MES15130 = "新生成的条码{sfc}在物料仓已存在，请设置更复杂的编码规则";
+        public const string MES15131 = "{type}编码规则未维护！";
+        public const string MES15132 = "{type}编码规则被维护多条！";
         #endregion
 
         #region 物料台账 15200
@@ -1330,6 +1337,7 @@
         public const string MES16617 = "条码已报废,不可再执行当前操作!";
         public const string MES16618 = "组件条码{barCode}的数据收集方式与主物料数据收集方式冲突!";
         public const string MES16619 = "当前条码【{Current}】的位置号【{Location}】已被【{BarCode}】使用！";
+        public const string MES16620 = "不能填写相同的条码进行替换!";
         #endregion
 
         #region 容器包装 MES 16700

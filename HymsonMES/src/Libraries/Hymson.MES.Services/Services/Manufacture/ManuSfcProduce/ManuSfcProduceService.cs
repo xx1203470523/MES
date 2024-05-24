@@ -22,6 +22,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -35,6 +36,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
+using System.Security.Policy;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
@@ -787,8 +789,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 BarCodes = manuSfcs
             });
 
-
-
             var manuSfcEntities = await manuSfcEntitiesTask;
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
             var sfcPackList = await sfcPackListTask;
@@ -905,6 +905,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     WorkOrderId = manuSfcInfoEntity?.WorkOrderId ?? 0,
                     WorkCenterId = manuSfcProduceEntity?.WorkCenterId,
                     ProductBOMId = manuSfcProduceEntity?.ProductBOMId,
+                    ProcessRouteId = manuSfcProduceEntity?.ProcessRouteId,
                     Qty = manuSfcEntity.Qty,
                     EquipmentId = manuSfcProduceEntity?.EquipmentId,
                     ResourceId = manuSfcProduceEntity?.ResourceId,
@@ -1473,6 +1474,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     WorkOrderId = item.WorkOrderId,
                     WorkCenterId = item.WorkCenterId,
                     ProductBOMId = item.ProductBOMId,
+                    ProcessRouteId = item?.ProcessRouteId,
                     Qty = item.Qty,
                     EquipmentId = item.EquipmentId,
                     ResourceId = item.ResourceId,
@@ -2017,5 +2019,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 
             return new PagedInfo<ManuUpdateViewDto>(manuSfcProduceDtos, pagedInfo!.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
+
+
+
     }
 }

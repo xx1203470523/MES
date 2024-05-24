@@ -17,6 +17,7 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 using System.Security.Policy;
 using System.Text.Json;
 
@@ -243,6 +244,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     WorkOrderId = sfc.WorkOrderId,
                     WorkCenterId = sfc.WorkCenterId,
                     ProductBOMId = sfc.ProductBOMId,
+                   ProcessRouteId = sfc.ProcessRouteId,
                     Qty = sfc.Qty,
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
@@ -386,6 +388,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     WorkOrderId = sfc.WorkOrderId,
                     WorkCenterId = sfc.WorkCenterId,
                     ProductBOMId = sfc.ProductBOMId,
+                    ProcessRouteId = sfc.ProcessRouteId,
                     Qty = sfc.Qty,
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
@@ -546,6 +549,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     WorkOrderId = sfc.WorkOrderId,
                     WorkCenterId = sfc.WorkCenterId,
                     ProductBOMId = sfc.ProductBOMId,
+                    ProcessRouteId=sfc.ProcessRouteId,
                     Qty = sfc.Qty,
                     EquipmentId = sfc.EquipmentId,
                     ResourceId = sfc.ResourceId,
@@ -724,6 +728,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 foreach (var item in manuBarCodeRelations)
                 {
                     var procMaterial = outputBarCodeMaterials.FirstOrDefault(it => it.Id == item.OutputBarCodeMaterialId);
+                    bool isManu = false;
                     //有库存直接锁库存
                     if (outputBarCodeInventorys != null && outputBarCodeInventorys.Any())
                     {
@@ -766,9 +771,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                             };
                             whMaterialStandingbookRelationList.Add(whMaterialStandingbookEntity);
                         }
+                        else
+                        {
+                            isManu = true;
+                        }
                     }
                     //没有库存锁在制
-                    else
+                    if (isManu)
                     {
                         //条码
                         var manuSfcRelation = manuSfcRelations.Where(it => it.SFC == item.OutputBarCode).FirstOrDefault();
@@ -1113,6 +1122,38 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             #endregion
         }
 
+
+
+
+        ///// <summary>
+        ///// 根据查询条件获取分页数据
+        ///// </summary>
+        ///// <param name="manuSfcProducePagedQueryDto"></param>
+        ///// <returns></returns> 
+        //public async Task<List<ManuSfcProduceViewDto>> GetSFCPageListAsync(InstantLockDto param)
+        //{
+
+        //    var sfcs = param.Sfcs.Distinct();
+        //    var siteId = _currentSite.SiteId ?? 0;
+
+        //    List<ManuSfcProduceViewDto> sfcList = new();
+
+        //    var manuBarCodeRelations = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery { InputBarCodes = sfcs, IsDisassemble = TrueOrFalseEnum.No, SiteId = siteId });
+        //    if (manuBarCodeRelations == null || !manuBarCodeRelations.Any())
+        //    {
+        //        return sfcList;
+        //    }
+        //    foreach (var item in manuBarCodeRelations)
+        //    {
+        //        ManuSfcProduceViewDto sfcEntity= new() 
+        //        {
+        //              Sfc= item.OutputBarCode,
+
+        //        };
+        //    }
+
+
+        //}
         #endregion
 
     }
