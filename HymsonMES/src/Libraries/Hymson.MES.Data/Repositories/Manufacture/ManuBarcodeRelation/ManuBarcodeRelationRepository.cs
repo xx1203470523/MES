@@ -118,10 +118,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<IEnumerable<ManuBarCodeRelationEntity>> GetEntitiesAsync(ManuBarcodeRelationQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
-            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             if (query.InputBarCodes != null && query.InputBarCodes.Any())
             {
@@ -131,8 +131,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("IsDisassemble=@IsDisassemble");
             }
+            if (query.DisassembledSfcStepId.HasValue)
+            {
+                sqlBuilder.Where("DisassembledSfcStepId=@DisassembledSfcStepId");
+            }
+            if (query.InputSfcStepId.HasValue)
+            {
+                sqlBuilder.Where("BusinessContent->>'$.InputSFCStepId'=@InputSfcStepId");
+            }
 
-            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            if (query.OutputSfcStepId.HasValue)
+            {
+                sqlBuilder.Where("BusinessContent->>'$.OutputSFCStepId'=@OutputSfcStepId");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuBarCodeRelationEntity>(template.RawSql, query);
         }
@@ -282,10 +293,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where(" IsDeleted=0 ");
             sqlBuilder.Select("*");
-
-            sqlBuilder.Where(" IsDisassemble=0 "); //筛选出未拆解的
-
             sqlBuilder.Where(" SiteId=@SiteId ");
+            if (queryParam.IsDisassemble.HasValue)
+            {
+                sqlBuilder.Where(" IsDisassemble=@IsDisassemble "); //筛选出未拆解的
+            }
 
             if (queryParam.CirculationProductId.HasValue)
             {
@@ -303,6 +315,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where(" InputBarCode=@CirculationBarCode ");
             }
 
+            if (!string.IsNullOrEmpty(queryParam.Sfc))
+            {
+                sqlBuilder.Where(" OutputBarCode=@Sfc ");
+            }
+
             if (queryParam.ProcedureId.HasValue)
             {
                 sqlBuilder.Where(" ProcedureId=@ProcedureId ");
@@ -311,6 +328,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (queryParam.ResourceId.HasValue)
             {
                 sqlBuilder.Where(" ResourceId=@ResourceId ");
+            }
+
+            if (queryParam.CirculationType.HasValue)
+            {
+                sqlBuilder.Where("RelationType = @CirculationType");
             }
 
 

@@ -356,6 +356,23 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         }
 
         /// <summary>
+        /// 分页查询列表（设备注册）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns> 
+        public async Task<PagedInfo<GetEquSpotcheckPlanEquipmentRelationListDto>> GetEquSpotcheckPlanEquipmentRelationListAsync(EquEquipmentSpotcheckRelationPagedQueryDto pagedQueryDto)
+        {
+            var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentSpotcheckRelationPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;  
+            var pagedInfo = await _equEquipmentRepository.GetEquSpotcheckPlanEquipmentRelationListAsync(pagedQuery);
+
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<GetEquSpotcheckPlanEquipmentRelationListDto>());
+
+            return new PagedInfo<GetEquSpotcheckPlanEquipmentRelationListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
         /// 查询列表（设备注册）
         /// </summary>
         /// <returns></returns>

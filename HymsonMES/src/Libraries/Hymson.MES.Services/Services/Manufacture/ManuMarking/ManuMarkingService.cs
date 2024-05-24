@@ -447,11 +447,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
                 WorkOrderId = sfcInfoEntity?.WorkOrderId ?? 0,
                 WorkCenterId = manuSfcProduceInfoEntity?.WorkCenterId,
                 ProductBOMId = manuSfcProduceInfoEntity?.ProductBOMId,
+                ProcessRouteId = manuSfcProduceInfoEntity?.ProcessRouteId,
                 Qty = sfcEntity?.Qty ?? 0,
                 EquipmentId = manuSfcProduceInfoEntity?.EquipmentId,
                 ResourceId = manuSfcProduceInfoEntity?.ResourceId,
                 ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
-                Operatetype = ManuSfcStepTypeEnum.BadEntry,
+                Operatetype = ManuSfcStepTypeEnum.CloseMarking,
                 CurrentStatus = sfcEntity!.Status,
                 SiteId = _currentSite.SiteId ?? 0,
                 CreatedOn = HymsonClock.Now(),
@@ -475,6 +476,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
                     Id = item.Id.GetValueOrDefault(),
                     Remark = item.Remark ?? "",
                     Status = item.Status.GetValueOrDefault(),
+                    CloseSfcStepId = manuSfcStepEntity.Id,
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 };

@@ -69,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuProductBadRecordEntity>(GetByIdsSql, new { ids = ids });
@@ -154,6 +154,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (query.InterceptOperationId != null)
             {
                 sqlBuilder.Where("InterceptOperationId = @InterceptOperationId");
+            }
+            if (query.SfcStepId.HasValue)
+            {
+                sqlBuilder.Where("SfcStepId = @SfcStepId");
+            }
+            if (query.ReJudgmentSfcStepId.HasValue)
+            {
+                sqlBuilder.Where("ReJudgmentSfcStepId = @ReJudgmentSfcStepId");
+            }
+            if (query.CloseSfcStepId.HasValue)
+            {
+                sqlBuilder.Where("CloseSfcStepId = @CloseSfcStepId");
             }
             var manuProductBadRecordEntities = await conn.QueryAsync<ManuProductBadRecordEntity>(template.RawSql, query);
             return manuProductBadRecordEntities;
@@ -499,7 +511,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateSql = "UPDATE manu_product_bad_record SET   SiteId = @SiteId, FoundBadOperationId = @FoundBadOperationId, FoundBadResourceId = @FoundBadResourceId, OutflowOperationId = @OutflowOperationId, UnqualifiedId = @UnqualifiedId, SFC = @SFC, SfcInfoId = @SfcInfoId, Qty = @Qty, Status = @Status, Source = @Source, DisposalResult = @DisposalResult, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SfcStepId = @SfcStepId, ReJudgmentSfcStepId = @ReJudgmentSfcStepId, ReJudgmentBy = @ReJudgmentBy, ReJudgmentOn = @ReJudgmentOn, ReJudgmentResult = @ReJudgmentResult, CloseBy = @CloseBy, CloseOn = @CloseOn WHERE Id = @Id ";
 
         //Marking关闭提交保存
-        const string UpdateMarkingCloseSql = "UPDATE manu_product_bad_record SET Status = @Status,Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateMarkingCloseSql = "UPDATE manu_product_bad_record SET Status = @Status,Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , CloseSfcStepId = @CloseSfcStepId WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_product_bad_record` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT * FROM `manu_product_bad_record`  WHERE Id = @Id ";

@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -87,6 +88,26 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedGroupEntity>> GetListByMaterialGroupIddAsync(QualUnqualifiedGroupQuery param)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("ug.*");
+            sqlBuilder.Where("ug.IsDeleted=0");
+            sqlBuilder.Where($"ug.SiteId =@SiteId");
+            sqlBuilder.LeftJoin("proc_material_group_unqualified_group_relation pr on ug.Id =pr.UnqualifiedGroupId ");
+            sqlBuilder.Where("pr.MaterialGroupId=@MaterialGroupId");
+
+            using var conn = GetMESDbConnection();
+            var qualUnqualifiedGroupEntities = await conn.QueryAsync<QualUnqualifiedGroupEntity>(template.RawSql, param);
+            return qualUnqualifiedGroupEntities;
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -95,6 +116,22 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<QualUnqualifiedGroupEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedGroupEntity>> GetByIdsAsync(long[] ids)
+        {
+            if (ids.Length <= 0)
+            {
+                return new List<QualUnqualifiedGroupEntity>();
+            }
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualUnqualifiedGroupEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -254,6 +291,9 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetByIdSql = @"SELECT 
                                Id, SiteId, UnqualifiedGroup, UnqualifiedGroupName, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                                 FROM `qual_unqualified_group`  WHERE Id = @Id  AND IsDeleted=0 ";
+        const string GetByIdsSql = @"SELECT 
+                               Id, SiteId, UnqualifiedGroup, UnqualifiedGroupName, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
+                                FROM `qual_unqualified_group`  WHERE Id in @ids  AND IsDeleted=0 ";
         const string GetByCodeSql = @"SELECT 
                               Id, SiteId, UnqualifiedGroup, UnqualifiedGroupName, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                                 FROM `qual_unqualified_group`  WHERE UnqualifiedGroup = @Code AND SiteId = @Site  AND IsDeleted = 0";

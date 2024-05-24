@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -37,20 +38,28 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
 
         /// <summary>
+        /// 仓储接口（物料组与不合格代码组关系）
+        /// </summary>
+        private readonly IProcMaterialGroupUnqualifiedGroupRelationRepository _groupRelationRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procMaterialGroupRepository"></param>
+        /// <param name="groupRelationRepository"></param>
         public ProcMaterialGroupService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcMaterialRepository procMaterialRepository,
-            IProcMaterialGroupRepository procMaterialGroupRepository)
+            IProcMaterialGroupRepository procMaterialGroupRepository,
+            IProcMaterialGroupUnqualifiedGroupRelationRepository groupRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procMaterialGroupRepository = procMaterialGroupRepository;
             _procMaterialRepository = procMaterialRepository;
+            _groupRelationRepository = groupRelationRepository;
         }
 
 
@@ -69,6 +78,7 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialGroupCreateDto.GroupName = procMaterialGroupCreateDto.GroupName.ToTrimSpace();
             procMaterialGroupCreateDto.Remark = procMaterialGroupCreateDto?.Remark ?? "".Trim();
 
+            var userName = _currentUser.UserName;
             //DTO转换实体
             var procMaterialGroupEntity = procMaterialGroupCreateDto!.ToEntity<ProcMaterialGroupEntity>();
             procMaterialGroupEntity.Id = IdGenProvider.Instance.CreateId();
@@ -98,6 +108,22 @@ namespace Hymson.MES.Services.Services.Process
 
             #endregion
 
+            //关联不合格组
+            var groupRelationEntities = new List<ProcMaterialGroupUnqualifiedGroupRelationEntity>();
+            if (procMaterialGroupCreateDto.UnqualifiedGroupIds != null && procMaterialGroupCreateDto.UnqualifiedGroupIds.Any())
+            {
+                foreach (var groupId in procMaterialGroupCreateDto.UnqualifiedGroupIds)
+                {
+                    groupRelationEntities.Add(new ProcMaterialGroupUnqualifiedGroupRelationEntity
+                    {
+                        MaterialGroupId = procMaterialGroupEntity.Id,
+                        UnqualifiedGroupId = groupId,
+                        CreatedBy = userName,
+                        CreatedOn = HymsonClock.Now()
+                    });
+                }
+            }
+
             #region 保存到数据库
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
@@ -121,6 +147,11 @@ namespace Hymson.MES.Services.Services.Process
                 if (response < procMaterialList.Count())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10218));
+                }
+
+                if (groupRelationEntities.Any())
+                {
+                    await _groupRelationRepository.InsertRangeAsync(groupRelationEntities);
                 }
 
                 ts.Complete();
@@ -158,6 +189,22 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }
 
+            //关联不合格组
+            var groupRelationEntities = new List<ProcMaterialGroupUnqualifiedGroupRelationEntity>();
+            if (procMaterialGroupModifyDto.UnqualifiedGroupIds != null && procMaterialGroupModifyDto.UnqualifiedGroupIds.Any())
+            {
+                foreach (var groupId in procMaterialGroupModifyDto.UnqualifiedGroupIds)
+                {
+                    groupRelationEntities.Add(new ProcMaterialGroupUnqualifiedGroupRelationEntity
+                    {
+                        MaterialGroupId = entity.Id,
+                        UnqualifiedGroupId = groupId,
+                        CreatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now()
+                    });
+                }
+            }
+
             #region 保存到数据库
             using (var trans = TransactionHelper.GetTransactionScope())
             {
@@ -170,6 +217,12 @@ namespace Hymson.MES.Services.Services.Process
 
                 rows = await _procMaterialRepository.UpdateProcMaterialGroupAsync(procMaterialList);
 
+                //删除旧的关联关系，插入新的关联关系
+                await _groupRelationRepository.DeleteByMaterialGroupIdAsync(entity.Id);
+                if (groupRelationEntities.Any())
+                {
+                    await _groupRelationRepository.InsertRangeAsync(groupRelationEntities);
+                }
                 trans.Complete();
             }
 
@@ -273,11 +326,18 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcMaterialGroupDto> QueryProcMaterialGroupByIdAsync(long id)
         {
             var procMaterialGroupEntity = await _procMaterialGroupRepository.GetByIdAndSiteIdAsync(id, _currentSite.SiteId ?? 0);
-            if (procMaterialGroupEntity != null)
+            if (procMaterialGroupEntity == null)
             {
-                return procMaterialGroupEntity.ToModel<ProcMaterialGroupDto>();
+                return new ProcMaterialGroupDto();
             }
-            return new ProcMaterialGroupDto();
+             var materialGroupDto=procMaterialGroupEntity.ToModel<ProcMaterialGroupDto>();
+            //查询关联的不合格组
+            var groupRelationEntities= await _groupRelationRepository.GetEntitiesAsync(new Data.Repositories.Process.Query.ProcMaterialGroupUnqualifiedGroupRelationQuery
+            {
+                MaterialGroupId= procMaterialGroupEntity.Id
+            });
+            materialGroupDto.UnqualifiedGroupIds = groupRelationEntities.Select(x => x.UnqualifiedGroupId).ToList();
+            return materialGroupDto;
         }
 
 

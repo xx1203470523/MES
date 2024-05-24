@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
@@ -361,6 +362,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ProductId = productId,
                     WorkOrderId = planWorkOrderEntity.Id,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                    ProcessRouteId= planWorkOrderEntity.ProcessRouteId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     Qty = qty,
                     ProcedureId = commonBo.ProcedureId,

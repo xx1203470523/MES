@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<ManuProductParameterEntity> list, string tableName)
         {
-            string insertSql = $"INSERT INTO {tableName}(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SFC,@ProcedureId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
+            string insertSql = $"INSERT INTO {tableName}(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,  `SfcstepId`) VALUES (@Id, @SiteId, @SFC,@ProcedureId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted,@SfcstepId)";
             using var conn = GetMESParamterDbConnection();
             return await conn.ExecuteAsync(insertSql, list);
         }
@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
             List<Task<int>> tasks = new();
             foreach (var dicItem in dic)
             {
-                string insertSql = $"INSERT INTO {dicItem.Key}(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SFC,@ProcedureId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
+                string insertSql = $"INSERT INTO {dicItem.Key}(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,  `SfcstepId` ) VALUES (@Id, @SiteId, @SFC,@ProcedureId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted,@SfcstepId)";
                 tasks.Add(conn.ExecuteAsync(insertSql, dicItem.Value));
             }
             var result = await Task.WhenAll(tasks);
@@ -82,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
         /// <returns></returns>
         public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterEntitiesAsync(ManuProductParameterBySfcQuery param, string tableName)
         {
-            string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted  FROM {tableName}  WHERE SFC IN @SFCs  AND SiteId =@SiteId AND IsDeleted=0";
+            string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SfcstepId  FROM {tableName}  WHERE SFC IN @SFCs  AND SiteId =@SiteId AND IsDeleted=0";
             using var conn = GetMESParamterDbConnection();
             return await conn.QueryAsync<ManuProductParameterEntity>(getBySFCSql, param);
         }
@@ -111,7 +111,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
             using var conn = GetMESParamterDbConnection();
             foreach (var dicItem in dic)
             {
-                string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted  FROM {dicItem.Key}  WHERE SFC IN @SFCs  AND SiteId =@SiteId AND IsDeleted=0";
+                string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted , SfcstepId  FROM {dicItem.Key}  WHERE SFC IN @SFCs  AND SiteId =@SiteId AND IsDeleted=0";
                 tasks.Add(conn.QueryAsync<ManuProductParameterEntity>(getBySFCSql, param));
             }
             var result = await Task.WhenAll(tasks);
@@ -131,7 +131,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
         {
             var tableNameByProcedureId = GetTableNameByProcedureId(param.SiteId, param.ProcedureId);
             var sqlBuilder = new SqlBuilder();
-            string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted  FROM {tableNameByProcedureId}  /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+            string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SfcstepId   FROM {tableNameByProcedureId}  /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
             var templateData = sqlBuilder.AddTemplate(getBySFCSql);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId =@SiteId");

@@ -8,6 +8,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFacePlateRepair.Query
 {
     public class ManuFacePlateRepairQuery
     {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 步骤id
+        /// </summary>
+        public long? SfcStepId { get; set; }
     }
 
     public class ManuSfcRepairDetailByProductBadIdQuery

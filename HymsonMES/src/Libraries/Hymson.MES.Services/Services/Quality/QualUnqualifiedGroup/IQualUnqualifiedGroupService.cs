@@ -26,6 +26,13 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
         Task<IEnumerable<QualUnqualifiedGroupDto>> GetListByProcedureIdAsync([FromQuery] QualUnqualifiedGroupQueryDto queryDto);
 
         /// <summary>
+        /// 查询物料组关联的不合格组列表
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedGroupDto>> GetListByMaterialGroupIddAsync([FromQuery] QualUnqualifiedGroupQueryDto queryDto);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="param"></param>

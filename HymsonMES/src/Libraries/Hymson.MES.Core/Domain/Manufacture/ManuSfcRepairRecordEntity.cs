@@ -22,41 +22,44 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 条码
         /// </summary>
         public string SFC { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public long WorkOrderId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 维修资源id
         /// </summary>
         public long ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 维修工序id
         /// </summary>
         public long ProcedureId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 返回工序Id
         /// </summary>
         public long? ReturnProcedureId { get; set; }
 
         /// <summary>
+        /// 步骤id
+        /// </summary>
+        public long SfcStepId { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
-
-       
     }
 }

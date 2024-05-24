@@ -169,6 +169,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetInStepBySFCSql, PrepareTableName(query.SiteId, query.SFC, false)), query);
         }
 
+
+        /// <summary>
+        /// 获取SFC的进站步骤
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetStepsBySFCAsync(EntityBySFCQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetStepBySFCSql, PrepareTableName(query.SiteId, query.SFC, false)), query);
+        }
+
         /// <summary>
         /// 获取SFC的出站步骤
         /// </summary>
@@ -353,7 +365,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 var tableName = PrepareTableName(manuSfcStepEntity, false);
                 if (!keyValuePairs.TryAdd(tableName, new List<ManuSfcStepEntity>() { manuSfcStepEntity }))
                 {
-                    keyValuePairs[tableName].Append(manuSfcStepEntity);
+                    keyValuePairs[tableName]=  keyValuePairs[tableName].Append(manuSfcStepEntity).ToList();
                 }
             }
             return keyValuePairs;
@@ -398,7 +410,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             byte[] bytes = Encoding.UTF8.GetBytes(input);
             return Crc32Algorithm.Compute(bytes);
         }
-        #endregion
+        #endregion  
 
     }
 
@@ -411,10 +423,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
         const string GetManuSfcStepEntitiesSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**where**/  ";
         const string InsertSfcStepBusinessSql = "INSERT INTO `manu_sfc_step_business`(`Id`, `SiteId`, `SfcStepId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcStepId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertSql = "INSERT INTO  `{0}` (  `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `VehicleCode`, `IsRepair`, `CurrentStatus`, `Operatetype`, `OperationProcedureId`, `OperationResourceId`, `OperationEquipmentId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `AfterOperationStatus`) VALUES (  @Id, @SFC, @ProductId, @WorkOrderId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @ResourceId, @ProcedureId, @VehicleCode, @IsRepair, @CurrentStatus, @Operatetype, @OperationProcedureId, @OperationResourceId, @OperationEquipmentId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @AfterOperationStatus) ";
+        const string InsertSql = "INSERT INTO  `{0}` (  `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `ProcessRouteId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `VehicleCode`, `IsRepair`, `CurrentStatus`, `Operatetype`, `OperationProcedureId`, `OperationResourceId`, `OperationEquipmentId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `AfterOperationStatus`) VALUES (  @Id, @SFC, @ProductId, @WorkOrderId, @WorkCenterId, @ProductBOMId,@ProcessRouteId, @Qty, @EquipmentId, @ResourceId, @ProcedureId, @VehicleCode, @IsRepair, @CurrentStatus, @Operatetype, @OperationProcedureId, @OperationResourceId, @OperationEquipmentId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @AfterOperationStatus) ";
         const string UpdateSql = "UPDATE `{0}` SET   SFC = @SFC, ProductId = @ProductId, WorkOrderId = @WorkOrderId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, VehicleCode = @VehicleCode, IsRepair = @IsRepair, CurrentStatus = @CurrentStatus, Operatetype = @Operatetype, OperationProcedureId = @OperationProcedureId, OperationResourceId = @OperationResourceId, OperationEquipmentId = @OperationEquipmentId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, AfterOperationStatus = @AfterOperationStatus WHERE Id = @Id ";
         const string GetByIdSql = @"SELECT * FROM `manu_sfc_step`  WHERE Id = @Id ";
         const string GetListByStartWaterMarkIdSql = @"SELECT * FROM `manu_sfc_step` WHERE Id > @StartWaterMarkId ORDER BY Id ASC LIMIT @Rows";
+        const string GetStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId  AND SFC = @SFC ORDER BY Id ASC ";
         const string GetInStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype = 3 AND SFC = @SFC ORDER BY Id ASC ";
         const string GetOutStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype = 4 AND SFC = @SFC ORDER BY Id ASC ";
         const string GetInOutStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype IN (3, 4) AND SFC = @SFC ORDER BY Id ASC ";

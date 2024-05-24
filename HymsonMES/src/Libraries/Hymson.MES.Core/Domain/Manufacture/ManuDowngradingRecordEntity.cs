@@ -21,7 +21,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string SFC { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 步骤id
+        /// </summary>
+        public long SFCStepId { get; set; }
+
+        /// <summary>
         /// 品级
         /// </summary>
         public string Grade { get; set; }
