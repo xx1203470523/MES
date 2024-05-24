@@ -2,6 +2,7 @@
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -70,23 +71,27 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
         /// <summary>
         /// 根据产线ID、资源ID获取工单数据（激活的工单）
         /// </summary>
-        /// <param name="workLineId"></param>
-        /// <param name="resourceId"></param>
+        /// <param name="equResModel"></param>
         /// <returns></returns>
-        public async Task<PlanWorkOrderEntity> GetByWorkLineIdAsync(long workLineId, long resourceId)
+        public async Task<PlanWorkOrderEntity> GetByWorkLineIdAsync(EquEquipmentResAllView equResModel)
         {
+            long workLineId = equResModel.LineId;
+            long resourceId = equResModel.ResId;
             PlanWorkOrderEntity? orderEntity = null;
             //查询产线信息
             var workLineEntity = await _inteWorkCenterRepository.GetByIdAsync(workLineId);
             if (workLineEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12125));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45036))
+                    .WithData("LineWorkCenterCode", equResModel.LineWorkCenterCode);
             }
             //获取线体激活工单
             var activeOrderList = await _planWorkOrderRepository.GetByWorkLineIdAsync(workLineId);
             if (activeOrderList == null || !activeOrderList.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45030));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45030))
+                    .WithData("EquipmentCode", equResModel.EquipmentCode)
+                    .WithData("LineWorkCenterCode", equResModel.LineWorkCenterCode);
             }
             if (activeOrderList.Count() == 1)
             {
@@ -98,7 +103,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
                 //不混线时 校验是否激活大于一个工单
                 if (activeOrderList.Count() > 1)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES45031));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45031))
+                        .WithData("EquipmentCode", equResModel.EquipmentCode)
+                        .WithData("LineWorkCenterCode", equResModel.LineWorkCenterCode);
                 }
                 orderEntity = activeOrderList.First();
             }
@@ -112,12 +119,14 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder
                 });
                 if (workOrderBindEntities == null || !workOrderBindEntities.Any())
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES45034));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45034))
+                        .WithData("EquipmentCode", equResModel.EquipmentCode);
                 }
                 var tempOrderList = activeOrderList.Where(x => workOrderBindEntities.Select(z => z.WorkOrderId).Contains(x.Id));
                 if (tempOrderList == null || tempOrderList.Any())
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES45035));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45035))
+                        .WithData("EquipmentCode", equResModel.EquipmentCode);
                 }
                 orderEntity = tempOrderList.First();
             }

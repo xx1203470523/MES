@@ -82,7 +82,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("OperatorLogin")]
-        [LogDescription("操作员登录001", BusinessType.OTHER, "OperatorLoginMes001", ReceiverTypeEnum.MES)]
+        [LogDescription("操作员登录001", BusinessType.OTHER, "001", ReceiverTypeEnum.MES)]
         [AllowAnonymous]
         public async Task OperatorLoginAsync(OperationLoginDto dto)
         {
@@ -102,7 +102,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Heartbeat")]
-        [LogDescription("设备心跳002", BusinessType.OTHER, "Heartbeat002", ReceiverTypeEnum.MES)]
+        [LogDescription("设备心跳002", BusinessType.OTHER, "002", ReceiverTypeEnum.MES)]
         public async Task HeartbeatAsync(HeartbeatDto dto)
         {
             if (IS_DEBUG == true)
@@ -125,7 +125,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("State")]
-        [LogDescription("设备状态上报003", BusinessType.OTHER, "State003", ReceiverTypeEnum.MES)]
+        [LogDescription("设备状态上报003", BusinessType.OTHER, "003", ReceiverTypeEnum.MES)]
         public async Task StateAsync(StateDto dto)
         {
             if (IS_DEBUG == true)
@@ -147,7 +147,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Alarm")]
-        [LogDescription("设备运行报警信息004", BusinessType.OTHER, "Alarm004", ReceiverTypeEnum.MES)]
+        [LogDescription("设备运行报警信息004", BusinessType.OTHER, "004", ReceiverTypeEnum.MES)]
         public async Task AlarmAsync(AlarmDto dto)
         {
             if (IS_DEBUG == true)
@@ -167,7 +167,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("TimeSynch")]
-        [LogDescription("时间同步005", BusinessType.OTHER, "TimeSynchMes005", ReceiverTypeEnum.MES)]
+        [LogDescription("时间同步005", BusinessType.OTHER, "005", ReceiverTypeEnum.MES)]
         public async Task<string> TimeSynchAsync(QknyBaseDto dto)
         {
             DateTime date = HymsonClock.Now();
@@ -182,7 +182,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("CcdFileUploadComplete")]
-        [LogDescription("CCD文件上传完成006", BusinessType.OTHER, "CCDFileUploadComplete006", ReceiverTypeEnum.MES)]
+        [LogDescription("CCD文件上传完成006", BusinessType.OTHER, "006", ReceiverTypeEnum.MES)]
         public async Task CcdFileUploadCompleteAsync(CCDFileUploadCompleteDto dto)
         {
             if (IS_DEBUG == true)
@@ -203,7 +203,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetRecipeList")]
-        [LogDescription("获取开机参数列表007", BusinessType.OTHER, "GetRecipeList007", ReceiverTypeEnum.MES)]
+        [LogDescription("获取开机参数列表007", BusinessType.OTHER, "007", ReceiverTypeEnum.MES)]
         public async Task<List<GetRecipeListReturnDto>> GetRecipeListAsync(GetRecipeListDto dto)
         {
             if (IS_DEBUG == true)
@@ -236,7 +236,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetRecipeDetail")]
-        [LogDescription("获取开机参数明细008", BusinessType.OTHER, "GetRecipeDetail008", ReceiverTypeEnum.MES)]
+        [LogDescription("获取开机参数明细008", BusinessType.OTHER, "008", ReceiverTypeEnum.MES)]
         public async Task<GetRecipeDetailReturnDto> GetRecipeDetailAsync(GetRecipeDetailDto dto)
         {
             //TODO
@@ -271,7 +271,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Recipe")]
-        [LogDescription("开机参数校验采集009", BusinessType.OTHER, "Recipe009", ReceiverTypeEnum.MES)]
+        [LogDescription("开机参数校验采集009", BusinessType.OTHER, "009", ReceiverTypeEnum.MES)]
         public async Task RecipeAsync(RecipeDto dto)
         {
             if (IS_DEBUG == true)
@@ -295,7 +295,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Feeding")]
-        [LogDescription("原材料上料010", BusinessType.OTHER, "Feeding010", ReceiverTypeEnum.MES)]
+        [LogDescription("原材料上料010", BusinessType.OTHER, "010", ReceiverTypeEnum.MES)]
         public async Task FeedingAsync(FeedingDto dto)
         {
             if (IS_DEBUG == true)
@@ -318,7 +318,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("HalfFeeding")]
-        [LogDescription("半成品上料011", BusinessType.OTHER, "HalfFeeding011", ReceiverTypeEnum.MES)]
+        [LogDescription("半成品上料011", BusinessType.OTHER, "011", ReceiverTypeEnum.MES)]
         public async Task HalfFeedingAsync(HalfFeedingDto dto)
         {
             if (IS_DEBUG == true)
@@ -347,7 +347,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("AgvUpMaterial")]
-        [LogDescription("上料呼叫Agv012", BusinessType.OTHER, "AgvUpMaterial012", ReceiverTypeEnum.MES)]
+        [LogDescription("上料呼叫Agv012", BusinessType.OTHER, "012", ReceiverTypeEnum.MES)]
         public async Task AgvUpMaterialAsync(AgvUpMaterialDto dto)
         {
             if (IS_DEBUG == true)
@@ -375,7 +375,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("AgvDownMaterial")]
-        [LogDescription("下料呼叫Agv013", BusinessType.OTHER, "AgvDownMaterial013", ReceiverTypeEnum.MES)]
+        [LogDescription("下料呼叫Agv013", BusinessType.OTHER, "013", ReceiverTypeEnum.MES)]
         public async Task AgvDownMaterialAsync(AgvUpMaterialDto dto)
         {
             if (IS_DEBUG == true)
@@ -403,7 +403,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("FormulaListGet")]
-        [LogDescription("获取配方列表(制胶匀浆)014", BusinessType.OTHER, "FormulaListGet014", ReceiverTypeEnum.MES)]
+        [LogDescription("获取配方列表(制胶匀浆)014", BusinessType.OTHER, "014", ReceiverTypeEnum.MES)]
         public async Task<List<FormulaListGetReturnDto>> FormulaListGetAsync(FormulaListGetDto dto)
         {
             //TODO
@@ -435,7 +435,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("FormulaDetailGet")]
-        [LogDescription("获取配方参数明细(制胶匀浆)015", BusinessType.OTHER, "FormulaDetailGet015", ReceiverTypeEnum.MES)]
+        [LogDescription("获取配方参数明细(制胶匀浆)015", BusinessType.OTHER, "015", ReceiverTypeEnum.MES)]
         public async Task<FormulaDetailGetReturnDto> FormulaDetailGetAsync(FormulaDetailGetDto dto)
         {
             //TODO
@@ -474,7 +474,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("FormulaVersionExamine")]
-        [LogDescription("配方版本校验(制胶匀浆)016", BusinessType.OTHER, "FormulaVersionExamine016", ReceiverTypeEnum.MES)]
+        [LogDescription("配方版本校验(制胶匀浆)016", BusinessType.OTHER, "016", ReceiverTypeEnum.MES)]
         public async Task FormulaVersionExamineAsync(FormulaVersionExamineDto dto)
         {
             if (IS_DEBUG == true)
@@ -495,7 +495,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ConsumeEquBeforeCheck")]
-        [LogDescription("设备投料前校验(制胶匀浆)017", BusinessType.OTHER, "ConsumeEquBeforeCheck017", ReceiverTypeEnum.MES)]
+        [LogDescription("设备投料前校验(制胶匀浆)017", BusinessType.OTHER, "017", ReceiverTypeEnum.MES)]
         public async Task ConsumeEquBeforeCheckAsync(ConsumeEquBeforeCheckDto dto)
         {
             if (IS_DEBUG == true)
@@ -518,7 +518,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ConsumeEqu")]
-        [LogDescription("设备投料(制胶匀浆)018", BusinessType.OTHER, "ConsumeEqu018", ReceiverTypeEnum.MES)]
+        [LogDescription("设备投料(制胶匀浆)018", BusinessType.OTHER, "018", ReceiverTypeEnum.MES)]
         public async Task ConsumeEquAsync(ConsumeEquDto dto)
         {
             if (IS_DEBUG == true)
@@ -538,7 +538,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("FeedingCompleted")]
-        [LogDescription("上料完成(制胶匀浆)019", BusinessType.OTHER, "FeedingCompleted019", ReceiverTypeEnum.MES)]
+        [LogDescription("上料完成(制胶匀浆)019", BusinessType.OTHER, "019", ReceiverTypeEnum.MES)]
         public async Task FeedingCompletedAsync(FeedingCompletedDto dto)
         {
             if (IS_DEBUG == true)
@@ -560,7 +560,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("OutputEqu")]
-        [LogDescription("设备产出(制胶匀浆)020", BusinessType.OTHER, "OutputEqu020", ReceiverTypeEnum.MES)]
+        [LogDescription("设备产出(制胶匀浆)020", BusinessType.OTHER, "020", ReceiverTypeEnum.MES)]
         public async Task<string> OutputEquAsync(QknyBaseDto dto)
         {
             if (IS_DEBUG == true)
@@ -583,7 +583,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("BatchMove")]
-        [LogDescription("批次转移(制胶匀浆)021", BusinessType.OTHER, "BatchMove021", ReceiverTypeEnum.MES)]
+        [LogDescription("批次转移(制胶匀浆)021", BusinessType.OTHER, "021", ReceiverTypeEnum.MES)]
         public async Task BatchMoveAsync(BatchMoveDto dto)
         {
             if (IS_DEBUG == true)
@@ -606,7 +606,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ConsumeInNonProductionEqu")]
-        [LogDescription("设备投料非生产投料(制胶匀浆)022", BusinessType.OTHER, "ConsumeInNonProductionEqu022", ReceiverTypeEnum.MES)]
+        [LogDescription("设备投料非生产投料(制胶匀浆)022", BusinessType.OTHER, "022", ReceiverTypeEnum.MES)]
         public async Task ConsumeInNonProductionEquAsync(ConsumeInNonProductionEquDto dto)
         {
             if (IS_DEBUG == true)
@@ -627,7 +627,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GenerateSfc")]
-        [LogDescription("请求产出极卷码023", BusinessType.OTHER, "GenerateSfc023", ReceiverTypeEnum.MES)]
+        [LogDescription("请求产出极卷码023", BusinessType.OTHER, "023", ReceiverTypeEnum.MES)]
         public async Task<List<string>> GenerateSfcAsync(GenerateSfcDto dto)
         {
             //TODO
@@ -658,7 +658,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("OutboundMetersReport")]
-        [LogDescription("产出上报024", BusinessType.OTHER, "OutboundMetersReport024", ReceiverTypeEnum.MES)]
+        [LogDescription("产出上报024", BusinessType.OTHER, "024", ReceiverTypeEnum.MES)]
         public async Task OutboundMetersReportAsync(OutboundMetersReportDto dto)
         {
             if (IS_DEBUG == true)
@@ -680,7 +680,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("CcdGetBarcode")]
-        [LogDescription("获取下发条码(用于CCD面密度)025", BusinessType.OTHER, "CcdGetBarcode025", ReceiverTypeEnum.MES)]
+        [LogDescription("获取下发条码(用于CCD面密度)025", BusinessType.OTHER, "025", ReceiverTypeEnum.MES)]
         public async Task<CcdGetBarcodeReturnDto> CcdGetBarcodeAsync(CCDFileUploadCompleteDto dto)
         {
             if (IS_DEBUG == true)
@@ -702,7 +702,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("EquipmentProcessParam")]
-        [LogDescription("设备过程参数026", BusinessType.OTHER, "EquipmentProcessParam026", ReceiverTypeEnum.MES)]
+        [LogDescription("设备过程参数026", BusinessType.OTHER, "026", ReceiverTypeEnum.MES)]
         public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto)
         {
             if (IS_DEBUG == true)
@@ -724,7 +724,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Inbound")]
-        [LogDescription("产品进站027", BusinessType.OTHER, "Inbound027", ReceiverTypeEnum.MES)]
+        [LogDescription("产品进站027", BusinessType.OTHER, "027", ReceiverTypeEnum.MES)]
         public async Task InboundAsync(InboundDto dto)
         {
             if (IS_DEBUG == true)
@@ -748,7 +748,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Outbound")]
-        [LogDescription("产品出站028", BusinessType.OTHER, "Outbound028", ReceiverTypeEnum.MES)]
+        [LogDescription("产品出站028", BusinessType.OTHER, "028", ReceiverTypeEnum.MES)]
         public async Task OutboundAsync(OutboundDto dto)
         {
             if (IS_DEBUG == true)
@@ -771,7 +771,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("InboundMore")]
-        [LogDescription("进站多个029", BusinessType.OTHER, "InboundMore029", ReceiverTypeEnum.MES)]
+        [LogDescription("进站多个029", BusinessType.OTHER, "029", ReceiverTypeEnum.MES)]
         public async Task<List<InboundMoreReturnDto>> InboundMoreAsync(InboundMoreDto dto)
         {
             //TODO
@@ -803,7 +803,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("OutboundMore")]
-        [LogDescription("出站多个030", BusinessType.OTHER, "OutboundMore030", ReceiverTypeEnum.MES)]
+        [LogDescription("出站多个030", BusinessType.OTHER, "030", ReceiverTypeEnum.MES)]
         public async Task<List<OutboundMoreReturnDto>> OutboundMoreAsync(OutboundMoreDto dto)
         {
             //TODO
@@ -834,7 +834,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("OutboundMultPolar")]
-        [LogDescription("多极组产品出站031", BusinessType.OTHER, "OutboundMultPolar031", ReceiverTypeEnum.MES)]
+        [LogDescription("多极组产品出站031", BusinessType.OTHER, "031", ReceiverTypeEnum.MES)]
         public async Task<List<OutboundMoreReturnDto>> OutboundMultPolarAsync(OutboundMultPolarDto dto)
         {
             //TODO
@@ -869,7 +869,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("OutboundSfcPolar")]
-        [LogDescription("电芯极组绑定产品出站032", BusinessType.OTHER, "OutboundSfcPolar032", ReceiverTypeEnum.MES)]
+        [LogDescription("电芯极组绑定产品出站032", BusinessType.OTHER, "032", ReceiverTypeEnum.MES)]
         public async Task OutboundSfcPolarAsync(OutboundSfcPolarDto dto)
         {
             if (IS_DEBUG == true)
@@ -891,7 +891,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GenerateCellSfc")]
-        [LogDescription("电芯码下发033", BusinessType.OTHER, "GenerateCellSfc033", ReceiverTypeEnum.MES)]
+        [LogDescription("电芯码下发033", BusinessType.OTHER, "033", ReceiverTypeEnum.MES)]
         public async Task<string> GenerateCellSfcAsync(GenerateDxSfcDto dto)
         {
             //TODO
@@ -922,7 +922,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("FillingData")]
-        [LogDescription("补液数据上报034", BusinessType.OTHER, "FillingData034", ReceiverTypeEnum.MES)]
+        [LogDescription("补液数据上报034", BusinessType.OTHER, "034", ReceiverTypeEnum.MES)]
         public async Task FillingDataAsync(FillingDataDto dto)
         {
             if (IS_DEBUG == true)
@@ -943,7 +943,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("EmptyContainerCheck")]
-        [LogDescription("空托盘校验035", BusinessType.OTHER, "EmptyContainerCheck035", ReceiverTypeEnum.MES)]
+        [LogDescription("空托盘校验035", BusinessType.OTHER, "035", ReceiverTypeEnum.MES)]
         public async Task EmptyContainerCheckAsync(EmptyContainerCheckDto dto)
         {
             if (IS_DEBUG == true)
@@ -965,7 +965,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ContainerSfcCheck")]
-        [LogDescription("单电芯校验036", BusinessType.OTHER, "ContainerSfcCheck036", ReceiverTypeEnum.MES)]
+        [LogDescription("单电芯校验036", BusinessType.OTHER, "036", ReceiverTypeEnum.MES)]
         public async Task ContainerSfcCheckAsync(ContainerSfcCheckDto dto)
         {
             if (IS_DEBUG == true)
@@ -991,7 +991,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("BindContainer")]
-        [LogDescription("托盘电芯绑定(在制品容器)037", BusinessType.OTHER, "BindContainer037", ReceiverTypeEnum.MES)]
+        [LogDescription("托盘电芯绑定(在制品容器)037", BusinessType.OTHER, "037", ReceiverTypeEnum.MES)]
         public async Task BindContainerAsync(BindContainerDto dto)
         {
             if (IS_DEBUG == true)
@@ -1019,7 +1019,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("UnBindContainer")]
-        [LogDescription("托盘电芯解绑(在制品容器)038", BusinessType.OTHER, "UnBindContainer038", ReceiverTypeEnum.MES)]
+        [LogDescription("托盘电芯解绑(在制品容器)038", BusinessType.OTHER, "038", ReceiverTypeEnum.MES)]
         public async Task UnBindContainerAsync(UnBindContainerDto dto)
         {
             if (IS_DEBUG == true)
@@ -1044,7 +1044,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ContainerNgReport")]
-        [LogDescription("托盘NG电芯上报039", BusinessType.OTHER, "ContainerNgReport039", ReceiverTypeEnum.MES)]
+        [LogDescription("托盘NG电芯上报039", BusinessType.OTHER, "039", ReceiverTypeEnum.MES)]
         public async Task ContainerNgReportAsync(ContainerNgReportDto dto)
         {
             //TODO
@@ -1070,7 +1070,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("InboundInContainer")]
-        [LogDescription("托盘进站(容器进站)040", BusinessType.OTHER, "InboundInContainer040", ReceiverTypeEnum.MES)]
+        [LogDescription("托盘进站(容器进站)040", BusinessType.OTHER, "040", ReceiverTypeEnum.MES)]
         public async Task InboundInContainerAsync(InboundInContainerDto dto)
         {
             if (IS_DEBUG == true)
@@ -1091,7 +1091,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("OutboundInContainer")]
-        [LogDescription("托盘出站(容器出站)041", BusinessType.OTHER, "OutboundInContainer041", ReceiverTypeEnum.MES)]
+        [LogDescription("托盘出站(容器出站)041", BusinessType.OTHER, "041", ReceiverTypeEnum.MES)]
         public async Task OutboundInContainerAsync(OutboundInContainerDto dto)
         {
             if (IS_DEBUG == true)
@@ -1113,7 +1113,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ToolLife")]
-        [LogDescription("工装寿命上报042", BusinessType.OTHER, "ToolLife042", ReceiverTypeEnum.MES)]
+        [LogDescription("工装寿命上报042", BusinessType.OTHER, "042", ReceiverTypeEnum.MES)]
         public async Task ToolLifeAsync(ToolLifeDto dto)
         {
             if (IS_DEBUG == true)
@@ -1134,7 +1134,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ProductParam")]
-        [LogDescription("产品参数上传043", BusinessType.OTHER, "ProductParam043", ReceiverTypeEnum.MES)]
+        [LogDescription("产品参数上传043", BusinessType.OTHER, "043", ReceiverTypeEnum.MES)]
         public async Task ProductParamAsync(ProductParamDto dto)
         {
             if (IS_DEBUG == true)
@@ -1155,7 +1155,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("CollingPolar")]
-        [LogDescription("卷绕极组产出044", BusinessType.OTHER, "CollingPolar044", ReceiverTypeEnum.MES)]
+        [LogDescription("卷绕极组产出044", BusinessType.OTHER, "044", ReceiverTypeEnum.MES)]
         public async Task CollingPolarAsync(CollingPolarDto dto)
         {
             if (IS_DEBUG == true)
@@ -1173,7 +1173,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SortingRule")]
-        [LogDescription("分选规则045", BusinessType.OTHER, "SortingRule045", ReceiverTypeEnum.MES)]
+        [LogDescription("分选规则045", BusinessType.OTHER, "045", ReceiverTypeEnum.MES)]
         public async Task<List<ProcSortRuleDto>> SortingRuleAsync(SortingRuleDto dto)
         {
             if (IS_DEBUG == true)
@@ -1207,7 +1207,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ProductParamSameMultSfc")]
-        [LogDescription("产品参数上传046", BusinessType.OTHER, "ProductParamSameMultSfc046", ReceiverTypeEnum.MES)]
+        [LogDescription("产品参数上传046", BusinessType.OTHER, "046", ReceiverTypeEnum.MES)]
         public async Task ProductParamSameMultSfcAsync(ProductParamSameMultSfcDto dto)
         {
             if (IS_DEBUG == true)
@@ -1225,7 +1225,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("MaterialInventory")]
-        [LogDescription("库存接收047", BusinessType.OTHER, "MaterialInventory047", ReceiverTypeEnum.MES)]
+        [LogDescription("库存接收047", BusinessType.OTHER, "047", ReceiverTypeEnum.MES)]
         public async Task MaterialInventoryAsync(MaterialInventoryDto dto)
         {
             if (IS_DEBUG == true)
@@ -1247,7 +1247,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ToolBindMaterialAsync")]
-        [LogDescription("工装条码绑定048", BusinessType.OTHER, "ToolBindMaterial048", ReceiverTypeEnum.MES)]
+        [LogDescription("工装条码绑定048", BusinessType.OTHER, "048", ReceiverTypeEnum.MES)]
         public async Task ToolBindMaterialAsync(ToolBindMaterialDto dto)
         {
             if (IS_DEBUG == true)
@@ -1265,7 +1265,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("InboundBindJzSingle")]
-        [LogDescription("绑定后极组单个条码进站049", BusinessType.OTHER, "InboundBindJzSingle049", ReceiverTypeEnum.MES)]
+        [LogDescription("绑定后极组单个条码进站049", BusinessType.OTHER, "049", ReceiverTypeEnum.MES)]
         public async Task InboundBindJzSingleAsync(InboundBindJzSingleDto dto)
         {
             if (IS_DEBUG == true)
@@ -1286,7 +1286,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("OutboundBindJzSingle")]
-        [LogDescription("绑定后极组单个条码出站050", BusinessType.OTHER, "OutboundBindJzSingle050", ReceiverTypeEnum.MES)]
+        [LogDescription("绑定后极组单个条码出站050", BusinessType.OTHER, "050", ReceiverTypeEnum.MES)]
         public async Task OutboundBindJzSingleAsync(OutboundBindJzSingleDto dto)
         {
             if (IS_DEBUG == true)
@@ -1305,7 +1305,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetSfcInfo")]
-        [LogDescription("获取电芯信息051", BusinessType.OTHER, "GetSfcInfo051", ReceiverTypeEnum.MES)]
+        [LogDescription("获取电芯信息051", BusinessType.OTHER, "051", ReceiverTypeEnum.MES)]
         public async Task<List<SortingSfcInfo>> GetSfcInfoAsync(GetSfcInfoDto dto)
         {
             if (IS_DEBUG == true)
@@ -1329,7 +1329,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SortingUnBind")]
-        [LogDescription("分选拆盘052", BusinessType.OTHER, "SortingUnBind052", ReceiverTypeEnum.MES)]
+        [LogDescription("分选拆盘052", BusinessType.OTHER, "052", ReceiverTypeEnum.MES)]
         public async Task SortingUnBindAsync(SortingUnBindDto dto)
         {
             if (IS_DEBUG == true)
@@ -1347,7 +1347,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SortingOutbound")]
-        [LogDescription("分选出站053", BusinessType.OTHER, "SortingOutbound053", ReceiverTypeEnum.MES)]
+        [LogDescription("分选出站053", BusinessType.OTHER, "053", ReceiverTypeEnum.MES)]
         public async Task SortingOutboundAsync(SortingOutboundDto dto)
         {
             if (IS_DEBUG)
@@ -1359,13 +1359,50 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// 获取设备Token054
+        /// 设备文件上传054
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("EquFileUpload")]
+        [LogDescription("设备文件上传054", BusinessType.OTHER, "054", ReceiverTypeEnum.MES)]
+        public async Task EquFileUploadAsync([FromForm] EquFileUploadDto dto)
+        {
+            if (IS_DEBUG)
+            {
+                return;
+            }
+
+            await _equCommonService.EquFileUploadAsync(dto);
+        }
+
+        /// <summary>
+        /// 发送请求Http请求097
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SendHttp")]
+        [LogDescription("发送请求Http请求097", BusinessType.OTHER, "SendHttp097", ReceiverTypeEnum.MES)]
+        [AllowAnonymous]
+        public async Task<string> SendHttpAsync(SendHttpDto dto)
+        {
+            if (IS_DEBUG)
+            {
+                return "token";
+            }
+
+            return await _qknyService.SendHttpAsync(dto);
+        }
+
+        /// <summary>
+        /// 获取设备Token098
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("GetEquToken")]
-        [LogDescription("获取设备Token", BusinessType.OTHER, "GetEquToken054", ReceiverTypeEnum.MES)]
+        [LogDescription("获取设备Token098", BusinessType.OTHER, "GetEquToken098", ReceiverTypeEnum.MES)]
         [AllowAnonymous]
         public async Task<string> GetEquTokenAsync(QknyBaseDto dto)
         {
@@ -1393,24 +1430,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             return await _fitTogether.Create24GbCodeAsync(dto);
-        }
-
-        /// <summary>
-        /// 设备文件上传055
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("EquFileUpload")]
-        [LogDescription("设备文件上传055", BusinessType.OTHER, "EquFileUpload055", ReceiverTypeEnum.MES)]
-        public async Task EquFileUploadAsync([FromForm]EquFileUploadDto dto)
-        {
-            if (IS_DEBUG)
-            {
-                return;
-            }
-
-            await _equCommonService.EquFileUploadAsync(dto);
         }
 
     }

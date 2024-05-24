@@ -144,5 +144,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<string> GetEquTokenAsync(QknyBaseDto dto);
+
+        /// <summary>
+        /// 发送HTTP请求
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<string> SendHttpAsync(SendHttpDto dto);
     }
 }

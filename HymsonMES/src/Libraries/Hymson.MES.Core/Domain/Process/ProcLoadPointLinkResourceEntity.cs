@@ -38,5 +38,29 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string? Remark { get; set; }
-        }
+    }
+
+    /// <summary>
+    /// 上料点关联资源表数据实体对象
+    /// @author admin
+    /// @date 2023-02-08
+    /// </summary>
+    public class ProcLoadPointLinkEquDto
+    {
+        /// <summary>
+        /// 上料点
+        /// </summary>
+        public string LoadPoint { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
+
+        /// <summary>
+        /// IP
+        /// </summary>
+        public string Ip { get; set; }
+    }
+
 }

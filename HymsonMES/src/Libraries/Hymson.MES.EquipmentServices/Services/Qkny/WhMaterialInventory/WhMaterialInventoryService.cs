@@ -72,7 +72,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
             var dbList = await _whMaterialInventoryRepository.GetByBarCodesNoQtyAsync(query);
             if (dbList.IsNullOrEmpty() == true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45081));
+                string barCodeStr = string.Join(";",query.BarCodes);
+                throw new CustomerValidationException(nameof(ErrorCode.MES45081))
+                    .WithData("barCodeStr", barCodeStr);
             }
             return dbList.ToList();
         }

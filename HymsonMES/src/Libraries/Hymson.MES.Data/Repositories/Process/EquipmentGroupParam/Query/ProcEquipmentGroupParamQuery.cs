@@ -72,6 +72,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 类型 1-开机参数 2-配方参数
         /// </summary>
         public string Type { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
     }
 
     /// <summary>

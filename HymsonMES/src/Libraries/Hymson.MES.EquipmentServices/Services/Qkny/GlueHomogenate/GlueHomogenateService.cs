@@ -179,11 +179,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
         {
             await _validationFormulaListGetDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 获取数据
             ProcFormulaListQueryDto query = new ProcFormulaListQueryDto();
             query.EquipmentId = equResModel.EquipmentId;
             query.ProductCode = dto.ProductCode;
+            query.EquipmentCode = dto.EquipmentCode;
             var list = await _procFormulaService.GetFormulaListAsync(query);
             List<FormulaListGetReturnDto> resultList = new List<FormulaListGetReturnDto>();
             foreach (var item in list)
@@ -207,7 +208,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
         {
             await _validationFormulaDetailGetDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 获取数据
             ProcFormulaDetailQueryDto query = new ProcFormulaDetailQueryDto();
             query.FormulaCode = dto.FormulaCode;
@@ -242,7 +243,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
         {
             await _validationFormulaVersionExamine.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 版本校验
             ProcFormlaGetByCodeVersionDto query = new ProcFormlaGetByCodeVersionDto();
             query.FormulaCode = dto.FormulaCode;
@@ -295,13 +296,25 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
                 equDto.ResourceCode = dto.ConsumeResourceCode;
                 EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(equDto);
                 //2. 查询设备激活工单
-                PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
+                PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
                 //4. 校验物料是否在激活工单对应的BOM里
                 materialDbList = await _planWorkOrderService.GetWorkOrderMaterialAsync(planEntity.ProductBOMId);
             }
-            if (sfcMaterialIdList.All(materialDbList.Contains) == false)
+            bool isNoBom = false; //是否不在BOM里面
+            List<string> noBomSfcList = new List<string>();
+            foreach (var item in sfcMaterialIdList)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45080));
+                if(materialDbList.Contains(item) == false)
+                {
+                    isNoBom = true;
+                    string curSfc = sfcMaterialList.Where(m => m.MaterialId == item)?.FirstOrDefault()?.MaterialBarCode;
+                    noBomSfcList.Add(curSfc);
+                }
+            }
+            if (isNoBom == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45080))
+                    .WithData("sfcListStr", string.Join(";",noBomSfcList));
             }
         }
 
@@ -318,7 +331,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
             equDto.ResourceCode = dto.ConsumeResourceCode;
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(equDto);
             //2. 查询设备激活工单
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
             //3. 批次转移数据
             MultBatchMoveDto moveDto = new MultBatchMoveDto();
             moveDto.EquipmentCode = dto.EquipmentCode;
@@ -423,7 +436,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             //2. 查询设备激活工单
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
             //3. 构造数据
             //3.1 产出条码
             CreateBarcodeByWorkOrderBo query = new CreateBarcodeByWorkOrderBo();

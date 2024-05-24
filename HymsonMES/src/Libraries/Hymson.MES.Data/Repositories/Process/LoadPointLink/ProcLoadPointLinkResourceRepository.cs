@@ -203,6 +203,17 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(GetByCodeSql, query);
         }
 
+        /// <summary>
+        /// 根据上料点编码获取关联的设备
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcLoadPointLinkEquDto>> GetEquByCodeAsync(ProcLoadPointCodeLinkResourceQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcLoadPointLinkEquDto>(GetEquByCodeSql, query);
+        }
+
         #endregion
 
     }
@@ -246,6 +257,20 @@ namespace Hymson.MES.Data.Repositories.Process
             where t1.LoadPoint = @LoadPoint
             and t1.IsDeleted = 0
         ";
+
+        /// <summary>
+        /// 根据上料点编码获取设备
+        /// </summary>
+        const string GetEquByCodeSql = @"
+            SELECT T1.LoadPoint ,T1.LoadPointName , T4.EquipmentCode ,T4.EquipmentName ,T4.Ip 
+            FROM proc_load_point T1
+            INNER JOIN proc_load_point_link_resource T2 ON T2.LoadPointId = T1.Id  AND T2.IsDeleted = 0
+            INNER JOIN proc_resource_equipment_bind T3 ON T3.ResourceId  = T2.ResourceId  AND T3.IsDeleted  = 0 AND T3.IsMain = 1
+            INNER JOIN equ_equipment T4 ON T4.Id = T3.EquipmentId  AND T4.IsDeleted  = 0
+            WHERE T1.IsDeleted = 0
+            AND t1.LoadPoint = @LoadPoint
+        ";
+
         #endregion
     }
 }

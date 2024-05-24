@@ -255,9 +255,10 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationOperationLoginDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
+            long equipmentId = equResModel.EquipmentId;
             //2. 校验用户名密码是否和设备匹配(equ_equipment_verify)
-            var verifyList = await _equEquipmentVerifyRepository.GetEquipmentVerifyByEquipmentIdAsync(equResModel.EquipmentId);
+            var verifyList = await _equEquipmentVerifyRepository.GetEquipmentVerifyByEquipmentIdAsync(equipmentId);
             if (verifyList == null || !verifyList.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45011)).WithData("EquipmentCode", dto.EquipmentCode); ;
@@ -273,7 +274,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             loginRecordDto.SiteId = equResModel.SiteId;
             loginRecordDto.Account = dto.OperatorUserID;
             loginRecordDto.Password = dto.OperatorPassword;
-            loginRecordDto.EquipmentId = equResModel.EquipmentId;
+            loginRecordDto.EquipmentId = equipmentId;
             loginRecordDto.CreateOn = HymsonClock.Now();
             loginRecordDto.CreateBy = equResModel.EquipmentCode;
             loginRecordDto.UpdateOn = loginRecordDto.CreateOn;
@@ -289,7 +290,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             newestDto.UpdatedOn = newestDto.CreatedOn;
             newestDto.UpdatedBy = equResModel.EquipmentCode;
             newestDto.SiteId = equResModel.SiteId;
-            newestDto.EquipmentId = equResModel.EquipmentId;
+            newestDto.EquipmentId = equipmentId;
             //5. 数据库操作
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             await _equEquipmentLoginRecordService.AddAsync(loginRecordDto);
@@ -306,7 +307,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationHeartbeatDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 添加心跳记录
             EquEquipmentHeartRecordSaveDto heartRecordDto = new EquEquipmentHeartRecordSaveDto();
             heartRecordDto.Id = IdGenProvider.Instance.CreateId();
@@ -346,7 +347,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationStateDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 添加状态时间
             ManuEquipmentStatusTimeSaveDto statusDto = new ManuEquipmentStatusTimeSaveDto();
             statusDto.EquipmentId = equResModel.EquipmentId;
@@ -382,7 +383,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationAlarmDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 添加故障记录
             EquEquipmentAlarmSaveDto saveDto = new EquEquipmentAlarmSaveDto();
             saveDto.Id = IdGenProvider.Instance.CreateId();
@@ -408,7 +409,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationCCDFileUploadCompleteDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 添加文件信息
             List<CcdFileUploadCompleteRecordSaveDto> saveDtoList = new List<CcdFileUploadCompleteRecordSaveDto>();
             foreach (var sfcItem in dto.SfcList)
@@ -442,7 +443,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationToolLifeDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 添加记录
             List<EquToolLifeRecordSaveDto> saveDtos = new();
             if (!string.IsNullOrWhiteSpace(dto.ToolCode))
@@ -489,6 +490,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             ProcEquipmentGroupParamEquProductQuery query = new ProcEquipmentGroupParamEquProductQuery();
             query.EquipmentId = equResModel.EquipmentId;
             query.ProductCode = dto.ProductCode;
+            query.EquipmentCode = dto.EquipmentCode;
             var paramList = await _procEquipmentGroupParamService.QueryByEquProductAsync(query);
             List<GetRecipeListReturnDto> resultList = new List<GetRecipeListReturnDto>();
             foreach (var item in paramList)
@@ -512,7 +514,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         {
             await _validationGetRecipeDetailDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 获取开机参数编码的对应激活的数据
             ProcEquipmentGroupParamCodeDetailQuery query = new ProcEquipmentGroupParamCodeDetailQuery();
             query.Code = dto.RecipeCode;

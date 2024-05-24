@@ -41,6 +41,11 @@ namespace Hymson.MES.Data.Repositories.Process.Query
         /// 设备id
         /// </summary>
         public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
     }
 
     /// <summary>

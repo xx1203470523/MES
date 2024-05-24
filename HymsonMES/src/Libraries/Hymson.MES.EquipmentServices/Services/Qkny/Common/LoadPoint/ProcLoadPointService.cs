@@ -68,7 +68,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
                 var dbCode = dbList.Where(m => m.Code == item).FirstOrDefault();
                 if (dbCode == null)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES45074));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45074))
+                        .WithData("item", item);
                 }
             }
             //var dbCode = dbList.Where(m => m.Code == query.CodeList[0]).FirstOrDefault();
@@ -94,7 +95,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
             var dbModel = await _procLoadPointRepository.GetProcLoadPointAsync(query);
             if (dbModel == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45070));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45070))
+                    .WithData("LoadPoint", query?.LoadPoint);
             }
             return dbModel;
         }
@@ -109,7 +111,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
             var dbList = await _procLoadPointRepository.GetProcLoadPointMaterialAsync(query);
             if (dbList.IsNullOrEmpty() == true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45076));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45076))
+                    .WithData("LoadPoint", query?.LoadPoint);
             }
             return dbList.ToList();
         }
