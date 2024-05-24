@@ -246,7 +246,52 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
             return converdionFactorDto;
         }
-    
+
+        /// <summary>
+        /// 根据MaterialId查询
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        public async Task<ProcPrintSetupDto> QueryProcPrintSetupByMaterialIdAsync(long materialId)
+        {
+            //通过ID获取proc_print_configure表数据
+            var procPrintSetupEntity = await _procPrintSetupRepository.GetByMaterialIdAsync(materialId);
+
+            if (procPrintSetupEntity == null)
+            {
+                return new ProcPrintSetupDto();
+
+            }
+
+            //主表数据映射
+            ProcPrintSetupDto converdionFactorDto = new ProcPrintSetupDto
+            {
+                Id = procPrintSetupEntity.Id,
+                Status = procPrintSetupEntity.Status,
+                BusinessType = procPrintSetupEntity.BusinessType,
+                Type = procPrintSetupEntity.Type,
+                ResCode = procPrintSetupEntity.ResCode,
+                Name = procPrintSetupEntity.Name,
+                Content = procPrintSetupEntity.Content,
+                Count = procPrintSetupEntity.Count,
+                Program = procPrintSetupEntity.Program,
+                Remark = procPrintSetupEntity.Remark,
+                PrintName = procPrintSetupEntity.PrintName,
+                LabelTemplateId = procPrintSetupEntity.LabelTemplateId,
+                ResourceId = procPrintSetupEntity.ResourceId,
+                PrintId = procPrintSetupEntity.PrintId,
+                MaterialId = procPrintSetupEntity.MaterialId,
+                Class = procPrintSetupEntity.Class
+            };
+            //物料
+            var printerSetupMaterial = await _procMaterialRepository.GetByIdAsync(procPrintSetupEntity.MaterialId);
+            if (printerSetupMaterial != null)
+            {
+                converdionFactorDto.MaterialCode = printerSetupMaterial.MaterialCode;
+                converdionFactorDto.Version = printerSetupMaterial.Version;
+            }
+            return converdionFactorDto;
+        }
 
         public async Task<long> AddProcPrintSetupAsync(AddPrintSetupDto AddPrintSetupDto)
         {
@@ -254,29 +299,16 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             if (AddPrintSetupDto == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            }
-            //if (AddConversionFactorDto.code == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10401));
-            //}
-            //if (AddConversionFactorDto.MaterialId == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10214));
-            // }
-            //if (AddConversionFactorDto.LinkMaterials.Count > 1)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10241));
-            //}
-
-            
+            }            
 
             //Dto值赋值给Entily
             var procPrintSetupEntity = AddPrintSetupDto.ToEntity<ProcPrintSetupEntity>();
             procPrintSetupEntity.MaterialId = AddPrintSetupDto.MaterialId;
-            procPrintSetupEntity.Type = AddPrintSetupDto.Type;
-            procPrintSetupEntity.BusinessType= AddPrintSetupDto.BusinessType;
             procPrintSetupEntity.LabelTemplateId = AddPrintSetupDto.LabelTemplateId;
-            procPrintSetupEntity.Count=AddPrintSetupDto.Count;
+            procPrintSetupEntity.ResourceId = AddPrintSetupDto.ResourceId;
+            procPrintSetupEntity.Type = AddPrintSetupDto.Type;
+            procPrintSetupEntity.BusinessType= AddPrintSetupDto.BusinessType;         
+            procPrintSetupEntity.Count=AddPrintSetupDto.Count;           
             procPrintSetupEntity.Class = AddPrintSetupDto.Class;
             procPrintSetupEntity.Id = IdGenProvider.Instance.CreateId();
             procPrintSetupEntity.CreatedBy = _currentUser.UserName;
@@ -291,14 +323,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             var isExists = (await _procPrintSetupRepository.GetProcConversionFactorEntitiesAsync(new ProcPrintSetupQuery()
             {
                 SiteId = procPrintSetupEntity.SiteId,
-                MaterialId= procPrintSetupEntity.MaterialId,
-                ResourceId= procPrintSetupEntity.ResourceId,
-                PrintId = procPrintSetupEntity.PrintId,
-                LabelTemplateId = procPrintSetupEntity.LabelTemplateId
+                MaterialId= procPrintSetupEntity.MaterialId
             })).Any();
             if (isExists)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10478)).WithData("MaterialId", procPrintSetupEntity.MaterialId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10242)).WithData("MaterialId", procPrintSetupEntity.MaterialId);
             }
             #endregion
 

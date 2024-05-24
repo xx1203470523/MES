@@ -43,6 +43,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据materialId获取数据
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        public async Task<ProcPrintSetupEntity> GetByMaterialIdAsync(long materialId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcPrintSetupEntity>(GetByMaterialIdSql, new { MaterialId = materialId });
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -165,21 +176,9 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(procConversionFactorQuery.ResourceId.ToString()))
-            {
-                sqlBuilder.Where(" ResourceId = @ResourceId ");
-            }
             if (!string.IsNullOrWhiteSpace(procConversionFactorQuery.MaterialId.ToString()))
             {
                 sqlBuilder.Where(" MaterialId = @MaterialId ");
-            }
-            if (!string.IsNullOrWhiteSpace(procConversionFactorQuery.PrintId.ToString()))
-            {
-                sqlBuilder.Where(" PrintId = @PrintId ");
-            }
-            if (!string.IsNullOrWhiteSpace(procConversionFactorQuery.LabelTemplateId.ToString()))
-            {
-                sqlBuilder.Where(" LabelTemplateId = @LabelTemplateId ");
             }
             using var conn = GetMESDbConnection();
             var procConversionFactortEntities = await conn.QueryAsync<ProcPrintSetupEntity>(template.RawSql, procConversionFactorQuery);
@@ -226,8 +225,6 @@ namespace Hymson.MES.Data.Repositories.Process
            
         }
 
-
-
         /// <summary>
         /// 更新状态
         /// </summary>
@@ -263,7 +260,15 @@ namespace Hymson.MES.Data.Repositories.Process
                                    LEFT JOIN proc_printer D ON A.PrintId = D.Id
                                    LEFT JOIN proc_label_template E ON A.LabelTemplateId = E.Id
                                    LEFT JOIN proc_resource_type F ON C.ResTypeId = F.Id                                  
-                                   WHERE A.Id = @Id ";
+                                   WHERE A.Id = @Id AND A.IsDeleted =0 ";
+        const string GetByMaterialIdSql = @"SELECT A.Id, A.Class, A.MaterialId, A.Type, A.ResourceId, A.Program, A.BusinessType, A.PrintId, A.LabelTemplateId, A.Count, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, A.SiteId, A.IsDeleted, A.Status, B.MaterialCode, B.Version, C.ResCode, D.PrintName, E.Name, E.Content
+                                   FROM proc_print_configure A
+                                   LEFT JOIN proc_material B ON A.MaterialId = B.Id
+                                   LEFT JOIN proc_resource C ON A.ResourceId = C.Id
+                                   LEFT JOIN proc_printer D ON A.PrintId = D.Id
+                                   LEFT JOIN proc_label_template E ON A.LabelTemplateId = E.Id
+                                   LEFT JOIN proc_resource_type F ON C.ResTypeId = F.Id                                  
+                                   WHERE A.MaterialId = @MaterialId AND A.IsDeleted =0";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `MaterialId`, `Type`, `ResourceId`, `Program`, `BusinessType`, `PrintId`, `LabelTemplateId`, `Count`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`, `Status`, `Class`
                             FROM `proc_print_configure`  WHERE Id IN @ids ";

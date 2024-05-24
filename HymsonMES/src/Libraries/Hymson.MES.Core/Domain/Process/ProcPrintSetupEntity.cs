@@ -18,16 +18,30 @@ namespace Hymson.MES.Core.Domain.Process
     /// </summary>
     public class ProcPrintSetupEntity : BaseEntity
     {
-        /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public long SiteId { get; set; }
+
         /// <summary>
         /// 描述 :物料ID
         /// 空值 : false  
         /// </summary>
         public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 描述:资源的Id
+        /// 空值 : true  
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 描述 :打印机ID
+        /// 空值 : true
+        /// </summary>
+        public long? PrintId { get; set; }
+
+        /// <summary>
+        /// 描述 :打印模板ID
+        /// 空值 : false  
+        /// </summary>
+        public long LabelTemplateId { get; set; }
 
         /// <summary>
         /// 描述 :物料编码
@@ -42,12 +56,6 @@ namespace Hymson.MES.Core.Domain.Process
         public PrintSetupEnum Type { get; set; }
 
         /// <summary>
-        /// 描述:资源ID
-        /// 空值 : true  
-        /// </summary>
-        public long? ResourceId { get; set; }
-
-        /// <summary>
         /// 描述:程序名
         /// 空值 : true  
         /// </summary>
@@ -58,18 +66,6 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : false  
         /// </summary>
         public CodeRuleCodeTypeEnum BusinessType { get; set; }
-
-        /// <summary>
-        /// 描述 :打印机ID
-        /// 空值 : true
-        /// </summary>
-        public long? PrintId { get; set; }
-
-        /// <summary>
-        /// 描述 :打印模板ID
-        /// 空值 : false  
-        /// </summary>
-        public long LabelTemplateId { get; set; }
 
         /// <summary>
         /// 描述：份数
@@ -119,9 +115,13 @@ namespace Hymson.MES.Core.Domain.Process
         /// <summary>
         /// 打印机
         /// </summary>
-        public string Class { get; set; }
+        public string? Class { get; set; }
 
-
+        /// <summary>
+        /// 描述 :所属站点代码 
+        /// 空值 : false  
+        /// </summary>
+        public long SiteId { get; set; }
 
     }
 

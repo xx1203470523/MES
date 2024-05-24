@@ -39,7 +39,7 @@ namespace Hymson.MES.Services.Dtos.Process
 
         /// <summary>
         /// 描述：业务类型
-        /// 空值 : false  
+        /// 空值 : true  
         /// </summary>
         public CodeRuleCodeTypeEnum BusinessType { get; set; }
         /// <summary>
@@ -69,13 +69,13 @@ namespace Hymson.MES.Services.Dtos.Process
 
         /// <summary>
         /// 描述 :物料编码
-        /// 空值 : false  
+        /// 空值 : true  
         /// </summary>
         public string MaterialCode { get; set; }
 
         /// <summary>
         /// 描述：份数
-        /// 空值 : false  
+        /// 空值 : true  
         /// </summary>
         public string Count { get; set; }
 
@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Dtos.Process
 
         /// <summary>
         /// 描述 :打印模板ID
-        /// 空值 : false  
+        /// 空值 : true  
         /// </summary>
         public long LabelTemplateId { get; set; }
 
@@ -123,15 +123,15 @@ namespace Hymson.MES.Services.Dtos.Process
 
         /// <summary>
         /// 描述 :物料ID
-        /// 空值 : false  
+        /// 空值 : true  
         /// </summary>
         public long? MaterialId { get; set; }
 
         /// <summary>
         /// 描述 :类
-        /// 空值 : false  
+        /// 空值 : true  
         /// </summary>
-        public string Class { get; set; }
+        public string? Class { get; set; }
     }
 
     /// <summary>
@@ -246,30 +246,17 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long MaterialId { get; set; }
 
-
-        /// <summary>
-        /// 配置类型 1-资源 2-类
-        /// 空值 : false  
-        /// </summary>
-        public PrintSetupEnum Type { get; set; }
-
         /// <summary>
         /// 描述:资源的Id
         /// 空值 : true  
         /// </summary>
-        public long? ResTypeId { get; set; }
+        public long? ResourceId { get; set; }
 
         /// <summary>
-        /// 描述:程序名
-        /// 空值 : true  
-        /// </summary>
-        public string? Program { get; set; }
-
-        /// <summary>
-        /// 描述：业务类型
+        /// 描述 :打印模板ID
         /// 空值 : false  
         /// </summary>
-        public CodeRuleCodeTypeEnum BusinessType { get; set; }
+        public long LabelTemplateId { get; set; }
 
         /// <summary>
         /// 描述 :打印机ID
@@ -278,10 +265,22 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? PrintId { get; set; }
 
         /// <summary>
-        /// 描述 :打印模板ID
+        /// 配置类型 1-资源 2-类
         /// 空值 : false  
         /// </summary>
-        public long LabelTemplateId { get; set; }
+        public PrintSetupEnum Type { get; set; }
+
+        /// <summary>
+        /// 描述:程序名
+        /// 空值 : true  
+        /// </summary>
+        public string Program { get; set; }
+
+        /// <summary>
+        /// 描述：业务类型
+        /// 空值 : false  
+        /// </summary>
+        public CodeRuleCodeTypeEnum BusinessType { get; set; }
 
         /// <summary>
         /// 描述：份数
@@ -331,9 +330,9 @@ namespace Hymson.MES.Services.Dtos.Process
 
         /// <summary>
         /// 描述:资源的Id
-        /// 空值 : true  
+        /// 空值 : false  
         /// </summary>
-        public long? ResTypeId { get; set; }
+        public long? ResourceId { get; set; }
 
         /// <summary>
         /// 工序名
