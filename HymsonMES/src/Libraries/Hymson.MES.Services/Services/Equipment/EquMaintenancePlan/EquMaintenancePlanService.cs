@@ -16,6 +16,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
+using Hymson.MES.CoreServices.Services.EquMaintenancePlan;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -82,13 +83,13 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         /// <summary>
         ///  IEquMaintenancePlanCoreService
         /// </summary>  
-        //private readonly IEquMaintenancePlanCoreService _EquMaintenancePlanCoreService;
+        private readonly IEquMaintenancePlanCoreService _EquMaintenancePlanCoreService;
 
 
         private readonly AbstractValidator<EquMaintenancePlanCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquMaintenancePlanModifyDto> _validationModifyRules;
 
-        public EquMaintenancePlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquMaintenancePlanRepository EquMaintenancePlanRepository, AbstractValidator<EquMaintenancePlanCreateDto> validationCreateRules, AbstractValidator<EquMaintenancePlanModifyDto> validationModifyRules, IEquMaintenancePlanEquipmentRelationRepository EquMaintenancePlanEquipmentRelationRepository, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceItemRepository equMaintenanceItemRepository, IEquMaintenanceTaskSnapshotItemRepository equMaintenanceTaskSnapshotItemRepository, IEquMaintenanceTaskSnapshotPlanRepository equMaintenanceTaskSnapshotPlanRepository, IEquMaintenanceTaskRepository equMaintenanceTaskRepository, IEquMaintenanceTaskItemRepository equMaintenanceTaskItemRepository)
+        public EquMaintenancePlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquMaintenancePlanRepository EquMaintenancePlanRepository, AbstractValidator<EquMaintenancePlanCreateDto> validationCreateRules, AbstractValidator<EquMaintenancePlanModifyDto> validationModifyRules, IEquMaintenancePlanEquipmentRelationRepository EquMaintenancePlanEquipmentRelationRepository, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceItemRepository equMaintenanceItemRepository, IEquMaintenanceTaskSnapshotItemRepository equMaintenanceTaskSnapshotItemRepository, IEquMaintenanceTaskSnapshotPlanRepository equMaintenanceTaskSnapshotPlanRepository, IEquMaintenanceTaskRepository equMaintenanceTaskRepository, IEquMaintenanceTaskItemRepository equMaintenanceTaskItemRepository, IEquMaintenancePlanCoreService equMaintenancePlanCoreService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -104,7 +105,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             _EquMaintenanceTaskSnapshotPlanRepository = equMaintenanceTaskSnapshotPlanRepository;
             _EquMaintenanceTaskRepository = equMaintenanceTaskRepository;
             _EquMaintenanceTaskItemRepository = equMaintenanceTaskItemRepository;
-            //_EquMaintenancePlanCoreService = EquMaintenancePlanCoreService;
+            _EquMaintenancePlanCoreService = equMaintenancePlanCoreService;
         }
 
 
@@ -323,177 +324,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         /// <returns></returns>
         public async Task GenerateEquMaintenanceTaskCoreAsync(GenerateDto param)
         {
-            //await _EquMaintenancePlanCoreService.GenerateEquMaintenanceTaskAsync(new GenerateEquMaintenanceTaskDto { SiteId = _currentSite.SiteId ?? 0, UserName = _currentUser.UserName, ExecType = param.ExecType, MaintenancePlanId = param.MaintenancePlanId, });
-        }
-
-        /// <summary>
-        /// 生成
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task GenerateEquMaintenanceTaskAsync(GenerateDto param)
-        {
-            ////计划
-            //var EquMaintenancePlanEntity = await _EquMaintenancePlanRepository.GetByIdAsync(param.MaintenancePlanId);
-            //if (param.ExecType == 0)
-            //{
-            //    if (EquMaintenancePlanEntity.FirstExecuteTime < HymsonClock.Now())
-            //    {
-            //        throw new CustomerValidationException(nameof(ErrorCode.MES12303));
-            //    }
-
-            //    if (!EquMaintenancePlanEntity.FirstExecuteTime.HasValue || !EquMaintenancePlanEntity.Type.HasValue || EquMaintenancePlanEntity.Cycle.HasValue)
-            //    {
-            //        throw new CustomerValidationException(nameof(ErrorCode.MES12304));
-            //    }
-            //}
-            //var EquMaintenancePlanEquipmentRelations = await _EquMaintenancePlanEquipmentRelationRepository.GetByMaintenancePlanIdsAsync(param.MaintenancePlanId);
-            //if (EquMaintenancePlanEquipmentRelations == null || !EquMaintenancePlanEquipmentRelations.Any())
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES12302));
-            //}
-            //var equipmentIds = EquMaintenancePlanEquipmentRelations.Select(it => it.EquipmentId).ToArray();
-            //var equEquipments = await _equEquipmentRepository.GetByIdAsync(equipmentIds);
-
-            ////模板与项目
-            //var MaintenanceTemplateIds = EquMaintenancePlanEquipmentRelations.Select(it => it.MaintenanceTemplateId).ToArray();
-            //var EquMaintenanceTemplateItemRelations = await _EquMaintenanceTemplateItemRelationRepository.GetEquMaintenanceTemplateItemRelationEntitiesAsync(
-            //      new EquMaintenanceTemplateItemRelationQuery { SiteId = _currentSite.SiteId, MaintenanceTemplateIds = MaintenanceTemplateIds });
-
-            ////项目  
-            //var MaintenanceItemIds = EquMaintenanceTemplateItemRelations.Select(it => it.MaintenanceItemId).ToArray();
-            //var EquMaintenanceItems = await _EquMaintenanceItemRepository.GetByIdsAsync(MaintenanceItemIds);
-            //if (EquMaintenanceItems == null || !EquMaintenanceItems.Any())
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES12301));
-            //}
-            ////项目快照  
-            //List<EquMaintenanceTaskSnapshotItemEntity> EquMaintenanceTaskSnapshotItemList = new();
-            //List<EquMaintenanceTaskSnapshotPlanEntity> EquMaintenanceTaskSnapshotPlanList = new();
-            //List<EquMaintenanceTaskEntity> EquMaintenanceTaskList = new();
-            //List<EquMaintenanceTaskItemEntity> EquMaintenanceTaskItemList = new();
-
-            //#region 组装
-            //foreach (var item in EquMaintenancePlanEquipmentRelations)
-            //{
-            //    var equEquipment = equEquipments.Where(it => it.Id == item.EquipmentId).FirstOrDefault();
-
-            //    EquMaintenanceTaskEntity EquMaintenanceTask = new()
-            //    {
-            //        Code = EquMaintenancePlanEntity.Code + equEquipment?.EquipmentCode,
-            //        Name = EquMaintenancePlanEntity.Name,
-            //        BeginTime = HymsonClock.Now(),
-            //        EndTime = HymsonClock.Now(),
-            //        Status = EquMaintenanceTaskStautusEnum.WaitInspect,
-            //        IsQualified = null,
-            //        Remark = EquMaintenancePlanEntity.Remark,
-
-            //        Id = IdGenProvider.Instance.CreateId(),
-            //        CreatedBy = _currentUser.UserName,
-            //        UpdatedBy = _currentUser.UserName,
-            //        CreatedOn = HymsonClock.Now(),
-            //        UpdatedOn = HymsonClock.Now(),
-            //        SiteId = _currentSite.SiteId ?? 0
-            //    };
-            //    EquMaintenanceTaskList.Add(EquMaintenanceTask);
-
-            //    EquMaintenanceTaskSnapshotPlanEntity EquMaintenanceTaskSnapshotPlan = new()
-            //    {
-            //        MaintenanceTaskId = EquMaintenanceTask.Id,
-            //        MaintenancePlanId = item.MaintenancePlanId,
-            //        Code = EquMaintenancePlanEntity.Code,
-            //        Name = EquMaintenancePlanEntity.Name,
-            //        Version = EquMaintenancePlanEntity.Version,
-            //        EquipmentId = item.EquipmentId,
-            //        MaintenanceTemplateId = item.MaintenanceTemplateId,
-            //        ExecutorIds = item.ExecutorIds ?? "",
-            //        LeaderIds = item.LeaderIds ?? "",
-            //        Type = EquMaintenancePlanEntity.Type ?? 0,
-            //        Status = EquMaintenancePlanEntity.Status,
-            //        BeginTime = EquMaintenancePlanEntity.BeginTime,
-            //        EndTime = EquMaintenancePlanEntity.EndTime,
-            //        IsSkipHoliday = EquMaintenancePlanEntity.IsSkipHoliday,
-            //        FirstExecuteTime = EquMaintenancePlanEntity.FirstExecuteTime,
-            //        Cycle = EquMaintenancePlanEntity.Cycle ?? 1,
-            //        CompletionHour = EquMaintenancePlanEntity.CompletionHour,
-            //        CompletionMinute = EquMaintenancePlanEntity.CompletionMinute,
-            //        PreGeneratedMinute = EquMaintenancePlanEntity.PreGeneratedMinute,
-            //        Remark = EquMaintenancePlanEntity.Remark,
-
-            //        Id = IdGenProvider.Instance.CreateId(),
-            //        CreatedBy = _currentUser.UserName,
-            //        UpdatedBy = _currentUser.UserName,
-            //        CreatedOn = HymsonClock.Now(),
-            //        UpdatedOn = HymsonClock.Now(),
-            //        SiteId = _currentSite.SiteId ?? 0
-            //    };
-            //    EquMaintenanceTaskSnapshotPlanList.Add(EquMaintenanceTaskSnapshotPlan);
-
-            //    var thisEquMaintenanceTemplateItemRelations = EquMaintenanceTemplateItemRelations.Where(it => it.MaintenanceTemplateId == item.MaintenanceTemplateId);
-            //    var thisMaintenanceItemIds = thisEquMaintenanceTemplateItemRelations.Select(it => it.MaintenanceItemId).ToArray();
-            //    var thisEquMaintenanceItems = EquMaintenanceItems.Where(it => thisMaintenanceItemIds.Contains(it.Id));
-
-            //    foreach (var thisEquMaintenanceItem in thisEquMaintenanceItems)
-            //    {
-
-            //        var thisEquMaintenanceTemplateItemRelation = thisEquMaintenanceTemplateItemRelations.Where(it => it.MaintenanceItemId == thisEquMaintenanceItem.Id).FirstOrDefault();
-            //        EquMaintenanceTaskSnapshotItemEntity EquMaintenanceTaskSnapshotItem = new()
-            //        {
-            //            MaintenanceTaskId = EquMaintenanceTask.Id,
-            //            MaintenanceItemId = thisEquMaintenanceItem.Id,
-            //            Code = thisEquMaintenanceItem.Code ?? "",
-            //            Name = thisEquMaintenanceItem.Name ?? "",
-            //            Status = thisEquMaintenanceItem.Status ?? DisableOrEnableEnum.Enable,
-            //            DataType = thisEquMaintenanceItem.DataType ?? DataTypeEnum.Text,
-            //            CheckType = thisEquMaintenanceItem.CheckType,
-            //            CheckMethod = thisEquMaintenanceItem.CheckMethod ?? "",
-            //            UnitId = thisEquMaintenanceItem.UnitId,
-            //            OperationContent = thisEquMaintenanceItem.OperationContent ?? "",
-            //            Components = thisEquMaintenanceItem.Components ?? "",
-            //            Remark = thisEquMaintenanceItem.Remark ?? "",
-            //            ReferenceValue = thisEquMaintenanceTemplateItemRelation?.Center,
-            //            UpperLimit = thisEquMaintenanceTemplateItemRelation?.UpperLimit,
-            //            LowerLimit = thisEquMaintenanceTemplateItemRelation?.LowerLimit,
-
-            //            Id = IdGenProvider.Instance.CreateId(),
-            //            CreatedBy = _currentUser.UserName,
-            //            UpdatedBy = _currentUser.UserName,
-            //            CreatedOn = HymsonClock.Now(),
-            //            UpdatedOn = HymsonClock.Now(),
-            //            SiteId = _currentSite.SiteId ?? 0
-            //        };
-            //        EquMaintenanceTaskSnapshotItemList.Add(EquMaintenanceTaskSnapshotItem);
-
-            //        EquMaintenanceTaskItemEntity EquMaintenanceTaskItem = new()
-            //        {
-            //            MaintenanceTaskId = EquMaintenanceTask.Id,
-            //            MaintenanceItemSnapshotId = EquMaintenanceTask.Id,
-            //            InspectionValue = "",
-            //            IsQualified = TrueOrFalseEnum.No,
-            //            Remark = EquMaintenanceTaskSnapshotItem.Remark,
-
-            //            Id = IdGenProvider.Instance.CreateId(),
-            //            CreatedBy = _currentUser.UserName,
-            //            UpdatedBy = _currentUser.UserName,
-            //            CreatedOn = HymsonClock.Now(),
-            //            UpdatedOn = HymsonClock.Now(),
-            //            SiteId = _currentSite.SiteId ?? 0
-            //        };
-            //        EquMaintenanceTaskItemList.Add(EquMaintenanceTaskItem);
-
-            //    }
-            //}
-            //#endregion
-
-            //using var trans = TransactionHelper.GetTransactionScope();
-
-            //await _EquMaintenanceTaskRepository.InsertRangeAsync(EquMaintenanceTaskList);
-            //await _EquMaintenanceTaskSnapshotPlanRepository.InsertRangeAsync(EquMaintenanceTaskSnapshotPlanList);
-            //await _EquMaintenanceTaskSnapshotItemRepository.InsertRangeAsync(EquMaintenanceTaskSnapshotItemList);
-            //await _EquMaintenanceTaskItemRepository.InsertRangeAsync(EquMaintenanceTaskItemList);
-
-            //trans.Complete();
-
+            await _EquMaintenancePlanCoreService.GenerateEquMaintenanceTaskAsync(new GenerateEquMaintenanceTaskDto { SiteId = _currentSite.SiteId ?? 0, UserName = _currentUser.UserName, ExecType = param.ExecType, MaintenancePlanId = param.MaintenancePlanId, });
         }
 
         #region 关联信息

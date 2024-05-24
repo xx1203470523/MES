@@ -30,6 +30,8 @@ using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem.Q
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.EquMaintenancePlan;
+using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
 using Hymson.MES.Data.Repositories.EquSpotcheckPlan;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.Inte;
@@ -74,6 +76,8 @@ using Hymson.MES.Data.Repositories.WhWarehouseRegion.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseShelf.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Equipment.EquMaintenance;
+using Hymson.MES.Services.Dtos.EquMaintenancePlan;
+using Hymson.MES.Services.Dtos.EquMaintenanceTemplate;
 using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
 using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.MES.Services.Dtos.Inte;
@@ -295,8 +299,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSpotcheckTemplateDto, EquSpotcheckTemplateEntity>();
             #endregion
 
-
-
             #region EquSpotcheckPlan
             CreateMap<EquSpotcheckPlanCreateDto, EquSpotcheckPlanEntity>();
             CreateMap<EquSpotcheckPlanModifyDto, EquSpotcheckPlanEntity>();
@@ -305,6 +307,25 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<EquSpotcheckPlanDto, EquSpotcheckPlanEntity>();
             CreateMap<EquSpotcheckPlanEntity, EquSpotcheckPlanDto>();
+            #endregion
+
+            #region EquMaintenanceTemplate
+            CreateMap<EquMaintenanceTemplateCreateDto, EquMaintenanceTemplateEntity>();
+            CreateMap<EquMaintenanceTemplateModifyDto, EquMaintenanceTemplateEntity>();
+            CreateMap<EquMaintenanceTemplatePagedQueryDto, EquMaintenanceTemplatePagedQuery>();
+            CreateMap<EquMaintenanceTemplateEntity, EquMaintenanceTemplateDto>();
+
+            CreateMap<EquMaintenanceTemplateDto, EquMaintenanceTemplateEntity>();
+            #endregion
+
+            #region EquMaintenancePlan
+            CreateMap<EquMaintenancePlanCreateDto, EquMaintenancePlanEntity>();
+            CreateMap<EquMaintenancePlanModifyDto, EquMaintenancePlanEntity>();
+            CreateMap<EquMaintenancePlanPagedQueryDto, EquMaintenancePlanPagedQuery>();
+            CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
+
+            CreateMap<EquMaintenancePlanDto, EquMaintenancePlanEntity>();
+            CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
             #endregion
 
         }

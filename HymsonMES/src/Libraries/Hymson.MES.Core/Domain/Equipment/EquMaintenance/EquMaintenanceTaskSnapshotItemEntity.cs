@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -33,17 +35,17 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
         /// <summary>
         /// 数值类型;文本/数值
         /// </summary>
-        public bool DataType { get; set; }
+        public DataTypeEnum DataType { get; set; }
 
         /// <summary>
         /// 保养方式
         /// </summary>
-        public bool? CheckType { get; set; }
+        public EquMaintenanceItemMethodEnum? CheckType { get; set; }
 
         /// <summary>
         /// 作业方法
