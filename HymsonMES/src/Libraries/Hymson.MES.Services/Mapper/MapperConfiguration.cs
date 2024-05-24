@@ -146,6 +146,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquInspectionTaskSaveDto, EquInspectionTaskEntity>();
             CreateMap<EquInspectionTaskEntity, EquInspectionTaskDto>();
 
+            CreateMap<EquOperationPermissionsQueryDto, EquOperationPermissionsQuery>();
+            CreateMap<EquOperationPermissionsQueryDto, EquOperationPermissionsPagedQuery>();
+            CreateMap<EquOperationPermissionsSaveDto, EquOperationPermissionsEntity>();
+            CreateMap<EquOperationPermissionsEntity, EquOperationPermissionsDto>();
+
             CreateMap<EquInspectionRecordPagedQueryDto, EquInspectionRecordPagedQuery>();
             CreateMap<EquInspectionRecordView, EquInspectionRecordDto>();
             #endregion
@@ -1333,6 +1338,15 @@ namespace Hymson.MES.Services.Mapper
             #region ComUsageReport
             CreateMap<ComUsageReportPagedQueryDto, ComUsageReportPagedQuery>();
 
+            #endregion
+
+            #region WorkOrderControl
+            CreateMap<WorkOrderControlReportPagedQueryDto, WorkOrderControlReportPagedQuery>();
+            CreateMap<WorkshopJobControlReportView, WorkOrderControlReportViewDto>();
+
+            CreateMap<WorkOrderControlReportOptimizePagedQueryDto, PlanWorkOrderPagedQuery>();
+
+            CreateMap<ManuSfcStepBySfcPagedQueryDto, ManuSfcStepBySfcPagedQuery>();
             #endregion
 
             CreateMap<NodeSourceBo, NodeSourceDto>();
