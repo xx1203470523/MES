@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
     /// </summary>
     public class EquMaintenanceTaskProcessedQuery
     {
-    
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public IEnumerable<long>? MaintenanceTaskIds { get; set; }
     }
 }

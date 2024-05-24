@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Hymson.Infrastructure;
 
 namespace Hymson.MES.Core.Domain.Equipment.EquMaintenance
 {
-    public class EquMaintenanceTaskUnionPlanEntity
+    public class EquMaintenanceTaskUnionPlanEntity: BaseEntity
     {
 
         /// <summary>

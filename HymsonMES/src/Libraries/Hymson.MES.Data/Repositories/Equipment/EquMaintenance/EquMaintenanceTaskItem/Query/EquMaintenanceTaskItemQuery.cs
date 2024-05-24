@@ -5,6 +5,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
     /// </summary>
     public class EquMaintenanceTaskItemQuery
     {
-    
+        public long? SiteId { get; set; }
+        public long? MaintenanceTaskId { get; set; }
     }
 }

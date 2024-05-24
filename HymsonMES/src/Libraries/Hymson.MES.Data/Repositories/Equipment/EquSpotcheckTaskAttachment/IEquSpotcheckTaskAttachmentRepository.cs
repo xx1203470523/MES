@@ -73,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualFqcOrderAttachmentEntity>> GetByOrderIdAsync(long orderId);
+        Task<IEnumerable<EquSpotcheckTaskAttachmentEntity>> GetByOrderIdAsync(long orderId);
 
         /// <summary>
         /// 获取List

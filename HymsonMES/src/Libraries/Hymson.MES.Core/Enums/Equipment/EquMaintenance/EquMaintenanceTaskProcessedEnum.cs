@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Hymson.MES.Core.Enums.Equipment.EquMaintenance
+namespace Hymson.MES.Core.Enums.Equipment
 {
     public enum EquMaintenanceTaskProcessedEnum : sbyte
     {

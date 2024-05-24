@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Equipment;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -18,7 +19,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 不合格处理方式;1-通过；2-不通过
         /// </summary>
-        public bool? HandMethod { get; set; }
+        public EquMaintenanceTaskProcessedEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 处理人

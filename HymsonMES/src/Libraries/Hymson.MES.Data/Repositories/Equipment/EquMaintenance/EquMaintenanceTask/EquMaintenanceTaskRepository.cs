@@ -1,6 +1,8 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
@@ -96,6 +98,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return await conn.QueryFirstOrDefaultAsync<EquMaintenanceTaskEntity>(GetByIdSql, new { Id = id });
         }
 
+        public async Task<EquMaintenanceTaskUnionPlanEntity> GeUnionByIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquMaintenanceTaskUnionPlanEntity>(GetUnionByIdSql, new { Id = id });
+        }
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -130,10 +138,22 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("st.*,stsp.Code as PlanCode,stsp.Name as PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.Type as PlanType,stsp.BeginTime as PlanBeginTime,stsp.EndTime PlanEndTime");
+            sqlBuilder.OrderBy("st.UpdatedOn DESC");
+            sqlBuilder.Where("st.IsDeleted = 0");
+            sqlBuilder.Where("st.SiteId = @SiteId");
+            sqlBuilder.LeftJoin("equ_spotcheck_task_snapshot_plan stsp on st.Id=stsp.SpotCheckTaskId");
+
+            if (pagedQuery.EquipmentId.HasValue)
+            {
+                sqlBuilder.Where("stsp.EquipmentId LIKE @EquipmentId");
+            }
+
+            if (pagedQuery.PlanStartTime != null && pagedQuery.PlanStartTime.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { PlanStartTimeStart = pagedQuery.PlanStartTime[0], PlanStartTimeEnd = pagedQuery.PlanStartTime[1].AddDays(1) });
+                sqlBuilder.Where("stsp.BeginTime >= @PlanStartTimeStart AND stsp.EndTime < @PlanStartTimeEnd");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -156,8 +176,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>
     public partial class EquMaintenanceTaskRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_maintenance_task /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_maintenance_task /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_maintenance_task st /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_maintenance_task st /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_maintenance_task /**where**/  ";
 
         const string InsertSql = "INSERT INTO equ_maintenance_task(  `Id`, `Code`, `Name`, `BeginTime`, `EndTime`, `Status`, `IsQualified`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @BeginTime, @EndTime, @Status, @IsQualified, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
@@ -171,6 +191,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string GetByIdSql = @"SELECT * FROM equ_maintenance_task WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM equ_maintenance_task WHERE Id IN @Ids ";
+
+        const string GetUnionByIdSql = @"SELECT st.*,stsp.Code as PlanCode,stsp.Name as PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.Type as PlanType,stsp.BeginTime PlanBeginTime,stsp.EndTime PlanEndTime
+                                            FROM equ_maintenance_task st
+                                            LEFT JOIN equ_maintenance_task_snapshot_plan stsp on st.Id=stsp.MaintenanceTaskId
+                                            WHERE st.IsDeleted = 0 AND st.Id = @Id ";
 
     }
 }

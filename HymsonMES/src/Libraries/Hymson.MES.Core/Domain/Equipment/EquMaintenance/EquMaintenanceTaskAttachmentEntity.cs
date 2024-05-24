@@ -13,7 +13,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 任务ID;equ_maintenance_task表的Id
         /// </summary>
-        public long MaintenanceCheckTaskId { get; set; }
+        public long MaintenanceTaskId { get; set; }
 
         /// <summary>
         /// 附件Id;inte_attachment表的Id
