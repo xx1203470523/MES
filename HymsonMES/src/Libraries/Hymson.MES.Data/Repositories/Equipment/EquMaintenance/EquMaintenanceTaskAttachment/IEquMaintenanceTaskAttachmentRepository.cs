@@ -58,7 +58,14 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquMaintenanceTaskAttachmentEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 根据任务单据Id获取
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquMaintenanceTaskAttachmentEntity>> GetByOrderIdAsync(long orderId);
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>

@@ -1,5 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 
@@ -58,7 +60,14 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquMaintenanceTaskEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 获取任务两表信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<EquMaintenanceTaskUnionPlanEntity> GeUnionByIdAsync(long id);
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>

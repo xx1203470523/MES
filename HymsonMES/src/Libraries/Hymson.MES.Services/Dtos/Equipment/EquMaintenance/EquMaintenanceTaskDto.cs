@@ -142,7 +142,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 点检类型
         /// </summary>
-        public EquipmentSpotcheckTypeEnum? PlanType { get; set; }
+        public EquipmentMaintenanceTypeEnum? PlanType { get; set; }
         public string? PlanTypeText { get; set; }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 主键
         /// </summary>
-        public long SpotCheckTaskId { get; set; }
+        public long MaintenanceTaskId { get; set; }
 
     }
 
@@ -251,18 +251,18 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
     public record EquMaintenanceTaskItemUnionSnapshotView : BaseEntityDto
     {
         /// <summary>
-        /// SpotCheckItemId
+        /// EquMaintenanceItemId
         /// </summary>
         public long Id { get; set; }
         /// <summary>
-        /// 点检任务ID;equ_spotcheck_task表的Id
+        /// 点检任务ID;equ_EquMaintenance_task表的Id
         /// </summary>
-        public long? SpotCheckTaskId { get; set; }
+        public long? EquMaintenanceTaskId { get; set; }
 
         /// <summary>
-        /// 点检项目快照ID;equ_spotcheck_item_snapshot表的Id
+        /// 点检项目快照ID;equ_EquMaintenance_item_snapshot表的Id
         /// </summary>
-        public long SpotCheckItemSnapshotId { get; set; }
+        public long EquMaintenanceItemSnapshotId { get; set; }
 
         /// <summary>
         /// 检验值
@@ -286,9 +286,9 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
 
 
         /// <summary>
-        /// 点检项目ID;equ_spotcheck_item的Id
+        /// 点检项目ID;equ_EquMaintenance_item的Id
         /// </summary>
-        public long SpotCheckItemId { get; set; }
+        public long EquMaintenanceItemId { get; set; }
 
         /// <summary>
         /// 点检项目编码
@@ -370,7 +370,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 任务id
         /// </summary>
-        public long SpotCheckTaskId { get; set; }
+        public long MaintenanceTaskId { get; set; }
 
         /// <summary>
         /// 样品参数
@@ -423,12 +423,12 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
     /// <summary>
     /// 处理结果完成Dto
     /// </summary>
-    public record EquMaintenancekTaskCloseDto
+    public record EquMaintenanceTaskCloseDto
     {
         /// <summary>
         /// 主键
         /// </summary>
-        public long SpotCheckTaskId { get; set; }
+        public long MaintenanceTaskId { get; set; }
 
         /// <summary>
         /// 不合格处理方式
@@ -467,7 +467,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 主键
         /// </summary>
-        public long SpotCheckTaskId { get; set; }
+        public long MaintenanceTaskId { get; set; }
 
         /// <summary>
         /// 项目编码

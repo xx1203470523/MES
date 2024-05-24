@@ -108,6 +108,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
+        /// 根据任务单据Id获取
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquMaintenanceTaskAttachmentEntity>> GetByOrderIdAsync(long orderId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquMaintenanceTaskAttachmentEntity>(GetByOrderIdSql, new { OrderId = orderId });
+        }
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>
@@ -171,6 +182,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string GetByIdSql = @"SELECT * FROM equ_maintenance_task_attachment WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM equ_maintenance_task_attachment WHERE Id IN @Ids ";
+
+        const string GetByOrderIdSql = @"SELECT * FROM equ_maintenance_task_attachment WHERE IsDeleted = 0 AND MaintenanceTaskId = @OrderId ";
 
     }
 }
