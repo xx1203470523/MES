@@ -32,7 +32,7 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
         /// <summary>
         /// 流转表 仓储
         /// </summary>
-        private readonly IManuSfcCirculationRepository _circulationRepository;
+        private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
 
         /// <summary>
         /// 物料维护 仓储
@@ -58,17 +58,17 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
         /// 构造函数
         /// </summary>
         /// <param name="currentSite"></param>
-        /// <param name="manuSfcCirculationRepository"></param>
+        /// <param name="manuBarCodeRelationRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="resourceRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procBomDetailRepository"></param>
-        public MaterialDeductionRecordService(ICurrentSite currentSite, IManuSfcCirculationRepository manuSfcCirculationRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcResourceRepository resourceRepository, IProcProcedureRepository procProcedureRepository, IProcBomDetailRepository procBomDetailRepository)
+        public MaterialDeductionRecordService(ICurrentSite currentSite, IManuBarCodeRelationRepository  manuBarCodeRelationRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcResourceRepository resourceRepository, IProcProcedureRepository procProcedureRepository, IProcBomDetailRepository procBomDetailRepository)
         {
             _currentSite = currentSite;
             _planWorkOrderRepository = planWorkOrderRepository;
-            _circulationRepository = manuSfcCirculationRepository;
+            _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
             _procMaterialRepository = procMaterialRepository;
             _resourceRepository = resourceRepository;
             _procProcedureRepository = procProcedureRepository;
@@ -86,8 +86,8 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
 
             var pagedQuery = param.ToQuery<ComUsageReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
-            pagedQuery.CirculationType = SfcCirculationTypeEnum.Consume;
-            var pagedInfo = await _circulationRepository.GetReportPagedInfoAsync(pagedQuery);
+            pagedQuery.CirculationType = ManuBarCodeRelationTypeEnum.SFC_Consumption;
+            var pagedInfo = await _manuBarCodeRelationRepository.GetReportPagedInfoAsync(pagedQuery);
 
             List<MaterialDeductionRecordResultDto> listDto = new List<MaterialDeductionRecordResultDto>();
 
@@ -97,8 +97,8 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
             }
 
             // 获取工单
-            var workOrderIds = pagedInfo.Data.Select(x => x.WorkOrderId).Distinct().ToArray();
-            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+            var workOrderIds = pagedInfo.Data.Select(x => x.OutputBarCodeWorkOrderId).Distinct().ToArray();
+            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds.OfType<long>());
 
             // 获取资源
             var resourceIds = pagedInfo.Data.Select(x => x.ResourceId).Distinct().ToArray();
@@ -106,36 +106,36 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
 
             // 获取工序
             var procedureIds = pagedInfo.Data.Select(x => x.ProcedureId).Distinct().ToArray();
-            var procedures = await _procProcedureRepository.GetByIdsAsync(procedureIds);
+            var procedures = await _procProcedureRepository.GetByIdsAsync(procedureIds.OfType<long>());
 
             // 获取物料
-            var productIds = pagedInfo.Data.Select(x => x.ProductId).Distinct().ToArray();
-            var products = await _procMaterialRepository.GetByIdsAsync(productIds);
+            var productIds = pagedInfo.Data.Select(x => x.OutputBarCodeMaterialId).Distinct().ToArray();
+            var products = await _procMaterialRepository.GetByIdsAsync(productIds.OfType<long>());
 
             //查询Bom详情
             var bomDetails = await _procBomDetailRepository.GetProcBomDetailEntitiesAsync(
                 new ProcBomDetailQuery
                 {
                     SiteId = _currentSite.SiteId ?? 123456,
-                    MaterialIds = productIds,
-                    ProcedureIds = procedureIds,
+                    MaterialIds = productIds.OfType<long>(),
+                    ProcedureIds = procedureIds.OfType<long>(),
                 }
                 );
 
             foreach (var item in pagedInfo.Data)
             {
-                var product = products.FirstOrDefault(x => x.Id == item.ProductId);
-                var workOrder = workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId);
+                var product = products.FirstOrDefault(x => x.Id == item.OutputBarCodeMaterialId);
+                var workOrder = workOrders.FirstOrDefault(x => x.Id == item.OutputBarCodeWorkOrderId);
                 var procedure = procedures.FirstOrDefault(x => x.Id == item.ProcedureId);
                 var resource = resources.FirstOrDefault(x => x.Id == item.ResourceId);
-                var bomUsgQty = bomDetails.FirstOrDefault(x => x.MaterialId == item.ProductId && x.ProcedureId == item.ProcedureId);
+                var bomUsgQty = bomDetails.FirstOrDefault(x => x.MaterialId == item.OutputBarCodeMaterialId && x.ProcedureId == item.ProcedureId);
                 listDto.Add(new MaterialDeductionRecordResultDto()
                 {
-                    Sfc = item.SFC,
+                    Sfc = item.OutputBarCode,
                     MaterialRemark = product != null ? product.MaterialCode + "/" + product.Version : "",
                     WorkOrder = workOrder != null ? workOrder.OrderCode : "",
-                    CirculationBarCode = item.CirculationBarCode,
-                    CirculationQty = item.CirculationQty ?? 0,
+                    CirculationBarCode = item.InputBarCode,
+                    CirculationQty = item.InputQty,
                     ProcedureName = procedure != null ? procedure.Code : "",
                     ResourceCode = resource != null ? resource.ResCode : "",
                     ResourceName = resource != null ? resource.ResName : "",

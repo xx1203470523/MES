@@ -4,6 +4,7 @@ using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -66,6 +67,7 @@ namespace Hymson.MES.Services.Services.Report
         {
             var pagedQuery = param.ToQuery<ComUsageReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 123456;
+            pagedQuery.IsDisassemble = TrueOrFalseEnum.No;
             var pagedInfo = await _manuBarCodeRelationRepository.GetReportPagedInfoAsync(pagedQuery);
 
             List<ComUsageReportViewDto> listDto = new List<ComUsageReportViewDto>();
@@ -83,21 +85,21 @@ namespace Hymson.MES.Services.Services.Report
             var materialIds = circulationProductIds.ToArray();
             var materials = await _procMaterialRepository.GetByIdsAsync(materialIds);
 
-            //var workOrderIds = pagedInfo.Data.Select(x => x.WorkOrderId).Distinct().ToArray();
-            //var workOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+            var workOrderIds = pagedInfo.Data.Select(x => x.OutputBarCodeWorkOrderId).Distinct().ToArray();
+            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds.OfType<long>());
 
             foreach (var item in pagedInfo.Data)
             {
                 var product = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.OutputBarCodeMaterialId) : null;
                 var circulationProduct = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.InputBarCodeMaterialId) : null;
 
-                //var workOrder = materials != null && materials.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
+                var workOrder = materials != null && materials.Any() ? workOrders.FirstOrDefault(x => x.Id == item.OutputBarCodeWorkOrderId) : null;
 
                 listDto.Add(new ComUsageReportViewDto()
                 {
                     SFC = item.OutputBarCode,
                     ProductCodeVersion = product != null ? product.MaterialCode + "/" + product.Version : "",
-                    //  OrderCode= workOrder!=null? workOrder.OrderCode : "",
+                    OrderCode = workOrder != null ? workOrder.OrderCode : "",
                     CirculationBarCode = item.InputBarCode,
                     CirculationProductCodeVersion = circulationProduct != null ? circulationProduct.MaterialCode + "/" + circulationProduct.Version : "",
                 });
