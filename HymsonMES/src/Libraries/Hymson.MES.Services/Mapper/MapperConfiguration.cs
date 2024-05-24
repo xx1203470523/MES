@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
@@ -24,9 +26,14 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.EquMaintenancePlan;
+using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
+using Hymson.MES.Data.Repositories.EquSpotcheckPlan;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.Inte;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
@@ -68,6 +75,11 @@ using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseRegion.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseShelf.Query;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Equipment.EquMaintenance;
+using Hymson.MES.Services.Dtos.EquMaintenancePlan;
+using Hymson.MES.Services.Dtos.EquMaintenanceTemplate;
+using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
+using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.MES.Services.Dtos.Inte;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -132,10 +144,12 @@ namespace Hymson.MES.Services.Mapper
             #region EquEquipment
             CreateMap<EquEquipmentSaveDto, EquEquipmentEntity>();
             CreateMap<EquEquipmentPagedQueryDto, EquEquipmentPagedQuery>();
+            CreateMap<EquEquipmentSpotcheckRelationPagedQueryDto, EquEquipmentSpotcheckRelationPagedQuery>();
 
             CreateMap<EquEquipmentEntity, EquEquipmentDto>();
             CreateMap<EquEquipmentEntity, EquEquipmentListDto>();
             CreateMap<EquEquipmentPageView, EquEquipmentListDto>();
+            CreateMap<GetEquSpotcheckPlanEquipmentRelationPageView, GetEquSpotcheckPlanEquipmentRelationListDto>();
 
             CreateMap<EquInspectionItemPagedQueryDto, EquInspectionItemPagedQuery>();
             CreateMap<EquInspectionItemSaveDto, EquInspectionItemEntity>();
@@ -145,6 +159,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquInspectionTaskView, EquInspectionTaskDto>();
             CreateMap<EquInspectionTaskSaveDto, EquInspectionTaskEntity>();
             CreateMap<EquInspectionTaskEntity, EquInspectionTaskDto>();
+
+            CreateMap<EquOperationPermissionsQueryDto, EquOperationPermissionsQuery>();
+            CreateMap<EquOperationPermissionsQueryDto, EquOperationPermissionsPagedQuery>();
+            CreateMap<EquOperationPermissionsSaveDto, EquOperationPermissionsEntity>();
+            CreateMap<EquOperationPermissionsEntity, EquOperationPermissionsDto>();
 
             CreateMap<EquInspectionRecordPagedQueryDto, EquInspectionRecordPagedQuery>();
             CreateMap<EquInspectionRecordView, EquInspectionRecordDto>();
@@ -248,6 +267,77 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EQualUnqualifiedGroupCreateDto, EquEquipmentFaultTypeEntity>();
             CreateMap<EQualUnqualifiedGroupModifyDto, EquEquipmentFaultTypeEntity>();
             CreateMap<EquipmentFaultTypePagedQueryDto, EquipmentFaultTypePagedQuery>();
+            #endregion            #region 设备点检
+
+            #region
+            CreateMap<EquSpotcheckItemSaveDto, EquSpotcheckItemEntity>();
+            CreateMap<EquSpotcheckItemPagedQueryDto, EquSpotcheckItemPagedQuery>();
+
+            CreateMap<EquSpotcheckItemEntity, EquSpotcheckItemDto>();
+            CreateMap<EquSpotcheckItemUpdateDto, EquSpotcheckItemEntity>();
+
+            //index
+            CreateMap<EquSpotcheckTaskPagedQueryDto, EquSpotcheckTaskPagedQuery>();
+            CreateMap<EquSpotcheckTaskUnionPlanEntity, EquSpotcheckTaskDto>();
+            //item
+            CreateMap<EquSpotcheckTaskSnapshotItemEntity, TaskItemUnionSnapshotView>();
+            CreateMap<EquSpotcheckTaskItemEntity, TaskItemUnionSnapshotView>();
+
+            #endregion
+
+            #region 设备保养
+            CreateMap<EquMaintenanceItemSaveDto, EquMaintenanceItemEntity>();
+            CreateMap<EquMaintenanceItemPagedQueryDto, EquMaintenanceItemPagedQuery>();
+
+            CreateMap<EquMaintenanceItemEntity, EquMaintenanceItemDto>();
+            CreateMap<EquMaintenanceItemUpdateDto, EquMaintenanceItemEntity>();
+
+            //task index
+            CreateMap<EquMaintenanceTaskPagedQueryDto, EquMaintenanceTaskPagedQuery>();
+            CreateMap<EquMaintenanceTaskUnionPlanEntity, EquMaintenanceTaskDto>();
+            //item
+            CreateMap<EquMaintenanceTaskSnapshotItemEntity, EquMaintenanceTaskItemUnionSnapshotView>();
+            CreateMap<EquMaintenanceTaskItemEntity, EquMaintenanceTaskItemUnionSnapshotView>();
+
+            #endregion
+
+
+            #region EquSpotcheckTemplate
+            CreateMap<EquSpotcheckTemplateCreateDto, EquSpotcheckTemplateEntity>();
+            CreateMap<EquSpotcheckTemplateModifyDto, EquSpotcheckTemplateEntity>();
+            CreateMap<EquSpotcheckTemplatePagedQueryDto, EquSpotcheckTemplatePagedQuery>();
+            CreateMap<EquSpotcheckTemplateEntity, EquSpotcheckTemplateDto>();
+
+            CreateMap<EquSpotcheckTemplateDto, EquSpotcheckTemplateEntity>();
+            #endregion
+
+            #region EquSpotcheckPlan
+            CreateMap<EquSpotcheckPlanCreateDto, EquSpotcheckPlanEntity>();
+            CreateMap<EquSpotcheckPlanModifyDto, EquSpotcheckPlanEntity>();
+            CreateMap<EquSpotcheckPlanPagedQueryDto, EquSpotcheckPlanPagedQuery>();
+            CreateMap<EquSpotcheckPlanEntity, EquSpotcheckPlanDto>();
+
+            CreateMap<EquSpotcheckPlanDto, EquSpotcheckPlanEntity>();
+            CreateMap<EquSpotcheckPlanEntity, EquSpotcheckPlanDto>();
+            #endregion
+
+            #region EquMaintenanceTemplate
+            CreateMap<EquMaintenanceTemplateCreateDto, EquMaintenanceTemplateEntity>();
+            CreateMap<EquMaintenanceTemplateModifyDto, EquMaintenanceTemplateEntity>();
+            CreateMap<EquMaintenanceTemplatePagedQueryDto, EquMaintenanceTemplatePagedQuery>();
+            CreateMap<EquMaintenanceTemplateEntity, EquMaintenanceTemplateDto>();
+
+            CreateMap<EquMaintenanceTemplateDto, EquMaintenanceTemplateEntity>();
+            #endregion
+
+            #region EquMaintenancePlan
+            CreateMap<EquMaintenancePlanCreateDto, EquMaintenancePlanEntity>();
+            CreateMap<EquMaintenancePlanModifyDto, EquMaintenancePlanEntity>();
+            CreateMap<EquMaintenancePlanPagedQueryDto, EquMaintenancePlanPagedQuery>();
+            CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
+
+            CreateMap<EquMaintenancePlanDto, EquMaintenancePlanEntity>();
+            CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
             #endregion
 
         }
@@ -1083,6 +1173,10 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            #region 车间物料不良录入
+            CreateMap<QualMaterialUnqualifiedDataPagedQueryDto, QualMaterialUnqualifiedDataPagedQuery>();
+            #endregion
+
         }
 
         /// <summary>
@@ -1333,6 +1427,15 @@ namespace Hymson.MES.Services.Mapper
             #region ComUsageReport
             CreateMap<ComUsageReportPagedQueryDto, ComUsageReportPagedQuery>();
 
+            #endregion
+
+            #region WorkOrderControl
+            CreateMap<WorkOrderControlReportPagedQueryDto, WorkOrderControlReportPagedQuery>();
+            CreateMap<WorkshopJobControlReportView, WorkOrderControlReportViewDto>();
+
+            CreateMap<WorkOrderControlReportOptimizePagedQueryDto, PlanWorkOrderPagedQuery>();
+
+            CreateMap<ManuSfcStepBySfcPagedQueryDto, ManuSfcStepBySfcPagedQuery>();
             #endregion
 
             CreateMap<NodeSourceBo, NodeSourceDto>();

@@ -53,6 +53,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 根据主表Id删除数据
+        /// </summary>
+        /// <param name="ParameterGroupId"></param>
+        /// <returns></returns>
+        Task<int> DeleteByMainIdAsync(long ParameterGroupId);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>

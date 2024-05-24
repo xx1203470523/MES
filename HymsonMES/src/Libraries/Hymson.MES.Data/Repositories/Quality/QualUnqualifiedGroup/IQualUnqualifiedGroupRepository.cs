@@ -54,11 +54,25 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<QualUnqualifiedGroupEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedGroupEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         Task<IEnumerable<QualUnqualifiedGroupEntity>> GetListByProcedureIdAsync(QualUnqualifiedGroupQuery param);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedGroupEntity>> GetListByMaterialGroupIddAsync(QualUnqualifiedGroupQuery param);
 
         /// <summary>
         /// 分页查询

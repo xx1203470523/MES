@@ -25,6 +25,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         public string WorkOrderCode { get; set; }
         /// <summary>
+        /// 物料组ID
+        /// </summary>
+        public long GroupId { get; set; }
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; }

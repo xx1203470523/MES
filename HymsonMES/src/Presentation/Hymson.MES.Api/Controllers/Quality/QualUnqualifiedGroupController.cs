@@ -52,6 +52,18 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Route("listByMaterialGroup")]
+        [HttpGet]
+        public async Task<IEnumerable<QualUnqualifiedGroupDto>> GetListByMaterialGroupIddAsync([FromQuery] QualUnqualifiedGroupQueryDto query)
+        {
+            return await _qualUnqualifiedGroupService.GetListByMaterialGroupIddAsync(query);
+        }
+
+        /// <summary>
         /// 查询详情（不合格代码组）
         /// </summary>
         /// <param name="id"></param>

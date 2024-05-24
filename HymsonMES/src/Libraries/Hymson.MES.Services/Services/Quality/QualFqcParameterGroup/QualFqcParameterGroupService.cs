@@ -453,7 +453,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     var detailCommand = new QualFqcParameterGroupDetailEntity()
                     {
-                        Id = (long)m.Id,
+                        Id = m.Id?? IdGenProvider.Instance.CreateId(),
                         CreatedOn = HymsonClock.Now(),
                         UpdatedOn = HymsonClock.Now(),
                         IsDeleted = 0,
@@ -476,19 +476,10 @@ namespace Hymson.MES.Services.Services.Quality
             }
             using var scope = TransactionHelper.GetTransactionScope();
 
+            await _qualFqcParameterGroupDetailRepository.DeleteByMainIdAsync(updateDto.Id ?? 0);
             await _qualFqcParameterGroupRepository.UpdateAsync(command);
-            foreach (var item in detailCommands)
-            {
-                var Isexist = _qualFqcParameterGroupDetailRepository.GetByIdAsync(item.Id);
-                if (Isexist.Result != null)
-                {
-                    await _qualFqcParameterGroupDetailRepository.UpdateAsync(item);
-                }
-                else
-                {
-                    await _qualFqcParameterGroupDetailRepository.InsertAsync(item);
-                }
-            }
+            await _qualFqcParameterGroupDetailRepository.InsertRangeAsync(detailCommands);
+
             scope.Complete();
         }
 
