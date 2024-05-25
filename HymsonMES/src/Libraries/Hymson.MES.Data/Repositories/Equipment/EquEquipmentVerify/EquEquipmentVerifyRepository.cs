@@ -190,20 +190,20 @@ namespace Hymson.MES.Data.Repositories.Equipment
                                             /**select**/
                                            FROM `equ_equipment_verify` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_equipment_verify`(  `Id`, `SiteId`, `EquipmentId`, `Account`, `Password`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @EquipmentId, @Account, @Password, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn )  ";
-        const string InsertsSql = "INSERT INTO `equ_equipment_verify`(  `Id`, `SiteId`, `EquipmentId`, `Account`, `Password`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @EquipmentId, @Account, @Password, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn )  ";
+        const string InsertSql = "INSERT INTO `equ_equipment_verify`(  `Id`, `SiteId`, `EquipmentId`, `Account`, `Password`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `AccountType`) VALUES (   @Id, @SiteId, @EquipmentId, @Account, @Password, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn , @AccountType)  ";
+        const string InsertsSql = "INSERT INTO `equ_equipment_verify`(  `Id`, `SiteId`, `EquipmentId`, `Account`, `Password`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `AccountType`) VALUES (   @Id, @SiteId, @EquipmentId, @Account, @Password, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn , @AccountType)  ";
 
-        const string UpdateSql = "UPDATE `equ_equipment_verify` SET   SiteId = @SiteId, EquipmentId = @EquipmentId, Account = @Account, Password = @Password, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_equipment_verify` SET   SiteId = @SiteId, EquipmentId = @EquipmentId, Account = @Account, Password = @Password, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_equipment_verify` SET   SiteId = @SiteId, EquipmentId = @EquipmentId, Account = @Account, Password = @Password, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, AccountType = @AccountType WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `equ_equipment_verify` SET   SiteId = @SiteId, EquipmentId = @EquipmentId, Account = @Account, Password = @Password, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, AccountType = @AccountType WHERE Id = @Id ";
 
         const string DeleteSql = "DELETE FROM `equ_equipment_verify` WHERE Id = @Id ";
         const string DeletesSql = "DELETE FROM `equ_equipment_verify` WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `EquipmentId`, `Account`, `Password`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
+                               `Id`, `SiteId`, `EquipmentId`, `Account`, `Password`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `AccountType`
                             FROM `equ_equipment_verify`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `EquipmentId`, `Account`, `Password`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
+                                          `Id`, `SiteId`, `EquipmentId`, `Account`, `Password`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `AccountType`
                             FROM `equ_equipment_verify`  WHERE Id IN @Ids ";
         const string DeletesByEquipmentIdsSql = "DELETE FROM `equ_equipment_verify` WHERE EquipmentId IN @EquipmentIds";
 

@@ -84,14 +84,16 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("OperatorLogin")]
         [LogDescription("操作员登录001", BusinessType.OTHER, "001", ReceiverTypeEnum.MES)]
         [AllowAnonymous]
-        public async Task OperatorLoginAsync(OperationLoginDto dto)
+        public async Task<OperationLoginReturnDto> OperatorLoginAsync(OperationLoginDto dto)
         {
             if (IS_DEBUG == true)
             {
-                return;
+                OperationLoginReturnDto result = new OperationLoginReturnDto();
+                result.AccountType = "1";
+                return result;
             }
 
-            await _equCommonService.OperatorLoginAsync(dto);
+            return await _equCommonService.OperatorLoginAsync(dto);
             //await _qknyService.OperatorLoginAsync(dto);
         }
 

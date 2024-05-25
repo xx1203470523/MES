@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Equipment;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -15,21 +16,24 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备id
         /// </summary>
         public long EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 账号
         /// </summary>
         public string Account { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 密码
         /// </summary>
         public string Password { get; set; }
 
-       
+        /// <summary>
+        /// 账户类型
+        /// </summary>
+        public EquVerifyAccountTypeEnum AccountType { get; set; }
     }
 }

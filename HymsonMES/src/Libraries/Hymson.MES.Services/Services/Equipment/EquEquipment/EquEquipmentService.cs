@@ -164,8 +164,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 }
             }
 
-
-
             //绑定验证
             List<EquEquipmentVerifyEntity> verifyList = new();
             if (parm.Verifys != null && parm.Verifys.Any())
@@ -182,6 +180,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                     verify.EquipmentId = entity.Id;
                     verify.Account = item.Account;
                     verify.Password = item.Password;
+                    verify.AccountType = item.AccountType;
 
                     verify.Id = IdGenProvider.Instance.CreateId();
                     verify.SiteId = _currentSite.SiteId ?? 0;
@@ -276,6 +275,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                     verify.EquipmentId = entity.Id;
                     verify.Account = item.Account;
                     verify.Password = item.Password;
+                    verify.AccountType = item.AccountType;
 
                     verify.Id = IdGenProvider.Instance.CreateId();
                     verify.SiteId = _currentSite.SiteId ?? 0;

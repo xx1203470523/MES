@@ -251,7 +251,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task OperatorLoginAsync(OperationLoginDto dto)
+        public async Task<OperationLoginReturnDto> OperatorLoginAsync(OperationLoginDto dto)
         {
             await _validationOperationLoginDto.ValidateAndThrowAsync(dto);
             //1. 获取设备基础信息
@@ -263,8 +263,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45011)).WithData("EquipmentCode", dto.EquipmentCode); ;
             }
-            bool verifyCheck = verifyList.Where(m => m.Account == dto.OperatorUserID && m.Password == dto.OperatorPassword).Any();
-            if (verifyCheck == false)
+            var verifyModel = verifyList.Where(m => m.Account == dto.OperatorUserID && m.Password == dto.OperatorPassword).FirstOrDefault();
+            if (verifyModel == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45012)).WithData("EquipmentCode", dto.EquipmentCode); ;
             }
@@ -296,6 +296,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             await _equEquipmentLoginRecordService.AddAsync(loginRecordDto);
             await _manuEuqipmentNewestInfoService.AddOrUpdateAsync(newestDto);
             trans.Complete();
+
+            OperationLoginReturnDto result = new OperationLoginReturnDto();
+            result.AccountType = ((int)verifyModel.AccountType).ToString();
+
+            return result;
         }
 
         /// <summary>
