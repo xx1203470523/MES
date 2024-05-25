@@ -154,11 +154,11 @@ namespace Hymson.MES.Services.Services.Equipment
         {
             if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
-            //var entities = await _equSparePartsRepository.GetByIdsAsync(ids);
-            //if (entities != null && entities.Any(a => a.Status == DisableOrEnableEnum.Enable))
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10135));
-            //}
+            var entities = await _equSparePartsRepository.GetByIdsAsync(ids);
+            if (entities != null && entities.Any(a => a.Status == DisableOrEnableEnum.Enable))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10135));
+            }
 
             return await _equSparePartsRepository.DeletesAsync(new DeleteCommand
             {
