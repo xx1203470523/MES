@@ -12,19 +12,19 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 下达
         /// </summary>
         [Description("下达")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.BatchCreate)]
+        [ManuSfcStepOperationTypeAttrribute("SFC_Release", JobOrAssemblyNameEnum.BatchCreate)]
         Create = 1,
         /// <summary>
         /// 条码接收
         /// </summary>
         [Description("条码接收")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.Receive)]
+        [ManuSfcStepOperationTypeAttrribute("Barcode_Reception", JobOrAssemblyNameEnum.Receive)]
         Receive = 2,
         /// <summary>
         /// 开始
         /// </summary>
         [Description("开始")]
-        [ManuSfcStepOperationTypeAttrribute("InStationJobService", JobOrAssemblyNameEnum.InStock)]
+        [ManuSfcStepOperationTypeAttrribute("Start", JobOrAssemblyNameEnum.InStock)]
         InStock = 3,
         /// <summary>
         /// 完成
@@ -36,31 +36,31 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 将来锁
         /// </summary>
         [Description("将来锁")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.QualityLocking)]
+        [ManuSfcStepOperationTypeAttrribute("Instant_Lock", JobOrAssemblyNameEnum.QualityLocking)]
         FutureLock = 5,
         /// <summary>
         /// 锁定
         /// </summary>
         [Description("锁定")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.QualityLocking)]
+        [ManuSfcStepOperationTypeAttrribute("Lock", JobOrAssemblyNameEnum.QualityLocking)]
         InstantLock = 6,
         /// <summary>
         /// 取消锁
         /// </summary>
         [Description("取消锁")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.QualityLocking)]
+        [ManuSfcStepOperationTypeAttrribute("Unlock", JobOrAssemblyNameEnum.QualityLocking)]
         Unlock = 7,
         /// <summary>
         /// 不良录入
         /// </summary>
         [Description("不良录入")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.BadEntry)]
+        [ManuSfcStepOperationTypeAttrribute("Entry_Grade", JobOrAssemblyNameEnum.BadEntry)]
         BadEntry = 8,
         /// <summary>
         /// 报废
         /// </summary>
         [Description("报废")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.BadEntry)]
+        [ManuSfcStepOperationTypeAttrribute("Scrap", JobOrAssemblyNameEnum.BadEntry)]
         Discard = 9,
         /// <summary>
         /// 停止
@@ -72,7 +72,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 不良复判
         /// </summary>
         [Description("不良复判")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.BadRejudgment)]
+        [ManuSfcStepOperationTypeAttrribute("NC_Rejudge", JobOrAssemblyNameEnum.BadRejudgment)]
         BadRejudgment = 11,
         /// <summary>
         /// 返修
@@ -88,7 +88,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 取消报废
         /// </summary>
         [Description("取消报废")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.BadEntry)]
+        [ManuSfcStepOperationTypeAttrribute("Unscrap", JobOrAssemblyNameEnum.BadEntry)]
         CancelDiscard = 14,
         /// <summary>
         /// 关闭标识
@@ -104,43 +104,43 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 删除
         /// </summary>
         [Description("删除")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.BatchCreate)]
+        [ManuSfcStepOperationTypeAttrribute("Delete", JobOrAssemblyNameEnum.BatchCreate)]
         Delete = 17,
         /// <summary>
         /// 开始维修
         /// </summary>
         [Description("开始维修")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.Repair)]
+        [ManuSfcStepOperationTypeAttrribute("Repair", JobOrAssemblyNameEnum.Repair)]
         Repair = 18,
         /// <summary>
         /// 步骤控制
         /// </summary>
         [Description("步骤控制")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.StepControl)]
+        [ManuSfcStepOperationTypeAttrribute("Step_Control", JobOrAssemblyNameEnum.StepControl)]
         StepControl = 19,
         /// <summary>
         /// 生产更改
         /// </summary>
         [Description("生产更改")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.ManuUpdate)]
+        [ManuSfcStepOperationTypeAttrribute("Production_Exchange", JobOrAssemblyNameEnum.ManuUpdate)]
         ManuUpdate = 20,
         /// <summary>
         /// 完成维修
         /// </summary>
         [Description("完成维修")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.Repair)]
+        [ManuSfcStepOperationTypeAttrribute("Repair", JobOrAssemblyNameEnum.Repair)]
         RepairComplete = 21,
         /// <summary>
         /// 维修返回
         /// </summary>
         [Description("维修返回")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.Repair)]
+        [ManuSfcStepOperationTypeAttrribute("Repair", JobOrAssemblyNameEnum.Repair)]
         RepairReturn = 22,
         /// <summary>
         /// 拆解
         /// </summary>
         [Description("拆解")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.ComponentConfiguration)]
+        [ManuSfcStepOperationTypeAttrribute("Component_Disassembly", JobOrAssemblyNameEnum.ComponentConfiguration)]
         Disassembly = 23,
         /// <summary>
         /// 添加
@@ -174,41 +174,41 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 包装
         /// </summary>
         [Description("包装")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.Packing)]
+        [ManuSfcStepOperationTypeAttrribute("Pack", JobOrAssemblyNameEnum.Packing)]
         Package = 29,
         /// <summary>
         /// 解包
         /// </summary>
         [Description("解包")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.Packing)]
+        [ManuSfcStepOperationTypeAttrribute("Pack", JobOrAssemblyNameEnum.Packing)]
         Unpack = 30,
 
         /// <summary>
         /// 录入等级
         /// </summary>
         [Description("录入等级")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.EnterDowngrading)]
+        [ManuSfcStepOperationTypeAttrribute("Entry_Grade", JobOrAssemblyNameEnum.EnterDowngrading)]
         EnterDowngrading = 31,
 
         /// <summary>
         /// 移除降级
         /// </summary>
         [Description("移除降级")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.RemoveDowngrading)]
+        [ManuSfcStepOperationTypeAttrribute("Entry_Grade", JobOrAssemblyNameEnum.RemoveDowngrading)]
         RemoveDowngrading = 32,
 
         /// <summary>
         /// Marking
         /// </summary>
         [Description("Marking录入")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.Marking)]
+        [ManuSfcStepOperationTypeAttrribute("Marking__Entry", JobOrAssemblyNameEnum.Marking)]
         Marking = 33,
 
         /// <summary>
         /// 关闭Marking
         /// </summary>
         [Description("关闭Marking")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.CloseMarking)]
+        [ManuSfcStepOperationTypeAttrribute("Marking__Entry", JobOrAssemblyNameEnum.CloseMarking)]
         CloseMarking = 34,
 
         /// <summary>
@@ -233,31 +233,31 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 条码合并
         /// </summary>
         [Description("条码合并")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.SfcMerge)]
+        [ManuSfcStepOperationTypeAttrribute("SFC_Merging", JobOrAssemblyNameEnum.SfcMerge)]
         SfcMerge = 38,
         /// <summary>
         /// 条码合并-新增
         /// </summary>
         [Description("条码合并-新增")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.SfcMerge)]
+        [ManuSfcStepOperationTypeAttrribute("SFC_Merging", JobOrAssemblyNameEnum.SfcMerge)]
         SfcMergeAdd = 39,
         /// <summary>
         /// 条码数量调整
         /// </summary>
         [Description("条码数量调整")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.SfcQtyAdjust)]
+        [ManuSfcStepOperationTypeAttrribute("SFC_Quantity_ Adjustments", JobOrAssemblyNameEnum.SfcQtyAdjust)]
         SfcQtyAdjust = 40,
         /// <summary>
         /// 条码拆分
         /// </summary>
         [Description("条码拆分")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.Split)]
+        [ManuSfcStepOperationTypeAttrribute("SFC_Splitting", JobOrAssemblyNameEnum.Split)]
         Split = 41,
         /// <summary>
         /// 条码拆分-新增
         /// </summary>
         [Description("条码拆分-新增")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.Split)]
+        [ManuSfcStepOperationTypeAttrribute("SFC_Splitting", JobOrAssemblyNameEnum.Split)]
         SplitCreate = 42,
         /// <summary>
         /// 离脱
@@ -293,7 +293,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 参数采集
         /// </summary>
         [Description("参数采集")]
-        [ManuSfcStepOperationTypeAttrribute("", JobOrAssemblyNameEnum.ParameterCollect)]
+        [ManuSfcStepOperationTypeAttrribute("Product_Parameters_Collection", JobOrAssemblyNameEnum.ParameterCollect)]
         ParameterCollect = 48
     }
 }
