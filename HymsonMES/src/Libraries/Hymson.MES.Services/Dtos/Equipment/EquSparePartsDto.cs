@@ -73,7 +73,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public YesOrNoEnum? IsStandardPart { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public long Qty { get; set; }
+
+        /// <summary>
         /// 描述
         /// </summary>
         public string? Remark { get; set; } = "";
@@ -180,7 +185,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public long Qty { get; set; }
+
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public long IsDeleted { get; set; }
