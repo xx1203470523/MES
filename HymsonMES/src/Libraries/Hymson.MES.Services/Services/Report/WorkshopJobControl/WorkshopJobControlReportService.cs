@@ -453,7 +453,9 @@ namespace Hymson.MES.Services.Services.Report
                 };
             }
             await StepAssignment(stepDetailDto.AfterStepDDto);
-            var manuSfcStepTypeobOrAssemblys = GetManuSfcStepTypeobOrAssemblys();
+            stepDetailDto.AfterStepDDto.CreatedBy = beforeStepEntity.CreatedBy;
+            stepDetailDto.AfterStepDDto.CreatedOn = beforeStepEntity.CreatedOn;
+           var manuSfcStepTypeobOrAssemblys = GetManuSfcStepTypeobOrAssemblys();
             var manuSfcStepTypeobOrAssembly = manuSfcStepTypeobOrAssemblys.FirstOrDefault(x => x.Key == beforeStepEntity.Operatetype);
             if (manuSfcStepTypeobOrAssembly != null)
             {
