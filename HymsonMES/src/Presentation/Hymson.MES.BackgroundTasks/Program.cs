@@ -70,7 +70,7 @@ Host.CreateDefaultBuilder(args)
            q.AddJobAndTrigger<EnvOrderCreateJob>(hostContext.Configuration);
 
            #endregion
-
+#if !DM
            q.UsePersistentStore((persistentStoreOptions) =>
            {
                persistentStoreOptions.UseProperties = true;
@@ -82,6 +82,7 @@ Host.CreateDefaultBuilder(args)
                persistentStoreOptions.SetProperty("quartz.scheduler.instanceId", assemblyName + hostContext.HostingEnvironment.EnvironmentName + programName);
                persistentStoreOptions.UseMySql(mySqlConnection);
            });
+#endif
        });
 
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
