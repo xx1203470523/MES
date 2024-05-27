@@ -8,7 +8,7 @@ namespace Hymson.MES.Services.Validators.Process
     /// <summary>
     /// 设备参数组 更新 验证
     /// </summary>
-    internal class ProcEquipmentGroupParamCreateValidator: AbstractValidator<ProcEquipmentGroupParamCreateDto>
+    internal class ProcEquipmentGroupParamCreateValidator : AbstractValidator<ProcEquipmentGroupParamCreateDto>
     {
         public ProcEquipmentGroupParamCreateValidator()
         {
@@ -46,9 +46,9 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Version).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18716));
 
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(EquipmentGroupParamTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES18710));
-            RuleFor(x => x.ProductId).Must(it => it>0).WithErrorCode(nameof(ErrorCode.MES18718));
-            RuleFor(x => x.ProcedureId).Must(it => it>0).WithErrorCode(nameof(ErrorCode.MES18719));
-            RuleFor(x => x.EquipmentGroupId).Must(it => it>0).WithErrorCode(nameof(ErrorCode.MES18720));
+            RuleFor(x => x.ProductId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18718));
+            RuleFor(x => x.ProcedureId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18719));
+            RuleFor(x => x.EquipmentGroupId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18720));
         }
     }
 }

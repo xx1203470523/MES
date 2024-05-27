@@ -1748,8 +1748,8 @@
         public const string MES18721 = "Recipe参数项目参数不能为空";
         public const string MES18722 = "Recipe参数项目小数位应该为0到9的整数";
         public const string MES18723 = "Recipe参数项目最大值应该大于或等于最小值";
-
         public const string MES18724 = "Recipe参数已存在同一的产品、工序、工艺组数据";
+        public const string MES18725 = "开机参数的上限、下限、参考值不能为空！";
         #endregion
 
         #region 单位维护 18800
