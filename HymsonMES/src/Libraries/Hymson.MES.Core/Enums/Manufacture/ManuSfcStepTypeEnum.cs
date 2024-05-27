@@ -54,7 +54,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 不良录入
         /// </summary>
         [Description("不良录入")]
-        [ManuSfcStepOperationTypeAttrribute("Entry_Grade", JobOrAssemblyNameEnum.BadEntry)]
+        [ManuSfcStepOperationTypeAttrribute("NC_Entry", JobOrAssemblyNameEnum.BadEntry)]
         BadEntry = 8,
         /// <summary>
         /// 报废
