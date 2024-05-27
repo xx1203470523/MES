@@ -1,7 +1,7 @@
 /*
  *creator: Karl
  *
- *describe: 设备点检计划仓储类 | 代码由框架生成
+ *describe: 设备保养计划仓储类 | 代码由框架生成
  *builder:  pengxin
  *build datetime: 2024-05-20 04:05:45
  */
@@ -12,7 +12,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
 {
     /// <summary>
-    /// 设备点检计划仓储接口
+    /// 设备保养计划仓储接口
     /// </summary>
     public interface IEquMaintenancePlanRepository
     {

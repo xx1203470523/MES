@@ -259,17 +259,17 @@ namespace Hymson.MES.Services.Services.Equipment
                 else pagedQuery.EquipmentId = default;
             }
 
-            // 将不合格处理方式转换为点检单ID
-            //if (pagedQueryDto.HandMethod.HasValue)
-            //{
-            //    var unqualifiedHandEntities = await _qualFqcOrderUnqualifiedHandleRepository.GetEntitiesAsync(new QualFqcOrderUnqualifiedHandleQuery
-            //    {
-            //        SiteId = pagedQuery.SiteId,
-            //        HandMethod = pagedQueryDto.HandMethod
-            //    });
-            //    if (unqualifiedHandEntities != null && unqualifiedHandEntities.Any()) pagedQuery.FQCOrderIds = unqualifiedHandEntities.Select(s => s.FQCOrderId);
-            //    else pagedQuery.FQCOrderIds = Array.Empty<long>();
-            //}
+            // 处理方式转换为任务单ID
+            if (pagedQueryDto.HandMethod.HasValue)
+            {
+                var processedHandEntities = await _equSpotcheckTaskProcessedRepository.GetEntitiesAsync(new EquSpotcheckTaskProcessedQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    HandMethod = pagedQueryDto.HandMethod
+                });
+                if (processedHandEntities != null && processedHandEntities.Any()) pagedQuery.TaskIds = processedHandEntities.Select(s => s.SpotCheckTaskId);
+                else pagedQuery.TaskIds = Array.Empty<long>();
+            }
 
             var result = new PagedInfo<EquSpotcheckTaskDto>(Enumerable.Empty<EquSpotcheckTaskDto>(), pagedQuery.PageIndex, pagedQuery.PageSize);
 

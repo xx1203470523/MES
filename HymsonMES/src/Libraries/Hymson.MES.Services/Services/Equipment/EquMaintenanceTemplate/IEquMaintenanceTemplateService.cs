@@ -1,7 +1,7 @@
 /*
  *creator: Karl
  *
- *describe: 设备点检模板    服务接口 | 代码由框架生成
+ *describe: 设备保养模板    服务接口 | 代码由框架生成
  *builder:  pengxin
  *build datetime: 2024-05-13 03:06:41
  */
@@ -11,7 +11,7 @@ using Hymson.MES.Services.Dtos.EquMaintenanceTemplate;
 namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
 {
     /// <summary>
-    /// 设备点检模板 service接口
+    /// 设备保养模板 service接口
     /// </summary>
     public interface IEquMaintenanceTemplateService
     {

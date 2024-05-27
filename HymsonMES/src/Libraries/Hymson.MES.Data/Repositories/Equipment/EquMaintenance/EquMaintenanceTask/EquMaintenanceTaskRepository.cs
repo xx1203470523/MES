@@ -133,7 +133,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquMaintenanceTaskEntity>> GetPagedListAsync(EquMaintenanceTaskPagedQuery pagedQuery)
+        public async Task<PagedInfo<EquMaintenanceTaskUnionPlanEntity>> GetPagedListAsync(EquMaintenanceTaskPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -144,11 +144,41 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.Where("st.SiteId = @SiteId");
             sqlBuilder.LeftJoin("equ_spotcheck_task_snapshot_plan stsp on st.Id=stsp.SpotCheckTaskId");
 
+            if (pagedQuery.TaskIds != null && pagedQuery.TaskIds.Any())
+            {
+                sqlBuilder.Where("st.Id IN @TaskIds");
+            }
+            //任务编码
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
+            {
+                sqlBuilder.Where("st.Code = @Code");
+            }
+            //任务名
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
+            {
+                sqlBuilder.Where("st.Name = @Name");
+            }
+            //负责人
+            if (!string.IsNullOrWhiteSpace(pagedQuery.LeaderIds))
+            {
+                sqlBuilder.Where("stsp.LeaderIds = @LeaderIds");
+            }
+            //设备
             if (pagedQuery.EquipmentId.HasValue)
             {
                 sqlBuilder.Where("stsp.EquipmentId LIKE @EquipmentId");
             }
-
+            //任务状态
+            if (pagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("st.Status = @Status");
+            }
+            //是否合格
+            if (pagedQuery.IsQualified.HasValue)
+            {
+                sqlBuilder.Where("st.IsQualified = @IsQualified");
+            }
+            //计划开始结束时间
             if (pagedQuery.PlanStartTime != null && pagedQuery.PlanStartTime.Length >= 2)
             {
                 sqlBuilder.AddParameters(new { PlanStartTimeStart = pagedQuery.PlanStartTime[0], PlanStartTimeEnd = pagedQuery.PlanStartTime[1].AddDays(1) });
@@ -161,11 +191,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<EquMaintenanceTaskEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<EquMaintenanceTaskUnionPlanEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<EquMaintenanceTaskEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<EquMaintenanceTaskUnionPlanEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }

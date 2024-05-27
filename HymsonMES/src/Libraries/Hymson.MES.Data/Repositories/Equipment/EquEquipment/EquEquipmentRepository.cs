@@ -271,7 +271,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<GetEquSpotcheckPlanEquipmentRelationPageView>> GetEquSpotcheckPlanEquipmentRelationListAsync(EquEquipmentSpotcheckRelationPagedQuery pagedQuery) 
+        public async Task<PagedInfo<GetEquSpotcheckPlanEquipmentRelationPageView>> GetEquSpotcheckPlanEquipmentRelationListAsync(EquEquipmentSpotcheckRelationPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -282,7 +282,18 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.LeftJoin("equ_equipment_group eeg ON eeg.Id = EE.EquipmentGroupId");
             sqlBuilder.LeftJoin("equ_spotcheck_template_equipment_group_relation estegr ON estegr.EquipmentGroupId = eeg.Id");
             sqlBuilder.LeftJoin("equ_spotcheck_template est ON est.Id = estegr.SpotCheckTemplateId");
-            sqlBuilder.LeftJoin("equ_operation_permissions eop ON eop.EquipmentId = EE.Id AND Type=1");
+            if (pagedQuery.EopType == 1)
+            {
+                sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id AND eop.Type=1");
+            }
+            else if (pagedQuery.EopType == 2)
+            {
+                sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id AND eop.Type=2");
+            }
+            else
+            {
+                sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id");
+            }
             sqlBuilder.Select("EE.*,EE.Id as EquipmentId,IWC.Name as WorkCenterShopName,IWC.Code as WorkCenterCode,eeg.EquipmentGroupCode,est.Id as TemplateId,est.Code as TemplateCode,est.Version as TemplateVersion,eop.ExecutorIds,eop.LeaderIds");
             sqlBuilder.Where("EE.IsDeleted = 0");
             sqlBuilder.Where("EE.SiteId = @SiteId");
@@ -309,7 +320,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
                 sqlBuilder.Where("EE.Location LIKE @Location");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode)) 
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode))
             {
                 sqlBuilder.Where("eeg.EquipmentGroupCode = @EquipmentGroupCode");
             }

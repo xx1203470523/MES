@@ -60,7 +60,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// </summary>
         public DateTime[]? PlanStartTime { get; set; }
 
-
-
+        /// <summary>
+        /// 任务Ids
+        /// </summary>
+        public IEnumerable<long>? TaskIds { get; set; }
     }
 }

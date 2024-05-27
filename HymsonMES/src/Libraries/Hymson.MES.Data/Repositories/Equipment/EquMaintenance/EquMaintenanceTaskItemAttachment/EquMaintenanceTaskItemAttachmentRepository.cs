@@ -118,6 +118,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
 
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
             if (query.MaintenanceTaskId.HasValue)
             {
                 sqlBuilder.Where("MaintenanceTaskId = @MaintenanceTaskId");
