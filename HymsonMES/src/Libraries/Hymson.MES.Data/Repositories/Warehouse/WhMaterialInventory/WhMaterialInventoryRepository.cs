@@ -116,6 +116,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.LeftJoin(" proc_material pm ON pm.Id = wmi.MaterialId");
             sqlBuilder.Where(" wmi.IsDeleted = 0");
             sqlBuilder.Where(" wmi.SiteId = @SiteId");
+
+            // 如果不显示已经用完的物料条码
+            if (!whMaterialInventoryPagedQuery.IsShowUsedUp) sqlBuilder.Where(" wmi.QuantityResidue > 0 ");
+
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
 
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Batch))

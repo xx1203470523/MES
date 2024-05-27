@@ -46,5 +46,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         public MaterialInventorySourceEnum[]? Sources { get; set; }
         #endregion
 
+        /// <summary>
+        /// 是否显示已经用完的物料条码
+        /// </summary>
+        public bool IsShowUsedUp { get; set; } = true;
+
     }
 }
