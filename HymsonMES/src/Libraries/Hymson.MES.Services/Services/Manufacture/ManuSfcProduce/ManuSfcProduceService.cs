@@ -1454,14 +1454,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             var sfcStepList = new List<ManuSfcStepEntity>();
             foreach (var item in manuSfcProduces)
             {
-                item.ProcedureId = manuUpdateSaveDto.ProcedureId.HasValue ? manuUpdateSaveDto.ProcedureId.Value : item.ProcedureId;
-                item.WorkOrderId = newPlanWorkOrderEntity.Id > 0 ? newPlanWorkOrderEntity.Id : item.WorkOrderId;
-                item.ProductId = productId > 0 ? productId : item.ProductId;
-                item.ProcessRouteId = processRouterId > 0 ? processRouterId : item.ProcessRouteId;
-                item.ProductBOMId = bomId > 0 ? bomId : item.ProductBOMId;
-                item.ResourceId = null; //更改步骤后 更改资源为null   为null则生产不限制匹配
-                item.Status = SfcStatusEnum.lineUp;
-
                 // 初始化步骤
                 var sfcStep = new ManuSfcStepEntity
                 {
@@ -1485,6 +1477,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
                 };
+                //item.ProcedureId = manuUpdateSaveDto.ProcedureId.HasValue ? manuUpdateSaveDto.ProcedureId.Value : item.ProcedureId;
+                //item.WorkOrderId = newPlanWorkOrderEntity.Id > 0 ? newPlanWorkOrderEntity.Id : item.WorkOrderId;
+                //item.ProductId = productId > 0 ? productId : item.ProductId;
+                //item.ProcessRouteId = processRouterId > 0 ? processRouterId : item.ProcessRouteId;
+                //item.ProductBOMId = bomId > 0 ? bomId : item.ProductBOMId;
+                //item.ResourceId = null; //更改步骤后 更改资源为null   为null则生产不限制匹配
+                //item.Status = SfcStatusEnum.lineUp;
                 sfcStepList.Add(sfcStep);
             }
 

@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
@@ -528,6 +529,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 WorkOrderId = workOrderId,
                 WorkCenterId = workCenterId,
                 ProductBOMId = productBOMId,
+                ProcessRouteId = processRouteId,
                 ProcedureId = procedureId,
                 ResourceId = resourceId,
                 EquipmentId = equipmentId,
@@ -933,6 +935,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProductBOMId = productBOMId,
                     ProcedureId = procedureId,
                     ResourceId = resourceId,
+                    ProcessRouteId = processRouteId,
                     EquipmentId = equipmentId,
                     Qty = item.Qty,
                     CurrentStatus = SfcStatusEnum.Invalid,
@@ -1129,6 +1132,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 WorkCenterId = workCenterId,
                 ProductBOMId = productBOMId,
                 ProcedureId = procedureId,
+                ProcessRouteId = processRouteId,
                 Qty = qty,
                 Operatetype = ManuSfcStepTypeEnum.SfcMergeAdd,
                 CurrentStatus = firstManuSFCView.Status,
@@ -1315,13 +1319,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SFC = adjustDto.SFC,
                 ProductId = manuSfcAboutInfoView.ProductId,
                 WorkOrderId = manuSfcAboutInfoView.WorkOrderId,
-                ProductBOMId = isProduce ? sfcProduces?.FirstOrDefault()?.ProductBOMId : workOrder?.ProductBOMId,
+                ProductBOMId = isProduce ? sfcProduces?.FirstOrDefault()?.ProductBOMId : manuSfcAboutInfoView?.ProductBomId,
                 WorkCenterId = isProduce ? sfcProduces?.FirstOrDefault()?.WorkCenterId : null,
                 Qty = adjustDto.Qty,
                 ResourceId = isProduce ? sfcProduces?.FirstOrDefault()?.ResourceId : null,
                 ProcedureId = isProduce ? sfcProduces?.FirstOrDefault()?.ProcedureId : null,
+                ProcessRouteId = isProduce ? sfcProduces?.FirstOrDefault()?.ProcessRouteId : manuSfcAboutInfoView?.ProcessRouteId,
                 Operatetype = ManuSfcStepTypeEnum.SfcQtyAdjust,
-                CurrentStatus = manuSfcAboutInfoView.Status,
+                CurrentStatus = manuSfcAboutInfoView?.Status,
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName,
                 Remark = adjustDto.Remark

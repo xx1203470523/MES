@@ -205,6 +205,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SiteId = _currentSite.SiteId ?? 0,
                     SFC = item,
                     ProductId = sfcInfo?.ProductId ?? 0,
+                    ResourceId= sfcProduce?.ResourceId,
                     WorkOrderId = sfcInfo?.WorkOrderId ?? 0,
                     ProductBOMId = sfcProduce?.ProductBOMId,
                     ProcessRouteId = sfcProduce?.ProcessRouteId,
