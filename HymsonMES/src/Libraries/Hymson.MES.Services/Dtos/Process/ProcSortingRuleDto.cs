@@ -304,6 +304,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Grade { get; set; }
 
         /// <summary>
+        /// 优先级
+        /// </summary>
+        public int Priority { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string? Remark { get; set; }

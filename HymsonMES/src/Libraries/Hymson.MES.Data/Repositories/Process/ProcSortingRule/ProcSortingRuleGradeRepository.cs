@@ -187,24 +187,18 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_sorting_rule_grade` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_sorting_rule_grade`(  `Id`, `SiteId`, `SortingRuleId`, `Grade`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SortingRuleId, @Grade, @remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_sorting_rule_grade`(  `Id`, `SiteId`, `SortingRuleId`, `Grade`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SortingRuleId, @Grade, @remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_sorting_rule_grade`(  `Id`, `SiteId`, `SortingRuleId`, `Grade`, `Priority`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SortingRuleId, @Grade, @Priority, @remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `proc_sorting_rule_grade`(  `Id`, `SiteId`, `SortingRuleId`, `Grade`, `Priority`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SortingRuleId, @Grade, @Priority, @remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `proc_sorting_rule_grade` SET   SiteId = @SiteId, SortingRuleId = @SortingRuleId, Grade = @Grade, remark = @remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_sorting_rule_grade` SET   SiteId = @SiteId, SortingRuleId = @SortingRuleId, Grade = @Grade, remark = @remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_sorting_rule_grade` SET   SiteId = @SiteId, SortingRuleId = @SortingRuleId, Grade = @Grade, Priority = @Priority, remark = @remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `proc_sorting_rule_grade` SET   SiteId = @SiteId, SortingRuleId = @SortingRuleId, Grade = @Grade, Priority = @Priority, remark = @remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `proc_sorting_rule_grade` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_sorting_rule_grade` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `SortingRuleId`, `Grade`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_sorting_rule_grade`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `SortingRuleId`, `Grade`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_sorting_rule_grade`  WHERE Id IN @Ids ";
-        const string GetBySortingRuleGradeByIdAsyncIdSql = @"SELECT 
-                                          `Id`, `SiteId`, `SortingRuleId`, `Grade`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_sorting_rule_grade`  WHERE SortingRuleId = @SortingRuleId AND  IsDeleted=0";
+        const string GetByIdSql = @"SELECT * FROM `proc_sorting_rule_grade`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `proc_sorting_rule_grade`  WHERE Id IN @Ids ";
+        const string GetBySortingRuleGradeByIdAsyncIdSql = @"SELECT * FROM `proc_sorting_rule_grade`  WHERE SortingRuleId = @SortingRuleId AND  IsDeleted=0";
         const string DeleteBySortingRuleGradeByIdAsyncIdSql = "DELETE FROM`proc_sorting_rule_grade` WHERE SortingRuleId = @SortingRuleId";
         #endregion
     }
