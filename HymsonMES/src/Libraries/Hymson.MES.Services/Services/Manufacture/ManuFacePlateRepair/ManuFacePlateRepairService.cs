@@ -538,7 +538,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 WorkCenterId = manuSfcProduceEntit.WorkCenterId,
                 ProductBOMId = manuSfcProduceEntit.ProductBOMId,
                 ProcessRouteId = manuSfcProduceEntit?.ProcessRouteId,
-                ProcedureId = confirmSubmitDto.ReturnProcedureId,
+                ProcedureId = manuSfcProduceEntit?.ProductId,
                 Qty = manuSfcProduceEntit.Qty,
                 IsRepair = TrueOrFalseEnum.Yes,
                 Operatetype = ManuSfcStepTypeEnum.RepairComplete,
