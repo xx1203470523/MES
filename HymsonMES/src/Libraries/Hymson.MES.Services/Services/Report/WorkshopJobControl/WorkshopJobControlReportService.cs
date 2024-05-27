@@ -571,7 +571,7 @@ namespace Hymson.MES.Services.Services.Report
                     var closeMarkingManuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
                     {
                         SiteId = _currentSite.SiteId ?? 0,
-                        SfcStepId = beforeStepEntity.Id
+                        CloseSfcStepId = beforeStepEntity.Id
                     });
                     if (closeMarkingManuProductBadRecordEntities != null && closeMarkingManuProductBadRecordEntities.Any())
                     {
