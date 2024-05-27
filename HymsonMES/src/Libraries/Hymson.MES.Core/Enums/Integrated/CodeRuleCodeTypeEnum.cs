@@ -33,7 +33,7 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// <summary>
         /// FQC
         /// </summary>
-       [Description("FQC")]
+        [Description("FQC")]
         FQC = 5,
 
         /// <summary>
@@ -53,5 +53,17 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// </summary>
         [Description("物料合并")]
         WhSfcMergeAdjust = 8,
+
+        /// <summary>
+        /// 设备点检
+        /// </summary>
+        [Description("设备点检")]
+        Spotcheck = 9,
+
+        /// <summary>
+        /// 设备保养
+        /// </summary>
+        [Description("设备保养")]
+        Maintain = 10,
     }
 }
