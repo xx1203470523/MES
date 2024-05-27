@@ -161,7 +161,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBo.InStationManuSfcByIdCommands.Add(new InStationManuSfcByIdCommand
                 {
                     Id = sfcProduceEntity.SFCId,
-                    Status = SfcStatusEnum.Activity,
+                    Status = SfcStatusEnum.lineUp,
                     IsUsed = YesOrNoEnum.Yes,
                     UpdatedBy = updatedBy,
                     UpdatedOn = updatedOn
