@@ -7,6 +7,8 @@ using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem;
@@ -14,16 +16,19 @@ using Hymson.MES.Data.Repositories.EquMaintenancePlan;
 using Hymson.MES.Data.Repositories.EquMaintenancePlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateItemRelation;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Linq;
 
 namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
 {
     /// <summary>
     /// 设备保养计划 服务
     /// </summary>
-    public class EquMaintenancePlanCoreService : IEquMaintenancePlanCoreService 
+    public class EquMaintenancePlanCoreService : IEquMaintenancePlanCoreService
     {
         /// <summary>
         /// 设备保养计划 仓储
@@ -65,12 +70,18 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
         /// 仓储接口（任务-项目） 
         /// </summary>  
         private readonly IEquMaintenanceTaskItemRepository _EquMaintenanceTaskItemRepository;
+        /// <summary>
+        /// 仓储接口（工作日历） 
+        /// </summary>  
+        private readonly IPlanCalendarRepository _planCalendarRepository;
 
+        private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
 
+        private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
 
-        public EquMaintenancePlanCoreService(IEquMaintenancePlanRepository EquMaintenancePlanRepository, IEquMaintenancePlanEquipmentRelationRepository EquMaintenancePlanEquipmentRelationRepository, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceItemRepository EquMaintenanceItemRepository, IEquMaintenanceTaskSnapshotItemRepository EquMaintenanceTaskSnapshotItemRepository, IEquMaintenanceTaskSnapshotPlanRepository EquMaintenanceTaskSnapshotPlanRepository, IEquMaintenanceTaskRepository EquMaintenanceTaskRepository, IEquMaintenanceTaskItemRepository EquMaintenanceTaskItemRepository)
+        public EquMaintenancePlanCoreService(IEquMaintenancePlanRepository EquMaintenancePlanRepository, IEquMaintenancePlanEquipmentRelationRepository EquMaintenancePlanEquipmentRelationRepository, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceItemRepository EquMaintenanceItemRepository, IEquMaintenanceTaskSnapshotItemRepository EquMaintenanceTaskSnapshotItemRepository, IEquMaintenanceTaskSnapshotPlanRepository EquMaintenanceTaskSnapshotPlanRepository, IEquMaintenanceTaskRepository EquMaintenanceTaskRepository, IEquMaintenanceTaskItemRepository EquMaintenanceTaskItemRepository, IPlanCalendarRepository planCalendarRepository, IInteCodeRulesRepository inteCodeRulesRepository, IManuGenerateBarcodeService manuGenerateBarcodeService)
         {
-             
+
             _EquMaintenancePlanRepository = EquMaintenancePlanRepository;
             _EquMaintenancePlanEquipmentRelationRepository = EquMaintenancePlanEquipmentRelationRepository;
             _EquMaintenanceTemplateRepository = EquMaintenanceTemplateRepository;
@@ -81,6 +92,9 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
             _EquMaintenanceTaskSnapshotPlanRepository = EquMaintenanceTaskSnapshotPlanRepository;
             _EquMaintenanceTaskRepository = EquMaintenanceTaskRepository;
             _EquMaintenanceTaskItemRepository = EquMaintenanceTaskItemRepository;
+            _planCalendarRepository = planCalendarRepository;
+            _inteCodeRulesRepository = inteCodeRulesRepository;
+            _manuGenerateBarcodeService = manuGenerateBarcodeService;
         }
         /// <summary>
         /// 生成保养任务
@@ -102,6 +116,27 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12304));
                 }
+
+                if (EquMaintenancePlanEntity.IsSkipHoliday == TrueOrFalseEnum.Yes)
+                {
+                    var thisDate = HymsonClock.Now();
+                    var planCalendar = await _planCalendarRepository.GetOneAsync(new PlanCalendarQuery { SiteId = param.SiteId, Year = thisDate.Year, Month = thisDate.Month });
+                    if (planCalendar != null && !string.IsNullOrWhiteSpace(planCalendar.Workday))
+                    {
+                        var workdayLike = thisDate.DayOfWeek.ToString();
+                        var week = GetWeekToInt(workdayLike);
+                        if (!planCalendar.Workday.Contains(week))
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES12307));
+                        }
+                    }
+                    else
+                    {
+                        //暂不验证
+                        //throw new CustomerValidationException(nameof(ErrorCode.MES12308));
+                    }
+                }
+
             }
             var EquMaintenancePlanEquipmentRelations = await _EquMaintenancePlanEquipmentRelationRepository.GetByMaintenancePlanIdsAsync(param.MaintenancePlanId);
             if (EquMaintenancePlanEquipmentRelations == null || !EquMaintenancePlanEquipmentRelations.Any())
@@ -134,9 +169,10 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
             {
                 var equEquipment = equEquipments.Where(it => it.Id == item.EquipmentId).FirstOrDefault();
 
+                var equMaintenanceTaskId = IdGenProvider.Instance.CreateId();
                 EquMaintenanceTaskEntity EquMaintenanceTask = new()
                 {
-                    Code = EquMaintenancePlanEntity.Code + equEquipment?.EquipmentCode,
+                    Code = await GenerateMaintenanceOrderCodeAsync(param.SiteId, param.UserName),
                     Name = EquMaintenancePlanEntity.Name,
                     BeginTime = HymsonClock.Now(),
                     EndTime = HymsonClock.Now(),
@@ -144,7 +180,7 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                     IsQualified = null,
                     Remark = EquMaintenancePlanEntity.Remark,
 
-                    Id = IdGenProvider.Instance.CreateId(),
+                    Id = equMaintenanceTaskId,
                     CreatedBy = param.UserName,
                     UpdatedBy = param.UserName,
                     CreatedOn = HymsonClock.Now(),
@@ -255,5 +291,73 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
 
         }
 
+
+
+        #region 帮助
+        private static string GetWeekToInt(string weekName)
+        {
+            int week = -1;
+            switch (weekName)
+            {
+                case "Sunday":
+                    week = 0;
+                    break;
+                case "Monday":
+                    week = 1;
+                    break;
+                case "Tuesday":
+                    week = 2;
+                    break;
+                case "Wednesday":
+                    week = 3;
+                    break;
+                case "Thursday":
+                    week = 4;
+                    break;
+                case "Friday":
+                    week = 5;
+                    break;
+                case "Saturday":
+                    week = 6;
+                    break;
+            }
+            return week.ToString();
+        }
+
+
+
+        /// <summary>
+        /// 点检单号生成
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        private async Task<string> GenerateMaintenanceOrderCodeAsync(long siteId, string userName)
+        {
+            var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
+            {
+                SiteId = siteId,
+                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.Spotcheck
+            });
+            if (codeRules == null || !codeRules.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12309));
+            }
+            if (codeRules.Count() > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12310));
+            }
+
+            var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeBo
+            {
+                SiteId = siteId,
+                UserName = userName,
+                CodeRuleId = codeRules.First().Id,
+                Count = 1
+            });
+
+            return orderCodes.First();
+        }
+        #endregion
     }
 }
