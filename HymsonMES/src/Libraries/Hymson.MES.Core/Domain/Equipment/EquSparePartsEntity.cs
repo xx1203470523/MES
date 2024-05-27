@@ -81,7 +81,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public YesOrNoEnum? IsStandardPart { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public long Qty { get; set; }
+
+        /// <summary>
         /// 描述
         /// </summary>
         public string? Remark { get; set; } = "";

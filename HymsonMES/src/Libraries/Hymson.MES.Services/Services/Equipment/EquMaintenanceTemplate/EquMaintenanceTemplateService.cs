@@ -1,7 +1,7 @@
 /*
  *creator: Karl
  *
- *describe: 设备点检模板    服务 | 代码由框架生成
+ *describe: 设备保养模板    服务 | 代码由框架生成
  *builder:  pengxin
  *build datetime: 2024-05-13 03:06:41
  */
@@ -35,7 +35,7 @@ using System.Transactions;
 namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
 {
     /// <summary>
-    /// 设备点检模板 服务
+    /// 设备保养模板 服务
     /// </summary>
     public class EquMaintenanceTemplateService : IEquMaintenanceTemplateService
     {
@@ -43,7 +43,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 设备点检模板 仓储
+        /// 设备保养模板 仓储
         /// </summary>
         private readonly IEquMaintenanceTemplateRepository _EquMaintenanceTemplateRepository;
         private readonly IEquMaintenanceTemplateItemRelationRepository _EquMaintenanceTemplateItemRelationRepository;
@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
             EquMaintenanceTemplateEntity.UpdatedOn = HymsonClock.Now();
             EquMaintenanceTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
 
-                
+
             List<EquMaintenanceTemplateEquipmentGroupRelationEntity> groupRelationList = new();
             var eGroupIds = EquMaintenanceTemplateCreateDto.groupRelationDto.Select(it => it.Id).ToArray();
             var EquMaintenanceTemplateEquipmentGroupRelations = await _EquMaintenanceTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
@@ -227,18 +227,22 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
             if (EquMaintenanceTemplatePagedQueryDto.EquipmentId.HasValue)
             {
                 var equEquipment = await _equEquipmentRepository.GetByIdAsync(EquMaintenanceTemplatePagedQueryDto.EquipmentId ?? 0);
-                if (equEquipment != null)
+                if (equEquipment == null)
                 {
-                    List<long> equGroupEquipmentIds = new()
+                    return null;
+                }
+
+                List<long> equGroupEquipmentIds = new()
                     {
                         equEquipment.EquipmentGroupId
                     };
-                    var EquMaintenanceTemplateEquipmentGroups = await _EquMaintenanceTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
-                    if (EquMaintenanceTemplateEquipmentGroups != null && EquMaintenanceTemplateEquipmentGroups.Any())
-                    {
-                        EquMaintenanceTemplatePagedQuery.MaintenanceTemplateIds = EquMaintenanceTemplateEquipmentGroups.Select(it => it.MaintenanceTemplateId).ToList();
-                    }
+                var EquMaintenanceTemplateEquipmentGroups = await _EquMaintenanceTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
+                if (EquMaintenanceTemplateEquipmentGroups == null || !EquMaintenanceTemplateEquipmentGroups.Any())
+                {
+                    return null;
                 }
+                EquMaintenanceTemplatePagedQuery.MaintenanceTemplateIds = EquMaintenanceTemplateEquipmentGroups.Select(it => it.MaintenanceTemplateId).ToList();
+
             }
             if (!string.IsNullOrWhiteSpace(EquMaintenanceTemplatePagedQueryDto.EquipmentGroupCode))
             {
@@ -263,6 +267,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
             List<EquMaintenanceTemplateDto> EquMaintenanceTemplateDtos = PrepareEquMaintenanceTemplateDtos(pagedInfo);
             return new PagedInfo<EquMaintenanceTemplateDto>(EquMaintenanceTemplateDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
+
 
         /// <summary>
         /// 

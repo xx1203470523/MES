@@ -1,7 +1,7 @@
 /*
  *creator: Karl
  *
- *describe: 设备点检计划    控制器 | 代码由框架生成  
+ *describe: 设备保养计划    控制器 | 代码由框架生成  
  *builder:  pengxin
  *build datetime: 2024-05-16 02:14:30
  */
@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.EquMaintenancePlan
 {
     /// <summary>
-    /// 控制器（设备点检计划）
+    /// 控制器（设备保养计划）
     /// @author pengxin
     /// @date 2024-05-16 02:14:30
     /// </summary>
@@ -24,13 +24,13 @@ namespace Hymson.MES.Api.Controllers.EquMaintenancePlan
     public class EquMaintenancePlanController : ControllerBase
     {
         /// <summary>
-        /// 接口（设备点检计划）
+        /// 接口（设备保养计划）
         /// </summary>
         private readonly IEquMaintenancePlanService _EquMaintenancePlanService;
         private readonly ILogger<EquMaintenancePlanController> _logger;
 
         /// <summary>
-        /// 构造函数（设备点检计划）
+        /// 构造函数（设备保养计划）
         /// </summary>
         /// <param name="EquMaintenancePlanService"></param>
         public EquMaintenancePlanController(IEquMaintenancePlanService EquMaintenancePlanService, ILogger<EquMaintenancePlanController> logger)
@@ -42,7 +42,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenancePlan
         #region 框架生成方法
 
         /// <summary>
-        /// 分页查询列表（设备点检计划）
+        /// 分页查询列表（设备保养计划）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -54,7 +54,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenancePlan
         }
 
         /// <summary>
-        /// 查询详情（设备点检计划）
+        /// 查询详情（设备保养计划）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -65,7 +65,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenancePlan
         }
 
         /// <summary>
-        /// 查询详情（设备点检计划）
+        /// 查询详情（设备保养计划）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -76,7 +76,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenancePlan
         }
 
         /// <summary>
-        /// 添加（设备点检计划）
+        /// 添加（设备保养计划）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -88,7 +88,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenancePlan
         }
 
         /// <summary>
-        /// 更新（设备点检计划）
+        /// 更新（设备保养计划）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -100,7 +100,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenancePlan
         }
 
         /// <summary>
-        /// 删除（设备点检计划）
+        /// 删除（设备保养计划）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
@@ -112,7 +112,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenancePlan
         }
 
         /// <summary>
-        /// 添加（生成点检任务）
+        /// 添加（生成保养任务）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>

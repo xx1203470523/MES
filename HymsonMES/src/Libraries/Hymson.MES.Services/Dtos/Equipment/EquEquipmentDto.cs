@@ -199,6 +199,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 设备组
         /// </summary>
         public string? EquipmentGroupCode { get; set; }
+
+
+        /// <summary>
+        /// 设备组
+        /// </summary>
+        public int? EopType { get; set; } = 0;
     }
 
     /// <summary>
