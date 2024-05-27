@@ -1,7 +1,7 @@
 /*
  *creator: Karl
  *
- *describe: 设备点检模板    服务 | 代码由框架生成
+ *describe: 设备保养模板    服务 | 代码由框架生成
  *builder:  pengxin
  *build datetime: 2024-05-13 03:06:41
  */
@@ -35,7 +35,7 @@ using System.Transactions;
 namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
 {
     /// <summary>
-    /// 设备点检模板 服务
+    /// 设备保养模板 服务
     /// </summary>
     public class EquMaintenanceTemplateService : IEquMaintenanceTemplateService
     {
@@ -43,7 +43,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 设备点检模板 仓储
+        /// 设备保养模板 仓储
         /// </summary>
         private readonly IEquMaintenanceTemplateRepository _EquMaintenanceTemplateRepository;
         private readonly IEquMaintenanceTemplateItemRelationRepository _EquMaintenanceTemplateItemRelationRepository;

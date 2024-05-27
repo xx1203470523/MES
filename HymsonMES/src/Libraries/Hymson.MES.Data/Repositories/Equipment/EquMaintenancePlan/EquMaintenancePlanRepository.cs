@@ -1,7 +1,7 @@
 /*
  *creator: Karl
  *
- *describe: 设备点检计划 仓储类 | 代码由框架生成
+ *describe: 设备保养计划 仓储类 | 代码由框架生成
  *builder:  pengxin
  *build datetime: 2024-05-20 04:05:45
  */
@@ -17,7 +17,7 @@ using MySql.Data.MySqlClient;
 namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
 {
     /// <summary>
-    /// 设备点检计划仓储
+    /// 设备保养计划仓储
     /// </summary>
     public partial class EquMaintenancePlanRepository : BaseRepository, IEquMaintenancePlanRepository
     {
