@@ -1,7 +1,7 @@
 /*
  *creator: Karl
  *
- *describe: 设备点检计划    服务 | 代码由框架生成
+ *describe: 设备保养计划    服务 | 代码由框架生成
  *builder:  pengxin
  *build datetime: 2024-05-16 02:14:30
  */
@@ -33,7 +33,7 @@ using Hymson.Utils.Tools;
 namespace Hymson.MES.Services.Services.EquMaintenancePlan
 {
     /// <summary>
-    /// 设备点检计划 服务
+    /// 设备保养计划 服务
     /// </summary>
     public class EquMaintenancePlanService : IEquMaintenancePlanService
     {
@@ -41,24 +41,24 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 设备点检计划 仓储
+        /// 设备保养计划 仓储
         /// </summary>
         private readonly IEquMaintenancePlanRepository _EquMaintenancePlanRepository;
         /// <summary>
-        /// 设备点检计划与设备关系仓储接口
+        /// 设备保养计划与设备关系仓储接口
         /// </summary>
         private readonly IEquMaintenancePlanEquipmentRelationRepository _EquMaintenancePlanEquipmentRelationRepository;
         /// <summary>
-        /// 设备点检模板仓储接口
+        /// 设备保养模板仓储接口
         /// </summary>
         private readonly IEquMaintenanceTemplateRepository _EquMaintenanceTemplateRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
         /// <summary>
-        /// 设备点检模板与项目关系仓储接口
+        /// 设备保养模板与项目关系仓储接口
         /// </summary>
         private readonly IEquMaintenanceTemplateItemRelationRepository _EquMaintenanceTemplateItemRelationRepository;
         /// <summary>
-        /// 仓储接口（设备点检项目）
+        /// 仓储接口（设备保养项目）
         /// </summary>
         private readonly IEquMaintenanceItemRepository _EquMaintenanceItemRepository;
 

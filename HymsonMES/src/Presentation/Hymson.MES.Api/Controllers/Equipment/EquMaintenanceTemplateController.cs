@@ -1,7 +1,7 @@
 /*
  *creator: Karl
  *
- *describe: 设备点检模板    控制器 | 代码由框架生成  
+ *describe: 设备保养模板    控制器 | 代码由框架生成  
  *builder:  pengxin
  *build datetime: 2024-05-13 03:06:41
  */
@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.EquMaintenanceTemplate
 {
     /// <summary>
-    /// 控制器（设备点检模板）
+    /// 控制器（设备保养模板）
     /// @author pengxin
     /// @date 2024-05-13 03:06:41
     /// </summary>
@@ -25,13 +25,13 @@ namespace Hymson.MES.Api.Controllers.EquMaintenanceTemplate
     public class EquMaintenanceTemplateController : ControllerBase
     {
         /// <summary>
-        /// 接口（设备点检模板）
+        /// 接口（设备保养模板）
         /// </summary>
         private readonly IEquMaintenanceTemplateService _EquMaintenanceTemplateService;
         private readonly ILogger<EquMaintenanceTemplateController> _logger;
 
         /// <summary>
-        /// 构造函数（设备点检模板）
+        /// 构造函数（设备保养模板）
         /// </summary>
         /// <param name="EquMaintenanceTemplateService"></param>
         public EquMaintenanceTemplateController(IEquMaintenanceTemplateService EquMaintenanceTemplateService, ILogger<EquMaintenanceTemplateController> logger)
@@ -43,7 +43,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenanceTemplate
         #region 框架生成方法
 
         /// <summary>
-        /// 分页查询列表（设备点检模板）
+        /// 分页查询列表（设备保养模板）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -55,7 +55,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenanceTemplate
         }
 
         /// <summary>
-        /// 查询详情（设备点检模板）
+        /// 查询详情（设备保养模板）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -66,7 +66,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenanceTemplate
         }
 
         /// <summary>
-        /// 添加（设备点检模板）
+        /// 添加（设备保养模板）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -78,7 +78,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenanceTemplate
         }
 
         /// <summary>
-        /// 更新（设备点检模板）
+        /// 更新（设备保养模板）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -90,7 +90,7 @@ namespace Hymson.MES.Api.Controllers.EquMaintenanceTemplate
         }
 
         /// <summary>
-        /// 删除（设备点检模板）
+        /// 删除（设备保养模板）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>

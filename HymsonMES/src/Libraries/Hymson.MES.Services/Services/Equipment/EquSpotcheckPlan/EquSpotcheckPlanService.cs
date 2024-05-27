@@ -271,6 +271,10 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             foreach (var item in equSpotcheckPlanModifyDto.RelationDto)
             {
+                if (item.TemplateId == 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12306));
+                }
                 EquSpotcheckPlanEquipmentRelationEntity equSpotcheckPlanEquipmentRelation = new()
                 {
                     EquipmentId = item.Id == 0 ? item.EquipmentId : item.Id,

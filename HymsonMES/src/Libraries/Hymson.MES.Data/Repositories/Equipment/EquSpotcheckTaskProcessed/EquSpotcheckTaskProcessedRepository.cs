@@ -118,11 +118,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
 
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
 
             if (query.SpotCheckTaskIds != null)
             {
                 sqlBuilder.Where("SpotCheckTaskId IN @SpotCheckTaskIds");
             }
+            if (query.HandMethod.HasValue)
+            {
+                sqlBuilder.Where("HandMethod = @HandMethod");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquSpotcheckTaskProcessedEntity>(template.RawSql, query);
         }

@@ -85,5 +85,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query
         /// </summary>
         public string? EquipmentGroupCode { get; set; }
 
+        /// <summary>
+        /// 设备组
+        /// </summary>
+        public int? EopType { get; set; } = 0;
+
     }
 }

@@ -29,7 +29,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 点检计划名称
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } 
 
         /// <summary>
         /// 版本

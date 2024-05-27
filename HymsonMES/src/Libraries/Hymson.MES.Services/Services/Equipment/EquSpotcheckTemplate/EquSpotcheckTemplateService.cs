@@ -105,7 +105,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             equSpotcheckTemplateEntity.UpdatedOn = HymsonClock.Now();
             equSpotcheckTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
 
-                
+
             List<EquSpotcheckTemplateEquipmentGroupRelationEntity> groupRelationList = new();
             var eGroupIds = equSpotcheckTemplateCreateDto.groupRelationDto.Select(it => it.Id).ToArray();
             var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
@@ -226,18 +226,21 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             if (equSpotcheckTemplatePagedQueryDto.EquipmentId.HasValue)
             {
                 var equEquipment = await _equEquipmentRepository.GetByIdAsync(equSpotcheckTemplatePagedQueryDto.EquipmentId ?? 0);
-                if (equEquipment != null)
+                if (equEquipment == null)
                 {
-                    List<long> equGroupEquipmentIds = new()
+                    return null;
+                }
+                List<long> equGroupEquipmentIds = new()
                     {
                         equEquipment.EquipmentGroupId
                     };
-                    var equSpotcheckTemplateEquipmentGroups = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
-                    if (equSpotcheckTemplateEquipmentGroups != null && equSpotcheckTemplateEquipmentGroups.Any())
-                    {
-                        equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds = equSpotcheckTemplateEquipmentGroups.Select(it => it.SpotCheckTemplateId).ToList();
-                    }
+                var equSpotcheckTemplateEquipmentGroups = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
+                if (equSpotcheckTemplateEquipmentGroups == null || !equSpotcheckTemplateEquipmentGroups.Any())
+                {
+                    return null;
                 }
+                equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds = equSpotcheckTemplateEquipmentGroups.Select(it => it.SpotCheckTemplateId).ToList();
+
             }
             if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQueryDto.EquipmentGroupCode))
             {

@@ -1,7 +1,7 @@
 /*
  *creator: Karl
  *
- *describe: 设备点检模板 分页查询类 | 代码由框架生成
+ *describe: 设备保养模板 分页查询类 | 代码由框架生成
  *builder:  pengxin
  *build datetime: 2024-05-13 03:06:41
  */
@@ -11,7 +11,7 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Data.Repositories.EquMaintenanceTemplate
 {
     /// <summary>
-    /// 设备点检模板 分页参数
+    /// 设备保养模板 分页参数
     /// </summary>
     public class EquMaintenanceTemplatePagedQuery : PagerInfo
     {
@@ -21,12 +21,12 @@ namespace Hymson.MES.Data.Repositories.EquMaintenanceTemplate
         public long? SiteId { get; set; }
 
         /// <summary>
-        /// 点检模板编码
+        /// 保养模板编码
         /// </summary>
         public string? Code { get; set; }
 
         /// <summary>
-        /// 点检模板名称
+        /// 保养模板名称
         /// </summary>
         public string? Name { get; set; }
 

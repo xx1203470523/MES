@@ -117,7 +117,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
-            if(query.SpotCheckTaskId.HasValue)
+            sqlBuilder.Where("IsDeleted = 0");
+            if (query.SpotCheckTaskId.HasValue)
             {
                 sqlBuilder.Where("SpotCheckTaskId = @SpotCheckTaskId");
             }
