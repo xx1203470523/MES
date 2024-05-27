@@ -118,10 +118,16 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
 
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
 
             if (query.MaintenanceTaskIds != null)
             {
                 sqlBuilder.Where("MaintenanceTaskId IN @MaintenanceTaskIds");
+            }
+
+            if (query.HandMethod.HasValue)
+            {
+                sqlBuilder.Where("HandMethod = @HandMethod");
             }
 
             using var conn = GetMESDbConnection();

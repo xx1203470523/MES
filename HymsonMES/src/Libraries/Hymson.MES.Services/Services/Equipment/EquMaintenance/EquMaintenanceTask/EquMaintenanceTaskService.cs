@@ -259,17 +259,17 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 else pagedQuery.EquipmentId = default;
             }
 
-            // 将不合格处理方式转换为点检单ID
-            //if (pagedQueryDto.HandMethod.HasValue)
-            //{
-            //    var unqualifiedHandEntities = await _qualFqcOrderUnqualifiedHandleRepository.GetEntitiesAsync(new QualFqcOrderUnqualifiedHandleQuery
-            //    {
-            //        SiteId = pagedQuery.SiteId,
-            //        HandMethod = pagedQueryDto.HandMethod
-            //    });
-            //    if (unqualifiedHandEntities != null && unqualifiedHandEntities.Any()) pagedQuery.FQCOrderIds = unqualifiedHandEntities.Select(s => s.FQCOrderId);
-            //    else pagedQuery.FQCOrderIds = Array.Empty<long>();
-            //}
+            // 处理方式转换为任务单ID
+            if (pagedQueryDto.HandMethod.HasValue)
+            {
+                var processedHandEntities = await _equMaintenanceTaskProcessedRepository.GetEntitiesAsync(new EquMaintenanceTaskProcessedQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    HandMethod = pagedQueryDto.HandMethod
+                });
+                if (processedHandEntities != null && processedHandEntities.Any()) pagedQuery.TaskIds = processedHandEntities.Select(s => s.MaintenanceTaskId);
+                else pagedQuery.TaskIds = Array.Empty<long>();
+            }
 
             var result = new PagedInfo<EquMaintenanceTaskDto>(Enumerable.Empty<EquMaintenanceTaskDto>(), pagedQuery.PageIndex, pagedQuery.PageSize);
 
@@ -791,10 +791,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             }
 
             var rows = 0;
-            using var trans = TransactionHelper.GetTransactionScope();
-            rows += await _inteAttachmentRepository.InsertRangeAsync(inteAttachmentEntities);
-            rows += await _equMaintenanceTaskAttachmentRepository.InsertRangeAsync(orderAttachmentEntities);
-            trans.Complete();
+            try
+            {
+                using var trans = TransactionHelper.GetTransactionScope();
+                rows += await _inteAttachmentRepository.InsertRangeAsync(inteAttachmentEntities);
+                rows += await _equMaintenanceTaskAttachmentRepository.InsertRangeAsync(orderAttachmentEntities);
+                trans.Complete();
+            }catch(Exception ex) { }
             return rows;
         }
 
