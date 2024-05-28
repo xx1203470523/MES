@@ -1438,6 +1438,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuSfcStepBySfcPagedQueryDto, ManuSfcStepBySfcPagedQuery>();
             #endregion
 
+            #region WorkOrderStepControl
+
+            CreateMap<WorkOrderStepControlOptimizePagedQueryDto, PlanWorkOrderPagedQuery>();
+            #endregion
+
             CreateMap<NodeSourceBo, NodeSourceDto>();
         }
 
