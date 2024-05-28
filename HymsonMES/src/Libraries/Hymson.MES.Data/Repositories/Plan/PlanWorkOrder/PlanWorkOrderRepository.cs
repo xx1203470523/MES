@@ -20,9 +20,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
-        {
-        }
+        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         /// <summary>
         /// 删除（软删除）
@@ -408,6 +406,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 退还下达数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> RefundPassDownQuantityByWorkOrderIdsAsync(IEnumerable<UpdatePassDownQuantityCommand> commands)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(RefundPassDownQuantitySql, commands);
+        }
+
+        /// <summary>
         /// 更新数量（投入数量）
         /// </summary>
         /// <param name="param"></param>
@@ -554,7 +563,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             "RealStart = (CASE WHEN RealStart IS NULL THEN @UpdatedOn ELSE RealStart END), " +
             "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
 #else
-        const string UpdatePassDownQuantitySql = "UPDATE plan_work_order_record SET PassDownQuantity = IFNULL(PassDownQuantity, 0) + @PassDownQuantity, UpdatedBy = @UserName, UpdatedOn = @UpdateDate WHERE WorkOrderId = @WorkOrderId AND IFNULL(PassDownQuantity, 0) <= @PlanQuantity - @PassDownQuantity AND IsDeleted = 0";
+        const string UpdatePassDownQuantitySql = "UPDATE plan_work_order_record SET PassDownQuantity = IFNULL(PassDownQuantity, 0) + @PassDownQuantity, UpdatedBy = @UserName, UpdatedOn = @UpdateDate WHERE WorkOrderId = @WorkOrderId AND IFNULL(PassDownQuantity, 0) <= @PlanQuantity - @PassDownQuantity AND IsDeleted = 0; ";
         const string UpdateFinishProductQuantitySql = "UPDATE plan_work_order_record SET " +
             "FinishProductQuantity = (CASE WHEN FinishProductQuantity IS NULL THEN 0 ELSE FinishProductQuantity END) + @Qty, " +
             "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
@@ -564,10 +573,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
 #endif
 
-
-        const string UpdateFinishProductQuantityAddOneSql = "UPDATE plan_work_order_record " +
-            "SET FinishProductQuantity = FinishProductQuantity + 1 " +
-            "WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
+        const string RefundPassDownQuantitySql = "UPDATE plan_work_order_record SET PassDownQuantity = IFNULL(PassDownQuantity, 0) - @PassDownQuantity, UpdatedBy = @UserName, UpdatedOn = @UpdateDate WHERE WorkOrderId = @WorkOrderId AND IsDeleted = 0;";
 
         const string DeleteSql = "UPDATE `plan_work_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";

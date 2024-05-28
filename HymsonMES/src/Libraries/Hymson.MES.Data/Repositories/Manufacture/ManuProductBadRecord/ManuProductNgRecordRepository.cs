@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
 using System.Security.Policy;
@@ -24,6 +25,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<ManuProductNgRecordEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
         }

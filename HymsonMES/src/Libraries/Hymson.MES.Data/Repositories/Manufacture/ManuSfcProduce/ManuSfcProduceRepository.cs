@@ -841,6 +841,92 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuSfcProduceEntity>(template.RawSql, query);
         }
 
+
+        /// <summary>
+        /// 分页查询（查询所有在制条码信息，根据Step）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcProduceVehicleView>> GetStepPageListAsync(ManuSfcProduceVehiclePagedQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+
+            sqlBuilder.Where("msp.SiteId = @SiteId");
+            sqlBuilder.OrderBy("msp.UpdatedOn DESC");
+
+            sqlBuilder.Select(@"msp.Id,msp.SFC,msp.WorkOrderId,msp.ProcedureId,msp.ResourceId,msp.Status,msp.ProductId,msp.ProcessRouteId,msp.ProductBOMId");
+
+
+            //单条码
+            if (!string.IsNullOrWhiteSpace(query.Sfc))
+            {
+                query.Sfc = $"%{query.Sfc}%";
+                sqlBuilder.Where("msp.Sfc like @Sfc");
+            }
+
+            //多条码
+            if (query.SfcArray != null && query.SfcArray.Length > 0)
+            {
+                sqlBuilder.Where("msp.Sfc in @SfcArray");
+            }
+
+            //状态
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("msp.Status=@Status");
+            }
+            //是否报废
+            if (query.IsScrap.HasValue)
+            {
+                sqlBuilder.Where("msp.IsScrap=@IsScrap");
+            }
+
+            //产品
+            if (query.ProductId.HasValue && query.ProductId > 0)
+            {
+                sqlBuilder.Where("  msp.ProductId = @ProductId ");
+            }
+            //工单
+            if (query.WorkOrderId.HasValue && query.WorkOrderId > 0)
+            {
+                sqlBuilder.Where(" msp.WorkOrderId = @WorkOrderId ");
+            }
+            //工艺路线
+            if (query.ProcessRouteId.HasValue && query.ProcessRouteId > 0)
+            {
+                sqlBuilder.Where("  msp.ProcessRouteId = @ProcessRouteId ");
+            }
+            //Bom
+            if (query.ProductBOMId.HasValue && query.ProductBOMId > 0)
+            {
+                sqlBuilder.Where("  msp.ProductBOMId = @ProductBOMId ");
+            }
+            //工序
+            if (query.ProcedureId.HasValue && query.ProcedureId > 0)
+            {
+                sqlBuilder.Where("  msp.ProcedureId = @ProcedureId ");
+            }
+            //资源
+            if (query.ResourceId.HasValue && query.ResourceId > 0)
+            {
+                sqlBuilder.Where("  msp.ResourceId = @ResourceId ");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
+
+            using var conn = GetMESDbConnection();
+            var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceVehicleView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuSfcProduceVehicleView>(manuSfcProduceEntities, query.PageIndex, query.PageSize, totalCount);
+        }
+
         /// <summary>
         /// 分页查询（查询所有在制条码信息，加入载具）
         /// </summary>
