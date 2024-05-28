@@ -19,6 +19,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 工厂Id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// bomid
+        /// </summary>
+        public IEnumerable<long> BomIds { get; set; }
     }
 
 
