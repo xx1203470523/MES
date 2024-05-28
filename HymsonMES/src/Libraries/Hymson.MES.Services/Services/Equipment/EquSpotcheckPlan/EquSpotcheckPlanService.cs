@@ -191,6 +191,13 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// <returns></returns>
         public async Task<int> DeletesEquSpotcheckPlanAsync(SpotcheckDeletesDto param)
         {
+            var equSpotcheckPlan = await _equSpotcheckPlanRepository.GetByIdsAsync(param.Ids.ToArray());
+            var equSpotcheckPlanEnable = equSpotcheckPlan.Where(it => it.Status == DisableOrEnableEnum.Enable);
+            if (equSpotcheckPlanEnable.Any())
+            {
+                var codes = string.Join(",", equSpotcheckPlanEnable.Select(it => it.Code));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12313)).WithData("Code", codes);
+            }
 
             int row = 0;
             using var trans = TransactionHelper.GetTransactionScope();
