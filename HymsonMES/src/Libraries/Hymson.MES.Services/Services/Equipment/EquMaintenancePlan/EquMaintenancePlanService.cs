@@ -194,6 +194,15 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         public async Task<int> DeletesEquMaintenancePlanAsync(DeletesDto param)
         {
 
+            var equMaintenancePlan = await _EquMaintenancePlanRepository.GetByIdsAsync(param.Ids.ToArray());
+            var equMaintenancePlanEnable = equMaintenancePlan.Where(it => it.Status == DisableOrEnableEnum.Enable);
+            if (equMaintenancePlanEnable.Any())
+            {
+                var codes = string.Join(",", equMaintenancePlanEnable.Select(it => it.Code));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12313)).WithData("Code", codes);
+            }
+
+
             int row = 0;
             using var trans = TransactionHelper.GetTransactionScope();
 

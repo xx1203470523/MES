@@ -583,9 +583,11 @@
         public const string MES12307 = "休息日不生成任务";
         public const string MES12308 = "请维护当月工作日历";
         public const string MES12309 = "点检单号生成失败：设备点检类型编码规则未维护！";
-        public const string MES12310 = "点检单号生成失败：编码规则错误，不允许同时存在多条设备点检类型编码规则！"; 
+        public const string MES12310 = "点检单号生成失败：编码规则错误，不允许同时存在多条设备点检类型编码规则！";
         public const string MES12311 = "保养单号生成失败：设备保养类型编码规则未维护！";
         public const string MES12312 = "保养单号生成失败：编码规则错误，不允许同时存在多条设备保养类型编码规则！";
+        public const string MES12313 = "计划【{Code}】已启用，不允许删除";
+        public const string MES12314 = "计划【{Code}】已禁用，请启用后再生成任务！"; 
 
         #endregion
 
