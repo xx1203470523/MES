@@ -164,6 +164,7 @@ namespace Hymson.MES.Services.Services.Process
                         SiteId = _currentSite.SiteId ?? 0,
                         SortingRuleId = procSortingRuleEntity.Id,
                         Grade = item.Grade,
+                        Priority = item.Priority,
                         Remark = item.Remark,
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName,
@@ -371,6 +372,7 @@ namespace Hymson.MES.Services.Services.Process
                         SiteId = _currentSite.SiteId ?? 0,
                         SortingRuleId = procSortingRuleEntity.Id,
                         Grade = item.Grade,
+                        Priority = item.Priority,
                         Remark = item.Remark,
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName,
@@ -514,6 +516,7 @@ namespace Hymson.MES.Services.Services.Process
                     {
                         Grade = item.Grade,
                         Remark = item.Remark,
+                        Priority = item.Priority,
                         Ratings = sortingRuleDetails.Where(o => gradeDetails.Select(x => x.SortingRuleDetailId).Contains(o.Id)).Select(k => k.Rating)
                     });
                 }

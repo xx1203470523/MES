@@ -228,13 +228,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceEntity>> GetPageListBylineIdAndProcProcedureIdAsync(ProcResourcePagedlineIdAndProcProcedureIdQuery query)
+        public async Task<PagedInfo<ProcResourceView>> GetPageListBylineIdAndProcProcedureIdAsync(ProcResourcePagedlineIdAndProcProcedureIdQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedListSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedListCountSqlTemplate);
-            sqlBuilder.Select("proc_resource.*");
+            sqlBuilder.InnerJoin("proc_resource_type prt ON proc_resource.ResTypeId = prt.Id AND prt.IsDeleted = 0");
             sqlBuilder.LeftJoin("inte_work_center_resource_relation  IWCRR ON IWCRR.IsDeleted = 0 AND  IWCRR.ResourceId = proc_resource.Id");
+            sqlBuilder.Select("proc_resource.*,prt.ResType ,prt.ResTypeName");
             sqlBuilder.Where("proc_resource.IsDeleted=0");
             sqlBuilder.Where("proc_resource.Status=1");
             sqlBuilder.Where("proc_resource.ResTypeId=@ResTypeId");
@@ -268,7 +269,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceEntities = await procResourceEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcResourceEntity>(procResourceEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcResourceView>(procResourceEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>

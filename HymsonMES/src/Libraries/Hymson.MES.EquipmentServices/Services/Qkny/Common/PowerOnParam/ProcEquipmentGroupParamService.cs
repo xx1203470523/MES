@@ -60,7 +60,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam
             var list = await _procEquipmentGroupParamRepository.QueryByEquProductAsync(query);
             if(list == null || list.Any() == false)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45021));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45021)).WithData("EquipmentCode", query.EquipmentCode);
             }
             return list;
         }
@@ -75,7 +75,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam
             var list = await _procEquipmentGroupParamRepository.GetDetailByCode(query);
             if (list == null || list.Any() == false)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45022));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45022)).WithData("Code", query.Code);
             }
             return list;
         }
@@ -90,7 +90,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam
             var model = await _procEquipmentGroupParamRepository.GetEntityByCodeVersion(query);
             if(model == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45023));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45023))
+                    .WithData("Code", query.Code).WithData("Version", query.Version).WithData("MaterialCode", query.MaterialCode);
             }
             return model;
         }

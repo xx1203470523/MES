@@ -110,6 +110,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetByCodeAsync(ProcLoadPointCodeLinkResourceQuery query);
 
+        /// <summary>
+        /// 根据上料点编码获取关联设备
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcLoadPointLinkEquDto>> GetEquByCodeAsync(ProcLoadPointCodeLinkResourceQuery query);
+
         #endregion
     }
 }

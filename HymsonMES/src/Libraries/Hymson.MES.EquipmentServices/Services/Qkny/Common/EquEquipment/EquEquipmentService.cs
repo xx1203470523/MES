@@ -64,7 +64,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
             EquEquipmentResAllView equResAllModel = await _equEquipmentRepository.GetEquResAsync(query);
             if (equResAllModel == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45001))
+                    .WithData("EquipmentCode",query.EquipmentCode).WithData("ResourceCode",query.ResCode);
             }
             return equResAllModel;
         }
@@ -82,7 +83,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
             EquEquipmentResAllView equResAllModel = await _equEquipmentRepository.GetEquResLineAsync(query);
             if (equResAllModel == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45005))
+                    .WithData("EquipmentCode", query.EquipmentCode).WithData("ResourceCode", query.ResCode);
             }
             return equResAllModel;
         }
@@ -100,7 +102,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
             EquEquipmentResAllView equResAllModel = await _equEquipmentRepository.GetEquResProcedureAsync(query);
             if (equResAllModel == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45004))
+                    .WithData("EquipmentCode", query.EquipmentCode).WithData("ResourceCode", query.ResCode);
             }
             return equResAllModel;
         }

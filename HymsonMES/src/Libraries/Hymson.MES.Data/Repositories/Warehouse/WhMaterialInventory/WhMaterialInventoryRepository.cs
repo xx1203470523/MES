@@ -110,12 +110,16 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select(@" wmi.Id, wmi.MaterialBarCode,wmi.Batch, wmi.QuantityResidue,wmi.DueDate,wmi.Source,wmi.CreatedOn,wmi.Status,
+            sqlBuilder.Select(@" wmi.Id, wmi.MaterialBarCode,wmi.Batch, wmi.QuantityResidue, wmi.ScrapQty, wmi.DueDate, wmi.Source, wmi.CreatedOn, wmi.Status,
                                 pm.Unit, pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName");
-            sqlBuilder.LeftJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
-            sqlBuilder.LeftJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
+            sqlBuilder.LeftJoin(" wh_supplier ws ON ws.Id = wmi.SupplierId");
+            sqlBuilder.LeftJoin(" proc_material pm ON pm.Id = wmi.MaterialId");
             sqlBuilder.Where(" wmi.IsDeleted = 0");
-            sqlBuilder.Where(" wmi.SiteId=@SiteId");
+            sqlBuilder.Where(" wmi.SiteId = @SiteId");
+
+            // 如果不显示已经用完的物料条码
+            if (!whMaterialInventoryPagedQuery.IsShowUsedUp) sqlBuilder.Where(" wmi.QuantityResidue > 0 ");
+
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
 
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Batch))
@@ -126,22 +130,22 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialBarCode))
             {
                 whMaterialInventoryPagedQuery.MaterialBarCode = $"%{whMaterialInventoryPagedQuery.MaterialBarCode}%";
-                sqlBuilder.Where(" wmi.MaterialBarCode like @MaterialBarCode");
+                sqlBuilder.Where(" wmi.MaterialBarCode LIKE @MaterialBarCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialCode))
             {
                 whMaterialInventoryPagedQuery.MaterialCode = $"%{whMaterialInventoryPagedQuery.MaterialCode}%";
-                sqlBuilder.Where(" pm.MaterialCode like @MaterialCode");
+                sqlBuilder.Where(" pm.MaterialCode LIKE @MaterialCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Version))
             {
                 whMaterialInventoryPagedQuery.Version = $"%{whMaterialInventoryPagedQuery.Version}%";
-                sqlBuilder.Where(" pm.Version like @Version");
+                sqlBuilder.Where(" pm.Version LIKE @Version");
             }
             if (whMaterialInventoryPagedQuery.Status > 0)
             {
                 //Enum.GetValues(whMaterialInventoryPagedQuery.Status)
-                sqlBuilder.Where(" wmi.Status=@Status");
+                sqlBuilder.Where(" wmi.Status = @Status");
             }
             if (whMaterialInventoryPagedQuery.CreatedOnRange != null && whMaterialInventoryPagedQuery.CreatedOnRange.Length >= 2)
             {
@@ -150,7 +154,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             }
             if (whMaterialInventoryPagedQuery.Sources != null && whMaterialInventoryPagedQuery.Sources.Length > 0)
             {
-                sqlBuilder.Where("wmi.Source in @Sources");
+                sqlBuilder.Where("wmi.Source IN @Sources");
             }
 
             var offSet = (whMaterialInventoryPagedQuery.PageIndex - 1) * whMaterialInventoryPagedQuery.PageSize;

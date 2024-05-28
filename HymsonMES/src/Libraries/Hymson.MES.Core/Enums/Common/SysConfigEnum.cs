@@ -16,6 +16,11 @@ namespace Hymson.MES.Core.Enums
         /// AQL检验计划
         /// </summary>
         [Description("AQLPlan")]
-        AQLPlan = 2
+        AQLPlan = 2,
+        /// <summary>
+        /// 上料点上料条码下发到设备
+        /// </summary>
+        [Description("UpMaterialSendEqu")]
+        UpMaterialSendEqu = 3
     }
 }

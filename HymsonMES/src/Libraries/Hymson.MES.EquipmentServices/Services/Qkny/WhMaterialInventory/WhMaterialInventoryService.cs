@@ -72,7 +72,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
             var dbList = await _whMaterialInventoryRepository.GetByBarCodesNoQtyAsync(query);
             if (dbList.IsNullOrEmpty() == true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45081));
+                string barCodeStr = string.Join(";",query.BarCodes);
+                throw new CustomerValidationException(nameof(ErrorCode.MES45081))
+                    .WithData("barCodeStr", barCodeStr);
             }
             return dbList.ToList();
         }
@@ -155,7 +157,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
                 IsCheckSupplier = false,
                 BarCodeList = dto.BarCodeList.Select(x => new CoreServices.Bos.Manufacture.MaterialInventorySfcInfoBo
                 {
-                    Source = Core.Enums.MaterialInventorySourceEnum.Equipment,
+                    Source = Core.Enums.MaterialInventorySourceEnum.WMS,
                     MaterialId = materialEntities.First(z => z.MaterialCode == x.MaterialCode).Id,
                     MaterialBarCode = x.BarCode,
                     QuantityResidue = x.Qty,

@@ -44,7 +44,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formula
             var dbList = await _procFormulaRepository.GetFormulaListAsync(queryDto);
             if(dbList.IsNullOrEmpty() == true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45050));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45050))
+                    .WithData("EquipmentCode", queryDto.EquipmentCode)
+                    .WithData("ProductCode", queryDto.ProductCode);
             }
             return dbList;
         }
@@ -59,7 +61,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formula
             var dbList = await _procFormulaRepository.GetFormulaDetailAsync(query);
             if(dbList.IsNullOrEmpty() == true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45051));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45051))
+                    .WithData("FormulaCode", query.FormulaCode);
             }
             return dbList;
         }
@@ -78,7 +81,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formula
             var model = await _procFormulaRepository.GetActivateByCodeAndVersionAsync(query);
             if (model == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45052));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45052))
+                    .WithData("FormulaCode", dto.FormulaCode)
+                    .WithData("Version", dto.Version);
             }
             return model;
         }

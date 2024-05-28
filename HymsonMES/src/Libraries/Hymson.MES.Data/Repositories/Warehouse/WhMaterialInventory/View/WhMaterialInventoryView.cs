@@ -12,11 +12,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// 供应商编码
         /// </summary>
         public string SupplierCode { get; set; }
+
         /// <summary>
         /// 供应商名称
         /// </summary>
         public string SupplierName { get; set; }
-
 
         /// <summary>
         /// 物料编码

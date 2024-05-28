@@ -26,6 +26,12 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.CoreServices.Dtos.Qkny;
 using System.Transactions;
+using Hymson.MES.Data.Repositories.Common;
+using Hymson.MES.Core.Domain.Common;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
+using Hymson.MessagePush.Helper;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Qkny
 {
@@ -34,6 +40,11 @@ namespace Hymson.MES.CoreServices.Services.Qkny
     /// </summary>
     public class ManuFeedingService : IManuFeedingService
     {
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<ManuFeedingService> _logger;
+
         /// <summary>
         ///  仓储（设备注册）
         /// </summary>
@@ -115,9 +126,21 @@ namespace Hymson.MES.CoreServices.Services.Qkny
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
         /// <summary>
+        /// 系统配置
+        /// </summary>
+        private readonly ISysConfigRepository _sysConfigRepository;
+
+        /// <summary>
+        /// 上料点关联资源&设备
+        /// </summary>
+        private readonly IProcLoadPointLinkResourceRepository _procLoadPointLinkResourceRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
-        public ManuFeedingService(IEquEquipmentRepository equEquipmentRepository,
+        public ManuFeedingService(
+            ILogger<ManuFeedingService> logger,
+            IEquEquipmentRepository equEquipmentRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IProcResourceRepository procResourceRepository,
             IProcLoadPointRepository procLoadPointRepository,
@@ -132,8 +155,11 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             IManuFeedingRepository manuFeedingRepository,
             IManuFeedingRecordRepository manuFeedingRecordRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+            ISysConfigRepository sysConfigRepository,
+            IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository)
         {
+            _logger = logger;
             _equEquipmentRepository = equEquipmentRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _procResourceRepository = procResourceRepository;
@@ -150,6 +176,8 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             _manuFeedingRecordRepository = manuFeedingRecordRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
+            _sysConfigRepository = sysConfigRepository;
+            _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
         }
 
         /// <summary>
@@ -267,6 +295,54 @@ namespace Hymson.MES.CoreServices.Services.Qkny
                 }
             }
 
+            #region 上料点上料条码下发到设备
+            //上料点才需要下发给设备
+            if (saveDto.Source == ManuSFCFeedingSourceEnum.FeedingPoint && saveDto.FeedingPointId != null)
+            {
+                //判断上料点是否存在
+                ProcLoadPointEntity loadPointEntity = await _procLoadPointRepository.GetByIdAsync((long)saveDto.FeedingPointId);
+                if (loadPointEntity != null)
+                {
+                    //获取配置
+                    SysConfigQuery query = new SysConfigQuery();
+                    query.SiteId = saveDto.SiteId;
+                    query.Type = SysConfigEnum.UpMaterialSendEqu;
+                    List<SysConfigEntity> configList = (await _sysConfigRepository.GetEntitiesAsync(query)).ToList();
+                    if (configList != null && configList.Count > 0)
+                    {
+                        List<string> loadPointList = configList.Select(m => m.Value).ToList();
+                        //系统中配置了相应的上料点，则需要下发给设备
+                        if (loadPointList.Contains(loadPointEntity.LoadPoint) == true)
+                        {
+                            //根据上料点，获取对应的资源，设备，设备IP
+                            ProcLoadPointCodeLinkResourceQuery linkResQuery = new ProcLoadPointCodeLinkResourceQuery();
+                            linkResQuery.LoadPoint = loadPointEntity.LoadPoint;
+                            var sendEquList = await _procLoadPointLinkResourceRepository.GetEquByCodeAsync(linkResQuery);
+                            if (sendEquList != null && sendEquList.Count() > 0)
+                            {
+                                //IP不为空才会下发
+                                sendEquList = sendEquList.Where(m => string.IsNullOrEmpty(m.Ip) == false).ToList();
+                                foreach (var item in sendEquList)
+                                {
+                                    string url = $"http://{item.Ip}:6868/api/SendBatchSfc";
+                                    string body = $"{{\"BatchSfc\":\"{saveDto.BarCode}\",\"EquipmentCode\":\"{item.EquipmentCode}\"}}";
+                                    try
+                                    {
+                                        await HttpHelper.HttpsPostAsync(url, body, "application/json");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        string logErrorMsg = $"【{item.EquipmentCode}】设备SendBatchSfc异常。URL:{url}。内容:{body}。异常信息:{ex}";
+                                        _logger.LogError(logErrorMsg);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion
+
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
 
@@ -302,6 +378,7 @@ namespace Hymson.MES.CoreServices.Services.Qkny
 
             rows += await _manuFeedingRepository.InsertAsync(entity);
             rows += await _manuFeedingRecordRepository.InsertAsync(GetManuFeedingRecord(entity, FeedingDirectionTypeEnum.Load));
+
             trans.Complete();
 
             // 因为前端要展开这级表格，所以把ID返回去
@@ -683,11 +760,13 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             //校验
             if(manuFeedingEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45072));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45072))
+                    .WithData("Sfc", saveDto.Sfc);
             }
             if(manuFeedingEntity.Qty <= 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45073));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45073))
+                    .WithData("Sfc", saveDto.Sfc);
             }
 
             DateTime curDate = HymsonClock.Now();

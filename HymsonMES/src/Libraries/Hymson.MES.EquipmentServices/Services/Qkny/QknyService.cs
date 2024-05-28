@@ -61,6 +61,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.Attributes;
 using MailKit.Search;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.Ocsp;
@@ -271,7 +272,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             else
             {
                 //1. 获取设备基础信息
-                EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
+                EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
                 siteId = equResModel.SiteId;
                 var sfcs = new List<string>() { dto.Sfc };
                 if (dto.IsTooling)
@@ -285,7 +286,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                     });
                     if (toolingBindEntities == null || !toolingBindEntities.Any())
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES45041));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES45041))
+                            .WithData("Sfc", dto.Sfc);
                     }
                     sfcs = toolingBindEntities.Select(x => x.Barcode).ToList();
                 }
@@ -343,7 +345,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
 
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
             //2. 构造数据
             ManuFeedingMaterialSaveDto saveDto = new ManuFeedingMaterialSaveDto();
             saveDto.BarCode = dto.Sfc;
@@ -362,9 +364,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task AgvMaterialAsync(AgvMaterialDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
             //2. 校验设备是否激活工单
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
             //3. 调用AGV接口
             var result = ""; //await HttpHelper.HttpPostAsync("", dto.Content, "");
             //4. 存储数据
@@ -390,10 +392,10 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task<List<string>> GenerateSfcAsync(GenerateSfcDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             //2. 构造数据
             //2.1 条码数据
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
             CreateBarcodeByWorkOrderBo query = new CreateBarcodeByWorkOrderBo();
             query.WorkOrderId = planEntity.Id;
             query.ResourceId = equResModel.ResId;
@@ -427,9 +429,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task OutboundMetersReportAsync(OutboundMetersReportDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             //2. 工单信息
-            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel.LineId, equResModel.ResId);
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
             //3. 查询条码信息
             var manuSfcInfo = await _manuSfcRepository.GetManSfcAboutInfoBySfcAsync(new ManuSfcAboutInfoBySfcQuery()
             {
@@ -558,7 +560,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task<CcdGetBarcodeReturnDto> CcdGetBarcodeAsync(CCDFileUploadCompleteDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 查询数据
             ManuSfcEquipmentNewestQuery query = new ManuSfcEquipmentNewestQuery();
             query.EquipmentId = equResModel.EquipmentId;
@@ -584,7 +586,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                 return;
             }
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 添加数据
             List<EquProcessParamRecordSaveDto> saveDtoList = new List<EquProcessParamRecordSaveDto>();
             foreach (var item in dto.ParamList)
@@ -616,7 +618,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task InboundAsync(InboundDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
             SFCInStationBo inBo = new SFCInStationBo();
             inBo.SiteId = equResModel.SiteId;
@@ -638,7 +640,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task OutboundAsync(OutboundDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
             //2.1 出站数据
             SFCOutStationBo outBo = new SFCOutStationBo();
@@ -700,7 +702,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task<List<InboundMoreReturnDto>> InboundMoreAsync(InboundMoreDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
             SFCInStationBo inBo = new SFCInStationBo();
             inBo.SiteId = equResModel.SiteId;
@@ -731,7 +733,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task<List<OutboundMoreReturnDto>> OutboundMoreAsync(OutboundMoreDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
             SFCOutStationBo outBo = new SFCOutStationBo();
             outBo.SiteId = equResModel.SiteId;
@@ -806,7 +808,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task ProductParamAsync(ProductParamDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 出站参数
             List<EquProductParamRecordSaveDto> saveDtoList = new List<EquProductParamRecordSaveDto>();
             foreach (var item in dto.SfcList)
@@ -1007,6 +1009,26 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task<string> GetEquTokenAsync(QknyBaseDto dto)
         {
             return await _equEquipmentService.GetEquTokenAsync(dto);
+        }
+
+        /// <summary>
+        /// 发送请求Http请求097
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<string> SendHttpAsync(SendHttpDto dto)
+        {
+            string result = string.Empty;
+            if(dto.Method == "2")
+            {
+                Dictionary<string,string> header = new Dictionary<string,string>();
+                result = await HttpHelper.HttpGetAsync(dto.Url, header);
+            }
+            else
+            {
+                result = await HttpHelper.HttpPostAsync(dto.Url, dto.Body, "application/json");
+            }
+            return result;
         }
 
         /// <summary>

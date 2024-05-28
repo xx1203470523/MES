@@ -16,7 +16,6 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -142,6 +141,13 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
+            // 开机参数上限、下限、参考值必填
+            if (entity.Type == EquipmentGroupParamTypeEnum.OpenParam)
+            {
+                var isHasNull = details.Any(a => !a.MaxValue.HasValue || !a.MinValue.HasValue || !a.CenterValue.HasValue);
+                if (isHasNull) throw new CustomerValidationException(nameof(ErrorCode.MES18725));
+            }
+
             using var trans = TransactionHelper.GetTransactionScope();
             var rows = await _procEquipmentGroupParamRepository.InsertAsync(entity);
             if (rows <= 0)
@@ -220,6 +226,13 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
+            // 开机参数上限、下限、参考值必填
+            if (entity.Type == EquipmentGroupParamTypeEnum.OpenParam)
+            {
+                var isHasNull = details.Any(a => !a.MaxValue.HasValue || !a.MinValue.HasValue || !a.CenterValue.HasValue);
+                if (isHasNull) throw new CustomerValidationException(nameof(ErrorCode.MES18725));
+            }
+
             using var ts = TransactionHelper.GetTransactionScope();
             await _procEquipmentGroupParamRepository.UpdateAsync(entity);
 
@@ -289,23 +302,6 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             return new PagedInfo<ProcEquipmentGroupParamViewDto>(procEquipmentGroupParamViewDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static List<ProcEquipmentGroupParamDto> PrepareProcEquipmentGroupParamDtos(PagedInfo<ProcEquipmentGroupParamEntity> pagedInfo)
-        {
-            var procEquipmentGroupParamDtos = new List<ProcEquipmentGroupParamDto>();
-            foreach (var procEquipmentGroupParamEntity in pagedInfo.Data)
-            {
-                var procEquipmentGroupParamDto = procEquipmentGroupParamEntity.ToModel<ProcEquipmentGroupParamDto>();
-                procEquipmentGroupParamDtos.Add(procEquipmentGroupParamDto);
-            }
-
-            return procEquipmentGroupParamDtos;
         }
 
         /// <summary>

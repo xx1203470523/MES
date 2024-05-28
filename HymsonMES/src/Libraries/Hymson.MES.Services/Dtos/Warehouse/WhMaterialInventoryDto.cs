@@ -43,6 +43,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 供应商编码
         /// </summary>
         public string SupplierCode { get; set; }
+
         /// <summary>
         /// 供应商名称
         /// </summary>
@@ -81,6 +82,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 数量（剩余）
         /// </summary>
         public decimal QuantityResidue { get; set; }
+
+        /// <summary>
+        /// 报废数量
+        /// </summary>
+        public decimal? ScrapQty { get; set; }
 
         /// <summary>
         /// 状态;待使用/使用中/锁定
