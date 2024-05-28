@@ -882,6 +882,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = addDto.ResourceId,
                 OutputBarCode = addDto.Sfc,//主条码
                 OutputBarCodeMaterialId = manuSfcProduce.ProductId,
+                OutputBarCodeWorkOrderId = whMaterialInventory.WorkOrderId,
                 InputBarCode = addDto.CirculationBarCode,//添加的条码
                 InputBarCodeMaterialId = addDto.CirculationMainProductId ?? 0,
                 InputBarCodeLocation = addDto.Location ?? "",
@@ -1447,6 +1448,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = replaceDto?.ResourceId,
                 OutputBarCode = replaceDto?.Sfc ?? "",//主条码
                 OutputBarCodeMaterialId = replaceDto?.CirculationMainProductId,
+                OutputBarCodeWorkOrderId = whMaterialInventory.WorkOrderId,
                 InputBarCode = replaceDto?.CirculationBarCode ?? "",//添加的条码
                 InputBarCodeMaterialId = bomDetailEntity?.MaterialId ?? 0,
                 InputBarCodeLocation = replaceDto?.Location ?? "",
@@ -2141,6 +2143,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProductBOMId = manuSfcView.ProductBOMId,
                 ResourceId = sfc.ResourceId,
                 ProcedureId = sfc.ProcedureId,
+                ProcessRouteId = manuSfcView.ProcessRouteId,
                 CurrentStatus = manuSfcView.Status,
                 Operatetype = type,
                 Remark = remark,
