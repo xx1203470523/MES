@@ -47,6 +47,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Status=@Status");
             }
+            //状态
+            if (manuSfcProducePagedQuery.Statuss!=null && manuSfcProducePagedQuery.Statuss.Any())
+            {
+                sqlBuilder.Where("msp.Status IN @Statuss");
+            }
             if (manuSfcProducePagedQuery.IsScrap.HasValue)
             {
                 sqlBuilder.Where("msp.IsScrap=@IsScrap");
