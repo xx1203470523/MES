@@ -147,6 +147,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<int> UpdatePassDownQuantityByWorkOrderIdAsync(UpdatePassDownQuantityCommand param);
 
         /// <summary>
+        /// 退还下达数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> RefundPassDownQuantityByWorkOrderIdsAsync(IEnumerable<UpdatePassDownQuantityCommand> commands);
+
+        /// <summary>
         /// 更新数量（投入数量）
         /// </summary>
         /// <param name="param"></param>
