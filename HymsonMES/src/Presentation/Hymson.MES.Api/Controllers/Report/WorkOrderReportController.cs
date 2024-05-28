@@ -13,7 +13,7 @@ namespace Hymson.MES.Api.Controllers.Report
     public class WorkOrderReportController : ControllerBase
     {
         /// <summary>
-        /// 接口（不良报告）
+        /// 接口（工单报告）
         /// </summary>
         private readonly ILogger<BadRecordReportController> _logger;
 
