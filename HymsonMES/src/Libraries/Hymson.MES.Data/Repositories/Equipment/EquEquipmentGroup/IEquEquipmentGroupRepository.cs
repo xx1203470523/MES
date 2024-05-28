@@ -63,6 +63,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         Task<EquEquipmentGroupEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentGroupEntity>> GetByCodeOrNameAsync(EntityByCodeQuery query);
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
@@ -74,6 +81,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// </summary>
         /// <param name="equipmentGroupQuery"></param>
         /// <returns></returns>
-         Task<IEnumerable<EquEquipmentGroupEntity>> GetEntitiesAsync(EquEquipmentGroupQuery equipmentGroupQuery);
+        Task<IEnumerable<EquEquipmentGroupEntity>> GetEntitiesAsync(EquEquipmentGroupQuery equipmentGroupQuery);
     }
 }

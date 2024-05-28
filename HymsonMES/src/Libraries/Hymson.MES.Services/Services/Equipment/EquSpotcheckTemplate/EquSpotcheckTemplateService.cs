@@ -222,13 +222,13 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         {
             var equSpotcheckTemplatePagedQuery = equSpotcheckTemplatePagedQueryDto.ToQuery<EquSpotcheckTemplatePagedQuery>();
             equSpotcheckTemplatePagedQuery.SiteId = _currentSite.SiteId;
-
+            var resDates = new PagedInfo<EquSpotcheckTemplateDto>(new List<EquSpotcheckTemplateDto>(), equSpotcheckTemplatePagedQueryDto.PageIndex, equSpotcheckTemplatePagedQueryDto.PageSize, 0);
             if (equSpotcheckTemplatePagedQueryDto.EquipmentId.HasValue)
             {
                 var equEquipment = await _equEquipmentRepository.GetByIdAsync(equSpotcheckTemplatePagedQueryDto.EquipmentId ?? 0);
                 if (equEquipment == null)
                 {
-                    return null;
+                    return resDates;
                 }
                 List<long> equGroupEquipmentIds = new()
                     {
@@ -237,27 +237,25 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                 var equSpotcheckTemplateEquipmentGroups = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
                 if (equSpotcheckTemplateEquipmentGroups == null || !equSpotcheckTemplateEquipmentGroups.Any())
                 {
-                    return null;
+                    return resDates;
                 }
                 equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds = equSpotcheckTemplateEquipmentGroups.Select(it => it.SpotCheckTemplateId).ToList();
 
             }
-            if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQueryDto.EquipmentGroupCode))
+            if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQueryDto.EquipmentGroupCode) || !string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQueryDto.EquipmentGroupName))
             {
-                var equGroupEquipment = await _equEquipmentGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Code = equSpotcheckTemplatePagedQueryDto.EquipmentGroupCode, Site = _currentSite.SiteId });
-                if (equGroupEquipment != null)
+                var equGroupEquipments = await _equEquipmentGroupRepository.GetByCodeOrNameAsync(new EntityByCodeQuery { Code = equSpotcheckTemplatePagedQueryDto.EquipmentGroupCode ?? "", Name = equSpotcheckTemplatePagedQueryDto.EquipmentGroupName ?? "", Site = _currentSite.SiteId });
+                if (equGroupEquipments == null || !equGroupEquipments.Any())
                 {
-                    List<long> equGroupEquipmentIds = new()
-                    {
-                        equGroupEquipment.Id
-                    };
-                    var equSpotcheckTemplateEquipmentGroups = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
-                    if (equSpotcheckTemplateEquipmentGroups != null && equSpotcheckTemplateEquipmentGroups.Any())
-                    {
-                        equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds = equSpotcheckTemplateEquipmentGroups.Select(it => it.SpotCheckTemplateId).ToList();
-                    }
+                    return resDates;
                 }
-
+                var equGroupEquipmentIds = equGroupEquipments.Select(it => it.Id);
+                var equSpotcheckTemplateEquipmentGroups = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
+                if (equSpotcheckTemplateEquipmentGroups == null || !equSpotcheckTemplateEquipmentGroups.Any())
+                {
+                    return resDates;
+                }
+                equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds = equSpotcheckTemplateEquipmentGroups.Select(it => it.SpotCheckTemplateId).ToList();
             }
             var pagedInfo = await _equSpotcheckTemplateRepository.GetPagedInfoAsync(equSpotcheckTemplatePagedQuery);
 

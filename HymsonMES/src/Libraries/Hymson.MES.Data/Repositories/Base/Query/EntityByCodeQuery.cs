@@ -20,5 +20,9 @@
         /// </summary>
         public string Version { get; set; }
 
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; } 
     }
 }

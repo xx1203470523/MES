@@ -14,5 +14,15 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query
         /// 设备组编码列表
         /// </summary>
         public string[]? EquipmentGroupCodes { get; set; }
+
+        /// <summary>
+        /// 设备组编码列表
+        /// </summary>
+        public string Code { get; set; } 
+
+        /// <summary>
+        /// 设备组编码列表
+        /// </summary>
+        public string Name { get; set; }
     }
 }
