@@ -4,6 +4,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
@@ -105,6 +106,10 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
         {
             //计划
             var EquMaintenancePlanEntity = await _EquMaintenancePlanRepository.GetByIdAsync(param.MaintenancePlanId);
+            if (EquMaintenancePlanEntity.Status == DisableOrEnableEnum.Disable)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12314)).WithData("Code", EquMaintenancePlanEntity.Code);
+            }
             if (param.ExecType == 0)
             {
                 if (EquMaintenancePlanEntity.FirstExecuteTime < HymsonClock.Now())
