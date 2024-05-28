@@ -70,7 +70,7 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckPlan
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("equRelation/{id}")]
-        public async Task<List<QueryEquRelationListDto>> QueryEquRelationListAsync(long id)
+        public async Task<List<QuerySpotcheckEquRelationListDto>> QueryEquRelationListAsync(long id)
         {
             return await _equSpotcheckPlanService.QueryEquRelationListAsync(id);
         }
@@ -106,7 +106,7 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckPlan
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteEquSpotcheckPlanAsync([FromBody] DeletesDto param) 
+        public async Task DeleteEquSpotcheckPlanAsync([FromBody] SpotcheckDeletesDto param) 
         {
             await _equSpotcheckPlanService.DeletesEquSpotcheckPlanAsync(param);
         }
@@ -118,7 +118,7 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckPlan
         /// <returns></returns>
         [HttpPost]
         [Route("generate")]
-        public async Task GenerateEquSpotcheckTaskAsync([FromBody] GenerateDto parm)
+        public async Task GenerateEquSpotcheckTaskAsync([FromBody] SpotcheckGenerateDto parm)
         {
             await _equSpotcheckPlanService.GenerateEquSpotcheckTaskCoreAsync(parm); 
         }

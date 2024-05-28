@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public EquEquipmentGroupRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public EquEquipmentGroupRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
 
         }
@@ -105,6 +105,27 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         }
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquEquipmentGroupEntity>> GetByCodeOrNameAsync(EntityByCodeQuery query)
+        {
+            if (string.IsNullOrWhiteSpace(query.Code))
+            {
+                query.Code = " ";
+            }
+            if (string.IsNullOrWhiteSpace(query.Name))
+            {
+                query.Name = " ";
+            }
+            query.Code = $"%{query.Code}%";
+            query.Name = $"%{query.Name}%";
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquEquipmentGroupEntity>(GetByCodeOrNameSql, query);
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
@@ -183,6 +204,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
                             FROM `equ_equipment_group`  WHERE IsDeleted = @IsDeleted AND Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `equ_equipment_group`  WHERE Id IN @ids and IsDeleted=0  ";
         const string GetByCodeSql = "SELECT * FROM equ_equipment_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND EquipmentGroupCode = @Code LIMIT 1";
+        const string GetByCodeOrNameSql = "SELECT * FROM equ_equipment_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND (EquipmentGroupCode LIKE @Code OR EquipmentGroupName LIKE @Name)";
         const string GetEntitiesSqlTemplate = "SELECT * FROM `equ_equipment_group` /**where**/ ";
     }
 }

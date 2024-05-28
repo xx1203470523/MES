@@ -122,6 +122,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntities)
         {
             if (manuSfcStepEntities == null || !manuSfcStepEntities.Any()) return 0;
+
             var keyValuePairs = TableGrouping(manuSfcStepEntities);
             using var conn = GetMESDbConnection();
             //插入分表数据
@@ -227,7 +228,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             foreach (var sfc in param.SFCs)
             {
-                var tableNameBySFC = PrepareTableName(param.SiteId, sfc,false);
+                var tableNameBySFC = PrepareTableName(param.SiteId, sfc, false);
                 if (!dic.ContainsKey(tableNameBySFC))
                 {
                     dic[tableNameBySFC] = new List<string>();
@@ -365,7 +366,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 var tableName = PrepareTableName(manuSfcStepEntity, false);
                 if (!keyValuePairs.TryAdd(tableName, new List<ManuSfcStepEntity>() { manuSfcStepEntity }))
                 {
-                    keyValuePairs[tableName]=  keyValuePairs[tableName].Append(manuSfcStepEntity).ToList();
+                    keyValuePairs[tableName] = keyValuePairs[tableName].Append(manuSfcStepEntity).ToList();
                 }
             }
             return keyValuePairs;

@@ -295,7 +295,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
     /// <summary>
     /// 设备点检模板与项目关系Dto
     /// </summary>
-    public record GetItemRelationListDto
+    public record GetSpotcheckItemRelationListDto
     {
         /// <summary>
         /// Id
@@ -361,7 +361,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
     /// <summary>
     /// 设备点检模板与项目关系Dto
     /// </summary>
-    public record QueryEquipmentGroupRelationListDto
+    public record QuerySpotcheckEquipmentGroupRelationListDto
     {
         /// <summary>
         /// Id
