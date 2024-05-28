@@ -12,6 +12,7 @@ using Hymson.MES.Services.Dtos.Report;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -55,6 +56,11 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
         private readonly IProcBomDetailRepository _procBomDetailRepository;
 
         /// <summary>
+        /// 条码信息表 仓储
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentSite"></param>
@@ -64,7 +70,8 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
         /// <param name="resourceRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procBomDetailRepository"></param>
-        public MaterialDeductionRecordService(ICurrentSite currentSite, IManuBarCodeRelationRepository  manuBarCodeRelationRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcResourceRepository resourceRepository, IProcProcedureRepository procProcedureRepository, IProcBomDetailRepository procBomDetailRepository)
+        /// <param name="manuSfcRepository"></param>
+        public MaterialDeductionRecordService(ICurrentSite currentSite, IManuBarCodeRelationRepository  manuBarCodeRelationRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcResourceRepository resourceRepository, IProcProcedureRepository procProcedureRepository, IProcBomDetailRepository procBomDetailRepository, IManuSfcRepository manuSfcRepository)
         {
             _currentSite = currentSite;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -73,6 +80,7 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
             _resourceRepository = resourceRepository;
             _procProcedureRepository = procProcedureRepository;
             _procBomDetailRepository = procBomDetailRepository;
+            _manuSfcRepository = manuSfcRepository;
         }
 
         /// <summary>
@@ -108,27 +116,35 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
             var procedureIds = pagedInfo.Data.Select(x => x.ProcedureId).Distinct().ToArray();
             var procedures = await _procProcedureRepository.GetByIdsAsync(procedureIds.OfType<long>());
 
-            // 获取物料
-            var productIds = pagedInfo.Data.Select(x => x.OutputBarCodeMaterialId).Distinct().ToArray();
-            var products = await _procMaterialRepository.GetByIdsAsync(productIds.OfType<long>());
+            var inputSFCs = pagedInfo.Data.Select(x => x.InputBarCode).Distinct().ToArray();
+            var manuSFCInfoViews = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery()
+            {
+                SiteId = _currentSite.SiteId ?? 123456,
+                Sfcs = inputSFCs
+            });
+            var productIds = manuSFCInfoViews.Select(item => item.ProductId).Distinct();
+            var bomIds = manuSFCInfoViews.Select(item => item.ProductBOMId).Distinct();
+            var products = await _procMaterialRepository.GetByIdsAsync(productIds);
 
             //查询Bom详情
             var bomDetails = await _procBomDetailRepository.GetProcBomDetailEntitiesAsync(
                 new ProcBomDetailQuery
                 {
                     SiteId = _currentSite.SiteId ?? 123456,
-                    MaterialIds = productIds.OfType<long>(),
+                    MaterialIds = productIds,
                     ProcedureIds = procedureIds.OfType<long>(),
+                    BomIds= bomIds.OfType<long>()
                 }
                 );
 
             foreach (var item in pagedInfo.Data)
             {
-                var product = products.FirstOrDefault(x => x.Id == item.OutputBarCodeMaterialId);
+                var sfcInfo = manuSFCInfoViews.FirstOrDefault(x => x.SFC == item.InputBarCode);
+                var product = sfcInfo != null ? products.FirstOrDefault(x => x.Id == sfcInfo?.ProductId) ?? null : null;
                 var workOrder = workOrders.FirstOrDefault(x => x.Id == item.OutputBarCodeWorkOrderId);
                 var procedure = procedures.FirstOrDefault(x => x.Id == item.ProcedureId);
                 var resource = resources.FirstOrDefault(x => x.Id == item.ResourceId);
-                var bomUsgQty = bomDetails.FirstOrDefault(x => x.MaterialId == item.OutputBarCodeMaterialId && x.ProcedureId == item.ProcedureId);
+                var bomUsgQty = bomDetails.FirstOrDefault(x => x.MaterialId == sfcInfo?.ProductId && x.ProcedureId == item.ProcedureId && x.BomId == sfcInfo.ProductBOMId);
                 listDto.Add(new MaterialDeductionRecordResultDto()
                 {
                     Sfc = item.OutputBarCode,
