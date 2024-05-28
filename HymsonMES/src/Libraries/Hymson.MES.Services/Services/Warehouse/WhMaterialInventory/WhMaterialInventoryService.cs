@@ -31,6 +31,7 @@ using Hymson.MES.Core.Domain.Process;
 using System.Security.Policy;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
+using AutoMapper.Execution;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -547,6 +548,9 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             if (oldWhMEntirty.QuantityResidue < adjustDto.Qty) throw new CustomerValidationException(nameof(ErrorCode.MES15126));
 
+            if (HasDecimalPart(adjustDto.Qty)) throw new CustomerValidationException(nameof(ErrorCode.MES15133));     
+ 
+
             var remainsQty = oldWhMEntirty.QuantityResidue - adjustDto.Qty;
 
             //新条码编码
@@ -1058,6 +1062,16 @@ namespace Hymson.MES.Services.Services.Warehouse
             });
 
             return orderCodes.First();
+        }
+
+        /// <summary>
+        /// 是否包含小数
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
+        private bool HasDecimalPart(decimal number)
+        {
+            return number != Math.Truncate(number);
         }
 
     }

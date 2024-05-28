@@ -23,6 +23,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// 物料条码
         /// </summary>
         public string? MaterialBarCode { get; set; }
+
+        /// <summary>
+        /// 供应商编码
+        /// </summary>
+        public string? SupplierCode { get; set; }
         /// <summary>
         /// 物料条码(多个)
         /// </summary>

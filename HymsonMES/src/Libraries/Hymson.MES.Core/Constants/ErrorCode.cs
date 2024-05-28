@@ -888,6 +888,7 @@
         public const string MES15130 = "新生成的条码{sfc}在物料仓已存在，请设置更复杂的编码规则";
         public const string MES15131 = "{type}编码规则未维护！";
         public const string MES15132 = "{type}编码规则被维护多条！";
+        public const string MES15133 = "待拆分数量不能填写小数!";
         #endregion
 
         #region 物料台账 15200
