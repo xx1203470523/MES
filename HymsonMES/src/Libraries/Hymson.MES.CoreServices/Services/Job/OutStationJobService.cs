@@ -4,7 +4,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
@@ -405,6 +404,15 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 消耗Bo传入参数
                 var requestConsumptionBo = new MaterialConsumptionRequestBo
                 {
+                    IdsBo = new ManufactureIdsBo
+                    {
+                        SiteId = commonBo.SiteId,
+                        ProcedureId = commonBo.ProcedureId,
+                        ResourceId = commonBo.ResourceId,
+                        EquipmentId = commonBo.EquipmentId,
+                        UserName = commonBo.UserName,
+                        Time = commonBo.Time
+                    },
                     SFCProduceEntity = sfcProduceEntity,
                     InitialMaterialSummaryBo = initialMaterialSummary,
                     ConsumeList = requestBo.ConsumeList,
@@ -1454,6 +1462,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ManuFeedingsDict = manuFeedingsDict,
                     MainMaterialBo = mainMaterialBo,
                     CurrentMaterialBo = mainMaterialBo,
+                    IdsBo = requestConsumptionBo.IdsBo,
                     SFCStepId = requestConsumptionBo.SFCStepId
                 };
 
@@ -1580,6 +1589,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ManuFeedingsDict = manuFeedingsDict,
                     MainMaterialBo = mainMaterialBo,
                     CurrentMaterialBo = mainMaterialBo,
+                    IdsBo = requestConsumptionBo.IdsBo,
                     SFCStepId = requestConsumptionBo.SFCStepId
                 });
             }
