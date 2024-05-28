@@ -101,7 +101,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 分页查询列表（过滤已经有类型的备件）
+        /// 分页查询列表（过滤已经有类型的备件）//
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
