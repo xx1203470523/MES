@@ -1471,20 +1471,25 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     EquipmentId = item.EquipmentId,
                     ResourceId = item.ResourceId,
                     Operatetype = ManuSfcStepTypeEnum.ManuUpdate,
-                    CurrentStatus = SfcStatusEnum.Activity,
+                    CurrentStatus = item.Status,
                     CreatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
                 };
-                //item.ProcedureId = manuUpdateSaveDto.ProcedureId.HasValue ? manuUpdateSaveDto.ProcedureId.Value : item.ProcedureId;
-                //item.WorkOrderId = newPlanWorkOrderEntity.Id > 0 ? newPlanWorkOrderEntity.Id : item.WorkOrderId;
-                //item.ProductId = productId > 0 ? productId : item.ProductId;
-                //item.ProcessRouteId = processRouterId > 0 ? processRouterId : item.ProcessRouteId;
-                //item.ProductBOMId = bomId > 0 ? bomId : item.ProductBOMId;
-                //item.ResourceId = null; //更改步骤后 更改资源为null   为null则生产不限制匹配
-                //item.Status = SfcStatusEnum.lineUp;
                 sfcStepList.Add(sfcStep);
+                var procedureId = manuUpdateSaveDto.ProcedureId.HasValue ? manuUpdateSaveDto.ProcedureId.Value : item.ProcedureId;
+                var workOrderId1 = newPlanWorkOrderEntity.Id > 0 ? newPlanWorkOrderEntity.Id : item.WorkOrderId;
+                var productId1 = productId > 0 ? productId : item.ProductId;
+                var processRouteId1 = processRouterId > 0 ? processRouterId : item.ProcessRouteId;
+                var productBOMId1 = bomId > 0 ? bomId : item.ProductBOMId;
+                item.ProcedureId = procedureId;
+                item.WorkOrderId = workOrderId1;
+                item.ProductId = productId1;
+                item.ProcessRouteId = processRouteId1;
+                item.ProductBOMId = productBOMId1;
+                item.ResourceId = null; //更改步骤后 更改资源为null   为null则生产不限制匹配
+                item.Status = SfcStatusEnum.lineUp;
             }
 
             //处理条码信息 
