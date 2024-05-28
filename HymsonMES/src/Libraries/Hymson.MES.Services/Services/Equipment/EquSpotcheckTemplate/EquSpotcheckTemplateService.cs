@@ -400,7 +400,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<List<GetItemRelationListDto>> QueryItemRelationListAsync(GetEquSpotcheckTemplateItemRelationDto param)
+        public async Task<List<GetSpotcheckItemRelationListDto>> QueryItemRelationListAsync(GetEquSpotcheckTemplateItemRelationDto param)
         {
             var equSpotcheckTemplateItemRelations = await _equSpotcheckTemplateItemRelationRepository.GetEquSpotcheckTemplateItemRelationEntitiesAsync(new EquSpotcheckTemplateItemRelationQuery
             {
@@ -408,7 +408,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                 SiteId = _currentSite.SiteId
             });
 
-            List<GetItemRelationListDto> list = new();
+            List<GetSpotcheckItemRelationListDto> list = new();
             if (equSpotcheckTemplateItemRelations != null && equSpotcheckTemplateItemRelations.Any())
             {
                 var spotCheckItemIds = equSpotcheckTemplateItemRelations.Select(it => it.SpotCheckItemId).ToArray();
@@ -417,7 +417,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                 foreach (var item in equSpotcheckTemplateItemRelations)
                 {
                     var equSpotcheckItem = equSpotcheckItems.FirstOrDefault(it => it.Id == item.SpotCheckItemId);
-                    GetItemRelationListDto itemRelation = new()
+                    GetSpotcheckItemRelationListDto itemRelation = new()
                     {
                         Id = item.Id,
                         SpotCheckItemId = item.SpotCheckItemId,
@@ -446,7 +446,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<List<QueryEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync(GetEquSpotcheckTemplateItemRelationDto param)
+        public async Task<List<QuerySpotcheckEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync(GetEquSpotcheckTemplateItemRelationDto param)
         {
             var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetEquSpotcheckTemplateEquipmentGroupRelationEntitiesAsync(new EquSpotcheckTemplateEquipmentGroupRelationQuery
             {
@@ -454,7 +454,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                 SiteId = _currentSite.SiteId
             });
 
-            List<QueryEquipmentGroupRelationListDto> list = new();
+            List<QuerySpotcheckEquipmentGroupRelationListDto> list = new();
             if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
             {
                 var equipmentGroupIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
@@ -463,7 +463,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                 foreach (var item in equSpotcheckTemplateEquipmentGroupRelations)
                 {
                     var equSpotcheckItem = equSpotcheckItems.FirstOrDefault(it => it.Id == item.EquipmentGroupId);
-                    QueryEquipmentGroupRelationListDto groupRelation = new()
+                    QuerySpotcheckEquipmentGroupRelationListDto groupRelation = new()
                     {
                         Id = item.Id,
                         EquipmentGroupId = item.EquipmentGroupId,
