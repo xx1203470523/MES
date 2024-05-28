@@ -911,12 +911,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             List<ManuSfcStepEntity> manuSfcStepEntities = new();//步骤记录
             List<WhMaterialStandingbookEntity> whMaterialStandingbookEntitys = new();
 
-            var workCenterId = isAllProduceSFC ? firstManuSFCProduceEntity?.WorkCenterId : null;
-            var productBOMId = isAllProduceSFC ? firstManuSFCProduceEntity?.ProductBOMId : workOrders?.FirstOrDefault(x => x.Id == firstManuSFCView.WorkOrderId)?.ProductBOMId;
-            var processRouteId = isAllProduceSFC ? firstManuSFCProduceEntity?.ProcessRouteId : null;
-            var procedureId = isAllProduceSFC ? firstManuSFCProduceEntity?.ProcedureId : null;
-            var resourceId = isAllProduceSFC ? firstManuSFCProduceEntity?.ResourceId : null;
-            var equipmentId = isAllProduceSFC ? firstManuSFCProduceEntity?.EquipmentId : null;
+            var workCenterId = firstManuSFCProduceEntity?.WorkCenterId;
+            var productBOMId = firstManuSFCProduceEntity?.ProductBOMId;
+            var processRouteId = firstManuSFCProduceEntity?.ProcessRouteId;
+            var procedureId = firstManuSFCProduceEntity?.ProcedureId;
+            var resourceId = firstManuSFCProduceEntity?.ResourceId;
+            var equipmentId = firstManuSFCProduceEntity?.EquipmentId;
 
             #region 父条码
             // 合并后条码的步骤ID
