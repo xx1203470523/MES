@@ -104,6 +104,10 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
         {
             //计划
             var equSpotcheckPlanEntity = await _equSpotcheckPlanRepository.GetByIdAsync(param.SpotCheckPlanId);
+            if (equSpotcheckPlanEntity.Status == DisableOrEnableEnum.Disable)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12314)).WithData("Code", equSpotcheckPlanEntity.Code);
+            }
             if (param.ExecType == 0)
             {
                 if (equSpotcheckPlanEntity.FirstExecuteTime < HymsonClock.Now())

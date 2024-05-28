@@ -313,11 +313,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             if (!string.IsNullOrEmpty(queryParam.CirculationBarCode))
             {
+                queryParam.CirculationBarCode = $"%{queryParam.CirculationBarCode}%";
                 sqlBuilder.Where(" InputBarCode LIKE @CirculationBarCode ");
             }
 
             if (!string.IsNullOrEmpty(queryParam.Sfc))
             {
+                queryParam.Sfc = $"%{queryParam.Sfc}%";
                 sqlBuilder.Where(" OutputBarCode LIKE @Sfc ");
             }
 
