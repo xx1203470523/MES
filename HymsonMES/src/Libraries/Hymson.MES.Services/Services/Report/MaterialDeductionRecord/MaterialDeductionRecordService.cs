@@ -123,7 +123,7 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
                 Sfcs = inputSFCs
             });
             var productIds = manuSFCInfoViews.Select(item => item.ProductId).Distinct();
-            var bomIds = manuSFCInfoViews.Select(item => item.ProductBOMId).Distinct();
+            var bomIds = workOrders.Select(item => item.ProductBOMId).Distinct();
             var products = await _procMaterialRepository.GetByIdsAsync(productIds);
 
             //查询Bom详情
