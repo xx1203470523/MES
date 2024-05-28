@@ -1225,9 +1225,22 @@ namespace Hymson.MES.Services.Services.Quality
             foreach (var item in filteredItems)
             {
                 item.HandMethod = updateDto.HandMethod;
+                item.UpdatedBy = _currentUser.UserName;
+                item.UpdatedOn = HymsonClock.Now();
+            }
+            foreach (var item in samples)
+            {
+                item.UpdatedBy = _currentUser.UserName;
+                item.UpdatedOn = HymsonClock.Now();
             }
 
-            return await _qualFqcOrderSfcRepository.UpdateRangeAsync(FQCOrderSFC);
+            var row = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+                row += await _qualFqcOrderSampleRepository.UpdateRangeAsync(samples);
+                row += await _qualFqcOrderSfcRepository.UpdateRangeAsync(FQCOrderSFC);
+            trans.Complete();
+
+            return row;
         }
 
 
