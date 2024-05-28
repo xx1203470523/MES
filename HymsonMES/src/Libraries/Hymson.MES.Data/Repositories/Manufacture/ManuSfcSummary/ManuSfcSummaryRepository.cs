@@ -199,9 +199,43 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Where("IsDeleted=0");
 
-            if (!string.IsNullOrWhiteSpace(query.SFC)) {
+            if (!string.IsNullOrWhiteSpace(query.SFC))
+            {
                 sqlBuilder.Where("SFC=@SFC");
             }
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcSummaryEntity>(template.RawSql, query);
+        }
+
+        /// <summary>
+        /// 按工单查询summary
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcSummaryEntity>> GetWorkOrderAsync(ManuSfcProduceVehiclePagedQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+            //产品
+            if (query.ProductId.HasValue && query.ProductId > 0)
+            {
+                sqlBuilder.Where("ProductId = @ProductId ");
+            }
+            //工单
+            if (query.WorkOrderId.HasValue && query.WorkOrderId > 0)
+            {
+                sqlBuilder.Where("WorkOrderId = @WorkOrderId ");
+            }
+            //工序
+            if (query.ProcedureId.HasValue && query.ProcedureId > 0)
+            {
+                sqlBuilder.Where("ProcedureId = @ProcedureId ");
+            }
+            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Where("IsDeleted=0");
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcSummaryEntity>(template.RawSql, query);
@@ -256,7 +290,7 @@ SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId
  WHEN NOT MATCHED THEN INSERT (  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ProcedureId`, `StartOn`, `EndOn`, `InvestQty`, `OutputQty`, `UnqualifiedQty`, `RepeatedCount`, `IsJudgment`, `JudgmentOn`, `Remark`,`LastUpdatedOn`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ProcedureId, @StartOn, @EndOn,@InvestQty, @OutputQty, @UnqualifiedQty, @RepeatedCount, @IsJudgment, @JudgmentOn, @Remark, @LastUpdatedOn, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);
 ";
 #else
-const string MergeSql = @"INSERT INTO manu_sfc_summary(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ProcedureId`, `StartOn`, `EndOn`, `InvestQty`, `OutputQty`, `UnqualifiedQty`, `RepeatedCount`, `IsJudgment`, `JudgmentOn`, `Remark`,`LastUpdatedOn`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ProcedureId, @StartOn, @EndOn,@InvestQty, @OutputQty, @UnqualifiedQty, @RepeatedCount, @IsJudgment, @JudgmentOn, @Remark, @LastUpdatedOn, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) 
+        const string MergeSql = @"INSERT INTO manu_sfc_summary(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ProcedureId`, `StartOn`, `EndOn`, `InvestQty`, `OutputQty`, `UnqualifiedQty`, `RepeatedCount`, `IsJudgment`, `JudgmentOn`, `Remark`,`LastUpdatedOn`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ProcedureId, @StartOn, @EndOn,@InvestQty, @OutputQty, @UnqualifiedQty, @RepeatedCount, @IsJudgment, @JudgmentOn, @Remark, @LastUpdatedOn, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) 
                            ON DUPLICATE KEY UPDATE SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcedureId = @ProcedureId, StartOn = @StartOn, EndOn = @EndOn, OutputQty = @OutputQty, UnqualifiedQty = @UnqualifiedQty, RepeatedCount = @RepeatedCount, IsJudgment = @IsJudgment, JudgmentOn = @JudgmentOn, Remark = @Remark,LastUpdatedOn=@LastUpdatedOn, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted;";
 #endif
         const string UpdateSql = "UPDATE manu_sfc_summary SET   SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcedureId = @ProcedureId, StartOn = @StartOn, EndOn = @EndOn, OutputQty = @OutputQty, UnqualifiedQty = @UnqualifiedQty, RepeatedCount = @RepeatedCount, IsJudgment = @IsJudgment, JudgmentOn = @JudgmentOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
@@ -275,7 +309,7 @@ const string MergeSql = @"INSERT INTO manu_sfc_summary(  `Id`, `SiteId`, `SFC`, 
 			SELECT ProductId, SFC, MAX(UpdatedOn) AS MaxUpdatedOn FROM manu_sfc_summary GROUP BY SFC,ProductId
 	        ) T2 ON T1.SFC = T2.SFC AND T1.ProductId = T2.ProductId AND T1.UpdatedOn = T2.MaxUpdatedOn WHERE T1.SFC IN @Sfcs  AND T1.IsDeleted=0   ";
 
-        
+
 
     }
 }

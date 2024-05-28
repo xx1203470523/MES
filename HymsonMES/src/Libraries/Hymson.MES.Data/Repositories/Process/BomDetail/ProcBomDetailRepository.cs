@@ -193,6 +193,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" MaterialId IN @MaterialIds");
             }
+            if (query.BomIds != null && query.BomIds.Any())
+            {
+                sqlBuilder.Where(" BomId IN @BomIds");
+            }
             sqlBuilder.AddParameters(query);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcBomDetailEntity>(template.RawSql, template.Parameters);
