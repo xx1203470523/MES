@@ -64,7 +64,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<List<GetItemRelationListDto>> QueryItemRelationListAsync(GetEquSpotcheckTemplateItemRelationDto param);
+        Task<List<GetSpotcheckItemRelationListDto>> QueryItemRelationListAsync(GetEquSpotcheckTemplateItemRelationDto param);
 
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<List<QueryEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync(GetEquSpotcheckTemplateItemRelationDto param);
+        Task<List<QuerySpotcheckEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync(GetEquSpotcheckTemplateItemRelationDto param);
 
         #endregion
     }
