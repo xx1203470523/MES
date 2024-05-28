@@ -231,6 +231,7 @@ namespace Hymson.MES.Services.Services.Equipment
             //关联备件
             var updatedTypeEntity = new UpdateSparePartsTypeEntity
             {
+                Id = entity.Id,
                 SparePartGroupIds = new[] { entity.Id },
                 SparePartIds = saveDto.SparePartIds,
                 UpdatedBy = _currentUser.UserName,
@@ -277,11 +278,11 @@ namespace Hymson.MES.Services.Services.Equipment
         {
             if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
-            var entities = await _equSparePartsGroupRepository.GetByIdsAsync(ids);
-            if (entities != null && entities.Any(a => a.Status == DisableOrEnableEnum.Enable))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10135));
-            }
+            //var entities = await _equSparePartsGroupRepository.GetByIdsAsync(ids);
+            //if (entities != null && entities.Any(a => a.Status == DisableOrEnableEnum.Enable))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10135));
+            //}
 
             var rows = 0;
             var nowTime = HymsonClock.Now();
