@@ -1,70 +1,59 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 
-namespace Hymson.MES.Data.Repositories.Manufacture
+namespace Hymson.MES.Services.Dtos.Report
 {
-    public class WorkOrderStepControlView:BaseEntity
-    {
-        /// <summary>
-        /// 站点id
-        /// </summary>
-        public long? SiteId { get; set; }
-
-        /// <summary>
-        /// 物料编码/版本
-        /// </summary>
-        public string MaterialCode { get; set; }
-
-        /// <summary>
-        /// 工单编码
-        /// </summary>
-        public string OrderCode { get; set; }
-
-        /// <summary>
-        /// 工作中心
-        /// </summary>
-        public string WorkCenterId { get; set; }
-
-        /// <summary>
-        /// 工单类型
-        /// </summary>
-        public PlanWorkOrderTypeEnum? Type { get; set; }
-
-        /// <summary>
-        /// 工单类型
-        /// </summary>
-        public PlanWorkOrderStatusEnum? Status { get; set; }
-
-        /// <summary>
-        /// 条码下达数量
-        /// </summary>
-        public decimal PassDownQuantity { get; set; }
-
-        /// <summary>
-        /// 在制数量
-        /// </summary>
-        public decimal ProcessDownQuantity { get; set; }
-
-        /// <summary>
-        /// 报废数量
-        /// </summary>
-        public decimal UnQualifiedQuantity { get; set; }
-
-        /// <summary>
-        /// 完成数量
-        /// </summary>
-        public decimal FinishProductQuantity { get; set; }
-
-        /// <summary>
-        /// 工单数量
-        /// </summary>
-        public decimal Qty { get; set; }
-    }
-
     /// <summary>
     /// 
     /// </summary>
-    public class WorkOrderStepControlOptimizeView : BaseEntity
+    public record WorkOrderStepControlViewDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 物料编码/版本
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 步骤标识
+        /// </summary>
+        public long Serialno { get; set; }
+
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工艺路线
+        /// </summary>
+        public string ProcessRout { get; set; }
+
+        /// <summary>
+        /// 排队中的数量
+        /// </summary>
+        public decimal PassDownQuantity { get; set; }
+
+        /// <summary>
+        /// 在制数量
+        /// </summary>
+        public decimal ProcessDownQuantity { get; set; }
+
+        /// <summary>
+        /// 完成数量
+        /// </summary>
+        public decimal FinishProductQuantity { get; set; }
+    }
+
+    /// <summary>
+    /// 工单报告 分页参数
+    /// </summary>
+    public class WorkOrderStepControlPagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 站点id
@@ -82,22 +71,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string OrderCode { get; set; }
 
         /// <summary>
-        /// 工作中心
+        /// 步骤标识
         /// </summary>
-        public string WorkCenterId { get; set; }
+        public string Serialno { get; set; }
 
         /// <summary>
-        /// 工单类型
+        /// 工序
         /// </summary>
-        public PlanWorkOrderTypeEnum? Type { get; set; }
+        public string ProcedureCode { get; set; }
 
         /// <summary>
-        /// 工单类型
+        /// 工艺路线
         /// </summary>
-        public PlanWorkOrderStatusEnum? Status { get; set; }
+        public string ProcessRout { get; set; }
 
         /// <summary>
-        /// 条码下达数量
+        /// 排队中的数量
         /// </summary>
         public decimal PassDownQuantity { get; set; }
 
@@ -107,18 +96,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public decimal ProcessDownQuantity { get; set; }
 
         /// <summary>
-        /// 报废数量
-        /// </summary>
-        public decimal UnQualifiedQuantity { get; set; }
-
-        /// <summary>
         /// 完成数量
         /// </summary>
         public decimal FinishProductQuantity { get; set; }
+    }
 
+    /// <summary>
+    /// 工单报告 分页参数
+    /// </summary>
+    public class WorkOrderStepControlOptimizePagedQueryDto : PagerInfo
+    {
         /// <summary>
-        /// 工单数量
+        /// 工单编码
         /// </summary>
-        public decimal Qty { get; set; }
+        public string? OrderCode { get; set; }
     }
 }
