@@ -7,6 +7,7 @@ using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Events.Equipment;
 using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -181,8 +182,8 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                 {
                     Code = await GenerateSpotcheckOrderCodeAsync(param.SiteId, param.UserName),
                     Name = equSpotcheckPlanEntity.Name,
-                    BeginTime = HymsonClock.Now(),
-                    EndTime = HymsonClock.Now(),
+                    //BeginTime = HymsonClock.Now(),
+                    //EndTime = HymsonClock.Now(),
                     Status = EquSpotcheckTaskStautusEnum.WaitInspect,
                     IsQualified = null,
                     Remark = equSpotcheckPlanEntity.Remark,
@@ -315,6 +316,15 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
             });
         }
 
+        /// <summary>
+        /// 停止点检任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns> 
+        public async Task StopEquSpotcheckTaskAsync(EquSpotcheckAutoStopIntegrationEvent param)
+        {
+  
+        }
         #region 帮助
         private static string GetWeekToInt(string weekName)
         {

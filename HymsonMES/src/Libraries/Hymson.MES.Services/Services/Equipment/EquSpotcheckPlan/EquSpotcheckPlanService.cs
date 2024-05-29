@@ -8,6 +8,7 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -15,6 +16,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
+using Hymson.MES.CoreServices.Events.Equipment;
 using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -23,10 +25,12 @@ using Hymson.MES.Data.Repositories.EquSpotcheckPlan;
 using Hymson.MES.Data.Repositories.EquSpotcheckPlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation;
+using Hymson.MES.Services.Dtos.EquMaintenancePlan;
 using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 {
@@ -84,10 +88,15 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         private readonly IEquSpotcheckPlanCoreService _equSpotcheckPlanCoreService;
 
 
+        /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance2> _eventBus;
+
         private readonly AbstractValidator<EquSpotcheckPlanCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquSpotcheckPlanModifyDto> _validationModifyRules;
 
-        public EquSpotcheckPlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckPlanRepository equSpotcheckPlanRepository, AbstractValidator<EquSpotcheckPlanCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckPlanModifyDto> validationModifyRules, IEquSpotcheckPlanEquipmentRelationRepository equSpotcheckPlanEquipmentRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquSpotcheckTaskSnapshotItemRepository equSpotcheckTaskSnapshotItemRepository, IEquSpotcheckTaskSnapshotPlanRepository equSpotcheckTaskSnapshotPlanRepository, IEquSpotcheckTaskRepository equSpotcheckTaskRepository, IEquSpotcheckTaskItemRepository equSpotcheckTaskItemRepository, IEquSpotcheckPlanCoreService equSpotcheckPlanCoreService)
+        public EquSpotcheckPlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckPlanRepository equSpotcheckPlanRepository, AbstractValidator<EquSpotcheckPlanCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckPlanModifyDto> validationModifyRules, IEquSpotcheckPlanEquipmentRelationRepository equSpotcheckPlanEquipmentRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquSpotcheckTaskSnapshotItemRepository equSpotcheckTaskSnapshotItemRepository, IEquSpotcheckTaskSnapshotPlanRepository equSpotcheckTaskSnapshotPlanRepository, IEquSpotcheckTaskRepository equSpotcheckTaskRepository, IEquSpotcheckTaskItemRepository equSpotcheckTaskItemRepository, IEquSpotcheckPlanCoreService equSpotcheckPlanCoreService, IEventBus<EventBusInstance2> eventBus)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -104,6 +113,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             _equSpotcheckTaskRepository = equSpotcheckTaskRepository;
             _equSpotcheckTaskItemRepository = equSpotcheckTaskItemRepository;
             _equSpotcheckPlanCoreService = equSpotcheckPlanCoreService;
+            _eventBus = eventBus;
         }
 
 
@@ -122,13 +132,17 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(equSpotcheckPlanCreateDto);
-            if (equSpotcheckPlanCreateDto.CompletionMinute > 60)
+            if (equSpotcheckPlanCreateDto.CompletionMinute > 60 || equSpotcheckPlanCreateDto.CompletionMinute < 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12315));
             }
-            if (equSpotcheckPlanCreateDto.PreGeneratedMinute > 60)
+            if (equSpotcheckPlanCreateDto.PreGeneratedMinute > 60 || equSpotcheckPlanCreateDto.PreGeneratedMinute < 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12316));
+            }
+            if (equSpotcheckPlanCreateDto.BeginTime > equSpotcheckPlanCreateDto.EndTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12321));
             }
             if (equSpotcheckPlanCreateDto.FirstExecuteTime < equSpotcheckPlanCreateDto.BeginTime || equSpotcheckPlanCreateDto.FirstExecuteTime > equSpotcheckPlanCreateDto.EndTime)
             {
@@ -272,13 +286,17 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(equSpotcheckPlanModifyDto);
-            if (equSpotcheckPlanModifyDto.CompletionMinute > 60)
+            if (equSpotcheckPlanModifyDto.CompletionMinute > 60 || equSpotcheckPlanModifyDto.CompletionMinute < 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12315));
             }
-            if (equSpotcheckPlanModifyDto.PreGeneratedMinute > 60)
+            if (equSpotcheckPlanModifyDto.PreGeneratedMinute > 60 || equSpotcheckPlanModifyDto.PreGeneratedMinute < 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12316));
+            }
+            if (equSpotcheckPlanModifyDto.BeginTime > equSpotcheckPlanModifyDto.EndTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12321));
             }
             if (equSpotcheckPlanModifyDto.FirstExecuteTime < equSpotcheckPlanModifyDto.BeginTime || equSpotcheckPlanModifyDto.FirstExecuteTime > equSpotcheckPlanModifyDto.EndTime)
             {
@@ -530,6 +548,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         }
 
         #region 关联信息
+
         /// <summary>
         /// 获取模板关联信息（项目）
         /// </summary>

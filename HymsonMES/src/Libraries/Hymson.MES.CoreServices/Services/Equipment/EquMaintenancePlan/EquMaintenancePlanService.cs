@@ -9,6 +9,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Events.Equipment;
 using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
@@ -181,8 +182,8 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                 {
                     Code = await GenerateMaintenanceOrderCodeAsync(param.SiteId, param.UserName),
                     Name = EquMaintenancePlanEntity.Name,
-                    BeginTime = HymsonClock.Now(),
-                    EndTime = HymsonClock.Now(),
+                    //BeginTime = HymsonClock.Now(),
+                    //EndTime = HymsonClock.Now(),
                     Status = EquMaintenanceTaskStautusEnum.WaitInspect,
                     IsQualified = null,
                     Remark = EquMaintenancePlanEntity.Remark,
@@ -300,7 +301,7 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
 
 
         /// <summary>
-        /// 生成点检任务
+        /// 生成保养任务
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
@@ -313,6 +314,16 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                 MaintenancePlanId = param.MaintenancePlanId,
                 ExecType = param.ExecType
             });
+        }
+
+        /// <summary>
+        /// 停止保养任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>  
+        public async Task StopEquMaintenanceTaskAsync(EquMaintenanceAutoStopIntegrationEvent param)
+        {
+
         }
 
         #region 帮助

@@ -593,7 +593,8 @@
         public const string MES12317 = "提前执行时间(分钟)须在0-60之间";
         public const string MES12318 = "周期不能小于0";
         public const string MES12319 = "提前执行时间(小时不能小于0)";
-        public const string MES12320 = "首次执行时间需在范围内"; 
+        public const string MES12320 = "首次执行时间需在开始/结束时间范围内"; 
+        public const string MES12321 = "结束时间需大于开始时间"; 
 
 
         #endregion

@@ -1,20 +1,17 @@
 ﻿using Hymson.EventBus.Abstractions;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Quality;
-using Hymson.MES.CoreServices.Bos.Quality;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Hymson.MES.CoreServices.Events.Quality
+namespace Hymson.MES.CoreServices.Events.Equipment
 {
     /// <summary>
-    ///
-    /// </summary>
-    public record EquMaintenanceAutoCreateIntegrationEvent : IntegrationEvent 
+    ///开始任务参数
+    /// </summary> 
+    public record EquMaintenanceAutoCreateIntegrationEvent : IntegrationEvent
     {
+        /// <summary>
+        /// 保养ID
+        /// </summary>
+        public long MaintenancePlanId { get; set; }
+
         /// <summary>
         /// 站点 
         /// </summary>
@@ -26,13 +23,30 @@ namespace Hymson.MES.CoreServices.Events.Quality
         public string UserName { get; set; } = "";
 
         /// <summary>
-        /// 计划ID
-        /// </summary>
-        public long MaintenancePlanId { get; set; } 
-
-        /// <summary>
         /// 计划类型 手动 1 自动 0（自动不用传默认0）
         /// </summary>
         public int? ExecType { get; set; } = 0;
+
+        /// <summary>
+        /// 表达式
+        /// </summary>
+        public string CornExpression { get; set; }
+
+        /// <summary>
+        /// 首次执行时间
+        /// </summary>
+        public DateTime FirstExecuteTime { get; set; }
     }
+
+    /// <summary>
+    /// 停止任务参数
+    /// </summary> 
+    public record EquMaintenanceAutoStopIntegrationEvent : IntegrationEvent
+    {
+        /// <summary>
+        /// 保养
+        /// </summary>
+        public long MaintenancePlanId { get; set; }
+    }
+
 }

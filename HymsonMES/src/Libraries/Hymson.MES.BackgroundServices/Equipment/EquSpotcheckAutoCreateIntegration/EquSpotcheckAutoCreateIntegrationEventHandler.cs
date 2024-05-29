@@ -1,6 +1,5 @@
 ﻿using Hymson.EventBus.Abstractions;
-using Hymson.MES.CoreServices.Events.Quality;
-using Hymson.MES.CoreServices.Services.EquMaintenancePlan;
+using Hymson.MES.CoreServices.Events.Equipment;
 using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
 
 namespace Hymson.MES.BackgroundServices.Quality.EquSpotcheckAutoCreateIntegration

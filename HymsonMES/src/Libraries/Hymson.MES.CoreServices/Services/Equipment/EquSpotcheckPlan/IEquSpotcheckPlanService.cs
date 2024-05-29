@@ -1,4 +1,5 @@
 
+using Hymson.MES.CoreServices.Events.Equipment;
 using Hymson.MES.CoreServices.Events.Quality;
 
 namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
@@ -23,5 +24,11 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
         /// <returns></returns>
         Task GenerateEquSpotcheckTaskAsync(EquSpotcheckAutoCreateIntegrationEvent param);
 
+        /// <summary>
+        /// 停止点检任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns> 
+        Task StopEquSpotcheckTaskAsync(EquSpotcheckAutoStopIntegrationEvent param);
     }
 }
