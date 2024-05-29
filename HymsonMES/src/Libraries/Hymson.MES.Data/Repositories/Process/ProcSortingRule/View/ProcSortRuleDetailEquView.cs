@@ -47,5 +47,10 @@ namespace Hymson.MES.Data.Repositories.Process.ProcSortingRule.View
         /// 挡位ID
         /// </summary>
         public long GradeId { get; set; }
+
+        /// <summary>
+        /// 档位优先级
+        /// </summary>
+        public int Priority {  get; set; }
     }
 }

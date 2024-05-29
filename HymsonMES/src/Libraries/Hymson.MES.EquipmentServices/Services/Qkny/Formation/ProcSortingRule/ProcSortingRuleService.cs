@@ -45,11 +45,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.ProcSortingRule
 
             List<ProcSortRuleDto> resultList = new List<ProcSortRuleDto>();
 
-            var groupNameList = dbList.Select(m => m.Grade).Distinct().ToList();
+            var groupNameList = dbList.OrderBy(x => x.Priority).Select(m => m.Grade).Distinct().ToList();
             foreach (var groupItem in groupNameList) //遍历每个挡位，每个挡位下会有多个规则
             {
                 ProcSortRuleDto ruleDto = new ProcSortRuleDto();
                 ruleDto.Grade = groupItem;
+                ruleDto.Order = dbList.FirstOrDefault(x => x.Grade == groupItem)?.Priority ?? 0;
 
                 var groupIdList = dbList.Where(m => m.Grade == groupItem).Select(m => m.GradeId).Distinct().ToList();
                 foreach (var groupId in groupIdList) //遍历每个挡位的规则（一个规则可能包含多个条件）
