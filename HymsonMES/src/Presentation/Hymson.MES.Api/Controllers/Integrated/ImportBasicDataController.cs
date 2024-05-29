@@ -136,12 +136,12 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 物料数据导入
+        /// 参数数据导入
         /// </summary>
         /// <returns></returns>
         [HttpPost]
         [Route("importParameter")]
-        [LogDescription("物料数据导入", BusinessType.EXPORT)]
+        [LogDescription("参数数据导入", BusinessType.EXPORT)]
         public async Task ImportParameterDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _importBasicDataService.ImportParameterDataAsync(formFile);
