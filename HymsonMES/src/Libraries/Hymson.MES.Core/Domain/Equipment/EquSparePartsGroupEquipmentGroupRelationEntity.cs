@@ -15,10 +15,15 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// equ_spare_parts_group 的id
         /// </summary>
         public long? SparePartsGroupId { get; set; }
+
+        /// <summary>
+        /// equ_spare_parts_group 的id
+        /// </summary>
+        public long? SparePartTypeId{ get; set; }
 
        /// <summary>
         /// equ_equipment_grou  的id

@@ -26,6 +26,7 @@ using Hymson.MES.Data.Repositories.EquMaintenancePlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateItemRelation;
 using Hymson.MES.Services.Dtos.EquMaintenancePlan;
+using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -124,7 +125,22 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(EquMaintenancePlanCreateDto);
-
+            if (EquMaintenancePlanCreateDto.CompletionMinute > 60 || EquMaintenancePlanCreateDto.CompletionMinute < 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12315));
+            }
+            if (EquMaintenancePlanCreateDto.PreGeneratedMinute > 60 || EquMaintenancePlanCreateDto.PreGeneratedMinute < 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12316));
+            }
+            if (EquMaintenancePlanCreateDto.BeginTime > EquMaintenancePlanCreateDto.EndTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12321));
+            }
+            if (EquMaintenancePlanCreateDto.FirstExecuteTime < EquMaintenancePlanCreateDto.BeginTime || EquMaintenancePlanCreateDto.FirstExecuteTime > EquMaintenancePlanCreateDto.EndTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12320));
+            }
             var EquMaintenancePlan = await _EquMaintenancePlanRepository.GetByCodeAsync(new EquMaintenancePlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = EquMaintenancePlanCreateDto.Code, Version = EquMaintenancePlanCreateDto.Version });
             if (EquMaintenancePlan != null)
             {
@@ -264,7 +280,22 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(EquMaintenancePlanModifyDto);
-
+            if (EquMaintenancePlanModifyDto.CompletionMinute > 60)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12315));
+            }
+            if (EquMaintenancePlanModifyDto.PreGeneratedMinute > 60)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12316));
+            }
+            if (EquMaintenancePlanModifyDto.BeginTime > EquMaintenancePlanModifyDto.EndTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12321));
+            }
+            if (EquMaintenancePlanModifyDto.FirstExecuteTime < EquMaintenancePlanModifyDto.BeginTime || EquMaintenancePlanModifyDto.FirstExecuteTime > EquMaintenancePlanModifyDto.EndTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12320));
+            }
             var EquMaintenancePlan = await _EquMaintenancePlanRepository.GetByCodeAsync(new EquMaintenancePlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = EquMaintenancePlanModifyDto.Code, Version = EquMaintenancePlanModifyDto.Version });
             if (EquMaintenancePlan != null && EquMaintenancePlan.Id != EquMaintenancePlanModifyDto.Id)
             {

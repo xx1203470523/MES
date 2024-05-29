@@ -297,6 +297,18 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(equSpotcheckTemplateModifyDto);
 
+            var equSpotcheckTemplate = await _equSpotcheckTemplateRepository.GetByCodeAsync(new EquSpotcheckTemplateQuery
+            {
+                Code = equSpotcheckTemplateModifyDto.Code,
+                Version = equSpotcheckTemplateModifyDto.Version,
+                SiteId = _currentSite.SiteId,
+            });
+
+            if (equSpotcheckTemplate != null && equSpotcheckTemplate.Id != equSpotcheckTemplateModifyDto.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12202)).WithData("Code", equSpotcheckTemplateModifyDto.Code).WithData("Version", equSpotcheckTemplateModifyDto.Version);
+            }
+
             //DTO转换实体
             var equSpotcheckTemplateEntity = equSpotcheckTemplateModifyDto.ToEntity<EquSpotcheckTemplateEntity>();
             equSpotcheckTemplateEntity.SiteId = _currentSite.SiteId ?? 0;

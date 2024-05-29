@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -96,18 +97,21 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
-
+            sqlBuilder.OrderBy("CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Code))
             {
-                sqlBuilder.Where("Code=@Code");
+                EquMaintenancePlanPagedQuery.Code = $"%{EquMaintenancePlanPagedQuery.Code}%";
+                sqlBuilder.Where("Code LIKE @Code");
             }
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Name))
             {
-                sqlBuilder.Where("Name=@Name");
+                EquMaintenancePlanPagedQuery.Name = $"%{EquMaintenancePlanPagedQuery.Name}%";
+                sqlBuilder.Where("Name LIKE @Name");
             }
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Version))
             {
-                sqlBuilder.Where("Version=@Version");
+                EquMaintenancePlanPagedQuery.Version = $"%{EquMaintenancePlanPagedQuery.Version}%";
+                sqlBuilder.Where("Version LIKE @Version");
             }
             if (EquMaintenancePlanPagedQuery.Status.HasValue)
             {
@@ -204,7 +208,7 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
     public partial class EquMaintenancePlanRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_plan` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_plan` /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_Maintenance_plan` /**where**/ ";
         const string GetEquMaintenancePlanEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Report.MaterialDeductionRecord
                 var workOrder = workOrders.FirstOrDefault(x => x.Id == item.OutputBarCodeWorkOrderId);
                 var procedure = procedures.FirstOrDefault(x => x.Id == item.ProcedureId);
                 var resource = resources.FirstOrDefault(x => x.Id == item.ResourceId);
-                var bomUsgQty = bomDetails.FirstOrDefault(x => x.MaterialId == sfcInfo?.ProductId && x.ProcedureId == item.ProcedureId && x.BomId == sfcInfo.ProductBOMId);
+                var bomUsgQty = bomDetails.FirstOrDefault(x => x.MaterialId == sfcInfo?.ProductId && x.ProcedureId == item.ProcedureId && x.BomId == workOrder?.ProductBOMId);
                 listDto.Add(new MaterialDeductionRecordResultDto()
                 {
                     Sfc = item.OutputBarCode,

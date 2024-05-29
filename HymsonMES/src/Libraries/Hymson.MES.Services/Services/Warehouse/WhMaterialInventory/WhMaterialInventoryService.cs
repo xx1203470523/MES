@@ -868,7 +868,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
 
             var inputBarcodeSingle = new WhMaterialInventoryEntity();
-            var beforeBarcode = standbookList.Select(s => s.MaterialBarCode);
+            var beforeBarcode = standbookList.Select(s => s.MaterialBarCode).Distinct();
 
             if (IsMergeSFC)
             {

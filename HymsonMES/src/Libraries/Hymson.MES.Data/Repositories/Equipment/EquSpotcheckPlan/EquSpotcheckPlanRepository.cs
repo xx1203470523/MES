@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -96,18 +97,21 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
-
+            sqlBuilder.OrderBy("CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Code))
             {
-                sqlBuilder.Where("Code=@Code");
+                equSpotcheckPlanPagedQuery.Code = $"%{equSpotcheckPlanPagedQuery.Code}%";
+                sqlBuilder.Where("Code LIKE @Code");
             }
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Name))
             {
-                sqlBuilder.Where("Name=@Name");
+                equSpotcheckPlanPagedQuery.Name = $"%{equSpotcheckPlanPagedQuery.Name}%";
+                sqlBuilder.Where("Name LIKE @Name");
             }
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Version))
             {
-                sqlBuilder.Where("Version=@Version");
+                equSpotcheckPlanPagedQuery.Version = $"%{equSpotcheckPlanPagedQuery.Version}%";
+                sqlBuilder.Where("Version LIKE @Version");
             }
             if (equSpotcheckPlanPagedQuery.Status.HasValue)
             {
@@ -204,7 +208,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
     public partial class EquSpotcheckPlanRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spotcheck_plan` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spotcheck_plan` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spotcheck_plan` /**where**/ ";
         const string GetEquSpotcheckPlanEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

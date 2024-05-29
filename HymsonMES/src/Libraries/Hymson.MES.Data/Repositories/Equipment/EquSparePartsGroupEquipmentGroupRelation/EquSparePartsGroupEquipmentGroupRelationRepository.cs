@@ -49,8 +49,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<EquSparePartsGroupEquipmentGroupRelationEntity> entities)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+           
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(InsertsSql, entities);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
         /// <summary>
@@ -103,9 +112,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="command"></param>
         /// <returns></returns>
         public async Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeleteBySparePartsId, command);
+        {   
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(DeleteBySparePartsId, command);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         /// <summary>
@@ -177,36 +194,35 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>
     public partial class EquSparePartsGroupEquipmentGroupRelationRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spare_parts_group_equipment_group_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spare_parts_group_equipment_group_relation` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_sparepart_type_equipment_group_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_sparepart_type_equipment_group_relation` /**where**/ ";
         const string GetEquSparePartsGroupEquipmentGroupRelationEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `equ_spare_parts_group_equipment_group_relation` /**where**/  ";
+                                           FROM `equ_sparepart_type_equipment_group_relation` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_spare_parts_group_equipment_group_relation`(  `Id`, `SiteId`, `SparePartsGroupId`, `EquipmentGroupId`, `CreatedBy`, `CreatedOn`) VALUES (   @Id, @SiteId, @SparePartsGroupId, @EquipmentGroupId, @CreatedBy, @CreatedOn )  ";
-        const string InsertsSql = "INSERT INTO `equ_spare_parts_group_equipment_group_relation`(  `Id`, `SiteId`, `SparePartsGroupId`, `EquipmentGroupId`, `CreatedBy`, `CreatedOn`) VALUES (   @Id, @SiteId, @SparePartsGroupId, @EquipmentGroupId, @CreatedBy, @CreatedOn )  ";
+        const string InsertSql = "INSERT INTO `equ_sparepart_type_equipment_group_relation` (`SparePartTypeId`, `EquipmentGroupId`, `CreatedBy`, `CreatedOn` ) VALUES ( @SparePartsGroupId, @EquipmentGroupId, @CreatedBy, @CreatedOn ) ";
+        const string InsertsSql = "INSERT INTO `equ_sparepart_type_equipment_group_relation` (`SparePartTypeId`, `EquipmentGroupId`, `CreatedBy`, `CreatedOn`) VALUES ( @SparePartsGroupId, @EquipmentGroupId, @CreatedBy, @CreatedOn ) ";
 
-        const string UpdateSql = "UPDATE `equ_spare_parts_group_equipment_group_relation` SET   SiteId = @SiteId, SparePartsGroupId = @SparePartsGroupId, EquipmentGroupId = @EquipmentGroupId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_spare_parts_group_equipment_group_relation` SET   SiteId = @SiteId, SparePartsGroupId = @SparePartsGroupId, EquipmentGroupId = @EquipmentGroupId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_sparepart_type_equipment_group_relation` SET   SparePartTypeId = @SparePartTypeId, EquipmentGroupId = @EquipmentGroupId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `equ_sparepart_type_equipment_group_relation` SET   SparePartTypeId = @SparePartTypeId, EquipmentGroupId = @EquipmentGroupId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn  WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE `equ_spare_parts_group_equipment_group_relation` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `equ_spare_parts_group_equipment_group_relation` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteSql = "UPDATE `equ_sparepart_type_equipment_group_relation` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `equ_sparepart_type_equipment_group_relation` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM `equ_spare_parts_group_equipment_group_relation`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM `equ_spare_parts_group_equipment_group_relation`  WHERE Id IN @Ids ";
-        const string DeleteBySparePartsId = "DELETE FROM equ_spare_parts_group_equipment_group_relation WHERE SparePartsGroupId = @ParentId";
+        const string GetByIdSql = @"SELECT * FROM `equ_sparepart_type_equipment_group_relation`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `equ_sparepart_type_equipment_group_relation`  WHERE Id IN @Ids ";
+        const string DeleteBySparePartsId = "DELETE FROM equ_sparepart_type_equipment_group_relation WHERE SparePartTypeId = @ParentId";
 
         const string GetSparePartsEquipmentGroupRelationSqlTemplate = @"SELECT
-	                                                                        ESPGEGR.Id,
-	                                                                        ESPGEGR.SparePartsGroupId,
+	                                                                        ESPGEGR.SparePartTypeId,
 	                                                                        ESPGEGR.EquipmentGroupId,
 	                                                                        EEG.EquipmentGroupCode,
 	                                                                        EEG.EquipmentGroupName,
 	                                                                        ESPGEGR.CreatedBy,
 	                                                                        ESPGEGR.CreatedOn
                                                                         FROM
-	                                                                        equ_spare_parts_group ESPG
-                                                                         JOIN equ_spare_parts_group_equipment_group_relation ESPGEGR ON ESPGEGR.SparePartsGroupId = ESPG.Id 
+	                                                                        equ_sparepart_type ESPG
+                                                                         JOIN equ_sparepart_type_equipment_group_relation ESPGEGR ON ESPGEGR.SparePartTypeId = ESPG.Id 
                                                                          JOIN equ_equipment_group EEG ON EEG.Id=ESPGEGR.EquipmentGroupId
 
                                                                         WHERE

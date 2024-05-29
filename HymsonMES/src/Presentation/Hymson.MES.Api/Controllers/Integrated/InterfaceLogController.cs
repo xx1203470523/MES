@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.Logging;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteIntefaceLog;
 using Microsoft.AspNetCore.Authorization;
@@ -34,7 +35,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<InteIntefaceLogDto>> QueryPagedListAsync([FromQuery] InteIntefaceLogPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<TraceLogEntry>> QueryPagedListAsync([FromQuery] InteIntefaceLogPagedQueryDto pagedQueryDto)
         {
             return await _inteIntefaceLogService.GetPagedListAsync(pagedQueryDto);
         }
@@ -45,11 +46,11 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<InteIntefaceLogDto> QueryByIdAsync(long id)
+        public async Task<TraceLogEntry> QueryByIdAsync(long id)
         {
             var query = new InteIntefaceLogPagedQueryDto() { Id = id.ToString(), PageSize = 10, PageIndex = 1 };
             var dtos = await _inteIntefaceLogService.GetPagedListAsync(query);
-            return dtos.Data.FirstOrDefault() ?? new InteIntefaceLogDto();
+            return dtos.Data.FirstOrDefault() ?? new TraceLogEntry();
         }
 
     }

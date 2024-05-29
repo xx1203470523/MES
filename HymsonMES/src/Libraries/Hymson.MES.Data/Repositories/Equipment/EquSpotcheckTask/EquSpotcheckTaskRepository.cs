@@ -144,7 +144,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             if (pagedQuery.TaskIds != null && pagedQuery.TaskIds.Any())
             {
-                sqlBuilder.Where("st.Id IN (@TaskIds)");
+                sqlBuilder.Where("st.Id IN @TaskIds");
             }
             //任务编码
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
@@ -177,10 +177,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
                 sqlBuilder.Where("st.IsQualified = @IsQualified");
             }
             //计划开始结束时间
-            if (pagedQuery.PlanStartTime != null && pagedQuery.PlanStartTime.Length >= 2)
+            if (pagedQuery.PlanBeginTime != null && pagedQuery.PlanBeginTime.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { PlanStartTimeStart = pagedQuery.PlanStartTime[0], PlanStartTimeEnd = pagedQuery.PlanStartTime[1].AddDays(1) });
-                sqlBuilder.Where("stsp.BeginTime >= @PlanStartTimeStart AND stsp.EndTime < @PlanStartTimeEnd");
+                sqlBuilder.AddParameters(new { PlanStartTimeStart = pagedQuery.PlanBeginTime[0], PlanStartTimeEnd = pagedQuery.PlanBeginTime[1].AddDays(1) });
+                sqlBuilder.Where("stsp.BeginTime >= @PlanStartTimeStart AND stsp.BeginTime <= @PlanStartTimeEnd");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;

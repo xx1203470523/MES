@@ -124,11 +124,12 @@ namespace Hymson.MES.Services.Services.Equipment
             var entity = saveDto.ToEntity<EquSparePartsEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
+            entity.SiteId= _currentSite.SiteId ?? 0;
 
-            if (entity.SparePartsGroupId == 0)
+            if (entity.SparePartTypeId == 0)
             {
                 var equSparePartsEntity = await _equSparePartsRepository.GetByIdAsync(entity.Id);
-                entity.SparePartsGroupId = equSparePartsEntity.SparePartsGroupId;
+                entity.SparePartTypeId = equSparePartsEntity.SparePartTypeId;
             }
 
 
@@ -178,9 +179,9 @@ namespace Hymson.MES.Services.Services.Equipment
             var equSparePartsEntity = await _equSparePartsRepository.GetByIdAsync(id);
             if (equSparePartsEntity == null) return null;
 
-            if (equSparePartsEntity.SparePartsGroupId.HasValue)
+            if (equSparePartsEntity.SparePartTypeId.HasValue)
             {
-             var equSparePartTypeEntity = await _equSparePartsGroupRepository.GetByIdAsync(equSparePartsEntity.SparePartsGroupId??0);
+             var equSparePartTypeEntity = await _equSparePartsGroupRepository.GetByIdAsync(equSparePartsEntity.SparePartTypeId ?? 0);
                 equSparePartsEntity.SparePartsGroup = equSparePartTypeEntity?.Code;
             }
           
@@ -242,7 +243,7 @@ namespace Hymson.MES.Services.Services.Equipment
                         Id = item.Id,
                         Code = item.Code,
                         Name = item.Name,
-                        SparePartsGroupId = item.SparePartsGroupId,
+                        SparePartTypeId = item.SparePartTypeId,
                         CreatedBy = item.CreatedBy,
                         IsDeleted = item.IsDeleted,
                         CreatedOn = item.CreatedOn
