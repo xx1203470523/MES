@@ -5,24 +5,23 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
-using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
-using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Org.BouncyCastle.Crypto;
+using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Quality
@@ -52,6 +51,10 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualMaterialUnqualifiedDataRepository _qualMaterialUnqualifiedDataRepository;
         private readonly IQualMaterialUnqualifiedDataDetailRepository _unqualifiedDataDetailRepository;
         private readonly IWhMaterialInventoryRepository _inventoryRepository;
+        /// <summary>
+        /// 物料台账 仓储
+        /// </summary>
+        private readonly IWhMaterialStandingbookRepository _standingbookRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IQualUnqualifiedGroupRepository _unqualifiedGroupRepository;
         private readonly IQualUnqualifiedCodeRepository _unqualifiedCodeRepository;
@@ -64,6 +67,7 @@ namespace Hymson.MES.Services.Services.Quality
             IQualMaterialUnqualifiedDataRepository qualMaterialUnqualifiedDataRepository,
             IQualMaterialUnqualifiedDataDetailRepository unqualifiedDataDetailRepository,
             IWhMaterialInventoryRepository inventoryRepository,
+            IWhMaterialStandingbookRepository standingbookRepository,
             IProcMaterialRepository procMaterialRepository,
             IQualUnqualifiedGroupRepository unqualifiedGroupRepository,
             IQualUnqualifiedCodeRepository unqualifiedCodeRepository)
@@ -74,6 +78,7 @@ namespace Hymson.MES.Services.Services.Quality
             _qualMaterialUnqualifiedDataRepository = qualMaterialUnqualifiedDataRepository;
             _unqualifiedDataDetailRepository = unqualifiedDataDetailRepository;
             _inventoryRepository = inventoryRepository;
+            _standingbookRepository = standingbookRepository;
             _procMaterialRepository = procMaterialRepository;
             _unqualifiedGroupRepository = unqualifiedGroupRepository;
             _unqualifiedCodeRepository = unqualifiedCodeRepository;
@@ -112,6 +117,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17504));
             }
+            var procMaterialEntity =await _procMaterialRepository.GetByIdAsync(inventoryEntity.MaterialId);
 
             //物料条码是否已记录不良且不良状态为打开，若是，则报错：物料条码XXX已录入不良且未进行不良处置
             var qualMaterials = await _qualMaterialUnqualifiedDataRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataQuery
@@ -144,6 +150,24 @@ namespace Hymson.MES.Services.Services.Quality
                 SiteId = _currentSite.SiteId ?? 0
             };
 
+            var standingbookEntity = new WhMaterialStandingbookEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                MaterialCode = procMaterialEntity?.MaterialCode ?? "",
+                MaterialName = procMaterialEntity?.MaterialName ?? "",
+                MaterialVersion = procMaterialEntity?.Version ?? "",
+                Unit = procMaterialEntity?.Unit ?? "",
+                Batch = procMaterialEntity?.Batch ?? "",
+                MaterialBarCode = inventoryEntity.MaterialBarCode,
+                Quantity = inventoryEntity.QuantityResidue,
+                Type = WhMaterialInventoryTypeEnum.BadEntry,
+                Source = MaterialInventorySourceEnum.BadEntry,
+                SiteId = _currentSite.SiteId ?? 0,
+                CreatedBy = _currentUser.UserName,
+                UpdatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedOn = HymsonClock.Now()
+            };
             var detailEntities = new List<QualMaterialUnqualifiedDataDetailEntity>();
             //记录详情
             foreach (var detail in saveDto.DetailDtos)
@@ -169,6 +193,9 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 // 保存
                 await _qualMaterialUnqualifiedDataRepository.InsertAsync(entity);
+
+                //记录物料台账
+                await _standingbookRepository.InsertAsync(standingbookEntity);
 
                 //保存详情
                 if (detailEntities.Any())
@@ -280,10 +307,34 @@ namespace Hymson.MES.Services.Services.Quality
                 Ids = new[] { entityOld.MaterialInventoryId }
             };
 
+            var inventoryEntity = await _inventoryRepository.GetByIdAsync(entityOld.MaterialInventoryId);
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(inventoryEntity?.MaterialId??0);
+            var standingbookEntity = new WhMaterialStandingbookEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                MaterialCode = procMaterialEntity?.MaterialCode ?? "",
+                MaterialName = procMaterialEntity?.MaterialName ?? "",
+                MaterialVersion = procMaterialEntity?.Version ?? "",
+                Unit = procMaterialEntity?.Unit ?? "",
+                Batch = procMaterialEntity?.Batch ?? "",
+                MaterialBarCode = inventoryEntity?.MaterialBarCode??"",
+                Quantity = inventoryEntity?.QuantityResidue??0,
+                Type = WhMaterialInventoryTypeEnum.BadDisposal,
+                Source = MaterialInventorySourceEnum.BadEntry,
+                SiteId = _currentSite.SiteId ?? 0,
+                CreatedBy = _currentUser.UserName,
+                UpdatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedOn = HymsonClock.Now()
+            };
+
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 // 保存
                 await _qualMaterialUnqualifiedDataRepository.UpdateAsync(entityOld);
+
+                //记录物料台账
+                await _standingbookRepository.InsertAsync(standingbookEntity);
 
                 //如果处置方式为放行解锁，若处置方式为退料不解锁
                 if (disposalDto.DisposalResult == QualMaterialDisposalResultEnum.Release)
