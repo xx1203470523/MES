@@ -588,8 +588,12 @@
         public const string MES12312 = "保养单号生成失败：编码规则错误，不允许同时存在多条设备保养类型编码规则！";
         public const string MES12313 = "计划【{Code}】已启用，不允许删除";
         public const string MES12314 = "计划【{Code}】已禁用，请启用后再生成任务！";
-        public const string MES12315 = "截止执行时间(分钟)不能超过60";
-        public const string MES12316 = "提前执行时间(分钟)不能超过60"; 
+        public const string MES12315 = "截止执行时间(分钟)须在0-60之间";
+        public const string MES12316 = "提前执行时间(分钟)须在0-60之间";
+        public const string MES12317 = "提前执行时间(分钟)须在0-60之间";
+        public const string MES12318 = "周期不能小于0";
+        public const string MES12319 = "提前执行时间(小时不能小于0)";
+        public const string MES12320 = "首次执行时间需在范围内"; 
 
 
         #endregion

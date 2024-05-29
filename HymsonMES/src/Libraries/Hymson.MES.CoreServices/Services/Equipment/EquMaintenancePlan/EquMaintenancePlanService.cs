@@ -9,6 +9,8 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Events.Quality;
+using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -297,6 +299,21 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
         }
 
 
+        /// <summary>
+        /// 生成点检任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task GenerateEquMaintenanceTaskAsync(EquMaintenanceAutoCreateIntegrationEvent param)
+        {
+            await GenerateEquMaintenanceTaskAsync(new GenerateEquMaintenanceTaskDto
+            {
+                SiteId = param.SiteId,
+                UserName = param.UserName,
+                MaintenancePlanId = param.MaintenancePlanId,
+                ExecType = param.ExecType
+            });
+        }
 
         #region 帮助
         private static string GetWeekToInt(string weekName)

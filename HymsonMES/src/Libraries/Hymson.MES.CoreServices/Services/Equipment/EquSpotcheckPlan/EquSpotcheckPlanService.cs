@@ -7,6 +7,7 @@ using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -19,6 +20,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Security.Policy;
 
 namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
 {
@@ -95,6 +97,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
         }
+
         /// <summary>
         /// 生成点检任务
         /// </summary>
@@ -295,6 +298,22 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
 
         }
 
+
+        /// <summary>
+        /// 生成点检任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task GenerateEquSpotcheckTaskAsync(EquSpotcheckAutoCreateIntegrationEvent param)
+        {
+            await GenerateEquSpotcheckTaskAsync(new GenerateEquSpotcheckTaskDto
+            {
+                SiteId = param.SiteId,
+                UserName = param.UserName,
+                SpotCheckPlanId = param.SpotCheckPlanId,
+                ExecType = param.ExecType
+            });
+        }
 
         #region 帮助
         private static string GetWeekToInt(string weekName)

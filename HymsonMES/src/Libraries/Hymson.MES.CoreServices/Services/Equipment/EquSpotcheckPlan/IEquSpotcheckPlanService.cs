@@ -1,10 +1,12 @@
 
+using Hymson.MES.CoreServices.Events.Quality;
+
 namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
 {
     /// <summary>
     /// 设备点检计划 service接口
     /// </summary>
-    public interface IEquSpotcheckPlanCoreService 
+    public interface IEquSpotcheckPlanCoreService
     {
         /// <summary>
         /// 生成点检任务
@@ -12,6 +14,14 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
         /// <param name="param"></param>
         /// <returns></returns>
         Task GenerateEquSpotcheckTaskAsync(GenerateEquSpotcheckTaskDto param);
+
+
+        /// <summary>
+        /// 生成点检任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task GenerateEquSpotcheckTaskAsync(EquSpotcheckAutoCreateIntegrationEvent param);
 
     }
 }
