@@ -911,12 +911,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             List<ManuSfcStepEntity> manuSfcStepEntities = new();//步骤记录
             List<WhMaterialStandingbookEntity> whMaterialStandingbookEntitys = new();
 
-            var workCenterId = isAllProduceSFC ? firstManuSFCProduceEntity?.WorkCenterId : null;
-            var productBOMId = isAllProduceSFC ? firstManuSFCProduceEntity?.ProductBOMId : workOrders?.FirstOrDefault(x => x.Id == firstManuSFCView.WorkOrderId)?.ProductBOMId;
-            var processRouteId = isAllProduceSFC ? firstManuSFCProduceEntity?.ProcessRouteId : null;
-            var procedureId = isAllProduceSFC ? firstManuSFCProduceEntity?.ProcedureId : null;
-            var resourceId = isAllProduceSFC ? firstManuSFCProduceEntity?.ResourceId : null;
-            var equipmentId = isAllProduceSFC ? firstManuSFCProduceEntity?.EquipmentId : null;
+            var workCenterId = firstManuSFCProduceEntity?.WorkCenterId;
+            var productBOMId = firstManuSFCProduceEntity?.ProductBOMId;
+            var processRouteId = firstManuSFCProduceEntity?.ProcessRouteId;
+            var procedureId = firstManuSFCProduceEntity?.ProcedureId;
+            var resourceId = firstManuSFCProduceEntity?.ResourceId;
+            var equipmentId = firstManuSFCProduceEntity?.EquipmentId;
 
             #region 父条码
             // 合并后条码的步骤ID
@@ -931,14 +931,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SFC = item.SFC,
                     ProductId = item.ProductId,
                     WorkOrderId = item.WorkOrderId,
-                    WorkCenterId = workCenterId,
-                    ProductBOMId = productBOMId,
-                    ProcedureId = procedureId,
+                    WorkCenterId = item.WorkOrderId,
+                    ProductBOMId = item.ProductBOMId,
+                    ProcedureId = resourceId,
                     ResourceId = resourceId,
-                    ProcessRouteId = processRouteId,
+                    ProcessRouteId = item.ProcessRouteId,
                     EquipmentId = equipmentId,
                     Qty = item.Qty,
-                    CurrentStatus = SfcStatusEnum.Invalid,
+                    CurrentStatus = item.Status,
                     Operatetype = ManuSfcStepTypeEnum.SfcMerge,
                     Remark = mergeDto.Remark,
                     SiteId = siteId,
