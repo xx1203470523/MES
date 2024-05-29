@@ -96,7 +96,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
-
+            sqlBuilder.OrderBy("CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Code))
             {
                 sqlBuilder.Where("Code=@Code");
@@ -204,7 +204,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
     public partial class EquSpotcheckPlanRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spotcheck_plan` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spotcheck_plan` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spotcheck_plan` /**where**/ ";
         const string GetEquSpotcheckPlanEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
