@@ -22,7 +22,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long? SparePartsGroupId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// equ_spare_parts_group 的id
+        /// </summary>
+        public long? SparePartTypeId { get; set; }
+
+        /// <summary>
         /// equ_equipment_grou  的id
         /// </summary>
         public long? EquipmentGroupId { get; set; }
@@ -70,7 +75,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long? SparePartsGroupId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// equ_spare_parts_group 的id
+        /// </summary>
+        public long? SparePartTypeId { get; set; }
+
+        /// <summary>
         /// equ_equipment_grou  的id
         /// </summary>
         public long? EquipmentGroupId { get; set; }
