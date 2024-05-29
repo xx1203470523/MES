@@ -115,6 +115,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         private readonly IEquEquipmentVerifyRepository _equEquipmentVerifyRepository;
 
         /// <summary>
+        /// 设备token
+        /// </summary>
+        private readonly IEquEquipmentTokenRepository _equEquipmentTokenRepository;
+
+        /// <summary>
         /// 登录记录
         /// </summary>
         private readonly IEquEquipmentLoginRecordService _equEquipmentLoginRecordService;
@@ -214,7 +219,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             AbstractValidator<ProductParamDto> validationProductParamDto,
             IManuProductParameterService manuProductParameterService,
             IMinioService minioService,
-            IProcessCollectionService processCollectionService)
+            IProcessCollectionService processCollectionService,
+            IEquEquipmentTokenRepository equEquipmentTokenRepository)
         {
             _equEquipmentService = equEquipmentService;
             _equEquipmentVerifyRepository = equEquipmentVerifyRepository;
@@ -244,6 +250,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             _manuProductParameterService = manuProductParameterService;
             _minioService = minioService;
             _processCollectionService = processCollectionService;
+            _equEquipmentTokenRepository = equEquipmentTokenRepository;
         }
 
         /// <summary>
@@ -261,12 +268,17 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             var verifyList = await _equEquipmentVerifyRepository.GetEquipmentVerifyByEquipmentIdAsync(equipmentId);
             if (verifyList == null || !verifyList.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45011)).WithData("EquipmentCode", dto.EquipmentCode); ;
+                throw new CustomerValidationException(nameof(ErrorCode.MES45011)).WithData("EquipmentCode", dto.EquipmentCode);
             }
             var verifyModel = verifyList.Where(m => m.Account == dto.OperatorUserID && m.Password == dto.OperatorPassword).FirstOrDefault();
             if (verifyModel == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45012)).WithData("EquipmentCode", dto.EquipmentCode); ;
+                throw new CustomerValidationException(nameof(ErrorCode.MES45012)).WithData("EquipmentCode", dto.EquipmentCode);
+            }
+            var tokenModel = await _equEquipmentTokenRepository.GetByEquipmentIdAsync(equipmentId);
+            if(tokenModel == null || string.IsNullOrEmpty(tokenModel.Token) == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45014)).WithData("EquipmentCode", dto.EquipmentCode);
             }
             //3.1 新增登录记录
             EquEquipmentLoginRecordSaveDto loginRecordDto = new EquEquipmentLoginRecordSaveDto();
@@ -299,6 +311,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
 
             OperationLoginReturnDto result = new OperationLoginReturnDto();
             result.AccountType = ((int)verifyModel.AccountType).ToString();
+            result.Authorization = $"Bearer {tokenModel.Token}";
 
             return result;
         }
