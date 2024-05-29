@@ -113,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 		            t7.id LineId, t7.Code LineWorkCenterCode, t7.Name LineWorkCenterName,
 	                t9.id WorkShopId, t9.Code WorkShopCode, t9.Name WorkShopName
             from equ_equipment t1
-            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0 and t2.IsMain = 1
+            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0
             inner join proc_resource t3 on t3.Id = t2.ResourceId and t3.IsDeleted = 0
             inner join proc_resource_type t4 on t4.Id = t3.ResTypeId and t4.IsDeleted = 0
             inner join proc_procedure t5 on t5.ResourceTypeId = t3.ResTypeId and t5.IsDeleted = 0
@@ -137,7 +137,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 		            t7.id LineId, t7.Code LineWorkCenterCode, t7.Name LineWorkCenterName,
 	                t9.id WorkShopId, t9.Code WorkShopCode, t9.Name WorkShopName
             from equ_equipment t1
-            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0 and t2.IsMain = 1
+            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0
             inner join proc_resource t3 on t3.Id = t2.ResourceId and t3.IsDeleted = 0
             inner join proc_resource_type t4 on t4.Id = t3.ResTypeId and t4.IsDeleted = 0
             inner join proc_procedure t5 on t5.ResourceTypeId = t3.ResTypeId and t5.IsDeleted = 0
@@ -157,7 +157,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             select  t1.id EquipmentId, t1.EquipmentCode, t1.EquipmentName ,t1.SiteId,
 		            t3.id ResId, t3.ResCode ,t3.ResName
             from equ_equipment t1
-            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0 and t2.IsMain = 1
+            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0
             inner join proc_resource t3 on t3.Id = t2.ResourceId and t3.IsDeleted = 0
             where t1.EquipmentCode = @EquipmentCode
             and t1.IsDeleted = 0
@@ -172,7 +172,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 		            t3.id ResId, t3.ResCode ,t3.ResName ,
 		            t7.id LineId, t7.Code LineWorkCenterCode, t7.Name LineWorkCenterName
             from equ_equipment t1
-            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0 and t2.IsMain = 1
+            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0
             inner join proc_resource t3 on t3.Id = t2.ResourceId and t3.IsDeleted = 0
             inner join inte_work_center_resource_relation t6 on t6.ResourceId = t3.Id and t6.IsDeleted = 0
             inner join inte_work_center t7 on t7.Id = t6.WorkCenterId and t7.IsDeleted = 0  
@@ -190,7 +190,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 		            t4.id ResTypeId, t4.ResType ,t4.ResTypeName ,
 		            t5.id procedureId ,t5.Code procedureCode, t5.Name procedureName
             from equ_equipment t1
-            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0 and t2.IsMain = 1
+            inner join proc_resource_equipment_bind t2 on t1.Id = t2.EquipmentId and t2.IsDeleted = 0
             inner join proc_resource t3 on t3.Id = t2.ResourceId and t3.IsDeleted = 0
             inner join proc_resource_type t4 on t4.Id = t3.ResTypeId and t4.IsDeleted = 0
             inner join proc_procedure t5 on t5.ResourceTypeId = t3.ResTypeId and t5.IsDeleted = 0

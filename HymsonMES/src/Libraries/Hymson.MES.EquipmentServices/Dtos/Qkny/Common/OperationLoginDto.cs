@@ -31,5 +31,10 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Common
         /// 账号类型
         /// </summary>
         public string AccountType { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 验证字段
+        /// </summary>
+        public string Authorization { get; set; } = string.Empty;
     }
 }

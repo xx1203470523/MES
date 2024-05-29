@@ -56,6 +56,11 @@ namespace Hymson.MES.Core.Constants
         /// </summary>
         public const string MES45013 = "用户名或密码不能为空";
 
+        /// <summary>
+        /// 设备没有维护对应的token
+        /// </summary>
+        public const string MES45014 = "【{EquipmentCode}】设备没有维护对应的token";
+
         #endregion
 
         #region 开机参数

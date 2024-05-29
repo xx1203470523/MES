@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.Logging;
 using Hymson.MES.Services.Dtos.Integrated;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 {
     public interface IInteIntefaceLogService
     {
-        Task<PagedInfo<InteIntefaceLogDto>> GetPagedListAsync(InteIntefaceLogPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<TraceLogEntry>> GetPagedListAsync(InteIntefaceLogPagedQueryDto pagedQueryDto);
 
         //Task<InteIntefaceLogDto?> QueryByIdAsync(long id);
 
