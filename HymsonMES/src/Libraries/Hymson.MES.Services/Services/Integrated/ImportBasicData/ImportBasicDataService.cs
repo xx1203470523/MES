@@ -1555,6 +1555,12 @@ namespace Hymson.MES.Services.Services.Integrated
             var addParameters = new List<ProcParameterEntity>();
             var updateParameters = new List<ProcParameterEntity>();
             var linkTypeEntities = new List<ProcParameterLinkTypeEntity>();
+            IEnumerable<ProcParameterLinkTypeEntity> existTypeEntities = new List<ProcParameterLinkTypeEntity>();
+            if (parameterEntities.Any())
+            {
+                var parameterIds = parameterEntities.Select(x => x.Id).ToArray();
+                existTypeEntities = await _parameterLinkTypeRepository.GetByParameterIdsAsync(parameterIds);
+            }
 
             var errorMessage = new StringBuilder("");
             var row = 0;
@@ -1617,57 +1623,73 @@ namespace Hymson.MES.Services.Services.Integrated
                 //环境参数
                 if (entity.IsEnvironment.HasValue && entity.IsEnvironment == TrueOrFalseEnum.Yes)
                 {
-                    linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                    var linkTypeEntity=existTypeEntities.FirstOrDefault(x => x.ParameterID == parameterId && x.ParameterType == ParameterTypeEnum.Environment);
+                    if (linkTypeEntity== null)
                     {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        ParameterID = parameterId,
-                        ParameterType = ParameterTypeEnum.Environment,
-                        CreatedBy = _currentUser.UserName,
-                        UpdatedBy = _currentUser.UserName,
-                        SiteId = _currentSite.SiteId ?? 0
-                    });
+                        linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            ParameterID = parameterId,
+                            ParameterType = ParameterTypeEnum.Environment,
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            SiteId = _currentSite.SiteId ?? 0
+                        });
+                    }
                 }
 
                 //设备参数
                 if (entity.IsEquipment.HasValue && entity.IsEquipment == TrueOrFalseEnum.Yes)
                 {
-                    linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                    var linkTypeEntity = existTypeEntities.FirstOrDefault(x => x.ParameterID == parameterId && x.ParameterType == ParameterTypeEnum.Equipment);
+                    if (linkTypeEntity == null)
                     {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        ParameterID = parameterId,
-                        ParameterType = ParameterTypeEnum.Equipment,
-                        CreatedBy = _currentUser.UserName,
-                        UpdatedBy = _currentUser.UserName,
-                        SiteId = _currentSite.SiteId ?? 0
-                    });
+                        linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            ParameterID = parameterId,
+                            ParameterType = ParameterTypeEnum.Equipment,
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            SiteId = _currentSite.SiteId ?? 0
+                        });
+                    }
                 }
 
                 //品质参数
                 if (entity.IsIQC.HasValue && entity.IsIQC == TrueOrFalseEnum.Yes)
                 {
-                    linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                    var linkTypeEntity = existTypeEntities.FirstOrDefault(x => x.ParameterID == parameterId && x.ParameterType == ParameterTypeEnum.IQC);
+                    if (linkTypeEntity == null)
                     {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        ParameterID = parameterId,
-                        ParameterType = ParameterTypeEnum.IQC,
-                        CreatedBy = _currentUser.UserName,
-                        UpdatedBy = _currentUser.UserName,
-                        SiteId = _currentSite.SiteId ?? 0
-                    });
+                        linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            ParameterID = parameterId,
+                            ParameterType = ParameterTypeEnum.IQC,
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            SiteId = _currentSite.SiteId ?? 0
+                        });
+                    }
                 }
 
                 //产品参数
                 if (entity.IsProduct.HasValue && entity.IsProduct == TrueOrFalseEnum.Yes)
                 {
-                    linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                    var linkTypeEntity = existTypeEntities.FirstOrDefault(x => x.ParameterID == parameterId && x.ParameterType == ParameterTypeEnum.Product);
+                    if (linkTypeEntity == null)
                     {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        ParameterID = parameterId,
-                        ParameterType = ParameterTypeEnum.Product,
-                        CreatedBy = _currentUser.UserName,
-                        UpdatedBy = _currentUser.UserName,
-                        SiteId = _currentSite.SiteId ?? 0
-                    });
+                        linkTypeEntities.Add(new ProcParameterLinkTypeEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            ParameterID = parameterId,
+                            ParameterType = ParameterTypeEnum.Product,
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            SiteId = _currentSite.SiteId ?? 0
+                        });
+                    }
                 }
             }
 
