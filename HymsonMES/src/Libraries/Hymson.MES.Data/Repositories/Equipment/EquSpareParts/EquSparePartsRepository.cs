@@ -71,8 +71,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> CleanTypeAsync(UpdateSparePartsTypeEntity entity)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(CleanTypeSql, entity);
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(CleanTypeSql, entity);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+           
         }
 
         /// <summary>
@@ -148,8 +157,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<IEnumerable<EquSparePartsEntity>> GetSparePartsGroupRelationAsync(long Id)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquSparePartsEntity>(GetSparePartsGroupRelationSqlTemplate, new { Id = Id });
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<EquSparePartsEntity>(GetSparePartsGroupRelationSqlTemplate, new { Id = Id });
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+     
         }
 
         /// <summary>
@@ -237,7 +255,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             sqlBuilder.Where("esp.IsDeleted = 0");
 
-            sqlBuilder.Where("(esp.SparePartId is null Or esp.SparePartId=0 Or esp.SparePartId=@Id)");
+            sqlBuilder.Where("(esp.SparePartTypeId is null Or esp.SparePartTypeId=0 Or esp.SparePartTypeId=@Id)");
 
             sqlBuilder.OrderBy("esp.UpdatedOn DESC");
 
@@ -273,8 +291,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string UpdateSql = "UPDATE `equ_sparepart`  SET   SiteId = @SiteId, Code = @Code, Name = @Name, Manufacturer = @Manufacturer, SupplierId = @SupplierId, Status = @Status, SparePartTypeId = @SparePartTypeId, DrawCode = @DrawCode, Specifications = @Specifications, Position = @Position, IsCritical = @IsCritical, IsStandard = @IsStandard, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Qty = @Qty WHERE Id = @Id";
         const string UpdatesSql = "UPDATE `equ_sparepart` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Manufacturer = @Manufacturer, Supplier = @Supplier, Status = @Status, SparePartId = @SparePartId, DrawCode = @DrawCode, Model = @Model, Position = @Position, IsAssociatedDevice = @IsAssociatedDevice, IsStandardPart = @IsStandardPart, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Qty = @Qty  WHERE Id = @Id ";
-        const string UpdateTypeSql = "UPDATE `equ_sparepart` SET  SparePartId = @Id, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @SparePartIds ";
-        const string CleanTypeSql = "UPDATE equ_sparepart SET SparePartId=0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn where SparePartId in @SparePartGroupIds";
+        const string UpdateTypeSql = "UPDATE `equ_sparepart` SET  SparePartTypeId = @Id, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @SparePartIds ";
+        const string CleanTypeSql = "UPDATE equ_sparepart SET SparePartTypeId=0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn where SparePartTypeId in @SparePartGroupIds";
 
         const string DeleteSql = "UPDATE `equ_sparepart` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `equ_sparepart` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -288,7 +306,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 	                                                                       Id,
 	                                                                       Code,
 	                                                                       Name,
-	                                                                       SparePartId,
+	                                                                       SparePartTypeId,
                                                                            IsDeleted,
 	                                                                       CreatedBy,
 	                                                                       CreatedOn
@@ -296,7 +314,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 	                                                                        equ_sparepart 
 
                                                                         WHERE
-	                                                                        SparePartId = @Id 
+	                                                                        SparePartTypeId = @Id 
 	                                                                        AND IsDeleted = 0";
 
     }

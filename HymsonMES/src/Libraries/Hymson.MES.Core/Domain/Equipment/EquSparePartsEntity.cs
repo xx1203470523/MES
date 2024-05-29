@@ -94,7 +94,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 供应商ID;wh_supplier表的Id-2024
         /// </summary>
-        public long? SparePartId { get; set; }
+        public long? SupplierId { get; set; }
 
         /// <summary>
         /// 规格型号-2024
@@ -110,11 +110,6 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 是否标准件;0、否 1、是-2024
         /// </summary>
         public YesOrNoEnum? IsStandard { get; set; }
-
-        /// <summary>
-        /// 供应商ID-2024
-        /// </summary>
-        public long? SupplierId { get; set; }
 
     }
 
