@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -99,15 +100,18 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
             sqlBuilder.OrderBy("CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Code))
             {
-                sqlBuilder.Where("Code=@Code");
+                equSpotcheckPlanPagedQuery.Code = $"%{equSpotcheckPlanPagedQuery.Code}%";
+                sqlBuilder.Where("Code LIKE @Code");
             }
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Name))
             {
-                sqlBuilder.Where("Name=@Name");
+                equSpotcheckPlanPagedQuery.Name = $"%{equSpotcheckPlanPagedQuery.Name}%";
+                sqlBuilder.Where("Name LIKE @Name");
             }
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Version))
             {
-                sqlBuilder.Where("Version=@Version");
+                equSpotcheckPlanPagedQuery.Version = $"%{equSpotcheckPlanPagedQuery.Version}%";
+                sqlBuilder.Where("Version LIKE @Version");
             }
             if (equSpotcheckPlanPagedQuery.Status.HasValue)
             {

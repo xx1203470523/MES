@@ -110,7 +110,8 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
             }
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Version))
             {
-                sqlBuilder.Where("Version=@Version");
+                EquMaintenancePlanPagedQuery.Version = $"%{EquMaintenancePlanPagedQuery.Version}%";
+                sqlBuilder.Where("Version LIKE @Version");
             }
             if (EquMaintenancePlanPagedQuery.Status.HasValue)
             {
