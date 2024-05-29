@@ -85,8 +85,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand command) 
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesSql, command);
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(DeletesSql, command);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
 
         /// <summary>
@@ -186,23 +195,23 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>
     public partial class EquSparePartsGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spare_parts_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spare_parts_group` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_sparepart_type` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_sparepart_type` /**where**/ ";
         const string GetEquSparePartsGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `equ_spare_parts_group` /**where**/  ";
+                                           FROM `equ_sparepart_type` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_spare_parts_group`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `equ_spare_parts_group`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `equ_spare_parts_group` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_spare_parts_group` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_sparepart_type` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `equ_sparepart_type` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE `equ_spare_parts_group` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `equ_spare_parts_group` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
-        const string GetByCodeSql = "SELECT * FROM `equ_spare_parts_group` WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
-        const string GetByIdSql = @"SELECT * FROM `equ_spare_parts_group`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM `equ_spare_parts_group`  WHERE Id IN @Ids ";
+        const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string GetByCodeSql = "SELECT * FROM `equ_sparepart_type` WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
+        const string GetByIdSql = @"SELECT * FROM `equ_sparepart_type`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `equ_sparepart_type`  WHERE Id IN @Ids ";
 
     }
 }

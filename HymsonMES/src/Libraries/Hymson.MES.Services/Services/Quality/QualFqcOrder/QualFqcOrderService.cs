@@ -1145,6 +1145,8 @@ namespace Hymson.MES.Services.Services.Quality
                         SiteId = site,
                     });
 
+                    //var remarks = await _qualFqcOrderUnqualifiedHandleRepository.GetEntitiesAsync(new QualFqcOrderUnqualifiedHandleQuery { FQCOrderIds= resultFQCIds });
+
                     result.Data = result.Data.Select(m =>
                     {
                         var FQCEntity = fQCEntities.FirstOrDefault(e => e.Id == m.FQCOrderId);
@@ -1177,6 +1179,12 @@ namespace Hymson.MES.Services.Services.Quality
                         else
                         {
                             m.HandMethodText = "-";
+                        }
+
+                        var remark = unqualifiedHandles.FirstOrDefault(e => e.FQCOrderId == m.FQCOrderId)?.Remark;
+                        if(remark != default)
+                        {
+                            m.Remark = remark;
                         }
 
                         return m;

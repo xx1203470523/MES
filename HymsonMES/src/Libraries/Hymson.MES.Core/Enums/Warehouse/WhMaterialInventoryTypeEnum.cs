@@ -85,6 +85,18 @@ namespace Hymson.MES.Core.Enums
         /// 物料解锁
         /// </summary>
         [Description("物料解锁")]
-        MaterialBarCodeUnLock = 16 
+        MaterialBarCodeUnLock = 16 ,
+
+        /// <summary>
+        /// 不良录入
+        /// </summary>
+        [Description("不良录入")]
+        BadEntry = 17,
+
+        /// <summary>
+        /// 不良处置
+        /// </summary>
+        [Description("不良处置")]
+        BadDisposal = 18
     }
 }

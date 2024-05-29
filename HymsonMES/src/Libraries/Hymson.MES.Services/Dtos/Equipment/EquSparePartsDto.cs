@@ -44,11 +44,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public DisableOrEnableEnum Status { get; set; }
 
        /// <summary>
-        /// 备件类型
-        /// </summary>
-        public long? SparePartsGroupId { get; set; }
-
-       /// <summary>
         /// 图纸编号
         /// </summary>
         public string? DrawCode { get; set; }
@@ -76,13 +71,37 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 数量
         /// </summary>
-        public long Qty { get; set; }
+        public int Qty { get; set; }
 
         /// <summary>
         /// 描述
         /// </summary>
         public string? Remark { get; set; } = "";
-       
+
+        /// <summary>
+        /// 备件类型Id-2024
+        /// </summary>
+        public long? SparePartTypeId { get; set; }
+
+        /// <summary>
+        /// 规格型号-2024
+        /// </summary>
+        public string? Specifications { get; set; }
+
+        /// <summary>
+        /// 是否关键设备;0、否 1、是-2024
+        /// </summary>
+        public YesOrNoEnum? IsCritical { get; set; }
+
+        /// <summary>
+        /// 是否标准件;0、否 1、是-2024
+        /// </summary>
+        public YesOrNoEnum? IsStandard { get; set; }
+        /// <summary>
+        /// 供应商ID-2024
+        /// </summary>
+        public long? SupplierId { get; set; }
+
     }
 
     /// <summary>
@@ -118,7 +137,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
        /// <summary>
         /// 供应商
         /// </summary>
-        public string Supplier { get; set; }
+        public string? Supplier { get; set; }
 
        /// <summary>
         /// 状态;0 禁用 1、启用
@@ -129,11 +148,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 备件类型
         /// </summary>
         public string? SparePartsGroup { get; set; }
-
-        /// <summary>
-        /// 备件类型Id
-        /// </summary>
-        public long? SparePartsGroupId { get; set; }
 
         /// <summary>
         /// 图纸编号
@@ -195,7 +209,32 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
+        /// <summary>
+        /// 备件类型Id-2024
+        /// </summary>
+        public long? SparePartTypeId { get; set; }
+
+        /// <summary>
+        /// 供应商ID;wh_supplier表的Id-2024
+        /// </summary>
+        public long? SupplierId { get; set; }
+
+        /// <summary>
+        /// 规格型号-2024
+        /// </summary>
+        public string Specifications { get; set; }
+
+        /// <summary>
+        /// 是否关键设备;0、否 1、是-2024
+        /// </summary>
+        public YesOrNoEnum? IsCritical { get; set; }
+
+        /// <summary>
+        /// 是否标准件;0、否 1、是-2024
+        /// </summary>
+        public YesOrNoEnum? IsStandard { get; set; }
+
+
     }
 
     /// <summary>
