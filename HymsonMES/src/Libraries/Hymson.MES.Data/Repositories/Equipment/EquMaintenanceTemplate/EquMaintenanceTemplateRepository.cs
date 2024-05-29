@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -103,14 +104,17 @@ namespace Hymson.MES.Data.Repositories.EquMaintenanceTemplate
             sqlBuilder.Where("est.IsDeleted=0");
             sqlBuilder.Where("est.SiteId = @SiteId");
             sqlBuilder.GroupBy("est.*");
+            sqlBuilder.OrderBy("est.CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(EquMaintenanceTemplatePagedQuery.Code))
             {
-                sqlBuilder.Where("est.Code=@Code");
+                EquMaintenanceTemplatePagedQuery.Code = $"%{EquMaintenanceTemplatePagedQuery.Code}%";
+                sqlBuilder.Where("est.Code LIKE @Code");
             }
 
             if (!string.IsNullOrWhiteSpace(EquMaintenanceTemplatePagedQuery.Name))
             {
-                sqlBuilder.Where("est.Name=@Name");
+                EquMaintenanceTemplatePagedQuery.Name = $"%{EquMaintenanceTemplatePagedQuery.Name}%";
+                sqlBuilder.Where("est.Name LIKE @Name");
             }
 
             if (EquMaintenanceTemplatePagedQuery.MaintenanceTemplateIds != null && EquMaintenanceTemplatePagedQuery.MaintenanceTemplateIds.Any())
@@ -215,7 +219,7 @@ namespace Hymson.MES.Data.Repositories.EquMaintenanceTemplate
     public partial class EquMaintenanceTemplateRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_template` est /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_template` est /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_Maintenance_template` est /**where**/ ";
         const string GetEquMaintenanceTemplateEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

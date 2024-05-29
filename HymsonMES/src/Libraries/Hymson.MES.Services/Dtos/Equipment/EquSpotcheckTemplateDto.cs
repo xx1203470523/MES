@@ -116,7 +116,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// <summary>
         /// 描述
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
         /// <summary>
         /// 模板与项目
@@ -163,7 +163,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// 点检项目ID;equ_spotcheck_item的Id
         /// </summary>
         public long SpotCheckItemId { get; set; }
-        
+
         /// <summary>
         /// 点检模板
         /// </summary>
@@ -284,11 +284,11 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// 设备组ID;equ_equipment_group的Id
         /// </summary>
         public long EquipmentGroupId { get; set; }
-        
+
         /// <summary>
         /// 设备组ID;equ_equipment_group的Id
         /// </summary>
-        public long SpotCheckTemplateId { get; set; } 
+        public long SpotCheckTemplateId { get; set; }
     }
 
 
