@@ -24,6 +24,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public SfcStatusEnum? Status { get; set; }
 
         /// <summary>
+        /// 条码状态
+        /// </summary>
+        public IEnumerable<SfcStatusEnum>? Statuss { get; set; }
+
+        /// <summary>
         /// 工单
         /// </summary>
         public string? OrderCode { get; set; }

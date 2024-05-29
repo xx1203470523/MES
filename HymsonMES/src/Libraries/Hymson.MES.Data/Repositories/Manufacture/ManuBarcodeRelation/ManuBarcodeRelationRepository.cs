@@ -294,6 +294,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where(" IsDeleted=0 ");
             sqlBuilder.Select("*");
             sqlBuilder.Where(" SiteId=@SiteId ");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             if (queryParam.IsDisassemble.HasValue)
             {
                 sqlBuilder.Where(" IsDisassemble=@IsDisassemble "); //筛选出未拆解的
@@ -312,12 +313,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             if (!string.IsNullOrEmpty(queryParam.CirculationBarCode))
             {
-                sqlBuilder.Where(" InputBarCode=@CirculationBarCode ");
+                queryParam.CirculationBarCode = $"%{queryParam.CirculationBarCode}%";
+                sqlBuilder.Where(" InputBarCode LIKE @CirculationBarCode ");
             }
 
             if (!string.IsNullOrEmpty(queryParam.Sfc))
             {
-                sqlBuilder.Where(" OutputBarCode=@Sfc ");
+                queryParam.Sfc = $"%{queryParam.Sfc}%";
+                sqlBuilder.Where(" OutputBarCode LIKE @Sfc ");
             }
 
             if (queryParam.ProcedureId.HasValue)

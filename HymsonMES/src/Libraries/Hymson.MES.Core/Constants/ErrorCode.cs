@@ -578,8 +578,19 @@
         public const string MES12302 = "请维护计划明细";
         public const string MES12303 = "未到首次执行时间，暂不执行";
         public const string MES12304 = "请维护执行时间/执行类型/执行周期";
-        public const string MES12305 = "编码【{Code}】,版本【{Version}】已存在"; 
+        public const string MES12305 = "编码【{Code}】,版本【{Version}】已存在";
         public const string MES12306 = "请选择关联模板";
+        public const string MES12307 = "休息日不生成任务";
+        public const string MES12308 = "请维护当月工作日历";
+        public const string MES12309 = "点检单号生成失败：设备点检类型编码规则未维护！";
+        public const string MES12310 = "点检单号生成失败：编码规则错误，不允许同时存在多条设备点检类型编码规则！";
+        public const string MES12311 = "保养单号生成失败：设备保养类型编码规则未维护！";
+        public const string MES12312 = "保养单号生成失败：编码规则错误，不允许同时存在多条设备保养类型编码规则！";
+        public const string MES12313 = "计划【{Code}】已启用，不允许删除";
+        public const string MES12314 = "计划【{Code}】已禁用，请启用后再生成任务！";
+        public const string MES12315 = "截止执行时间(分钟)不能超过60";
+        public const string MES12316 = "提前执行时间(分钟)不能超过60"; 
+
 
         #endregion
 
@@ -882,6 +893,7 @@
         public const string MES15130 = "新生成的条码{sfc}在物料仓已存在，请设置更复杂的编码规则";
         public const string MES15131 = "{type}编码规则未维护！";
         public const string MES15132 = "{type}编码规则被维护多条！";
+        public const string MES15133 = "待拆分数量不能填写小数!";
         #endregion
 
         #region 物料台账 15200

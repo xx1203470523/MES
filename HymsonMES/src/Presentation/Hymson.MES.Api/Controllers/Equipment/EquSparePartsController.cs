@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.Equipment
 {
     /// <summary>
-    /// 控制器（备件注册表）
+    /// 控制器（设备-备件注册表）
     /// @author Kongaomeng
     /// @date 2023-12-18 02:37:31
     /// </summary>
@@ -101,7 +101,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 分页查询列表（过滤已经有类型的备件）
+        /// 分页查询列表（过滤已经有类型的备件）//
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>

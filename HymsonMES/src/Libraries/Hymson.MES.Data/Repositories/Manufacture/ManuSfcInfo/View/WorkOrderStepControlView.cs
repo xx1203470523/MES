@@ -3,7 +3,7 @@ using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
-    public class WorkOrderStepControlView:BaseEntity
+    public class WorkOrderControlReportView:BaseEntity
     {
         /// <summary>
         /// 站点id
@@ -64,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 
     /// </summary>
-    public class WorkOrderStepControlOptimizeView : BaseEntity
+    public class WorkOrderControlReportOptimizeView : BaseEntity
     {
         /// <summary>
         /// 站点id

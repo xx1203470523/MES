@@ -134,8 +134,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialBarCode))
             {
-                whMaterialInventoryPagedQuery.MaterialBarCode = $"%{whMaterialInventoryPagedQuery.MaterialBarCode}%";
-                sqlBuilder.Where(" wmi.MaterialBarCode like @MaterialBarCode");
+                whMaterialInventoryPagedQuery.MaterialBarCode = whMaterialInventoryPagedQuery.MaterialBarCode;
+                sqlBuilder.Where(" wmi.MaterialBarCode = @MaterialBarCode");
             }
             if (whMaterialInventoryPagedQuery.MaterialBarCodes != null && whMaterialInventoryPagedQuery.MaterialBarCodes.Any())
             {
@@ -143,8 +143,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialCode))
             {
-                whMaterialInventoryPagedQuery.MaterialCode = $"%{whMaterialInventoryPagedQuery.MaterialCode}%";
-                sqlBuilder.Where(" pm.MaterialCode like @MaterialCode");
+                whMaterialInventoryPagedQuery.MaterialCode = whMaterialInventoryPagedQuery.MaterialCode;
+                sqlBuilder.Where(" pm.MaterialCode = @MaterialCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialName))
             {
@@ -155,6 +155,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             {
                 whMaterialInventoryPagedQuery.Version = $"%{whMaterialInventoryPagedQuery.Version}%";
                 sqlBuilder.Where(" pm.Version like @Version");
+            }
+            if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.SupplierCode))
+            {
+                whMaterialInventoryPagedQuery.SupplierCode = whMaterialInventoryPagedQuery.SupplierCode;
+                sqlBuilder.Where(" ws.Code = @SupplierCode");
             }
             if (whMaterialInventoryPagedQuery.Status > 0)
             {

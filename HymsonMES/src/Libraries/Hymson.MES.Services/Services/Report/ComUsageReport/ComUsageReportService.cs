@@ -117,9 +117,10 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<ComUsageExportResultDto> ExprotComUsagePageListAsync(ComUsageReportPagedQueryDto param)
         {
             var pagedQuery = param.ToQuery<ComUsageReportPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId.Value;
-            pagedQuery.PageSize = 1000;
-            var pagedInfo = await _circulationRepository.GetReportPagedInfoAsync(pagedQuery);
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.PageSize = 10000;
+            pagedQuery.IsDisassemble = TrueOrFalseEnum.No;
+            var pagedInfo = await _manuBarCodeRelationRepository.GetReportPagedInfoAsync(pagedQuery);
 
             List<ComUsageReportExcelExportDto> listDto = new List<ComUsageReportExcelExportDto>();
 
@@ -135,30 +136,30 @@ namespace Hymson.MES.Services.Services.Report
                 };
             }
 
-            var circulationProductIds = pagedInfo.Data.Select(x => x.CirculationProductId).Distinct().ToList();
-            var productIds = pagedInfo.Data.Select(x => x.ProductId).Distinct().ToList();
+            var circulationProductIds = pagedInfo.Data.Select(x => x.InputBarCodeMaterialId).Distinct().ToList();
+            var productIds = pagedInfo.Data.Select(x => x.OutputBarCodeMaterialId).Distinct().ToList();
 
             //合并 成 materialIds
-            circulationProductIds.AddRange(productIds);
+            circulationProductIds.AddRange(productIds.OfType<long>());
             var materialIds = circulationProductIds.ToArray();
             var materials = await _procMaterialRepository.GetByIdsAsync(materialIds);
 
-            var workOrderIds = pagedInfo.Data.Select(x => x.WorkOrderId).Distinct().ToArray();
-            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+            var workOrderIds = pagedInfo.Data.Select(x => x.OutputBarCodeWorkOrderId).Distinct().ToArray();
+            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds.OfType<long>());
 
             foreach (var item in pagedInfo.Data)
             {
-                var product = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
-                var circulationProduct = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.CirculationProductId) : null;
+                var product = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.OutputBarCodeMaterialId) : null;
+                var circulationProduct = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.InputBarCodeMaterialId) : null;
 
-                var workOrder = materials != null && materials.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
+                var workOrder = materials != null && materials.Any() ? workOrders.FirstOrDefault(x => x.Id == item.OutputBarCodeWorkOrderId) : null;
 
                 listDto.Add(new ComUsageReportExcelExportDto()
                 {
-                    SFC = item.SFC,
+                    SFC = item.OutputBarCode,
                     ProductCodeVersion = product != null ? product.MaterialCode + "/" + product.Version : "",
                     OrderCode = workOrder != null ? workOrder.OrderCode : "",
-                    CirculationBarCode = item.CirculationBarCode,
+                    CirculationBarCode = item.InputBarCode,
                     CirculationProductCodeVersion = circulationProduct != null ? circulationProduct.MaterialCode + "/" + circulationProduct.Version : "",
                 });
             }

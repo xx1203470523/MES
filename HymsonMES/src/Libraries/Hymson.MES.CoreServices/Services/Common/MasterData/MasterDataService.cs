@@ -34,7 +34,6 @@ using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Hymson.MES.CoreServices.Services.Common
 {
@@ -1328,7 +1327,7 @@ namespace Hymson.MES.CoreServices.Services.Common
                 WorkOrderId = sfc.WorkOrderId,
                 WorkCenterId = sfc.WorkCenterId,
                 ProductBOMId = sfc.ProductBOMId,
-                ProcessRouteId=sfc.ProcessRouteId,
+                ProcessRouteId = sfc.ProcessRouteId,
                 Qty = sfc.Qty,
                 EquipmentId = sfc.EquipmentId,
                 ResourceId = sfc.ResourceId,
@@ -1564,10 +1563,6 @@ namespace Hymson.MES.CoreServices.Services.Common
                 adds.Add(new ManuBarCodeRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = sfcProduceEntity.SiteId,
-                    ProcedureId = sfcProduceEntity.ProcedureId,
-                    ResourceId = sfcProduceEntity.ResourceId,
-                    EquipmentId = 0,
                     RelationType = ManuBarCodeRelationTypeEnum.SFC_Consumption,
 
                     InputBarCode = feeding.BarCode,
@@ -1590,8 +1585,15 @@ namespace Hymson.MES.CoreServices.Services.Common
                     }.ToSerialize(),
                     Remark = "",
 
-                    CreatedBy = sfcProduceEntity.CreatedBy,
-                    UpdatedBy = sfcProduceEntity.UpdatedBy
+                    ProcedureId = coreEntryRequestBo.IdsBo.ProcedureId,
+                    ResourceId = coreEntryRequestBo.IdsBo.ResourceId,
+                    EquipmentId = coreEntryRequestBo.IdsBo.EquipmentId,
+
+                    SiteId = coreEntryRequestBo.IdsBo.SiteId,
+                    CreatedBy = coreEntryRequestBo.IdsBo.UserName,
+                    CreatedOn = coreEntryRequestBo.IdsBo.Time,
+                    UpdatedBy = coreEntryRequestBo.IdsBo.UserName,
+                    UpdatedOn = coreEntryRequestBo.IdsBo.Time
                 });
             }
 

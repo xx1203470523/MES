@@ -2,25 +2,21 @@
 using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
-using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.EquSpotcheckPlan;
 using Hymson.MES.Data.Repositories.EquSpotcheckPlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation;
-using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Data.Repositories.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 
-namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
+namespace Hymson.MES.CoreServices.Services.Equipment.EquSpotcheckPlan.Dto
 {
     /// <summary>
     /// 设备点检计划 服务
@@ -68,17 +64,9 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
         /// </summary>  
         private readonly IEquSpotcheckTaskItemRepository _equSpotcheckTaskItemRepository;
 
-        /// <summary>
-        /// 仓储接口（工作日历） 
-        /// </summary>  
-        private readonly IPlanCalendarRepository _planCalendarRepository;
 
 
-        private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
-
-        private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
-
-        public EquSpotcheckPlanCoreService(IEquSpotcheckPlanRepository equSpotcheckPlanRepository, IEquSpotcheckPlanEquipmentRelationRepository equSpotcheckPlanEquipmentRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquSpotcheckTaskSnapshotItemRepository equSpotcheckTaskSnapshotItemRepository, IEquSpotcheckTaskSnapshotPlanRepository equSpotcheckTaskSnapshotPlanRepository, IEquSpotcheckTaskRepository equSpotcheckTaskRepository, IEquSpotcheckTaskItemRepository equSpotcheckTaskItemRepository, IPlanCalendarRepository planCalendarRepository, IInteCodeRulesRepository inteCodeRulesRepository, IManuGenerateBarcodeService manuGenerateBarcodeService)
+        public EquSpotcheckPlanCoreService(IEquSpotcheckPlanRepository equSpotcheckPlanRepository, IEquSpotcheckPlanEquipmentRelationRepository equSpotcheckPlanEquipmentRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquSpotcheckTaskSnapshotItemRepository equSpotcheckTaskSnapshotItemRepository, IEquSpotcheckTaskSnapshotPlanRepository equSpotcheckTaskSnapshotPlanRepository, IEquSpotcheckTaskRepository equSpotcheckTaskRepository, IEquSpotcheckTaskItemRepository equSpotcheckTaskItemRepository)
         {
 
             _equSpotcheckPlanRepository = equSpotcheckPlanRepository;
@@ -91,9 +79,6 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
             _equSpotcheckTaskSnapshotPlanRepository = equSpotcheckTaskSnapshotPlanRepository;
             _equSpotcheckTaskRepository = equSpotcheckTaskRepository;
             _equSpotcheckTaskItemRepository = equSpotcheckTaskItemRepository;
-            _planCalendarRepository = planCalendarRepository;
-            _inteCodeRulesRepository = inteCodeRulesRepository;
-            _manuGenerateBarcodeService = manuGenerateBarcodeService;
         }
         /// <summary>
         /// 生成点检任务
@@ -104,10 +89,6 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
         {
             //计划
             var equSpotcheckPlanEntity = await _equSpotcheckPlanRepository.GetByIdAsync(param.SpotCheckPlanId);
-            if (equSpotcheckPlanEntity.Status == DisableOrEnableEnum.Disable)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12314)).WithData("Code", equSpotcheckPlanEntity.Code);
-            }
             if (param.ExecType == 0)
             {
                 if (equSpotcheckPlanEntity.FirstExecuteTime < HymsonClock.Now())
@@ -115,31 +96,10 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                     throw new CustomerValidationException(nameof(ErrorCode.MES12303));
                 }
 
-                if (!equSpotcheckPlanEntity.FirstExecuteTime.HasValue || !equSpotcheckPlanEntity.Type.HasValue || !equSpotcheckPlanEntity.Cycle.HasValue)
+                if (!equSpotcheckPlanEntity.FirstExecuteTime.HasValue || !equSpotcheckPlanEntity.Type.HasValue || equSpotcheckPlanEntity.Cycle.HasValue)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12304));
                 }
-
-                if (equSpotcheckPlanEntity.IsSkipHoliday == TrueOrFalseEnum.Yes)
-                {
-                    var thisDate = HymsonClock.Now();
-                    var planCalendar = await _planCalendarRepository.GetOneAsync(new PlanCalendarQuery { SiteId = param.SiteId, Year = thisDate.Year, Month = thisDate.Month });
-                    if (planCalendar != null && !string.IsNullOrWhiteSpace(planCalendar.Workday))
-                    {
-                        var workdayLike = thisDate.DayOfWeek.ToString();
-                        var week = GetWeekToInt(workdayLike);
-                        if (!planCalendar.Workday.Contains(week))
-                        {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES12307));
-                        }
-                    }
-                    else
-                    {
-                        //暂不验证
-                        //throw new CustomerValidationException(nameof(ErrorCode.MES12308));
-                    }
-                }
-
             }
             var equSpotcheckPlanEquipmentRelations = await _equSpotcheckPlanEquipmentRelationRepository.GetBySpotCheckPlanIdsAsync(param.SpotCheckPlanId);
             if (equSpotcheckPlanEquipmentRelations == null || !equSpotcheckPlanEquipmentRelations.Any())
@@ -172,11 +132,9 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
             {
                 var equEquipment = equEquipments.Where(it => it.Id == item.EquipmentId).FirstOrDefault();
 
-                var equMaintenanceTaskId = IdGenProvider.Instance.CreateId();
-
                 EquSpotcheckTaskEntity equSpotcheckTask = new()
                 {
-                    Code = await GenerateSpotcheckOrderCodeAsync(param.SiteId, param.UserName),
+                    Code = equSpotcheckPlanEntity.Code + equEquipment?.EquipmentCode,
                     Name = equSpotcheckPlanEntity.Name,
                     BeginTime = HymsonClock.Now(),
                     EndTime = HymsonClock.Now(),
@@ -184,7 +142,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                     IsQualified = null,
                     Remark = equSpotcheckPlanEntity.Remark,
 
-                    Id = equMaintenanceTaskId,
+                    Id = IdGenProvider.Instance.CreateId(),
                     CreatedBy = param.UserName,
                     UpdatedBy = param.UserName,
                     CreatedOn = HymsonClock.Now(),
@@ -295,72 +253,5 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
 
         }
 
-
-        #region 帮助
-        private static string GetWeekToInt(string weekName)
-        {
-            int week = -1;
-            switch (weekName)
-            {
-                case "Sunday":
-                    week = 0;
-                    break;
-                case "Monday":
-                    week = 1;
-                    break;
-                case "Tuesday":
-                    week = 2;
-                    break;
-                case "Wednesday":
-                    week = 3;
-                    break;
-                case "Thursday":
-                    week = 4;
-                    break;
-                case "Friday":
-                    week = 5;
-                    break;
-                case "Saturday":
-                    week = 6;
-                    break;
-            }
-            return week.ToString();
-        }
-
-
-
-        /// <summary>
-        /// 点检单号生成
-        /// </summary>
-        /// <param name="bo"></param>
-        /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
-        private async Task<string> GenerateSpotcheckOrderCodeAsync(long siteId, string userName)
-        {
-            var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
-            {
-                SiteId = siteId,
-                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.Spotcheck
-            });
-            if (codeRules == null || !codeRules.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12309));
-            }
-            if (codeRules.Count() > 1)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12310));
-            }
-
-            var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeBo
-            {
-                SiteId = siteId,
-                UserName = userName,
-                CodeRuleId = codeRules.First().Id,
-                Count = 1
-            });
-
-            return orderCodes.First();
-        }
-        #endregion
     }
 }

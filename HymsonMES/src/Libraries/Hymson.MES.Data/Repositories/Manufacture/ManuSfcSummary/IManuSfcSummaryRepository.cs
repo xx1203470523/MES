@@ -123,6 +123,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcSummaryEntity>> GetEntitiesAsync(ManuSfcSummaryQuery query);
 
         /// <summary>
+        /// 按工单查询summary
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcSummaryEntity>> GetWorkOrderAsync(ManuSfcProduceVehiclePagedQuery query);
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>

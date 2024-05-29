@@ -122,6 +122,14 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(equSpotcheckPlanCreateDto);
+            if (equSpotcheckPlanCreateDto.CompletionMinute > 60)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12315));
+            }
+            if (equSpotcheckPlanCreateDto.PreGeneratedMinute > 60)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12316));
+            }
 
             var equSpotcheckPlan = await _equSpotcheckPlanRepository.GetByCodeAsync(new EquSpotcheckPlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = equSpotcheckPlanCreateDto.Code, Version = equSpotcheckPlanCreateDto.Version });
             if (equSpotcheckPlan != null)
@@ -189,8 +197,15 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesEquSpotcheckPlanAsync(DeletesDto param)
+        public async Task<int> DeletesEquSpotcheckPlanAsync(SpotcheckDeletesDto param)
         {
+            var equSpotcheckPlan = await _equSpotcheckPlanRepository.GetByIdsAsync(param.Ids.ToArray());
+            var equSpotcheckPlanEnable = equSpotcheckPlan.Where(it => it.Status == DisableOrEnableEnum.Enable);
+            if (equSpotcheckPlanEnable.Any())
+            {
+                var codes = string.Join(",", equSpotcheckPlanEnable.Select(it => it.Code));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12313)).WithData("Code", codes);
+            }
 
             int row = 0;
             using var trans = TransactionHelper.GetTransactionScope();
@@ -253,7 +268,14 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(equSpotcheckPlanModifyDto);
-
+            if (equSpotcheckPlanModifyDto.CompletionMinute > 60)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12315));
+            }
+            if (equSpotcheckPlanModifyDto.PreGeneratedMinute > 60)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12316));
+            }
             var equSpotcheckPlan = await _equSpotcheckPlanRepository.GetByCodeAsync(new EquSpotcheckPlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = equSpotcheckPlanModifyDto.Code, Version = equSpotcheckPlanModifyDto.Version });
             if (equSpotcheckPlan != null && equSpotcheckPlan.Id != equSpotcheckPlanModifyDto.Id)
             {
@@ -324,7 +346,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task GenerateEquSpotcheckTaskCoreAsync(GenerateDto param)
+        public async Task GenerateEquSpotcheckTaskCoreAsync(SpotcheckGenerateDto param)
         {
             await _equSpotcheckPlanCoreService.GenerateEquSpotcheckTaskAsync(new GenerateEquSpotcheckTaskDto { SiteId = _currentSite.SiteId ?? 0, UserName = _currentUser.UserName, ExecType = param.ExecType, SpotCheckPlanId = param.SpotCheckPlanId, });
         }
@@ -334,7 +356,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task GenerateEquSpotcheckTaskAsync(GenerateDto param)
+        public async Task GenerateEquSpotcheckTaskAsync(SpotcheckGenerateDto param)
         {
             //计划
             var equSpotcheckPlanEntity = await _equSpotcheckPlanRepository.GetByIdAsync(param.SpotCheckPlanId);
@@ -505,11 +527,11 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// </summary>
         /// <param name="spotCheckPlanId"></param>
         /// <returns></returns>
-        public async Task<List<QueryEquRelationListDto>> QueryEquRelationListAsync(long spotCheckPlanId)
+        public async Task<List<QuerySpotcheckEquRelationListDto>> QueryEquRelationListAsync(long spotCheckPlanId)
         {
             var equSpotcheckPlanEquipmentRelations = await _equSpotcheckPlanEquipmentRelationRepository.GetBySpotCheckPlanIdsAsync(spotCheckPlanId);
 
-            List<QueryEquRelationListDto> list = new();
+            List<QuerySpotcheckEquRelationListDto> list = new();
             if (equSpotcheckPlanEquipmentRelations != null && equSpotcheckPlanEquipmentRelations.Any())
             {
                 var spotCheckItemIds = equSpotcheckPlanEquipmentRelations.Select(it => it.SpotCheckTemplateId).ToArray();
@@ -521,7 +543,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                 {
                     var equSpotcheckTemplate = equSpotcheckTemplates.FirstOrDefault(it => it.Id == item.SpotCheckTemplateId);
                     var equipment = equipments.FirstOrDefault(it => it.Id == item.EquipmentId);
-                    QueryEquRelationListDto itemRelation = new()
+                    QuerySpotcheckEquRelationListDto itemRelation = new()
                     {
                         SpotCheckPlanId = spotCheckPlanId,
                         TemplateId = item.SpotCheckTemplateId,

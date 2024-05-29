@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Equipment.Query
 {
@@ -21,6 +22,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// 名称
         /// </summary>
         public string? Name { get; set; }
+
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
 
     }
 }

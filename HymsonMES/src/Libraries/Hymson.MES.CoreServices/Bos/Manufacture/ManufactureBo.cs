@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture
@@ -59,10 +60,20 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     }
 
     /// <summary>
-    /// 当前生成对象
+    /// 生产对象（ID）
     /// </summary>
-    public class ManufactureResponseBo
+    public class ManufactureIdsBo
     {
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
         /// <summary>
         /// 资源ID
         /// </summary>
@@ -71,12 +82,29 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 设备ID
         /// </summary>
-        public long EquipmentId { get; set; }
+        public long? EquipmentId { get; set; }
 
         /// <summary>
-        /// 工序ID
+        /// 用户名
         /// </summary>
-        public long ProcedureId { get; set; }
+        public string UserName { get; set; } = "";
+
+        /// <summary>
+        /// 当前时间
+        /// </summary>
+        public DateTime Time { get; set; } = HymsonClock.Now();
+
+    }
+
+    /// <summary>
+    /// 当前生成对象
+    /// </summary>
+    public class ManufactureResponseBo : ManufactureIdsBo
+    {
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public new long EquipmentId { get; set; }
 
     }
 
@@ -135,6 +163,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 是否主物料
         /// </summary>
         public bool IsMainMaterial { get; set; } = true;
+
+        /// <summary>
+        /// 作业基础参数
+        /// </summary>
+        public ManufactureIdsBo IdsBo { get; set; }
 
         /// <summary>
         /// 步骤ID
