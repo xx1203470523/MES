@@ -11,7 +11,7 @@ using Hymson.Snowflake;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 
-namespace Hymson.MES.BackgroundServices.Manufacture
+namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.WorkOrderStatistic
 {
     /// <summary>
     /// 
@@ -130,7 +130,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 }
 
                 // 需要扣减统计的类型
-                var stepsOfDeduction = item.Value.Where(a => ManuSfcStatus.ForbidSfcStatuss.Contains(a.CurrentStatus??SfcStatusEnum.Invalid));
+                var stepsOfDeduction = item.Value.Where(a => ManuSfcStatus.ForbidSfcStatuss.Contains(a.CurrentStatus ?? SfcStatusEnum.Invalid));
                 if (stepsOfDeduction.Any())
                 {
                     entity.Status = SfcStatusEnum.Detachment; // 这里的状态其实不重要，因为对应的条码记录均会被删除

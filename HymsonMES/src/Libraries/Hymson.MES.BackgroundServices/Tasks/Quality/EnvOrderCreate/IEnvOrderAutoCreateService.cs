@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.BackgroundServices.Quality.EnvOrderCreate
+﻿namespace Hymson.MES.BackgroundServices.Tasks.Quality.EnvOrderCreate
 {
     public interface IEnvOrderAutoCreateService
     {

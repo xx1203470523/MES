@@ -9,7 +9,7 @@ using Hymson.Snowflake;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 
-namespace Hymson.MES.BackgroundServices.Manufacture
+namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
 {
     /// <summary>
     /// 

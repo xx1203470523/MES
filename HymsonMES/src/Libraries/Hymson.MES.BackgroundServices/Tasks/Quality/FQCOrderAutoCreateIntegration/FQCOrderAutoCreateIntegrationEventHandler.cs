@@ -2,7 +2,7 @@
 using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.Services.Quality.QualFqcOrder;
 
-namespace Hymson.MES.BackgroundServices.Quality.FQCOrderAutoCreateIntegration
+namespace Hymson.MES.BackgroundServices.Tasks.Quality.FQCOrderAutoCreateIntegration
 {
     public class FQCOrderAutoCreateIntegrationEventHandler : IIntegrationEventHandler<FQCOrderAutoCreateIntegrationEvent>
     {

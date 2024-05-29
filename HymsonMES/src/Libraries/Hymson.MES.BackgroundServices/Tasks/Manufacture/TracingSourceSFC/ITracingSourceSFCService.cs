@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.BackgroundServices.Manufacture
+﻿namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
 {
     /// <summary>
     /// 

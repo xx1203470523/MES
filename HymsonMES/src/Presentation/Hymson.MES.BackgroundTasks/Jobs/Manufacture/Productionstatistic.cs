@@ -1,7 +1,7 @@
 ﻿using Hymson.MES.BackgroundServices.Manufacture.Productionstatistic;
 using Quartz;
 
-namespace Hymson.MES.BackgroundTasks.Manufacture
+namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
 {
     [DisallowConcurrentExecution]
     public class Productionstatistic : IJob
@@ -14,7 +14,7 @@ namespace Hymson.MES.BackgroundTasks.Manufacture
         /// <param name="manuSfcSummaryService"></param>
         public Productionstatistic(IProductionstatisticService productionstatisticService)
         {
-            this._productionstatisticService = productionstatisticService;
+            _productionstatisticService = productionstatisticService;
         }
         public async Task Execute(IJobExecutionContext context)
         {

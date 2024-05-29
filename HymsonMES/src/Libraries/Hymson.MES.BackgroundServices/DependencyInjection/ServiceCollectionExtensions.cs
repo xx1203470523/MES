@@ -2,7 +2,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.BackgroundServices.EventHandling;
 using Hymson.MES.BackgroundServices.EventHandling.ProcessEventHandling.PrintEventHandling;
-using Hymson.MES.BackgroundServices.Quality.FQCOrderAutoCreateIntegration;
+using Hymson.MES.BackgroundServices.Tasks.Quality.FQCOrderAutoCreateIntegration;
 using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
 using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;

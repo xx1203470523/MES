@@ -1,8 +1,8 @@
-﻿using Hymson.MES.BackgroundServices.Quality.EnvOrderCreate;
+﻿using Hymson.MES.BackgroundServices.Tasks.Quality.EnvOrderCreate;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace Hymson.MES.BackgroundTasks.Quality
+namespace Hymson.MES.BackgroundTasks.Jobs.Quality
 {
     /// <summary>
     /// 环境检验单自动生成

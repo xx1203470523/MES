@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.CoreServices.Services.Quality;
 
-namespace Hymson.MES.BackgroundServices.Quality.EnvOrderCreate
+namespace Hymson.MES.BackgroundServices.Tasks.Quality.EnvOrderCreate
 {
     /// <summary>
     /// 

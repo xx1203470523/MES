@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace Hymson.MES.BackgroundTasks.Manufacture
+namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
 {
     /// <summary>
     /// 条码追溯任务

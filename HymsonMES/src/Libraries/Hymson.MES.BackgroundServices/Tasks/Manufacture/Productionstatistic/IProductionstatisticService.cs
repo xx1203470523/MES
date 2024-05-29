@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.BackgroundServices.Manufacture.Productionstatistic
+namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.Productionstatistic
 {
     public interface IProductionstatisticService
     {
