@@ -728,7 +728,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         public async Task EquFileUploadAsync(EquFileUploadDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
 
             //文件列表
             var fileList = dto.FormCollection.Files;
@@ -741,9 +741,10 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
 
             foreach (var file in fileList)
             {
+                var fileDir = $"{equResModel.ProcedureCode}/{HymsonClock.Now():yyyyMMdd}/{equResModel.EquipmentCode}/{dto.Sfc}";
                 //上传
                 using var stream = file.OpenReadStream();
-                var uploadResult = await _minioService.PutObjectAsync(file.FileName, stream, file.ContentType);
+                var uploadResult = await _minioService.PutObjectAsync(file.FileName, stream, file.ContentType, fileDir);
 
                 saveDtoList.Add(new CcdFileUploadCompleteRecordSaveDto
                 {
