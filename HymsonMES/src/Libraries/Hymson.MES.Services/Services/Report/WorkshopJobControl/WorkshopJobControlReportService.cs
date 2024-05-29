@@ -495,7 +495,7 @@ namespace Hymson.MES.Services.Services.Report
                         stepDetailDto.ExtendedProperties = reJudgmentManuProductBadRecordEntities.Select(x => new ExtendedPropertieDto
                         {
                             Field = qualUnqualifiedCodeEntities?.FirstOrDefault(o => o.Id == x.UnqualifiedId)?.UnqualifiedCode ?? "",
-                            FieldValue = _localizationService.GetResource("Hymson.MES.Core.Enums.Manufacture.ProductBadDisposalResultEnum." + x.ReJudgmentResult)
+                            FieldValue = x.ReJudgmentResult== ProductBadDisposalResultEnum.ReJudgmentClosed? _localizationService.GetResource("Hymson.MES.Core.Enums.Manufacture.ProductBadRecordStatusEnum." + ProductBadRecordStatusEnum.Close): _localizationService.GetResource("Hymson.MES.Core.Enums.Manufacture.ProductBadRecordStatusEnum." + ProductBadRecordStatusEnum.Open)
                         }
                         );
                     }
