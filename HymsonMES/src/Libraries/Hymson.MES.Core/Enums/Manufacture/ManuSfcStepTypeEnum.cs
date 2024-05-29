@@ -60,7 +60,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 报废
         /// </summary>
         [Description("报废")]
-        [ManuSfcStepOperationTypeAttrribute("Scrap", JobOrAssemblyNameEnum.BadEntry)]
+        [ManuSfcStepOperationTypeAttrribute("Scrap", JobOrAssemblyNameEnum.Discard)]
         Discard = 9,
         /// <summary>
         /// 停止
@@ -88,7 +88,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 取消报废
         /// </summary>
         [Description("取消报废")]
-        [ManuSfcStepOperationTypeAttrribute("Unscrap", JobOrAssemblyNameEnum.BadEntry)]
+        [ManuSfcStepOperationTypeAttrribute("Unscrap", JobOrAssemblyNameEnum.UnDiscard)]
         CancelDiscard = 14,
         /// <summary>
         /// 关闭标识

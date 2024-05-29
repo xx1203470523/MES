@@ -593,6 +593,7 @@ namespace Hymson.MES.Services.Services.Report
                 //case ManuSfcStepTypeEnum.FutureLock:
                 case ManuSfcStepTypeEnum.Add:
                 case ManuSfcStepTypeEnum.Split:
+                case ManuSfcStepTypeEnum.SfcMerge:
                     var manuBarCodeRelationEnties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
                     {
                         InputSfcStepId = beforeStepEntity.Id,
@@ -616,7 +617,7 @@ namespace Hymson.MES.Services.Services.Report
                         OutputBarCode = x.OutputBarCode,
                     });
                     break;
-                case ManuSfcStepTypeEnum.SfcMerge:
+
                 case ManuSfcStepTypeEnum.SplitCreate:
                 case ManuSfcStepTypeEnum.SfcMergeAdd:
                     var SfcMergeManuBarCodeRelationEnties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
