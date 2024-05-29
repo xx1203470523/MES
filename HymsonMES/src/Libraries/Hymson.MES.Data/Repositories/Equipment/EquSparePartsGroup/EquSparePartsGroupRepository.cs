@@ -85,8 +85,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand command) 
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesSql, command);
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(DeletesSql, command);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
 
         /// <summary>

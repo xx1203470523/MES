@@ -84,11 +84,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long? SparePartTypeId { get; set; }
 
         /// <summary>
-        /// 供应商ID;wh_supplier表的Id-2024
-        /// </summary>
-        public long? SparePartId { get; set; }
-
-        /// <summary>
         /// 规格型号-2024
         /// </summary>
         public string? Specifications { get; set; }
@@ -222,7 +217,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 供应商ID;wh_supplier表的Id-2024
         /// </summary>
-        public long? SparePartId { get; set; }
+        public long? SupplierId { get; set; }
 
         /// <summary>
         /// 规格型号-2024
