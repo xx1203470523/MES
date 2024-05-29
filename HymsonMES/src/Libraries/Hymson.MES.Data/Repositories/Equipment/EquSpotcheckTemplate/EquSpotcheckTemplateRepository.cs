@@ -103,14 +103,17 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
             sqlBuilder.Where("est.IsDeleted=0");
             sqlBuilder.Where("est.SiteId = @SiteId");
             sqlBuilder.GroupBy("est.*");
+            sqlBuilder.OrderBy("est.CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQuery.Code))
             {
-                sqlBuilder.Where("est.Code=@Code");
+                equSpotcheckTemplatePagedQuery.Code = $"%{equSpotcheckTemplatePagedQuery.Code}%";
+                sqlBuilder.Where("est.Code LIKE @Code");
             }
 
             if (!string.IsNullOrWhiteSpace(equSpotcheckTemplatePagedQuery.Name))
             {
-                sqlBuilder.Where("est.Name=@Name");
+                equSpotcheckTemplatePagedQuery.Name = $"%{equSpotcheckTemplatePagedQuery.Name}%";
+                sqlBuilder.Where("est.Name LIKE @Name");
             }
 
             if (equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds != null && equSpotcheckTemplatePagedQuery.SpotCheckTemplateIds.Any())
@@ -215,7 +218,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplate
     public partial class EquSpotcheckTemplateRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spotcheck_template` est /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spotcheck_template` est /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spotcheck_template` est /**where**/ ";
         const string GetEquSpotcheckTemplateEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
