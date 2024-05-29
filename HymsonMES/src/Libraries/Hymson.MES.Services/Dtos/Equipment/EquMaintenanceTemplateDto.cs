@@ -117,7 +117,7 @@ namespace Hymson.MES.Services.Dtos.EquMaintenanceTemplate
         /// <summary>
         /// 描述
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
         /// <summary>
         /// 模板与项目
@@ -164,7 +164,7 @@ namespace Hymson.MES.Services.Dtos.EquMaintenanceTemplate
         /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace Hymson.MES.Services.Dtos.EquMaintenanceTemplate
         /// 点检项目ID;equ_Maintenance_item的Id
         /// </summary>
         public long MaintenanceItemId { get; set; }
-        
+
         /// <summary>
         /// 点检模板
         /// </summary>
@@ -285,11 +285,11 @@ namespace Hymson.MES.Services.Dtos.EquMaintenanceTemplate
         /// 设备组ID;equ_equipment_group的Id
         /// </summary>
         public long EquipmentGroupId { get; set; }
-        
+
         /// <summary>
         /// 设备组ID;equ_equipment_group的Id
         /// </summary>
-        public long MaintenanceTemplateId { get; set; } 
+        public long MaintenanceTemplateId { get; set; }
     }
 
 

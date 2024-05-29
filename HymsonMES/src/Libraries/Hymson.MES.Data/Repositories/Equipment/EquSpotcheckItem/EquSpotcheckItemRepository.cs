@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquSpotcheckItemEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquSpotcheckItemEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquSpotcheckItemEntity>(GetByIdsSql, new { Ids = ids });
@@ -152,6 +152,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 sqlBuilder.Where("Code = @Code");
+            }
+
+            if (pagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;

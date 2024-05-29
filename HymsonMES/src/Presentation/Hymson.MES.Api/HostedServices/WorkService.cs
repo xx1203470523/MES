@@ -62,8 +62,8 @@ namespace Hymson.MES.Api
                 }, stoppingToken);
                 await _resourceService.InitEnumAsync();
                 await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
-                //await InitExcelDtoAsync();
-                //await _resourceService.HotLoadingAsync();
+                await InitExcelDtoAsync();
+                await _resourceService.HotLoadingAsync();
 
             }
             catch (Exception e)

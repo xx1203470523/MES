@@ -122,6 +122,14 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(equSpotcheckPlanCreateDto);
+            if (equSpotcheckPlanCreateDto.CompletionMinute > 60)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12315));
+            }
+            if (equSpotcheckPlanCreateDto.PreGeneratedMinute > 60)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12316));
+            }
 
             var equSpotcheckPlan = await _equSpotcheckPlanRepository.GetByCodeAsync(new EquSpotcheckPlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = equSpotcheckPlanCreateDto.Code, Version = equSpotcheckPlanCreateDto.Version });
             if (equSpotcheckPlan != null)
@@ -260,7 +268,14 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(equSpotcheckPlanModifyDto);
-
+            if (equSpotcheckPlanModifyDto.CompletionMinute > 60)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12315));
+            }
+            if (equSpotcheckPlanModifyDto.PreGeneratedMinute > 60)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12316));
+            }
             var equSpotcheckPlan = await _equSpotcheckPlanRepository.GetByCodeAsync(new EquSpotcheckPlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = equSpotcheckPlanModifyDto.Code, Version = equSpotcheckPlanModifyDto.Version });
             if (equSpotcheckPlan != null && equSpotcheckPlan.Id != equSpotcheckPlanModifyDto.Id)
             {
