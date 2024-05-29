@@ -313,7 +313,6 @@ namespace Hymson.MES.Services.Services.Equipment
                 }
                 catch (Exception ex) { }
 
-
             }
 
             return result;
@@ -670,6 +669,7 @@ namespace Hymson.MES.Services.Services.Equipment
             {
                 // 默认是关闭
                 entity.Status = EquSpotcheckTaskStautusEnum.Closed;
+                entity.IsQualified = TrueOrFalseEnum.Yes;
                 operationType = EquSpotcheckOperationTypeEnum.Close;
             }
 

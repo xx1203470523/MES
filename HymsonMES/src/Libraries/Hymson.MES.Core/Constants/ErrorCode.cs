@@ -2116,7 +2116,7 @@
 
         #region 设备点检执行 15900
         public const string MES15901 = "不良已关闭，不允许删除!";
-        public const string MES15902 = "有检验值是为空！";
+        public const string MES15902 = "待处理状态的保养任务，数据需要先保存后点击完成！";
         #endregion
 
         #region 设备点检 车间物料不良录入 17500
