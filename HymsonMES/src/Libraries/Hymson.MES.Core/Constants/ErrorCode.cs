@@ -583,9 +583,19 @@
         public const string MES12307 = "休息日不生成任务";
         public const string MES12308 = "请维护当月工作日历";
         public const string MES12309 = "点检单号生成失败：设备点检类型编码规则未维护！";
-        public const string MES12310 = "点检单号生成失败：编码规则错误，不允许同时存在多条设备点检类型编码规则！"; 
+        public const string MES12310 = "点检单号生成失败：编码规则错误，不允许同时存在多条设备点检类型编码规则！";
         public const string MES12311 = "保养单号生成失败：设备保养类型编码规则未维护！";
         public const string MES12312 = "保养单号生成失败：编码规则错误，不允许同时存在多条设备保养类型编码规则！";
+        public const string MES12313 = "计划【{Code}】已启用，不允许删除";
+        public const string MES12314 = "计划【{Code}】已禁用，请启用后再生成任务！";
+        public const string MES12315 = "截止执行时间(分钟)须在0-60之间";
+        public const string MES12316 = "提前执行时间(分钟)须在0-60之间";
+        public const string MES12317 = "提前执行时间(分钟)须在0-60之间";
+        public const string MES12318 = "周期不能小于0";
+        public const string MES12319 = "提前执行时间(小时不能小于0)";
+        public const string MES12320 = "首次执行时间需在开始/结束时间范围内"; 
+        public const string MES12321 = "结束时间需大于开始时间"; 
+
 
         #endregion
 
@@ -888,6 +898,7 @@
         public const string MES15130 = "新生成的条码{sfc}在物料仓已存在，请设置更复杂的编码规则";
         public const string MES15131 = "{type}编码规则未维护！";
         public const string MES15132 = "{type}编码规则被维护多条！";
+        public const string MES15133 = "待拆分数量不能填写小数!";
         #endregion
 
         #region 物料台账 15200
@@ -2110,7 +2121,7 @@
 
         #region 设备点检执行 15900
         public const string MES15901 = "不良已关闭，不允许删除!";
-        public const string MES15902 = "有检验值是为空！";
+        public const string MES15902 = "待处理状态的保养任务，数据需要先保存后点击完成！";
         #endregion
 
         #region 设备点检 车间物料不良录入 17500

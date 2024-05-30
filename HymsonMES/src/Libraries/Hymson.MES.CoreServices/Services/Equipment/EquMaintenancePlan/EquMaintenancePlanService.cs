@@ -4,10 +4,14 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Events.Equipment;
+using Hymson.MES.CoreServices.Events.Quality;
+using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -105,6 +109,10 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
         {
             //计划
             var EquMaintenancePlanEntity = await _EquMaintenancePlanRepository.GetByIdAsync(param.MaintenancePlanId);
+            if (EquMaintenancePlanEntity.Status == DisableOrEnableEnum.Disable)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12314)).WithData("Code", EquMaintenancePlanEntity.Code);
+            }
             if (param.ExecType == 0)
             {
                 if (EquMaintenancePlanEntity.FirstExecuteTime < HymsonClock.Now())
@@ -174,8 +182,8 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                 {
                     Code = await GenerateMaintenanceOrderCodeAsync(param.SiteId, param.UserName),
                     Name = EquMaintenancePlanEntity.Name,
-                    BeginTime = HymsonClock.Now(),
-                    EndTime = HymsonClock.Now(),
+                    //BeginTime = HymsonClock.Now(),
+                    //EndTime = HymsonClock.Now(),
                     Status = EquMaintenanceTaskStautusEnum.WaitInspect,
                     IsQualified = null,
                     Remark = EquMaintenancePlanEntity.Remark,
@@ -292,6 +300,31 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
         }
 
 
+        /// <summary>
+        /// 生成保养任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task GenerateEquMaintenanceTaskAsync(EquMaintenanceAutoCreateIntegrationEvent param)
+        {
+            await GenerateEquMaintenanceTaskAsync(new GenerateEquMaintenanceTaskDto
+            {
+                SiteId = param.SiteId,
+                UserName = param.UserName,
+                MaintenancePlanId = param.MaintenancePlanId,
+                ExecType = param.ExecType
+            });
+        }
+
+        /// <summary>
+        /// 停止保养任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>  
+        public async Task StopEquMaintenanceTaskAsync(EquMaintenanceAutoStopIntegrationEvent param)
+        {
+
+        }
 
         #region 帮助
         private static string GetWeekToInt(string weekName)

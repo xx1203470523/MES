@@ -461,6 +461,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string? MaterialBarCode { get; set; }
 
         /// <summary>
+        /// 供应商编码
+        /// </summary>
+        public string? SupplierCode { get; set; }
+
+        /// <summary>
         /// 物料条码(多个)
         /// </summary>
         public IEnumerable<string>? MaterialBarCodes { get; set; }

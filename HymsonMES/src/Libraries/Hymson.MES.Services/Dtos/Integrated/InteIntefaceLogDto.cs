@@ -54,7 +54,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 请求入参
         /// </summary>
-        public string RequestBody { get; set; }  
+        public string RequestBody { get; set; }
         /// <summary>
         /// 路径
         /// </summary>
@@ -74,7 +74,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// IP
         /// </summary>
-        public string Ip { get; set; }  
+        public string Ip { get; set; }
 
         /// <summary>
         /// 请求时间  时间范围  数组
@@ -82,46 +82,79 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public DateTime[]? TimeStamp { get; set; }
 
     }
-     
+
 
     public class InteIntefaceLogPagedQueryDto : PagerInfo
     {
         public string? Id { get; set; }
 
-        /// <summary>
-        /// 接口编码
-        /// </summary>
+        ///// <summary>
+        ///// 接口编码
+        ///// </summary>
         public string? InterfaceCode { get; set; }
-
         /// <summary>
         /// 接口名称
         /// </summary>
-        public string? InterfaceName { get; set; }
+        public string? Message { get; set; }
+        public DataObject? Data { get; set; }
 
-        /// <summary>
-        /// 结果;0、成功 1、失败
-        /// </summary>
-        public ResponseResultEnum? ResponseResult { get; set; }
 
-        /// <summary>
-        /// 查询类型
-        /// </summary>
+
+        ///// <summary>
+        ///// 接口名称
+        ///// </summary>
+        //public string? InterfaceName { get; set; }
+
+        ///// <summary>
+        ///// 结果;0、成功 1、失败
+        ///// </summary>
+        //public ResponseResultEnum? ResponseResult { get; set; }
+
+        ///// <summary>
+        ///// 查询类型
+        ///// </summary>
         public InterfaceLogQueryTyeEnum? QueryType { get; set; }
 
+        ///// <summary>
+        ///// 请求方
+        ///// </summary>
+        //public string? Requestor { get; set; }
+
+        ///// <summary>
+        ///// 请求方编码
+        ///// </summary>
+        //public string? RequestorCode { get; set; }
+
+        ///// <summary>
+        ///// 接收方
+        ///// </summary>
+        //public string? Responsetor { get; set; }
+
+        ///// <summary>
+        ///// 请求时间  时间范围  数组
+        ///// </summary>
+        public DateTime[]? TimeStamp { get; set; }
+
+    }
+
+    public record DataObject
+    { 
         /// <summary>
         /// 请求方
         /// </summary>
-        public string? Requestor { get; set; }
-
+        public string? Name { get; set; }
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string? Code { get; set; }
         /// <summary>
         /// 接收方
         /// </summary>
-        public string? Responsetor { get; set; }
-
+        public string? ReceiverType { get; set; }
         /// <summary>
-        /// 请求时间  时间范围  数组
+        /// 是否成功
         /// </summary>
-        public DateTime[]? TimeStamp { get; set; }
+        public int? IsSuccess { get; set; }
 
     }
 }

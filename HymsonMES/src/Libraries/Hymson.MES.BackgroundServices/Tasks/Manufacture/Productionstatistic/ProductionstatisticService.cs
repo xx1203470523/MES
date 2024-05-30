@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.BackgroundServices.Manufacture.Productionstatistic
+namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.Productionstatistic
 {
     public class ProductionstatisticService : IProductionstatisticService
     {
@@ -29,7 +29,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture.Productionstatistic
         /// <returns></returns>
         public async Task ExecuteAsync()
         {
-          await  _manuSfcSummaryService.ExecutStatisticAsync("AUTO");
+            await _manuSfcSummaryService.ExecutStatisticAsync("AUTO");
         }
     }
 }

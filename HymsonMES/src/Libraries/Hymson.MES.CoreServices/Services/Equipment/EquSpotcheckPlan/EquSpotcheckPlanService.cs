@@ -7,6 +7,8 @@ using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Events.Equipment;
+using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -19,6 +21,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Security.Policy;
 
 namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
 {
@@ -95,6 +98,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
         }
+
         /// <summary>
         /// 生成点检任务
         /// </summary>
@@ -104,6 +108,10 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
         {
             //计划
             var equSpotcheckPlanEntity = await _equSpotcheckPlanRepository.GetByIdAsync(param.SpotCheckPlanId);
+            if (equSpotcheckPlanEntity.Status == DisableOrEnableEnum.Disable)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12314)).WithData("Code", equSpotcheckPlanEntity.Code);
+            }
             if (param.ExecType == 0)
             {
                 if (equSpotcheckPlanEntity.FirstExecuteTime < HymsonClock.Now())
@@ -174,8 +182,8 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                 {
                     Code = await GenerateSpotcheckOrderCodeAsync(param.SiteId, param.UserName),
                     Name = equSpotcheckPlanEntity.Name,
-                    BeginTime = HymsonClock.Now(),
-                    EndTime = HymsonClock.Now(),
+                    //BeginTime = HymsonClock.Now(),
+                    //EndTime = HymsonClock.Now(),
                     Status = EquSpotcheckTaskStautusEnum.WaitInspect,
                     IsQualified = null,
                     Remark = equSpotcheckPlanEntity.Remark,
@@ -292,6 +300,31 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
         }
 
 
+        /// <summary>
+        /// 生成点检任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task GenerateEquSpotcheckTaskAsync(EquSpotcheckAutoCreateIntegrationEvent param)
+        {
+            await GenerateEquSpotcheckTaskAsync(new GenerateEquSpotcheckTaskDto
+            {
+                SiteId = param.SiteId,
+                UserName = param.UserName,
+                SpotCheckPlanId = param.SpotCheckPlanId,
+                ExecType = param.ExecType
+            });
+        }
+
+        /// <summary>
+        /// 停止点检任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns> 
+        public async Task StopEquSpotcheckTaskAsync(EquSpotcheckAutoStopIntegrationEvent param)
+        {
+  
+        }
         #region 帮助
         private static string GetWeekToInt(string weekName)
         {

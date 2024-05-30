@@ -24,7 +24,9 @@ using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateEquipmentGroupRelation;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateItemRelation;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Services.Dtos.EquMaintenanceTemplate;
+using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -223,6 +225,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
         {
             var EquMaintenanceTemplatePagedQuery = EquMaintenanceTemplatePagedQueryDto.ToQuery<EquMaintenanceTemplatePagedQuery>();
             EquMaintenanceTemplatePagedQuery.SiteId = _currentSite.SiteId;
+            var resDates = new PagedInfo<EquMaintenanceTemplateDto>(new List<EquMaintenanceTemplateDto>(), EquMaintenanceTemplatePagedQueryDto.PageIndex, EquMaintenanceTemplatePagedQueryDto.PageSize, 0);
 
             if (EquMaintenanceTemplatePagedQueryDto.EquipmentId.HasValue)
             {
@@ -244,22 +247,20 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
                 EquMaintenanceTemplatePagedQuery.MaintenanceTemplateIds = EquMaintenanceTemplateEquipmentGroups.Select(it => it.MaintenanceTemplateId).ToList();
 
             }
-            if (!string.IsNullOrWhiteSpace(EquMaintenanceTemplatePagedQueryDto.EquipmentGroupCode))
+            if (!string.IsNullOrWhiteSpace(EquMaintenanceTemplatePagedQueryDto.EquipmentGroupCode) || !string.IsNullOrWhiteSpace(EquMaintenanceTemplatePagedQueryDto.EquipmentGroupName))
             {
-                var equGroupEquipment = await _equEquipmentGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Code = EquMaintenanceTemplatePagedQueryDto.EquipmentGroupCode, Site = _currentSite.SiteId });
-                if (equGroupEquipment != null)
+                var equGroupEquipments = await _equEquipmentGroupRepository.GetByCodeOrNameAsync(new EntityByCodeQuery { Code = EquMaintenanceTemplatePagedQueryDto.EquipmentGroupCode ?? "", Name = EquMaintenanceTemplatePagedQueryDto.EquipmentGroupName ?? "", Site = _currentSite.SiteId });
+                if (equGroupEquipments == null || !equGroupEquipments.Any())
                 {
-                    List<long> equGroupEquipmentIds = new()
-                    {
-                        equGroupEquipment.Id
-                    };
-                    var EquMaintenanceTemplateEquipmentGroups = await _EquMaintenanceTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
-                    if (EquMaintenanceTemplateEquipmentGroups != null && EquMaintenanceTemplateEquipmentGroups.Any())
-                    {
-                        EquMaintenanceTemplatePagedQuery.MaintenanceTemplateIds = EquMaintenanceTemplateEquipmentGroups.Select(it => it.MaintenanceTemplateId).ToList();
-                    }
+                    return resDates;
                 }
-
+                var equGroupEquipmentIds = equGroupEquipments.Select(it => it.Id);
+                var equSpotcheckTemplateEquipmentGroups = await _EquMaintenanceTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equGroupEquipmentIds);
+                if (equSpotcheckTemplateEquipmentGroups == null || !equSpotcheckTemplateEquipmentGroups.Any())
+                {
+                    return resDates;
+                }
+                EquMaintenanceTemplatePagedQuery.MaintenanceTemplateIds = equSpotcheckTemplateEquipmentGroups.Select(it => it.MaintenanceTemplateId).ToList();
             }
             var pagedInfo = await _EquMaintenanceTemplateRepository.GetPagedInfoAsync(EquMaintenanceTemplatePagedQuery);
 
@@ -301,6 +302,18 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(EquMaintenanceTemplateModifyDto);
+
+            var equSpotcheckTemplate = await _EquMaintenanceTemplateRepository.GetByCodeAsync(new EquMaintenanceTemplateQuery
+            {
+                Code = EquMaintenanceTemplateModifyDto.Code,
+                Version = EquMaintenanceTemplateModifyDto.Version,
+                SiteId = _currentSite.SiteId,
+            });
+
+            if (equSpotcheckTemplate != null && equSpotcheckTemplate.Id != EquMaintenanceTemplateModifyDto.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12202)).WithData("Code", EquMaintenanceTemplateModifyDto.Code).WithData("Version", EquMaintenanceTemplateModifyDto.Version);
+            }
 
             //DTO转换实体
             var EquMaintenanceTemplateEntity = EquMaintenanceTemplateModifyDto.ToEntity<EquMaintenanceTemplateEntity>();

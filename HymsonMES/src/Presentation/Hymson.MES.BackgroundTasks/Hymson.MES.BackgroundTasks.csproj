@@ -75,4 +75,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Libraries\Hymson.MES.BackgroundServices\Hymson.MES.BackgroundServices.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Jobs\Equipment\" />
+	</ItemGroup>
 </Project>

@@ -264,6 +264,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
     public class MaterialConsumptionRequestBo
     {
         /// <summary>
+        /// 作业基础参数
+        /// </summary>
+        public ManufactureIdsBo IdsBo { get; set; }
+
+        /// <summary>
         /// 产品序列码
         /// </summary>
         public ManuSfcProduceEntity SFCProduceEntity { get; set; }

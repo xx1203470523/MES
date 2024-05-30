@@ -1,4 +1,4 @@
-﻿using Hymson.MES.BackgroundServices.Manufacture.Productionstatistic;
+﻿using Hymson.MES.BackgroundServices.Tasks.Manufacture.Productionstatistic;
 using Quartz;
 
 namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture

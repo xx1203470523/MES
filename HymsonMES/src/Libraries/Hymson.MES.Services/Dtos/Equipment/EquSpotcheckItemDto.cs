@@ -195,6 +195,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public string? Name { get; set; }
 
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
+
     }
 
 }

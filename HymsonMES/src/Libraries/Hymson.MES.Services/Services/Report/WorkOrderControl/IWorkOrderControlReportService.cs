@@ -17,13 +17,13 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Services.Services.Report
 {
     /// <summary>
-    /// 不良记录报表
+    /// 工单报告
     /// </summary>
     public interface IWorkOrderControlReportService
     {
 
         /// <summary>
-        /// 根据查询条件获取车间作业控制报表分页数据
+        /// 根据查询条件获取工单报告分页数据
         /// 优化: 不模糊查询，且通过关联ID查询
         /// </summary>
         /// <param name="param"></param>

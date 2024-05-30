@@ -642,6 +642,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             {
                 // 默认是关闭
                 entity.Status = EquMaintenanceTaskStautusEnum.Closed;
+                entity.IsQualified = TrueOrFalseEnum.Yes;
                 operationType = EquMaintenanceOperationTypeEnum.Close;
             }
 
@@ -670,8 +671,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             if (entity.Status != EquMaintenanceTaskStautusEnum.Completed)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11912))
-                    .WithData("Before", InspectionStatusEnum.Completed.GetDescription())
-                    .WithData("After", InspectionStatusEnum.Closed.GetDescription());
+                    .WithData("Before", EquMaintenanceTaskStautusEnum.Completed.GetDescription())
+                    .WithData("After", "结果处理");
+                    //.WithData("After", EquMaintenanceTaskStautusEnum.Closed.GetDescription());
             }
 
             // 不合格处理完成之后直接关闭（无需变为合格）

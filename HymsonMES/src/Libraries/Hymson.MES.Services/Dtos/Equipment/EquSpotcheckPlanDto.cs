@@ -216,7 +216,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 关联设备信息
         /// </summary>
-        public IEnumerable<EquRelatedDto> RelationDto { get; set; }
+        public IEnumerable<SpotcheckEquRelatedDto> RelationDto { get; set; }
     }
 
     /// <summary>
@@ -297,7 +297,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 关联设备信息
         /// </summary>
-        public IEnumerable<EquRelatedDto> RelationDto { get; set; }
+        public IEnumerable<SpotcheckEquRelatedDto> RelationDto { get; set; }
     }
 
     /// <summary>
@@ -354,7 +354,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
     /// <summary>
     /// 设备点检计划更新Dto
     /// </summary>
-    public record GenerateDto
+    public record SpotcheckGenerateDto
     {
         /// <summary>
         /// 计划ID
@@ -371,7 +371,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
     /// <summary>
     /// 设备点检计划更新Dto
     /// </summary>
-    public record DeletesDto
+    public record SpotcheckDeletesDto
     {
         /// <summary>
         /// 设备Id
@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
     /// <summary>
     /// 设备点检计划更新Dto
     /// </summary>
-    public record EquRelatedDto
+    public record SpotcheckEquRelatedDto
     {
 
         /// <summary>
@@ -418,7 +418,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         public string? LeaderIds { get; set; }
     }
 
-    public record QueryEquRelationListDto
+    public record QuerySpotcheckEquRelationListDto
     {
         /// <summary>
         /// 计划

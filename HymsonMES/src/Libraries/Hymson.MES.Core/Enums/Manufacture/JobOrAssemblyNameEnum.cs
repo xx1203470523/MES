@@ -143,6 +143,12 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 装箱
         /// </summary>
         [Description("装箱")]
-        Packing = 24
+        Packing = 24,
+        /// <summary>
+        /// 取消条码报废
+        /// </summary>
+        [Description("取消条码报废")]
+        UnDiscard = 25,
+
     }
 }

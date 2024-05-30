@@ -49,7 +49,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> DeletesEquSpotcheckPlanAsync(DeletesDto param);
+        Task<int> DeletesEquSpotcheckPlanAsync(SpotcheckDeletesDto param);
 
         /// <summary>
         /// 根据ID查询
@@ -64,7 +64,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task GenerateEquSpotcheckTaskCoreAsync(GenerateDto param);
+        Task GenerateEquSpotcheckTaskCoreAsync(SpotcheckGenerateDto param);
 
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task GenerateEquSpotcheckTaskAsync(GenerateDto param);
+        Task GenerateEquSpotcheckTaskAsync(SpotcheckGenerateDto param);
 
         #region 关联信息
 
@@ -81,7 +81,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// </summary>
         /// <param name="spotCheckPlanId"></param>
         /// <returns></returns>
-        Task<List<QueryEquRelationListDto>> QueryEquRelationListAsync(long spotCheckPlanId);
+        Task<List<QuerySpotcheckEquRelationListDto>> QueryEquRelationListAsync(long spotCheckPlanId);
 
         #endregion
 

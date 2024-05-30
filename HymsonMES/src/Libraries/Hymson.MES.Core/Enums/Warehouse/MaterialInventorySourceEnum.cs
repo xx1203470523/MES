@@ -53,6 +53,12 @@ namespace Hymson.MES.Core.Enums
         /// 物料合并
         /// </summary>
         [Description("合并")]
-        Merge = 10
+        Merge = 10,
+
+        /// <summary>
+        /// 不良录入
+        /// </summary>
+        [Description("不良录入")]
+        BadEntry = 11
     }
 }

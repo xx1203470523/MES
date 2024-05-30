@@ -1145,6 +1145,8 @@ namespace Hymson.MES.Services.Services.Quality
                         SiteId = site,
                     });
 
+                    //var remarks = await _qualFqcOrderUnqualifiedHandleRepository.GetEntitiesAsync(new QualFqcOrderUnqualifiedHandleQuery { FQCOrderIds= resultFQCIds });
+
                     result.Data = result.Data.Select(m =>
                     {
                         var FQCEntity = fQCEntities.FirstOrDefault(e => e.Id == m.FQCOrderId);
@@ -1177,6 +1179,12 @@ namespace Hymson.MES.Services.Services.Quality
                         else
                         {
                             m.HandMethodText = "-";
+                        }
+
+                        var remark = unqualifiedHandles.FirstOrDefault(e => e.FQCOrderId == m.FQCOrderId)?.Remark;
+                        if(remark != default)
+                        {
+                            m.Remark = remark;
                         }
 
                         return m;
@@ -1225,9 +1233,22 @@ namespace Hymson.MES.Services.Services.Quality
             foreach (var item in filteredItems)
             {
                 item.HandMethod = updateDto.HandMethod;
+                item.UpdatedBy = _currentUser.UserName;
+                item.UpdatedOn = HymsonClock.Now();
+            }
+            foreach (var item in samples)
+            {
+                item.UpdatedBy = _currentUser.UserName;
+                item.UpdatedOn = HymsonClock.Now();
             }
 
-            return await _qualFqcOrderSfcRepository.UpdateRangeAsync(FQCOrderSFC);
+            var row = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+                row += await _qualFqcOrderSampleRepository.UpdateRangeAsync(samples);
+                row += await _qualFqcOrderSfcRepository.UpdateRangeAsync(FQCOrderSFC);
+            trans.Complete();
+
+            return row;
         }
 
 

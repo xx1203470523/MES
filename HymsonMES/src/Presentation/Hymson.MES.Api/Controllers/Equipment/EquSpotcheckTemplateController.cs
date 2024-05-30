@@ -109,7 +109,7 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckTemplate
         /// <returns></returns>
         [HttpGet]
         [Route("getitem")]
-        public async Task<List<GetItemRelationListDto>> QueryItemRelationListAsync([FromQuery] GetEquSpotcheckTemplateItemRelationDto param)
+        public async Task<List<GetSpotcheckItemRelationListDto>> QueryItemRelationListAsync([FromQuery] GetEquSpotcheckTemplateItemRelationDto param)
         {
             return await _equSpotcheckTemplateService.QueryItemRelationListAsync(param);
         }
@@ -121,7 +121,7 @@ namespace Hymson.MES.Api.Controllers.EquSpotcheckTemplate
         /// <returns></returns>
         [HttpGet]
         [Route("getgroup")]
-        public async Task<List<QueryEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync([FromQuery] GetEquSpotcheckTemplateItemRelationDto param)
+        public async Task<List<QuerySpotcheckEquipmentGroupRelationListDto>> QueryEquipmentGroupRelationListAsync([FromQuery] GetEquSpotcheckTemplateItemRelationDto param)
         {
             return await _equSpotcheckTemplateService.QueryEquipmentGroupRelationListAsync(param);
         }
