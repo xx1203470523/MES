@@ -156,6 +156,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory
                     Batch = item.Batch ?? "",
                     MaterialType = MaterialInventoryMaterialTypeEnum.PurchaseParts,
                     QuantityResidue = item.QuantityResidue,
+                    ReceivedQty = item.QuantityResidue,
                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                     DueDate = item.DueDate,
                     Source = item.Source,
