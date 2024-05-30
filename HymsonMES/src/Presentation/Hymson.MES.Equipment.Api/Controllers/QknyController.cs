@@ -328,18 +328,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 return;
             }
             await _qknyService.HalfFeedingAsync(dto);
-            //TODO
-            //1. 本用于涂布，辊分，模切，卷绕工序，现涂布，辊分，模切改为一个工单，这几个地方改为直接进站
-            //2. 校验条码是否在上工序产出(manu_sfc_produce)
-            //3. 走进站流程
-            /*
-             * select * from manu_sfc => 修改状态
-             * select * from manu_sfc_info msi => 不处理
-             * select * from manu_sfc_produce msp => 修改状态
-             * 
-             * select * from manu_sfc_step mss => 新增
-             */
-            //4. 工序产出时，在制品表 manu_sfc_produce 删除进站条码, manu_sfc_step 新增
         }
 
         /// <summary>
@@ -669,10 +657,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             await _qknyService.OutboundMetersReportAsync(dto);
-
-            //TODO
-            //1. 设备上报条码和对应的长度
-            //2. 去 manu_sfc，manu_sfc_produce 表修改条码的长度，manu_sfc根据manu_sfc_produce的id来
         }
 
         /// <summary>
@@ -692,9 +676,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             return await _qknyService.CcdGetBarcodeAsync(dto);
-
-            //TODO
-            //1. 用于异常情况，返回设备产出最近的一个条码，从manu_sfc_produce中取
         }
 
         /// <summary>
@@ -713,10 +694,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             await _equCommonService.EquipmentProcessParamAsync(dto);
-
-            //TODO
-            //1. 写入参数表，参考现有的EquipmentCollectionAsync，
-            //2. 支持错误参数不NG，记录或者忽略
         }
 
         /// <summary>
@@ -735,12 +712,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             await _qknyService.InboundAsync(dto);
-
-            //TODO
-            //1. 上工序出站校验
-            //2. 是否合格校验
-            //3. 支持重复进站（重复进站当前系统能否处理，系统会有个将两条记录移到另一条记录）
-            //4. 参考现有进站
         }
 
         /// <summary>
@@ -933,9 +904,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             await _formationService.FillingDataAsync(dto);
-
-            //TODO
-            //1. 新增表进行记录
         }
 
         /// <summary>
@@ -954,10 +922,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             await _formationService.EmptyContainerCheckAsync(dto);
-
-            //TODO
-            //2. 校验托盘是否存在系统中（待确认）
-            //3. 托盘(载具)表 inte_vehicle_freight_stack 是否存在数据
         }
 
         /// <summary>
@@ -1057,12 +1021,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             await _formationService.ContainerNgReportAsync(dto);
-
-            //TODO
-            //1. inte_vehicle_freight_stack 删除绑定数据
-            //2. 添加冗余表 inte_vehicle_freight_ng_record，NG解绑记录
-            //3. 添加 inte_vehicle_freight_record 解绑记录
-            //4. 添加电芯NG记录 manu_product_bad_record
         }
 
         /// <summary>
@@ -1316,11 +1274,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             }
 
             return await _qknyService.GetSfcInfoAsync(dto);
-
-            //TODO
-            //1. 用于分选工序，获取电芯是B品，NG品，良品
-
-            //await _qknyService.InboundAsync(dto);
 
         }
 

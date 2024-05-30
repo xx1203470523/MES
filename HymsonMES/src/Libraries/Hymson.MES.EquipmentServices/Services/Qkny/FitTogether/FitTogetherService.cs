@@ -23,6 +23,7 @@ using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment;
 using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
 using Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory;
+using Hymson.MES.EquipmentServices.Validators.EquVerifyHelper;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Dtos.ManuJzBind;
 using Hymson.MES.Services.Dtos.ManuJzBindRecord;
@@ -139,8 +140,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         /// <returns></returns>
         public async Task<List<OutboundMoreReturnDto>> OutboundMultPolarAsync(OutboundMultPolarDto dto)
         {
+            EquVerifyHelper.OutboundMultPolarDto(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
             SFCOutStationBo outBo = new SFCOutStationBo();
             outBo.SiteId = equResModel.SiteId;
@@ -228,6 +230,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         /// <returns></returns>
         public async Task InboundBindJzSingleAsync(InboundBindJzSingleDto dto)
         {
+            EquVerifyHelper.InboundBindJzSingleDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
 
@@ -257,21 +260,13 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             {
                 if (string.IsNullOrEmpty(jzModel.Sfc) == true)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES45271));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45271))
+                        .WithData("Sfc", dto.Sfc);
                 }
                 //以电芯做进出站
                 inBo.SFCs = new List<string>() { jzModel.Sfc };
                 await _manuPassStationService.InStationRangeBySFCAsync(inBo, RequestSourceEnum.EquipmentApi);
             }
-
-            ////4. 返回
-            //List<InboundMoreReturnDto> resultList = new List<InboundMoreReturnDto>();
-            //foreach (var item in sfcList)
-            //{
-            //    InboundMoreReturnDto model = new InboundMoreReturnDto();
-            //    model.Sfc = item;
-            //    resultList.Add(model);
-            //}
         }
 
         /// <summary>
@@ -307,8 +302,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         /// <returns></returns>
         public async Task<string> Create24GbCodeAsync(GenerateDxSfcDto dto)
         {
+            EquVerifyHelper.GenerateDxSfcDto(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 查询极组信息
             ManuJzBindQuery query = new ManuJzBindQuery();
             query.JzSfc = dto.Sfc;
@@ -322,7 +318,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             param.ProcedureId = equResModel.ProcedureId;
             param.EquipmentId = equResModel.EquipmentId;
             param.ResourceId = equResModel.ResId;
-            param.ProcedureId = equResModel.ProcedureId;
 
             return await _manuCreateBarcodeService.CreateCellBarCodeBySfcAsync(param);
         }
@@ -334,6 +329,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         /// <returns></returns>
         public async Task OutboundSfcPolarAsync(OutboundSfcPolarDto dto)
         {
+            EquVerifyHelper.OutboundSfcPolarDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 查询极组信息
@@ -433,6 +429,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         [LogDescription("绑定后极组单个条码出站050", BusinessType.OTHER, "OutboundBindJzSingle050", ReceiverTypeEnum.MES)]
         public async Task OutboundBindJzSingleAsync(OutboundBindJzSingleDto dto)
         {
+            EquVerifyHelper.OutboundBindJzSingleDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
 
@@ -504,6 +501,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         /// <returns></returns>
         public async Task CollingPolarAsync(CollingPolarDto dto)
         {
+            EquVerifyHelper.CollingPolarDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
@@ -514,7 +512,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             var whInfo = await _whMaterialInventoryService.GetByBarCodeAsync(whQuery);
             if (whInfo != null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45230));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45230))
+                    .WithData("Sfc", dto.Sfc);
             }
             //3. 构造数据
             //3.1 外部条码下达

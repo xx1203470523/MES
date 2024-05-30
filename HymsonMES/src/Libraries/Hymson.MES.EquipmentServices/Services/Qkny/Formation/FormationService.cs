@@ -19,6 +19,7 @@ using Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment;
 using Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle;
 using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
 using Hymson.MES.EquipmentServices.Services.Qkny.ProcSortingRule;
+using Hymson.MES.EquipmentServices.Validators.EquVerifyHelper;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Dtos.ManuFillingDataRecord;
 using Hymson.MES.Services.Services.EquProductParamRecord;
@@ -27,6 +28,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -156,6 +158,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// <returns></returns>
         public async Task EmptyContainerCheckAsync(EmptyContainerCheckDto dto)
         {
+            EquVerifyHelper.EmptyContainerCheckDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 托盘校验
@@ -170,12 +173,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             var vehicleList = await _manuCommonService.GetSfcListByVehicleCodesAsync(vehicleQuery);
             if (vehicleList.IsNullOrEmpty() == false)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45111));
+                string sfcListStr = string.Join(",", vehicleList);
+                throw new CustomerValidationException(nameof(ErrorCode.MES45111))
+                    .WithData("ContainerCode", dto.ContainerCode)
+                    .WithData("sfcListStr", sfcListStr);
             }
-
-            //TODO
-            //2. 校验托盘是否存在系统中（待确认）
-            //3. 托盘(载具)表 inte_vehicle_freight_stack 是否存在数据
         }
 
         /// <summary>
@@ -185,6 +187,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// <returns></returns>
         public async Task ContainerSfcCheckAsync(ContainerSfcCheckDto dto)
         {
+            EquVerifyHelper.ContainerSfcCheckDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 校验电芯是否存在
@@ -195,7 +198,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             //校验电芯是否合格
             if (sfcEntity.Status == SfcStatusEnum.Scrapping)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45091));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45091))
+                    .WithData("Sfc", dto.Sfc);
             }
         }
 
@@ -206,6 +210,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// <returns></returns>
         public async Task BindContainerAsync(BindContainerDto dto)
         {
+            EquVerifyHelper.BindContainerDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = new EquEquipmentResAllView();
             if(dto.OperationType == 0)
@@ -269,50 +274,21 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// <returns></returns>
         public async Task UnBindContainerAsync(UnBindContainerDto dto)
         {
+            EquVerifyHelper.UnBindContainerDto(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 托盘电芯绑定
             InteVehicleUnBindDto bindDto = new InteVehicleUnBindDto();
             bindDto.ContainerCode = dto.ContainCode;
             bindDto.SfcList = dto.SfcList;
             bindDto.SiteId = equResModel.SiteId;
             bindDto.UserName = dto.EquipmentCode;
-            ////托盘进站
-            //VehicleInStationBo inStationBo = new VehicleInStationBo();
-            //inStationBo.EquipmentId = equResModel.EquipmentId;
-            //inStationBo.ResourceId = equResModel.ResId;
-            //inStationBo.SiteId = equResModel.SiteId;
-            //inStationBo.ProcedureId = equResModel.ProcedureId;
-            //inStationBo.UserName = dto.EquipmentCode;
-            //inStationBo.VehicleCodes = new List<string> { dto.ContainCode };
-            ////多条码出站
-            //SFCOutStationBo outStationBo = new SFCOutStationBo
-            //{
-            //    SiteId = equResModel.SiteId,
-            //    EquipmentId = equResModel.EquipmentId,
-            //    ResourceId = equResModel.ResId,
-            //    ProcedureId = equResModel.ProcedureId,
-            //    UserName = dto.EquipmentCode,
-            //    OutStationRequestBos = dto.SfcList.Select(item => new OutStationRequestBo
-            //    {
-            //        SFC = item,
-            //        IsQualified = true
-            //    })
-            //};
 
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             //await _manuPassStationService.InStationRangeByVehicleAsync(inStationBo);
             await _inteVehicleService.VehicleUnBindOperationAsync(bindDto);
             //await _manuPassStationService.OutStationRangeBySFCAsync(outStationBo);
             trans.Complete();
-
-            //TODO 添加进出站逻辑
-            //拿完整的工艺路线进行测试
-
-            //TODO
-            //1. 校验电芯是否在托盘中
-            //2. inte_vehicle_freight_stack 删除绑定数据
-            //3. 添加 inte_vehicle_freight_record 解绑记录
         }
 
         /// <summary>
@@ -322,6 +298,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// <returns></returns>
         public async Task ContainerNgReportAsync(ContainerNgReportDto dto)
         {
+            EquVerifyHelper.ContainerNgReportDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 获取实际NG设备信息
@@ -331,7 +308,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             var factList = await _equEquipmentService.GetMultEquResAllAsync(factQuery);
             if (factList.IsNullOrEmpty() == true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45001))
+                    .WithData("EquipmentCode", equResModel.EquipmentCode).WithData("ResourceCode", equResModel.ResCode);
             }
             //3. 组装数据
             InteVehicleNgSfcDto ngDto = new InteVehicleNgSfcDto();
@@ -365,6 +343,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// <returns></returns>
         public async Task InboundInContainerAsync(InboundInContainerDto dto)
         {
+            EquVerifyHelper.InboundInContainerDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 托盘进站
@@ -385,6 +364,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// <returns></returns>
         public async Task OutboundInContainerAsync(OutboundInContainerDto dto)
         {
+            EquVerifyHelper.OutboundInContainerDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
@@ -433,6 +413,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// <returns></returns>
         public async Task<List<ProcSortRuleDto>> SortingRuleAsync(SortingRuleDto dto)
         {
+            EquVerifyHelper.SortingRuleDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 查询激活的工单

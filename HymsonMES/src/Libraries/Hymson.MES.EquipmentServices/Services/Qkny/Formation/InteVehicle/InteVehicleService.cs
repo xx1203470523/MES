@@ -136,7 +136,10 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             var dbSfcList = sfcProductList.Select(m => m.SFC).ToList();
             if (dbSfcList.Count != param.SfcList.Count)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45113));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45113))
+                    .WithData("ContainerCode", param.ContainerCode)
+                    .WithData("SfcCount", sfcList.Count)
+                    .WithData("DbSfcCount", dbSfcList.Count);
             }
             //条码差异校验
             var exceptList = dbSfcList.Except(sfcList).ToList();
@@ -270,7 +273,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(vehicleQuery);
             if (inteVehicleEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45112));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45110))
+                    .WithData("ContainerCode", param.ContainerCode);
             }
 
             //查数据库中在制品条码
@@ -281,13 +285,17 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             var sfcProductList = (await _manuSfcProduceRepository.GetListBySfcsAsync(sfcQuery)).ToList();
             if (sfcProductList == null || sfcProductList.Count == 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45112));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45112))
+                    .WithData("SfcListStr", string.Join(",",sfcList));
             }
             //数量校验
             var dbSfcList = sfcProductList.Select(m => m.SFC).ToList();
             if (dbSfcList.Count != sfcList.Count)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45113));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45113))
+                    .WithData("ContainerCode", param.ContainerCode)
+                    .WithData("SfcCount", sfcList.Count)
+                    .WithData("DbSfcCount", dbSfcList.Count);
             }
             //条码差异校验
             var exceptList = dbSfcList.Except(sfcList).ToList();
@@ -350,7 +358,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(vehicleQuery);
             if (inteVehicleEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45112));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45110))
+                    .WithData("ContainerCode", param.ContainerCode);
             }
 
             //查数据库中在制品条码
@@ -361,13 +370,17 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             var sfcProductList = (await _manuSfcProduceRepository.GetListBySfcsAsync(sfcQuery)).ToList(); ;
             if (sfcProductList == null || sfcProductList.Count == 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45112));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45112))
+                    .WithData("SfcListStr", string.Join(",", sfcList));
             }
             //数量校验
             var dbSfcList = sfcProductList.Select(m => m.SFC).ToList();
             if (dbSfcList.Count != sfcList.Count)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45113));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45113))
+                    .WithData("ContainerCode", param.ContainerCode)
+                    .WithData("SfcCount", sfcList.Count)
+                    .WithData("DbSfcCount", dbSfcList.Count);
             }
             //条码差异校验
             var exceptList = dbSfcList.Except(sfcList).ToList();

@@ -10,13 +10,10 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Qkny;
-using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.CoreServices.Services.Qkny;
-using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
@@ -29,32 +26,18 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ToolBindMaterial;
-using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment;
-using Hymson.MES.EquipmentServices.Services.Qkny.Formula;
 using Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle;
 using Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint;
 using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
-using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
-using Hymson.MES.EquipmentServices.Services.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory;
+using Hymson.MES.EquipmentServices.Validators.EquVerifyHelper;
 using Hymson.MES.Services.Dtos.AgvTaskRecord;
 using Hymson.MES.Services.Dtos.EquProcessParamRecord;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Services.AgvTaskRecord;
-using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
-using Hymson.MES.Services.Services.EquEquipmentAlarm;
-using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
-using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Services.EquProcessParamRecord;
 using Hymson.MES.Services.Services.EquProductParamRecord;
-using Hymson.MES.Services.Services.EquToolLifeRecord;
-using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
-using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
-using Hymson.MES.Services.Services.ManuFeedingCompletedZjyjRecord;
-using Hymson.MES.Services.Services.ManuFeedingNoProductionRecord;
-using Hymson.MES.Services.Services.ManuFeedingTransferRecord;
-using Hymson.MES.Services.Services.ManuFillingDataRecord;
 using Hymson.MessagePush.Helper;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -617,6 +600,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task InboundAsync(InboundDto dto)
         {
+            EquVerifyHelper.InboundDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
@@ -639,6 +623,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task OutboundAsync(OutboundDto dto)
         {
+            EquVerifyHelper.OutboundDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
@@ -701,6 +686,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task<List<InboundMoreReturnDto>> InboundMoreAsync(InboundMoreDto dto)
         {
+            EquVerifyHelper.InboundMoreDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
@@ -732,6 +718,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task<List<OutboundMoreReturnDto>> OutboundMoreAsync(OutboundMoreDto dto)
         {
+            EquVerifyHelper.OutboundMoreDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
@@ -807,6 +794,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task ProductParamAsync(ProductParamDto dto)
         {
+            EquVerifyHelper.ProductParamDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 出站参数
@@ -845,10 +833,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task MaterialInventoryAsync(MaterialInventoryDto dto)
         {
-            if (dto == null || dto.BarCodeList == null || !dto.BarCodeList.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            }
+            EquVerifyHelper.MaterialInventoryDto(dto);
 
             await _whMaterialInventoryService.MaterialInventoryAsync(dto);
         }
@@ -860,6 +845,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task ToolBindMaterialAsync(ToolBindMaterialDto dto)
         {
+            EquVerifyHelper.ToolBindMaterialDto(dto);
             //获取设备基础信息
             var equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //校验条码是否已绑定工装
@@ -910,6 +896,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task<List<SortingSfcInfo>> GetSfcInfoAsync(GetSfcInfoDto dto)
         {
+            EquVerifyHelper.GetSfcInfoDto(dto);
             //获取设备基础信息
             var equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //查询降级信息
@@ -933,8 +920,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task SortingUnBindAsync(SortingUnBindDto dto)
         {
+            EquVerifyHelper.SortingUnBindDto(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 托盘电芯解绑
             InteVehicleUnBindDto bindDto = new InteVehicleUnBindDto();
             bindDto.ContainerCode = dto.ContainCode;
@@ -953,6 +941,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task SortingOutboundAsync(SortingOutboundDto dto)
         {
+            EquVerifyHelper.SortingOutboundDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 参数组装

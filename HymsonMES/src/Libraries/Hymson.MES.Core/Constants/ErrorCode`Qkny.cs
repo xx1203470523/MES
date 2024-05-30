@@ -215,12 +215,12 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 设备无产出条码
         /// </summary>
-        public const string MES45090 = "设备无产出条码";
+        public const string MES45090 = "设备无产出【{Sfc}】条码";
 
         /// <summary>
         /// 条码是NG状态
         /// </summary>
-        public const string MES45091 = "条码是NG状态";
+        public const string MES45091 = "【{Sfc}】条码是NG状态";
 
         #endregion
 
@@ -238,22 +238,22 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 载具不存在
         /// </summary>
-        public const string MES45110 = "载具不存在";
+        public const string MES45110 = "【{ContainerCode}】载具不存在";
 
         /// <summary>
         /// 载具已经绑定条码
         /// </summary>
-        public const string MES45111 = "载具已经绑定条码";
+        public const string MES45111 = "【{ContainerCode}】载具已经绑定【{sfcListStr}】条码";
 
         /// <summary>
-        /// 载具中条码系统不存在
+        /// 条码在系统中不存在
         /// </summary>
-        public const string MES45112 = "载具中条码在系统中不存在";
+        public const string MES45112 = "【{SfcListStr}】条码在系统中不存在";
 
         /// <summary>
         /// 载具中条码数量和数据库中不匹配
         /// </summary>
-        public const string MES45113 = "载具中条码数量和数据库中不匹配";
+        public const string MES45113 = "【{ContainerCode}】载具中条码【{SfcCount}】数量和数据库【{DbSfcCount}】数量不匹配";
 
         /// <summary>
         /// 载具中条码和数据库中不匹配
@@ -371,7 +371,7 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 条码已经在库存中存在
         /// </summary>
-        public const string MES45230 = "条码已经在库存中存在";
+        public const string MES45230 = "【{Sfc}】条码已经在库存中存在";
 
         /// <summary>
         /// 物料条码格式错误
@@ -392,7 +392,7 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 极组条码没有绑定的电芯
         /// </summary>
-        public const string MES45271 = "极组条码没有绑定的电芯";
+        public const string MES45271 = "【{Sfc}】极组条码没有绑定的电芯";
 
         #endregion
 
