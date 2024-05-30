@@ -225,7 +225,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
                 paramModel.MarerialGroupCode = item.MaterialGroupCode;
                 paramModel.ParameCode = item.ParameterCode;
                 paramModel.ParamValue = item.Setvalue;
-                paramModel.FunctionCode = item.FunctionName;
+                paramModel.FunctionCode = item.FunctionCode;
                 paramModel.Unit = item.Unit;
 
                 result.ParamList.Add(paramModel);

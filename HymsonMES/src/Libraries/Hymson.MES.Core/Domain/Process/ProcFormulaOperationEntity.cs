@@ -33,7 +33,7 @@ namespace Hymson.MES.Core.Domain.Process
         public string Version { get; set; }
 
        /// <summary>
-        /// 操作类型 1、物料 2、物料组 3、固定值 5、设定值 6、参数值
+        /// 操作类型 1、物料 2、物料组 3、固定值 4、设定值 5、参数值
         /// </summary>
         public FormulaOperationTypeEnum Type { get; set; }
 
