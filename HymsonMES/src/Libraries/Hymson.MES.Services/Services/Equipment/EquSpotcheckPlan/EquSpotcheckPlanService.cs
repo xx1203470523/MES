@@ -167,6 +167,13 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             List<EquSpotcheckPlanEquipmentRelationEntity> equSpotcheckPlanEquipmentRelationList = new();
 
+
+            var equMaintenancePlanUser = equSpotcheckPlanCreateDto.RelationDto.Where(it => string.IsNullOrWhiteSpace(it.ExecutorIds) || string.IsNullOrWhiteSpace(it.LeaderIds));
+            if (equMaintenancePlanUser != null && equMaintenancePlanUser.Any())
+            {
+                var equEquipments = await _equEquipmentRepository.GetByIdAsync(equMaintenancePlanUser.Select(item => item.Id == 0 ? item.EquipmentId : item.Id));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12322)).WithData("Code", string.Join(",", equEquipments.Select(it => it.EquipmentCode).ToArray()));
+            }
             foreach (var item in equSpotcheckPlanCreateDto.RelationDto)
             {
                 if (item.TemplateId == 0)
@@ -317,6 +324,13 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             List<EquSpotcheckPlanEquipmentRelationEntity> equSpotcheckPlanEquipmentRelationList = new();
             List<long> spotCheckPlanIds = new() { equSpotcheckPlanModifyDto.Id };
 
+
+            var equMaintenancePlanUser = equSpotcheckPlanModifyDto.RelationDto.Where(it => string.IsNullOrWhiteSpace(it.ExecutorIds) || string.IsNullOrWhiteSpace(it.LeaderIds));
+            if (equMaintenancePlanUser != null && equMaintenancePlanUser.Any())
+            {
+                var equEquipments = await _equEquipmentRepository.GetByIdAsync(equMaintenancePlanUser.Select(item => item.Id == 0 ? item.EquipmentId : item.Id));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12322)).WithData("Code", string.Join(",", equEquipments.Select(it => it.EquipmentCode).ToArray()));
+            }
             foreach (var item in equSpotcheckPlanModifyDto.RelationDto)
             {
                 if (item.TemplateId == 0)

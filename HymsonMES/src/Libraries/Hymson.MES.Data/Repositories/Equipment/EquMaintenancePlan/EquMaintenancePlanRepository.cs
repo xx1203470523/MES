@@ -94,6 +94,8 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            //sqlBuilder.LeftJoin("equ_maintenance_plan_equipment_relation emper ON emp.Id=emper.MaintainPlanId");
+
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
@@ -208,7 +210,7 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
     public partial class EquMaintenancePlanRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_plan` /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_plan` emp /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_Maintenance_plan` /**where**/ ";
         const string GetEquMaintenancePlanEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
@@ -232,7 +234,7 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
 
         const string GetByCodeSql = @"SELECT  
                                `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
-                            FROM `equ_Maintenance_plan`  WHERE Code = @Code AND Version=@Version AND SiteId=@SiteId";
+                            FROM `equ_Maintenance_plan`  WHERE Code = @Code AND Version=@Version AND SiteId=@SiteId AND IsDeleted=0";
         #endregion
     }
 }

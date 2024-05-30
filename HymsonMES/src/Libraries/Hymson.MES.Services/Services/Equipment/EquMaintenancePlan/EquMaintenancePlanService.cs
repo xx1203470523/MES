@@ -30,6 +30,8 @@ using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
+using System.Linq;
 
 namespace Hymson.MES.Services.Services.EquMaintenancePlan
 {
@@ -159,6 +161,13 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
 
             List<EquMaintenancePlanEquipmentRelationEntity> EquMaintenancePlanEquipmentRelationList = new();
 
+
+            var equMaintenancePlanUser = EquMaintenancePlanCreateDto.RelationDto.Where(it => string.IsNullOrWhiteSpace(it.ExecutorIds) || string.IsNullOrWhiteSpace(it.LeaderIds));
+            if (equMaintenancePlanUser != null && equMaintenancePlanUser.Any())
+            {
+                var equEquipments = await _equEquipmentRepository.GetByIdAsync(equMaintenancePlanUser.Select(item => item.Id == 0 ? item.EquipmentId : item.Id));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12322)).WithData("Code", string.Join(",", equEquipments.Select(it => it.EquipmentCode).ToArray()));
+            }
             foreach (var item in EquMaintenancePlanCreateDto.RelationDto)
             {
                 if (item.TemplateId == 0)
@@ -310,9 +319,15 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
 
             List<EquMaintenancePlanEquipmentRelationEntity> EquMaintenancePlanEquipmentRelationList = new();
             List<long> MaintenancePlanIds = new() { EquMaintenancePlanModifyDto.Id };
-
+            var equMaintenancePlanUser = EquMaintenancePlanModifyDto.RelationDto.Where(it => string.IsNullOrWhiteSpace(it.ExecutorIds) || string.IsNullOrWhiteSpace(it.LeaderIds));
+            if (equMaintenancePlanUser != null && equMaintenancePlanUser.Any())
+            {
+                var equEquipments = await _equEquipmentRepository.GetByIdAsync(equMaintenancePlanUser.Select(item => item.Id == 0 ? item.EquipmentId : item.Id));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12322)).WithData("Code", string.Join(",", equEquipments.Select(it => it.EquipmentCode).ToArray()));
+            }
             foreach (var item in EquMaintenancePlanModifyDto.RelationDto)
             {
+
                 EquMaintenancePlanEquipmentRelationEntity EquMaintenancePlanEquipmentRelation = new()
                 {
                     EquipmentId = item.Id == 0 ? item.EquipmentId : item.Id,
