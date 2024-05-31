@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -85,5 +86,9 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="palletNo"></param>
         /// <returns></returns>
         Task<IEnumerable<InteVehicleFreightRecordView>> QueryVehicleFreightRecordByPalletNoAsync(string palletNo);
+
+        Task DownloadImportTemplateAsync(Stream stream);
+
+        Task ImportInteCustomAsync(IFormFile formFile);
     }
 }

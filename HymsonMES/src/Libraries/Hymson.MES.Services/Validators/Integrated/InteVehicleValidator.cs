@@ -49,6 +49,22 @@ namespace Hymson.MES.Services.Validators.Integrated
 
         }
     }
+
+
+    internal class InteVehicletImportValidator : AbstractValidator<InteVehicleFreightImportDto>
+    {
+        public InteVehicletImportValidator()
+        {
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x.VehicleTypeCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18604));
+            RuleFor(x => x.VehicleTypeCode).Must(x => !x.Any(x => Char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES18618));
+            RuleFor(x => x.VehicleTypeName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18605));
+            RuleFor(x => x.VehicleTypeCode).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18606));
+            RuleFor(x => x.VehicleTypeName).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18607));
+            RuleFor(x => x.Describe).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18408));
+            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(DisableOrEnableEnum), it)).WithErrorCode(nameof(ErrorCode.MES18609));
+        }
+    }
     /// <summary>
     /// 解盘校验
     /// </summary>

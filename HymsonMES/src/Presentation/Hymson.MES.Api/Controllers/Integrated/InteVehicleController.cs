@@ -194,5 +194,31 @@ namespace Hymson.MES.Api.Controllers.Integrated
         {
             return await _inteVehicleService.QueryVehicleFreightRecordByPalletNoAsync(palletNo);
         }
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _inteVehicleService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"载具注册导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导入客户数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importCustom")]
+        public async Task ImportCustomAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+
+            await _inteVehicleService.ImportInteCustomAsync(formFile);
+        }
     }
 }
