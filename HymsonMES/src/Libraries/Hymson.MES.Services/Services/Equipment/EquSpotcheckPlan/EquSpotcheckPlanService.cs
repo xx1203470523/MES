@@ -205,6 +205,8 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             trans.Complete();
 
+            //TODO 这里要另外加入口 先这样用着
+            ExecPublish(equSpotcheckPlanEntity);
         }
 
         /// <summary>
@@ -364,6 +366,8 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             trans.Complete();
 
+            //TODO 这里要另外加入口 先这样用着
+            ExecPublish(equSpotcheckPlanEntity, true);
         }
 
         /// <summary>
@@ -563,6 +567,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
         #region 关联信息
 
+
         /// <summary>
         /// 获取模板关联信息（项目）
         /// </summary>
@@ -631,6 +636,39 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             }
             var expression = $"{second} {minute} {hour} {day} {tail}";
             return expression;
+        }
+
+
+        /// <summary>
+        /// 执行发送任务
+        /// </summary>
+        /// <param name="equSpotcheckPlanEntity"></param>
+        /// <param name="isEdit"></param>
+        private void ExecPublish(EquSpotcheckPlanEntity equSpotcheckPlanEntity, bool isEdit = false)
+        {
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanEntity.CornExpression) && equSpotcheckPlanEntity.FirstExecuteTime.HasValue)
+            {
+                if (equSpotcheckPlanEntity.Status == DisableOrEnableEnum.Enable)
+                {
+                    EquSpotcheckAutoCreateIntegrationEvent equSpotcheckAutoCreateIntegrationEvent = new()
+                    {
+                        SiteId = _currentSite.SiteId ?? 0,
+                        CornExpression = equSpotcheckPlanEntity.CornExpression,
+                        FirstExecuteTime = (DateTime)equSpotcheckPlanEntity.FirstExecuteTime,
+                        SpotCheckPlanId = equSpotcheckPlanEntity.Id,
+                        UserName = _currentUser.UserName,
+                    };
+                    _eventBus.Publish(equSpotcheckAutoCreateIntegrationEvent);
+                }
+                else if (isEdit)
+                {
+                    EquSpotcheckAutoStopIntegrationEvent equSpotcheckAutoCreateIntegrationEvent = new()
+                    {
+                        SpotCheckPlanId = equSpotcheckPlanEntity.Id,
+                    };
+                    _eventBus.Publish(equSpotcheckAutoCreateIntegrationEvent);
+                }
+            }
         }
         #endregion
     }

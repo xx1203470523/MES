@@ -147,8 +147,8 @@ namespace Hymson.MES.Services.Dtos.Report
         public PlanWorkOrderStatusEnum? Status { get; set; }
 
         /// <summary>
-        /// 录入时间
+        /// 创建时间  数组 ：时间范围 
         /// </summary>
-        public DateTime? CreatedOn { get; set; }
+        public DateTime[]? CreatedOn { get; set; }
     }
 }

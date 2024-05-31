@@ -105,8 +105,8 @@ namespace Hymson.MES.Services.Services.Report
                         OrderCode = item?.OrderCode ?? "",
                         Type = item?.Type,
                         PassDownQuantity = item.PassDownQuantity,
-                        ProcessDownQuantity = item.PassDownQuantity- item.PassDownQuantity- item.FinishProductQuantity,
-                        UnQualifiedQuantity = item.PassDownQuantity,
+                        ProcessDownQuantity = item.PassDownQuantity- item.UnQualifiedQuantity- item.FinishProductQuantity,
+                        UnQualifiedQuantity = item.UnQualifiedQuantity,
                         FinishProductQuantity = item.FinishProductQuantity,
                     });
                 }
