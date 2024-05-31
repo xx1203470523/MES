@@ -247,11 +247,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             sqlBuilder.Where("esp.SiteId = @SiteId");
 
-            //wipe off Status 
-            //if (pagedQuery.Status.HasValue)
-            //{
-            //    sqlBuilder.Where("esp.Status = @Status");
-            //}
+            if (pagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("NOT (esp.STATUS = 0 AND esp.SparePartTypeId IS NULL)");
+            }
 
             sqlBuilder.Where("esp.IsDeleted = 0");
 
