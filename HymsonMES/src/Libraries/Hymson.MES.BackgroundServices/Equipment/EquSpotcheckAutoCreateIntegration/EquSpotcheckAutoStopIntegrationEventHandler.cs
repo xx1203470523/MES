@@ -11,9 +11,9 @@ namespace Hymson.MES.BackgroundServices.Quality.EquSpotcheckAutoStopIntegration
     {
         private readonly IScheduler _scheduler;
 
-        public EquSpotcheckAutoStopIntegrationEventHandler(IScheduler scheduler)
+        public EquSpotcheckAutoStopIntegrationEventHandler(ISchedulerFactory schedulerFactory)
         {
-            _scheduler = scheduler;
+            _scheduler = schedulerFactory.GetScheduler().Result;
         }
 
         public async Task Handle(EquSpotcheckAutoStopIntegrationEvent @event)
@@ -43,7 +43,7 @@ namespace Hymson.MES.BackgroundServices.Quality.EquSpotcheckAutoStopIntegration
                 }
             }
 
-            if (triggerKeys.Any(a => a == triggerKey))
+            if (triggerKeys.Any(it => it.Name == triggerKey.Name && it.Group == triggerKey.Group))
             {
                 await _scheduler.UnscheduleJob(triggerKey);
             }
