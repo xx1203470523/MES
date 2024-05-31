@@ -24,4 +24,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         public long SiteId { get; set; }
     }
+
+    /// <summary>
+    /// 载具类型维护 名称查询参数
+    /// </summary>
+    public class InteVehicleTypeNameQuery
+    {
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public IEnumerable<string>? Codes { get; set; }
+
+        public long SiteId { get; set; }
+    }
 }

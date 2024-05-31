@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -180,6 +181,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, inteVehicleTypeEntitys);
         }
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteVehicleTypeEntity>> GetByCodesAsync(InteVehicleTypeNameQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteVehicleTypeEntity>(GetByCodesSql, query);
+        }
         #endregion
 
     }
@@ -211,6 +223,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         const string GetByCodeSql = @"SELECT * 
                             FROM `inte_vehicle_type`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
+
+        const string GetByCodesSql = @"SELECT * 
+                            FROM `inte_vehicle_type`  WHERE Code IN @Codes AND IsDeleted=0 AND SiteId=@SiteId ";
         #endregion
     }
 }

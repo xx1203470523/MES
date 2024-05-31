@@ -10,6 +10,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -481,5 +482,49 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string? Unit { get; set; }
     }
 
+    public record InteVehicleFreightImportDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 载具编码
+        /// </summary>
+        [EpplusTableColumn(Header = "载具编码(必填)", Order = 1)]
+        public string VehicleTypeCode { get; set; }
+
+        /// <summary>
+        /// 载具名称
+        /// </summary>
+        [EpplusTableColumn(Header = "载具名称(必填)", Order = 2)]
+        public string VehicleTypeName { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        [EpplusTableColumn(Header = "描述", Order = 3)]
+        public string? Describe { get; set; }
+
+        /// <summary>
+        /// 状态;0-未启用 1-启用
+        /// </summary>
+        [EpplusTableColumn(Header = "状态(必填,已启用/已禁用)", Order = 4)]
+        public DisableOrEnableEnum Status { get; set; }
+
+        /// <summary>
+        /// 载具类型
+        /// </summary>
+        [EpplusTableColumn(Header = "载具类型编码", Order = 5)]
+        public string VehicleType { get; set; }
+
+        /// <summary>
+        /// 存在位置
+        /// </summary>
+        [EpplusTableColumn(Header = "存放位置", Order = 6)]
+        public string? Position { get; set; }
+
+        /// <summary>
+        /// 有效期
+        /// </summary>
+        [EpplusTableColumn(Header = "有效期(年-月-日)", Order = 7)]
+        public string? ExpirationDate { get; set; }
+    }
     #endregion
 }

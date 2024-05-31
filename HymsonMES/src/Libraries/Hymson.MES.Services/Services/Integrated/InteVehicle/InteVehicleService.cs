@@ -1,9 +1,13 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -25,6 +29,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Http;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -61,6 +66,10 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly IExcelService _excelService;
+
+        private readonly AbstractValidator<InteVehicleFreightImportDto> _validationImportRules;
+        private readonly ILocalizationService _localizationService;
 
         public InteVehicleService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleRepository inteVehicleRepository, AbstractValidator<InteVehicleCreateDto> validationCreateRules, AbstractValidator<InteVehicleModifyDto> validationModifyRules, IInteVehicleTypeRepository inteVehicleTypeRepository,
             IInteVehicleVerifyRepository inteVehicleVerifyRepository,
@@ -75,8 +84,13 @@ namespace Hymson.MES.Services.Services.Integrated
             IInteVehicleFreightRepository inteVehicleFreightRepository,
             IProcMaterialGroupRepository procMaterialGroupRepository,
             IProcMaterialRepository proMaterialRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository, IPlanWorkOrderRepository planWorkOrderRepository)
+            IWhMaterialInventoryRepository whMaterialInventoryRepository, IPlanWorkOrderRepository planWorkOrderRepository, IExcelService excelService, 
+            AbstractValidator<InteVehicleFreightImportDto> validationImportRules,
+            ILocalizationService localization)
         {
+            _localizationService = localization;
+            _validationImportRules = validationImportRules;
+            _excelService = excelService;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -1090,6 +1104,190 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadImportTemplateAsync(Stream stream)
+        {
+            var excelTemplateDtos = new List<InteVehicleFreightImportDto>();
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "载具注册导入模板");
+        }
+
+        /// <summary>
+        /// 导入客户信息表格
+        /// </summary>
+        /// <returns></returns>
+        public async Task ImportInteCustomAsync(IFormFile formFile)
+        {
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            var excelImportDtos = _excelService.Import<InteVehicleFreightImportDto>(memoryStream);
+
+            /*
+            // 备份用户上传的文件，可选
+            var stream = formFile.OpenReadStream();
+            var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            */
+
+            if (excelImportDtos == null || !excelImportDtos.Any())
+            {
+                throw new CustomerValidationException("导入数据为空");
+            }
+
+            #region 验证基础数据
+            var validationFailures = new List<ValidationFailure>();
+            var rows = 1;
+            foreach (var item in excelImportDtos)
+            {
+                var validationResult = await _validationImportRules!.ValidateAsync(item);
+                if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
+                {
+                    foreach (var validationFailure in validationResult.Errors)
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                        validationFailures.Add(validationFailure);
+                    }
+                }
+                rows++;
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+            #endregion
+
+            #region 检测导入数据编码是否重复
+            var repeats = new List<string>();
+            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.VehicleTypeCode });
+            foreach (var item in hasDuplicates)
+            {
+                if (item.Count() > 1)
+                {
+                    repeats.Add($@"[{item.Key.VehicleTypeCode}]");
+                }
+            }
+            if (repeats.Any())
+            {
+                throw new CustomerValidationException("载具编码{repeats}重复").WithData("repeats", string.Join(",", repeats));
+            }
+
+            List<InteVehicleEntity> inteCustomList = new();
+            List<InteVehicleVerifyEntity> inteVehicleVerifiesList = new();
+            #endregion
+
+            #region  验证数据库中是否存在数据，且组装数据
+            // 读取载具信息
+            var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Select(x => x.VehicleTypeCode).Distinct().ToArray()
+            });
+
+            //查询载具信息
+            var vehicles = await _inteVehicleTypeRepository.GetByCodesAsync(new InteVehicleTypeNameQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Where(x => !string.IsNullOrEmpty(x.VehicleType)).Select(x => x.VehicleType).Distinct().ToArray()
+            });
+
+            var currentRow = 0;
+            var customCode = vehicleEntities.Select(x => x.Code).Distinct().ToList();
+            foreach (var item in excelImportDtos)
+            {
+                currentRow++;
+
+                if (customCode.Contains(item.VehicleTypeCode))
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES18602), item.VehicleTypeCode, currentRow, "VehicleTypeCode"));
+                }
+                var vehicleinfo = vehicles.Where(x => x.Name == item.VehicleType).FirstOrDefault();
+                if (vehicleinfo == null && item.VehicleType != null)
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES18501), item.VehicleTypeName, currentRow, "VehicleTypeName"));
+                }
+               
+                //如果载具编码不存在，则组装数据
+                if (!customCode.Contains(item.VehicleTypeCode))
+                {
+                    var inteVehicleEntity = new InteVehicleEntity()
+                    {
+                        Code = item.VehicleTypeCode,
+                        Name = item.VehicleTypeName,
+                        Remark = item.Describe ?? "",
+                        Position = item.Position ?? "",
+                        VehicleTypeId = vehicleinfo?.Id ?? 0,
+                        Status = item.Status,
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0
+                    };
+                    inteCustomList.Add(inteVehicleEntity);
+                    #region 处理 载具验证数据
+                    if (item.ExpirationDate != null)
+                    {
+                        var inteVehicleVerify = new InteVehicleVerifyEntity()
+                        {
+                            VehicleId = inteVehicleEntity.Id,
+                            ExpirationDate = DateTime.Parse(item.ExpirationDate),
+                            Id = IdGenProvider.Instance.CreateId(),
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now(),
+                            SiteId = _currentSite.SiteId ?? 0
+                        };
+                        inteVehicleVerifiesList.Add(inteVehicleVerify);
+                    }
+                    #endregion
+                }
+                
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                //保存记录 
+                if (inteCustomList.Any())
+                    await _inteVehicleRepository.InsertsAsync(inteCustomList);
+
+                if (inteVehicleVerifiesList.Any())
+                    await _inteVehicleVerifyRepository.InsertsAsync(inteVehicleVerifiesList);
+                ts.Complete();
+            }
+            #endregion
+        }
+
+        /// <summary>
+        /// 获取验证对象
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <param name="codeFormattedMessage"></param>
+        /// <param name="cuurrentRow"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { key, codeFormattedMessage }
+            };
+            return validationFailure;
         }
     }
 }
