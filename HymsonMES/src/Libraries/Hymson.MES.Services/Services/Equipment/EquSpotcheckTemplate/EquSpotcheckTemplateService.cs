@@ -122,7 +122,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                 var groupRelation = new EquSpotcheckTemplateEquipmentGroupRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    EquipmentGroupId = item.Id,
+                    EquipmentGroupId = item.EquipmentGroupId == 0 ? item.Id : item.EquipmentGroupId,
                     SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
 
                     IsDeleted = 0,
@@ -145,7 +145,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                     SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
                     Center = item.Center,
                     LowerLimit = item.LowerLimit,
-                    SpotCheckItemId = item.Id,
+                    SpotCheckItemId = item.SpotCheckItemId == 0 ? item.Id : item.SpotCheckItemId,
                     UpperLimit = item.UpperLimit,
 
                     IsDeleted = 0,

@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
+using Newtonsoft.Json;
 using Quartz;
 using System;
 using System.Collections.Generic;
@@ -22,13 +23,17 @@ namespace Hymson.MES.BackgroundServices.Tasks.Equipment.GenerateSpotCheck
 
         public async Task Execute(IJobExecutionContext context)
         {
-            var jobDataObj = context.JobDetail.JobDataMap.Get("param");
-            if (jobDataObj is GenerateEquSpotcheckTaskDto jobData)
+            var jobDataObj = context.JobDetail.JobDataMap.Get("param").ToString();
+            if (!string.IsNullOrWhiteSpace(jobDataObj))
             {
-                await _equSpotcheckPlanCoreService.GenerateEquSpotcheckTaskAsync(jobData);
-            }
-            else
-            {
+                if (JsonConvert.DeserializeObject<GenerateEquSpotcheckTaskDto>(jobDataObj) is GenerateEquSpotcheckTaskDto jobData)
+                {
+                    await _equSpotcheckPlanCoreService.GenerateEquSpotcheckTaskAsync(jobData);
+                }
+                else
+                {
+
+                }
             }
         }
     }
