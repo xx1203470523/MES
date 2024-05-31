@@ -689,6 +689,7 @@
         public const string MES12612 = "设备验证账号不允许有空格";
         public const string MES12613 = "设备验证账号最大长度为50";
         public const string MES12614 = "设备验证密码最大长度为50";
+        public const string MES12615 = "已存在相同的设备编码【{EquipmentCode}】和类型【{Type}】，不允许操作。";
         #endregion
 
         #region 设备组 12700

@@ -851,38 +851,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
 
             sqlBuilder.Where("msp.SiteId = @SiteId");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
             sqlBuilder.Select(@"msp.Id,msp.SFC,msp.WorkOrderId,msp.ProcedureId,msp.ResourceId,msp.Status,msp.ProductId,msp.ProcessRouteId,msp.ProductBOMId");
 
-
-            //单条码
-            if (!string.IsNullOrWhiteSpace(query.Sfc))
-            {
-                query.Sfc = $"%{query.Sfc}%";
-                sqlBuilder.Where("msp.Sfc like @Sfc");
-            }
-
-            //多条码
-            if (query.SfcArray != null && query.SfcArray.Length > 0)
-            {
-                sqlBuilder.Where("msp.Sfc in @SfcArray");
-            }
-
             //状态
             if (query.Status.HasValue)
             {
                 sqlBuilder.Where("msp.Status=@Status");
             }
-            //是否报废
-            if (query.IsScrap.HasValue)
-            {
-                sqlBuilder.Where("msp.IsScrap=@IsScrap");
-            }
-
             //产品
             if (query.ProductId.HasValue && query.ProductId > 0)
             {
@@ -898,22 +877,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("  msp.ProcessRouteId = @ProcessRouteId ");
             }
-            //Bom
-            if (query.ProductBOMId.HasValue && query.ProductBOMId > 0)
-            {
-                sqlBuilder.Where("  msp.ProductBOMId = @ProductBOMId ");
-            }
             //工序
             if (query.ProcedureId.HasValue && query.ProcedureId > 0)
             {
                 sqlBuilder.Where("  msp.ProcedureId = @ProcedureId ");
             }
-            //资源
-            if (query.ResourceId.HasValue && query.ResourceId > 0)
-            {
-                sqlBuilder.Where("  msp.ResourceId = @ResourceId ");
-            }
-
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
@@ -921,10 +889,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             using var conn = GetMESDbConnection();
             var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceVehicleView>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<ManuSfcProduceVehicleView>(manuSfcProduceEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ManuSfcProduceVehicleView>(manuSfcProduceEntities, query.PageIndex, query.PageSize);
         }
 
         /// <summary>
