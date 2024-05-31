@@ -281,7 +281,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = iwcrr.WorkCenterId AND IWC.IsDeleted = 0");
             sqlBuilder.LeftJoin("equ_equipment_group eeg ON eeg.Id = EE.EquipmentGroupId AND eeg.IsDeleted = 0");
             sqlBuilder.LeftJoin("equ_spotcheck_template_equipment_group_relation estegr ON estegr.EquipmentGroupId = eeg.Id");
-            sqlBuilder.LeftJoin("equ_spotcheck_template est ON est.Id = estegr.SpotCheckTemplateId AND est.IsDeleted = 0 AND Status=1");
+            sqlBuilder.LeftJoin("equ_spotcheck_template est ON est.Id = estegr.SpotCheckTemplateId AND est.IsDeleted = 0 AND est.Status=1");
 
             if (pagedQuery.EopType == 1)
             {
