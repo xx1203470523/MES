@@ -107,15 +107,16 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
 
 
             List<EquSpotcheckTemplateEquipmentGroupRelationEntity> groupRelationList = new();
-            var eGroupIds = equSpotcheckTemplateCreateDto.groupRelationDto.Select(it => it.Id).ToArray();
-            var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
-            if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
-            {
-                var groupRelationIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
-                var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
-                var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
-                throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
-            }
+            //暂不验证
+            //var eGroupIds = equSpotcheckTemplateCreateDto.groupRelationDto.Select(it => it.Id).ToArray();
+            //var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
+            //if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
+            //{
+            //    var groupRelationIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
+            //    var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
+            //    var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
+            //}
             foreach (var item in equSpotcheckTemplateCreateDto.groupRelationDto)
             {
                 var groupRelation = new EquSpotcheckTemplateEquipmentGroupRelationEntity
@@ -350,15 +351,16 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
 
             List<EquSpotcheckTemplateEquipmentGroupRelationEntity> addGroupRelation = new();
 
-            var eGroupIds = equSpotcheckTemplateModifyDto.groupRelationDto.Select(it => it.Id).ToArray();
-            var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
-            if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
-            {
-                var groupRelationIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
-                var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
-                var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
-                throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
-            }
+            //暂不验证
+            //var eGroupIds = equSpotcheckTemplateModifyDto.groupRelationDto.Select(it => it.Id).ToArray();
+            //var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
+            //if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
+            //{
+            //    var groupRelationIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
+            //    var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
+            //    var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
+            //}
             foreach (var item in equSpotcheckTemplateModifyDto.groupRelationDto)
             {
                 addGroupRelation.Add(new EquSpotcheckTemplateEquipmentGroupRelationEntity

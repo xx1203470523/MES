@@ -370,15 +370,15 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
             var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
             {
                 SiteId = siteId,
-                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.Spotcheck
+                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.Maintain
             });
             if (codeRules == null || !codeRules.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12309));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12311));
             }
             if (codeRules.Count() > 1)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12310));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12312));
             }
 
             var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeBo

@@ -232,7 +232,7 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
 
         const string GetByCodeSql = @"SELECT  
                                `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
-                            FROM `equ_spotcheck_plan`  WHERE Code = @Code AND Version=@Version AND SiteId=@SiteId";
+                            FROM `equ_spotcheck_plan`  WHERE Code = @Code AND Version=@Version AND SiteId=@SiteId AND IsDeleted=0";
         #endregion
     }
 }

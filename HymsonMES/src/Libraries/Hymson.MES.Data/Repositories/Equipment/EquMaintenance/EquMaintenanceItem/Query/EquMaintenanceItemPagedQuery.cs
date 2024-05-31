@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem.Query
 {
@@ -21,6 +22,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceIt
         /// 名称
         /// </summary>
         public string? Name { get; set; }
+
+
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
 
     }
 }

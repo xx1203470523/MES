@@ -155,6 +155,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
                 sqlBuilder.Where("Code = @Code");
             }
 
+
+            if (pagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
