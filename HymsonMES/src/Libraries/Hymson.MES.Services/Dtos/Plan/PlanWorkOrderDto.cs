@@ -215,6 +215,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 电芯批次码
         /// </summary>
         public IEnumerable<InteSFCBoxRView>? SFCBox { get; set; }
+
+        /// <summary>
+        /// 模组转换系数
+        /// </summary>
+        public decimal? ModuleConversion { get; set; }
+
+        /// <summary>
+        /// Pack转换系数
+        /// </summary>
+        public decimal? PackConversion { get; set; }
     }
 
     /// <summary>
@@ -301,6 +311,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 电芯批次码
         /// </summary>
         public IEnumerable<InteSFCBoxRView>? SFCBox { get; set; }
+
+        /// <summary>
+        /// 模组转换系数
+        /// </summary>
+        public decimal? ModuleConversion { get; set; }
+
+        /// <summary>
+        /// Pack转换系数
+        /// </summary>
+        public decimal? PackConversion { get; set; }
     }
 
     /// <summary>
@@ -498,6 +518,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工单关联批次箱码
         /// </summary>
         public IEnumerable<PlanWorkOrderSFCBoxQuery>? SFCBox { get; set; }
+
+        /// <summary>
+        /// 模组转换系数
+        /// </summary>
+        public decimal ModuleConversion { get; set; }
+
+        /// <summary>
+        /// Pack转换系数
+        /// </summary>
+        public decimal PackConversion { get; set; }
     }
 
     /// <summary>
@@ -667,6 +697,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 实际结束时间
         /// </summary>
         public DateTime? RealEnd { get; set; }
+
+        /// <summary>
+        /// 模组转换系数
+        /// </summary>
+        public decimal ModuleConversion {  get; set; }
+
+        /// <summary>
+        /// Pack转换系数
+        /// </summary>
+        public decimal PackConversion { get; set; }
     }
 
     /// <summary>

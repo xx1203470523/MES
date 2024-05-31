@@ -74,6 +74,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentTokenRepository, EquEquipmentTokenRepository>();
 
             services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
+            services.AddSingleton<IEquEquipmentTheoryRepository, EquEquipmentTheoryRepository>();
             #endregion
 
             #region Integrated
@@ -249,6 +250,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();
             services.AddSingleton<IPlanWorkOrderStatusRecordRepository, PlanWorkOrderStatusRecordRepository>();
+            services.AddSingleton<IPlanWorkOrderConversionRepository, PlanWorkOrderConversionRepository>();
             #endregion
 
             #region PlanSfcReceive

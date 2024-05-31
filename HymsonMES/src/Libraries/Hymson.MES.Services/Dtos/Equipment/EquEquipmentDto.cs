@@ -114,6 +114,16 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public List<EquEquipmentLinkApiCreateDto> ApiLinks { get; set; }
         #endregion
+
+        /// <summary>
+        /// 理论产出数
+        /// </summary>
+        public decimal? TheoryOutPutQty { get; set; }
+
+        /// <summary>
+        /// 理论产出时间
+        /// </summary>
+        public decimal? TheoryOnTime { get; set; }
     }
 
     /// <summary>
@@ -125,6 +135,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 编码（设备注册）
         /// </summary>
         public string? EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 设备编码组
+        /// </summary>
+        public string[]? EquipmentCodes { get; set; }
 
         /// <summary>
         /// 名称（设备注册）
@@ -303,6 +318,16 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 车间名称
         /// </summary>
         public string WorkCenterShopName { get; set; } = "";
+
+        /// <summary>
+        /// 理论生产数
+        /// </summary>
+        public decimal TheoryOutputQty { get; set; }
+
+        /// <summary>
+        /// 理论开机时长
+        /// </summary>
+        public decimal TheoryOnTime { get; set; }
     }
 
     /// <summary>
@@ -451,6 +476,16 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 设备组名称
         /// </summary>
         public string EquipmentGroupName { get; set; } = "";
+
+        /// <summary>
+        /// 理论产出数
+        /// </summary>
+        public decimal? TheoryOutputQty { get; set; }
+
+        /// <summary>
+        /// 理论开机时长
+        /// </summary>
+        public decimal? TheoryOnTime { get; set; }
     }
 
     /// <summary>

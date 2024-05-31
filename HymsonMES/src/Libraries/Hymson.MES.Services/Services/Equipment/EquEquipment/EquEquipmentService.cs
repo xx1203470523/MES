@@ -21,6 +21,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using IdGen;
 using Microsoft.Extensions.Options;
+using Minio.DataModel;
 using System.Data.SqlTypes;
 
 namespace Hymson.MES.Services.Services.Equipment.EquEquipment
@@ -67,25 +68,30 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         private readonly IEquEquipmentTokenRepository _equEquipmentTokenRepository;
 
+        private readonly IEquEquipmentTheoryRepository _equEquipmentTheoryRepository;
+
         private readonly JwtOptions _jwtOptions;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentSite"></param>
         /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equEquipmentRepository"></param>
         /// <param name="equEquipmentLinkApiRepository"></param>
         /// <param name="equEquipmentLinkHardwareRepository"></param>
         /// <param name="equEquipmentTokenRepository"></param>
+        /// <param name="equEquipmentTheoryRepository"></param>
         /// <param name="jwtOptions"></param>
         public EquEquipmentService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<EquEquipmentSaveDto> validationSaveRules,
             IEquEquipmentRepository equEquipmentRepository,
             IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
             IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository,
-            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions)
+            IEquEquipmentTokenRepository equEquipmentTokenRepository,
+            IEquEquipmentTheoryRepository equEquipmentTheoryRepository,
+            IOptions<JwtOptions> jwtOptions)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -94,6 +100,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             _equEquipmentLinkApiRepository = equEquipmentLinkApiRepository;
             _equEquipmentLinkHardwareRepository = equEquipmentLinkHardwareRepository;
             _equEquipmentTokenRepository = equEquipmentTokenRepository;
+            _equEquipmentTheoryRepository = equEquipmentTheoryRepository;
             _jwtOptions = jwtOptions.Value;
         }
 
@@ -157,12 +164,29 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("Code", entity.EquipmentCode);
             #endregion
 
+            EquEquipmentTheoryCreateCommand theoryCreateCommand = new();
+            //新增理论产出数
+            if (createDto.TheoryOutPutQty != null)
+            {
+                theoryCreateCommand.Id = IdGenProvider.Instance.CreateId();
+                theoryCreateCommand.CreatedBy = _currentUser.UserName;
+                theoryCreateCommand.CreatedOn = HymsonClock.Now();
+                theoryCreateCommand.UpdatedBy = _currentUser.UserName;
+                theoryCreateCommand.UpdatedOn = HymsonClock.Now();
+                theoryCreateCommand.SiteId = _currentSite.SiteId ?? 0;
+                theoryCreateCommand.EquipmentCode = createDto.EquipmentCode;
+                theoryCreateCommand.OutputQty = createDto.TheoryOutPutQty;
+                theoryCreateCommand.TheoryOutputQty = createDto.TheoryOutPutQty;
+                theoryCreateCommand.TheoryOnTime = createDto.TheoryOnTime;
+            }
+
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows += await _equEquipmentRepository.InsertAsync(entity);
                 rows += await _equEquipmentLinkApiRepository.InsertRangeAsync(linkApiList);
                 rows += await _equEquipmentLinkHardwareRepository.InsertRangeAsync(linkHardwareList);
+                rows += await _equEquipmentTheoryRepository.InsertAsync(theoryCreateCommand);
                 trans.Complete();
             }
             return rows;
@@ -212,6 +236,23 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                     linkHardwareList.Add(linkHardware);
                 }
             }
+
+            EquEquipmentTheoryUpdateCommand theoryUpdateCommand = new();
+            //新增理论产出数
+            if (modifyDto.TheoryOutPutQty != null)
+            {
+                theoryUpdateCommand.Id = IdGenProvider.Instance.CreateId();
+                theoryUpdateCommand.CreatedBy = _currentUser.UserName;
+                theoryUpdateCommand.CreatedOn = HymsonClock.Now();
+                theoryUpdateCommand.UpdatedBy = _currentUser.UserName;
+                theoryUpdateCommand.UpdatedOn = HymsonClock.Now();
+                theoryUpdateCommand.SiteId = _currentSite.SiteId ?? 0;
+                theoryUpdateCommand.EquipmentCode = modifyDto.EquipmentCode;
+                theoryUpdateCommand.OutputQty = modifyDto.TheoryOutPutQty;
+                theoryUpdateCommand.TheoryOutputQty = modifyDto.TheoryOutPutQty;
+                theoryUpdateCommand.TheoryOnTime = modifyDto.TheoryOnTime;
+            }
+
             #endregion
 
             #region 参数校验
@@ -232,6 +273,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 // 绑定硬件数据
                 rows += await _equEquipmentLinkHardwareRepository.DeletesAsync(entity.Id);
                 rows += await _equEquipmentLinkHardwareRepository.InsertRangeAsync(linkHardwareList);
+
+                rows += await _equEquipmentTheoryRepository.InsertOrUpdateAsync(theoryUpdateCommand);
                 trans.Complete();
             }
             return rows;
@@ -269,10 +312,24 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
+            var equipmentTheoryEntities = await _equEquipmentTheoryRepository.GetListAsync(new() { EquipmentCodes = pagedQueryDto.EquipmentCodes });
+
             var pagedInfo = await _equEquipmentRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentListDto>());
+            foreach (var item in dtos)
+            {
+                var theoryEntity = equipmentTheoryEntities.FirstOrDefault(a => a.EquipmentCode == item.EquipmentCode);
+
+                if (theoryEntity != null)
+                {
+                    item.TheoryOutputQty = theoryEntity.TheoryOutputQty.GetValueOrDefault();
+                    item.TheoryOnTime = theoryEntity?.TheoryOnTime ?? 0;
+                }
+            }
+
             return new PagedInfo<EquEquipmentListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -312,7 +369,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
-            return (await _equEquipmentRepository.GetByIdAsync(id)).ToModel<EquEquipmentDto>();
+            var result = (await _equEquipmentRepository.GetByIdAsync(id)).ToModel<EquEquipmentDto>();
+
+            var equipmentTheoryEntity = await _equEquipmentTheoryRepository.GetOneAsync(new() {  EquipmentCode = result .EquipmentCode});
+
+            result.TheoryOutputQty = equipmentTheoryEntity.TheoryOutputQty.GetValueOrDefault();
+            result.TheoryOnTime = equipmentTheoryEntity?.TheoryOnTime ?? 0;
+
+            return result;
         }
 
         /// <summary>
