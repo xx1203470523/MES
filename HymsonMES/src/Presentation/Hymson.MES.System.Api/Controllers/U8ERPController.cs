@@ -1,5 +1,4 @@
-﻿
-using Hymson.MES.SystemServices.Dtos;
+﻿using Hymson.MES.SystemServices.Dtos;
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -58,156 +57,186 @@ namespace Hymson.MES.System.Api.Controllers
         }
 
         /// <summary>
-        /// 新增或者修改物料组信息
+        /// 物料信息
         /// </summary>
-        /// <param name="groupDtos"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("SaveOrUpdateMaterialGroup")]
-        [ProducesResponseType(typeof(ResultDto), 200)]
-        [LogDescription("接收物料组信息", BusinessType.INSERT)]
-        public async Task SaveMaterialGroupAsync(ProcMaterialGroupDto[] groupDtos)
-        {
-            //await _kingdeeERPService.SaveMaterialGroupAsync(groupDtos);
-        }
-
-        /// <summary>
-        /// 新增或者修改物料信息
-        /// </summary>
-        /// <param name="materialDtos"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("SaveOrUpdateMaterial")]
+        [HttpPost("SaveOrUpdateMaterial")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收物料信息", BusinessType.INSERT)]
-        public async Task SaveMaterialAsync(ProcMaterialDto[] materialDtos)
+        public async Task SaveMaterialAsync(ProcMaterialDto[] requestDtos)
         {
-           // await _kingdeeERPService.SaveMaterialAsync(materialDtos);
+            await Task.CompletedTask;
+            // await _kingdeeERPService.SaveMaterialAsync(requestDtos);
         }
 
         /// <summary>
-        /// 新增或者修改供应商信息
+        /// 物料组信息
         /// </summary>
-        /// <param name="supplierDtos"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("SaveOrUpdateSupplier")]
+        [HttpPost("SaveOrUpdateMaterialGroup")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("接收物料组信息", BusinessType.INSERT)]
+        public async Task SaveMaterialGroupAsync(ProcMaterialGroupDto[] requestDtos)
+        {
+            await Task.CompletedTask;
+            //await _kingdeeERPService.SaveMaterialGroupAsync(requestDtos);
+        }
+
+        /// <summary>
+        /// 供应商信息
+        /// </summary>
+        /// <param name="requestDtos"></param>
+        /// <returns></returns>
+        [HttpPost("SaveOrUpdateSupplier")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收供应商信息", BusinessType.INSERT)]
-        public async Task SaveSupplierAsync(WhSupplierDto[] supplierDtos)
+        public async Task SaveSupplierAsync(WhSupplierDto[] requestDtos)
         {
-           // await _kingdeeERPService.SaveSupplierAsync(supplierDtos);
+            await Task.CompletedTask;
+            // await _kingdeeERPService.SaveSupplierAsync(requestDtos);
         }
+
         /// <summary>
-        /// 新增或者修改供应商信息
+        /// 客户信息
         /// </summary>
-        /// <param name="supplierDtos"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("SaveOrUpdateCustomer")]
+        [HttpPost("SaveOrUpdateCustomer")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收客户信息", BusinessType.INSERT)]
-        public async Task SaveCustomerAsync(InteCustomDto[] customerDtos)
+        public async Task SaveCustomerAsync(InteCustomDto[] requestDtos)
         {
-            // await _kingdeeERPService.SaveSupplierAsync(supplierDtos);
+            await Task.CompletedTask;
+            // await _kingdeeERPService.SaveSupplierAsync(requestDtos);
         }
 
         /// <summary>
-        /// 新增或者修改仓库信息
+        /// 仓库信息
         /// </summary>
-        /// <param name="warehouseDtos"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("SaveOrUpdateWareHouse")]
+        [HttpPost("SaveOrUpdateWareHouse")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收仓库信息", BusinessType.INSERT)]
-        public async Task SaveWareHouseAsync(WhWarehouseDto[] warehouseDtos)
+        public async Task SaveWareHouseAsync(WhWarehouseDto[] requestDtos)
         {
-           // await _kingdeeERPService.SaveWareHouseAsync(warehouseDtos);
+            await Task.CompletedTask;
+            // await _kingdeeERPService.SaveWareHouseAsync(requestDtos);
         }
 
         /// <summary>
-        /// 新增或者修改计量单位信息
+        /// 计量单位信息
         /// </summary>
-        /// <param name="inteUnitDtos"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("SaveOrUpdateUnit")]
+        [HttpPost("SaveOrUpdateUnit")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收计量单位信息", BusinessType.INSERT)]
-        public async Task SaveUnitAsync(InteUnitDto[] inteUnitDtos)
+        public async Task SaveUnitAsync(InteUnitDto[] requestDtos)
         {
-           // await _kingdeeERPService.SaveUnitAsync(inteUnitDtos);
+            await Task.CompletedTask;
+            // await _kingdeeERPService.SaveUnitAsync(requestDtos);
         }
 
         /// <summary>
-        /// 新增或者修改班次信息
+        /// 班次信息
         /// </summary>
-        /// <param name="inteClassDtos"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("SaveOrUpdateClass")]
+        [HttpPost("SaveOrUpdateClass")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收班次信息", BusinessType.INSERT)]
-        public async Task SaveClassAsync(InteClassDto[] inteClassDtos)
+        public async Task SaveClassAsync(InteClassDto[] requestDtos)
         {
-          //  await _kingdeeERPService.SaveClassAsync(inteClassDtos);
+            await Task.CompletedTask;
+            //  await _kingdeeERPService.SaveClassAsync(requestDtos);
         }
 
         /// <summary>
-        /// 新增或者修改工作中心信息
+        /// 工作中心信息（车间/产线）
         /// </summary>
-        /// <param name="workCenterDtos"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("SaveOrUpdateWorkCenter")]
+
+        [HttpPost("SaveOrUpdateWorkCenter")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收工作中心信息", BusinessType.INSERT)]
-        public async Task SaveWorkCenterAsync(InteWorkCenterDto[] workCenterDtos)
+        public async Task SaveWorkCenterAsync(InteWorkCenterDto[] requestDtos)
         {
-           // await _kingdeeERPService.SaveWorkCenterAsync(workCenterDtos);
+            await Task.CompletedTask;
+            // await _kingdeeERPService.SaveWorkCenterAsync(requestDtos);
         }
 
         /// <summary>
         /// 工单及BOM（工单下达时同步)
         /// </summary>
-        /// <param name="workOrderDtos"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("CreateWorkOrder")]
+        [HttpPost("CreateWorkOrder")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收工单及BOM信息", BusinessType.INSERT)]
-        public async Task SaveWorkOrderAsync(WorkOrderDto[] workOrderDtos)
+        public async Task SaveWorkOrderAsync(WorkOrderDto[] requestDtos)
         {
-           // await _kingdeeERPService.SaveWorkOrderAsync(workOrderDtos);
+            await Task.CompletedTask;
+            // await _kingdeeERPService.SaveWorkOrderAsync(requestDtos);
         }
 
         /// <summary>
         /// 生产领料(人工在ERP领料单完成后)
         /// </summary>
-        /// <param name="productionPickDto"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("PickMaterials")]
+        [HttpPost("PickMaterials")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收生产领料信息", BusinessType.INSERT)]
-        public async Task SavePickMaterialsAsync(ProductionPickDto productionPickDto)
+        public async Task SavePickMaterialsAsync(ProductionPickDto requestDto)
         {
-           // await _manuRequistionOrderService.SavePickMaterialsAsync(productionPickDto);
+            await Task.CompletedTask;
+            // await _manuRequistionOrderService.SavePickMaterialsAsync(requestDto);
         }
 
         /// <summary>
         /// 退料单(人工在ERP退料单完成后)
         /// </summary>
-        /// <param name="returnMaterialDto"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("ReturnMaterials")]
+        [HttpPost("ReturnMaterials")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收生产退料信息", BusinessType.INSERT)]
-        public async Task SaveReturnMaterialsAsync(ProductionReturnMaterialDto returnMaterialDto)
+        public async Task SaveReturnMaterialsAsync(ProductionReturnMaterialDto requestDto)
         {
-           // await _manuReturnMaterialService.SaveReturnMaterialsAsync(returnMaterialDto);
+            await Task.CompletedTask;
+            // await _manuReturnMaterialService.SaveReturnMaterialsAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 生产入库单（人工在ERP入库单）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("PackInWarehouse")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("接收生产入库单信息", BusinessType.INSERT)]
+        public async Task SavePackInWarehouseAsync(PackProductionInWarehouseDto requestDto)
+        {
+            await Task.CompletedTask;
+            // await _productInstocksService.SavePackInWarehouseAsync(requestDto);
+        }
+
+        /// <summary>
+        /// 生产入库单（人工在ERP入库单）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("InWarehouse")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("接收生产入库单信息", BusinessType.INSERT)]
+        public async Task SaveProductionInWarehouseAsync(ProductionInWarehouseDto requestDto)
+        {
+            await Task.CompletedTask;
+            // await _productInstocksService.SaveProductionInWarehouseAsync(requestDto);
         }
 
         /// <summary>
@@ -215,45 +244,17 @@ namespace Hymson.MES.System.Api.Controllers
         /// </summary>
         /// <param name="barCode"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("GetPaking/{barCode}")]
-        [ProducesResponseType(typeof(ResultDto<List<PackingDto>>), 200)]
+        [HttpGet("GetPacking/{barCode}")]
+        [ProducesResponseType(typeof(ResultDto<IEnumerable<PackingDto>>), 200)]
         // [LogDescription("获取包装信息", BusinessType.OTHER)]
-        public async Task<List<PackingDto>> GetPackageInfoAsync(string barCode)
+        public async Task<IEnumerable<PackingDto>> GetPackageInfoAsync(string barCode)
         {
-            return new List<PackingDto>();
+            return await Task.FromResult<IEnumerable<PackingDto>>(new List<PackingDto> { });
             //return await _kingdeeERPService.GetPackageInfoAsync(new PackingReqDto
             //{
             //    BarCode = barCode
             //});
         }
 
-        /// <summary>
-        /// 生产入库单(人工在ERP入库单)
-        /// </summary>
-        /// <param name="inWarehouseDto"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("PackInWarehouse")]
-        [ProducesResponseType(typeof(ResultDto), 200)]
-        [LogDescription("接收生产入库单信息", BusinessType.INSERT)]
-        public async Task SavePackInWarehouseAsync(PackProductionInWarehouseDto inWarehouseDto)
-        {
-           // await _productInstocksService.SavePackInWarehouseAsync(inWarehouseDto);
-        }
-
-        /// <summary>
-        /// 生产入库单(人工在ERP入库单)
-        /// </summary>
-        /// <param name="inWarehouseDto"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("InWarehouse")]
-        [ProducesResponseType(typeof(ResultDto), 200)]
-        [LogDescription("接收生产入库单信息", BusinessType.INSERT)]
-        public async Task SaveProductionInWarehouseAsync(ProductionInWarehouseDto inWarehouseDto)
-        {
-           // await _productInstocksService.SaveProductionInWarehouseAsync(inWarehouseDto);
-        }
     }
 }
