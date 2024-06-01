@@ -118,6 +118,49 @@ namespace Hymson.MES.CoreServices.Services.Common
         }
 
         /// <summary>
+        /// 检查条码状态是否合法
+        /// </summary>
+        /// <param name="sfcProduceEntities"></param>
+        /// <param name="sfcStatusList"></param>
+        /// <param name="localizationService"></param>
+        public static IEnumerable<ManuSfcProduceEntity> VerifySFCStatus(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, IEnumerable<SfcStatusEnum> sfcStatusList, ILocalizationService localizationService)
+        {
+            // 当前条码是否是已报废
+            if (sfcProduceEntities.Any(a => a.IsScrap == TrueOrFalseEnum.Yes)) throw new CustomerValidationException(nameof(ErrorCode.MES16324));
+
+            // 当前条码是否是被锁定
+            if (sfcProduceEntities.Any(a => a.Status == SfcStatusEnum.Locked)) throw new CustomerValidationException(nameof(ErrorCode.MES16325));
+
+            // 当前条码是否是指定状态
+            var sfcProduceEntitiesOfStatus = sfcProduceEntities.Where(a => !sfcStatusList.Contains(a.Status));
+            if (sfcProduceEntitiesOfStatus.Any())
+            {
+                var validationFailures = new List<ValidationFailure>();
+                var sfcProduceEntitiesOfStatusDic = sfcProduceEntitiesOfStatus.ToLookup(w => w.Status).ToDictionary(d => d.Key, d => d);
+                foreach (var item in sfcProduceEntitiesOfStatusDic)
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.Key);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("SFC", string.Join(",", item.Value.Select(s => s.SFC)));
+                    validationFailure.FormattedMessagePlaceholderValues.Add("Current", localizationService.GetSFCStatusEnumDescription(item.Key));
+
+                    var statusDesc = string.Join(",", sfcStatusList.Select(s => localizationService.GetSFCStatusEnumDescription(s)));
+                    validationFailure.FormattedMessagePlaceholderValues.Add("Status", statusDesc);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16361);
+                    validationFailures.Add(validationFailure);
+                }
+
+                if (validationFailures.Any())
+                {
+                    throw new ValidationException("", validationFailures);
+                }
+            }
+
+            return sfcProduceEntities;
+        }
+
+
+        /// <summary>
         /// 检查条码的复投次数
         /// </summary>
         /// <param name="sfcProduceEntities"></param>
