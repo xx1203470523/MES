@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.165" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.165" />
+    <PackageReference Include="Hymson.Web.Framework" Version="2.1.165" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
   </ItemGroup>
 
