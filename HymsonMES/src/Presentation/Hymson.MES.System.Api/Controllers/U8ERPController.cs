@@ -1,4 +1,5 @@
-﻿using Hymson.MES.SystemServices.Dtos;
+﻿
+using Hymson.MES.SystemServices.Dtos;
 
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
@@ -99,6 +100,19 @@ namespace Hymson.MES.System.Api.Controllers
         public async Task SaveSupplierAsync(WhSupplierDto[] supplierDtos)
         {
            // await _kingdeeERPService.SaveSupplierAsync(supplierDtos);
+        }
+        /// <summary>
+        /// 新增或者修改供应商信息
+        /// </summary>
+        /// <param name="supplierDtos"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SaveOrUpdateCustomer")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("接收客户信息", BusinessType.INSERT)]
+        public async Task SaveCustomerAsync(InteCustomDto[] customerDtos)
+        {
+            // await _kingdeeERPService.SaveSupplierAsync(supplierDtos);
         }
 
         /// <summary>

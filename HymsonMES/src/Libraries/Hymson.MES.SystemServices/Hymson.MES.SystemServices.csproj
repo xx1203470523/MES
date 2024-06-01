@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hymson.Excel" Version="2.1.165" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
   </ItemGroup>
 
