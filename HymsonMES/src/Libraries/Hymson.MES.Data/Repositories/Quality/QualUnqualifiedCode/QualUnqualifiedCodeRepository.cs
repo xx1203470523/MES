@@ -113,6 +113,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByCodesAsync(QualUnqualifiedCodeByCodesQuery query)
         {
+            if (query == null || query.Codes == null || !query.Codes.Any())
+            {
+                return Enumerable.Empty<QualUnqualifiedCodeEntity>();
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualUnqualifiedCodeEntity>(GetByCodesSql, query);
         }

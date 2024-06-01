@@ -224,7 +224,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByCodesAsync(new QualUnqualifiedCodeByCodesQuery
             {
                 SiteId = commonBo.SiteId,
-                Codes = commonBo.OutStationRequestBos.SelectMany(s => s.OutStationUnqualifiedList?.Select(o => o.UnqualifiedCode))
+                Codes = commonBo.OutStationRequestBos.Where(x => x.OutStationUnqualifiedList != null).SelectMany(s => s.OutStationUnqualifiedList).Select(o => o.UnqualifiedCode)
             });
             if (qualUnqualifiedCodeEntities == null || !qualUnqualifiedCodeEntities.Any())
                 return default;
