@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Configurations>Debug;Release;DM</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -16,16 +15,17 @@
     <NoWarn>1701;1702;1591;8618</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DM|AnyCPU'">
-    <NoWarn>1701;1702;1591;8618</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
+    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.165" />
     <PackageReference Include="Hymson.ClearCache" Version="2.1.165" />
     <PackageReference Include="Hymson.NLog.Web" Version="2.1.165" />
+    <PackageReference Include="Hymson.Print" Version="2.1.165" />
     <PackageReference Include="Hymson.Web.Framework" Version="2.1.165" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-	  <PackageReference Include="Hymson.EventBus.RabbitMQ" Version="2.1.149" />
+	  
+	  <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
+	
+	  <PackageReference Include="Hymson.EventBus.RabbitMQ" Version="2.1.165" />
   </ItemGroup>
 
   <ItemGroup>

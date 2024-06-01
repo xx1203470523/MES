@@ -1,7 +1,6 @@
 using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Web.Framework.Filters;
 using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

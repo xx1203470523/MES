@@ -1,5 +1,4 @@
 ﻿using Hymson.MES.SystemServices.Dtos;
-
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -8,9 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.System.Api.Controllers
 {
     /// <summary>
-    /// 对接U8ERP
-    /// @author zhaoqing
-    /// @date 2023-06-08
+    /// U8 ERP
     /// </summary>
     [ApiController]
     [Route("SystemService/api/v1/[controller]")]
