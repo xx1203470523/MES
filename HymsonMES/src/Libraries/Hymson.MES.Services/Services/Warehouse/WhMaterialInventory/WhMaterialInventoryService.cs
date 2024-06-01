@@ -912,10 +912,16 @@ namespace Hymson.MES.Services.Services.Warehouse
             foreach (var entity in standbookList)
             {
                 decimal quantityResidue = 0;
-
+                //指定条码
                 if (IsMergeSFC)
                 {
                     quantityResidue = qty;
+                }
+                else
+                {
+                    //新条码时处理
+                    quantityResidue = entity.QuantityResidue;
+                    beforeBarcode = beforeBarcode.Where(x => x != entity.MaterialBarCode);
                 }
 
                 var standingbook = new WhMaterialStandingbookEntity

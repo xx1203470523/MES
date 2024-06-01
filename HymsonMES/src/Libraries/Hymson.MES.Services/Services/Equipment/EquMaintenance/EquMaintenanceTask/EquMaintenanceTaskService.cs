@@ -25,6 +25,7 @@ using Hymson.Utils.Tools;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
+using Elastic.Clients.Elasticsearch;
 
 namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTask
 {
@@ -196,6 +197,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
+            var entitys = await _equMaintenanceTaskRepository.GetByIdAsync(id);
+            if (entitys != null)
+            {
+                if (entitys.Status != EquMaintenanceTaskStautusEnum.WaitInspect)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15904));
+                }
+            }
             return await _equMaintenanceTaskRepository.DeleteAsync(id);
         }
 
@@ -206,6 +215,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            var entitys = await _equMaintenanceTaskRepository.GetByIdsAsync(ids);
+            if (entitys != null)
+            {
+                if (!entitys.Any(x => x.Status == EquMaintenanceTaskStautusEnum.WaitInspect))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15904));
+                }
+            }
+
             return await _equMaintenanceTaskRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
@@ -232,8 +250,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             result.IsQualifiedText = result.IsQualified?.GetDescription() ?? string.Empty;
             result.EquipmentCode = equipmenEntity?.EquipmentCode ?? string.Empty;
             result.Location = equipmenEntity?.Location ?? string.Empty;
-            result.PlanTypeText = result.PlanType?.GetDescription() ?? string.Empty;
-
+            if (result.PlanType?.GetDescription() != "0")
+            {
+                result.PlanTypeText = result.PlanType?.GetDescription() ?? string.Empty;
+            }
             return result;
         }
 
@@ -384,7 +404,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             var MaintenanceItemSnapshotIds = taskitem.Select(e => e.MaintenanceItemSnapshotId);
             if (!MaintenanceItemSnapshotIds.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15903));
             }
             var taskitemSnap = await _equMaintenanceTaskSnapshotItemRepository.GetEntitiesAsync(new EquMaintenanceTaskSnapshotItemQuery { Ids = MaintenanceItemSnapshotIds });
             //单位
@@ -471,14 +491,22 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         {
             var taskItemids = requestDto.Details.Select(x => x.Id);
 
-            var entitys = await _equMaintenanceTaskItemRepository.GetByIdsAsync(taskItemids.ToArray());
-            if (!entitys.Any()) return 0;
-
-            var site = entitys.FirstOrDefault()?.SiteId ?? 0;
-
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
+
+            var taskEntity = await _equMaintenanceTaskRepository.GetByIdAsync(requestDto.MaintenanceTaskId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15910));
+
+            var entitys = await _equMaintenanceTaskItemRepository.GetByIdsAsync(taskItemids.ToArray());
+            if (!entitys.Any()) return 0;
+
+            taskEntity.UpdatedBy = updatedBy;
+            taskEntity.UpdatedOn = updatedOn;
+
+            var snapshotItemEntitys = await _equMaintenanceTaskSnapshotItemRepository.GetByIdsAsync(taskItemids.ToArray());
+
+            var site = entitys.FirstOrDefault()?.SiteId ?? 0;            
 
             // 样本附件
             List<InteAttachmentEntity> attachmentEntities = new();
@@ -495,6 +523,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 entity.Remark = transItem.Remark ?? string.Empty;
                 entity.UpdatedBy = updatedBy;
                 entity.UpdatedOn = updatedOn;
+
+                var currentDataType = snapshotItemEntitys.FirstOrDefault(x => x.Id == entity.MaintenanceItemSnapshotId)?.DataType;
+                if (currentDataType != null && currentDataType == DataTypeEnum.Numeric)
+                {
+                    if (!decimal.TryParse(entity.InspectionValue, out var v))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15905));
+                    }
+                }
 
                 var oneDetail = requestDto.Details.Where(x => x.Id == entity.Id).FirstOrDefault();
                 if (oneDetail == null) continue;
@@ -566,6 +603,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                     Ids = beforeAttachments.Select(s => s.AttachmentId)
                 });
             }
+
+            //更新task操作时间
+            rows += await _equMaintenanceTaskRepository.UpdateAsync(taskEntity);
+
 
             if (attachmentEntities.Any())
             {
@@ -673,7 +714,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 throw new CustomerValidationException(nameof(ErrorCode.MES11912))
                     .WithData("Before", EquMaintenanceTaskStautusEnum.Completed.GetDescription())
                     .WithData("After", "结果处理");
-                    //.WithData("After", EquMaintenanceTaskStautusEnum.Closed.GetDescription());
+                //.WithData("After", EquMaintenanceTaskStautusEnum.Closed.GetDescription());
             }
 
             // 不合格处理完成之后直接关闭（无需变为合格）
@@ -799,7 +840,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 rows += await _inteAttachmentRepository.InsertRangeAsync(inteAttachmentEntities);
                 rows += await _equMaintenanceTaskAttachmentRepository.InsertRangeAsync(orderAttachmentEntities);
                 trans.Complete();
-            }catch(Exception ex) { }
+            }
+            catch (Exception ex) { }
             return rows;
         }
 

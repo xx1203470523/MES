@@ -256,7 +256,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     Code = pagedQuery.EquipmentCode,
                 });
                 if (equipmenEntities != null) pagedQuery.EquipmentId = equipmenEntities.Id;
-                else pagedQuery.EquipmentId = default;
+                else pagedQuery.EquipmentId = 0;
             }
 
             // 处理方式转换为任务单ID
@@ -497,15 +497,26 @@ namespace Hymson.MES.Services.Services.Equipment
         public async Task<int> SaveAndUpdateTaskItemAsync(SpotcheckTaskItemSaveDto requestDto)
         {
             var taskItemids = requestDto.Details.Select(x => x.Id);
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            //单据状态
+            var taskEntity = await _equSpotcheckTaskRepository.GetByIdAsync(requestDto.SpotCheckTaskId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15910));
+
+            var snapshotItemEntitys = await _equSpotcheckTaskSnapshotItemRepository.GetByIdsAsync(taskItemids.ToArray());
+
+            taskEntity.UpdatedBy = updatedBy;
+            taskEntity.UpdatedOn = updatedOn;
+
 
             var entitys = await _equSpotcheckTaskItemRepository.GetByIdsAsync(taskItemids.ToArray());
             if (!entitys.Any()) return 0;
 
             var site = entitys.FirstOrDefault()?.SiteId ?? 0;
 
-            // 更新时间
-            var updatedBy = _currentUser.UserName;
-            var updatedOn = HymsonClock.Now();
+           
 
             // 样本附件
             List<InteAttachmentEntity> attachmentEntities = new();
@@ -527,6 +538,15 @@ namespace Hymson.MES.Services.Services.Equipment
                 if (oneDetail == null) continue;
 
                 var requestAttachments = oneDetail.Attachments;
+
+                var currentDataType = snapshotItemEntitys.FirstOrDefault(x => x.Id == entity.SpotCheckItemSnapshotId)?.DataType;
+                if (currentDataType != null && currentDataType == DataTypeEnum.Numeric)
+                {
+                    if (!decimal.TryParse(entity.InspectionValue, out var v))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15905));
+                    }
+                }
 
 
                 if (requestAttachments != null && requestAttachments.Any())
@@ -593,6 +613,8 @@ namespace Hymson.MES.Services.Services.Equipment
                     Ids = beforeAttachments.Select(s => s.AttachmentId)
                 });
             }
+            //更新task操作时间
+            rows += await _equSpotcheckTaskRepository.UpdateAsync(taskEntity);
 
             if (attachmentEntities.Any())
             {

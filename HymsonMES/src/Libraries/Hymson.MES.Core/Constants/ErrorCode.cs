@@ -2122,8 +2122,14 @@
         #endregion
 
         #region 设备点检执行 15900
+        //保养
         public const string MES15901 = "不良已关闭，不允许删除!";
         public const string MES15902 = "待处理状态的保养任务，数据需要先保存后点击完成！";
+        public const string MES15903 = "没有找到相应的保养快照项！请检查生成是否遇到问题";
+        public const string MES15904 = "保养单据状态为检验中、待审核、已关闭的单据，删除失败!";
+        public const string MES15905 = "数值类型的检验值请输入不为数值！";
+        //点检
+        public const string MES15910 = "保存时，未找到点检单!请联系管理员";
         #endregion
 
         #region 设备点检 车间物料不良录入 17500
