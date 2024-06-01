@@ -901,6 +901,7 @@
         public const string MES15131 = "{type}编码规则未维护！";
         public const string MES15132 = "{type}编码规则被维护多条！";
         public const string MES15133 = "待拆分数量不能填写小数!";
+        public const string MES15134 = "物料仓库有重复的条码或与当前条码无法匹配，导致无法正常记录物料台账!";
         #endregion
 
         #region 物料台账 15200
@@ -2128,8 +2129,14 @@
         public const string MES15903 = "没有找到相应的保养快照项！请检查生成是否遇到问题";
         public const string MES15904 = "保养单据状态为检验中、待审核、已关闭的单据，删除失败!";
         public const string MES15905 = "数值类型的检验值请输入不为数值！";
+ 
         //点检
         public const string MES15910 = "保存时，未找到点检单!请联系管理员";
+
+        //点检保养项目
+        public const string MES15920 = "{Code}已被设备保养模板引用！";
+        public const string MES15921 = "{Code}已被设备点检模板引用！";
+
         #endregion
 
         #region 设备点检 车间物料不良录入 17500

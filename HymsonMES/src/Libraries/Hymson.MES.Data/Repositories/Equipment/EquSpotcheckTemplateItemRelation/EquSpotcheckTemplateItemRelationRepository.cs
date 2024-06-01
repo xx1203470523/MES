@@ -158,6 +158,11 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
                 sqlBuilder.Where("SpotCheckTemplateId IN @SpotCheckTemplateIds");
             }
 
+            if (equSpotcheckTemplateItemRelationQuery.SpotCheckItemIds != null && equSpotcheckTemplateItemRelationQuery.SpotCheckItemIds.Any())
+            {
+                sqlBuilder.Where("SpotCheckItemId IN @SpotCheckItemIds");
+            }
+
             using var conn = GetMESDbConnection();
             var equSpotcheckTemplateItemRelationEntities = await conn.QueryAsync<EquSpotcheckTemplateItemRelationEntity>(template.RawSql, equSpotcheckTemplateItemRelationQuery);
             return equSpotcheckTemplateItemRelationEntities;

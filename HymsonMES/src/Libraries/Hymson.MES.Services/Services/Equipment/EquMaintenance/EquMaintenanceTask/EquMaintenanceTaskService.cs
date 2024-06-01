@@ -250,6 +250,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             result.IsQualifiedText = result.IsQualified?.GetDescription() ?? string.Empty;
             result.EquipmentCode = equipmenEntity?.EquipmentCode ?? string.Empty;
             result.Location = equipmenEntity?.Location ?? string.Empty;
+            result.ExecutorIds = _currentUser.UserName;
             if (result.PlanType?.GetDescription() != "0")
             {
                 result.PlanTypeText = result.PlanType?.GetDescription() ?? string.Empty;
@@ -478,6 +479,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         {
             var result = new PagedInfo<EquMaintenanceTaskItemUnionSnapshotView>(Enumerable.Empty<EquMaintenanceTaskItemUnionSnapshotView>(), dto.PageIndex, dto.PageSize);
             result.Data = await querySnapshotItemAsync(new EquMaintenanceTaskSnapshotItemQueryDto { MaintenanceTaskId = dto.MaintenanceTaskId });
+            result.TotalCount = result.Data.Count();
             return result;
         }
 
@@ -506,7 +508,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
 
             var snapshotItemEntitys = await _equMaintenanceTaskSnapshotItemRepository.GetByIdsAsync(taskItemids.ToArray());
 
-            var site = entitys.FirstOrDefault()?.SiteId ?? 0;            
+            var site = entitys.FirstOrDefault()?.SiteId ?? 0;
 
             // 样本附件
             List<InteAttachmentEntity> attachmentEntities = new();

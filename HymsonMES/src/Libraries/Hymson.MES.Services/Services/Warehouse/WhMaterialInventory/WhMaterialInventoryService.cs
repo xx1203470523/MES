@@ -755,6 +755,13 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SiteId = _currentSite.SiteId ?? 0,
                 BarCodes = adjustDto.SFCs
             });
+            if (oldWhMEntirty != null)
+            {
+                if (oldWhMEntirty.Count() != adjustDto.SFCs.Count())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15134));
+                }
+            }
 
             oldWhMEntirty = oldWhMEntirty.Where(x => x.Status == WhMaterialInventoryStatusEnum.ToBeUsed);
 
@@ -869,6 +876,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             var inputBarcodeSingle = new WhMaterialInventoryEntity();
             var beforeBarcode = standbookList.Select(s => s.MaterialBarCode).Distinct();
+            string afterBarcode = string.Empty;
 
             if (IsMergeSFC)
             {
@@ -913,15 +921,24 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 decimal quantityResidue = 0;
                 //指定条码
+                //处理备注内容及数量
                 if (IsMergeSFC)
                 {
-                    quantityResidue = qty;
+                    if (entity.MaterialBarCode == adjustDto.MergeSFC)
+                    {
+                        quantityResidue = qty;
+                    }
+                    afterBarcode = adjustDto.MergeSFC ?? string.Empty;
                 }
                 else
                 {
-                    //新条码时处理
-                    quantityResidue = entity.QuantityResidue;
-                    beforeBarcode = beforeBarcode.Where(x => x != entity.MaterialBarCode);
+                    if (entity.MaterialBarCode == inputBarcodeSingle?.MaterialBarCode)
+                    {
+                        //新条码时处理
+                        quantityResidue = entity.QuantityResidue;
+                    }
+                    beforeBarcode = beforeBarcode.Where(x => x != inputBarcodeSingle?.MaterialBarCode);
+                    afterBarcode = inputBarcodeSingle?.MaterialBarCode ?? string.Empty;
                 }
 
                 var standingbook = new WhMaterialStandingbookEntity
@@ -944,7 +961,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedOn = HymsonClock.Now(),
-                    Remark = $"合并前条码:{string.Join(',', beforeBarcode)},合并后:{inputBarcodeSingle.MaterialBarCode}"
+                    Remark = $"合并前条码:{string.Join(',', beforeBarcode)},合并后:{afterBarcode}"
                 };
 
                 whMaterialStandingbookEntities.Add(standingbook);

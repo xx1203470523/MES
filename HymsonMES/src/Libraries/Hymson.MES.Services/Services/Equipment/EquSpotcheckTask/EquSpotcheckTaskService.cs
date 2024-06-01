@@ -232,6 +232,8 @@ namespace Hymson.MES.Services.Services.Equipment
             result.IsQualifiedText = result.IsQualified?.GetDescription() ?? string.Empty;
             result.EquipmentCode = equipmenEntity.EquipmentCode;
             result.Location = equipmenEntity.Location;
+            result.ExecutorIds = _currentUser.UserName;
+
             result.PlanTypeText = result.PlanType?.GetDescription() ?? string.Empty;
 
             return result;
@@ -485,6 +487,7 @@ namespace Hymson.MES.Services.Services.Equipment
         {
             var result = new PagedInfo<TaskItemUnionSnapshotView>(Enumerable.Empty<TaskItemUnionSnapshotView>(), dto.PageIndex, dto.PageSize);
             result.Data = await querySnapshotItemAsync(new SpotcheckTaskSnapshotItemQueryDto { SpotCheckTaskId = dto.SpotCheckTaskId });
+            result.TotalCount = result.Data.Count();
             return result;
         }
 
