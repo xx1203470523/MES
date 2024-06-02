@@ -691,13 +691,26 @@ namespace Hymson.MES.Services.Services.Equipment
                 SpotCheckTaskId = entity.Id
             });
 
-            var operationType = EquSpotcheckOperationTypeEnum.Complete;
+            var snapshotItem = await _equSpotcheckTaskSnapshotItemRepository.GetByIdsAsync(sampleDetailEntities.Select(x => x.SpotCheckItemSnapshotId).ToArray());         
 
             //检验值是否为空
             if (sampleDetailEntities.Any(x => string.IsNullOrEmpty(x.InspectionValue)))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15902));
+                var isEmptyValueList = sampleDetailEntities.Where(x => string.IsNullOrWhiteSpace(x.InspectionValue));
+                if (isEmptyValueList.Any())
+                {
+                    foreach (var item in isEmptyValueList)
+                    {
+                        var emptyValueSnapshotItem = snapshotItem.Where(x => x.Id == item.SpotCheckItemSnapshotId).FirstOrDefault();
+                        if (emptyValueSnapshotItem != null && emptyValueSnapshotItem.DataType == DataTypeEnum.Numeric)
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES15911));
+                        }
+                    }
+                }
             }
+
+            var operationType = EquSpotcheckOperationTypeEnum.Complete;
 
             //有任一不合格，完成
             if (sampleDetailEntities.Any(X => X.IsQualified == TrueOrFalseEnum.No))

@@ -2132,6 +2132,8 @@
  
         //点检
         public const string MES15910 = "保存时，未找到点检单!请联系管理员";
+        public const string MES15911 = "含有数值类型，需要先保存才能执行完成";
+        
 
         //点检保养项目
         public const string MES15920 = "{Code}已被设备保养模板引用！";

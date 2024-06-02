@@ -683,13 +683,26 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 MaintenanceTaskId = entity.Id
             });
 
-            var operationType = EquMaintenanceOperationTypeEnum.Complete;
+            var snapshotItem = await _equMaintenanceTaskSnapshotItemRepository.GetByIdsAsync(sampleDetailEntities.Select(x => x.MaintenanceItemSnapshotId).ToArray());
 
             //检验值是否为空
             if (sampleDetailEntities.Any(x => string.IsNullOrEmpty(x.InspectionValue)))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15902));
+                var isEmptyValueList = sampleDetailEntities.Where(x => string.IsNullOrWhiteSpace(x.InspectionValue));
+                if (isEmptyValueList.Any())
+                {
+                    foreach (var item in isEmptyValueList)
+                    {
+                        var emptyValueSnapshotItem = snapshotItem.Where(x => x.Id == item.MaintenanceItemSnapshotId).FirstOrDefault();
+                        if (emptyValueSnapshotItem != null && emptyValueSnapshotItem.DataType == DataTypeEnum.Numeric)
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES15911));
+                        }
+                    }
+                }
             }
+
+            var operationType = EquMaintenanceOperationTypeEnum.Complete;
 
             //有任一不合格，完成
             if (sampleDetailEntities.Any(X => X.IsQualified == TrueOrFalseEnum.No))
