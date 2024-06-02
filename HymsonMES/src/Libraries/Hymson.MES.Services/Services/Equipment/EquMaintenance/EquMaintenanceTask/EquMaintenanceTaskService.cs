@@ -96,6 +96,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         /// </summary>
         private readonly IEquMaintenanceTaskAttachmentRepository _equMaintenanceTaskAttachmentRepository;
 
+        private readonly IEquMaintenanceTaskSnapshotPlanRepository _equMaintenanceTaskSnapshotPlanRepository;
+
         /// <summary>
         /// 
         /// </summary>
@@ -121,7 +123,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             IEquMaintenanceTaskItemAttachmentRepository equMaintenanceTaskItemAttachmentRepository,
             IEquMaintenanceTaskOperationRepository equMaintenanceTaskOperationRepository,
             IEquMaintenanceTaskProcessedRepository equMaintenanceTaskProcessedRepository,
-            IEquMaintenanceTaskAttachmentRepository equMaintenanceTaskAttachmentRepository)
+            IEquMaintenanceTaskAttachmentRepository equMaintenanceTaskAttachmentRepository, IEquMaintenanceTaskSnapshotPlanRepository equMaintenanceTaskSnapshotPlanRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -136,6 +138,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             _equMaintenanceTaskOperationRepository = equMaintenanceTaskOperationRepository;
             _equMaintenanceTaskProcessedRepository = equMaintenanceTaskProcessedRepository;
             _equMaintenanceTaskAttachmentRepository = equMaintenanceTaskAttachmentRepository;
+            _equMaintenanceTaskSnapshotPlanRepository = equMaintenanceTaskSnapshotPlanRepository;
         }
 
 
@@ -485,7 +488,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
 
 
         /// <summary>
-        /// 保存点检
+        /// 保存保养项
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -500,11 +503,21 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             var taskEntity = await _equMaintenanceTaskRepository.GetByIdAsync(requestDto.MaintenanceTaskId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES15910));
 
+            //单据快照 更新执行人
+            var snapshotPlanEntitys = await _equMaintenanceTaskSnapshotPlanRepository.GetByTaskIdAsync(requestDto.MaintenanceTaskId);
+
             var entitys = await _equMaintenanceTaskItemRepository.GetByIdsAsync(taskItemids.ToArray());
             if (!entitys.Any()) return 0;
 
             taskEntity.UpdatedBy = updatedBy;
             taskEntity.UpdatedOn = updatedOn;
+
+            if (snapshotPlanEntitys is not null)
+            {
+                snapshotPlanEntitys.ExecutorIds = updatedBy;
+                snapshotPlanEntitys.UpdatedBy = updatedBy;
+                snapshotPlanEntitys.UpdatedOn = updatedOn;
+            }
 
             var snapshotItemEntitys = await _equMaintenanceTaskSnapshotItemRepository.GetByIdsAsync(taskItemids.ToArray());
 
@@ -608,7 +621,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
 
             //更新task操作时间
             rows += await _equMaintenanceTaskRepository.UpdateAsync(taskEntity);
-
+            //更新快照执行人
+            if (snapshotPlanEntitys != null)
+            {
+                rows += await _equMaintenanceTaskSnapshotPlanRepository.UpdateAsync(snapshotPlanEntitys);
+            }
 
             if (attachmentEntities.Any())
             {

@@ -92,7 +92,10 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         private readonly IEquSpotcheckTaskAttachmentRepository _equSpotcheckTaskAttachmentRepository;
 
-
+        /// <summary>
+        /// 快照计划
+        /// </summary>
+        private readonly IEquSpotcheckTaskSnapshotPlanRepository _equSpotcheckTaskSnapshotPlanRepository;
 
 
 
@@ -120,7 +123,8 @@ namespace Hymson.MES.Services.Services.Equipment
             IEquSpotcheckTaskItemAttachmentRepository equSpotcheckTaskItemAttachmentRepository,
             IEquSpotcheckTaskOperationRepository equSpotcheckTaskOperationRepository,
             IEquSpotcheckTaskProcessedRepository equSpotcheckTaskProcessedRepository,
-            IEquSpotcheckTaskAttachmentRepository equSpotcheckTaskAttachmentRepository)
+            IEquSpotcheckTaskAttachmentRepository equSpotcheckTaskAttachmentRepository,
+            IEquSpotcheckTaskSnapshotPlanRepository equSpotcheckTaskSnapshotPlanRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -135,6 +139,7 @@ namespace Hymson.MES.Services.Services.Equipment
             _equSpotcheckTaskOperationRepository = equSpotcheckTaskOperationRepository;
             _equSpotcheckTaskProcessedRepository = equSpotcheckTaskProcessedRepository;
             _equSpotcheckTaskAttachmentRepository = equSpotcheckTaskAttachmentRepository;
+            _equSpotcheckTaskSnapshotPlanRepository = equSpotcheckTaskSnapshotPlanRepository;
         }
 
 
@@ -508,18 +513,26 @@ namespace Hymson.MES.Services.Services.Equipment
             var taskEntity = await _equSpotcheckTaskRepository.GetByIdAsync(requestDto.SpotCheckTaskId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES15910));
 
+            //单据快照 更新执行人
+            var snapshotPlanEntitys = await _equSpotcheckTaskSnapshotPlanRepository.GetByTaskIdAsync(requestDto.SpotCheckTaskId);
+
+            //快照项目
             var snapshotItemEntitys = await _equSpotcheckTaskSnapshotItemRepository.GetByIdsAsync(taskItemids.ToArray());
 
             taskEntity.UpdatedBy = updatedBy;
             taskEntity.UpdatedOn = updatedOn;
 
+            if (snapshotPlanEntitys is not null)
+            {
+                snapshotPlanEntitys.ExecutorIds = updatedBy;
+                snapshotPlanEntitys.UpdatedBy = updatedBy;
+                snapshotPlanEntitys.UpdatedOn = updatedOn;
+            }
 
             var entitys = await _equSpotcheckTaskItemRepository.GetByIdsAsync(taskItemids.ToArray());
             if (!entitys.Any()) return 0;
 
             var site = entitys.FirstOrDefault()?.SiteId ?? 0;
-
-           
 
             // 样本附件
             List<InteAttachmentEntity> attachmentEntities = new();
@@ -618,7 +631,10 @@ namespace Hymson.MES.Services.Services.Equipment
             }
             //更新task操作时间
             rows += await _equSpotcheckTaskRepository.UpdateAsync(taskEntity);
-
+            if (snapshotPlanEntitys != null)
+            {
+                rows += await _equSpotcheckTaskSnapshotPlanRepository.UpdateAsync(snapshotPlanEntitys);
+            }
             if (attachmentEntities.Any())
             {
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);

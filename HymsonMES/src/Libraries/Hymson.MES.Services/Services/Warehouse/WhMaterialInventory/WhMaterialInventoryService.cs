@@ -25,13 +25,8 @@ using Hymson.Utils.Tools;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Plan;
 using System.Transactions;
-using Hymson.MES.CoreServices.Bos.Common;
-using System.Net.NetworkInformation;
 using Hymson.MES.Core.Domain.Process;
-using System.Security.Policy;
-using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
-using AutoMapper.Execution;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
