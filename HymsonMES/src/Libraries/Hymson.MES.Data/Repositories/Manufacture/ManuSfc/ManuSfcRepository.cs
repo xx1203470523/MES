@@ -215,35 +215,40 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
 
             #region TODO 2024.03.30 发现,下面这块代码建议优化下写法 ↓
-            using var conn = GetMESDbConnection();
-            sqlBuilder.AddParameters(query);
-            if (!string.IsNullOrEmpty(query.code))
-            {
-                string procedureIdSql = $"SELECT * FROM `proc_procedure` WHERE proc_procedure.`Code` = '{query.code}' ";
-                var procedureId = await conn.QueryAsync<ManuSfcProduceSelectView>(procedureIdSql, templateData.Parameters);
-                if (procedureId.Count() > 0)
-                {
-                    var procedureIdList = procedureId.ToList();
-                    //工序
-                    int a = 0;
+            //sqlBuilder.AddParameters(query);
+            //if (!string.IsNullOrEmpty(query.code))
+            //{
+            //    string procedureIdSql = $"SELECT * FROM `proc_procedure` WHERE proc_procedure.`Code` = '{query.code}' ";
+            //    var procedureId = await conn.QueryAsync<ManuSfcProduceSelectView>(procedureIdSql, templateData.Parameters);
+            //    if (procedureId.Count() > 0)
+            //    {
+            //        var procedureIdList = procedureId.ToList();
+            //        //工序
+            //        int a = 0;
 
-                    StringBuilder pSqlBuilder = new StringBuilder();
-                    foreach (var item in procedureIdList)
-                    {
-                        a++;
-                        if (a == 1)
-                        {
-                            pSqlBuilder.Append($"(msp.ProcedureId = {item.Id} ");
-                        }
-                        else
-                        {
-                            pSqlBuilder.Append($"OR msp.ProcedureId = {item.Id} ");
-                        }
-                    }
-                    pSqlBuilder.Append(")");
-                    string prSql = pSqlBuilder.ToString();
-                    sqlBuilder.Where(prSql);
-                }
+            //        StringBuilder pSqlBuilder = new StringBuilder();
+            //        foreach (var item in procedureIdList)
+            //        {
+            //            a++;
+            //            if (a == 1)
+            //            {
+            //                pSqlBuilder.Append($"(msp.ProcedureId = {item.Id} ");
+            //            }
+            //            else
+            //            {
+            //                pSqlBuilder.Append($"OR msp.ProcedureId = {item.Id} ");
+            //            }
+            //        }
+            //        pSqlBuilder.Append(")");
+            //        string prSql = pSqlBuilder.ToString();
+            //        sqlBuilder.Where(prSql);
+            //    }
+            //}
+
+            //工序
+            if (query.ProcedureId.HasValue && query.ProcedureId > 0)
+            {
+                sqlBuilder.Where("  msp.ProcedureId = @ProcedureId ");
             }
             //资源
             if (query.ResourceId.HasValue && query.ResourceId > 0)
@@ -254,9 +259,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            //sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(query);
             #endregion
 
+            using var conn = GetMESDbConnection();
             var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceSelectView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;

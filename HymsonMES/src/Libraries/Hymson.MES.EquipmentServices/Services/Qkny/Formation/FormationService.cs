@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
@@ -6,6 +7,7 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Qkny;
 using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Qkny;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -26,6 +28,7 @@ using Hymson.MES.Services.Services.EquProductParamRecord;
 using Hymson.MES.Services.Services.ManuFillingDataRecord;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections;
@@ -42,6 +45,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
     /// </summary>
     public class FormationService : IFormationService
     {
+        /// <summary>
+        /// 注入反射获取依赖对象
+        /// </summary>
+        private readonly IServiceProvider _serviceProvider;
+
+        /// <summary>
+        /// 本地化
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 设备服务
         /// </summary>
@@ -95,7 +108,10 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         /// <summary>
         /// 构造函数
         /// </summary>
-        public FormationService(IEquEquipmentService equEquipmentService,
+        public FormationService(
+            IServiceProvider serviceProvider,
+            ILocalizationService localizationService,
+            IEquEquipmentService equEquipmentService,
             IManuFillingDataRecordService manuFillingDataRecordService,
             IManuCommonService manuCommonService,
             IManuSfcProduceService manuSfcProduceService,
@@ -106,6 +122,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             IProcSortingRuleService procSortingRuleService,
             IProcMaterialRepository procMaterialRepository)
         {
+            _serviceProvider = serviceProvider;
+            _localizationService = localizationService;
             _equEquipmentService = equEquipmentService;
             _manuFillingDataRecordService = manuFillingDataRecordService;
             _manuCommonService = manuCommonService;
@@ -189,18 +207,37 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         {
             EquVerifyHelper.ContainerSfcCheckDto(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
+
+            using var scope = _serviceProvider.CreateScope();
+            //param.LocalizationService = _localizationService;
+            //param.Proxy = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
+
+            JobRequestBo verifyParam = new JobRequestBo();
+            verifyParam.LocalizationService = _localizationService;
+            verifyParam.Proxy = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
+            verifyParam.UserName = dto.EquipmentCode;
+            verifyParam.SiteId = equResModel.SiteId;
+            verifyParam.EquipmentId = equResModel.EquipmentId;
+            verifyParam.ResourceId = equResModel.ResId;
+            verifyParam.ProcedureId = equResModel.ProcedureId;
+            List<InStationRequestBo> inList = new List<InStationRequestBo>();
+            InStationRequestBo inModel = new InStationRequestBo() { SFC = dto.Sfc };
+            inList.Add(inModel);
+            verifyParam.InStationRequestBos = inList;
+            await _manuCommonService.VerifyProcedureAsync(verifyParam);
+
             //2. 校验电芯是否存在
-            ManuSfcProduceBySfcQuery query = new ManuSfcProduceBySfcQuery();
-            query.SiteId = equResModel.SiteId;
-            query.Sfc = dto.Sfc;
-            var sfcEntity = await _manuSfcProduceService.GetBySFCAsync(query);
-            //校验电芯是否合格
-            if (sfcEntity.Status == SfcStatusEnum.Scrapping)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45091))
-                    .WithData("Sfc", dto.Sfc);
-            }
+            //ManuSfcProduceBySfcQuery query = new ManuSfcProduceBySfcQuery();
+            //query.SiteId = equResModel.SiteId;
+            //query.Sfc = dto.Sfc;
+            //var sfcEntity = await _manuSfcProduceService.GetBySFCAsync(query);
+            ////校验电芯是否合格
+            //if (sfcEntity.Status == SfcStatusEnum.Scrapping)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES45091))
+            //        .WithData("Sfc", dto.Sfc);
+            //}
         }
 
         /// <summary>

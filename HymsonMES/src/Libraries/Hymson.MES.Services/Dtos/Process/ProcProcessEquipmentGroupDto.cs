@@ -81,6 +81,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? Code { get; set; }
 
+        /// <summary>
+        /// 名称（工艺设备组）
+        /// </summary>
+        public string? Name { get; set; }
     }
 
     /// <summary>

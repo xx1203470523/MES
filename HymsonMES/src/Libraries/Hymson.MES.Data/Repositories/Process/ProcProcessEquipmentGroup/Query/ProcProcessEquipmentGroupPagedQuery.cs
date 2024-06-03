@@ -17,5 +17,10 @@ namespace Hymson.MES.Data.Repositories.Process.Query
         /// </summary>
         public string Code { get; set; } = "";
 
+        /// <summary>
+        /// 名称（设备组）
+        /// </summary>
+        public string Name { get; set; } = "";
+
     }
 }

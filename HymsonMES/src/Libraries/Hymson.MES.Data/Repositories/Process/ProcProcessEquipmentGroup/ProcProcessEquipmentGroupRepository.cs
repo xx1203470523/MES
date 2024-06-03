@@ -144,6 +144,12 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("proc_process_equipment_group.Code LIKE @Code");
             }
 
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
+            {
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("proc_process_equipment_group.Name LIKE @Name");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
