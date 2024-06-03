@@ -349,7 +349,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
             agvDto.EquipmentCode = dto.EquipmentCode;
             agvDto.ResourceCode = dto.ResourceCode;
             agvDto.LocalTime = dto.LocalTime;
-            agvDto.TaskType = "1";
+            if(string.IsNullOrEmpty(dto.TaskType) == true)
+            {
+                agvDto.TaskType = "1";
+            }
             agvDto.Content = string.Empty;
             await _qknyService.AgvMaterialAsync(agvDto);
 
@@ -377,7 +380,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
             agvDto.EquipmentCode = dto.EquipmentCode;
             agvDto.ResourceCode = dto.ResourceCode;
             agvDto.LocalTime = dto.LocalTime;
-            agvDto.TaskType = "2";
+            if(string.IsNullOrEmpty(dto.TaskType) == true)
+            {
+                agvDto.TaskType = "2";
+            }
             agvDto.Content = string.Empty;
             await _qknyService.AgvMaterialAsync(agvDto);
 
