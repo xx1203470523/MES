@@ -2113,6 +2113,7 @@
 
 
         #region 设备点检 15800
+        //公共
         public const string MES15801 = "此设备点检项目{code}在系统中已经存在!";
         public const string MES15802 = "此设备点检任务{code}在系统中已经存在!";
         public const string MES15803 = "设备点检任务不存在！";
@@ -2129,11 +2130,15 @@
         public const string MES15903 = "没有找到相应的保养快照项！请检查生成是否遇到问题";
         public const string MES15904 = "保养单据状态为检验中、待审核、已关闭的单据，删除失败!";
         public const string MES15905 = "数值类型的检验值请输入不为数值！";
+        public const string MES15906 = "当前时间,未到保养计划开始时间{time}";
+        public const string MES15907 = "当前时间,已超过保养计划结束时间{time}";
  
         //点检
         public const string MES15910 = "保存时，未找到点检单!请联系管理员";
         public const string MES15911 = "含有数值类型，需要先保存才能执行完成";
-        
+        public const string MES15912 = "当前时间,未到点检计划开始时间{time}";
+        public const string MES15913 = "当前时间,已超过点检计划结束时间{time}";
+
 
         //点检保养项目
         public const string MES15920 = "已被设备保养模板{Code}引用！";
