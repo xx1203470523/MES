@@ -5,7 +5,6 @@
  *builder:  pengxin
  *build datetime: 2024-05-13 03:06:41
  */
-using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -17,22 +16,17 @@ using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem;
+using Hymson.MES.Data.Repositories.EquMaintenancePlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateEquipmentGroupRelation;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateItemRelation;
-using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Services.Dtos.EquMaintenanceTemplate;
-using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
-using System.Security.Policy;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
 {
@@ -53,10 +47,11 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
         private readonly IEquMaintenanceItemRepository _EquMaintenanceItemRepository;
         private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
+        private readonly IEquMaintenancePlanEquipmentRelationRepository _equMaintenancePlanEquipmentRelationRepository;
         private readonly AbstractValidator<EquMaintenanceTemplateCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquMaintenanceTemplateModifyDto> _validationModifyRules;
 
-        public EquMaintenanceTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, AbstractValidator<EquMaintenanceTemplateCreateDto> validationCreateRules, AbstractValidator<EquMaintenanceTemplateModifyDto> validationModifyRules, IEquMaintenanceItemRepository EquMaintenanceItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceTemplateEquipmentGroupRelationRepository EquMaintenanceTemplateEquipmentGroupRelationRepository, IEquEquipmentRepository equEquipmentRepository)
+        public EquMaintenanceTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, AbstractValidator<EquMaintenanceTemplateCreateDto> validationCreateRules, AbstractValidator<EquMaintenanceTemplateModifyDto> validationModifyRules, IEquMaintenanceItemRepository EquMaintenanceItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceTemplateEquipmentGroupRelationRepository EquMaintenanceTemplateEquipmentGroupRelationRepository, IEquEquipmentRepository equEquipmentRepository, IEquMaintenancePlanEquipmentRelationRepository equMaintenancePlanEquipmentRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -68,6 +63,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
             _EquMaintenanceTemplateItemRelationRepository = EquMaintenanceTemplateItemRelationRepository;
             _EquMaintenanceTemplateEquipmentGroupRelationRepository = EquMaintenanceTemplateEquipmentGroupRelationRepository;
             _equEquipmentRepository = equEquipmentRepository;
+            _equMaintenancePlanEquipmentRelationRepository = equMaintenancePlanEquipmentRelationRepository;
         }
 
         /// <summary>
@@ -206,6 +202,13 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
             if (!string.IsNullOrWhiteSpace(codeEnabiles))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
+            }
+
+            var equMaintenancePlanEquipmentRelations = await _equMaintenancePlanEquipmentRelationRepository.GetByMaintenanceTemplateIdsAsync(ids);
+            if (equMaintenancePlanEquipmentRelations != null && equMaintenancePlanEquipmentRelations.Any())
+            {
+                var equMaintenanceTemplates = await _EquMaintenanceTemplateRepository.GetByIdsAsync(equMaintenancePlanEquipmentRelations.Select(it => it.MaintenanceTemplateId).ToArray());
+                throw new CustomerValidationException(nameof(ErrorCode.MES12204)).WithData("Code", string.Join(",", equMaintenanceTemplates.Select(it => it.Code).ToArray()));
             }
 
             int row = 0;
