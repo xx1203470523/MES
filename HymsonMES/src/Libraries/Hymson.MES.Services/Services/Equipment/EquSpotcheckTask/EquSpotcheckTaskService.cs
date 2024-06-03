@@ -315,6 +315,8 @@ namespace Hymson.MES.Services.Services.Equipment
                             m.ProcessedBy = processEntity.ProcessedBy;
                         }
 
+                        m.PlanTypeText = m.PlanType == 0 ? string.Empty : m.PlanType?.GetDescription();
+
                         return m;
                     });
                 }
