@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem;
 using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.EquMaintenanceTemplateItemRelation;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services;
 using Hymson.MES.Services.Dtos.Equipment;
@@ -48,6 +49,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
         /// </summary>
         private readonly IInteUnitRepository _inteUnitRepository;
 
+        private readonly IEquMaintenanceTemplateItemRelationRepository _EquMaintenanceTemplateItemRelationRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -57,13 +60,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
         /// <param name="equMaintenanceItemRepository"></param>
         public EquMaintenanceItemService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquMaintenanceItemSaveDto> validationSaveRules,
             IEquMaintenanceItemRepository equMaintenanceItemRepository,
-            IInteUnitRepository inteUnitRepository)
+            IInteUnitRepository inteUnitRepository, IEquMaintenanceTemplateItemRelationRepository equMaintenanceTemplateItemRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _equMaintenanceItemRepository = equMaintenanceItemRepository;
             _inteUnitRepository = inteUnitRepository;
+            _EquMaintenanceTemplateItemRelationRepository = equMaintenanceTemplateItemRelationRepository;
         }
 
 
@@ -148,6 +152,28 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            var equMaintenanceItemEntity = await _equMaintenanceItemRepository.GetByIdsAsync(ids);             
+
+            var equMaintenanceTemplateItemRelations = await _EquMaintenanceTemplateItemRelationRepository.GetEquMaintenanceTemplateItemRelationEntitiesAsync(new EquMaintenanceTemplateItemRelationQuery
+            {
+                MaintenanceItemIds = ids,
+                SiteId = _currentSite.SiteId
+            });
+
+            if(equMaintenanceTemplateItemRelations != null&& equMaintenanceTemplateItemRelations.Any())
+            {
+                var itemIds = equMaintenanceTemplateItemRelations.Select(s => s.MaintenanceItemId);
+
+                var itemCodes = equMaintenanceItemEntity
+                    .Where(x => itemIds.Contains(x.Id)).Select(x => x.Code).ToList();
+
+                if (itemCodes.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15920)).WithData("Code", string.Join(',', itemCodes));
+                }
+
+            }
+
             return await _equMaintenanceItemRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
