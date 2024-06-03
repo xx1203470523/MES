@@ -40,7 +40,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 数值类型;文本/数值
         /// </summary>
-        public DataTypeEnum DataType { get; set; }
+        public EquMaintenanceDataTypeEnum DataType { get; set; }
 
         /// <summary>
         /// 保养方式

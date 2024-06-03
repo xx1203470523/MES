@@ -244,7 +244,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                         Code = thisEquSpotcheckItem.Code ?? "",
                         Name = thisEquSpotcheckItem.Name ?? "",
                         Status = thisEquSpotcheckItem.Status ?? DisableOrEnableEnum.Enable,
-                        DataType = thisEquSpotcheckItem.DataType ?? DataTypeEnum.Text,
+                        DataType = thisEquSpotcheckItem.DataType ?? EquSpotcheckDataTypeEnum.Text,
                         CheckType = thisEquSpotcheckItem.CheckType,
                         CheckMethod = thisEquSpotcheckItem.CheckMethod ?? "",
                         UnitId = thisEquSpotcheckItem.UnitId,

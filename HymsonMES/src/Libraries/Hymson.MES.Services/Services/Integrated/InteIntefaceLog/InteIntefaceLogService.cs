@@ -67,12 +67,21 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
                 logDataPagedQuery.InterfaceCode = pagedQueryDto.InterfaceCode;
             }
 
+            if (pagedQueryDto?.Message != null)
+            {
+                logDataPagedQuery.Message = pagedQueryDto.Message;
+            }
 
             var data = new Dictionary<string, string> { };
 
             if (pagedQueryDto?.Data?.Code != null)
             {
                 data.Add("Code", pagedQueryDto.Data.Code);
+            }
+
+            if (pagedQueryDto?.Data?.Name != null)
+            {
+                data.Add("Name", pagedQueryDto.Data.Name);
             }
 
             if (pagedQueryDto?.Data?.ReceiverType != null)

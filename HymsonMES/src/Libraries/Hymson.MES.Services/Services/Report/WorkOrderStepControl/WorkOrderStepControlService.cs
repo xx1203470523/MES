@@ -98,6 +98,23 @@ namespace Hymson.MES.Services.Services.Report
             List<WorkOrderStepControlViewDto> listDto = new();
             if (pagedInfo.Data.Any())
             {
+                var ManuSfcProduceResultquery = new ManuSfcProduceVehiclePagedQuery()
+                {
+                    WorkOrderId = pagedInfo.Data.First().Id,
+                    ProductId = pagedInfo.Data.First().ProductId,
+                    ProcessRouteId = pagedInfo.Data.First().ProcessRouteId,
+                    PageIndex = pagedQuery.PageIndex,
+                    PageSize = pagedQuery.PageSize,
+                    SiteId = pagedQuery.SiteId,
+                };
+                var SummaryResultquery = new ManuSfcProduceVehiclePagedQuery()
+                {
+                    WorkOrderId = pagedInfo.Data.First().Id,
+                    ProductId = pagedInfo.Data.First().ProductId,
+                    PageIndex = pagedQuery.PageIndex,
+                    PageSize = pagedQuery.PageSize,
+                    SiteId = pagedQuery.SiteId,
+                };
                 // 查询物料
                 var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId));
                 // 查询工序节点明细
@@ -108,54 +125,34 @@ namespace Hymson.MES.Services.Services.Report
                 var materials = await materialsTask;
                 var procProcessRouteDetailNode = await procProcessRouteDetailNodeTask;
                 var procProcedures = await procProceduresTask;
+                var SummaryResult = await _manuSfcSummaryRepository.GetWorkOrderAsync(SummaryResultquery);
+                var ManuSfcProduceResult = await _manuSfcProduceRepository.GetStepPageListAsync(ManuSfcProduceResultquery);
 
-                foreach (var item in procProcessRouteDetailNode.ToList())
+                var list = procProcessRouteDetailNode.ToList();
+                list.RemoveAt(list.Count - 1);
+                foreach (var item in list)
                 {
                     var material = materials.FirstOrDefault(x => x.Id == pagedInfo.Data.First().ProductId);
-                    var PassDownQuantityquery = new ManuSfcProduceVehiclePagedQuery()
-                    {
-                        WorkOrderId = pagedInfo.Data.First().Id,
-                        ProductId = pagedInfo.Data.First().ProductId,
-                        ProcessRouteId = pagedInfo.Data.First().ProcessRouteId,
-                        ProcedureId = item.ProcedureId,
-                        Status = (SfcStatusEnum)1
-                    };
-                    var PassDownQuantity = _manuSfcProduceRepository.GetStepPageListAsync(PassDownQuantityquery).Result.Data.Count();
-
-                    var ProcessDownQuantityquery = new ManuSfcProduceVehiclePagedQuery()
-                    {
-                        WorkOrderId = pagedInfo.Data.First().Id,
-                        ProductId = pagedInfo.Data.First().ProductId,
-                        ProcessRouteId = pagedInfo.Data.First().ProcessRouteId,
-                        ProcedureId = item.ProcedureId,
-                        Status = (SfcStatusEnum)2
-                    };
-                    var ProcessDownQuantity = _manuSfcProduceRepository.GetStepPageListAsync(PassDownQuantityquery).Result.Data.Count();
-
-                    var FinishProductQuantityquery = new ManuSfcProduceVehiclePagedQuery()
-                    {
-                        WorkOrderId = pagedInfo.Data.First().Id,
-                        ProductId = pagedInfo.Data.First().ProductId,
-                        ProcedureId = item.ProcedureId,
-                        SiteId = _currentSite.SiteId
-                    };
-                    var summaryResult = await _manuSfcSummaryRepository.GetWorkOrderAsync(FinishProductQuantityquery);
-                    var FinishProductQuantity = summaryResult.FirstOrDefault()?.OutputQty;
+                    var passDownQuantity = ManuSfcProduceResult.Data.Where(x => x.WorkOrderId == pagedInfo.Data.First().Id && x.ProductId == pagedInfo.Data.First().ProductId && x.ProcessRouteId == pagedInfo.Data.First().ProcessRouteId && x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.lineUp).Count();
+                    var processDownQuantity = ManuSfcProduceResult.Data.Where(x => x.WorkOrderId == pagedInfo.Data.First().Id && x.ProductId == pagedInfo.Data.First().ProductId && x.ProcessRouteId == pagedInfo.Data.First().ProcessRouteId && x.ProcedureId == item.ProcedureId &&x.Status == SfcStatusEnum.Activity).Count();
+                    var finishProductQuantity = SummaryResult.Where(x=>x.WorkOrderId == pagedInfo.Data.First().Id&&x.ProductId == pagedInfo.Data.First().ProductId&& x.ProcedureId == item.ProcedureId).FirstOrDefault()?.OutputQty;
 
                     listDto.Add(new WorkOrderStepControlViewDto
                     {
-                        Serialno = item.SerialNo,
+                        OrderId = pagedInfo.Data.First().Id,
+                        ProcedureId = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Id ?? 0,
+                        Serialno = item.ManualSortNumber,
                         ProcedureCode = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Code,
                         MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
                         ProcessRout = pagedInfo.Data.First().ProcessRouteCode + "/" + pagedInfo.Data.First().ProcessRouteVersion,
                         OrderCode = pagedInfo.Data.First()?.OrderCode ?? "",
-                        PassDownQuantity = PassDownQuantity,
-                        ProcessDownQuantity = PassDownQuantity,
-                        FinishProductQuantity = FinishProductQuantity ?? 0,
+                        PassDownQuantity = passDownQuantity,
+                        ProcessDownQuantity = processDownQuantity,
+                        FinishProductQuantity = finishProductQuantity ?? 0,
                     });
                 }
             }
-            return new PagedInfo<WorkOrderStepControlViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<WorkOrderStepControlViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, listDto.Count());
         }
     }
 }

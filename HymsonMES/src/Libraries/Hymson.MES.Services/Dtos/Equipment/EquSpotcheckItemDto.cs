@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 数值类型;文本/数值
         /// </summary>
-        public DataTypeEnum DataType { get; set; } = DataTypeEnum.Text;
+        public EquSpotcheckDataTypeEnum? DataType { get; set; } = EquSpotcheckDataTypeEnum.Text;
 
         /// <summary>
         /// 点检方式
@@ -200,6 +200,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 状态
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
+        public EquSpotcheckDataTypeEnum? DataType { get; set; }
 
     }
 

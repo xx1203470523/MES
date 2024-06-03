@@ -96,6 +96,14 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return await conn.QueryFirstOrDefaultAsync<EquMaintenanceTaskSnapshotPlanEntity>(GetByIdSql, new { Id = id });
         }
 
+        public async Task<EquMaintenanceTaskSnapshotPlanEntity> GetByTaskIdAsync(long taskId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquMaintenanceTaskSnapshotPlanEntity>(GetByTaskIdSql, new { TaskId = taskId });
+        }
+
+        
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -169,8 +177,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string DeleteSql = "UPDATE equ_maintenance_task_snapshot_plan SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE equ_maintenance_task_snapshot_plan SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM equ_maintenance_task_snapshot_plan WHERE Id = @Id ";
+        const string GetByIdSql = @"SELECT * FROM equ_maintenance_task_snapshot_plan WHERE Id = @Id ";        
         const string GetByIdsSql = @"SELECT * FROM equ_maintenance_task_snapshot_plan WHERE Id IN @Ids ";
+
+        const string GetByTaskIdSql = @"SELECT * FROM equ_maintenance_task_snapshot_plan WHERE MaintenanceTaskId = @TaskId ";
 
     }
 }

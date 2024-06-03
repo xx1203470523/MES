@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -48,7 +49,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 数值类型;文本/数值
         /// </summary>
-        public DataTypeEnum? DataType { get; set; } = DataTypeEnum.Text;
+        public EquMaintenanceDataTypeEnum? DataType { get; set; } = EquMaintenanceDataTypeEnum.Text;
 
         /// <summary>
         /// 点检方式
@@ -196,7 +197,10 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public string? Name { get; set; }
 
-
+        /// <summary>
+        /// 数据类型
+        /// </summary>
+        public EquMaintenanceDataTypeEnum? DataType { get; set; }
 
         /// <summary>
         /// 状态
