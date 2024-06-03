@@ -9,6 +9,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
+using System.Transactions;
 
 namespace Hymson.MES.CoreServices.Services.Parameter
 {
@@ -112,7 +113,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                     .WithData("ParameterCodes", string.Join(",", errorParameter));
             }
 
-            using var trans = TransactionHelper.GetTransactionScope();
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.RequiresNew);
             var row = await _manuProductParameterRepository.InsertRangeAsync(list);
             trans.Complete();
             return row;
@@ -162,7 +163,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                 }));
             }
 
-            using var trans = TransactionHelper.GetTransactionScope();
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.RequiresNew);
             var row = await _manuProductParameterRepository.InsertRangeAsync(list);
             trans.Complete();
             return row;
