@@ -211,6 +211,15 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            var entitys = await _equSpotcheckTaskRepository.GetByIdsAsync(ids);
+            if (entitys != null)
+            {
+                if (!entitys.Any(x => x.Status == EquSpotcheckTaskStautusEnum.WaitInspect))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15904));
+                }
+            }
+
             return await _equSpotcheckTaskRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
