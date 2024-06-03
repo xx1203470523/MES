@@ -157,6 +157,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
                 sqlBuilder.Where("Code like @Code");
             }
 
+            if (pagedQuery.DataType.HasValue)
+            {
+                sqlBuilder.Where("DataType = @DataType");
+            }
 
             if (pagedQuery.Status.HasValue)
             {
