@@ -58,6 +58,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquSpotcheckTaskSnapshotPlanEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 按任务Id查找
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <returns></returns>
+        Task<EquSpotcheckTaskSnapshotPlanEntity> GetByTaskIdAsync(long taskId);
     
         /// <summary>
         /// 根据IDs获取数据（批量）

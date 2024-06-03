@@ -149,22 +149,25 @@ namespace Hymson.MES.Data.Repositories.Equipment
             //任务编码
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
-                sqlBuilder.Where("st.Code = @Code");
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("st.Code like @Code");
             }
             //任务名
             if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
-                sqlBuilder.Where("st.Name = @Name");
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("st.Name like @Name");
             }
             //负责人
             if (!string.IsNullOrWhiteSpace(pagedQuery.LeaderIds))
             {
-                sqlBuilder.Where("stsp.LeaderIds = @LeaderIds");
+                pagedQuery.LeaderIds = $"%{pagedQuery.LeaderIds}%";
+                sqlBuilder.Where("stsp.LeaderIds like @LeaderIds");
             }
             //设备
             if (pagedQuery.EquipmentId.HasValue)
             {
-                sqlBuilder.Where("stsp.EquipmentId LIKE @EquipmentId");
+                sqlBuilder.Where("stsp.EquipmentId = @EquipmentId");
             }
             //任务状态
             if (pagedQuery.Status.HasValue)

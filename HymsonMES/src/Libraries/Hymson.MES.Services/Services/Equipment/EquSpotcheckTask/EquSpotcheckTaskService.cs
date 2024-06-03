@@ -92,7 +92,10 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         private readonly IEquSpotcheckTaskAttachmentRepository _equSpotcheckTaskAttachmentRepository;
 
-
+        /// <summary>
+        /// 快照计划
+        /// </summary>
+        private readonly IEquSpotcheckTaskSnapshotPlanRepository _equSpotcheckTaskSnapshotPlanRepository;
 
 
 
@@ -120,7 +123,8 @@ namespace Hymson.MES.Services.Services.Equipment
             IEquSpotcheckTaskItemAttachmentRepository equSpotcheckTaskItemAttachmentRepository,
             IEquSpotcheckTaskOperationRepository equSpotcheckTaskOperationRepository,
             IEquSpotcheckTaskProcessedRepository equSpotcheckTaskProcessedRepository,
-            IEquSpotcheckTaskAttachmentRepository equSpotcheckTaskAttachmentRepository)
+            IEquSpotcheckTaskAttachmentRepository equSpotcheckTaskAttachmentRepository,
+            IEquSpotcheckTaskSnapshotPlanRepository equSpotcheckTaskSnapshotPlanRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -135,6 +139,7 @@ namespace Hymson.MES.Services.Services.Equipment
             _equSpotcheckTaskOperationRepository = equSpotcheckTaskOperationRepository;
             _equSpotcheckTaskProcessedRepository = equSpotcheckTaskProcessedRepository;
             _equSpotcheckTaskAttachmentRepository = equSpotcheckTaskAttachmentRepository;
+            _equSpotcheckTaskSnapshotPlanRepository = equSpotcheckTaskSnapshotPlanRepository;
         }
 
 
@@ -232,6 +237,8 @@ namespace Hymson.MES.Services.Services.Equipment
             result.IsQualifiedText = result.IsQualified?.GetDescription() ?? string.Empty;
             result.EquipmentCode = equipmenEntity.EquipmentCode;
             result.Location = equipmenEntity.Location;
+            result.ExecutorIds = _currentUser.UserName;
+
             result.PlanTypeText = result.PlanType?.GetDescription() ?? string.Empty;
 
             return result;
@@ -256,7 +263,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     Code = pagedQuery.EquipmentCode,
                 });
                 if (equipmenEntities != null) pagedQuery.EquipmentId = equipmenEntities.Id;
-                else pagedQuery.EquipmentId = default;
+                else pagedQuery.EquipmentId = 0;
             }
 
             // 处理方式转换为任务单ID
@@ -485,6 +492,7 @@ namespace Hymson.MES.Services.Services.Equipment
         {
             var result = new PagedInfo<TaskItemUnionSnapshotView>(Enumerable.Empty<TaskItemUnionSnapshotView>(), dto.PageIndex, dto.PageSize);
             result.Data = await querySnapshotItemAsync(new SpotcheckTaskSnapshotItemQueryDto { SpotCheckTaskId = dto.SpotCheckTaskId });
+            result.TotalCount = result.Data.Count();
             return result;
         }
 
@@ -497,15 +505,34 @@ namespace Hymson.MES.Services.Services.Equipment
         public async Task<int> SaveAndUpdateTaskItemAsync(SpotcheckTaskItemSaveDto requestDto)
         {
             var taskItemids = requestDto.Details.Select(x => x.Id);
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            //单据状态
+            var taskEntity = await _equSpotcheckTaskRepository.GetByIdAsync(requestDto.SpotCheckTaskId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15910));
+
+            //单据快照 更新执行人
+            var snapshotPlanEntitys = await _equSpotcheckTaskSnapshotPlanRepository.GetByTaskIdAsync(requestDto.SpotCheckTaskId);
+
+            //快照项目
+            var snapshotItemEntitys = await _equSpotcheckTaskSnapshotItemRepository.GetByIdsAsync(taskItemids.ToArray());
+
+            taskEntity.UpdatedBy = updatedBy;
+            taskEntity.UpdatedOn = updatedOn;
+
+            if (snapshotPlanEntitys is not null)
+            {
+                snapshotPlanEntitys.ExecutorIds = updatedBy;
+                snapshotPlanEntitys.UpdatedBy = updatedBy;
+                snapshotPlanEntitys.UpdatedOn = updatedOn;
+            }
 
             var entitys = await _equSpotcheckTaskItemRepository.GetByIdsAsync(taskItemids.ToArray());
             if (!entitys.Any()) return 0;
 
             var site = entitys.FirstOrDefault()?.SiteId ?? 0;
-
-            // 更新时间
-            var updatedBy = _currentUser.UserName;
-            var updatedOn = HymsonClock.Now();
 
             // 样本附件
             List<InteAttachmentEntity> attachmentEntities = new();
@@ -527,6 +554,15 @@ namespace Hymson.MES.Services.Services.Equipment
                 if (oneDetail == null) continue;
 
                 var requestAttachments = oneDetail.Attachments;
+
+                var currentDataType = snapshotItemEntitys.FirstOrDefault(x => x.Id == entity.SpotCheckItemSnapshotId)?.DataType;
+                if (currentDataType != null && currentDataType == DataTypeEnum.Numeric)
+                {
+                    if (!decimal.TryParse(entity.InspectionValue, out var v))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15905));
+                    }
+                }
 
 
                 if (requestAttachments != null && requestAttachments.Any())
@@ -593,7 +629,12 @@ namespace Hymson.MES.Services.Services.Equipment
                     Ids = beforeAttachments.Select(s => s.AttachmentId)
                 });
             }
-
+            //更新task操作时间
+            rows += await _equSpotcheckTaskRepository.UpdateAsync(taskEntity);
+            if (snapshotPlanEntitys != null)
+            {
+                rows += await _equSpotcheckTaskSnapshotPlanRepository.UpdateAsync(snapshotPlanEntitys);
+            }
             if (attachmentEntities.Any())
             {
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
@@ -650,13 +691,26 @@ namespace Hymson.MES.Services.Services.Equipment
                 SpotCheckTaskId = entity.Id
             });
 
-            var operationType = EquSpotcheckOperationTypeEnum.Complete;
+            var snapshotItem = await _equSpotcheckTaskSnapshotItemRepository.GetByIdsAsync(sampleDetailEntities.Select(x => x.SpotCheckItemSnapshotId).ToArray());         
 
             //检验值是否为空
             if (sampleDetailEntities.Any(x => string.IsNullOrEmpty(x.InspectionValue)))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15902));
+                var isEmptyValueList = sampleDetailEntities.Where(x => string.IsNullOrWhiteSpace(x.InspectionValue));
+                if (isEmptyValueList.Any())
+                {
+                    foreach (var item in isEmptyValueList)
+                    {
+                        var emptyValueSnapshotItem = snapshotItem.Where(x => x.Id == item.SpotCheckItemSnapshotId).FirstOrDefault();
+                        if (emptyValueSnapshotItem != null && emptyValueSnapshotItem.DataType == DataTypeEnum.Numeric)
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES15911));
+                        }
+                    }
+                }
             }
+
+            var operationType = EquSpotcheckOperationTypeEnum.Complete;
 
             //有任一不合格，完成
             if (sampleDetailEntities.Any(X => X.IsQualified == TrueOrFalseEnum.No))
