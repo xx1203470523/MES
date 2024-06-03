@@ -4,6 +4,7 @@ using Hymson.MES.CoreServices.Dtos.Parameter;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
+using System.Transactions;
 
 namespace Hymson.MES.CoreServices.Services.Parameter
 {
@@ -40,7 +41,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                 list.Add(entity);
             }
 
-            using var trans = TransactionHelper.GetTransactionScope();
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.RequiresNew);
 
             await _manuEquipmentParameterRepository.InsertRangeAsync(list);
 
