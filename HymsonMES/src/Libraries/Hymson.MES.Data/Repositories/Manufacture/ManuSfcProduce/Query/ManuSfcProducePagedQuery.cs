@@ -115,9 +115,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public long? ProcedureId { get; set; }
 
         /// <summary>
-        /// 工序
+        /// 工序编码
         /// </summary>
-        public string? code { get; set; }
+        public string? Code { get; set; }
+
+        /// <summary>
+        ///  资源编码
+        /// </summary>
+        public string? ResCode { get; set; }
+
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string? OrderCode { get; set; }
 
         /// <summary>
         /// 条码列表
