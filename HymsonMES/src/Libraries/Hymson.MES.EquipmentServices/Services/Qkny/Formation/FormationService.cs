@@ -213,31 +213,31 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             //param.LocalizationService = _localizationService;
             //param.Proxy = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
 
-            JobRequestBo verifyParam = new JobRequestBo();
-            verifyParam.LocalizationService = _localizationService;
-            verifyParam.Proxy = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
-            verifyParam.UserName = dto.EquipmentCode;
-            verifyParam.SiteId = equResModel.SiteId;
-            verifyParam.EquipmentId = equResModel.EquipmentId;
-            verifyParam.ResourceId = equResModel.ResId;
-            verifyParam.ProcedureId = equResModel.ProcedureId;
-            List<InStationRequestBo> inList = new List<InStationRequestBo>();
-            InStationRequestBo inModel = new InStationRequestBo() { SFC = dto.Sfc };
-            inList.Add(inModel);
-            verifyParam.InStationRequestBos = inList;
-            await _manuCommonService.VerifyProcedureAsync(verifyParam);
+            //JobRequestBo verifyParam = new JobRequestBo();
+            //verifyParam.LocalizationService = _localizationService;
+            //verifyParam.Proxy = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
+            //verifyParam.UserName = dto.EquipmentCode;
+            //verifyParam.SiteId = equResModel.SiteId;
+            //verifyParam.EquipmentId = equResModel.EquipmentId;
+            //verifyParam.ResourceId = equResModel.ResId;
+            //verifyParam.ProcedureId = equResModel.ProcedureId;
+            //List<InStationRequestBo> inList = new List<InStationRequestBo>();
+            //InStationRequestBo inModel = new InStationRequestBo() { SFC = dto.Sfc };
+            //inList.Add(inModel);
+            //verifyParam.InStationRequestBos = inList;
+            //await _manuCommonService.VerifyProcedureAsync(verifyParam);
 
             //2. 校验电芯是否存在
-            //ManuSfcProduceBySfcQuery query = new ManuSfcProduceBySfcQuery();
-            //query.SiteId = equResModel.SiteId;
-            //query.Sfc = dto.Sfc;
-            //var sfcEntity = await _manuSfcProduceService.GetBySFCAsync(query);
-            ////校验电芯是否合格
-            //if (sfcEntity.Status == SfcStatusEnum.Scrapping)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES45091))
-            //        .WithData("Sfc", dto.Sfc);
-            //}
+            ManuSfcProduceBySfcQuery query = new ManuSfcProduceBySfcQuery();
+            query.SiteId = equResModel.SiteId;
+            query.Sfc = dto.Sfc;
+            var sfcEntity = await _manuSfcProduceService.GetBySFCAsync(query);
+            //校验电芯是否合格
+            if (sfcEntity.Status == SfcStatusEnum.Scrapping)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45091))
+                    .WithData("Sfc", dto.Sfc);
+            }
         }
 
         /// <summary>
