@@ -163,7 +163,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
             sqlBuilder.LeftJoin("manu_sfc_produce msp  on msp.SFC =ms.SFC");
-
+            sqlBuilder.LeftJoin("proc_procedure pp ON pp.Id=msp.ProcedureId");//关联工序表
+            sqlBuilder.LeftJoin("proc_resource pr ON pr.Id=msp.ResourceId");//关联资源表
+            sqlBuilder.LeftJoin("plan_work_order pwo ON pwo.Id=msp.WorkOrderId");//关联工单表
 
             if (!string.IsNullOrEmpty(query.MaterialVersion) || !string.IsNullOrWhiteSpace(query.MaterialCode))
             {
@@ -261,6 +263,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
             sqlBuilder.AddParameters(query);
             #endregion
+
+            //工序
+            if (!string.IsNullOrEmpty(query.Code))
+            {
+                sqlBuilder.Where("pp.Code = @Code ");
+            }
+            //资源
+            if (!string.IsNullOrEmpty(query.ResCode))
+            {
+                sqlBuilder.Where("pr.ResCode = @ResCode ");
+            }
+            //工单
+            if (!string.IsNullOrEmpty(query.OrderCode))
+            {
+                sqlBuilder.Where("pwo.OrderCode = @OrderCode ");
+            }
 
             using var conn = GetMESDbConnection();
             var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceSelectView>(templateData.RawSql, templateData.Parameters);
