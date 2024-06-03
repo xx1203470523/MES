@@ -540,7 +540,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 entity.UpdatedOn = updatedOn;
 
                 var currentDataType = snapshotItemEntitys.FirstOrDefault(x => x.Id == entity.MaintenanceItemSnapshotId)?.DataType;
-                if (currentDataType != null && currentDataType == DataTypeEnum.Numeric)
+                if (currentDataType != null && currentDataType == EquMaintenanceDataTypeEnum.Numeric)
                 {
                     if (!decimal.TryParse(entity.InspectionValue, out var v))
                     {
@@ -694,7 +694,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                     foreach (var item in isEmptyValueList)
                     {
                         var emptyValueSnapshotItem = snapshotItem.Where(x => x.Id == item.MaintenanceItemSnapshotId).FirstOrDefault();
-                        if (emptyValueSnapshotItem != null && emptyValueSnapshotItem.DataType == DataTypeEnum.Numeric)
+                        if (emptyValueSnapshotItem != null && emptyValueSnapshotItem.DataType == EquMaintenanceDataTypeEnum.Numeric)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES15911));
                         }

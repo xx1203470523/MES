@@ -2136,8 +2136,8 @@
         
 
         //点检保养项目
-        public const string MES15920 = "{Code}已被设备保养模板引用！";
-        public const string MES15921 = "{Code}已被设备点检模板引用！";
+        public const string MES15920 = "已被设备保养模板{Code}引用！";
+        public const string MES15921 = "已被设备点检模板{Code}引用！";
 
         #endregion
 

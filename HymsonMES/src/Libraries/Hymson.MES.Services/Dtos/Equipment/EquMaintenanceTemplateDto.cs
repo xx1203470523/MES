@@ -340,7 +340,7 @@ namespace Hymson.MES.Services.Dtos.EquMaintenanceTemplate
         /// <summary>
         /// 数据类型
         /// </summary>
-        public DataTypeEnum? DataType { get; set; }
+        public EquMaintenanceDataTypeEnum? DataType { get; set; }
 
         /// <summary>
         /// 规格下限

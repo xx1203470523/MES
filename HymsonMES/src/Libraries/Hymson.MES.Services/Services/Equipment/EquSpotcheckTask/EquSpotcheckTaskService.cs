@@ -556,7 +556,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 var requestAttachments = oneDetail.Attachments;
 
                 var currentDataType = snapshotItemEntitys.FirstOrDefault(x => x.Id == entity.SpotCheckItemSnapshotId)?.DataType;
-                if (currentDataType != null && currentDataType == DataTypeEnum.Numeric)
+                if (currentDataType != null && currentDataType == EquSpotcheckDataTypeEnum.Numeric)
                 {
                     if (!decimal.TryParse(entity.InspectionValue, out var v))
                     {
@@ -702,7 +702,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     foreach (var item in isEmptyValueList)
                     {
                         var emptyValueSnapshotItem = snapshotItem.Where(x => x.Id == item.SpotCheckItemSnapshotId).FirstOrDefault();
-                        if (emptyValueSnapshotItem != null && emptyValueSnapshotItem.DataType == DataTypeEnum.Numeric)
+                        if (emptyValueSnapshotItem != null && emptyValueSnapshotItem.DataType == EquSpotcheckDataTypeEnum.Numeric)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES15911));
                         }

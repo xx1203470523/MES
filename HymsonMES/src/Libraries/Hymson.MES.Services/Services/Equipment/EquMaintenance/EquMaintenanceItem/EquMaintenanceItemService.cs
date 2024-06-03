@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem;
 using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateItemRelation;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services;
@@ -50,6 +51,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
         private readonly IInteUnitRepository _inteUnitRepository;
 
         private readonly IEquMaintenanceTemplateItemRelationRepository _EquMaintenanceTemplateItemRelationRepository;
+        private readonly IEquMaintenanceTemplateRepository _equMaintenanceTemplateRepository;
 
         /// <summary>
         /// 构造函数
@@ -60,7 +62,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
         /// <param name="equMaintenanceItemRepository"></param>
         public EquMaintenanceItemService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquMaintenanceItemSaveDto> validationSaveRules,
             IEquMaintenanceItemRepository equMaintenanceItemRepository,
-            IInteUnitRepository inteUnitRepository, IEquMaintenanceTemplateItemRelationRepository equMaintenanceTemplateItemRelationRepository)
+            IInteUnitRepository inteUnitRepository, 
+            IEquMaintenanceTemplateItemRelationRepository equMaintenanceTemplateItemRelationRepository,
+            IEquMaintenanceTemplateRepository equMaintenanceTemplateRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -68,6 +72,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
             _equMaintenanceItemRepository = equMaintenanceItemRepository;
             _inteUnitRepository = inteUnitRepository;
             _EquMaintenanceTemplateItemRelationRepository = equMaintenanceTemplateItemRelationRepository;
+            _equMaintenanceTemplateRepository= equMaintenanceTemplateRepository;
         }
 
 
@@ -152,7 +157,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
-            var equMaintenanceItemEntity = await _equMaintenanceItemRepository.GetByIdsAsync(ids);             
+            //var equMaintenanceItemEntity = await _equMaintenanceItemRepository.GetByIdsAsync(ids);             
 
             var equMaintenanceTemplateItemRelations = await _EquMaintenanceTemplateItemRelationRepository.GetEquMaintenanceTemplateItemRelationEntitiesAsync(new EquMaintenanceTemplateItemRelationQuery
             {
@@ -162,16 +167,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
 
             if(equMaintenanceTemplateItemRelations != null&& equMaintenanceTemplateItemRelations.Any())
             {
-                var itemIds = equMaintenanceTemplateItemRelations.Select(s => s.MaintenanceItemId);
-
-                var itemCodes = equMaintenanceItemEntity
-                    .Where(x => itemIds.Contains(x.Id)).Select(x => x.Code).ToList();
-
-                if (itemCodes.Any())
+                var equMaintenanceTemplateEntitys = await _equMaintenanceTemplateRepository.GetByIdsAsync(equMaintenanceTemplateItemRelations.Select(x=>x.MaintenanceTemplateId).ToArray());
+           
+                var templateCodes = equMaintenanceTemplateEntitys.Select(s=>s.Code).ToList();
+ 
+                if (templateCodes.Any())
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15920)).WithData("Code", string.Join(',', itemCodes));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15920)).WithData("Code", string.Join(',', templateCodes));
                 }
-
             }
 
             return await _equMaintenanceItemRepository.DeletesAsync(new DeleteCommand
