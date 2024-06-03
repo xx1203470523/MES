@@ -332,7 +332,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                             m.ProcessedBy = processEntity.ProcessedBy;
                         }
 
-                        m.PlanTypeText= m.PlanType == 0 ? string.Empty : m.PlanType?.GetDescription();
+                        m.PlanTypeText = m.PlanType == 0 ? string.Empty : m.PlanType?.GetDescription();
 
                         return m;
                     });
@@ -516,9 +516,19 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
 
             if (snapshotPlanEntitys is not null)
             {
+                //更新执行人
                 snapshotPlanEntitys.ExecutorIds = updatedBy;
                 snapshotPlanEntitys.UpdatedBy = updatedBy;
                 snapshotPlanEntitys.UpdatedOn = updatedOn;
+                //校验是否超期
+                if (updatedOn < snapshotPlanEntitys.BeginTime)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15906)).WithData("time", snapshotPlanEntitys.BeginTime);
+                }
+                if (updatedOn > snapshotPlanEntitys.EndTime)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15907)).WithData("time", snapshotPlanEntitys.EndTime);
+                }
             }
 
             var snapshotItemEntitys = await _equMaintenanceTaskSnapshotItemRepository.GetByIdsAsync(taskItemids.ToArray());
@@ -663,20 +673,19 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
-
-            // 检查每种类型是否已经录入足够
-            //var sampleEntities = await _equMaintenanceTaskItemRepository.GetEntitiesAsync(new QualFqcOrderSampleQuery
-            //{
-            //    SiteId = entity.SiteId,
-            //    FQCOrderId = entity.Id
-            //});
-
-            ////校验已检数量
-
-            //if (sampleEntities.Count() < entity.SampleQty)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES11716)).WithData("CheckedQty", sampleEntities.Count()).WithData("SampleQty", entity.SampleQty);
-            //}
+            //校验是否超期
+            var snapshotPlanEntitys = await _equMaintenanceTaskSnapshotPlanRepository.GetByTaskIdAsync(requestDto.Id);
+            if (snapshotPlanEntitys is not null)
+            {
+                if (updatedOn < snapshotPlanEntitys.BeginTime)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15906)).WithData("time", snapshotPlanEntitys.BeginTime);
+                }
+                if (updatedOn > snapshotPlanEntitys.EndTime)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15907)).WithData("time", snapshotPlanEntitys.EndTime);
+                }
+            }
 
             // 读取所有明细参数
             var sampleDetailEntities = await _equMaintenanceTaskItemRepository.GetEntitiesAsync(new EquMaintenanceTaskItemQuery
