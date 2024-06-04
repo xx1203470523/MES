@@ -638,6 +638,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             {
                 rows += await _equMaintenanceTaskSnapshotPlanRepository.UpdateAsync(snapshotPlanEntitys);
             }
+            //修改检验状态
+            rows += await OperationOrderAsync(new EquMaintenanceTaskOrderOperationStatusDto
+            {
+                OrderId = requestDto.MaintenanceTaskId,
+                OperationType = EquMaintenanceOperationTypeEnum.Start
+            });
 
             if (attachmentEntities.Any())
             {
