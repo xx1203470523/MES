@@ -598,6 +598,7 @@
         public const string MES12321 = "结束时间需大于开始时间";
         public const string MES12322 = "请维护设备{Code}执行人/责任人";
         public const string MES12323 = "截止执行时间必须填写一个";
+        public const string MES12324 = "完成时间必须填写一个"; 
 
 
         #endregion

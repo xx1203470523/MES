@@ -200,11 +200,11 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                 var endTime = HymsonClock.Now();
                 if (equMaintenancePlanEntity.CompletionHour.HasValue)
                 {
-                    endTime.AddHours(equMaintenancePlanEntity.CompletionHour.ParseToDouble());
+                    endTime = endTime.AddHours(equMaintenancePlanEntity.CompletionHour.ParseToDouble());
                 }
                 if (equMaintenancePlanEntity.CompletionMinute.HasValue)
                 {
-                    endTime.AddMinutes(equMaintenancePlanEntity.CompletionMinute.ParseToDouble());
+                    endTime = endTime.AddMinutes(equMaintenancePlanEntity.CompletionMinute.ParseToDouble());
                 }
                 EquMaintenanceTaskSnapshotPlanEntity EquMaintenanceTaskSnapshotPlan = new()
                 {

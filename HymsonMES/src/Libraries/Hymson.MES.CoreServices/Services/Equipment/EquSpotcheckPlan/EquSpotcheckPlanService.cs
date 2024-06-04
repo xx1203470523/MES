@@ -201,11 +201,11 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                 var endTime = HymsonClock.Now();
                 if (equSpotcheckPlanEntity.CompletionHour.HasValue)
                 {
-                    endTime.AddHours(equSpotcheckPlanEntity.CompletionHour.ParseToDouble());
+                    endTime = endTime.AddHours(equSpotcheckPlanEntity.CompletionHour.ParseToDouble());
                 }
                 if (equSpotcheckPlanEntity.CompletionMinute.HasValue)
                 {
-                    endTime.AddMinutes(equSpotcheckPlanEntity.CompletionMinute.ParseToDouble());
+                    endTime = endTime.AddMinutes(equSpotcheckPlanEntity.CompletionMinute.ParseToDouble());
                 }
                 EquSpotcheckTaskSnapshotPlanEntity equSpotcheckTaskSnapshotPlan = new()
                 {
