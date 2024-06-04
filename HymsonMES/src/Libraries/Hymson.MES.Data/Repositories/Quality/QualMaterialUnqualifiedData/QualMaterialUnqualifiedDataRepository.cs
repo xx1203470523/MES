@@ -199,6 +199,10 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.AddParameters(new { DisposalTimeStart = pagedQuery.DisposalTime[0], DisposalTimeEnd = pagedQuery.DisposalTime[1] });
                 sqlBuilder.Where(" mud.DisposalTime>=@DisposalTimeStart AND mud.DisposalTime <@DisposalTimeEnd ");
             }
+            if (pagedQuery.Ids!=null&& pagedQuery.Ids.Any())
+            {
+                sqlBuilder.Where(" mud.Id in @Ids");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

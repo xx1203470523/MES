@@ -24,14 +24,14 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public string? MaterialCode { get; set; }
 
         /// <summary>
-        /// 不合格组
+        /// 不合格代码组ID
         /// </summary>
-        public string? UnqualifiedGroup { get; set; }
+        public long? UnqualifiedGroupId { get; set; }
 
         /// <summary>
-        /// 不合格代码
+        /// 不合格代码ID
         /// </summary>
-        public string? UnqualifiedCode { get; set; }
+        public long? UnqualifiedCodeId { get; set; }
 
         /// <summary>
         /// 创建时间数组 ：时间范围 
@@ -52,5 +52,10 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 处置结果;1、放行 2、退料
         /// </summary>
         public QualMaterialDisposalResultEnum? DisposalResult { get; set; }
+
+        /// <summary>
+        /// 不良Id
+        /// </summary>
+        public IEnumerable<long>? Ids { get; set; }
     }
 }
