@@ -2149,6 +2149,7 @@
         public const string MES15920 = "已被设备保养模板{Code}引用！";
         public const string MES15921 = "已被设备点检模板{Code}引用！";
         public const string MES15922 = "延期时间不允许为空";
+        public const string MES15923 = "延期失败,计划结束时间需大于当前时间，请将开始时间设置于{time}之后！";
 
 
         #endregion

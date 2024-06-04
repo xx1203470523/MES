@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Common;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -67,7 +68,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public TrueOrFalseEnum? IsQualified { get; set; }
+        public TrueFalseEmptyEnum? IsQualified { get; set; }
         public string? IsQualifiedText { get; set; }
 
         /// <summary>
@@ -287,7 +288,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 是否合格;(0-否 1-是)
         /// </summary>
-        public TrueOrFalseEnum? IsQualified { get; set; }
+        public TrueFalseEmptyEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 描述
@@ -409,7 +410,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public TrueOrFalseEnum IsQualified { get; set; }
+        public TrueFalseEmptyEnum IsQualified { get; set; }
 
         /// <summary>
         /// 备注
