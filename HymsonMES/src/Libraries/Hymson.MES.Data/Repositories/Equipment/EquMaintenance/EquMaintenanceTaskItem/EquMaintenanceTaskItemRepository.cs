@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquMaintenanceTaskItemEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquMaintenanceTaskItemEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquMaintenanceTaskItemEntity>(GetByIdsSql, new { Ids = ids });
@@ -121,8 +121,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
             {
                 sqlBuilder.Where("MaintenanceTaskId = @MaintenanceTaskId");
             }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquMaintenanceTaskItemEntity>(template.RawSql, query);
+
         }
 
         /// <summary>

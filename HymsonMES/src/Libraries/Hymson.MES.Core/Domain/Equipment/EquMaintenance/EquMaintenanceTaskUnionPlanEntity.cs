@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Common;
 
 namespace Hymson.MES.Core.Domain.Equipment.EquMaintenance
 {
@@ -38,9 +39,9 @@ namespace Hymson.MES.Core.Domain.Equipment.EquMaintenance
         public EquSpotcheckTaskStautusEnum? Status { get; set; }
 
         /// <summary>
-        /// 是否合格;0、不合格 1、合格
+        /// 是否合格;0、不合格 1、合格 2、无
         /// </summary>
-        public TrueOrFalseEnum? IsQualified { get; set; }
+        public TrueFalseEmptyEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 描述

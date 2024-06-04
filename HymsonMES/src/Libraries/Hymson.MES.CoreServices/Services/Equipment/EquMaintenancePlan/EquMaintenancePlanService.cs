@@ -6,6 +6,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Common;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
@@ -278,7 +279,7 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                         MaintenanceTaskId = EquMaintenanceTask.Id,
                         MaintenanceItemSnapshotId = EquMaintenanceTaskSnapshotItem.Id,
                         InspectionValue = "",
-                        IsQualified = TrueOrFalseEnum.No,
+                        IsQualified = TrueFalseEmptyEnum.No,
                         Remark = EquMaintenanceTaskSnapshotItem.Remark,
 
                         Id = IdGenProvider.Instance.CreateId(),

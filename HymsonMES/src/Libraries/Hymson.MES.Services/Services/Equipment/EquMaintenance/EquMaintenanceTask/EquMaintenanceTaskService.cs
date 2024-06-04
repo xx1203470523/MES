@@ -26,6 +26,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Elastic.Clients.Elasticsearch;
+using Hymson.MES.Core.Enums.Common;
 
 namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTask
 {
@@ -337,8 +338,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                         m.PlanTypeText = m.PlanType == 0 ? string.Empty : m.PlanType?.GetDescription();
 
                         //保养延期
-                        var deferEntity = deferOperations.FirstOrDefault(f=>f.MaintenanceTaskId==m.Id);
-                        if(deferEntity != null)
+                        var deferEntity = deferOperations.FirstOrDefault(f => f.MaintenanceTaskId == m.Id);
+                        if (deferEntity != null)
                         {
                             m.IsDefer = TrueOrFalseEnum.Yes;
                             m.DeferReason = m.PlanRemark;
@@ -732,7 +733,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             var operationType = EquMaintenanceOperationTypeEnum.Complete;
 
             //有任一不合格，完成
-            if (sampleDetailEntities.Any(X => X.IsQualified == TrueOrFalseEnum.No))
+            if (sampleDetailEntities.Any(X => X.IsQualified == TrueFalseEmptyEnum.No))
             {
                 entity.Status = EquMaintenanceTaskStautusEnum.Completed;
                 entity.IsQualified = TrueOrFalseEnum.No;
@@ -820,6 +821,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             //推算endtime
             snapShotPlan.EndTime = requestDto.PlanBeginTime!.Value.Add(timeDifference);
             snapShotPlan.Remark = requestDto.Remark ?? string.Empty;
+
+            if (nowtime > snapShotPlan.EndTime) throw new CustomerValidationException(nameof(ErrorCode.MES15923)).WithData("time", snapShotPlan.BeginTime);
 
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
