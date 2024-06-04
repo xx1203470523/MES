@@ -1,3 +1,5 @@
+using Hymson.MES.Core.Enums.Equipment;
+
 namespace Hymson.MES.Data.Repositories.Equipment.Query
 {
     /// <summary>
@@ -5,6 +7,11 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
     /// </summary>
     public class EquMaintenanceTaskOperationQuery
     {
-    
+        public IEnumerable<long>? MaintenanceTaskIds { get; set; }
+
+        /// <summary>
+        /// 操作类型
+        /// </summary>
+        public EquMaintenanceOperationTypeEnum? OperationType { get; set; }
     }
 }
