@@ -97,5 +97,10 @@ namespace Hymson.MES.Core.Domain.Equipment.EquMaintenance
         /// 结束时间（计划）
         /// </summary>
         public DateTime? PlanEndTime { get; set; }
+
+        /// <summary>
+        /// 计划备注
+        /// </summary>
+        public string? PlanRemark { get; set; }
     }
 }
