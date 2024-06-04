@@ -153,6 +153,10 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
             }
+            if (!EquMaintenancePlanCreateDto.CompletionHour.HasValue && !EquMaintenancePlanCreateDto.CompletionHour.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12323));
+            }
             var EquMaintenancePlan = await _EquMaintenancePlanRepository.GetByCodeAsync(new EquMaintenancePlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = EquMaintenancePlanCreateDto.Code, Version = EquMaintenancePlanCreateDto.Version });
             if (EquMaintenancePlan != null)
             {
@@ -316,6 +320,10 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             if (EquMaintenancePlanModifyDto.FirstExecuteTime < EquMaintenancePlanModifyDto.BeginTime || EquMaintenancePlanModifyDto.FirstExecuteTime > EquMaintenancePlanModifyDto.EndTime)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
+            }
+            if (!EquMaintenancePlanModifyDto.CompletionHour.HasValue && !EquMaintenancePlanModifyDto.CompletionHour.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12323));
             }
             var EquMaintenancePlan = await _EquMaintenancePlanRepository.GetByCodeAsync(new EquMaintenancePlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = EquMaintenancePlanModifyDto.Code, Version = EquMaintenancePlanModifyDto.Version });
             if (EquMaintenancePlan != null && EquMaintenancePlan.Id != EquMaintenancePlanModifyDto.Id)

@@ -275,7 +275,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountCOUNTSqlTemplate);
             sqlBuilder.LeftJoin("proc_resource_equipment_bind preb ON preb.EquipmentId = EE.Id AND preb.IsDeleted = 0");
             sqlBuilder.LeftJoin("inte_work_center_resource_relation iwcrr ON iwcrr.ResourceId = preb.ResourceId AND iwcrr.IsDeleted = 0");
             sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = iwcrr.WorkCenterId AND IWC.IsDeleted = 0");
@@ -365,8 +365,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string GetBaseListSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND SiteId = @SiteId;";
         const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE IsDeleted = 0 AND SiteId = @Site AND EquipmentCode = @Code;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/ /**groupby**/  /**orderby**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/";
-        const string GetEntitiesSqlTemplate = "SELECT * FROM `equ_equipment` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/  /**groupby**/  /**orderby**/ ";
+        const string GetPagedInfoCountCOUNTSqlTemplate = "SELECT COUNT(*) FROM (SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/  /**groupby**/  /**orderby**/)x";
+        const string GetEntitiesSqlTemplate = "SELECT * FROM `equ_equipment` /**where**/ "; 
         /// <summary>
         /// 
         /// </summary>
