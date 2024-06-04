@@ -115,12 +115,12 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
             }
             if (param.ExecType == 0)
             {
-                if (EquMaintenancePlanEntity.FirstExecuteTime < HymsonClock.Now())
+                if (EquMaintenancePlanEntity.FirstExecuteTime > HymsonClock.Now())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12303));
                 }
 
-                if (!EquMaintenancePlanEntity.FirstExecuteTime.HasValue || !EquMaintenancePlanEntity.Type.HasValue || EquMaintenancePlanEntity.Cycle.HasValue)
+                if (!EquMaintenancePlanEntity.FirstExecuteTime.HasValue || !EquMaintenancePlanEntity.Type.HasValue || !EquMaintenancePlanEntity.Cycle.HasValue)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12304));
                 }

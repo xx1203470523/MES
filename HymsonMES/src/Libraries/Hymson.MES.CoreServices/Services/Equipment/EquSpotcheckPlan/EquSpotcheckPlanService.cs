@@ -114,7 +114,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
             }
             if (param.ExecType == 0)
             {
-                if (equSpotcheckPlanEntity.FirstExecuteTime < HymsonClock.Now())
+                if (equSpotcheckPlanEntity.FirstExecuteTime > HymsonClock.Now())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12303));
                 }
@@ -244,7 +244,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                         Code = thisEquSpotcheckItem.Code ?? "",
                         Name = thisEquSpotcheckItem.Name ?? "",
                         Status = thisEquSpotcheckItem.Status ?? DisableOrEnableEnum.Enable,
-                        DataType = thisEquSpotcheckItem.DataType ?? DataTypeEnum.Text,
+                        DataType = thisEquSpotcheckItem.DataType ?? EquSpotcheckDataTypeEnum.Text,
                         CheckType = thisEquSpotcheckItem.CheckType,
                         CheckMethod = thisEquSpotcheckItem.CheckMethod ?? "",
                         UnitId = thisEquSpotcheckItem.UnitId,
@@ -323,7 +323,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
         /// <returns></returns> 
         public async Task StopEquSpotcheckTaskAsync(EquSpotcheckAutoStopIntegrationEvent param)
         {
-  
+
         }
         #region 帮助
         private static string GetWeekToInt(string weekName)

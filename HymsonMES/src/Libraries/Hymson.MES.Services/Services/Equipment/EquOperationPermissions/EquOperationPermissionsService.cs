@@ -79,16 +79,22 @@ namespace Hymson.MES.Services.Services.Equipment
             var equOperationPermissions = await _equOperationPermissionsRepository.GetEntitiesAsync(equOperationPermissionsQuery);
             if (equOperationPermissions != null && equOperationPermissions.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15801)).WithData("EquipmentCode", saveDto.EquipmentCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES12615))
+                    .WithData("EquipmentCode", saveDto.EquipmentCode ?? "")
+                    .WithData("Type", saveDto.Type);
             }
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
+            string leaders = saveDto.Leaderids != null ? string.Join(",", saveDto.Leaderids) : "";
+            string executorIds = saveDto.Executorids != null ? string.Join(",", saveDto.Executorids) : "";
 
             // DTO转换实体
             var entity = saveDto.ToEntity<EquOperationPermissionsEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
+            entity.Leaderids = leaders;
+            entity.Executorids = executorIds;
             entity.Equipmentid=saveDto.Id;
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
@@ -117,7 +123,11 @@ namespace Hymson.MES.Services.Services.Equipment
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
+            string leaders = saveDto.Leaderids != null ? string.Join(",", saveDto.Leaderids) : "";
+            string executorIds = saveDto.Executorids != null ? string.Join(",", saveDto.Executorids) : "";
             var entity = saveDto.ToEntity<EquOperationPermissionsEntity>();
+            entity.Executorids = executorIds;
+            entity.Equipmentid = saveDto.Id;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 

@@ -35,12 +35,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 点检执行人;
         /// </summary>
-        public string? Executorids { get; set; }
+        public string[]? Executorids { get; set; }
 
         /// <summary>
         /// 点检负责人;
         /// </summary>
-        public string? Leaderids { get; set; }
+        public string[]? Leaderids { get; set; }
 
         /// <summary>
         /// 描述

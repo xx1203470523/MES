@@ -20,9 +20,19 @@ namespace Hymson.MES.Services.Dtos.Report
         public string OrderCode { get; set; }
 
         /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
         /// 步骤标识
         /// </summary>
-        public long Serialno { get; set; }
+        public string Serialno { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 工序

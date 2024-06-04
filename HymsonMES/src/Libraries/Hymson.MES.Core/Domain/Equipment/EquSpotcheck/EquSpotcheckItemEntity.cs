@@ -30,7 +30,7 @@ namespace Hymson.MES.Core.Domain.Equipment.EquSpotcheck
         /// <summary>
         /// 数值类型;文本/数值
         /// </summary>
-        public DataTypeEnum? DataType { get; set; } = DataTypeEnum.Text;
+        public EquSpotcheckDataTypeEnum? DataType { get; set; } = EquSpotcheckDataTypeEnum.Text;
 
         /// <summary>
         /// 点检方式

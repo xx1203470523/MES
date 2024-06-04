@@ -23,6 +23,11 @@ namespace Hymson.MES.Data.Repositories.EquMaintenanceTemplateItemRelation
         /// </summary>
         public IEnumerable<long>? MaintenanceTemplateIds { get; set; }
 
+        /// <summary>
+        /// 项目ID
+        /// </summary>
+        public IEnumerable<long>? MaintenanceItemIds { get; set; }
+
     }
 
     /// <summary>

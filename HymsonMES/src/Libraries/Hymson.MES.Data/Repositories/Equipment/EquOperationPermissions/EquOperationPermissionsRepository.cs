@@ -122,6 +122,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("EquipmentId=@EquipmentId ");
+            sqlBuilder.Where("Type=@Type ");
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquOperationPermissionsEntity>(template.RawSql, query);
         }
@@ -139,6 +140,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.Select("eop.*");
             sqlBuilder.Select("ee.EquipmentCode");
             sqlBuilder.Select("ee.EquipmentName");
+            sqlBuilder.Select("ee.Location");
             sqlBuilder.Select("eg.EquipmentGroupCode");
             sqlBuilder.Select("eg.EquipmentGroupName");
             sqlBuilder.Where("eop.IsDeleted = 0");
@@ -150,12 +152,40 @@ namespace Hymson.MES.Data.Repositories.Equipment
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
             {
                 pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
-                sqlBuilder.Where(" EquipmentCode like @EquipmentCode ");
+                sqlBuilder.Where(" ee.EquipmentCode like @EquipmentCode ");
             }
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentName))
             {
                 pagedQuery.EquipmentName = $"%{pagedQuery.EquipmentName}%";
-                sqlBuilder.Where(" EquipmentName like @EquipmentName ");
+                sqlBuilder.Where(" ee.EquipmentName like @EquipmentName ");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode))
+            {
+                pagedQuery.EquipmentGroupCode = $"%{pagedQuery.EquipmentGroupCode}%";
+                sqlBuilder.Where("eg.EquipmentGroupCode LIKE @EquipmentGroupCode");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupName))
+            {
+                pagedQuery.EquipmentGroupName = $"%{pagedQuery.EquipmentGroupName}%";
+                sqlBuilder.Where("eg.EquipmentGroupName LIKE @EquipmentGroupName");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ExecutorIds))
+            {
+                pagedQuery.ExecutorIds = $"%{pagedQuery.ExecutorIds}%";
+                sqlBuilder.Where(" eop.ExecutorIds like @ExecutorIds ");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.LeaderIds))
+            {
+                pagedQuery.LeaderIds = $"%{pagedQuery.LeaderIds}%";
+                sqlBuilder.Where(" eop.LeaderIds like @LeaderIds ");
+            }
+            if (pagedQuery.Status!=null)
+            {
+                sqlBuilder.Where(" eop.Status like @Status ");
+            }
+            if (pagedQuery.Type!=null)
+            {
+                sqlBuilder.Where(" eop.Type like @Type ");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;

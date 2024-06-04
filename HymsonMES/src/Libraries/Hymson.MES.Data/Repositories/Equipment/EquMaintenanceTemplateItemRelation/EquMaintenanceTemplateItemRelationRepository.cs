@@ -158,10 +158,17 @@ namespace Hymson.MES.Data.Repositories.EquMaintenanceTemplateItemRelation
                 sqlBuilder.Where("MaintenanceTemplateId IN @MaintenanceTemplateIds");
             }
 
+            if (EquMaintenanceTemplateItemRelationQuery.MaintenanceItemIds != null && EquMaintenanceTemplateItemRelationQuery.MaintenanceItemIds.Any())
+            {
+                sqlBuilder.Where("MaintenanceItemId IN @MaintenanceItemIds");
+            }
+
             using var conn = GetMESDbConnection();
             var EquMaintenanceTemplateItemRelationEntities = await conn.QueryAsync<EquMaintenanceTemplateItemRelationEntity>(template.RawSql, EquMaintenanceTemplateItemRelationQuery);
             return EquMaintenanceTemplateItemRelationEntities;
         }
+
+        
 
         /// <summary>
         /// 新增

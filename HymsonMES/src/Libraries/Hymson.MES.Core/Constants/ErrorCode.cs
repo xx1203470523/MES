@@ -569,6 +569,7 @@
         public const string MES12201 = "模板{Code}已启用，不允许删除";
         public const string MES12202 = "模板【{Code}】，版本【{Version}】已存在";
         public const string MES12203 = "设备组【{Code}】已绑定模板";
+        public const string MES12204 = "模板{Code}已被使用,不允许删除"; 
         #endregion
 
 
@@ -689,6 +690,7 @@
         public const string MES12612 = "设备验证账号不允许有空格";
         public const string MES12613 = "设备验证账号最大长度为50";
         public const string MES12614 = "设备验证密码最大长度为50";
+        public const string MES12615 = "已存在相同的设备编码【{EquipmentCode}】和类型【{Type}】，不允许操作。";
         #endregion
 
         #region 设备组 12700
@@ -900,6 +902,7 @@
         public const string MES15131 = "{type}编码规则未维护！";
         public const string MES15132 = "{type}编码规则被维护多条！";
         public const string MES15133 = "待拆分数量不能填写小数!";
+        public const string MES15134 = "物料仓库有重复的条码或与当前条码无法匹配，导致无法正常记录物料台账!";
         #endregion
 
         #region 物料台账 15200
@@ -2111,6 +2114,7 @@
 
 
         #region 设备点检 15800
+        //公共
         public const string MES15801 = "此设备点检项目{code}在系统中已经存在!";
         public const string MES15802 = "此设备点检任务{code}在系统中已经存在!";
         public const string MES15803 = "设备点检任务不存在！";
@@ -2121,8 +2125,26 @@
         #endregion
 
         #region 设备点检执行 15900
+        //保养
         public const string MES15901 = "不良已关闭，不允许删除!";
         public const string MES15902 = "待处理状态的保养任务，数据需要先保存后点击完成！";
+        public const string MES15903 = "没有找到相应的保养快照项！请检查生成是否遇到问题";
+        public const string MES15904 = "保养单据状态为检验中、待审核、已关闭的单据，删除失败!";
+        public const string MES15905 = "数值类型的检验值请输入不为数值！";
+        public const string MES15906 = "当前时间,未到保养计划开始时间{time}";
+        public const string MES15907 = "当前时间,已超过保养计划结束时间{time}";
+ 
+        //点检
+        public const string MES15910 = "保存时，未找到点检单!请联系管理员";
+        public const string MES15911 = "含有数值类型，需要先保存才能执行完成";
+        public const string MES15912 = "当前时间,未到点检计划开始时间{time}";
+        public const string MES15913 = "当前时间,已超过点检计划结束时间{time}";
+
+
+        //点检保养项目
+        public const string MES15920 = "已被设备保养模板{Code}引用！";
+        public const string MES15921 = "已被设备点检模板{Code}引用！";
+
         #endregion
 
         #region 设备点检 车间物料不良录入 17500
