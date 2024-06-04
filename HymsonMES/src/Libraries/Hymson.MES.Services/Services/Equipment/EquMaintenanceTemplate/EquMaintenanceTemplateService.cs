@@ -122,7 +122,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
                 var groupRelation = new EquMaintenanceTemplateEquipmentGroupRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    EquipmentGroupId = item.Id,
+                    EquipmentGroupId = item.EquipmentGroupId == 0 ? item.Id : item.EquipmentGroupId,
                     MaintenanceTemplateId = EquMaintenanceTemplateEntity.Id,
 
                     IsDeleted = 0,
@@ -145,7 +145,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
                     MaintenanceTemplateId = EquMaintenanceTemplateEntity.Id,
                     Center = item.Center,
                     LowerLimit = item.LowerLimit,
-                    MaintenanceItemId = item.Id,
+                    MaintenanceItemId = item.MaintenanceItemId == 0 ? item.Id : item.MaintenanceItemId,
                     UpperLimit = item.UpperLimit,
 
                     IsDeleted = 0,
