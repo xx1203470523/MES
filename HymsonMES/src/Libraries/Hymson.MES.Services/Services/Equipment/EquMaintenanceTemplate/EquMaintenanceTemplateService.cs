@@ -188,21 +188,21 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
         public async Task<int> DeletesEquMaintenanceTemplateAsync(EquMaintenanceTemplateDeleteDto param)
         {
             var ids = param.Ids;
-            var templateList = await _EquMaintenanceTemplateRepository.GetByIdsAsync(ids.ToArray());
+            //var templateList = await _EquMaintenanceTemplateRepository.GetByIdsAsync(ids.ToArray());
 
-            var codeEnabiles = "";
-            foreach (var item in templateList)
-            {
-                if (item.Status == DisableOrEnableEnum.Enable)
-                {
-                    codeEnabiles += item.Code + ",";
-                }
-            }
+            //var codeEnabiles = "";
+            //foreach (var item in templateList)
+            //{
+            //    if (item.Status == DisableOrEnableEnum.Enable)
+            //    {
+            //        codeEnabiles += item.Code + ",";
+            //    }
+            //}
 
-            if (!string.IsNullOrWhiteSpace(codeEnabiles))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
-            }
+            //if (!string.IsNullOrWhiteSpace(codeEnabiles))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
+            //}
 
             var equMaintenancePlanEquipmentRelations = await _equMaintenancePlanEquipmentRelationRepository.GetByMaintenanceTemplateIdsAsync(ids);
             if (equMaintenancePlanEquipmentRelations != null && equMaintenancePlanEquipmentRelations.Any())
