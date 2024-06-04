@@ -122,7 +122,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
                 var groupRelation = new EquMaintenanceTemplateEquipmentGroupRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    EquipmentGroupId = item.Id,
+                    EquipmentGroupId = item.EquipmentGroupId == 0 ? item.Id : item.EquipmentGroupId,
                     MaintenanceTemplateId = EquMaintenanceTemplateEntity.Id,
 
                     IsDeleted = 0,
@@ -145,7 +145,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
                     MaintenanceTemplateId = EquMaintenanceTemplateEntity.Id,
                     Center = item.Center,
                     LowerLimit = item.LowerLimit,
-                    MaintenanceItemId = item.Id,
+                    MaintenanceItemId = item.MaintenanceItemId == 0 ? item.Id : item.MaintenanceItemId,
                     UpperLimit = item.UpperLimit,
 
                     IsDeleted = 0,
@@ -188,21 +188,21 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
         public async Task<int> DeletesEquMaintenanceTemplateAsync(EquMaintenanceTemplateDeleteDto param)
         {
             var ids = param.Ids;
-            var templateList = await _EquMaintenanceTemplateRepository.GetByIdsAsync(ids.ToArray());
+            //var templateList = await _EquMaintenanceTemplateRepository.GetByIdsAsync(ids.ToArray());
 
-            var codeEnabiles = "";
-            foreach (var item in templateList)
-            {
-                if (item.Status == DisableOrEnableEnum.Enable)
-                {
-                    codeEnabiles += item.Code + ",";
-                }
-            }
+            //var codeEnabiles = "";
+            //foreach (var item in templateList)
+            //{
+            //    if (item.Status == DisableOrEnableEnum.Enable)
+            //    {
+            //        codeEnabiles += item.Code + ",";
+            //    }
+            //}
 
-            if (!string.IsNullOrWhiteSpace(codeEnabiles))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
-            }
+            //if (!string.IsNullOrWhiteSpace(codeEnabiles))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
+            //}
 
             var equMaintenancePlanEquipmentRelations = await _equMaintenancePlanEquipmentRelationRepository.GetByMaintenanceTemplateIdsAsync(ids);
             if (equMaintenancePlanEquipmentRelations != null && equMaintenancePlanEquipmentRelations.Any())
