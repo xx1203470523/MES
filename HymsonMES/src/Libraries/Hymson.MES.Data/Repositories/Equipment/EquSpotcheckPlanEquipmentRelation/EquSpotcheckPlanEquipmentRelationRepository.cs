@@ -97,6 +97,18 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlanEquipmentRelation
 
 
         /// <summary>
+        /// 根据SpotCheckTemplateIds批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquSpotcheckPlanEquipmentRelationEntity>> GetBySpotCheckSpotCheckTemplateIdsAsync(IEnumerable<long> spotCheckTemplateIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquSpotcheckPlanEquipmentRelationEntity>(GetByspotCheckspotCheckTemplateIdsSql, new { SpotCheckTemplateIds = spotCheckTemplateIds });
+        }
+
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="equSpotcheckPlanEquipmentRelationPagedQuery"></param>
@@ -216,6 +228,9 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlanEquipmentRelation
         const string GetByspotCheckPlanIdsSql = @"SELECT  
                                           `SpotCheckPlanId`, `SpotCheckTemplateId`, `EquipmentId`, `CreatedBy`, `CreatedOn`, `ExecutorIds`, `LeaderIds`
                             FROM `equ_spotcheck_plan_equipment_relation`  WHERE SpotCheckPlanId = @SpotCheckPlanId ";
+        const string GetByspotCheckspotCheckTemplateIdsSql = @"SELECT   
+                                          `SpotCheckPlanId`, `SpotCheckTemplateId`, `EquipmentId`, `CreatedBy`, `CreatedOn`, `ExecutorIds`, `LeaderIds`
+                            FROM `equ_spotcheck_plan_equipment_relation`  WHERE SpotCheckTemplateId IN @SpotCheckTemplateIds ";
         #endregion
     }
 }
