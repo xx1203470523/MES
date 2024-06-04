@@ -44,7 +44,5 @@ namespace Hymson.MES.Core.Domain.ManuFeedingTransferRecord
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-        
     }
 }

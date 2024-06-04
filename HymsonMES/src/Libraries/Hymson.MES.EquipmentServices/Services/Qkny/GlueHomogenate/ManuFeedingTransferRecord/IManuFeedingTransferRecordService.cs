@@ -16,6 +16,13 @@ namespace Hymson.MES.Services.Services.ManuFeedingTransferRecord
         Task<int> AddAsync(ManuFeedingTransferRecordSaveDto saveDto);
 
         /// <summary>
+        /// 添加
+        /// </summary>
+        /// <param name="saveDtoList"></param>
+        /// <returns></returns>
+        Task<int> AddMultAsync(List<ManuFeedingTransferRecordSaveDto> saveDtoList);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="saveDto"></param>

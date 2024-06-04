@@ -455,15 +455,15 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                 EntityByResourceIdQuery loadQuery = new EntityByResourceIdQuery();
                 loadQuery.SiteId = equResModel.SiteId;
                 loadQuery.Resourceid = equResModel.ResId;
-                var loadList = await _manuFeedingService.GetAllByResourceIdAsync(loadQuery);
-                foreach (var item in loadList)
-                {
-                    OutStationConsumeBo consumeSfc = new OutStationConsumeBo();
-                    consumeSfc.BarCode = item.BarCode;
-                    consumeSfc.MaterialId = item.MaterialId;
-                    consumeSfc.ConsumeQty = item.Qty;
-                    consumeSfcList.Add(consumeSfc);
-                }
+                //var loadList = await _manuFeedingService.GetAllByResourceIdAsync(loadQuery);
+                //foreach (var item in loadList)
+                //{
+                //    OutStationConsumeBo consumeSfc = new OutStationConsumeBo();
+                //    consumeSfc.BarCode = item.BarCode;
+                //    consumeSfc.MaterialId = item.MaterialId;
+                //    consumeSfc.ConsumeQty = item.Qty;
+                //    consumeSfcList.Add(consumeSfc);
+                //}
             }
             //NG代码
             List<OutStationUnqualifiedBo> ngList = new List<OutStationUnqualifiedBo>();

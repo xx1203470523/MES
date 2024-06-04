@@ -5,6 +5,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.CcdFileUploadCompleteRecord;
 using Hymson.MES.Core.Domain.ManuFeedingTransferRecord;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.ManuFeedingTransferRecord;
@@ -68,6 +69,33 @@ namespace Hymson.MES.Services.Services.ManuFeedingTransferRecord
 
             // 保存
             return await _manuFeedingTransferRecordRepository.InsertAsync(entity);
+        }
+
+        /// <summary>
+        /// 添加
+        /// </summary>
+        /// <param name="saveDtoList"></param>
+        /// <returns></returns>
+        public async Task<int> AddMultAsync(List<ManuFeedingTransferRecordSaveDto> saveDtoList)
+        {
+            List<ManuFeedingTransferRecordEntity> list = saveDtoList
+                .Select(m => new ManuFeedingTransferRecordEntity
+                {
+                    Id = m.Id,
+                    EquipmentId = m.EquipmentId,
+                    Sfc = m.Sfc,
+                    Qty = m.Qty,
+                    EquipmentCodeIn = m.EquipmentCodeIn,
+                    EquipmentCodeOut = m.EquipmentCodeOut,
+                    CreatedBy = m.CreatedBy,
+                    CreatedOn = m.CreatedOn,
+                    UpdatedBy = m.UpdatedBy,
+                    UpdatedOn = m.UpdatedOn,
+                    IsDeleted = m.IsDeleted,
+                    Remark = m.Remark,
+                    SiteId = m.SiteId,
+                }).ToList();
+            return await _manuFeedingTransferRecordRepository.InsertRangeAsync(list);
         }
 
         /// <summary>
