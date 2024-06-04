@@ -99,11 +99,11 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlanEquipmentRelation
         /// 根据MaintenanceTemplateId批量获取数据
         /// </summary>
         /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<EquMaintenancePlanEquipmentRelationEntity>> GetByMaintenanceTemplateIdsAsync(IEnumerable<long> maintenancePlanIds)
+        /// <returns></returns> 
+        public async Task<IEnumerable<EquMaintenancePlanEquipmentRelationEntity>> GetByMaintenanceTemplateIdsAsync(IEnumerable<long> maintenanceTemplateIds)
         {
             using var conn = GetMESDbConnection();  
-            return await conn.QueryAsync<EquMaintenancePlanEquipmentRelationEntity>(GetByMaintenanceTemplateIdsSql, new { MaintenancePlanIds = maintenancePlanIds });
+            return await conn.QueryAsync<EquMaintenancePlanEquipmentRelationEntity>(GetByMaintenanceTemplateIdsSql, new { MaintenanceTemplateIds = maintenanceTemplateIds });
         }
 
 
