@@ -215,6 +215,17 @@ namespace Hymson.MES.Data.Repositories.Quality
             var qualUnqualifiedCodes = await conn.QueryAsync<QualUnqualifiedCodeEntity>(template.RawSql, query);
             return qualUnqualifiedCodes;
         }
+
+        /// <summary>
+        /// 列表拆线呢
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetListAsync(QualUnqualifiedCodeQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<QualUnqualifiedCodeEntity>(GetListSql, query);
+        }
     }
 
     /// <summary>
@@ -252,5 +263,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetByCodesSql = @"SELECT 
                                Id, SiteId, UnqualifiedCode, UnqualifiedCodeName, Status, Type, Degree, ProcessRouteId, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                             FROM `qual_unqualified_code`  WHERE UnqualifiedCode IN @Codes  AND SiteId=@Site AND IsDeleted=0 ";
+
+        const string GetListSql = "SELECT * FROM `qual_unqualified_code` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
     }
 }

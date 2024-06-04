@@ -394,4 +394,52 @@ namespace Hymson.MES.Services.Dtos.Report
         public string Day { get; set; }
     }
 
+    public record ManuSummaryBadRecordTop3Dto
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string? ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string? ProcedureName { get; set; }
+
+        /// <summary>
+        /// 不良数
+        /// </summary>
+        public int UnqualifiedQty { get; set; }
+
+        /// <summary>
+        /// 不良率
+        /// </summary>
+        public decimal UnqualifiedRate { get; set; }
+    }
+
+    public record ManuSummaryBadRecordTop3QueryDto
+    {
+        /// <summary>
+        /// 查询类型 0,day,1,month
+        /// </summary>
+        public int? Type { get; set; } = 0;
+    }
+
+    public record ManuSummarySfcBadRecordTop3Dto
+    {
+        /// <summary>
+        /// 不良编码
+        /// </summary>
+        public string? UnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不良名称
+        /// </summary>
+        public string? UnqualifiedName { get; set; }
+
+        /// <summary>
+        /// 不良数
+        /// </summary>
+        public int UnqualifiedQty { get; set; }
+    }
 }

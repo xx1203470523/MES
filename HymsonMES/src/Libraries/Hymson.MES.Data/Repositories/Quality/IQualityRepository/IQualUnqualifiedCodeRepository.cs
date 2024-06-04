@@ -101,5 +101,12 @@ namespace Hymson.MES.Data.Repositories.Quality.IQualityRepository
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<QualUnqualifiedCodeEntity>> GetListByGroupIdAsync(QualUnqualifiedCodeQuery query);
+
+        /// <summary>
+        /// 根据不合格代码组id查询不合格代码列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetListAsync(QualUnqualifiedCodeQuery query);
     }
 }

@@ -148,11 +148,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (manuSfcSummaryQuery.StartTime.HasValue)
             {
-                sqlBuilder.Where("CreatedOn >= @StartTime");
+                sqlBuilder.Where($"CreatedOn >= '{manuSfcSummaryQuery.StartTime.GetValueOrDefault().ToString("yyyy-MM-dd HH:mm:ss")}'");
             }
             if (manuSfcSummaryQuery.EndTime.HasValue)
             {
-                sqlBuilder.Where("CreatedOn < @EndTime");
+                sqlBuilder.Where($"CreatedOn < '{manuSfcSummaryQuery.EndTime.GetValueOrDefault().ToString("yyyy-MM-dd HH:mm:ss")}'");
             }
             using var conn = GetMESDbConnection();
             var manuSfcSummaryEntities = await conn.QueryAsync<ManuSfcSummaryEntity>(template.RawSql, manuSfcSummaryQuery);

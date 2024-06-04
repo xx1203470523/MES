@@ -42,10 +42,11 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _productionManagePanelService.GetModuleAchievingInfoAsync(param);
         }
+
         /// <summary>
         /// 获取模组达成详细信息
         /// </summary>
-        /// <param name="param">/param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("getModuleInfoDynamic")]
@@ -95,6 +96,28 @@ namespace Hymson.MES.Api.Controllers.Report
         public async Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsAsync([FromQuery] ProcessIndicatorsQueryDto param)
         {
             return await _productionManagePanelService.GetProcessIndicatorsAsync(param);
+        }
+
+        /// <summary>
+        /// 获取工序每日不良率和不良数Top3
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getUnqualifiedTop3")]
+        public async Task<IEnumerable<ManuSummaryBadRecordTop3Dto>> getUnqualifiedTop3([FromQuery]ManuSummaryBadRecordTop3QueryDto query)
+        {
+            return await _productionManagePanelService.getUnqualifiedTop3(query);
+        }
+
+        /// <summary>
+        /// 获取每月上报不良类型数
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getBadTop3")]
+        public async Task<IEnumerable<ManuSummarySfcBadRecordTop3Dto>> GetBadTop3Async()
+        {
+            return await _productionManagePanelService.GetBadTop3Async();
         }
     }
 }

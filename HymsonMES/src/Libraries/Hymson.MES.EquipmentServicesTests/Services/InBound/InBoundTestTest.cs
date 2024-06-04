@@ -26,6 +26,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
         public void TestCleanup()
         {
         }
+
         /// <summary>
         /// 初始化
         /// </summary>

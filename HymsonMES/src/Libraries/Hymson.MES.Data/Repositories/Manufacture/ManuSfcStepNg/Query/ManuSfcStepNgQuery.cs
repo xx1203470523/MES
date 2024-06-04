@@ -13,5 +13,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuSfcStepNgQuery
     {
+        /// <summary>
+        /// 起始日期
+        /// </summary>
+        public DateTime? StartDate { get; set; }
+
+        /// <summary>
+        /// 截止日期
+        /// </summary>
+        public DateTime? EndDate { get; set; }
     }
 }

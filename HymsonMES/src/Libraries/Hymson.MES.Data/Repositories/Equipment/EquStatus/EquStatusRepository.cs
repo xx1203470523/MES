@@ -102,11 +102,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
             }
             if (equStatusQuery.StartTime.HasValue)
             {
-                sqlBuilder.Where(" CreatedOn >= @StartTime");
+                sqlBuilder.Where($" CreatedOn >= '{equStatusQuery.StartTime?.ToString("yyyy-MM-dd HH:mm:ss")}'");
             }
             if (equStatusQuery.EndTime.HasValue)
             {
-                sqlBuilder.Where(" CreatedOn < @EndTime");
+                sqlBuilder.Where($" CreatedOn < '{equStatusQuery.EndTime?.ToString("yyyy-MM-dd HH:mm:ss")}'");
             }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquStatusStatisticsEntity>(template.RawSql, equStatusQuery);

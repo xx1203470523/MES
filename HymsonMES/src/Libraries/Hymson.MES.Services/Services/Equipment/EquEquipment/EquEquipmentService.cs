@@ -373,7 +373,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             var equipmentTheoryEntity = await _equEquipmentTheoryRepository.GetOneAsync(new() {  EquipmentCode = result .EquipmentCode});
 
-            result.TheoryOutputQty = equipmentTheoryEntity.TheoryOutputQty.GetValueOrDefault();
+            result.TheoryOutputQty = equipmentTheoryEntity?.TheoryOutputQty.GetValueOrDefault();
             result.TheoryOnTime = equipmentTheoryEntity?.TheoryOnTime ?? 0;
 
             return result;

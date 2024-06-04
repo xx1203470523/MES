@@ -6,12 +6,15 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.Utils;
 using System.Collections;
+using System.Collections.Immutable;
 using System.Data;
 using System.Dynamic;
 using System.Globalization;
+using System.Security.Policy;
 using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
@@ -31,12 +34,26 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IEquEquipmentRepository _equipmentRepository;
         private readonly IEquStatusRepository _equStatusRepository;
+        private readonly IPlanWorkOrderConversionRepository _planWorkOrderConversionRepository;
+        private readonly IEquEquipmentTheoryRepository _equEquipmentTheoryRepository;
+        private readonly IManuSfcStepNgRepository _manuSfcStepNgRepository;
+        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+        private readonly IProcResourceRepository _procResourceRepository;
+        private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
         public ProductionManagePanelService(IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository, IProcProcessRouteRepository procProcessRouteRepository,
             IProcMaterialRepository procMaterialRepository, IInteWorkCenterRepository inteWorkCenterRepository,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
-            IProcProcedureRepository procProcedureRepository, IEquEquipmentRepository equipmentRepository, IEquStatusRepository equStatusRepository)
+            IProcProcedureRepository procProcedureRepository,
+            IEquEquipmentRepository equipmentRepository,
+            IEquStatusRepository equStatusRepository,
+            IPlanWorkOrderConversionRepository planWorkOrderConversionRepository,
+            IEquEquipmentTheoryRepository equEquipmentTheoryRepository,
+            IManuSfcStepNgRepository manuSfcStepNgRepository,
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+            IProcResourceRepository procResourceRepository,
+            IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository)
         {
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -48,6 +65,12 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             _procProcedureRepository = procProcedureRepository;
             _equipmentRepository = equipmentRepository;
             _equStatusRepository = equStatusRepository;
+            _planWorkOrderConversionRepository = planWorkOrderConversionRepository;
+            _equEquipmentTheoryRepository = equEquipmentTheoryRepository;
+            _manuSfcStepNgRepository = manuSfcStepNgRepository;
+            _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
+            _procResourceRepository = procResourceRepository;
+            _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
         }
 
         /// <summary>
@@ -265,6 +288,11 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         {
             //获取最新的一个激活工单
             var planWorkOrderEntity = await GetPlanWorkOrderFirstActivation(siteId);
+            var planWorkOrderConversionEntity = await _planWorkOrderConversionRepository.GetOneAsync(new() { PlanWorkOrderId = planWorkOrderEntity.Id });
+
+            var moduleConversion = planWorkOrderConversionEntity?.ModuleConversion ?? 13;
+            var packConversion = planWorkOrderConversionEntity?.PackConversion ?? 4;
+
             if (planWorkOrderEntity == null) { return null; }
             //查询工作中心
             var inteWorkCenterEntity = await _inteWorkCenterRepository.GetByIdAsync(planWorkOrderEntity.WorkCenterId ?? -1);
@@ -275,20 +303,24 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             //查询工单记录
             var workOrderRecord = await _planWorkOrderRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id);
             if (workOrderRecord == null) { return null; }
+
+            //取下线数据做为最终产出数
+            var getProcedureEntity = await _procProcedureRepository.GetByCodeAsync(procedureCode, siteId);
+
             //查询工单维度生产汇总信息
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new ManuSfcSummaryQuery
             {
                 WorkOrderId = planWorkOrderEntity.Id,
                 SiteId = siteId,
-                QualityStatus = 0//不合格数
+                QualityStatus = 0,//不合格数,
+                ProcedureIds = new long[] { getProcedureEntity.Id }
             });
             //获取首工序
             var processRouteDetailNodeEntity = await _procProcessRouteDetailNodeRepository.GetFirstProcedureByProcessRouteIdAsync(planWorkOrderEntity.ProcessRouteId);
             var firstProcedureSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new ManuSfcSummaryQuery
             {
                 SiteId = siteId,
-                //ProcedureIds = new long[] { processRouteDetailNodeEntity.ProcedureId },
-                ProcedureIds = new long[] { 20033620040740864 },
+                ProcedureIds = new long[] { processRouteDetailNodeEntity.ProcedureId },
                 StartTime = DayStartTime,
                 EndTime = DayEndTime,
             });
@@ -307,27 +339,27 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             completedQty = await _manuSfcSummaryRepository.GetSumQtyAsync(new()
             {
                 QualityStatus = 1,
-                ProcedureIds = new long[]{ 20033620040740864 },
+                ProcedureIds = new long[] { getProcedureEntity.Id },
                 SiteId = siteId
             });
 
             //当天投入量(当前班次)
             //decimal dayConsume = firstProcedureSummaryEntities.Count();
-            decimal dayConsume = Math.Round(firstProcedureSummaryEntities.Count().ParseToDecimal(),0);
+            decimal dayConsume = Math.Round(firstProcedureSummaryEntities.Count().ParseToDecimal(), 0);
 
             //投入数
-            //decimal inputQty = workOrderRecord?.InputQty ?? 0;
-            //TODO 计算逻辑变更，取电芯OCV工序数量/13/4 （暂时这样处理）
+            //工单上显示电芯投入数
             decimal inputQty = await _manuSfcSummaryRepository.GetSumQtyAsync(new()
             {
                 QualityStatus = 1,
-                ProcedureIds = new long[] { 20033299167047680 },
-                SiteId= siteId
+                ProcedureIds = new long[] { processRouteDetailNodeEntity.ProcedureId },
+                SiteId = siteId,
+                WorkOrderId = planWorkOrderEntity?.Id
             });
-            inputQty = Math.Round(inputQty / 13 / 4,0);
+            inputQty = Math.Round(inputQty, 0);
 
             //完成率
-            decimal completedRate = decimal.Parse((completedQty / (inputQty == 0 ? 1 : inputQty) * 100).ToString("#0.00"));
+            decimal completedRate = decimal.Parse((completedQty / (inputQty == 0 ? 1 : (inputQty / moduleConversion / packConversion)) * 100).ToString("#0.00"));
             //计划数量
             decimal planQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100);
             //计划达成率
@@ -347,8 +379,8 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 CompletedRate = completedRate,
                 DayConsume = dayConsume,
                 DayShift = IsDayShift() ? 1 : 0,
-                InputQty = workOrderRecord?.InputQty,
-                OverallPlanAchievingRate = planAchievingRate < 0 ? 0 : planAchievingRate,
+                InputQty = inputQty,
+                OverallPlanAchievingRate = planAchievingRate < 0 ? 0 : (planAchievingRate > 100 ? 100 : planAchievingRate),
                 OverallYieldRate = (100 - (unqualifiedRate > 100 ? 100 : unqualifiedRate)) == 0 ? 100 : (100 - (unqualifiedRate > 100 ? 100 : unqualifiedRate)),//不良率太低
                 ProcessRouteCode = processRouteEntity?.Code,
                 ProcessRouteName = processRouteEntity?.Name,
@@ -437,6 +469,23 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 QualityStatus = 1//良品数
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+
+            //调整目标数取值逻辑，获取最新的一个激活工单
+            var planWorkOrderEntity = await GetPlanWorkOrderFirstActivation(param.SiteId);
+            var planWorkOrderConversionEntity = await _planWorkOrderConversionRepository.GetOneAsync(new() { PlanWorkOrderId = planWorkOrderEntity.Id });
+
+            var moduleConversion = planWorkOrderConversionEntity?.ModuleConversion ?? 13;
+            var packConversion = planWorkOrderConversionEntity?.PackConversion ?? 4;
+
+            //获取工序关联设备，在获取对应理论产出数
+            var resource = (await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procProcedureEntity.Id)).FirstOrDefault();
+            var equipmentBind = (await _procResourceEquipmentBindRepository.GetByResourceIdsAsync(new long[] { resource?.Id ?? 0 })).FirstOrDefault();
+            var equipment = await _equipmentRepository.GetByIdAsync(equipmentBind?.EquipmentId ?? 0);
+            var equipmentTheory = await _equEquipmentTheoryRepository.GetOneAsync(new() { EquipmentCode = equipment.EquipmentCode });
+
+            //每俩小时理论产出数
+            param.TargetTotal = (equipmentTheory?.TheoryOutputQty ?? param.TargetTotal) * 2;
+
             //按照2小时为间隔进行分段统计
             TimeSpan interval = new(2, 0, 0);//分段间隔
             //动态生成分段列表
@@ -453,8 +502,8 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             //统计每个分段的数据数量
             var statistics = segments.Select((segment, index) =>
             {
-                //目标数
-                var targetQty = dateTimeRangeTarger;
+                //目标数（工序对应设备理论产出数（h）*2）
+                var targetQty = param.TargetTotal;
                 //投入数
                 int count = manuSfcSummaryEntities.Count(c => c.CreatedOn >= segment.Item1 && c.CreatedOn < segment.Item2);
                 //达成率
@@ -637,6 +686,8 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                         Day = x.Day.Date.Day.ToString().PadLeft(2, '0'),
                         YieldQty = x.PassQty,
                         Total = x.Total,
+                        //YieldRate = decimal.Parse((x.PassQty.ParseToDecimal() / (x.Total == 0 ? 1 : x.Total.ParseToDecimal())).ToString("0.00")) * 100
+                        //调整为 良品数/直通数（复投次数）
                         YieldRate = decimal.Parse((x.PassQty.ParseToDecimal() / (x.Total == 0 ? 1 : x.Total.ParseToDecimal())).ToString("0.00")) * 100
                     };
                 })
@@ -805,6 +856,9 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// <returns></returns>
         public async Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync(EquipmentUtilizationRateQueryDto param)
         {
+            //获取设备理论产能
+            var equipmentTheoryEntities = await _equEquipmentTheoryRepository.GetListAsync(new());
+
             List<EquipmentUtilizationRateDto> equipmentUtilizationRateDtos = new List<EquipmentUtilizationRateDto>();
             //查询需要统计的设备信息
             var equEquipmentEntities = await _equipmentRepository.GetEntitiesAsync(new EquEquipmentQuery { SiteId = param.SiteId, EquipmentCodes = param.EquipmentCodes });
@@ -820,8 +874,12 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             //统计设备OEE
             foreach (var equCode in param.EquipmentCodes)
             {
-                var theoryCycle = param.TheoryCycle;//理想加工周期
-                var workingHours = param.WorkingHours;//正常出勤时间/计划时间(小时)
+                var equipmentTheory = equipmentTheoryEntities.FirstOrDefault(a => a.EquipmentCode == equCode);
+
+                //var theoryCycle = param.TheoryCycle;//理想加工周期
+                //var workingHours = param.WorkingHours;//正常出勤时间/计划时间(小时)
+                var theoryCycle = equipmentTheory?.TheoryOutputQty ?? param.TheoryCycle;//理论每小时产出数
+                var workingHours = equipmentTheory?.TheoryOnTime ?? param.WorkingHours;//理论每天开机时长
                 //当前设备
                 var equEquipmentEntity = equEquipmentEntities.Where(c => c.EquipmentCode == equCode).First();
                 //获取当前设备异常时长
@@ -832,14 +890,21 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 var workingSeconds = workingHours * 3600;
                 //操作时间
                 var operateTime = workingSeconds - (equipmentStopTime?.StopSeconds ?? 0);
+
                 //可用率
                 var availability = operateTime / workingSeconds;
                 //表现性 实际运行实际取操作时间
-                var expressive = theoryCycle * (equipmentYield?.Total ?? 0) / (operateTime == 0 ? 1 : operateTime);
+                //var expressive = theoryCycle * (equipmentYield?.Total ?? 0) / (operateTime == 0 ? 1 : operateTime);
+                var expressive = (equipmentYield?.Total??0) / (theoryCycle * workingHours);
                 //质量指数
-                var qualityIndex = (equipmentYield?.YieldQty ?? 0) / (equipmentYield?.Total ?? 1);
+                var qualityIndex = (equipmentYield?.Total ?? 0) / (equipmentYield?.Total ?? 1);
                 //OEE
-                var utilizationRate = decimal.Parse((availability * expressive * qualityIndex).ToString("0.00"));
+                //var utilizationRate = decimal.Parse((availability * expressive * qualityIndex).ToString("0.00"));
+
+                //设备性能稼动率 = ((设备理论开机时长-设备停机时长) / 设备理论开机时长)
+                var equStopTime = equipmentStopTime?.StopSeconds ?? 0;
+                var utilizationRate = Math.Round(((workingSeconds - equStopTime) / workingSeconds) * expressive, 2);
+
                 var equipmentUtilizationRateDto = new EquipmentUtilizationRateDto
                 {
                     EquipmentCode = equCode,
@@ -908,5 +973,143 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             return equipmentYieldDtos;
         }
         #endregion
+
+        /// <summary>
+        /// 每日不良率Top3
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSummaryBadRecordTop3Dto>> getUnqualifiedTop3(ManuSummaryBadRecordTop3QueryDto query)
+        {
+            //获取当前时间
+            DateTime startDate;
+            DateTime endDate;
+
+            if (query.Type == 0)
+            {
+                if (DateTime.Now < DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd 08:30:00")))
+                {
+                    startDate = DateTime.Parse(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd 08:30:00"));
+                    endDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd 08:30:00"));
+                }
+                else
+                {
+                    startDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd 08:30:00"));
+                    endDate = DateTime.Parse(DateTime.Now.AddDays(1).ToString("yyyy-MM-dd 08:30:00"));
+                }
+            }
+            else
+            {
+                //获取当前时间
+                startDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-01 08:30:00"));
+                endDate = DateTime.Parse(DateTime.Now.AddMonths(1).ToString("yyyy-MM-01 08:30:00"));
+            }
+
+
+            var manuSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new() { StartTime = startDate, EndTime = endDate, SiteId = 123456 });
+
+            var procedureIds = manuSummaryEntities.Select(a => a.ProcedureId).Distinct();
+            var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds.ToArray());
+
+            var summaryBadTop3 = manuSummaryEntities.GroupBy(a => a.ProcedureId)
+                .Select(a => new { a.Key, Qty = a.Sum(b => b.Qty), BadQty = a.Sum(b => b.QualityStatus) })
+                .OrderBy(a => a.BadQty)
+                .Take(3);
+
+            List<ManuSummaryBadRecordTop3Dto> result = new();
+            foreach (var item in summaryBadTop3)
+            {
+                var procedure = procedureEntities.FirstOrDefault(a => a.Id == item.Key);
+                result.Add(new()
+                {
+                    ProcedureCode = procedure?.Code,
+                    ProcedureName = procedure?.Name,
+                    UnqualifiedQty = item.BadQty.GetValueOrDefault(),
+                    UnqualifiedRate = Math.Round(item.BadQty.GetValueOrDefault() == 0 || item.Qty.GetValueOrDefault() == 0 ? 1 : (item.BadQty / item.Qty).GetValueOrDefault(), 2)
+                });
+            }
+
+            if (result.Count < 3)
+            {
+                var procedures = (await _procProcedureRepository.GetAllAsync(123456)).ToList();
+                procedures = procedures.Where(a => !procedureIds.Any(b => b == a.Id)).ToList();
+                //如果数量不足三个，则补充数据进来
+                while (true)
+                {
+                    var random = new Random();
+                    var procedure = procedures[random.Next(procedures.Count)];
+                    result.Add(new()
+                    {
+                        ProcedureCode = procedure?.Code,
+                        ProcedureName = procedure?.Name,
+                        UnqualifiedQty = 0,
+                        UnqualifiedRate = 0
+                    });
+
+                    procedures.Remove(procedure);
+
+                    if (result.Count() > 2) break;
+                }
+            }
+
+
+            return result;
+        }
+
+        /// <summary>
+        /// 每月不良代码Top3
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSummarySfcBadRecordTop3Dto>> GetBadTop3Async()
+        {
+            //获取当前时间
+            DateTime startDate = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-01 08:30:00"));
+            DateTime endDate = DateTime.Parse(DateTime.Now.AddMonths(1).ToString("yyyy-MM-01 08:30:00"));
+
+            var manuStepNgEntities = await _manuSfcStepNgRepository.GetManuSfcStepNgEntitiesAsync(new() { StartDate = startDate, EndDate = endDate });
+            var manuSfcStepTop3 = manuStepNgEntities.GroupBy(a => a.UnqualifiedCode)
+                .Select(a => new { a.Key, Qty = a.Count() })
+                .OrderBy(a => a.Qty)
+                .Take(3);
+
+            var unqualifiedCodes = manuSfcStepTop3.Select(a => a.Key);
+            var unqualifiedEntities = await _qualUnqualifiedCodeRepository.GetByCodesAsync(new() { Codes = unqualifiedCodes.ToArray(), Site = 123456 });
+
+            List<ManuSummarySfcBadRecordTop3Dto> result = new();
+            foreach (var item in manuSfcStepTop3)
+            {
+                var unqualified = unqualifiedEntities.FirstOrDefault(a => a.UnqualifiedCode == item.Key);
+
+                result.Add(new()
+                {
+                    UnqualifiedCode = unqualified?.UnqualifiedCode,
+                    UnqualifiedName = unqualified?.UnqualifiedCodeName,
+                    UnqualifiedQty = item.Qty
+                });
+            }
+
+            if (result.Count < 3)
+            {
+                var allUnqualifiedCodes = (await _qualUnqualifiedCodeRepository.GetListAsync(new())).ToList();
+                allUnqualifiedCodes = allUnqualifiedCodes.Where(a => !unqualifiedCodes.Any(b => b == a.UnqualifiedCode)).ToList();
+                //如果数量不足三个，则补充数据进来
+                while (true)
+                {
+                    var random = new Random();
+                    var unCode = allUnqualifiedCodes[random.Next(allUnqualifiedCodes.Count)];
+                    result.Add(new()
+                    {
+                        UnqualifiedCode = unCode?.UnqualifiedCode,
+                        UnqualifiedName = unCode?.UnqualifiedCodeName,
+                        UnqualifiedQty = 0,
+                    });
+
+                    allUnqualifiedCodes.Remove(unCode);
+
+                    if (result.Count() > 2) break;
+                }
+            }
+
+            return result;
+        }
     }
 }

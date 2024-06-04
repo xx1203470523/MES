@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -19,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 条码步骤ng信息记录表仓储
     /// </summary>
-    public partial class ManuSfcStepNgRepository :BaseRepository, IManuSfcStepNgRepository
+    public partial class ManuSfcStepNgRepository : BaseRepository, IManuSfcStepNgRepository
     {
 
-        public ManuSfcStepNgRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuSfcStepNgRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuSfcStepNgEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcStepNgEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcStepNgEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +66,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcStepNgEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuSfcStepNgEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuSfcStepNgEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuSfcStepNgEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -99,7 +100,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (manuSfcStepNgPagedQuery.PageIndex - 1) * manuSfcStepNgPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuSfcStepNgPagedQuery.PageSize });
@@ -116,14 +117,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="manuSfcStepNgQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcStepNgEntity>> GetManuSfcStepNgEntitiesAsync(ManuSfcStepNgQuery manuSfcStepNgQuery)
+        public async Task<IEnumerable<ManuSfcStepNgEntity>> GetManuSfcStepNgEntitiesAsync(ManuSfcStepNgQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuSfcStepNgEntitiesSqlTemplate);
+
+            if (query.StartDate != null)
+            {
+                sqlBuilder.Where($"CreatedOn >= '{ query.StartDate?.ToString("yyyy-MM-dd HH:mm:ss") }'");
+            }
+            if (query.EndDate != null)
+            {
+                sqlBuilder.Where($"CreatedOn <= @'{query.EndDate?.ToString("yyyy-MM-dd HH:mm:ss")}'");
+            }
+
+            sqlBuilder.AddParameters(query);
+
+            sqlBuilder.Select("*");
             using var conn = GetMESDbConnection();
-            var manuSfcStepNgEntities = await conn.QueryAsync<ManuSfcStepNgEntity>(template.RawSql, manuSfcStepNgQuery);
+            var manuSfcStepNgEntities = await conn.QueryAsync<ManuSfcStepNgEntity>(template.RawSql, template.Parameters);
             return manuSfcStepNgEntities;
         }
 

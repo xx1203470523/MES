@@ -54,5 +54,17 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// <param name="param"></param>
         /// <returns></returns>
         Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync(EquipmentUtilizationRateQueryDto param);
+
+        /// <summary>
+        /// 获取每日工序Top3不良（不良率和不良数）
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSummaryBadRecordTop3Dto>> getUnqualifiedTop3(ManuSummaryBadRecordTop3QueryDto query);
+
+        /// <summary>
+        /// 获取每月Top3不良上报
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSummarySfcBadRecordTop3Dto>> GetBadTop3Async();
     }
 }
