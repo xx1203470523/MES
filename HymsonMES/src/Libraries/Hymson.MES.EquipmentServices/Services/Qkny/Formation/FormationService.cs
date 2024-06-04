@@ -5,6 +5,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Qkny;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
@@ -144,7 +145,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
         public async Task FillingDataAsync(FillingDataDto dto)
         {
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
             ManuFillingDataRecordSaveDto saveDto = new ManuFillingDataRecordSaveDto();
             saveDto.Sfc = dto.Sfc;
@@ -163,7 +164,23 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
             saveDto.CreatedOn = HymsonClock.Now();
             saveDto.UpdatedBy = saveDto.CreatedBy;
             saveDto.UpdatedOn = saveDto.CreatedOn;
+
+            SFCOutStationBo outBo = new SFCOutStationBo();
+            outBo.SiteId = equResModel.SiteId;
+            outBo.EquipmentId = equResModel.EquipmentId;
+            outBo.ResourceId = equResModel.ResId;
+            outBo.ProcedureId = equResModel.ProcedureId;
+            outBo.UserName = equResModel.EquipmentCode;
+            OutStationRequestBo outReqBo = new OutStationRequestBo();
+            outReqBo.SFC = dto.Sfc;
+            outReqBo.IsQualified = true;
+            outBo.OutStationRequestBos = new List<OutStationRequestBo>() { outReqBo };
+
+            //3. 出站和补液记录
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
             await _manuFillingDataRecordService.AddAsync(saveDto);
+            trans.Complete();
 
             //TODO
             //1. 新增表进行记录
