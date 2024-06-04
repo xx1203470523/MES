@@ -197,6 +197,16 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                 };
                 equSpotcheckTaskList.Add(equSpotcheckTask);
 
+
+                var endTime = HymsonClock.Now();
+                if (equSpotcheckPlanEntity.CompletionHour.HasValue)
+                {
+                    endTime.AddHours(equSpotcheckPlanEntity.CompletionHour.ParseToDouble());
+                }
+                if (equSpotcheckPlanEntity.CompletionMinute.HasValue)
+                {
+                    endTime.AddMinutes(equSpotcheckPlanEntity.CompletionMinute.ParseToDouble());
+                }
                 EquSpotcheckTaskSnapshotPlanEntity equSpotcheckTaskSnapshotPlan = new()
                 {
                     SpotCheckTaskId = equSpotcheckTask.Id,
@@ -210,8 +220,8 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                     LeaderIds = item.LeaderIds ?? "",
                     Type = equSpotcheckPlanEntity.Type ?? 0,
                     Status = equSpotcheckPlanEntity.Status,
-                    BeginTime = equSpotcheckPlanEntity.BeginTime,
-                    EndTime = equSpotcheckPlanEntity.EndTime,
+                    BeginTime = HymsonClock.Now(), //equSpotcheckPlanEntity.BeginTime,
+                    EndTime = endTime, //equSpotcheckPlanEntity.EndTime,
                     IsSkipHoliday = equSpotcheckPlanEntity.IsSkipHoliday,
                     FirstExecuteTime = equSpotcheckPlanEntity.FirstExecuteTime,
                     Cycle = equSpotcheckPlanEntity.Cycle ?? 1,
