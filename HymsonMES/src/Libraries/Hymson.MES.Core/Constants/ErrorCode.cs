@@ -569,6 +569,7 @@
         public const string MES12201 = "模板{Code}已启用，不允许删除";
         public const string MES12202 = "模板【{Code}】，版本【{Version}】已存在";
         public const string MES12203 = "设备组【{Code}】已绑定模板";
+        public const string MES12204 = "模板{Code}已被使用,不允许删除"; 
         #endregion
 
 

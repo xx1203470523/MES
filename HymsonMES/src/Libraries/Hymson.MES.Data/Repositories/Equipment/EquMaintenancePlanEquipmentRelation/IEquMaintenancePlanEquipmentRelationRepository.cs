@@ -88,6 +88,14 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlanEquipmentRelation
         /// <returns></returns>
         Task<IEnumerable<EquMaintenancePlanEquipmentRelationEntity>> GetByMaintenancePlanIdsAsync(long MaintenancePlanId);
 
+
+        /// <summary>
+        /// 根据MaintenanceTemplateId批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquMaintenancePlanEquipmentRelationEntity>> GetByMaintenanceTemplateIdsAsync(IEnumerable<long> maintenancePlanIds);
+
         /// <summary>
         /// 获取List
         /// </summary>
