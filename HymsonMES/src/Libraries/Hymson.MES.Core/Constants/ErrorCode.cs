@@ -2135,6 +2135,8 @@
         public const string MES15905 = "数值类型的检验值请输入不为数值！";
         public const string MES15906 = "当前时间,未到保养计划开始时间{time}";
         public const string MES15907 = "当前时间,已超过保养计划结束时间{time}";
+        public const string MES15908 = "未找到保养计划数据";
+        public const string MES15909 = "当前时间无需延期，当前时间未超过计划开始时间{time}";
 
         //点检
         public const string MES15910 = "保存时，未找到点检单!请联系管理员";
