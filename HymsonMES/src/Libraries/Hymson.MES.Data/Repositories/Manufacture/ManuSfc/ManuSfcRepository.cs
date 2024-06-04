@@ -267,17 +267,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //工序
             if (!string.IsNullOrEmpty(query.Code))
             {
-                sqlBuilder.Where("pp.Code = @Code ");
+                query.Code = $"%{query.Code}%";
+                sqlBuilder.Where("pp.Code like @Code ");
             }
             //资源
             if (!string.IsNullOrEmpty(query.ResCode))
             {
-                sqlBuilder.Where("pr.ResCode = @ResCode ");
+                query.ResCode = $"%{query.ResCode}%";
+                sqlBuilder.Where("pr.ResCode like @ResCode ");
             }
             //工单
             if (!string.IsNullOrEmpty(query.OrderCode))
             {
-                sqlBuilder.Where("pwo.OrderCode = @OrderCode ");
+                query.OrderCode = $"%{query.OrderCode}%";
+                sqlBuilder.Where("pwo.OrderCode like @OrderCode ");
             }
 
             using var conn = GetMESDbConnection();
