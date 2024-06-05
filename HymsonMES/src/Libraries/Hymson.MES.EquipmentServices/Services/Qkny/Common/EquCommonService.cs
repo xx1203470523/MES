@@ -656,7 +656,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             };
             //3. 数据操作
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
-            await _equProcessParamRecordService.AddMultAsync(saveDtoList);
+            //await _equProcessParamRecordService.AddMultAsync(saveDtoList);
             await _processCollectionService.EquipmentCollectionAsync(parameterCollectDto);
             trans.Complete();
         }
