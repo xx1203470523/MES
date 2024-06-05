@@ -5,7 +5,6 @@ using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-
 using System.Text;
 using static Dapper.SqlMapper;
 
@@ -63,16 +62,45 @@ namespace Hymson.MES.Data.Repositories.Parameter
                 dic[tableNameByProcedureId].Add(entity);
             }
 
-            using var conn = GetMESParamterDbConnection();
-            List<Task<int>> tasks = new();
+            //using var conn = GetMESParamterDbConnection();
+            //List<Task<int>> tasks = new();
+            //foreach (var dicItem in dic)
+            //{
+            //    string insertSql = $"INSERT INTO {dicItem.Key}(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SFC,@ProcedureId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
+            //    tasks.Add(conn.ExecuteAsync(insertSql, dicItem.Value));
+            //}
+            //var result = await Task.WhenAll(tasks);
+
+            //return result.Sum();
+
+            StringBuilder sqlBuilder = new StringBuilder();
             foreach (var dicItem in dic)
             {
-                string insertSql = $"INSERT INTO {dicItem.Key}(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SFC,@ProcedureId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
-                tasks.Add(conn.ExecuteAsync(insertSql, dicItem.Value));
-            }
-            var result = await Task.WhenAll(tasks);
+                var insertSql = $"INSERT INTO {dicItem.Key}(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ";
 
-            return result.Sum();
+                if (dicItem.Value.Count == 1)
+                {
+                    var item = dicItem.Value[0];
+
+                    insertSql += $"({item.Id}, {item.SiteId}, '{item.SFC}',{item.ProcedureId}, {item.ParameterId},'{item.ParameterValue}','{item.CollectionTime:yyyy-MM-dd HH:mm:ss.fff}','{item.CreatedBy}','{item.CreatedOn:yyyy-MM-dd HH:mm:ss.fff}', '{item.UpdatedBy}', '{item.UpdatedOn:yyyy-MM-dd HH:mm:ss.fff}',{item.IsDeleted});";
+                }
+                else
+                {
+                    foreach (var item in dicItem.Value)
+                    {
+                        insertSql += $"({item.Id}, {item.SiteId}, '{item.SFC}',{item.ProcedureId}, {item.ParameterId},'{item.ParameterValue}','{item.CollectionTime:yyyy-MM-dd HH:mm:ss.fff}','{item.CreatedBy}','{item.CreatedOn:yyyy-MM-dd HH:mm:ss.fff}', '{item.UpdatedBy}', '{item.UpdatedOn:yyyy-MM-dd HH:mm:ss.fff}',{item.IsDeleted}),";
+                    }
+                    insertSql = insertSql.Remove(insertSql.Length - 1);
+                    insertSql += ";";
+                }
+
+                sqlBuilder.Append(insertSql);
+            }
+
+            using var conn = GetMESParamterDbConnection();
+            var result = await conn.ExecuteAsync(sqlBuilder.ToString());
+
+            return result;
         }
 
         /// <summary>

@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Infrastructure;
 using AutoMapper;
+using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.Data.Repositories.Manufacture;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture.Tests
 {
@@ -23,6 +25,15 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.Tests
         IManuDegradedProductExtendService _service;
         ILocalizationService _localizationService;
         IConfiguration _configuration;
+        /// <summary>
+        /// 仓储接口（降级录入）
+        /// </summary>
+        private  IManuDowngradingRepository _manuDowngradingRepository;
+
+        /// <summary>
+        /// 仓储接口（降级品录入记录）
+        /// </summary>
+        private  IManuDowngradingRecordRepository _manuDowngradingRecordRepository;
         [SetUp]
         public void Setup()
         {
@@ -46,6 +57,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.Tests
             var provider = services.BuildServiceProvider();
             _localizationService = provider.GetService<ILocalizationService>();
             _service = provider.GetRequiredService<IManuDegradedProductExtendService>();
+
+            _manuDowngradingRepository = provider.GetRequiredService<IManuDowngradingRepository>();
+            _manuDowngradingRecordRepository = provider.GetRequiredService<IManuDowngradingRecordRepository>();
 
         }
         public static void AddAutoMapper()
@@ -76,58 +90,69 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.Tests
         {
             var lst1 =  _service.GetManuDownGradingsAsync(new Bos.Manufacture.DegradedProductExtendBo
             {
-                SiteId = 30654441397841920,
+                SiteId = 39612349211041792,
                 UserName = "Test",
                 KeyValues = {new Bos.Manufacture.DegradedProductExtendKeyValueBo
                     {
-                        SFC="wxk",
-                        BarCode= "dx231218647"
+                        SFC="AYJ1E0603001",
+                        BarCode= "AZJ1E0603001"
                     },
                     new Bos.Manufacture.DegradedProductExtendKeyValueBo
                     {
-                        SFC="wxk",
-                        BarCode= "dx231220652"
+                        SFC="AYJ1E0603001",
+                        BarCode= "AZJ1E0603001"
                     },
                     new Bos.Manufacture.DegradedProductExtendKeyValueBo
                     {
-                        SFC="wxk",
-                        BarCode= "dx231221657"
+                        SFC="AYJ1E0603002",
+                        BarCode= "AZJ1E0603001"
                     },
-                     new Bos.Manufacture.DegradedProductExtendKeyValueBo
-                    {
-                        SFC="wxk",
-                        BarCode= "dx231222662"
-                    }
+                    // new Bos.Manufacture.DegradedProductExtendKeyValueBo
+                    //{
+                    //    SFC="wxk",
+                    //    BarCode= "dx231222662"
+                    //}
                 }
             });
             var task = _service.GetManuDowngradingsByConsumesAsync(new Bos.Manufacture.DegradedProductExtendBo
             {
-                SiteId = 30654441397841920,
-                UserName = "wxk",
+                SiteId = 39612349211041792,
+                UserName = "Test",
                 KeyValues = new List<Bos.Manufacture.DegradedProductExtendKeyValueBo>()
                 {
                     new Bos.Manufacture.DegradedProductExtendKeyValueBo
                     {
-                        SFC="wxk",
-                        BarCode= "dx231218647"
+                        SFC="AYJ1E0603001",
+                        BarCode= "AZJ1E0603001"
                     },
                     new Bos.Manufacture.DegradedProductExtendKeyValueBo
                     {
-                        SFC="wxk",
-                        BarCode= "dx231220652"
+                         SFC="AYJ1E0603001",
+                        BarCode= "AZJ1E0603001"
                     },
                     new Bos.Manufacture.DegradedProductExtendKeyValueBo
                     {
-                        SFC="wxk",
-                        BarCode= "dx231221657"
+                        SFC="AYJ1E0603002",
+                        BarCode= "AZJ1E0603001"
                     },
-                     new Bos.Manufacture.DegradedProductExtendKeyValueBo
-                    {
-                        SFC="wxk",
-                        BarCode= "dx231222662"
-                    }
+                    // new Bos.Manufacture.DegradedProductExtendKeyValueBo
+                    //{
+                    //     SFC="AYJ1E0603002",
+                    //    BarCode= "AZJ1E0603001"
+                    //}
                 }
             }, lst1.Result);
+            var responseBo = new OutStationResponseBo();
+            responseBo.DowngradingEntities = task.Result.Item1;
+            responseBo.DowngradingRecordEntities = task.Result.Item2;
+            var responseBos = new List<OutStationResponseBo>();
+            responseBos.Add(responseBo);
+            var r1 = responseBos.Where(w => w.DowngradingRecordEntities != null).SelectMany(s => s.DowngradingEntities);
+            var r2 = responseBos.Where(w => w.DowngradingRecordEntities != null).SelectMany(s => s.DowngradingRecordEntities);
+
+            int i = _manuDowngradingRepository.InsertsAsync(r1).Result;
+            int j = _manuDowngradingRecordRepository.InsertsAsync(r2).Result;
+
         }
     }
 }
