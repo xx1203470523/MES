@@ -60,6 +60,16 @@ namespace Hymson.MES.Api.Controllers.Plan
             await _planSfcPrintService.CreatePrintAsync(createDto);
         }
 
+        [HttpPost]
+        [Route("materialPrint")]
+        [LogDescription("物料库存条码打印", BusinessType.INSERT)]
+        [PermissionDescription("plan:sfcPrint:materialPrint")]
+        public async Task WhMaterialPrintAsync([FromBody] WhMaterialInventoryPrintCreatePrintDto createDto)
+        {
+            await _planSfcPrintService.WhMaterialPrintAsync(createDto);
+        }
+
+        
         /// <summary>
         /// 删除（条码打印）
         /// </summary>

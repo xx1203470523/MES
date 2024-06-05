@@ -151,4 +151,30 @@ namespace Hymson.MES.Services.Dtos.Plan
 
     }
 
+    /// <summary>
+    /// 物料条码下达且打印Dto
+    /// </summary>
+    public record WhMaterialInventoryPrintCreatePrintDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? SFC { get; set; }
+
+        /// <summary>
+        /// 打印机id
+        /// </summary>
+        public long? PrintId { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+    }
 }

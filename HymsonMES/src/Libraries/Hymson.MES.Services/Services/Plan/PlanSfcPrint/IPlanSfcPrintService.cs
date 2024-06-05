@@ -58,5 +58,12 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="planSfcPrintQueryDto"></param>
         /// <returns></returns>
         Task<IEnumerable<CreateBarcodeByWorkOrderOutputBo>> GetNewBarCodeOnBarCodeCreatedAsync(PlanSfcPrintQueryDto planSfcPrintQueryDto);
+
+        /// <summary>
+        /// 物料库存打印
+        /// </summary>
+        /// <param name="createDto"></param>
+        /// <returns></returns>
+        Task WhMaterialPrintAsync(WhMaterialInventoryPrintCreatePrintDto createDto);
     }
 }

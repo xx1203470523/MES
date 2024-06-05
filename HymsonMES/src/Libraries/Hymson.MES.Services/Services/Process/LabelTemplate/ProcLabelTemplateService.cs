@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Requests.Print;
@@ -82,6 +83,17 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10340)).WithData("Name", procLabelTemplateEntity.Name);
             }
+
+            // if (procLabelTemplateEntity.CurrencyTemplateType != CurrencyTemplateTypeEnum.AllTemplateType)
+            // {
+            // 验证模板类型是否重复
+            var procLabel = await QueryProcLabelTemplateByTemplateTypeAsync(procLabelTemplateEntity.CurrencyTemplateType);
+            if (procLabel != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10392)).WithData("CurrencyTemplateType", procLabelTemplateEntity.CurrencyTemplateType.GetDescription());
+            }
+        //    }
+            
             procLabelTemplateEntity.Id = IdGenProvider.Instance.CreateId();
             procLabelTemplateEntity.CreatedBy = _currentUser.UserName;
             procLabelTemplateEntity.UpdatedBy = _currentUser.UserName;
@@ -270,6 +282,11 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
 
         }
 
+        private async Task<ProcLabelTemplateEntity> QueryProcLabelTemplateByTemplateTypeAsync(CurrencyTemplateTypeEnum TemplateType)
+        {
+            return await _procLabelTemplateRepository.GetByTemplateTypeAsync(new ProcLabelTemplateByTemplateTypeQuery() { SiteId = _currentSite.SiteId ?? 0, CurrencyTemplateType = TemplateType });
+        }
+        
         /// <summary>
         /// 查询标签模板对应的打印设计信息
         /// </summary>

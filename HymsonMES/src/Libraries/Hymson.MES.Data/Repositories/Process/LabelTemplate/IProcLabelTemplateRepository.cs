@@ -14,7 +14,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLabelTemplateEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcLabelTemplateEntity procLabelTemplateEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -28,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLabelTemplateEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcLabelTemplateEntity procLabelTemplateEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -42,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -63,7 +63,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcLabelTemplateEntity>> GetByIdsAsync(IEnumerable<long>  ids);
+        Task<IEnumerable<ProcLabelTemplateEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
@@ -71,12 +71,19 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLabelTemplateQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcLabelTemplateEntity>> GetProcLabelTemplateEntitiesAsync(ProcLabelTemplateQuery procLabelTemplateQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procLabelTemplatePagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcLabelTemplateEntity>> GetPagedInfoAsync(ProcLabelTemplatePagedQuery procLabelTemplatePagedQuery);
+
+        /// <summary>
+        /// 查询模板类型
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcLabelTemplateEntity> GetByTemplateTypeAsync(ProcLabelTemplateByTemplateTypeQuery query);
     }
 }
