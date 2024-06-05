@@ -1329,6 +1329,7 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             CreateMap<NodeSourceBo, NodeSourceDto>();
+            CreateMap<WorkOrderControlReportOptimizePagedQueryDto, PlanWorkOrderPagedQuery>();
         }
 
         /// <summary>
