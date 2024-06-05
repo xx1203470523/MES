@@ -8,6 +8,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
@@ -99,6 +100,7 @@ namespace Hymson.MES.Services.Services.Report
                     listDto.Add(new WorkOrderControlReportViewDto
                     {
                         Id = item.Id,
+                        WorkOrderId=item.Id,
                         Status = item.Status,
                         Qty = item.Qty,
                         MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
