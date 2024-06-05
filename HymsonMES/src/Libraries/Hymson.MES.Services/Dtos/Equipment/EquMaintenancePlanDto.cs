@@ -50,7 +50,7 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
         /// <summary>
         /// 点检类型;天/小时
         /// </summary>
-        public EquipmentMaintenanceTypeEnum Type { get; set; }
+        public EquipmentMaintenanceTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 点检计划状态
