@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Services.Equipment
 
             var siteId = _currentSite.SiteId ?? 0;
             //判断设备点检项目在系统中是否已经存在
-            var equOperationPermissionsQuery = new EquOperationPermissionsQuery { SiteId = siteId, EquipmentId = saveDto.Id };
+            var equOperationPermissionsQuery = new EquOperationPermissionsQuery { SiteId = siteId, EquipmentId = saveDto.Id, Type = saveDto.Type };
             var equOperationPermissions = await _equOperationPermissionsRepository.GetEntitiesAsync(equOperationPermissionsQuery);
             if (equOperationPermissions != null && equOperationPermissions.Any())
             {
