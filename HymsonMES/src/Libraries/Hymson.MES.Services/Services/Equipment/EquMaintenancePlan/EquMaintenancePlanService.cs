@@ -482,7 +482,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         /// <param name="isEdit"></param>
         private void ExecPublish(EquMaintenancePlanEntity equMaintenancePlanEntity, bool isEdit = false)
         {
-            if (!string.IsNullOrWhiteSpace(equMaintenancePlanEntity.CornExpression) && equMaintenancePlanEntity.FirstExecuteTime.HasValue)
+            if (!string.IsNullOrWhiteSpace(equMaintenancePlanEntity.CornExpression) && equMaintenancePlanEntity.FirstExecuteTime.HasValue && equMaintenancePlanEntity.EndTime.HasValue)
             {
                 if (equMaintenancePlanEntity.Status == DisableOrEnableEnum.Enable)
                 {
@@ -493,6 +493,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
                         FirstExecuteTime = (DateTime)equMaintenancePlanEntity.FirstExecuteTime,
                         MaintenancePlanId = equMaintenancePlanEntity.Id,
                         UserName = _currentUser.UserName,
+                        EndTime = (DateTime)equMaintenancePlanEntity.EndTime,
                     };
                     _eventBus.Publish(equSpotcheckAutoCreateIntegrationEvent);
                 }
