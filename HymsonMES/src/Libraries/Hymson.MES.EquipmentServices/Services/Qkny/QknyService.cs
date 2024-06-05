@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
@@ -174,6 +175,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuProductParameterService _manuProductParameterService;
 
         /// <summary>
+        /// 物料
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -197,7 +203,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuDowngradingRepository manuDowngradingRepository,
             IEquEquipmentService equEquipmentService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto,
-            IManuProductParameterService manuProductParameterService)
+            IManuProductParameterService manuProductParameterService,
+            IProcMaterialRepository procMaterialRepository)
         {
             _equEquipmentRepository = equEquipmentRepository;
             _planWorkOrderService = planWorkOrderService;
@@ -219,6 +226,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuToolingBindRepository = manuToolingBindRepository;
             _equEquipmentService = equEquipmentService;
             _manuDowngradingRepository = manuDowngradingRepository;
+            _procMaterialRepository = procMaterialRepository;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
             _manuProductParameterService = manuProductParameterService;
@@ -409,7 +417,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task OutboundMetersReportAsync(OutboundMetersReportDto dto)
+        public async Task<OutReportSfcReturnDto> OutboundMetersReportAsync(OutboundMetersReportDto dto)
         {
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
@@ -522,6 +530,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             // 数据库操作
             // 参考条码数量更改
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            long sfcMaterialId = manuSfcInfo.ProductId;
+            ProcMaterialEntity materialModel = await _procMaterialRepository.GetByIdAsync(sfcMaterialId);
             await _manuSfcProduceService.UpdateQtyBySfcAsync(command);
             await _manuSfcServicecs.UpdateQtyBySfcAsync(command);
             int updateNum = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(updateQtyCommand);
@@ -533,6 +543,28 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             await _manuSfcStepRepository.InsertAsync(sfcStep);
             await _manuProductParameterService.ProductProcessCollectAsync(parameterBo);
             trans.Complete();
+
+            var now = HymsonClock.Now();
+            OutReportSfcReturnDto result = new OutReportSfcReturnDto();
+            result.Sfc = dto.Sfc;
+            result.OrderCode = manuSfcInfo.WorkOrderCode;
+            result.EquipmentCode = dto.EquipmentCode;
+            result.MaterialName = materialModel?.MaterialName;
+            result.MaterialBatch = now.ToString("yyyyMMdd");
+            result.ManuDate = now.ToString("yyyyMMddHHmm");
+            if (materialModel == null || materialModel.ValidTime == null)
+            {
+                result.EffectiveDate = "";
+            }
+            else
+            {
+                result.EffectiveDate = (now.AddDays((int)materialModel.ValidTime)).ToString("yyyyMMddHHmm");
+            }
+            //result.TotalQty = dto.TotalQty.ToString("F2");
+            //result.OkQty = dto.OkQty.ToString("F2");
+            //result.OkQty = dto.NgQty.ToString("F2");
+
+            return result;
         }
 
         /// <summary>

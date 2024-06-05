@@ -52,7 +52,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task OutboundMetersReportAsync(OutboundMetersReportDto dto);
+        Task<OutReportSfcReturnDto> OutboundMetersReportAsync(OutboundMetersReportDto dto);
 
         /// <summary>
         /// 获取下发条码(用于CCD面密度)025

@@ -633,13 +633,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
             if (IS_DEBUG == true)
             {
-                List<string> sfcList = new List<string>();
-                for (var i = 0; i < dto.Qty + 1; ++i)
-                {
-                    sfcList.Add($"sfc00{i + 1}");
-                }
+                //List<string> sfcList = new List<string>();
+                //for (var i = 0; i < dto.Qty + 1; ++i)
+                //{
+                //    sfcList.Add($"sfc00{i + 1}");
+                //}
 
-                return sfcList;
+                //return sfcList;
             }
             //如果型号设置的是多个，则一次只出一个
             //如果型号设置的是单个，则一次应该根据指定数量出
@@ -655,14 +655,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("OutboundMetersReport")]
         [LogDescription("产出上报024", BusinessType.OTHER, "024", ReceiverTypeEnum.MES)]
-        public async Task OutboundMetersReportAsync(OutboundMetersReportDto dto)
+        public async Task<OutReportSfcReturnDto> OutboundMetersReportAsync(OutboundMetersReportDto dto)
         {
             if (IS_DEBUG == true)
             {
-                return;
+                //return;
             }
 
-            await _qknyService.OutboundMetersReportAsync(dto);
+            return await _qknyService.OutboundMetersReportAsync(dto);
         }
 
         /// <summary>
