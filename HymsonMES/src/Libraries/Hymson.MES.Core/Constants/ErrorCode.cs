@@ -2151,6 +2151,7 @@
         public const string MES15921 = "已被设备点检模板{Code}引用！";
         public const string MES15922 = "延期时间不允许为空";
         public const string MES15923 = "延期失败,计划结束时间需大于当前时间，请将开始时间设置于{time}之后！";
+        public const string MES15924 = "单位编码{Code}不存在，请选择或输入正确单位编码";
 
 
         #endregion
