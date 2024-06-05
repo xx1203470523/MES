@@ -237,6 +237,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         public decimal FinishProductQuantity { get; set; }
 
         /// <summary>
+        /// 报废数量
+        /// </summary>
+        public decimal UnQualifiedQuantity { get; set; }
+
+        /// <summary>
         /// 下达数量
         /// </summary>
         public decimal PassDownQuantity { get; set; }

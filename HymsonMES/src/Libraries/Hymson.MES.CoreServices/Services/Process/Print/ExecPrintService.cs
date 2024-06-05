@@ -2,6 +2,7 @@
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.DataSource;
 using Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility;
 using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
@@ -209,6 +210,8 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                 UserName = @event.UserName
             };
             var groups = @event.BarCodes.GroupBy(x => x.MateriaId);
+
+            var procLabelTemplateTypeEnties = await _procLabelTemplateRepository.GetByTemplateTypeAsync(new ProcLabelTemplateByTemplateTypeQuery() { SiteId = @event.SiteId, CurrencyTemplateType = @event.CurrencyTemplateType ?? 0 });
             var batchBarcodeList = new List<PrintStructDto<BatchBarcodeDto>>();
             var productionBarcodeList = new List<PrintStructDto<ProductionBarcodeDto>>();
             foreach (var groupItem in groups)
@@ -220,8 +223,18 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                 }
                 foreach (var procProcedurePrintReleation in procProcedurePrintReleationByMaterialIdEnties)
                 {
+                    long labelTemplateId = 0;
                     var rocLabelTemplateEntity = procLabelTemplateEnties.FirstOrDefault(x => x.Id == procProcedurePrintReleation.TemplateId);
-                    var procLabelTemplateRelationEntity = await _procLabelTemplateRelationRepository.GetByLabelTemplateIdAsync(rocLabelTemplateEntity?.Id??0);
+                    // rocLabelTemplateEntity为空 就用通用得
+                    if (rocLabelTemplateEntity == null)
+                    {
+                        labelTemplateId = procLabelTemplateTypeEnties.Id;
+                    }
+                    else
+                    {
+                        labelTemplateId = rocLabelTemplateEntity.Id;
+                    }
+                    var procLabelTemplateRelationEntity = await _procLabelTemplateRelationRepository.GetByLabelTemplateIdAsync(labelTemplateId);
                     switch (procLabelTemplateRelationEntity?.PrintDataModel)
                     {
                         case "Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.DataSource.BatchBarcodeDto":
@@ -230,7 +243,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                             {
                                 batchBarcodeList.Add(new PrintStructDto<BatchBarcodeDto>
                                 {
-                                    TemplateName = rocLabelTemplateEntity.Id.ToString(),
+                                    TemplateName = labelTemplateId.ToString(),
                                     PrintCount = Convert.ToInt16(procProcedurePrintReleation.Copy ?? 0),
                                     PrintName = printConfigEntiy.PrintName,
                                     PrintData = batchBarcodeItem
@@ -243,7 +256,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                             {
                                 productionBarcodeList.Add(new PrintStructDto<ProductionBarcodeDto>
                                 {
-                                    TemplateName = rocLabelTemplateEntity.Id.ToString(),
+                                    TemplateName = labelTemplateId.ToString(),
                                     PrintCount = Convert.ToInt16(procProcedurePrintReleation.Copy ?? 0),
                                     PrintName = printConfigEntiy.PrintName,
                                     PrintData = productionBarcodeItem

@@ -157,6 +157,8 @@
         public const string MES10379 = "IP设定不符合规范!";
         public const string MES10390 = "资源【{ResourceCode}】未找到打印机!";
         public const string MES10391 = "工序【{ResourceCode}】未配置物料【{MaterialCode}】的模版!";
+
+        public const string MES10392 = "模板类型【{CurrencyTemplateType}】已经存在!";
         #endregion
 
         #region 工序 10400
