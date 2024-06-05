@@ -98,6 +98,7 @@ namespace Hymson.MES.Services.Services.Report
 
                     listDto.Add(new WorkOrderControlReportViewDto
                     {
+                        Id = item.Id,
                         Status = item.Status,
                         Qty = item.Qty,
                         MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
