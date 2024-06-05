@@ -41,9 +41,10 @@ namespace Hymson.MES.BackgroundServices.Quality.EquMaintenanceAutoCreateIntegrat
             var triggerKey_Add = EncryptProvider.Md5(new TriggerKey($"{jobKey}-Trigger").ToString());
             var trigger = TriggerBuilder.Create()
                 .WithIdentity(triggerKey_Add)
-            .ForJob(job)
+                .ForJob(job)
                 .WithCronSchedule(@event.CornExpression)
                 .StartAt(@event.FirstExecuteTime)
+                .EndAt(@event.EndTime)
                 .Build();
             await _scheduler.ScheduleJob(job, trigger);
         }

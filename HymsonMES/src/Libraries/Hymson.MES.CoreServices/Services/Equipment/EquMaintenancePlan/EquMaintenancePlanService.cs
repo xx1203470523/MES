@@ -121,6 +121,11 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                     throw new CustomerValidationException(nameof(ErrorCode.MES12303));
                 }
 
+                if (equMaintenancePlanEntity.EndTime < HymsonClock.Now())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12325));
+                }
+
                 if (!equMaintenancePlanEntity.FirstExecuteTime.HasValue || !equMaintenancePlanEntity.Type.HasValue || !equMaintenancePlanEntity.Cycle.HasValue)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12304));
