@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Job;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility;
@@ -88,6 +89,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             return new PrintIntegrationEvent
             {
+                CurrencyTemplateType = CurrencyTemplateTypeEnum.Production,
                 SiteId = commonBo.SiteId,
                 ResourceId = commonBo.ResourceId,
                 ProcedureId = commonBo.ProcedureId,

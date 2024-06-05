@@ -6,6 +6,7 @@
  *build datetime: 2023-03-09 02:51:26
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Process;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,5 +49,9 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public long SiteId { get; set; }
 
+        /// <summary>
+        /// 模板通用类型
+        /// </summary>
+        public CurrencyTemplateTypeEnum CurrencyTemplateType {  get; set; }
     }
 }

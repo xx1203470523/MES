@@ -261,7 +261,11 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.AddParameters(new { PlanStartTimeStart = pageQuery.PlanStartTime[0], PlanStartTimeEnd = pageQuery.PlanStartTime[1].AddDays(1) });
                 sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
             }
-
+            if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length > 0 && pageQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where(" wo.CreatedOn >= @CreatedOnStart AND  wo.CreatedOn < @CreatedOnEnd ");
+            }
             if (pageQuery.Statuss != null && pageQuery.Statuss.Any())
             {
                 sqlBuilder.Where("wo.Status IN @Statuss");

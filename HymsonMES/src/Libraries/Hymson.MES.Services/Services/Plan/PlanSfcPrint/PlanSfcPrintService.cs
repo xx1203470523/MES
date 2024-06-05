@@ -10,6 +10,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility;
@@ -47,6 +48,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         private readonly AbstractValidator<PlanSfcPrintCreateDto> _validationCreateRules;
         private readonly AbstractValidator<PlanSfcPrintCreatePrintDto> _validationCreatePrintRules;
+        private readonly AbstractValidator<WhMaterialInventoryPrintCreatePrintDto> _validationWhMaterialInventoryPrintRules;
 
         /// <summary>
         /// 服务接口（生产通用）
@@ -108,6 +110,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="currentSite"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationCreatePrintRules"></param>
+        /// <param name="validationWhMaterialInventoryPrintRules"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
@@ -123,9 +126,11 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="manuCreateBarcodeService"></param>
         /// <param name="localizationService"></param>
+        /// <param name="eventBus"></param>
         public PlanSfcPrintService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<PlanSfcPrintCreateDto> validationCreateRules,
             AbstractValidator<PlanSfcPrintCreatePrintDto> validationCreatePrintRules,
+               AbstractValidator<WhMaterialInventoryPrintCreatePrintDto> validationWhMaterialInventoryPrintRules,
             IManuCommonService manuCommonService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
@@ -163,6 +168,7 @@ namespace Hymson.MES.Services.Services.Plan
             _manuCreateBarcodeService = manuCreateBarcodeService;
             _localizationService = localizationService;
             _eventBus = eventBus;
+            _validationWhMaterialInventoryPrintRules = validationWhMaterialInventoryPrintRules;
         }
 
         /// <summary>
@@ -209,6 +215,57 @@ namespace Hymson.MES.Services.Services.Plan
 
             _eventBus.Publish(new PrintIntegrationEvent
             {
+                CurrencyTemplateType = CurrencyTemplateTypeEnum.Production,
+                SiteId = _currentSite.SiteId ?? 0,
+                PrintId = createDto.PrintId,
+                ProcedureId = createDto.ProcedureId,
+                ResourceId = createDto.ResourceId,
+                BarCodes = new List<LabelTemplateBarCodeDto>
+                {
+                    new LabelTemplateBarCodeDto
+                    {
+                        BarCode = createDto.SFC ?? "",
+                        MateriaId = sfcInfoEntity.ProductId
+                    }
+                },
+                UserName = _currentUser.UserName
+            });
+        }
+
+        /// <summary>
+        /// 物料库存打印
+        /// </summary>
+        /// <param name="createDto"></param>
+        /// <returns></returns>
+        public async Task WhMaterialPrintAsync(WhMaterialInventoryPrintCreatePrintDto createDto)
+        {
+            // 验证DTO
+            await _validationWhMaterialInventoryPrintRules.ValidateAndThrowAsync(createDto);
+
+            var resourceEntity = await _procResourceRepository.GetResByIdAsync(createDto.ResourceId);
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(createDto.ProcedureId);
+
+            // 对工序资源类型和资源的资源类型校验
+            if (resourceEntity != null && procedureEntity != null && procedureEntity.ResourceTypeId.HasValue && resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16507));
+            }
+
+            // 读取条码
+            var sfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
+            {
+                SiteId = resourceEntity?.SiteId,
+                SFC = createDto.SFC
+            });
+            if (sfcEntity == null) return;
+
+            // 读取条码信息
+            var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdAsync(sfcEntity.Id);
+            if (sfcInfoEntity == null) return;
+
+            _eventBus.Publish(new PrintIntegrationEvent
+            {
+                CurrencyTemplateType = CurrencyTemplateTypeEnum.Material,
                 SiteId = _currentSite.SiteId ?? 0,
                 PrintId = createDto.PrintId,
                 ProcedureId = createDto.ProcedureId,
@@ -420,6 +477,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             _eventBus.Publish(new PrintIntegrationEvent
             {
+                CurrencyTemplateType = CurrencyTemplateTypeEnum.Production,
                 SiteId = _currentSite.SiteId ?? 0,
                 PrintId = parm.PrintId,
                 ProcedureId = parm.ProcedureId,
