@@ -132,17 +132,19 @@ namespace Hymson.MES.Services.Services.Report
                 list.RemoveAt(list.Count - 1);
                 foreach (var item in list)
                 {
+                    var passViews=ManuSfcProduceResult.Data.Where(x => x.WorkOrderId == pagedInfo.Data.First().Id && x.ProductId == pagedInfo.Data.First().ProductId && x.ProcessRouteId == pagedInfo.Data.First().ProcessRouteId && x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.lineUp);
+                    var activityViews = ManuSfcProduceResult.Data.Where(x => x.WorkOrderId == pagedInfo.Data.First().Id && x.ProductId == pagedInfo.Data.First().ProductId && x.ProcessRouteId == pagedInfo.Data.First().ProcessRouteId && x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.Activity);
                     var material = materials.FirstOrDefault(x => x.Id == pagedInfo.Data.First().ProductId);
-                    var passDownQuantity = ManuSfcProduceResult.Data.Where(x => x.WorkOrderId == pagedInfo.Data.First().Id && x.ProductId == pagedInfo.Data.First().ProductId && x.ProcessRouteId == pagedInfo.Data.First().ProcessRouteId && x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.lineUp).Count();
-                    var processDownQuantity = ManuSfcProduceResult.Data.Where(x => x.WorkOrderId == pagedInfo.Data.First().Id && x.ProductId == pagedInfo.Data.First().ProductId && x.ProcessRouteId == pagedInfo.Data.First().ProcessRouteId && x.ProcedureId == item.ProcedureId &&x.Status == SfcStatusEnum.Activity).Count();
+                    var passDownQuantity = passViews.Sum(x=>x.Qty);
+                    var processDownQuantity = activityViews.Sum(x => x.Qty);
                     var finishProductQuantity = SummaryResult.Where(x=>x.WorkOrderId == pagedInfo.Data.First().Id&&x.ProductId == pagedInfo.Data.First().ProductId&& x.ProcedureId == item.ProcedureId).FirstOrDefault()?.OutputQty;
 
                     listDto.Add(new WorkOrderStepControlViewDto
                     {
                         OrderId = pagedInfo.Data.First().Id,
-                        ProcedureId = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Id ?? 0,
+                        ProcedureId = procProcedures?.FirstOrDefault(x => x.Id == item.ProcedureId)?.Id ?? 0,
                         Serialno = item.ManualSortNumber,
-                        ProcedureCode = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Code,
+                        ProcedureCode = procProcedures?.FirstOrDefault(x => x.Id == item.ProcedureId)?.Code??"",
                         MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
                         ProcessRout = pagedInfo.Data.First().ProcessRouteCode + "/" + pagedInfo.Data.First().ProcessRouteVersion,
                         OrderCode = pagedInfo.Data.First()?.OrderCode ?? "",
