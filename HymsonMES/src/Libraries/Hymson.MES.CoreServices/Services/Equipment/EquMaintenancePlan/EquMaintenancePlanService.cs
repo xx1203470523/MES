@@ -279,7 +279,7 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                         MaintenanceTaskId = EquMaintenanceTask.Id,
                         MaintenanceItemSnapshotId = EquMaintenanceTaskSnapshotItem.Id,
                         InspectionValue = "",
-                        IsQualified = TrueFalseEmptyEnum.No,
+                        IsQualified = TrueFalseEmptyEnum.Empty,
                         Remark = EquMaintenanceTaskSnapshotItem.Remark,
 
                         Id = IdGenProvider.Instance.CreateId(),
