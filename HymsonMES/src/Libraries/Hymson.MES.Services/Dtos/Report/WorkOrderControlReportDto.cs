@@ -10,6 +10,11 @@ namespace Hymson.MES.Services.Dtos.Report
     public record WorkOrderControlReportViewDto : BaseEntityDto
     {
         /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 物料编码/版本
         /// </summary>
         public string MaterialCode { get; set; }

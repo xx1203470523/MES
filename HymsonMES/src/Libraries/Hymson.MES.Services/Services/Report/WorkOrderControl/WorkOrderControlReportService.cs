@@ -98,16 +98,17 @@ namespace Hymson.MES.Services.Services.Report
 
                     listDto.Add(new WorkOrderControlReportViewDto
                     {
+                        Id = item.Id,
                         Status = item.Status,
                         Qty = item.Qty,
                         MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
                         WorkCenterId = item.WorkCenterCode ?? "",
                         OrderCode = item?.OrderCode ?? "",
                         Type = item?.Type,
-                        PassDownQuantity = item.PassDownQuantity,
-                        ProcessDownQuantity = item.PassDownQuantity- item.UnQualifiedQuantity- item.FinishProductQuantity,
-                        UnQualifiedQuantity = item.UnQualifiedQuantity,
-                        FinishProductQuantity = item.FinishProductQuantity,
+                        PassDownQuantity = item?.PassDownQuantity ?? 0,
+                        ProcessDownQuantity = item?.PassDownQuantity ?? 0 - item?.UnQualifiedQuantity ?? 0 - item?.FinishProductQuantity ?? 0,
+                        UnQualifiedQuantity = item?.UnQualifiedQuantity ?? 0,
+                        FinishProductQuantity = item?.FinishProductQuantity ?? 0,
                     });
                 }
 

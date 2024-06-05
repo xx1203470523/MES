@@ -654,7 +654,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// <param name="isEdit"></param>
         private void ExecPublish(EquSpotcheckPlanEntity equSpotcheckPlanEntity, bool isEdit = false)
         {
-            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanEntity.CornExpression) && equSpotcheckPlanEntity.FirstExecuteTime.HasValue)
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanEntity.CornExpression) && equSpotcheckPlanEntity.FirstExecuteTime.HasValue && equSpotcheckPlanEntity.EndTime.HasValue)
             {
                 if (equSpotcheckPlanEntity.Status == DisableOrEnableEnum.Enable)
                 {
@@ -665,6 +665,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                         FirstExecuteTime = (DateTime)equSpotcheckPlanEntity.FirstExecuteTime,
                         SpotCheckPlanId = equSpotcheckPlanEntity.Id,
                         UserName = _currentUser.UserName,
+                        EndTime = (DateTime)equSpotcheckPlanEntity.EndTime
                     };
                     _eventBus.Publish(equSpotcheckAutoCreateIntegrationEvent);
                 }

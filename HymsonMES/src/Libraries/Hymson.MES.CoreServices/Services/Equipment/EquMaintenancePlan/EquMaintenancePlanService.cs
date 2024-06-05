@@ -121,6 +121,11 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                     throw new CustomerValidationException(nameof(ErrorCode.MES12303));
                 }
 
+                if (equMaintenancePlanEntity.EndTime < HymsonClock.Now())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12325));
+                }
+
                 if (!equMaintenancePlanEntity.FirstExecuteTime.HasValue || !equMaintenancePlanEntity.Type.HasValue || !equMaintenancePlanEntity.Cycle.HasValue)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12304));
@@ -279,7 +284,7 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                         MaintenanceTaskId = EquMaintenanceTask.Id,
                         MaintenanceItemSnapshotId = EquMaintenanceTaskSnapshotItem.Id,
                         InspectionValue = "",
-                        IsQualified = TrueFalseEmptyEnum.No,
+                        IsQualified = TrueFalseEmptyEnum.Empty,
                         Remark = EquMaintenanceTaskSnapshotItem.Remark,
 
                         Id = IdGenProvider.Instance.CreateId(),

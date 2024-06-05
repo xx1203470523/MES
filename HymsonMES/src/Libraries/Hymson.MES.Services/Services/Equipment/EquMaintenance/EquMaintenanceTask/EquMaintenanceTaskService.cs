@@ -96,7 +96,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         /// 单据附件
         /// </summary>
         private readonly IEquMaintenanceTaskAttachmentRepository _equMaintenanceTaskAttachmentRepository;
-
+        /// <summary>
+        /// 仓储接口（设备保养快照任务计划）
+        /// </summary>
         private readonly IEquMaintenanceTaskSnapshotPlanRepository _equMaintenanceTaskSnapshotPlanRepository;
 
         /// <summary>
@@ -685,7 +687,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11912))
                     .WithData("Before", EquMaintenanceTaskStautusEnum.Inspecting.GetDescription())
-                    .WithData("After", EquMaintenanceTaskStautusEnum.Completed.GetDescription());
+                    .WithData("After", "完成");
             }
             // 更新时间
             var updatedBy = _currentUser.UserName;
