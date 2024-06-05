@@ -22,6 +22,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Minio.DataModel;
+using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Quality
@@ -117,7 +118,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17504));
             }
-            var procMaterialEntity =await _procMaterialRepository.GetByIdAsync(inventoryEntity.MaterialId);
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(inventoryEntity.MaterialId);
 
             //物料条码是否已记录不良且不良状态为打开，若是，则报错：物料条码XXX已录入不良且未进行不良处置
             var qualMaterials = await _qualMaterialUnqualifiedDataRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataQuery
@@ -308,7 +309,7 @@ namespace Hymson.MES.Services.Services.Quality
             };
 
             var inventoryEntity = await _inventoryRepository.GetByIdAsync(entityOld.MaterialInventoryId);
-            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(inventoryEntity?.MaterialId??0);
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(inventoryEntity?.MaterialId ?? 0);
             var standingbookEntity = new WhMaterialStandingbookEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
@@ -317,8 +318,8 @@ namespace Hymson.MES.Services.Services.Quality
                 MaterialVersion = procMaterialEntity?.Version ?? "",
                 Unit = procMaterialEntity?.Unit ?? "",
                 Batch = procMaterialEntity?.Batch ?? "",
-                MaterialBarCode = inventoryEntity?.MaterialBarCode??"",
-                Quantity = inventoryEntity?.QuantityResidue??0,
+                MaterialBarCode = inventoryEntity?.MaterialBarCode ?? "",
+                Quantity = inventoryEntity?.QuantityResidue ?? 0,
                 Type = WhMaterialInventoryTypeEnum.BadDisposal,
                 Source = MaterialInventorySourceEnum.BadEntry,
                 SiteId = _currentSite.SiteId ?? 0,
@@ -477,6 +478,17 @@ namespace Hymson.MES.Services.Services.Quality
         {
             var pagedQuery = pagedQueryDto.ToQuery<QualMaterialUnqualifiedDataPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
+            IEnumerable<QualMaterialUnqualifiedDataDetailEntity> detailEntities = new List<QualMaterialUnqualifiedDataDetailEntity>();
+            if (pagedQuery.UnqualifiedGroupId.HasValue || pagedQuery.UnqualifiedCodeId.HasValue)
+            {
+                detailEntities = await _unqualifiedDataDetailRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataDetailQuery
+                {
+                    UnqualifiedGroupId = pagedQuery.UnqualifiedGroupId,
+                    UnqualifiedCodeId = pagedQuery.UnqualifiedCodeId
+                });
+                pagedQuery.Ids = detailEntities.Select(x => x.MaterialUnqualifiedDataId).ToList();
+            }
             var pagedInfo = await _qualMaterialUnqualifiedDataRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
@@ -487,10 +499,13 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             var dataIds = pagedInfo.Data.Select(x => x.Id).ToArray();
-            var detailEntities = await _unqualifiedDataDetailRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataDetailQuery
+            if (!pagedQuery.UnqualifiedGroupId.HasValue && !pagedQuery.UnqualifiedCodeId.HasValue)
             {
-                MaterialUnqualifiedDataIds = dataIds
-            });
+                detailEntities = await _unqualifiedDataDetailRepository.GetEntitiesAsync(new QualMaterialUnqualifiedDataDetailQuery
+                {
+                    MaterialUnqualifiedDataIds = dataIds
+                });
+            }
 
             var unqualifiedCodeIds = detailEntities.Select(x => x.UnqualifiedCodeId).Distinct().ToArray();
             var unqualifiedCodeEntities = await _unqualifiedCodeRepository.GetByIdsAsync(unqualifiedCodeIds);

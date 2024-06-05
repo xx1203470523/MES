@@ -20,6 +20,11 @@ namespace Hymson.MES.Services.Dtos.Report
         public string MaterialCode { get; set; }
 
         /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
         /// 工单编码
         /// </summary>
         public string OrderCode { get; set; }
