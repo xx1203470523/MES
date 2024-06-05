@@ -123,14 +123,27 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
             {
                 sqlBuilder.Where("Type=@Type");
             }
-            //if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.EquipmentCode))
-            //{
-            //    sqlBuilder.Where("EquipmentCode=@EquipmentCode");
-            //}
-            //if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.EquipmentName))
-            //{
-            //    sqlBuilder.Where("EquipmentName=@EquipmentName");
-            //}
+
+            if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.EquipmentCode))
+            {
+                EquMaintenancePlanPagedQuery.EquipmentCode = $"%{EquMaintenancePlanPagedQuery.EquipmentCode}%";
+                sqlBuilder.Where("ee.EquipmentCode LIKE @EquipmentCode");
+            }
+            if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.EquipmentName))
+            {
+                EquMaintenancePlanPagedQuery.EquipmentName = $"%{EquMaintenancePlanPagedQuery.EquipmentName}%";
+                sqlBuilder.Where("ee.EquipmentName LIKE @EquipmentName");
+            }
+            if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.ExecutorIds))
+            {
+                EquMaintenancePlanPagedQuery.ExecutorIds = $"%{EquMaintenancePlanPagedQuery.ExecutorIds}%";
+                sqlBuilder.Where("esper.ExecutorIds LIKE @ExecutorIds");
+            }
+            if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.LeaderIds))
+            {
+                EquMaintenancePlanPagedQuery.LeaderIds = $"%{EquMaintenancePlanPagedQuery.LeaderIds}%";
+                sqlBuilder.Where("esper.LeaderIds LIKE @LeaderIds");
+            }
 
 
             var offSet = (EquMaintenancePlanPagedQuery.PageIndex - 1) * EquMaintenancePlanPagedQuery.PageSize;
