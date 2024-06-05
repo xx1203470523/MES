@@ -45,6 +45,7 @@ namespace Hymson.MES.BackgroundServices.Quality.EquSpotcheckAutoCreateIntegratio
                 .ForJob(job)
                 .WithCronSchedule(@event.CornExpression)
                 .StartAt(@event.FirstExecuteTime)
+                .EndAt(@event.EndTime)
                 .Build();
             await _scheduler.ScheduleJob(job, trigger);
 

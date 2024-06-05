@@ -148,6 +148,10 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
             }
+            if (!equSpotcheckPlanCreateDto.CompletionHour.HasValue && !equSpotcheckPlanCreateDto.CompletionHour.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12323));
+            }
 
             var equSpotcheckPlan = await _equSpotcheckPlanRepository.GetByCodeAsync(new EquSpotcheckPlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = equSpotcheckPlanCreateDto.Code, Version = equSpotcheckPlanCreateDto.Version });
             if (equSpotcheckPlan != null)
@@ -310,6 +314,10 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             if (equSpotcheckPlanModifyDto.FirstExecuteTime < equSpotcheckPlanModifyDto.BeginTime || equSpotcheckPlanModifyDto.FirstExecuteTime > equSpotcheckPlanModifyDto.EndTime)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
+            }
+            if (!equSpotcheckPlanModifyDto.CompletionHour.HasValue && !equSpotcheckPlanModifyDto.CompletionHour.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12323));
             }
             var equSpotcheckPlan = await _equSpotcheckPlanRepository.GetByCodeAsync(new EquSpotcheckPlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = equSpotcheckPlanModifyDto.Code, Version = equSpotcheckPlanModifyDto.Version });
             if (equSpotcheckPlan != null && equSpotcheckPlan.Id != equSpotcheckPlanModifyDto.Id)
@@ -646,7 +654,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// <param name="isEdit"></param>
         private void ExecPublish(EquSpotcheckPlanEntity equSpotcheckPlanEntity, bool isEdit = false)
         {
-            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanEntity.CornExpression) && equSpotcheckPlanEntity.FirstExecuteTime.HasValue)
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanEntity.CornExpression) && equSpotcheckPlanEntity.FirstExecuteTime.HasValue && equSpotcheckPlanEntity.EndTime.HasValue)
             {
                 if (equSpotcheckPlanEntity.Status == DisableOrEnableEnum.Enable)
                 {
@@ -657,6 +665,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                         FirstExecuteTime = (DateTime)equSpotcheckPlanEntity.FirstExecuteTime,
                         SpotCheckPlanId = equSpotcheckPlanEntity.Id,
                         UserName = _currentUser.UserName,
+                        EndTime = (DateTime)equSpotcheckPlanEntity.EndTime
                     };
                     _eventBus.Publish(equSpotcheckAutoCreateIntegrationEvent);
                 }

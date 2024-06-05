@@ -569,7 +569,7 @@
         public const string MES12201 = "模板{Code}已启用，不允许删除";
         public const string MES12202 = "模板【{Code}】，版本【{Version}】已存在";
         public const string MES12203 = "设备组【{Code}】已绑定模板";
-        public const string MES12204 = "模板{Code}已被使用,不允许删除"; 
+        public const string MES12204 = "模板{Code}已被使用,不允许删除";
         #endregion
 
 
@@ -596,7 +596,10 @@
         public const string MES12319 = "提前执行时间(小时不能小于0)";
         public const string MES12320 = "首次执行时间需在开始/结束时间范围内";
         public const string MES12321 = "结束时间需大于开始时间";
-        public const string MES12322 = "请维护设备{Code}执行人/责任人"; 
+        public const string MES12322 = "请维护设备{Code}执行人/责任人";
+        public const string MES12323 = "截止执行时间必须填写一个";
+        public const string MES12324 = "完成时间必须填写一个"; 
+        public const string MES12325 = "已过结束时间，不执行"; 
 
 
         #endregion
@@ -2133,7 +2136,9 @@
         public const string MES15905 = "数值类型的检验值请输入不为数值！";
         public const string MES15906 = "当前时间,未到保养计划开始时间{time}";
         public const string MES15907 = "当前时间,已超过保养计划结束时间{time}";
- 
+        public const string MES15908 = "未找到保养计划数据";
+        public const string MES15909 = "当前时间无需延期，当前时间未超过计划开始时间{time}";
+
         //点检
         public const string MES15910 = "保存时，未找到点检单!请联系管理员";
         public const string MES15911 = "含有数值类型，需要先保存才能执行完成";
@@ -2144,6 +2149,9 @@
         //点检保养项目
         public const string MES15920 = "已被设备保养模板{Code}引用！";
         public const string MES15921 = "已被设备点检模板{Code}引用！";
+        public const string MES15922 = "延期时间不允许为空";
+        public const string MES15923 = "延期失败,计划结束时间需大于当前时间，请将开始时间设置于{time}之后！";
+
 
         #endregion
 

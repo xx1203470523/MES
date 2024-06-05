@@ -172,6 +172,18 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
+        /// 保养延期
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("defer")]
+        [LogDescription("保养延期", BusinessType.OTHER)]
+        public async Task<long> DeferOrderAsync(EquMaintenanceTaskDeferDto requestDto)
+        {
+            return await _equMaintenanceTaskService.DeferOrderAsync(requestDto);
+        }
+
+        /// <summary>
         /// 上传单据附件
         /// </summary>
         /// <param name="dto"></param>

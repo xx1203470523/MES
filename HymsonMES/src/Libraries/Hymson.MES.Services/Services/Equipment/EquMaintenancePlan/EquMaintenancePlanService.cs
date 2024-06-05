@@ -153,6 +153,10 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
             }
+            if (!EquMaintenancePlanCreateDto.CompletionHour.HasValue && !EquMaintenancePlanCreateDto.CompletionHour.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12323));
+            }
             var EquMaintenancePlan = await _EquMaintenancePlanRepository.GetByCodeAsync(new EquMaintenancePlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = EquMaintenancePlanCreateDto.Code, Version = EquMaintenancePlanCreateDto.Version });
             if (EquMaintenancePlan != null)
             {
@@ -317,6 +321,10 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
             }
+            if (!EquMaintenancePlanModifyDto.CompletionHour.HasValue && !EquMaintenancePlanModifyDto.CompletionHour.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12323));
+            }
             var EquMaintenancePlan = await _EquMaintenancePlanRepository.GetByCodeAsync(new EquMaintenancePlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = EquMaintenancePlanModifyDto.Code, Version = EquMaintenancePlanModifyDto.Version });
             if (EquMaintenancePlan != null && EquMaintenancePlan.Id != EquMaintenancePlanModifyDto.Id)
             {
@@ -474,7 +482,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         /// <param name="isEdit"></param>
         private void ExecPublish(EquMaintenancePlanEntity equMaintenancePlanEntity, bool isEdit = false)
         {
-            if (!string.IsNullOrWhiteSpace(equMaintenancePlanEntity.CornExpression) && equMaintenancePlanEntity.FirstExecuteTime.HasValue)
+            if (!string.IsNullOrWhiteSpace(equMaintenancePlanEntity.CornExpression) && equMaintenancePlanEntity.FirstExecuteTime.HasValue && equMaintenancePlanEntity.EndTime.HasValue)
             {
                 if (equMaintenancePlanEntity.Status == DisableOrEnableEnum.Enable)
                 {
@@ -485,6 +493,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
                         FirstExecuteTime = (DateTime)equMaintenancePlanEntity.FirstExecuteTime,
                         MaintenancePlanId = equMaintenancePlanEntity.Id,
                         UserName = _currentUser.UserName,
+                        EndTime = (DateTime)equMaintenancePlanEntity.EndTime,
                     };
                     _eventBus.Publish(equSpotcheckAutoCreateIntegrationEvent);
                 }

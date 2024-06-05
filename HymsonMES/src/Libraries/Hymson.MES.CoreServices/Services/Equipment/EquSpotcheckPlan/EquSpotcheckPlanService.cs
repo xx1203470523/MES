@@ -119,6 +119,11 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                     throw new CustomerValidationException(nameof(ErrorCode.MES12303));
                 }
 
+                if (equSpotcheckPlanEntity.EndTime < HymsonClock.Now())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12325));
+                }
+
                 if (!equSpotcheckPlanEntity.FirstExecuteTime.HasValue || !equSpotcheckPlanEntity.Type.HasValue || !equSpotcheckPlanEntity.Cycle.HasValue)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12304));
@@ -197,6 +202,16 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                 };
                 equSpotcheckTaskList.Add(equSpotcheckTask);
 
+
+                var endTime = HymsonClock.Now();
+                if (equSpotcheckPlanEntity.CompletionHour.HasValue)
+                {
+                    endTime = endTime.AddHours(equSpotcheckPlanEntity.CompletionHour.ParseToDouble());
+                }
+                if (equSpotcheckPlanEntity.CompletionMinute.HasValue)
+                {
+                    endTime = endTime.AddMinutes(equSpotcheckPlanEntity.CompletionMinute.ParseToDouble());
+                }
                 EquSpotcheckTaskSnapshotPlanEntity equSpotcheckTaskSnapshotPlan = new()
                 {
                     SpotCheckTaskId = equSpotcheckTask.Id,
@@ -210,8 +225,8 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                     LeaderIds = item.LeaderIds ?? "",
                     Type = equSpotcheckPlanEntity.Type ?? 0,
                     Status = equSpotcheckPlanEntity.Status,
-                    BeginTime = equSpotcheckPlanEntity.BeginTime,
-                    EndTime = equSpotcheckPlanEntity.EndTime,
+                    BeginTime = HymsonClock.Now(), //equSpotcheckPlanEntity.BeginTime,
+                    EndTime = endTime, //equSpotcheckPlanEntity.EndTime,
                     IsSkipHoliday = equSpotcheckPlanEntity.IsSkipHoliday,
                     FirstExecuteTime = equSpotcheckPlanEntity.FirstExecuteTime,
                     Cycle = equSpotcheckPlanEntity.Cycle ?? 1,
