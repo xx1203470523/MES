@@ -62,7 +62,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
         /// <param name="equMaintenanceItemRepository"></param>
         public EquMaintenanceItemService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquMaintenanceItemSaveDto> validationSaveRules,
             IEquMaintenanceItemRepository equMaintenanceItemRepository,
-            IInteUnitRepository inteUnitRepository, 
+            IInteUnitRepository inteUnitRepository,
             IEquMaintenanceTemplateItemRelationRepository equMaintenanceTemplateItemRelationRepository,
             IEquMaintenanceTemplateRepository equMaintenanceTemplateRepository)
         {
@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
             _equMaintenanceItemRepository = equMaintenanceItemRepository;
             _inteUnitRepository = inteUnitRepository;
             _EquMaintenanceTemplateItemRelationRepository = equMaintenanceTemplateItemRelationRepository;
-            _equMaintenanceTemplateRepository= equMaintenanceTemplateRepository;
+            _equMaintenanceTemplateRepository = equMaintenanceTemplateRepository;
         }
 
 
@@ -97,6 +97,22 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
             if (Entitys.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10405)).WithData("Code", saveDto.Code);
+            }
+            //校验单位
+            if (saveDto.Unit != null)
+            {
+
+                var unitEntity = await _inteUnitRepository.GetByCodeAsync(new Data.Repositories.Common.Query.EntityByCodeQuery
+                {
+                    Code = saveDto.Unit!,
+                    Site = _currentSite.SiteId ?? 0
+                });
+
+                if (unitEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES15924)).WithData("Code", saveDto.Unit ?? string.Empty);
+            }
+            else
+            {
+                saveDto.UnitId = null;
             }
 
             // 更新时间
@@ -129,6 +145,23 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+
+            //校验单位
+            if (saveDto.Unit != null)
+            {
+
+                var unitEntity = await _inteUnitRepository.GetByCodeAsync(new Data.Repositories.Common.Query.EntityByCodeQuery
+                {
+                    Code = saveDto.Unit!,
+                    Site = _currentSite.SiteId ?? 0
+                });
+
+                if (unitEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES15924)).WithData("Code", saveDto.Unit ?? string.Empty);
+            }
+            else
+            {
+                saveDto.UnitId = null;
+            }
 
             // DTO转换实体
             var entity = saveDto.ToEntity<EquMaintenanceItemEntity>();
@@ -165,12 +198,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceIt
                 SiteId = _currentSite.SiteId
             });
 
-            if(equMaintenanceTemplateItemRelations != null&& equMaintenanceTemplateItemRelations.Any())
+            if (equMaintenanceTemplateItemRelations != null && equMaintenanceTemplateItemRelations.Any())
             {
-                var equMaintenanceTemplateEntitys = await _equMaintenanceTemplateRepository.GetByIdsAsync(equMaintenanceTemplateItemRelations.Select(x=>x.MaintenanceTemplateId).ToArray());
-           
-                var templateCodes = equMaintenanceTemplateEntitys.Select(s=>s.Code).ToList();
- 
+                var equMaintenanceTemplateEntitys = await _equMaintenanceTemplateRepository.GetByIdsAsync(equMaintenanceTemplateItemRelations.Select(x => x.MaintenanceTemplateId).ToArray());
+
+                var templateCodes = equMaintenanceTemplateEntitys.Select(s => s.Code).ToList();
+
                 if (templateCodes.Any())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15920)).WithData("Code", string.Join(',', templateCodes));

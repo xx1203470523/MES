@@ -389,6 +389,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             var EquMaintenancePlanEntity = await _EquMaintenancePlanRepository.GetByIdAsync(id);
             if (EquMaintenancePlanEntity != null)
             {
+                EquMaintenancePlanEntity.Type = EquMaintenancePlanEntity.Type == 0 ? null : EquMaintenancePlanEntity.Type;
                 return EquMaintenancePlanEntity.ToModel<EquMaintenancePlanDto>();
             }
             return null;

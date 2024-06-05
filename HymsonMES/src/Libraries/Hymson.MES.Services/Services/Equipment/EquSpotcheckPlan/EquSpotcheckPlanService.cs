@@ -388,6 +388,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             var equSpotcheckPlanEntity = await _equSpotcheckPlanRepository.GetByIdAsync(id);
             if (equSpotcheckPlanEntity != null)
             {
+                equSpotcheckPlanEntity.Type = equSpotcheckPlanEntity.Type == 0 ? null : equSpotcheckPlanEntity.Type;
                 return equSpotcheckPlanEntity.ToModel<EquSpotcheckPlanDto>();
             }
             return null;
