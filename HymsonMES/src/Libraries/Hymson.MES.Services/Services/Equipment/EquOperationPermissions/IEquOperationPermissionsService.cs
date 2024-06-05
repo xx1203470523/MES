@@ -23,6 +23,13 @@ namespace Hymson.MES.Services.Services.Equipment
         Task<int> ModifyAsync(EquOperationPermissionsSaveDto saveDto);
 
         /// <summary>
+        /// 批量修改
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        Task<int> BatchModifyAsync(EquOperationPermissionsBatchSaveDto saveDto);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
@@ -41,7 +48,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquOperationPermissionsDto?> QueryByIdAsync(long id);
+        Task<EquOperationPermissionsDetailDto?> QueryByIdAsync(long id);
 
         /// <summary>
         /// 获取分页List
