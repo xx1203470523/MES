@@ -408,8 +408,8 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 #region 降级品信息
                 if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute
-                    && responseSummaryBo.ManuSfcCirculationEntities != null
-                    && responseSummaryBo.ManuSfcCirculationEntities.Any())
+                    && responseBo.ManuSfcCirculationEntities != null
+                    && responseBo.ManuSfcCirculationEntities.Any())
                 {
                     var degradedProductExtendBo = new DegradedProductExtendBo
                     {
@@ -418,7 +418,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     };
 
                     // 添加降级品记录
-                    degradedProductExtendBo.KeyValues.AddRange(responseSummaryBo.ManuSfcCirculationEntities.Select(s => new DegradedProductExtendKeyValueBo
+                    degradedProductExtendBo.KeyValues.AddRange(responseBo.ManuSfcCirculationEntities.Select(s => new DegradedProductExtendKeyValueBo
                     {
                         BarCode = s.CirculationBarCode,
                         SFC = sfcProduceEntity.SFC
@@ -1449,7 +1449,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (summaryBo.InitialMaterials == null) return responseBo;
 
             List<ManuFeedingEntity> feedings = new();
-            foreach (var item in requestBo.ConsumeList)
+            var consumelist = requestBo.ConsumeList.ToList();
+            foreach (var item in consumelist)
             {
                 var feedingEntity = allFeedingEntities.FirstOrDefault(f => f.BarCode == item.BarCode);
                 if (feedingEntity == null)
@@ -1473,7 +1474,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             List<MaterialDeductResponseBo> filterMaterials = new();
             foreach (var item in summaryBo.InitialMaterials)
             {
-                var consume = requestBo.ConsumeList.FirstOrDefault(f => f.MaterialId == item.MaterialId);
+                var consume = consumelist.FirstOrDefault(f => f.MaterialId == item.MaterialId);
                 if (consume == null) continue;
 
                 if (consume.ConsumeQty.HasValue)

@@ -210,6 +210,11 @@ namespace Hymson.MES.Services.Dtos.Report
         public string ProcedureCode { get; set; }
 
         /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+
+        /// <summary>
         /// 状态
         /// </summary>
         public SfcInOutStatusEnum Status { get; set; }

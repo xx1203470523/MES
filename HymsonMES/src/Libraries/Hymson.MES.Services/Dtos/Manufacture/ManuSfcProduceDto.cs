@@ -558,10 +558,21 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 工序Id
         /// </summary>
         public long? ProcedureId { get; set; }
+
         /// <summary>
         /// 工序
         /// </summary>
-        public string? code { get; set; }
+        public string? Code { get; set; }
+
+        /// <summary>
+        ///  资源编码
+        /// </summary>
+        public string? ResCode { get; set; }
+
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string? OrderCode { get; set; }
 
         /// <summary>
         /// 条码列表

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.Qkny
 {
@@ -61,7 +62,8 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             var dbModel = await _manuSfcProduceRepository.GetBySFCAsync(query);
             if (dbModel == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45090));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45090))
+                    .WithData("Sfc", query.Sfc);
             }
             return dbModel!;
         }

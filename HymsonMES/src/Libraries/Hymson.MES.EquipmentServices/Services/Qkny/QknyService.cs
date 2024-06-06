@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
@@ -10,13 +11,10 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Qkny;
-using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.CoreServices.Services.Qkny;
-using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
@@ -29,32 +27,18 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.ToolBindMaterial;
-using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment;
-using Hymson.MES.EquipmentServices.Services.Qkny.Formula;
 using Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle;
 using Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint;
 using Hymson.MES.EquipmentServices.Services.Qkny.PlanWorkOrder;
-using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
-using Hymson.MES.EquipmentServices.Services.Qkny.ProcSortingRule;
 using Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory;
+using Hymson.MES.EquipmentServices.Validators.EquVerifyHelper;
 using Hymson.MES.Services.Dtos.AgvTaskRecord;
 using Hymson.MES.Services.Dtos.EquProcessParamRecord;
 using Hymson.MES.Services.Dtos.EquProductParamRecord;
 using Hymson.MES.Services.Services.AgvTaskRecord;
-using Hymson.MES.Services.Services.CcdFileUploadCompleteRecord;
-using Hymson.MES.Services.Services.EquEquipmentAlarm;
-using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
-using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Services.EquProcessParamRecord;
 using Hymson.MES.Services.Services.EquProductParamRecord;
-using Hymson.MES.Services.Services.EquToolLifeRecord;
-using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
-using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
-using Hymson.MES.Services.Services.ManuFeedingCompletedZjyjRecord;
-using Hymson.MES.Services.Services.ManuFeedingNoProductionRecord;
-using Hymson.MES.Services.Services.ManuFeedingTransferRecord;
-using Hymson.MES.Services.Services.ManuFillingDataRecord;
 using Hymson.MessagePush.Helper;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -191,6 +175,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuProductParameterService _manuProductParameterService;
 
         /// <summary>
+        /// 物料
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -214,7 +203,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuDowngradingRepository manuDowngradingRepository,
             IEquEquipmentService equEquipmentService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto,
-            IManuProductParameterService manuProductParameterService)
+            IManuProductParameterService manuProductParameterService,
+            IProcMaterialRepository procMaterialRepository)
         {
             _equEquipmentRepository = equEquipmentRepository;
             _planWorkOrderService = planWorkOrderService;
@@ -236,6 +226,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuToolingBindRepository = manuToolingBindRepository;
             _equEquipmentService = equEquipmentService;
             _manuDowngradingRepository = manuDowngradingRepository;
+            _procMaterialRepository = procMaterialRepository;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
             _manuProductParameterService = manuProductParameterService;
@@ -426,7 +417,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task OutboundMetersReportAsync(OutboundMetersReportDto dto)
+        public async Task<OutReportSfcReturnDto> OutboundMetersReportAsync(OutboundMetersReportDto dto)
         {
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
@@ -472,15 +463,15 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                 EntityByResourceIdQuery loadQuery = new EntityByResourceIdQuery();
                 loadQuery.SiteId = equResModel.SiteId;
                 loadQuery.Resourceid = equResModel.ResId;
-                var loadList = await _manuFeedingService.GetAllByResourceIdAsync(loadQuery);
-                foreach (var item in loadList)
-                {
-                    OutStationConsumeBo consumeSfc = new OutStationConsumeBo();
-                    consumeSfc.BarCode = item.BarCode;
-                    consumeSfc.MaterialId = item.MaterialId;
-                    consumeSfc.ConsumeQty = item.Qty;
-                    consumeSfcList.Add(consumeSfc);
-                }
+                //var loadList = await _manuFeedingService.GetAllByResourceIdAsync(loadQuery);
+                //foreach (var item in loadList)
+                //{
+                //    OutStationConsumeBo consumeSfc = new OutStationConsumeBo();
+                //    consumeSfc.BarCode = item.BarCode;
+                //    consumeSfc.MaterialId = item.MaterialId;
+                //    consumeSfc.ConsumeQty = item.Qty;
+                //    consumeSfcList.Add(consumeSfc);
+                //}
             }
             //NG代码
             List<OutStationUnqualifiedBo> ngList = new List<OutStationUnqualifiedBo>();
@@ -539,6 +530,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             // 数据库操作
             // 参考条码数量更改
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            long sfcMaterialId = manuSfcInfo.ProductId;
+            ProcMaterialEntity materialModel = await _procMaterialRepository.GetByIdAsync(sfcMaterialId);
             await _manuSfcProduceService.UpdateQtyBySfcAsync(command);
             await _manuSfcServicecs.UpdateQtyBySfcAsync(command);
             int updateNum = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderIdAsync(updateQtyCommand);
@@ -550,6 +543,28 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             await _manuSfcStepRepository.InsertAsync(sfcStep);
             await _manuProductParameterService.ProductProcessCollectAsync(parameterBo);
             trans.Complete();
+
+            var now = HymsonClock.Now();
+            OutReportSfcReturnDto result = new OutReportSfcReturnDto();
+            result.Sfc = dto.Sfc;
+            result.OrderCode = manuSfcInfo.WorkOrderCode;
+            result.EquipmentCode = dto.EquipmentCode;
+            result.MaterialName = materialModel?.MaterialName;
+            result.MaterialBatch = now.ToString("yyyyMMdd");
+            result.ManuDate = now.ToString("yyyyMMddHHmm");
+            if (materialModel == null || materialModel.ValidTime == null)
+            {
+                result.EffectiveDate = "";
+            }
+            else
+            {
+                result.EffectiveDate = (now.AddDays((int)materialModel.ValidTime)).ToString("yyyyMMddHHmm");
+            }
+            //result.TotalQty = dto.TotalQty.ToString("F2");
+            //result.OkQty = dto.OkQty.ToString("F2");
+            //result.OkQty = dto.NgQty.ToString("F2");
+
+            return result;
         }
 
         /// <summary>
@@ -617,6 +632,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task InboundAsync(InboundDto dto)
         {
+            EquVerifyHelper.InboundDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
@@ -639,6 +655,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task OutboundAsync(OutboundDto dto)
         {
+            EquVerifyHelper.OutboundDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
@@ -701,6 +718,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task<List<InboundMoreReturnDto>> InboundMoreAsync(InboundMoreDto dto)
         {
+            EquVerifyHelper.InboundMoreDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
@@ -732,6 +750,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task<List<OutboundMoreReturnDto>> OutboundMoreAsync(OutboundMoreDto dto)
         {
+            EquVerifyHelper.OutboundMoreDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 构造数据
@@ -807,6 +826,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task ProductParamAsync(ProductParamDto dto)
         {
+            EquVerifyHelper.ProductParamDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 出站参数
@@ -845,10 +865,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task MaterialInventoryAsync(MaterialInventoryDto dto)
         {
-            if (dto == null || dto.BarCodeList == null || !dto.BarCodeList.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            }
+            EquVerifyHelper.MaterialInventoryDto(dto);
 
             await _whMaterialInventoryService.MaterialInventoryAsync(dto);
         }
@@ -860,6 +877,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task ToolBindMaterialAsync(ToolBindMaterialDto dto)
         {
+            EquVerifyHelper.ToolBindMaterialDto(dto);
             //获取设备基础信息
             var equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //校验条码是否已绑定工装
@@ -910,6 +928,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task<List<SortingSfcInfo>> GetSfcInfoAsync(GetSfcInfoDto dto)
         {
+            EquVerifyHelper.GetSfcInfoDto(dto);
             //获取设备基础信息
             var equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //查询降级信息
@@ -933,8 +952,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task SortingUnBindAsync(SortingUnBindDto dto)
         {
+            EquVerifyHelper.SortingUnBindDto(dto);
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 托盘电芯解绑
             InteVehicleUnBindDto bindDto = new InteVehicleUnBindDto();
             bindDto.ContainerCode = dto.ContainCode;
@@ -953,6 +973,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <returns></returns>
         public async Task SortingOutboundAsync(SortingOutboundDto dto)
         {
+            EquVerifyHelper.SortingOutboundDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
             //2. 参数组装

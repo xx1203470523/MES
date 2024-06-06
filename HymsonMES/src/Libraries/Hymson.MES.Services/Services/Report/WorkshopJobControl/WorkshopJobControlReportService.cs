@@ -227,6 +227,7 @@ namespace Hymson.MES.Services.Services.Report
                     Id = currentStep.Id,
                     WorkOrderCode = workOrders.FirstOrDefault(x => x.Id == currentStep.WorkOrderId)?.OrderCode ?? string.Empty,
                     ProcedureCode = procedureEntities.FirstOrDefault(x => x.Id == currentStep.ProcedureId)?.Code ?? string.Empty,
+                    ProcedureName = procedureEntities.FirstOrDefault(x => x.Id == currentStep.ProcedureId)?.Name ?? string.Empty,
                     Status = nextStep != null || outStep != null ? SfcInOutStatusEnum.Finished : SfcInOutStatusEnum.Activity,
                     InDateTime = currentStep.CreatedOn,
                     OutDatetTime = outStep?.CreatedOn

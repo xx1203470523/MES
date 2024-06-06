@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
@@ -461,7 +462,11 @@ namespace Hymson.MES.CoreServices.Services.Common
             var sfcProduceBusinessEntities = await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService);
+            //sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService);
+
+            // 顷刻说活动中也可以进站
+            sfcProduceEntities.VerifySFCStatus(ManuSfcStatus.InStationAllowStatus, _localizationService);
+
             sfcProduceBusinessEntities?.VerifyProcedureLock(sfcProduceEntities, procedureEntity);
 
             // 验证条码是否被容器包装

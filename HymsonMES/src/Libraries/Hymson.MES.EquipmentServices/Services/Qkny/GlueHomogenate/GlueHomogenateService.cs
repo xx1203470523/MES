@@ -29,9 +29,11 @@ using Hymson.MES.Services.Dtos.ManuFeedingTransferRecord;
 using Hymson.MES.Services.Services.ManuFeedingCompletedZjyjRecord;
 using Hymson.MES.Services.Services.ManuFeedingNoProductionRecord;
 using Hymson.MES.Services.Services.ManuFeedingTransferRecord;
+using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.IdentityModel.Tokens;
+using Minio.DataModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -225,7 +227,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
                 paramModel.MarerialGroupCode = item.MaterialGroupCode;
                 paramModel.ParameCode = item.ParameterCode;
                 paramModel.ParamValue = item.Setvalue;
-                paramModel.FunctionCode = item.FunctionName;
+                paramModel.FunctionCode = item.FunctionCode;
                 paramModel.Unit = item.Unit;
 
                 result.ParamList.Add(paramModel);
@@ -361,13 +363,35 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
             //    }
             //}
             //5. 原材料数据
-            foreach(var item in dto.ConsumeSfcList)
+            //foreach(var item in dto.ConsumeSfcList)
+            //{
+            //    moveDto.SfcList.Add(new BatchMoveSfcDto { Qty = item.Qty, Sfc = item.Sfc });
+            //}
+
+            //4.2 记录数据
+            List<ManuFeedingTransferRecordSaveDto> recordList = new List<ManuFeedingTransferRecordSaveDto>();
+            foreach (var item in dto.ConsumeSfcList)
             {
-                moveDto.SfcList.Add(new BatchMoveSfcDto { Qty = item.Qty, Sfc = item.Sfc });
+                ManuFeedingTransferRecordSaveDto recordDto = new ManuFeedingTransferRecordSaveDto();
+                recordDto.Id = IdGenProvider.Instance.CreateId();
+                recordDto.EquipmentId = moveDto.EquipmentId;
+                recordDto.Sfc = item.Sfc;
+                recordDto.EquipmentCodeOut = moveDto.EquipmentCodeOut;
+                recordDto.EquipmentCodeIn = moveDto.EquipmentCodeIn;
+                recordDto.Qty = item.Qty;
+                recordDto.CreatedBy = dto.EquipmentCode;
+                recordDto.CreatedOn = HymsonClock.Now();
+                recordDto.UpdatedBy = recordDto.CreatedBy;
+                recordDto.UpdatedOn = recordDto.CreatedOn;
+                recordList.Add(recordDto);
             }
-            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
-            await MultBatchMoveAsync(moveDto);
-            trans.Complete();
+
+            //5. 数据库操作
+            await _manuFeedingTransferRecordService.AddMultAsync(recordList);
+
+            //using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            //await MultBatchMoveAsync(moveDto);
+            //trans.Complete();
 
             ////3. 构造数据
             //ManuFeedingMaterialSaveDto saveDto = new ManuFeedingMaterialSaveDto();
@@ -625,7 +649,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
                 recordDto.UpdatedBy = recordDto.CreatedBy;
                 recordDto.UpdatedOn = recordDto.CreatedOn;
                 //5. 数据库操作
-                await _manuFeedingService.ManuFeedingTransferAsync(saveDto);
+                //await _manuFeedingService.ManuFeedingTransferAsync(saveDto);
                 await _manuFeedingTransferRecordService.AddAsync(recordDto);
             }
             //trans.Complete();

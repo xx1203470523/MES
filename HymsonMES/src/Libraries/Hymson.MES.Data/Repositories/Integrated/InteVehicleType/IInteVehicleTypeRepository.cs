@@ -94,6 +94,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteVehicleTypePagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<InteVehicleTypeEntity>> GetPagedInfoAsync(InteVehicleTypePagedQuery inteVehicleTypePagedQuery);
+
+        /// <summary>
+        /// 根据编码查询数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteVehicleTypeEntity>> GetByCodesAsync(InteVehicleTypeNameQuery query);
         #endregion
     }
 }

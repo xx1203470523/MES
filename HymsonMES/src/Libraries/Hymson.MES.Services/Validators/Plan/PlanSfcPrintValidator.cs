@@ -21,4 +21,12 @@ namespace Hymson.MES.Services.Validators.Plan
         }
     }
 
+    internal class WhMaterialSfcPrintCreatePrintValidator : AbstractValidator<WhMaterialInventoryPrintCreatePrintDto>
+    {
+        public WhMaterialSfcPrintCreatePrintValidator()
+        {
+
+        }
+    }
+
 }

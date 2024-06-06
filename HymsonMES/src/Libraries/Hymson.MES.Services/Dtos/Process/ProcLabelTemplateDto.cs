@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Process;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,6 +76,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long SiteId { get; set; }
 
+        /// <summary>
+        /// 模板通用类型
+        /// </summary>
+        public CurrencyTemplateTypeEnum CurrencyTemplateType { get; set; }
+
 
     }
     public record PreviewImageDataDto : BaseEntityDto
@@ -107,6 +113,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 模板内容
         /// </summary>
         public string? Content { get; set; }
+
+        /// <summary>
+        /// 模板通用类型
+        /// </summary>
+        public CurrencyTemplateTypeEnum CurrencyTemplateType { get; set; }
 
         /// <summary>
         /// 模板打印配置信息
@@ -177,6 +188,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 数据源
         /// </summary>
         public string? printDataModel { get; set; }
+
+        /// <summary>
+        /// 模板通用类型
+        /// </summary>
+        public CurrencyTemplateTypeEnum CurrencyTemplateType { get; set; }
 
 
         /// <summary>

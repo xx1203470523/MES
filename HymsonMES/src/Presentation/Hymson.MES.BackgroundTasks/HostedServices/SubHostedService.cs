@@ -60,8 +60,6 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
         {
             try
             {
-                //缓存清理服务
-                await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] { ServiceTypeEnum.MES }, cancellationToken);
                 //分表初始化服务 只初始化一次即可
                 //await _deliveryService.InitializeSplitTableAsync(DbName.MES_MASTER, ManuSfcStepRepository.TEMPLATETABLENAME, _options.Value.Divides);
                 _eventBus.Subscribe<MessageTriggerUpgradeIntegrationEvent, MessageTriggerUpgradeIntegrationEventHandler>();
@@ -70,7 +68,8 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
                 _eventBus.Subscribe<PrintIntegrationEvent, ExecPrintIntegrationEventHandler>();
                 _eventBus.Subscribe<FQCOrderAutoCreateIntegrationEvent, FQCOrderAutoCreateIntegrationEventHandler>();
                 SubscribeManufactureServices();
-
+                //缓存清理服务
+                await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] { ServiceTypeEnum.MES }, cancellationToken);
             }
             catch (Exception ex)
             {

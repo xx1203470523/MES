@@ -8,6 +8,14 @@ namespace Hymson.MES.Core.Constants.Manufacture
     public static class ManuSfcStatus
     {
         /// <summary>
+        /// 进站允许的状态（排队，活动中）
+        /// </summary>
+        public static readonly IEnumerable<SfcStatusEnum> InStationAllowStatus = new List<SfcStatusEnum>() {
+            SfcStatusEnum.lineUp,
+            SfcStatusEnum.Activity
+        };
+
+        /// <summary>
         /// 条码在制品状态为 排队 活动 在制完成
         /// </summary>
         public static readonly IEnumerable<SfcStatusEnum> SfcStatusInProcess = new List<SfcStatusEnum>() {
@@ -31,7 +39,10 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// 禁止报废状态 报废 删除 无效 锁定
         /// </summary>
         public static readonly IEnumerable<SfcStatusEnum> ForbidScrapSfcStatuss = new List<SfcStatusEnum>() {
-                 SfcStatusEnum.Scrapping, SfcStatusEnum.Delete, SfcStatusEnum.Invalid,SfcStatusEnum.Locked
+            SfcStatusEnum.Scrapping,
+            SfcStatusEnum.Delete,
+            SfcStatusEnum.Invalid,
+            SfcStatusEnum.Locked
         };
     }
 }

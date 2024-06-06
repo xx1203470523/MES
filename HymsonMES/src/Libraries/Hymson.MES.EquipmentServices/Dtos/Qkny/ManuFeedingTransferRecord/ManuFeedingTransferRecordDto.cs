@@ -20,17 +20,17 @@ namespace Hymson.MES.Services.Dtos.ManuFeedingTransferRecord
        /// <summary>
         /// 条码
         /// </summary>
-        public string Sfc { get; set; }
+        public string Sfc { get; set; } = string.Empty;
 
        /// <summary>
         /// 转出罐体设备号
         /// </summary>
-        public string EquipmentCodeOut { get; set; }
+        public string EquipmentCodeOut { get; set; } = string.Empty;
 
        /// <summary>
         /// 转入罐体设备号
         /// </summary>
-        public string EquipmentCodeIn { get; set; }
+        public string EquipmentCodeIn { get; set; } = string.Empty;
 
        /// <summary>
         /// 重量
@@ -40,7 +40,7 @@ namespace Hymson.MES.Services.Dtos.ManuFeedingTransferRecord
        /// <summary>
         /// 创建人
         /// </summary>
-        public string CreatedBy { get; set; }
+        public string CreatedBy { get; set; } = string.Empty;
 
        /// <summary>
         /// 创建时间
@@ -50,7 +50,7 @@ namespace Hymson.MES.Services.Dtos.ManuFeedingTransferRecord
        /// <summary>
         /// 最后修改人
         /// </summary>
-        public string UpdatedBy { get; set; }
+        public string UpdatedBy { get; set; } = string.Empty;
 
        /// <summary>
         /// 修改时间
@@ -65,7 +65,7 @@ namespace Hymson.MES.Services.Dtos.ManuFeedingTransferRecord
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = string.Empty;
 
        /// <summary>
         /// 站点Id

@@ -157,6 +157,8 @@
         public const string MES10379 = "IP设定不符合规范!";
         public const string MES10390 = "资源【{ResourceCode}】未找到打印机!";
         public const string MES10391 = "工序【{ResourceCode}】未配置物料【{MaterialCode}】的模版!";
+
+        public const string MES10392 = "模板类型【{CurrencyTemplateType}】已经存在!";
         #endregion
 
         #region 工序 10400
@@ -1782,6 +1784,7 @@
         public const string MES19007 = "SFC条码不允许重复";
         public const string MES19008 = "资源不匹配";
         public const string MES19009 = "产品序列码【{SFC}】已经存在";
+        public const string MES19010 = "传输实体不能为空";
         #endregion
 
         public const string MES19101 = "条码列表不能为空";
@@ -1834,6 +1837,16 @@
         public const string MES19148 = "配方上传：配方集合不能为空";
         public const string MES19149 = "配方校验：存在未接收的配方,校验失败，上位机请停止生产。";
         public const string MES19150 = "配方校验：未找到指定配方,校验失败，上位机请停止生产。";
+        public const string MES19151 = "工装夹具编码不能为空。";
+        public const string MES19152 = "条码和产品型号不能都为空。";
+        public const string MES19153 = "账号和密码不能为空。";
+        public const string MES19154 = "状态字符串异常，值如下1-运行;2-故障;3-待机。";
+        public const string MES19155 = "开机参数编码不能为空";
+        public const string MES19156 = "开机参数编码，版本，型号都不能为空。";
+        public const string MES19157 = "开机参数列表不能为空。";
+        public const string MES19158 = "产出数量不能小于等于0。";
+        public const string MES19159 = "产出总数不等于良品数和NG数量之和";
+        public const string MES19160 = "产出类型异常，参考如下：1制胶 2匀浆 3涂布 4辊分 5模切";
 
         #region 产品参数采集
         public const string MES19600 = "产品参数采集异常";

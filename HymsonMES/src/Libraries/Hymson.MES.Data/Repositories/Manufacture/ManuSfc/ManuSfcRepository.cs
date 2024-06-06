@@ -163,7 +163,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
             sqlBuilder.LeftJoin("manu_sfc_produce msp  on msp.SFC =ms.SFC");
-
+            sqlBuilder.LeftJoin("proc_procedure pp ON pp.Id=msp.ProcedureId");//关联工序表
+            sqlBuilder.LeftJoin("proc_resource pr ON pr.Id=msp.ResourceId");//关联资源表
+            sqlBuilder.LeftJoin("plan_work_order pwo ON pwo.Id=msp.WorkOrderId");//关联工单表
 
             if (!string.IsNullOrEmpty(query.MaterialVersion) || !string.IsNullOrWhiteSpace(query.MaterialCode))
             {
@@ -215,35 +217,40 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
 
             #region TODO 2024.03.30 发现,下面这块代码建议优化下写法 ↓
-            using var conn = GetMESDbConnection();
-            sqlBuilder.AddParameters(query);
-            if (!string.IsNullOrEmpty(query.code))
-            {
-                string procedureIdSql = $"SELECT * FROM `proc_procedure` WHERE proc_procedure.`Code` = '{query.code}' ";
-                var procedureId = await conn.QueryAsync<ManuSfcProduceSelectView>(procedureIdSql, templateData.Parameters);
-                if (procedureId.Count() > 0)
-                {
-                    var procedureIdList = procedureId.ToList();
-                    //工序
-                    int a = 0;
+            //sqlBuilder.AddParameters(query);
+            //if (!string.IsNullOrEmpty(query.code))
+            //{
+            //    string procedureIdSql = $"SELECT * FROM `proc_procedure` WHERE proc_procedure.`Code` = '{query.code}' ";
+            //    var procedureId = await conn.QueryAsync<ManuSfcProduceSelectView>(procedureIdSql, templateData.Parameters);
+            //    if (procedureId.Count() > 0)
+            //    {
+            //        var procedureIdList = procedureId.ToList();
+            //        //工序
+            //        int a = 0;
 
-                    StringBuilder pSqlBuilder = new StringBuilder();
-                    foreach (var item in procedureIdList)
-                    {
-                        a++;
-                        if (a == 1)
-                        {
-                            pSqlBuilder.Append($"(msp.ProcedureId = {item.Id} ");
-                        }
-                        else
-                        {
-                            pSqlBuilder.Append($"OR msp.ProcedureId = {item.Id} ");
-                        }
-                    }
-                    pSqlBuilder.Append(")");
-                    string prSql = pSqlBuilder.ToString();
-                    sqlBuilder.Where(prSql);
-                }
+            //        StringBuilder pSqlBuilder = new StringBuilder();
+            //        foreach (var item in procedureIdList)
+            //        {
+            //            a++;
+            //            if (a == 1)
+            //            {
+            //                pSqlBuilder.Append($"(msp.ProcedureId = {item.Id} ");
+            //            }
+            //            else
+            //            {
+            //                pSqlBuilder.Append($"OR msp.ProcedureId = {item.Id} ");
+            //            }
+            //        }
+            //        pSqlBuilder.Append(")");
+            //        string prSql = pSqlBuilder.ToString();
+            //        sqlBuilder.Where(prSql);
+            //    }
+            //}
+
+            //工序
+            if (query.ProcedureId.HasValue && query.ProcedureId > 0)
+            {
+                sqlBuilder.Where("  msp.ProcedureId = @ProcedureId ");
             }
             //资源
             if (query.ResourceId.HasValue && query.ResourceId > 0)
@@ -254,9 +261,29 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            //sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(query);
             #endregion
 
+            //工序
+            if (!string.IsNullOrEmpty(query.Code))
+            {
+                query.Code = $"%{query.Code}%";
+                sqlBuilder.Where("pp.Code like @Code ");
+            }
+            //资源
+            if (!string.IsNullOrEmpty(query.ResCode))
+            {
+                query.ResCode = $"%{query.ResCode}%";
+                sqlBuilder.Where("pr.ResCode like @ResCode ");
+            }
+            //工单
+            if (!string.IsNullOrEmpty(query.OrderCode))
+            {
+                query.OrderCode = $"%{query.OrderCode}%";
+                sqlBuilder.Where("pwo.OrderCode like @OrderCode ");
+            }
+
+            using var conn = GetMESDbConnection();
             var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceSelectView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
