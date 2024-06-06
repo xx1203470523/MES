@@ -855,7 +855,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("msp.SiteId = @SiteId");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            sqlBuilder.Select(@"msp.Id,msp.SFC,msp.WorkOrderId,msp.ProcedureId,msp.ResourceId,msp.Status,msp.ProductId,msp.ProcessRouteId,msp.ProductBOMId");
+            sqlBuilder.Select(@"msp.Id,msp.Qty,msp.SFC,msp.WorkOrderId,msp.ProcedureId,msp.ResourceId,msp.Status,msp.ProductId,msp.ProcessRouteId,msp.ProductBOMId,msp.SFCId");
 
             //状态
             if (query.Status.HasValue)
