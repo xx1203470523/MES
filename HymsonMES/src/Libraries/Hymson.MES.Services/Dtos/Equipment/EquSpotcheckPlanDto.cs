@@ -247,7 +247,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 点检类型;天/小时
         /// </summary>
-        public EquipmentSpotcheckTypeEnum Type { get; set; }
+        public EquipmentSpotcheckTypeEnum? Type { get; set; } = 0;
 
         /// <summary>
         /// 点检计划状态

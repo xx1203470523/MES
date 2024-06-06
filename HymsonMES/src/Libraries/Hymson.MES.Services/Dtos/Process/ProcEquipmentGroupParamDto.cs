@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -239,5 +240,83 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? ProcedureId { get; set; }
 
 
+    }
+
+    /// <summary>
+    /// 设备参数导入参数
+    /// </summary>
+    public record ProcEquipmentGroupParamDetailParamImportDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 参数集编码
+        /// </summary>
+        [EpplusTableColumn(Header = "参数集编码(必填)", Order = 1)]
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 参数集名称
+        /// </summary>
+        [EpplusTableColumn(Header = "参数集名称(必填)", Order = 2)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        [EpplusTableColumn(Header = "版本", Order = 3)]
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 功能类型;开机参数/设备过程参数
+        /// </summary>
+        [EpplusTableColumn(Header = "功能类型(必填,开机参数/设备过程参数)", Order = 4)]
+        public EquipmentGroupParamTypeEnum Type { get; set; }
+       
+        /// <summary>
+        /// 产品
+        /// </summary>
+        [EpplusTableColumn(Header = "产品编码(必填)", Order = 5)]
+        public string ProductCode { get; set; }
+
+        /// <summary>
+        /// 工序
+        /// </summary>
+        [EpplusTableColumn(Header = "工序编码(必填)", Order = 6)]
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工艺设备组编码
+        /// </summary>
+        [EpplusTableColumn(Header = "工艺设备组编码(必填)", Order = 7)]
+        public string EquipmentGroupCode { get; set; }
+
+        /// <summary>
+        /// 标准参数编码
+        /// </summary>
+        [EpplusTableColumn(Header = "参数编码", Order = 8)]
+        public string? ParamCode { get; set; }
+
+        /// <summary>
+        /// 小数位数
+        /// </summary>
+        [EpplusTableColumn(Header = "小数位数", Order = 9)]
+        public int? DecimalPlaces { get; set; }
+
+        /// <summary>
+        /// 规格上限
+        /// </summary>
+        [EpplusTableColumn(Header = "规格上限", Order = 10)]
+        public decimal? MaxValue { get; set; }
+
+        /// <summary>
+        /// 规格下限
+        /// </summary>
+        [EpplusTableColumn(Header = "规格下限", Order = 11)]
+        public decimal? MinValue { get; set; }
+
+        /// <summary>
+        /// 规格中心
+        /// </summary>
+        [EpplusTableColumn(Header = "规格中心", Order = 12)]
+        public decimal? CenterValue { get; set; }
     }
 }

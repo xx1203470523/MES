@@ -26,7 +26,8 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 事件类型id
         /// </summary>
-        public long EventTypeId { get; set; }
+        public long? EventTypeId { get; set; }
+        public string? EventTypeCode { get; set; }
 
         /// <summary>
         /// 状态;0、禁用 1、启用

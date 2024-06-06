@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -72,5 +73,18 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         Task UpdateStatusAsync(ChangeStatusDto param);
 
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task DownloadImportTemplateAsync(Stream stream);
+
+
+        /// <summary>
+        /// 导入信息表格
+        /// </summary>
+        /// <returns></returns>
+        Task ImportInteEquipmentGroupParamAsync(IFormFile formFile);
     }
 }

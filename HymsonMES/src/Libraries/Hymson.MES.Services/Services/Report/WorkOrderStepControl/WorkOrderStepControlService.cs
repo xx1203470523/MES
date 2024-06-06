@@ -101,23 +101,24 @@ namespace Hymson.MES.Services.Services.Report
                 return new PagedInfo<WorkOrderStepControlViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, listDto.Count());
             }
 
+            var siteId = _currentSite.SiteId ?? 0;
             var orderId = pagedInfo.Data.FirstOrDefault()?.Id ?? 0;
             var manuSfcProduceResultquery = new ManuSfcProduceVehiclePagedQuery()
             {
                 WorkOrderId = orderId,
                 //ProductId = pagedInfo.Data.First().ProductId,
                 ProcessRouteId = pagedInfo.Data.First().ProcessRouteId,
-                PageIndex = pagedQuery.PageIndex,
-                PageSize = pagedQuery.PageSize,
-                SiteId = pagedQuery.SiteId
+                PageIndex = 1,
+                PageSize = 100000,
+                SiteId = siteId
             };
             var summaryResultquery = new ManuSfcProduceVehiclePagedQuery()
             {
                 WorkOrderId = orderId,
                 //ProductId = pagedInfo.Data.First().ProductId,
-                PageIndex = pagedQuery.PageIndex,
-                PageSize = pagedQuery.PageSize,
-                SiteId = pagedQuery.SiteId,
+                PageIndex = 1,
+                PageSize = 100000,
+                SiteId = siteId
             };
             // 查询物料
             var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId));
@@ -164,8 +165,8 @@ namespace Hymson.MES.Services.Services.Report
                 if (scrapViews.Any())
                 {
                     var sfcids = scrapViews.Select(x => x.SFCId.GetValueOrDefault()).Distinct().ToArray();
-                    var sfcInfoIds=sfcInfoEntities.Where(x => sfcids.Contains(x.SfcId)).Select(x=>x.Id).ToArray();
-                    scrapQuantity=sfcScrapEntities.Where(x=> sfcInfoIds.Contains(x.SfcinfoId)).ToArray().Sum(x=>x.ScrapQty)??0;
+                    var sfcInfoIds = sfcInfoEntities.Where(x => sfcids.Contains(x.SfcId)).Select(x => x.Id).ToArray();
+                    scrapQuantity = sfcScrapEntities.Where(x => sfcInfoIds.Contains(x.SfcinfoId)).ToArray().Sum(x => x.ScrapQty) ?? 0;
                 }
 
                 var procedures = procProcedures?.FirstOrDefault(x => x.Id == item.ProcedureId);

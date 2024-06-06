@@ -1,21 +1,29 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
+using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -43,8 +51,12 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcParameterRepository _procParameterRepository;
         private readonly ILocalizationService _localizationService;
 
+        private readonly IExcelService _excelService;
+
+        private readonly AbstractValidator<ProcEquipmentGroupParamDetailParamImportDto> _validationImportRules;
+
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
@@ -58,6 +70,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procEquipmentGroupParamDetailRepository"></param>
         /// <param name="procParameterRepository"></param>
         /// <param name="localizationService"></param>
+        /// <param name="validationImportRules"></param>
+        /// <param name="excelService"></param>
         public ProcEquipmentGroupParamService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcEquipmentGroupParamRepository procEquipmentGroupParamRepository,
             AbstractValidator<ProcEquipmentGroupParamCreateDto> validationCreateRules,
@@ -68,8 +82,13 @@ namespace Hymson.MES.Services.Services.Process
             IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository,
             IProcEquipmentGroupParamDetailRepository procEquipmentGroupParamDetailRepository,
             IProcParameterRepository procParameterRepository,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            AbstractValidator<ProcEquipmentGroupParamDetailParamImportDto> validationImportRules,
+            IExcelService excelService
+            )
         {
+            _excelService = excelService;
+            _validationImportRules = validationImportRules;
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procEquipmentGroupParamRepository = procEquipmentGroupParamRepository;
@@ -520,5 +539,290 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         #endregion
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadImportTemplateAsync(Stream stream)
+        {
+            var excelTemplateDtos = new List<ProcEquipmentGroupParamDetailParamImportDto>();
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "Recipe参数导入模板");
+        }
+
+        /// <summary>
+        /// 导入信息表格
+        /// </summary>
+        /// <returns></returns>
+        public async Task ImportInteEquipmentGroupParamAsync(IFormFile formFile)
+        {
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            var excelImportDtos = _excelService.Import<ProcEquipmentGroupParamDetailParamImportDto>(memoryStream);
+
+            /*
+            // 备份用户上传的文件，可选
+            var stream = formFile.OpenReadStream();
+            var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            */
+
+            if (excelImportDtos == null || !excelImportDtos.Any())
+            {
+                throw new CustomerValidationException("导入数据为空");
+            }
+
+            #region 验证基础数据
+            var validationFailures = new List<ValidationFailure>();
+            var rows = 1;
+            foreach (var item in excelImportDtos)
+            {
+                var validationResult = await _validationImportRules!.ValidateAsync(item);
+                if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
+                {
+                    foreach (var validationFailure in validationResult.Errors)
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                        validationFailures.Add(validationFailure);
+                    }
+                }
+                rows++;
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+            #endregion
+
+            #region 检测导入数据编码是否重复
+            var repeats = new List<string>();
+            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.Code });
+            foreach (var item in hasDuplicates)
+            {
+                if (item.Count() > 1)
+                {
+                    repeats.Add($@"[{item.Key.Code}]");
+                }
+            }
+            if (repeats.Any())
+            {
+                throw new CustomerValidationException("参数集编码【{repeats}】重复").WithData("repeats", string.Join(",", repeats));
+            }
+
+            //var paramCoderepeats = new List<string>();
+            //var paramCodehasDuplicates = excelImportDtos.GroupBy(x => new { x.ParamCode });
+            //foreach (var item in paramCodehasDuplicates)
+            //{
+            //    if (item.Count() > 1)
+            //    {
+            //        paramCoderepeats.Add($@"[{item.Key.ParamCode}]");
+            //    }
+            //}
+            //if (paramCoderepeats.Any())
+            //{
+            //    throw new CustomerValidationException("参数编码【{paramCoderepeats}】重复").WithData("paramCoderepeats", string.Join(",", paramCoderepeats));
+            //}
+
+
+            List<ProcEquipmentGroupParamEntity> inteCustomList = new();
+            List<ProcEquipmentGroupParamDetailEntity> inteVehicleVerifiesList = new();
+            #endregion
+
+            #region  验证数据库中是否存在数据，且组装数据
+            // 读取参数编码信息
+            var procParameterEntities = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Select(x => x.ParamCode ?? "").Distinct().ToArray()
+            });
+
+            // 读取参数集编码信息
+            var procEquipmentGroupParamEntities = await _procEquipmentGroupParamRepository.GetByCodesAsync(new ProcEquipmentGroupParamByCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Select(x => x.Code).Distinct().ToArray()
+            });
+            
+
+            //查询工序信息
+            var procedureEntities = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Select(x => x.ProcedureCode).Distinct().ToArray()
+            });
+
+            //查询工艺设备组
+            var equipmentGroupEntity = await _procProcessEquipmentGroupRepository.GetByCodesAsync(new ProcProcessEquipmentGroupByCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Select(x => x.EquipmentGroupCode).Distinct().ToArray()
+            });
+            //查询产品信息
+            var materialQuery = new ProcMaterialQuery() { SiteId = _currentSite.SiteId ?? 0, MaterialCodes = excelImportDtos.Where(x => !string.IsNullOrEmpty(x.ProductCode)).Select(x => x.ProductCode).Distinct().ToArray() };
+            var procMaterials = await _procMaterialRepository.GetProcMaterialEntitiesAsync(materialQuery);
+
+            var procEquipmentGroupParams = await _procEquipmentGroupParamRepository.GetByProductIdsAndProcedureIdsAsync(new ProcEquipmentGroupParamByIdsQuery {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureIds = procedureEntities.Select(x => x.Id).Distinct().ToArray(),
+                EquipmentGroupIds = equipmentGroupEntity.Select(x => x.Id).Distinct().ToArray(),
+                ProductIds = procMaterials.Select(x => x.Id).Distinct().ToArray()
+            });
+
+            var currentRow = 0;
+            var customCode = procEquipmentGroupParamEntities.Select(x => x.Code).Distinct().ToList();
+            foreach (var item in excelImportDtos)
+            {
+                currentRow++;
+
+                //if (customCode.Contains(item.Code))
+                //{
+                //    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10521), item.Code, currentRow, "Code"));
+                //}
+                var isCodeAndVersion = procEquipmentGroupParamEntities.Where(x => x.Code == item.Code && x.Version == item.Version);
+                if (isCodeAndVersion.Any())
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10520), item.Code, currentRow, "Code", "Version"));
+                }
+               
+                var procMaterial = procMaterials.Where(x => x.MaterialCode == item.ProductCode).FirstOrDefault();
+                if (procMaterial == null && item.ProductCode != null)
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES19118), item.ProductCode, currentRow, "Code"));
+                }
+
+                var procProcedure = procedureEntities.Where(x => x.Code == item.ProcedureCode).FirstOrDefault();
+                if (procProcedure == null && item.ProcedureCode != null)
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10538), item.ProcedureCode, currentRow, "ProcedureCode"));
+                }
+
+                var procParameterEntity = procParameterEntities.Where(x => x.ParameterCode == item.ParamCode).FirstOrDefault();
+                if (procParameterEntity == null && item.ParamCode != null)
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES19108), item.ParamCode, currentRow, "Code"));
+                }
+
+                var procEquipment = equipmentGroupEntity.Where(x => x.Code == item.EquipmentGroupCode).FirstOrDefault();
+                if (procEquipment == null && item.EquipmentGroupCode != null)
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10539), item.EquipmentGroupCode, currentRow, "Code"));
+                }
+
+                var isProductAndprocProcedure = procEquipmentGroupParams.Where(x => x.Type == item.Type && x.ProcedureId == procProcedure?.Id && x.ProductId == procMaterial?.Id && x.EquipmentGroupId == procEquipment?.Id);
+                if (isProductAndprocProcedure.Any())
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10536), item.Code, currentRow, "Code", "Version"));
+                }
+                //如果载具编码不存在，则组装数据
+                if (!customCode.Contains(item.Code))
+                {
+                    var procEquipmentGroupParam = new ProcEquipmentGroupParamEntity()
+                    {
+                        Code = item.Code,
+                        Name = item.Name,
+                        Status = SysDataStatusEnum.Build,
+                        ProcedureId = procProcedure?.Id ?? 0,
+                        ProductId = procMaterial?.Id ?? 0,
+                        Type = item.Type,
+                        Version = item.Version,
+                        EquipmentGroupId = procEquipment?.Id ?? 0,
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0
+                    };
+                    // 验证是否编码唯一
+                    await CheckUniqueAsync(procEquipmentGroupParam);
+                    inteCustomList.Add(procEquipmentGroupParam);
+                    #region 处理 载具验证数据
+                    if (item.ParamCode != null)
+                    {
+                        var inteVehicleVerify = new ProcEquipmentGroupParamDetailEntity
+                        {
+                            RecipeId = procEquipmentGroupParam.Id,
+                            ParamId = procParameterEntity?.Id ?? 0,
+                            CenterValue = item.CenterValue,
+                            MaxValue = item.MaxValue,
+                            MinValue = item.MinValue,
+                            DecimalPlaces = item.DecimalPlaces,
+                            Id = IdGenProvider.Instance.CreateId(),
+                            CreatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now(),
+                            SiteId = _currentSite.SiteId ?? 0
+                        };
+                        inteVehicleVerifiesList.Add(inteVehicleVerify);
+                    }
+                    #endregion
+                }
+
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                //保存记录 
+                if (inteCustomList.Any())
+                    await _procEquipmentGroupParamRepository.InsertsAsync(inteCustomList);
+
+                if (inteVehicleVerifiesList.Any())
+                    await _procEquipmentGroupParamDetailRepository.InsertsAsync(inteVehicleVerifiesList);
+                ts.Complete();
+            }
+            #endregion
+        }
+        /// <summary>
+        /// 获取验证对象
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <param name="codeFormattedMessage"></param>
+        /// <param name="cuurrentRow"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { key, codeFormattedMessage }
+            };
+            return validationFailure;
+        }
+
+        /// <summary>
+        /// 获取验证对象
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <param name="codeFormattedMessage"></param>
+        /// <param name="cuurrentRow"></param>
+        /// <param name="key"></param>
+        /// <param name="keys"></param>
+        /// 
+        /// <returns></returns>
+        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code", string keys = "codes")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { key, codeFormattedMessage },
+                {keys,codeFormattedMessage }
+            };
+            return validationFailure;
+        }
     }
 }
