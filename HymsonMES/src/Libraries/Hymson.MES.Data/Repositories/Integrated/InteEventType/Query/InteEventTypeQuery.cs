@@ -5,6 +5,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.Query
     /// </summary>
     public class InteEventTypeQuery
     {
-    
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+        public string? EventTypeCode { get; set; }
     }
 }

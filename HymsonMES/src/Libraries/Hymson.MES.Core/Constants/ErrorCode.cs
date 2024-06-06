@@ -351,6 +351,7 @@
         public const string MES10907 = "私钥不允许有空格";
         public const string MES10908 = "关键字不允许有空格";
         public const string MES10909 = "启用状态无法删除";
+        public const string MES10910 = "事件类型编码{Code}不存在,请输入或选择正确的事件编码!";
         #endregion
 
         #region 降级规则 11000
