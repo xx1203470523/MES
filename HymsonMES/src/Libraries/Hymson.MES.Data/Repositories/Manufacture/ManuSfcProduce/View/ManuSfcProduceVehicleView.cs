@@ -58,5 +58,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 当前数量
         /// </summary>
         public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 条码Id
+        /// </summary>
+        public long? SFCId { get; set; }
     }
 }
