@@ -326,6 +326,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             }
 
             //DTO转换实体
+            equSpotcheckPlanModifyDto.Type = equSpotcheckPlanModifyDto.Type.HasValue ? equSpotcheckPlanModifyDto.Type : 0;
             var equSpotcheckPlanEntity = equSpotcheckPlanModifyDto.ToEntity<EquSpotcheckPlanEntity>();
             equSpotcheckPlanEntity.UpdatedBy = _currentUser.UserName;
             equSpotcheckPlanEntity.UpdatedOn = HymsonClock.Now();

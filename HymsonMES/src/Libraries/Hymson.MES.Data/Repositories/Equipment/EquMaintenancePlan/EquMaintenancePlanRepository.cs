@@ -94,34 +94,34 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            //sqlBuilder.LeftJoin("equ_maintenance_plan_equipment_relation emper ON emp.Id=emper.MaintainPlanId");
-
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId=@SiteId");
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("CreatedOn DESC");
+            sqlBuilder.LeftJoin("equ_maintenance_plan_equipment_relation emper ON emp.Id=emper.MaintenancePlanId");
+            sqlBuilder.LeftJoin("equ_equipment ee ON ee.Id = emper.EquipmentId");
+            sqlBuilder.Where("emp.IsDeleted=0");
+            sqlBuilder.Where("emp.SiteId=@SiteId");
+            sqlBuilder.Select("emp.*");
+            sqlBuilder.OrderBy("emp.CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Code))
             {
                 EquMaintenancePlanPagedQuery.Code = $"%{EquMaintenancePlanPagedQuery.Code}%";
-                sqlBuilder.Where("Code LIKE @Code");
+                sqlBuilder.Where("emp.Code LIKE @Code");
             }
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Name))
             {
                 EquMaintenancePlanPagedQuery.Name = $"%{EquMaintenancePlanPagedQuery.Name}%";
-                sqlBuilder.Where("Name LIKE @Name");
+                sqlBuilder.Where("emp.Name LIKE @Name");
             }
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Version))
             {
                 EquMaintenancePlanPagedQuery.Version = $"%{EquMaintenancePlanPagedQuery.Version}%";
-                sqlBuilder.Where("Version LIKE @Version");
+                sqlBuilder.Where("emp.Version LIKE @Version");
             }
             if (EquMaintenancePlanPagedQuery.Status.HasValue)
             {
-                sqlBuilder.Where("Status=@Status");
+                sqlBuilder.Where("emp.Status=@Status");
             }
             if (EquMaintenancePlanPagedQuery.Type.HasValue)
             {
-                sqlBuilder.Where("Type=@Type");
+                sqlBuilder.Where("emp.Type=@Type");
             }
 
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.EquipmentCode))
@@ -137,12 +137,12 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.ExecutorIds))
             {
                 EquMaintenancePlanPagedQuery.ExecutorIds = $"%{EquMaintenancePlanPagedQuery.ExecutorIds}%";
-                sqlBuilder.Where("esper.ExecutorIds LIKE @ExecutorIds");
+                sqlBuilder.Where("emper.ExecutorIds LIKE @ExecutorIds");
             }
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.LeaderIds))
             {
                 EquMaintenancePlanPagedQuery.LeaderIds = $"%{EquMaintenancePlanPagedQuery.LeaderIds}%";
-                sqlBuilder.Where("esper.LeaderIds LIKE @LeaderIds");
+                sqlBuilder.Where("emper.LeaderIds LIKE @LeaderIds");
             }
 
 
@@ -224,7 +224,7 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
     {
         #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_plan` emp /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_Maintenance_plan` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_Maintenance_plan` emp /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/ ";
         const string GetEquMaintenancePlanEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `equ_Maintenance_plan` /**where**/  ";
