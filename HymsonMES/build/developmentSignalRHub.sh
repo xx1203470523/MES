@@ -3,7 +3,7 @@ PublishEnvironment=Debug
 timestamp=$(date +%Y%m%d%H%M%S)
 serviceName=hymson-mes-api-dev
 registryUrl=harbor.xnebula.com/new-energy
-imageName=hymson.mes.signalRHub
+imageName=hymson.mes.signalrhub
 docker build --build-arg PublishEnvironment=$PublishEnvironment -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.SignalRHub/Dockerfile .
 docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
 docker push $registryUrl/$imageName:$timestamp
