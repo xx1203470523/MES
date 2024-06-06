@@ -304,6 +304,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 queryDto.FeedingPointId = null;
 
                 // 2023.10.17 中越和产品说，需要再过滤一次，只要资源关联工序对应的物料（这个方法是有问题的，因为程序没有限制一个资源可以绑定多个工序）
+                //2024-06-06  已限制资源关联的工序
                 var procedureEntity = await _procProcedureRepository.GetProcProcedureByResourceIdAsync(new ProcProdureByResourceIdQuery
                 {
                     SiteId = _currentSite.SiteId ?? 0,

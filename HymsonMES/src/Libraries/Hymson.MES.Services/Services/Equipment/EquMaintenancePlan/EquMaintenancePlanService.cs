@@ -332,6 +332,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             }
 
             //DTO转换实体
+            EquMaintenancePlanModifyDto.Type = EquMaintenancePlanModifyDto.Type.HasValue ? EquMaintenancePlanModifyDto.Type : 0;
             var equMaintenancePlanEntity = EquMaintenancePlanModifyDto.ToEntity<EquMaintenancePlanEntity>();
             equMaintenancePlanEntity.UpdatedBy = _currentUser.UserName;
             equMaintenancePlanEntity.UpdatedOn = HymsonClock.Now();
