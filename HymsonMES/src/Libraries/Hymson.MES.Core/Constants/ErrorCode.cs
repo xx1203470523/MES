@@ -266,6 +266,8 @@
         public const string MES10535 = "载具没有绑定条码";
         public const string MES10536 = "功能类型【{Type}】+产品【{ProductCode}】+工序【{ProcedureCode}】+工艺设备组【{EquipmentGroupCode}】已存在，请重新输入！";
         public const string MES10537 = "功能类型【{Type}】+产品【{ProductCode}】+工序【{ProcedureCode}】+工艺设备组【{EquipmentGroupCode}】启用状态的已存在，请重新输入！";
+        public const string MES10538 = "工序编码【{Code}】不存在！";
+        public const string MES10539 = "工艺设备组编码【{Code}】不存在！";
         #endregion
 
         #region Bom 10600
@@ -979,7 +981,7 @@
         public const string MES15414 = "条码{sfcs}标识已取消,不能重复取消!";
         public const string MES15415 = "条码不存在";
         public const string MES15416 = "条码已经被锁定";
-        public const string MES15417 = "条码已报废";
+        public const string MES15417 = "条码未报废，不允许取消报废";
         public const string MES15418 = "条码工单未激活,无法返修";
         public const string MES15419 = "条码状态已经被更新，请刷新后再操作";
         public const string MES15420 = "返工工艺路线与条码工艺路线不能一致";
@@ -1853,7 +1855,7 @@
         public const string MES19115 = "产品编码不能为空";
         public const string MES19116 = "请维护产品编码：{Code}的编码规则";
         public const string MES19117 = "条码：{SFC}不存在";
-        public const string MES19118 = "产品编码：{Code}不存在";
+        public const string MES19118 = "产品编码：【{Code}】不存在";
         public const string MES19119 = "绑定条码列表不能为空";
         public const string MES19120 = "解绑条码列表不能为空";
         public const string MES19121 = "绑定条码：{SFC}和BindSFC：{BindSFC}绑定关系已经存在";
