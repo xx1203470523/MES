@@ -5,6 +5,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
     /// </summary>
     public class ManuSfcScrapQuery
     {
-    
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 条码信息表Id
+        /// </summary>
+        public IEnumerable<long>? SfcinfoIds { get; set; }
     }
 }
