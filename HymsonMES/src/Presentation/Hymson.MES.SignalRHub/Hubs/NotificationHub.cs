@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.SignalR;
 namespace Hymson.MES.SignalRHub.Hubs
 {
     [Authorize]
-    public class NotificationHub : Hub
+    public class NotificationHub : Hub<IChatClient>
     {
         public override async Task OnConnectedAsync()
         {
-            var name = Context?.User.Claims?.FirstOrDefault(c => c.Type == "name");
             await Groups.AddToGroupAsync(Context.ConnectionId, Context.User.Identity.Name);
             await base.OnConnectedAsync();
         }
@@ -21,7 +20,6 @@ namespace Hymson.MES.SignalRHub.Hubs
         }
 
         #region 给web界面发送信息
-        private const string _webListenMethod = "ReceiveMessage";
         /// <summary>
         /// 向指定群组发送信息
         /// </summary>
@@ -30,7 +28,7 @@ namespace Hymson.MES.SignalRHub.Hubs
         /// <returns></returns>
         public async Task SendMessageToGroupAsync(string groupName, ClientMessageDto message)
         {
-            await Clients.Group(groupName).SendAsync(_webListenMethod, message);
+            await Clients.Group(groupName).ReceiveMessage(message);
         }
 
         /// <summary>
@@ -41,12 +39,12 @@ namespace Hymson.MES.SignalRHub.Hubs
         /// <returns></returns>
         public async Task SendPrivateMessage(string user, ClientMessageDto message)
         {
-            await Clients.User(user).SendAsync(_webListenMethod, message);
+            await Clients.User(user).ReceiveMessage(message);
         }
 
         public async Task SendMessage(ClientMessageDto message)
         {
-            await Clients.All.SendAsync(_webListenMethod, message);
+            await Clients.All.ReceiveMessage(message);
         }
         #endregion
     }

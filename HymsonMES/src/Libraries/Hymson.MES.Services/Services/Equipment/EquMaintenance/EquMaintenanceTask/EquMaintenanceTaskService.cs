@@ -27,6 +27,8 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Elastic.Clients.Elasticsearch;
 using Hymson.MES.Core.Enums.Common;
+using System.Linq;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTask
 {
@@ -716,20 +718,26 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             var snapshotItem = await _equMaintenanceTaskSnapshotItemRepository.GetByIdsAsync(sampleDetailEntities.Select(x => x.MaintenanceItemSnapshotId).ToArray());
 
             //检验值是否为空
-            if (sampleDetailEntities.Any(x => string.IsNullOrEmpty(x.InspectionValue)))
+            if (sampleDetailEntities.Any(x => string.IsNullOrEmpty(x.InspectionValue) || x.IsQualified == TrueFalseEmptyEnum.Empty))
             {
-                var isEmptyValueList = sampleDetailEntities.Where(x => string.IsNullOrWhiteSpace(x.InspectionValue));
-                if (isEmptyValueList.Any())
+                var taskItemUnions = from a in sampleDetailEntities
+                                     join b in snapshotItem on a.MaintenanceItemSnapshotId equals b.Id
+                                     select new { b.Code, b.DataType, a.InspectionValue, a.IsQualified };
+
+                //验证数值类型是否为空
+                var emptyAndNumericsCodes = taskItemUnions.Where(x => string.IsNullOrWhiteSpace(x.InspectionValue) && x.DataType == EquMaintenanceDataTypeEnum.Numeric).Select(s => s.Code);
+                if (emptyAndNumericsCodes.Any())
                 {
-                    foreach (var item in isEmptyValueList)
-                    {
-                        var emptyValueSnapshotItem = snapshotItem.Where(x => x.Id == item.MaintenanceItemSnapshotId).FirstOrDefault();
-                        if (emptyValueSnapshotItem != null && emptyValueSnapshotItem.DataType == EquMaintenanceDataTypeEnum.Numeric)
-                        {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES15911));
-                        }
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15915)).WithData("Code", emptyAndNumericsCodes);
                 }
+
+                //验证合格是否处理
+                var unQualifiedCodes = taskItemUnions.Where(x => x.IsQualified == TrueFalseEmptyEnum.Empty).Select(s => s.Code);
+                if (unQualifiedCodes.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15914)).WithData("Code", string.Join(',', unQualifiedCodes));
+                }
+               
             }
 
             var operationType = EquMaintenanceOperationTypeEnum.Complete;

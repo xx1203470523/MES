@@ -479,6 +479,7 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedQuery = pagedQueryDto.ToQuery<QualMaterialUnqualifiedDataPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
+            var dtos = new List<QualMaterialUnqualifiedDataViewDto>();
             IEnumerable<QualMaterialUnqualifiedDataDetailEntity> detailEntities = new List<QualMaterialUnqualifiedDataDetailEntity>();
             if (pagedQuery.UnqualifiedGroupId.HasValue || pagedQuery.UnqualifiedCodeId.HasValue)
             {
@@ -487,12 +488,15 @@ namespace Hymson.MES.Services.Services.Quality
                     UnqualifiedGroupId = pagedQuery.UnqualifiedGroupId,
                     UnqualifiedCodeId = pagedQuery.UnqualifiedCodeId
                 });
+                if (!detailEntities.Any())
+                {
+                    return new PagedInfo<QualMaterialUnqualifiedDataViewDto>(dtos, pagedQueryDto.PageIndex, pagedQueryDto.PageSize, 0);
+                }
                 pagedQuery.Ids = detailEntities.Select(x => x.MaterialUnqualifiedDataId).ToList();
             }
             var pagedInfo = await _qualMaterialUnqualifiedDataRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = new List<QualMaterialUnqualifiedDataViewDto>();
             if (pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
                 return new PagedInfo<QualMaterialUnqualifiedDataViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);

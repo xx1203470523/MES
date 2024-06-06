@@ -58,6 +58,16 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 完成数量
         /// </summary>
         public decimal FinishProductQuantity { get; set; }
+
+        /// <summary>
+        /// 锁定数量
+        /// </summary>
+        public decimal LockQuantity { get; set; }
+
+        /// <summary>
+        /// 报废数量
+        /// </summary>
+        public decimal ScrapQuantity { get; set; }
     }
 
     /// <summary>
