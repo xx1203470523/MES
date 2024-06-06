@@ -11,6 +11,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -27,7 +28,9 @@ using Hymson.Snowflake;
 using Hymson.SqlActuator.Services;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
+using IdGen;
+using OfficeOpenXml.ConditionalFormatting;
+using Org.BouncyCastle.Crypto;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.Procedure
@@ -35,7 +38,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
     /// <summary>
     /// 工序表 服务
     /// </summary>
-    public partial class ProcProcedureService : IProcProcedureService
+    public class ProcProcedureService : IProcProcedureService
     {
         /// <summary>
         /// 当前登录用户对象
@@ -49,10 +52,6 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// 工序表 仓储
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
-        /// <summary>
-        /// 资源仓储
-        /// </summary>
-        private readonly IProcResourceRepository _resourceRepository;
         /// <summary>
         /// 资源类型仓储
         /// </summary>
@@ -90,11 +89,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// sql执行器
         /// </summary>
         private readonly ISqlExecuteTaskService _sqlExecuteTaskService;
-
-        /// <summary>
-        /// 参数收集仓储
-        /// </summary>
-        private readonly IManuProductParameterRepository _manuProductParameterRepository;
+        private readonly IManuProductParameterService _manuProductParameterService;
 
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcedureModifyDto> _validationModifyRules;
@@ -107,12 +102,15 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
 
         /// <summary>
+        /// 参数收集仓储
+        /// </summary>
+        private readonly IManuProductParameterRepository _manuProductParameterRepository;
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ProcProcedureService(
             ICurrentUser currentUser, ICurrentSite currentSite,
             IProcProcedureRepository procProcedureRepository,
-            IProcResourceRepository resourceRepository,
             IProcResourceTypeRepository resourceTypeRepository,
             IInteJobBusinessRelationRepository jobBusinessRelationRepository,
             IProcProcedurePrintRelationRepository procedurePrintRelationRepository,
@@ -120,16 +118,16 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             IInteJobRepository inteJobRepository,
             IProcLabelTemplateRepository procLabelTemplateRepository,
             IProcProductSetRepository procProductSetRepository,
-            IManuProductParameterRepository manuProductParameterRepository,
+            IManuProductParameterService manuProductParameterService,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
             IProcProcedureRejudgeRepository procProcedureRejudgeRepository,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
-            AbstractValidator<ProcProcedureModifyDto> validationModifyRules, ILocalizationService localizationService, ISqlExecuteTaskService sqlExecuteTaskService)
+            AbstractValidator<ProcProcedureModifyDto> validationModifyRules, ILocalizationService localizationService, ISqlExecuteTaskService sqlExecuteTaskService, IManuProductParameterRepository manuProductParameterRepository)
         {
+            _manuProductParameterRepository = manuProductParameterRepository;
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procProcedureRepository = procProcedureRepository;
-            _resourceRepository = resourceRepository;
             _resourceTypeRepository = resourceTypeRepository;
             _jobBusinessRelationRepository = jobBusinessRelationRepository;
             _procedurePrintRelationRepository = procedurePrintRelationRepository;
@@ -137,7 +135,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             _inteJobRepository = inteJobRepository;
             _procLabelTemplateRepository = procLabelTemplateRepository;
             _procProductSetRepository = procProductSetRepository;
-            _manuProductParameterRepository = manuProductParameterRepository;
+            _manuProductParameterService = manuProductParameterService;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
@@ -244,9 +242,9 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     SiteId = _currentSite.SiteId ?? 0,
                     ParentId = id
                 });
-                if (procProceduresList.Any())
+                if (procProceduresList != null && procProceduresList.Count() > 0)
                 {
-                    var markProcProcedure = procProceduresList.FirstOrDefault(x => x.ProcedureId == id && x.DefectType == RejudgeUnqualifiedCodeEnum.Mark);
+                    var markProcProcedure = procProceduresList.Where(x => x.ProcedureId == id && x.DefectType == RejudgeUnqualifiedCodeEnum.Mark).FirstOrDefault();
                     if (markProcProcedure != null)
                     {
                         var markQualUnqualifiedCode = await _qualUnqualifiedCodeRepository.GetByIdAsync(markProcProcedure.UnqualifiedCodeId);
@@ -258,7 +256,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         };
                     }
 
-                    var lastProcProcedure = procProceduresList.FirstOrDefault(x => x.ProcedureId == id && x.DefectType == RejudgeUnqualifiedCodeEnum.Last);
+                    var lastProcProcedure = procProceduresList.Where(x => x.ProcedureId == id && x.DefectType == RejudgeUnqualifiedCodeEnum.Last).FirstOrDefault();
                     if (lastProcProcedure != null)
                     {
                         var lastQualUnqualifiedCode = await _qualUnqualifiedCodeRepository.GetByIdAsync(lastProcProcedure.UnqualifiedCodeId);
@@ -439,15 +437,37 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         public async Task AddProcProcedureAsync(AddProcProcedureDto procProcedureCreateDto)
         {
             #region 验证
-            if (procProcedureCreateDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            if (procProcedureCreateDto.Procedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            if (procProcedureCreateDto == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+            if (procProcedureCreateDto.Procedure == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
 
             var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
             procProcedureCreateDto.Procedure.Code = procProcedureCreateDto.Procedure.Code.ToTrimSpace().ToUpperInvariant();
             procProcedureCreateDto.Procedure.Name = procProcedureCreateDto.Procedure.Name.Trim();
-
-            // 验证DTO
+            procProcedureCreateDto.Procedure.Remark = procProcedureCreateDto.Procedure.Remark.Trim();
+            if (procProcedureCreateDto.Procedure.IsRejudges)
+            {
+                procProcedureCreateDto.Procedure.IsRejudge = TrueOrFalseEnum.Yes;
+            }
+            else
+            {
+                procProcedureCreateDto.Procedure.IsRejudge = TrueOrFalseEnum.No;
+            }
+            if (procProcedureCreateDto.Procedure.IsValidNGCodes)
+            {
+                procProcedureCreateDto.Procedure.IsValidNGCode = TrueOrFalseEnum.Yes;
+            }
+            else
+            {
+                procProcedureCreateDto.Procedure.IsValidNGCode = TrueOrFalseEnum.No;
+            }
+            //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procProcedureCreateDto.Procedure);
 
             var code = procProcedureCreateDto.Procedure.Code;
@@ -462,7 +482,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
             #endregion
 
-            // DTO转换实体
+            //DTO转换实体
             var procProcedureEntity = procProcedureCreateDto.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.Id = IdGenProvider.Instance.CreateId();
             procProcedureEntity.Code = code;
@@ -471,9 +491,51 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             procProcedureEntity.UpdatedBy = userName;
             procProcedureEntity.Status = SysDataStatusEnum.Build;
 
+            //工序复判设置
+            List<ProcProcedureRejudgeEntity> procProcedureRejudgeList = new List<ProcProcedureRejudgeEntity>();
+            var firstUndesirableList = procProcedureCreateDto.Procedure.FirstUndesirableId;
+            if (firstUndesirableList != null && firstUndesirableList.Count > 0)
+            {
+                foreach (var item in firstUndesirableList)
+                {
+                    ProcProcedureRejudgeEntity procedureRejudgeEntity = new ProcProcedureRejudgeEntity();
+                    procedureRejudgeEntity.ProcedureId = procProcedureEntity.Id;
+                    procedureRejudgeEntity.Id = IdGenProvider.Instance.CreateId();
+                    procedureRejudgeEntity.UnqualifiedCodeId = item.Id;
+                    procedureRejudgeEntity.SiteId = siteId;
+                    procedureRejudgeEntity.DefectType = RejudgeUnqualifiedCodeEnum.Block;
+                    procedureRejudgeEntity.CreatedBy = userName;
+                    procedureRejudgeEntity.UpdatedBy = userName;
+                    procProcedureRejudgeList.Add(procedureRejudgeEntity);
+                }
+            }
+            if (procProcedureCreateDto.Procedure.MarkId.HasValue && procProcedureCreateDto.Procedure.MarkId > 0)
+            {
+                ProcProcedureRejudgeEntity procedureRejudgeEntity = new ProcProcedureRejudgeEntity();
+                procedureRejudgeEntity.ProcedureId = procProcedureEntity.Id;
+                procedureRejudgeEntity.Id = IdGenProvider.Instance.CreateId();
+                procedureRejudgeEntity.UnqualifiedCodeId = procProcedureCreateDto.Procedure.MarkId.Value;
+                procedureRejudgeEntity.SiteId = siteId;
+                procedureRejudgeEntity.DefectType = RejudgeUnqualifiedCodeEnum.Mark;
+                procedureRejudgeEntity.CreatedBy = userName;
+                procedureRejudgeEntity.UpdatedBy = userName;
+                procProcedureRejudgeList.Add(procedureRejudgeEntity);
+            }
+            if (procProcedureCreateDto.Procedure.DefectId.HasValue && procProcedureCreateDto.Procedure.DefectId > 0)
+            {
+                ProcProcedureRejudgeEntity procedureRejudgeEntity = new ProcProcedureRejudgeEntity();
+                procedureRejudgeEntity.ProcedureId = procProcedureEntity.Id;
+                procedureRejudgeEntity.Id = IdGenProvider.Instance.CreateId();
+                procedureRejudgeEntity.UnqualifiedCodeId = procProcedureCreateDto.Procedure.DefectId.Value;
+                procedureRejudgeEntity.SiteId = siteId;
+                procedureRejudgeEntity.DefectType = RejudgeUnqualifiedCodeEnum.Last;
+                procedureRejudgeEntity.CreatedBy = userName;
+                procedureRejudgeEntity.UpdatedBy = userName;
+                procProcedureRejudgeList.Add(procedureRejudgeEntity);
+            }
             var validationFailures = new List<ValidationFailure>();
-            // 打印
-            List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new();
+            //打印
+            List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new List<ProcProcedurePrintRelationEntity>();
             if (procProcedureCreateDto.ProcedurePrintList != null && procProcedureCreateDto.ProcedurePrintList.Count > 0)
             {
                 int i = 0;
@@ -512,8 +574,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
             }
 
-            // job
-            List<InteJobBusinessRelationEntity> procedureConfigJobList = new();
+            //job
+            List<InteJobBusinessRelationEntity> procedureConfigJobList = new List<InteJobBusinessRelationEntity>();
             if (procProcedureCreateDto.ProcedureJobList != null && procProcedureCreateDto.ProcedureJobList.Count > 0)
             {
                 int index = 1;
@@ -557,7 +619,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         continue;
                     }
 
-                    procedureConfigJobList.Add(new InteJobBusinessRelationEntity
+                    var relationEntity = new InteJobBusinessRelationEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
@@ -571,9 +633,9 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         SiteId = siteId,
                         CreatedBy = userName,
                         UpdatedBy = userName
-                    });
-
+                    };
                     index++;
+                    procedureConfigJobList.Add(relationEntity);
                 }
             }
 
@@ -582,45 +644,54 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 throw new ValidationException(_localizationService.GetResource(nameof(ErrorCode.MES10107)), validationFailures);
             }
 
-            // productSet
-            List<ProcProductSetEntity> productSetList = new();
+            //productSet
+            List<ProcProductSetEntity> productSetList = new List<ProcProductSetEntity>();
             if (procProcedureCreateDto.ProductSetList != null && procProcedureCreateDto.ProductSetList.Count > 0)
             {
-                productSetList.AddRange(procProcedureCreateDto.ProductSetList.Select(s => new ProcProductSetEntity
+                foreach (var item in procProcedureCreateDto.ProductSetList)
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    ProductId = s.ProductId,
-                    SetPointId = procProcedureEntity.Id,
-                    SemiProductId = s.SemiProductId,
-                    SiteId = siteId,
-                    CreatedBy = userName,
-                    UpdatedBy = userName
-                }));
+                    var relationEntity = new ProcProductSetEntity();
+                    relationEntity.Id = IdGenProvider.Instance.CreateId();
+                    relationEntity.ProductId = item.ProductId;
+                    relationEntity.SetPointId = procProcedureEntity.Id;
+                    relationEntity.SemiProductId = item.SemiProductId;
+                    relationEntity.SiteId = siteId;
+                    relationEntity.CreatedBy = userName;
+                    relationEntity.UpdatedBy = userName;
+                    productSetList.Add(relationEntity);
+                }
             }
-
             var createProductParameterProcedureCodeTableSql = _manuProductParameterRepository.PrepareProductParameterProcedureIdTableSql(siteId, procProcedureEntity.Id);
-            using TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
-            // 保存
-            await _procProcedureRepository.InsertAsync(procProcedureEntity);
 
-            if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
             {
-                await _procedurePrintRelationRepository.InsertRangeAsync(procedureConfigPrintList);
+                //入库
+                await _procProcedureRepository.InsertAsync(procProcedureEntity);
+
+                if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
+                {
+                    await _procedurePrintRelationRepository.InsertRangeAsync(procedureConfigPrintList);
+                }
+
+                if (procedureConfigJobList != null && procedureConfigJobList.Count > 0)
+                {
+                    await _jobBusinessRelationRepository.InsertRangeAsync(procedureConfigJobList);
+                }
+
+                if (productSetList != null && productSetList.Count > 0)
+                {
+                    await _procProductSetRepository.InsertsAsync(productSetList);
+                }
+
+                if (procProcedureRejudgeList != null && procProcedureRejudgeList.Count > 0)
+                {
+                    await _procProcedureRejudgeRepository.InsertRangeAsync(procProcedureRejudgeList);
+                }
+                await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER_PARAMETER, createProductParameterProcedureCodeTableSql, userName);
+                //提交
+                ts.Complete();
             }
 
-            if (procedureConfigJobList != null && procedureConfigJobList.Count > 0)
-            {
-                await _jobBusinessRelationRepository.InsertRangeAsync(procedureConfigJobList);
-            }
-
-            if (productSetList != null && productSetList.Count > 0)
-            {
-                await _procProductSetRepository.InsertsAsync(productSetList);
-            }
-
-            await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER_PARAMETER, createProductParameterProcedureCodeTableSql, userName);
-            // 提交
-            ts.Complete();
         }
 
         /// <summary>
@@ -630,32 +701,54 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <returns></returns>
         public async Task UpdateProcProcedureAsync(UpdateProcProcedureDto procProcedureModifyDto)
         {
-            #region 验证
-            if (procProcedureModifyDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-
+            #region
+            if (procProcedureModifyDto == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
             var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
 
             procProcedureModifyDto.Procedure.Name = procProcedureModifyDto.Procedure.Name.Trim();
-            // 验证DTO
+            procProcedureModifyDto.Procedure.Remark = procProcedureModifyDto.Procedure.Remark.Trim();
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procProcedureModifyDto.Procedure);
 
             var procProcedureEntityOld = await _procProcedureRepository.GetByIdAsync(procProcedureModifyDto.Procedure.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10406));
-
-            // 验证某些状态是不能编辑的
+            //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
-            if (!canEditStatusEnum.Any(x => x == procProcedureEntityOld.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES10129));
+            if (!canEditStatusEnum.Any(x => x == procProcedureEntityOld.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
+            }
             #endregion
 
-            // DTO转换实体
+            if (procProcedureModifyDto.Procedure.IsRejudges)
+            {
+                procProcedureModifyDto.Procedure.IsRejudge = TrueOrFalseEnum.Yes;
+            }
+            else
+            {
+                procProcedureModifyDto.Procedure.IsRejudge = TrueOrFalseEnum.No;
+            }
+            if (procProcedureModifyDto.Procedure.IsValidNGCodes)
+            {
+                procProcedureModifyDto.Procedure.IsValidNGCode = TrueOrFalseEnum.Yes;
+            }
+            else
+            {
+                procProcedureModifyDto.Procedure.IsValidNGCode = TrueOrFalseEnum.No;
+            }
+
+            //DTO转换实体
             var procProcedureEntity = procProcedureModifyDto.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.UpdatedBy = _currentUser.UserName;
 
-            // TODO 现在关联表批量删除批量新增，后面再修改
-            // 打印
+            //TODO 现在关联表批量删除批量新增，后面再修改
+            //打印
 
             var validationFailures = new List<ValidationFailure>();
-            List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new();
+            List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new List<ProcProcedurePrintRelationEntity>();
             if (procProcedureModifyDto.ProcedurePrintList != null && procProcedureModifyDto.ProcedurePrintList.Count > 0)
             {
                 int i = 0;
@@ -693,8 +786,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
             }
 
-            // job
-            List<InteJobBusinessRelationEntity> procedureConfigJobList = new();
+            //job
+            List<InteJobBusinessRelationEntity> procedureConfigJobList = new List<InteJobBusinessRelationEntity>();
             if (procProcedureModifyDto.ProcedureJobList != null && procProcedureModifyDto.ProcedureJobList.Count > 0)
             {
                 int index = 1;
@@ -762,47 +855,102 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             {
                 throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
             }
-
-            // productSet
-            List<ProcProductSetEntity> productSetList = new();
+            //productSet
+            List<ProcProductSetEntity> productSetList = new List<ProcProductSetEntity>();
             if (procProcedureModifyDto.ProductSetList != null && procProcedureModifyDto.ProductSetList.Count > 0)
             {
-                productSetList.AddRange(procProcedureModifyDto.ProductSetList.Select(s => new ProcProductSetEntity
+                foreach (var item in procProcedureModifyDto.ProductSetList)
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    ProductId = s.ProductId,
-                    SetPointId = procProcedureEntity.Id,
-                    SemiProductId = s.SemiProductId,
-                    SiteId = siteId,
-                    CreatedBy = userName,
-                    UpdatedBy = userName
-                }));
+                    var relationEntity = new ProcProductSetEntity();
+                    relationEntity.Id = IdGenProvider.Instance.CreateId();
+                    relationEntity.ProductId = item.ProductId;
+                    relationEntity.SetPointId = procProcedureEntity.Id;
+                    relationEntity.SemiProductId = item.SemiProductId;
+                    relationEntity.SiteId = siteId;
+                    relationEntity.CreatedBy = userName;
+                    relationEntity.UpdatedBy = userName;
+                    productSetList.Add(relationEntity);
+                }
             }
 
-            using TransactionScope ts = TransactionHelper.GetTransactionScope();
-            // 保存
-            await _procProcedureRepository.UpdateAsync(procProcedureEntity);
-
-            await _procedurePrintRelationRepository.DeleteByProcedureIdAsync(procProcedureEntity.Id);
-            if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
+            List<RejudgeUnqualifiedCodeEnum> ids = new List<RejudgeUnqualifiedCodeEnum>();
+            //工序复判设置
+            List<ProcProcedureRejudgeEntity> procProcedureRejudgeList = new List<ProcProcedureRejudgeEntity>();
+            var firstUndesirableList = procProcedureModifyDto.Procedure.FirstUndesirableId;
+            if (firstUndesirableList != null && firstUndesirableList.Count > 0)
             {
-                await _procedurePrintRelationRepository.InsertRangeAsync(procedureConfigPrintList);
+                foreach (var item in firstUndesirableList)
+                {
+                    ProcProcedureRejudgeEntity procedureRejudgeEntity = new ProcProcedureRejudgeEntity();
+                    procedureRejudgeEntity.ProcedureId = procProcedureEntity.Id;
+                    procedureRejudgeEntity.Id = IdGenProvider.Instance.CreateId();
+                    procedureRejudgeEntity.UnqualifiedCodeId = item.Id;
+                    procedureRejudgeEntity.SiteId = siteId;
+                    procedureRejudgeEntity.DefectType = RejudgeUnqualifiedCodeEnum.Block;
+                    procedureRejudgeEntity.CreatedBy = userName;
+                    procedureRejudgeEntity.UpdatedBy = userName;
+                    procProcedureRejudgeList.Add(procedureRejudgeEntity);
+                }
+                ids.Add(RejudgeUnqualifiedCodeEnum.Block);
             }
-
-            await _jobBusinessRelationRepository.DeleteByBusinessIdAsync(procProcedureEntity.Id);
-            if (procedureConfigJobList != null && procedureConfigJobList.Count > 0)
+            if (procProcedureModifyDto.Procedure.MarkId.HasValue && procProcedureModifyDto.Procedure.MarkId > 0)
             {
-                await _jobBusinessRelationRepository.InsertRangeAsync(procedureConfigJobList);
+                ProcProcedureRejudgeEntity procedureRejudgeEntity = new ProcProcedureRejudgeEntity();
+                procedureRejudgeEntity.ProcedureId = procProcedureEntity.Id;
+                procedureRejudgeEntity.Id = IdGenProvider.Instance.CreateId();
+                procedureRejudgeEntity.UnqualifiedCodeId = procProcedureModifyDto.Procedure.MarkId.Value;
+                procedureRejudgeEntity.SiteId = siteId;
+                procedureRejudgeEntity.DefectType = RejudgeUnqualifiedCodeEnum.Mark;
+                procedureRejudgeEntity.CreatedBy = userName;
+                procedureRejudgeEntity.UpdatedBy = userName;
+                procProcedureRejudgeList.Add(procedureRejudgeEntity);
+                ids.Add(RejudgeUnqualifiedCodeEnum.Mark);
             }
-
-            await _procProductSetRepository.DeleteBySetPointIdAsync(procProcedureEntity.Id);
-            if (productSetList != null && productSetList.Count > 0)
+            if (procProcedureModifyDto.Procedure.DefectId.HasValue && procProcedureModifyDto.Procedure.DefectId > 0)
             {
-                await _procProductSetRepository.InsertsAsync(productSetList);
+                ProcProcedureRejudgeEntity procedureRejudgeEntity = new ProcProcedureRejudgeEntity();
+                procedureRejudgeEntity.ProcedureId = procProcedureEntity.Id;
+                procedureRejudgeEntity.Id = IdGenProvider.Instance.CreateId();
+                procedureRejudgeEntity.UnqualifiedCodeId = procProcedureModifyDto.Procedure.DefectId.Value;
+                procedureRejudgeEntity.SiteId = siteId;
+                procedureRejudgeEntity.DefectType = RejudgeUnqualifiedCodeEnum.Last;
+                procedureRejudgeEntity.CreatedBy = userName;
+                procedureRejudgeEntity.UpdatedBy = userName;
+                procProcedureRejudgeList.Add(procedureRejudgeEntity);
+                ids.Add(RejudgeUnqualifiedCodeEnum.Last);
             }
 
-            // 提交
-            ts.Complete();
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                //入库
+                await _procProcedureRepository.UpdateAsync(procProcedureEntity);
+
+                await _procedurePrintRelationRepository.DeleteByProcedureIdAsync(procProcedureEntity.Id);
+                if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
+                {
+                    await _procedurePrintRelationRepository.InsertRangeAsync(procedureConfigPrintList);
+                }
+
+                await _jobBusinessRelationRepository.DeleteByBusinessIdAsync(procProcedureEntity.Id);
+                if (procedureConfigJobList != null && procedureConfigJobList.Count > 0)
+                {
+                    await _jobBusinessRelationRepository.InsertRangeAsync(procedureConfigJobList);
+                }
+
+                await _procProductSetRepository.DeleteBySetPointIdAsync(procProcedureEntity.Id);
+                if (productSetList != null && productSetList.Count > 0)
+                {
+                    await _procProductSetRepository.InsertsAsync(productSetList);
+                }
+
+                await _procProcedureRejudgeRepository.DeleteByParentIdAndDefectTypeAsync(procProcedureEntity.Id, ids.ToArray());
+                if (procProcedureRejudgeList != null && procProcedureRejudgeList.Count > 0)
+                {
+                    await _procProcedureRejudgeRepository.InsertRangeAsync(procProcedureRejudgeList);
+                }
+                //提交
+                ts.Complete();
+            }
         }
 
         /// <summary>
@@ -916,5 +1064,6 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         }
 
         #endregion
+
     }
 }

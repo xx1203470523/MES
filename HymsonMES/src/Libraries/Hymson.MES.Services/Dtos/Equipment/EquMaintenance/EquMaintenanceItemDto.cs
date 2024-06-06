@@ -65,6 +65,10 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 单位ID;inte_unit表的Id
         /// </summary>
         public long? UnitId { get; set; }
+        /// <summary>
+        /// 单位编码
+        /// </summary>
+        public string? Unit { get; set; }
 
         /// <summary>
         /// 操作内容

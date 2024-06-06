@@ -175,7 +175,7 @@ namespace Hymson.MES.Services.Services.Integrated
             return workCenters.Select(s => new SelectOptionDto
             {
                 Key = $"{s.Id}",
-                Label = s.Code,
+                Label = $"【{s.Code}】 {s.Name}",
                 Value = $"{s.Id}"
             });
         }

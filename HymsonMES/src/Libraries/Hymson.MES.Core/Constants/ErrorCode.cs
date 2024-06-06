@@ -2144,6 +2144,8 @@
         public const string MES15911 = "含有数值类型，需要先保存才能执行完成";
         public const string MES15912 = "当前时间,未到点检计划开始时间{time}";
         public const string MES15913 = "当前时间,已超过点检计划结束时间{time}";
+        public const string MES15914 = "项目编码{Code},合格状态不能为无！";
+        public const string MES15915 = "项目编码{Code},数值类型不能为空！";
 
 
         //点检保养项目
@@ -2151,6 +2153,7 @@
         public const string MES15921 = "已被设备点检模板{Code}引用！";
         public const string MES15922 = "延期时间不允许为空";
         public const string MES15923 = "延期失败,计划结束时间需大于当前时间，请将开始时间设置于{time}之后！";
+        public const string MES15924 = "单位编码{Code}不存在，请选择或输入正确单位编码";
 
 
         #endregion

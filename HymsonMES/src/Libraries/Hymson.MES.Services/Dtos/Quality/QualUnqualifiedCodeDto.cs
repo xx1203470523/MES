@@ -132,6 +132,24 @@ namespace Hymson.MES.Services.Dtos.Quality
         public DateTime? UpdatedOn { get; set; }
     }
 
+
+    public record QualUnqualifiedCodeResultDto
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public string UnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不合格代码名称
+        /// </summary>
+        public string UnqualifiedCodeName { get; set; }
+    }
     /// <summary>
     /// 不合格代码新增Dto
     /// @author wangkeming
