@@ -2,12 +2,14 @@ using AutoMapper.Execution;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
@@ -19,6 +21,7 @@ using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
@@ -26,6 +29,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 
 using OfficeOpenXml;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Policy;
 using System.Text;
@@ -449,6 +453,21 @@ namespace Hymson.MES.Services.Services.Quality
             var detailCommands = Enumerable.Empty<QualFqcParameterGroupDetailEntity>();
             if (updateDto.qualFqcParameterGroupDetailDtos != null && updateDto.qualFqcParameterGroupDetailDtos.Any())
             {
+                //检测导入数据是否重复
+                var repeats = new List<string>();
+                //检验重复  目前只设定检验 参数编码 是否重复
+                var hasDuplicates = updateDto.qualFqcParameterGroupDetailDtos.GroupBy(x => new { x.ParameterCode });
+                foreach (var item in hasDuplicates)
+                {
+                    if (item.Count() > 1)
+                    {
+                        repeats.Add(item.Key.ParameterCode ?? "");
+                    }
+                }
+                if (repeats.Any())
+                {
+                    throw new CustomerValidationException("{repeats}相关的编码重复").WithData("repeats", string.Join(",", repeats));
+                }
                 detailCommands = updateDto.qualFqcParameterGroupDetailDtos.Select(m =>
                 {
                     var detailCommand = new QualFqcParameterGroupDetailEntity()
