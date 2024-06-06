@@ -31,6 +31,7 @@ using Hymson.Utils.Tools;
 using IdGen;
 using OfficeOpenXml.ConditionalFormatting;
 using Org.BouncyCastle.Crypto;
+using System.Security.AccessControl;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.Procedure
@@ -480,6 +481,12 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10405)).WithData("Code", procProcedureCreateDto.Procedure.Code);
             }
+            //资源类型验证 
+            var procProcedures = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery { SiteId = siteId, ResourceTypeId = procProcedureCreateDto.Procedure.ResourceTypeId });
+            if (procProcedures != null && procProcedures.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10413)).WithData("Code", procProcedures.FirstOrDefault()?.Code ?? "");
+            }
             #endregion
 
             //DTO转换实体
@@ -720,6 +727,13 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             if (!canEditStatusEnum.Any(x => x == procProcedureEntityOld.Status))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10129));
+            }
+
+            //资源类型验证  
+            var procProcedures = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery { SiteId = siteId, ResourceTypeId = procProcedureModifyDto.Procedure.ResourceTypeId });
+            if (procProcedures != null && procProcedures.Any(it => it.Id != procProcedureModifyDto.Procedure.Id))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10413)).WithData("Code", procProcedures.Where(it => it.Id != procProcedureModifyDto.Procedure.Id).FirstOrDefault()?.Code ?? "");
             }
             #endregion
 

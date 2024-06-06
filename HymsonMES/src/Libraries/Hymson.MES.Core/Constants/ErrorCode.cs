@@ -173,6 +173,7 @@
         public const string MES10410 = "作业关联点不合法，请检查！";
         public const string MES10411 = "关联物料不能为空，请检查！";
         public const string MES10412 = "作业参数不能为空！";
+        public const string MES10413 = "资源类型已被{Code}工序绑定"; 
 
         public const string MES10430 = $"不能删除启用和保留状态的工艺路线！";
         public const string MES10431 = $"此工艺路线在系统中已经存在!";

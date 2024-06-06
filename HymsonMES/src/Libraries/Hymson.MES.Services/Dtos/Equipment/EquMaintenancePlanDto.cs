@@ -247,7 +247,7 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
         /// <summary>
         /// 点检类型;天/小时
         /// </summary>
-        public EquipmentMaintenanceTypeEnum Type { get; set; }
+        public EquipmentMaintenanceTypeEnum? Type { get; set; } = 0;
 
         /// <summary>
         /// 点检计划状态
@@ -376,7 +376,7 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
         /// <summary>
         /// 设备Id
         /// </summary>
-        public IEnumerable<long> Ids { get; set; } 
+        public IEnumerable<long> Ids { get; set; }
     }
 
     #region  关联信息
