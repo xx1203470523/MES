@@ -38,6 +38,8 @@ using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
+using Hymson.MES.Data.Repositories.Marking.Query;
+using Hymson.MES.Data.Repositories.Marking;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Plan.Query;
@@ -61,6 +63,7 @@ using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionTail.View;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
 using Hymson.MES.Data.Repositories.Query;
+using Hymson.MES.Data.Repositories.Report.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Data.Repositories.WhShipment.Query;
@@ -88,6 +91,7 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
+using Hymson.MES.Services.Dtos.Marking;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -1336,6 +1340,17 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<NodeSourceBo, NodeSourceDto>();
             CreateMap<WorkOrderControlReportOptimizePagedQueryDto, PlanWorkOrderPagedQuery>();
+
+            #region ManuDowngradingDetailReport
+            CreateMap<ManuDowngradingDetailReportPagedQueryDto, ManuDowngradingDetailReportPagedQuery>();
+            #endregion
+
+            CreateMap<VehicleFreightRecordQueryDto, InteVehicleFreightRecordPagedQuery>();
+
+            #region MarkingInterceptReport
+            CreateMap<MarkingInterceptReportPagedQueryDto, MarkingReportReportPagedQuery>();
+            CreateMap<MarkingRecordQueryReportView, MarkingRecordReportDto>();
+            #endregion
         }
 
         /// <summary>
