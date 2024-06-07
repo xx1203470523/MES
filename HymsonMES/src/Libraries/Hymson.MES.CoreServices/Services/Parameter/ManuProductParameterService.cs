@@ -162,6 +162,10 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                     UpdatedOn = bo.Time
                 }));
             }
+            if(list == null || list.Count == 0)
+            {
+                return 0;
+            }
 
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.RequiresNew);
             var row = await _manuProductParameterRepository.InsertRangeAsync(list);
