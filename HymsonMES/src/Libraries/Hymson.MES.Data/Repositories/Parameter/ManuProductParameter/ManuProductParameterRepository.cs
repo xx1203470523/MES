@@ -4,6 +4,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
+using Hymson.Utils;
 using Microsoft.Extensions.Options;
 using System.Text;
 using static Dapper.SqlMapper;
@@ -42,6 +43,11 @@ namespace Hymson.MES.Data.Repositories.Parameter
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<ManuProductParameterEntity> list)
         {
+            if(list == null || list.Count() == 0)
+            {
+                return 0;
+            }
+
             var dic = new Dictionary<string, List<ManuProductParameterEntity>>();
 
             foreach (var entity in list)
