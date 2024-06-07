@@ -145,7 +145,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 SiteId = multiSFCBo.SiteId,
                 SFCs = multiSFCBo.SFCs,
-                Type = SfcTypeEnum.Produce
+                //Type = SfcTypeEnum.Produce
             });
 
             var resourceEntity = await _procResourceRepository.GetByIdAsync(commonBo.ResourceId)
