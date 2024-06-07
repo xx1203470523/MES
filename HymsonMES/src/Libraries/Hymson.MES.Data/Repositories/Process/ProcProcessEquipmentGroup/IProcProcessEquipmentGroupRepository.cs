@@ -89,5 +89,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<ProcProcessEquipmentGroupEntity> GetByCodeAsync(EntityByCodeQuery query);
 
+        Task<IEnumerable<ProcEquipmentGroupParamEntity>> GetByCodesAsync(ProcProcessEquipmentGroupByCodeQuery param);
     }
 }

@@ -35,7 +35,6 @@ namespace Hymson.MES.SignalRHub
             builder.Services.AddClearCacheService(builder.Configuration);
             builder.Services.AddNLog(builder.Configuration);
             builder.Services.AddEventBusRabbitMQService(builder.Configuration);
-            builder.Services.AddSignalR();
             builder.Services.AddSignalRStackExchangeRedis(builder.Configuration);
             builder.Services.AddHostedService<SubHostedService>();
 

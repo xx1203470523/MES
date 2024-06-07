@@ -40,10 +40,10 @@ namespace Hymson.MES.Api
             ILanguageRepository languageRepository)
         {
             _logger = logger;
-            //_resourceService = resourceService;
-            //_clearCacheService = clearCacheService;
-            //_resourceRepository = resourceRepository;
-            //_languageRepository = languageRepository;
+            _resourceService = resourceService;
+            _clearCacheService = clearCacheService;
+            _resourceRepository = resourceRepository;
+            _languageRepository = languageRepository;
         }
 
 
@@ -60,10 +60,10 @@ namespace Hymson.MES.Api
                  ServiceTypeEnum.User,
                  ServiceTypeEnum.MES
                 }, stoppingToken);
-                await _resourceService.InitEnumAsync();
-                await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
-                await InitExcelDtoAsync();
-                await _resourceService.HotLoadingAsync();
+                //await _resourceService.InitEnumAsync();
+                //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
+                //await InitExcelDtoAsync();
+                //await _resourceService.HotLoadingAsync();
 
             }
             catch (Exception e)
