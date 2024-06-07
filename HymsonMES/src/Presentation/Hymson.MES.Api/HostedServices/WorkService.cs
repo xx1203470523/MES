@@ -40,10 +40,10 @@ namespace Hymson.MES.Api
             ILanguageRepository languageRepository)
         {
             _logger = logger;
-            //_resourceService = resourceService;
-            //_clearCacheService = clearCacheService;
-            //_resourceRepository = resourceRepository;
-            //_languageRepository = languageRepository;
+            _resourceService = resourceService;
+            _clearCacheService = clearCacheService;
+            _resourceRepository = resourceRepository;
+            _languageRepository = languageRepository;
         }
 
 
