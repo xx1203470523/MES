@@ -750,15 +750,16 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SiteId = _currentSite.SiteId ?? 0,
                 BarCodes = adjustDto.SFCs
             });
-            if (oldWhMEntirty != null)
+
+            if (oldWhMEntirty.Any())
             {
                 if (oldWhMEntirty.Count() != adjustDto.SFCs.Count())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15134));
                 }
-            }
 
-            oldWhMEntirty = oldWhMEntirty.Where(x => x.Status == WhMaterialInventoryStatusEnum.ToBeUsed);
+                oldWhMEntirty = oldWhMEntirty.Where(x => x.Status == WhMaterialInventoryStatusEnum.ToBeUsed);
+            }           
 
             if (oldWhMEntirty.Count() == 0)
             {
@@ -783,15 +784,21 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             if (adjustDto.MergeSFC != null || !string.IsNullOrWhiteSpace(adjustDto.MergeSFC))
             {
+                //校验是否为合并列表中
+                bool isExist = adjustDto.SFCs.Any(x => x.Contains(adjustDto.MergeSFC));
+                if (!isExist)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15135));
+                }
                 IsMergeSFC = true;
+                returnSFC = adjustDto.MergeSFC;
             }
 
             //指定父条码
             if (IsMergeSFC)
             {
-                returnSFC = adjustDto.MergeSFC;
+               
                 var newEntity = oldWhMEntirty.Where(w => w.MaterialBarCode == adjustDto.MergeSFC).FirstOrDefault();
-
 
                 foreach (var entity in oldWhMEntirty)
                 {
@@ -1002,14 +1009,11 @@ namespace Hymson.MES.Services.Services.Warehouse
                     {
                         await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(updateSFCOtherCommand);
                     }
+
                     //更新指定SFC
                     if (updateSFCSpecifyCommand.SFCs != null)
                     {
                         await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(updateSFCSpecifyCommand);
-                        //if (row == 0)
-                        //{
-                        //    throw new CustomerValidationException(nameof(ErrorCode.MES12832));
-                        //}
                     }
 
                     //INVENTORY UPDATE

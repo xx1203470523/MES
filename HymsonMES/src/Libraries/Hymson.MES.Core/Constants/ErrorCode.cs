@@ -910,6 +910,7 @@
         public const string MES15132 = "{type}编码规则被维护多条！";
         public const string MES15133 = "待拆分数量不能填写小数!";
         public const string MES15134 = "物料仓库有重复的条码或与当前条码无法匹配，导致无法正常记录物料台账!";
+        public const string MES15135 = "指定条码错误，不在合并的条码中";
         #endregion
 
         #region 物料台账 15200
