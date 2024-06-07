@@ -26,6 +26,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
+using Hymson.MES.Data.Repositories.Equipment.Qkny;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Data.Repositories.Inte;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -1300,6 +1301,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanShiftEntity, PlanShiftDto>();
 
             #endregion
+
+            #region ManuEquipmentStatusTime
+
+            CreateMap<ManuEquipmentStatusReportView, ManuEquipmentStatusReportViewDto>();
+            #endregion 
         }
 
         /// <summary>

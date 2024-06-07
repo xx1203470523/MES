@@ -12,5 +12,15 @@ namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime.Query
         /// </summary>
         public long SiteId { get; set; }
 
+        /// <summary>
+        /// 工作中心名称
+        /// </summary>
+        public long? WorkCenterId { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
     }
 }

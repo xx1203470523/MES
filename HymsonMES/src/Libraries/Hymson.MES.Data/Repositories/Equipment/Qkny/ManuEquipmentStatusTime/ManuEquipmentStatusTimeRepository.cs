@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.ManuEquipmentStatusTime;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.Qkny;
 using Hymson.MES.Data.Repositories.ManuEquipmentStatusTime.Query;
 using Microsoft.Extensions.Options;
 
@@ -125,15 +126,25 @@ namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuEquipmentStatusTimeEntity>> GetPagedListAsync(ManuEquipmentStatusTimePagedQuery pagedQuery)
+        public async Task<PagedInfo<ManuEquipmentStatusReportView>> GetPagedListAsync(ManuEquipmentStatusTimePagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
-            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            var templateData = sqlBuilder.AddTemplate(manuEquipmentStatusSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(manuEquipmentStatusCountSqlTemplat);
+       
+            sqlBuilder.Where("ee.SiteId = @SiteId");
+            sqlBuilder.Where("ee.IsDeleted = 0");
+            sqlBuilder.Where("es.CurrentStatus IS NOT NULL");
+            sqlBuilder.OrderBy(" es.UpdatedOn DESC");
+
+            if (pagedQuery.WorkCenterId.HasValue)
+            {
+                sqlBuilder.Where(" iwc.Id= @WorkCenterId ");
+            }
+            if (pagedQuery.EquipmentId.HasValue)
+            {
+                sqlBuilder.Where(" ee.Id = @EquipmentId ");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -141,13 +152,13 @@ namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<ManuEquipmentStatusTimeEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<ManuEquipmentStatusReportView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ManuEquipmentStatusTimeEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<ManuEquipmentStatusReportView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
     }
 
 
@@ -171,6 +182,27 @@ namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime
 
         const string GetByIdSql = @"SELECT * FROM manu_equipment_status_time WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_equipment_status_time WHERE Id IN @Ids ";
+
+        const string manuEquipmentStatusSqlTemplate = @"SELECT ee.Id,iwc.`Name` AS WorkCenterName ,iwc.Code AS WorkCenterCode,pp.Code AS ProcedureCode,
+                      pp.`Name` AS ProcedureName,ee.EquipmentCode,ee.EquipmentName,es.CurrentStatus,es.UpdatedOn 
+                      FROM equ_equipment ee
+                      LEFT JOIN  manu_equipment_status_time es  ON ee.Id=es.EquipmentId AND ee.IsDeleted=es.IsDeleted
+                      LEFT JOIN proc_resource_equipment_bind  preb ON ee.Id=preb.EquipmentId
+                      LEFT JOIN proc_resource pr ON preb.ResourceId=pr.Id and  pr.SiteId = ee.SiteId
+                      LEFT JOIN inte_work_center_resource_relation iwcrr ON pr.Id=iwcrr.ResourceId
+                      LEFT JOIN inte_work_center iwc ON iwcrr.WorkCenterId=iwc.Id and  iwc.SiteId = ee.SiteId
+                      LEFT JOIN proc_resource_type prt ON pr.ResTypeId=prt.Id
+                      LEFT JOIN proc_procedure pp ON prt.Id=pp.ResourceTypeId 
+                      /**where**/
+	                  ORDER BY   es.UpdatedOn DESC LIMIT @Offset,@Rows";
+        const string manuEquipmentStatusCountSqlTemplat = @"SELECT COUNT(*) FROM equ_equipment ee
+LEFT JOIN  manu_equipment_status_time es  ON ee.Id=es.EquipmentId AND ee.IsDeleted=es.IsDeleted
+LEFT JOIN proc_resource_equipment_bind  preb ON ee.Id=preb.EquipmentId
+LEFT JOIN proc_resource pr ON preb.ResourceId=pr.Id
+LEFT JOIN inte_work_center_resource_relation iwcrr ON pr.Id=iwcrr.ResourceId
+LEFT JOIN inte_work_center iwc ON iwcrr.WorkCenterId=iwc.Id
+LEFT JOIN proc_resource_type prt ON pr.ResTypeId=prt.Id
+LEFT JOIN proc_procedure pp ON prt.Id=pp.ResourceTypeId  /**where**/ ";
 
     }
 }
