@@ -46,7 +46,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
             EquEquipmentResAllView equResAllModel = await _equEquipmentRepository.GetEquResAllAsync(query);
             if (equResAllModel == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45001))
+                    .WithData("EquipmentCode", query.EquipmentCode).WithData("ResourceCode", query.ResCode); ;
             }
             return equResAllModel;
         }

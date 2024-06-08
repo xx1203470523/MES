@@ -1239,7 +1239,7 @@
 
         public const string MES16373 = "产品序列码【{SFC}】指定的工单不存在！";
         public const string MES16374 = "TODO";
-        public const string MES16375 = "TODO";
+        public const string MES16375 = "条码在manu_sfc表不存在或者不是生产(type=1)条码！";
         public const string MES16376 = "TODO";
         public const string MES16377 = "SFC条码{SFC}循环次数超过当前工序的循环次数，不允许操作。";
         public const string MES16378 = "产品序列码状态为【{Status}】，不允许操作。";
