@@ -1204,7 +1204,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 {
                     validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES18602), item.VehicleTypeCode, currentRow, "VehicleTypeCode"));
                 }
-                var vehicleinfo = vehicles.Where(x => x.Name == item.VehicleType).FirstOrDefault();
+                var vehicleinfo = vehicles.Where(x => x.Code == item.VehicleType).FirstOrDefault();
                 if (vehicleinfo == null && item.VehicleType != null)
                 {
                     validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES18501), item.VehicleTypeName, currentRow, "VehicleTypeName"));
