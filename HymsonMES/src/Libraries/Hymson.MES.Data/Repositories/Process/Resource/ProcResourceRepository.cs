@@ -595,7 +595,7 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcResourceRepository
     {
-        const string GetByIdSql = "SELECT a.*,b.ResType,b.ResType FROM proc_resource a left join proc_resource_type b on a.ResTypeId=b.Id and b.IsDeleted =0 where a.Id=@Id ";
+        const string GetByIdSql = "SELECT a.*,b.ResType,b.ResTypeName FROM proc_resource a left join proc_resource_type b on a.ResTypeId=b.Id and b.IsDeleted =0 where a.Id=@Id ";
         const string GetByResTypeIdsSql = "select * from proc_resource where SiteId=@SiteId and ResTypeId in @Ids and IsDeleted =0 ";
         const string GetByIdsAndStatusSql = "select * from proc_resource where  Id  in @Ids and Status=@Status";
         const string GetByIdsSql = "select * from proc_resource  WHERE Id IN @ids and IsDeleted=0";
