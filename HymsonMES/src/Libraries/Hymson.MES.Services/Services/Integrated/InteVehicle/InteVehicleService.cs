@@ -1174,10 +1174,11 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 throw new CustomerValidationException("载具编码{repeats}重复").WithData("repeats", string.Join(",", repeats));
             }
+            #endregion
 
             List<InteVehicleEntity> inteCustomList = new();
             List<InteVehicleVerifyEntity> inteVehicleVerifiesList = new();
-            #endregion
+            List<InteVehicleFreightEntity> inteVehicleFreightEntities = new();
 
             #region  验证数据库中是否存在数据，且组装数据
             // 读取载具信息
@@ -1187,8 +1188,8 @@ namespace Hymson.MES.Services.Services.Integrated
                 Codes = excelImportDtos.Select(x => x.VehicleTypeCode).Distinct().ToArray()
             });
 
-            //查询载具信息
-            var vehicles = await _inteVehicleTypeRepository.GetByCodesAsync(new InteVehicleTypeNameQuery
+            //查询载具类型信息
+            var vehicleTypes = await _inteVehicleTypeRepository.GetByCodesAsync(new InteVehicleTypeNameQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 Codes = excelImportDtos.Where(x => !string.IsNullOrEmpty(x.VehicleType)).Select(x => x.VehicleType).Distinct().ToArray()
@@ -1204,12 +1205,12 @@ namespace Hymson.MES.Services.Services.Integrated
                 {
                     validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES18602), item.VehicleTypeCode, currentRow, "VehicleTypeCode"));
                 }
-                var vehicleinfo = vehicles.Where(x => x.Code == item.VehicleType).FirstOrDefault();
-                if (vehicleinfo == null && item.VehicleType != null)
+                var vehicleTypeInfo = vehicleTypes.Where(x => x.Code == item.VehicleType).FirstOrDefault();
+                if (vehicleTypeInfo == null && item.VehicleType != null)
                 {
                     validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES18501), item.VehicleTypeName, currentRow, "VehicleTypeName"));
                 }
-               
+
                 //如果载具编码不存在，则组装数据
                 if (!customCode.Contains(item.VehicleTypeCode))
                 {
@@ -1219,7 +1220,7 @@ namespace Hymson.MES.Services.Services.Integrated
                         Name = item.VehicleTypeName,
                         Remark = item.Describe ?? "",
                         Position = item.Position ?? "",
-                        VehicleTypeId = vehicleinfo?.Id ?? 0,
+                        VehicleTypeId = vehicleTypeInfo?.Id ?? 0,
                         Status = item.Status,
                         Id = IdGenProvider.Instance.CreateId(),
                         CreatedBy = _currentUser.UserName,
@@ -1246,8 +1247,33 @@ namespace Hymson.MES.Services.Services.Integrated
                         inteVehicleVerifiesList.Add(inteVehicleVerify);
                     }
                     #endregion
+
+                    //载具装载
+                    if (vehicleTypeInfo == null) continue;
+                    int location = 1;
+                    for (int row = 1; row <= vehicleTypeInfo.Row; row++)
+                    {
+                        for (int col = 1; col <= vehicleTypeInfo.Column; col++)
+                        {
+                            inteVehicleFreightEntities.Add(new InteVehicleFreightEntity
+                            {
+                                Id = IdGenProvider.Instance.CreateId(),
+                                SiteId = inteVehicleEntity.SiteId,
+                                VehicleId = inteVehicleEntity.Id,
+                                Column = col,
+                                Row = row,
+                                Location = location.ToString(),
+                                Qty = 0,
+                                Status = true,
+                                CreatedBy = inteVehicleEntity.CreatedBy,
+                                CreatedOn = inteVehicleEntity.CreatedOn,
+                                UpdatedBy = inteVehicleEntity.UpdatedBy,
+                                UpdatedOn = inteVehicleEntity.UpdatedOn
+                            });
+                            location++;
+                        }
+                    }
                 }
-                
             }
 
             if (validationFailures.Any())
@@ -1255,17 +1281,19 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
             }
 
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
-            {
-                //保存记录 
-                if (inteCustomList.Any())
-                    await _inteVehicleRepository.InsertsAsync(inteCustomList);
-
-                if (inteVehicleVerifiesList.Any())
-                    await _inteVehicleVerifyRepository.InsertsAsync(inteVehicleVerifiesList);
-                ts.Complete();
-            }
             #endregion
+
+            //保存记录 
+            using TransactionScope ts = TransactionHelper.GetTransactionScope();
+            if (inteCustomList.Any())
+                await _inteVehicleRepository.InsertsAsync(inteCustomList);
+
+            if (inteVehicleVerifiesList.Any())
+                await _inteVehicleVerifyRepository.InsertsAsync(inteVehicleVerifiesList);
+
+            if (inteVehicleFreightEntities.Any())
+                await _inteVehicleFreightRepository.InsertsAsync(inteVehicleFreightEntities);
+            ts.Complete();
         }
 
         /// <summary>

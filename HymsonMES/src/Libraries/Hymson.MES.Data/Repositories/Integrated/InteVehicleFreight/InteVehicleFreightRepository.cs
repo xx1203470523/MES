@@ -132,8 +132,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<InteVehicleFreightEntity> inteVehicleFreightEntitys)
         {
+            if (inteVehicleFreightEntitys == null || !inteVehicleFreightEntitys.Any()) return 0;
+
+            var sql = "INSERT INTO `inte_vehicle_freight`( `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ";
+            foreach (var item in inteVehicleFreightEntitys)
+            {
+                sql += $"({item.Id},{item.SiteId},{item.VehicleId},{item.Qty},{item.Row},{item.Column},'{item.Location ?? ""}',{(item.Status == true ? 1 : 0)},'{item.CreatedBy}','{item.CreatedOn:yyyy-MM-dd HH:mm:ss.fff}','{item.UpdatedBy}','{item.UpdatedOn:yyyy-MM-dd HH:mm:ss.fff}',{item.IsDeleted}),";
+            }
+            sql = sql.Remove(sql.Length - 1);
+            sql += ";";
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, inteVehicleFreightEntitys);
+            return await conn.ExecuteAsync(sql);
         }
 
         /// <summary>
