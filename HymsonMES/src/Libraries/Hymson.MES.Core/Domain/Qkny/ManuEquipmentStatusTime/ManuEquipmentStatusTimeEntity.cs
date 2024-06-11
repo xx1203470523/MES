@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.ManuEquipmentStatusTime
 {
@@ -18,12 +19,12 @@ namespace Hymson.MES.Core.Domain.ManuEquipmentStatusTime
        /// <summary>
         /// 当前状态
         /// </summary>
-        public string CurrentStatus { get; set; }
+        public ManuEquipmentStatusEnum CurrentStatus { get; set; }
 
        /// <summary>
         /// 下一个状态
         /// </summary>
-        public string NextStatus { get; set; }
+        public ManuEquipmentStatusEnum NextStatus { get; set; }
 
        /// <summary>
         /// 状态开始时间

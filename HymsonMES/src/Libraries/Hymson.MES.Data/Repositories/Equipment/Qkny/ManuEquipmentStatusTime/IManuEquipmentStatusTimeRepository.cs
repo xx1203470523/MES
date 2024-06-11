@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.ManuEquipmentStatusTime;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.Qkny;
 using Hymson.MES.Data.Repositories.ManuEquipmentStatusTime.Query;
 
 namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime
@@ -16,7 +17,7 @@ namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuEquipmentStatusTimeEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuEquipmentStatusTimeEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -58,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuEquipmentStatusTimeEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -72,13 +73,13 @@ namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuEquipmentStatusTimeEntity>> GetEntitiesAsync(ManuEquipmentStatusTimeQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuEquipmentStatusTimeEntity>> GetPagedListAsync(ManuEquipmentStatusTimePagedQuery pagedQuery);
+        Task<PagedInfo<ManuEquipmentStatusReportView>> GetPagedListAsync(ManuEquipmentStatusTimePagedQuery pagedQuery);
 
     }
 }
