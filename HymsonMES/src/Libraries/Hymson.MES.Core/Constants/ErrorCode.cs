@@ -269,6 +269,7 @@
         public const string MES10537 = "功能类型【{Type}】+产品【{ProductCode}】+工序【{ProcedureCode}】+工艺设备组【{EquipmentGroupCode}】启用状态的已存在，请重新输入！";
         public const string MES10538 = "工序编码【{Code}】不存在！";
         public const string MES10539 = "工艺设备组编码【{Code}】不存在！";
+        public const string MES10540 = "工艺设备组编码不能为空！";
         #endregion
 
         #region Bom 10600
