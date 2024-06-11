@@ -94,14 +94,18 @@ namespace Hymson.MES.Services.Services.Marking
             var workOrderIds = pagedInfoData.Select(x => x.WorkOrderId).Distinct().ToArray();
             var workOrderInfos = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
 
-            var findProcedureIds = pagedInfoData.Select(x => x.FindProcedureId).Distinct().ToList();
-            var findProcedureInfos = await _procProcedureRepository.GetByIdsAsync(findProcedureIds);
-
-            var appointInterceptPrecedureIds = pagedInfoData.Select(x => x.AppointInterceptProcedureId).Distinct().ToList();
-            var appointInterceptInfos = await _procProcedureRepository.GetByIdsAsync(appointInterceptPrecedureIds);
-
+            var procedureIds = pagedInfoData.Select(x => x.FindProcedureId).Distinct().ToList();
+            var interceptPrecedureIds = pagedInfoData.Select(x => x.AppointInterceptProcedureId).Distinct().ToList();
+            if (interceptPrecedureIds.Any())
+            {
+                procedureIds.AddRange(interceptPrecedureIds);
+            }
             var interceptProducedureIds = pagedInfoData.Select(x => x.InterceptProcedureId).Distinct().ToList();
-            var interceptProcedureInfos = await _procProcedureRepository.GetByIdsAsync(interceptProducedureIds);
+            if (interceptProducedureIds.Any())
+            {
+                procedureIds.AddRange(interceptProducedureIds);
+            }
+            var procedureInfos = await _procProcedureRepository.GetByIdsAsync(procedureIds.Distinct());
 
             var interceptEquipmentIds = pagedInfoData.Select(x => x.InterceptEquipmentId).Distinct().ToList();
             var interceptEquipmentInfos = await _equEquipmentRepository.GetByIdAsync(interceptEquipmentIds);
@@ -109,16 +113,16 @@ namespace Hymson.MES.Services.Services.Marking
             var resourceIds = pagedInfoData.Select(x => x.ResourceId).Distinct().ToArray();
             var resourceInfos = await _procResourceRepository.GetListByIdsAsync(resourceIds);
 
-            var interceptWorkCenterIds = workOrderInfos?.Select(x => x.WorkCenterId!.Value).Distinct().ToArray();
+            var interceptWorkCenterIds = workOrderInfos?.Select(x => x.WorkCenterId.GetValueOrDefault()).Distinct().ToArray();
             var workCenterInfos = await _inteWorkCenterRepository.GetByIdsAsync(interceptWorkCenterIds);
 
             foreach (var item in pagedInfoData)
             {
                 var procMaterialInfo = procMaterialInfos.FirstOrDefault(x => x.Id == item.ProductId);
-                var workOrderInfo = workOrderInfos.FirstOrDefault(x => x.Id == item.WorkOrderId);
-                var findProcedureInfo = findProcedureInfos.FirstOrDefault(x => x.Id == item.FindProcedureId);
-                var appointInterceptInfo = appointInterceptInfos.FirstOrDefault(x => x.Id == item.AppointInterceptProcedureId);
-                var interceptProcedureInfo = interceptProcedureInfos.FirstOrDefault(x => x.Id == item.InterceptProcedureId);
+                var workOrderInfo = workOrderInfos?.FirstOrDefault(x => x.Id == item.WorkOrderId);
+                var findProcedureInfo = procedureInfos.FirstOrDefault(x => x.Id == item.FindProcedureId);
+                var appointInterceptInfo = procedureInfos.FirstOrDefault(x => x.Id == item.AppointInterceptProcedureId);
+                var interceptProcedureInfo = procedureInfos.FirstOrDefault(x => x.Id == item.InterceptProcedureId);
                 var interceptEquipmentInfo = interceptEquipmentInfos.FirstOrDefault(x => x.Id == item.InterceptEquipmentId);
                 var resourceInfo = resourceInfos.FirstOrDefault(x => x.Id == item.ResourceId);
                 var workCenterInfo = workCenterInfos.FirstOrDefault(x => x.Id !=null);
