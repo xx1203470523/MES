@@ -610,6 +610,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
 
                 sfcEntity.Qty = item.Qty;
                 sfcEntity.IsUsed = YesOrNoEnum.Yes;
+                sfcEntity.Type = SfcTypeEnum.Produce;
                 sfcEntity.Status = SfcStatusEnum.lineUp;
                 sfcEntity.UpdatedBy = param.UserName;
                 sfcEntity.UpdatedOn = HymsonClock.Now();
