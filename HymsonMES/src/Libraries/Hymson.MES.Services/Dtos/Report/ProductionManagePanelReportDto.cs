@@ -409,7 +409,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 不良数
         /// </summary>
-        public int UnqualifiedQty { get; set; }
+        public decimal UnqualifiedQty { get; set; }
 
         /// <summary>
         /// 不良率

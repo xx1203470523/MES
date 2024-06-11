@@ -324,6 +324,15 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 StartTime = DayStartTime,
                 EndTime = DayEndTime,
             });
+
+            //获取尾工序
+            var endProcedureSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new ManuSfcSummaryQuery
+            {
+                SiteId = siteId,
+                ProcedureIds = new long[] { getProcedureEntity.Id },
+                StartTime = DayStartTime,
+                EndTime = DayEndTime,
+            });
             //完成数量
             decimal completedQty = 0;
 
@@ -340,12 +349,14 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             {
                 QualityStatus = 1,
                 ProcedureIds = new long[] { getProcedureEntity.Id },
-                SiteId = siteId
+                SiteId = siteId,
+                WorkOrderId = planWorkOrderEntity?.Id
             });
 
-            //当天投入量(当前班次)
+            //当天投入Pack(当前班次)
             //decimal dayConsume = firstProcedureSummaryEntities.Count();
-            decimal dayConsume = Math.Round(firstProcedureSummaryEntities.Count().ParseToDecimal(), 0);
+            //decimal dayConsume = Math.Round(firstProcedureSummaryEntities.Count().ParseToDecimal(), 0);
+            decimal dayConsume = Math.Round(endProcedureSummaryEntities.Count().ParseToDecimal(), 0);
 
             //投入数
             //工单上显示电芯投入数
@@ -358,7 +369,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             });
             inputQty = Math.Round(inputQty, 0);
 
-            //完成率
+            //完成率 = 完工数量/(投入数/转换系数)
             decimal completedRate = decimal.Parse((completedQty / (inputQty == 0 ? 1 : (inputQty / moduleConversion / packConversion)) * 100).ToString("#0.00"));
             //计划数量
             decimal planQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100);
@@ -1011,8 +1022,8 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds.ToArray());
 
             var summaryBadTop3 = manuSummaryEntities.GroupBy(a => a.ProcedureId)
-                .Select(a => new { a.Key, Qty = a.Sum(b => b.Qty), BadQty = a.Sum(b => b.QualityStatus) })
-                .OrderBy(a => a.BadQty)
+                .Select(a => new { a.Key, Qty = a.Sum(b => b.Qty), QualityQty = a.Sum(b => b.QualityStatus?? 1m) })
+                .OrderByDescending(a =>a.Qty - a.QualityQty)
                 .Take(3);
 
             List<ManuSummaryBadRecordTop3Dto> result = new();
@@ -1023,8 +1034,8 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 {
                     ProcedureCode = procedure?.Code,
                     ProcedureName = procedure?.Name,
-                    UnqualifiedQty = item.BadQty.GetValueOrDefault(),
-                    UnqualifiedRate = Math.Round(item.BadQty.GetValueOrDefault() == 0 || item.Qty.GetValueOrDefault() == 0 ? 1 : (item.BadQty / item.Qty).GetValueOrDefault(), 2)
+                    UnqualifiedQty = item.Qty.GetValueOrDefault() -  item.QualityQty,
+                    UnqualifiedRate = Math.Round(item.QualityQty == 0 || item.Qty.GetValueOrDefault() == 0 ? 1 : ((item.Qty - item.QualityQty) / item.Qty).GetValueOrDefault(), 2)
                 });
             }
 

@@ -289,7 +289,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("EndTime < @EndTime");
             }
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstAsync<decimal>(template.RawSql, manuSfcSummaryQuery);
+            return (await conn.QueryFirstAsync<decimal?>(template.RawSql, manuSfcSummaryQuery)).GetValueOrDefault();
         }
         #endregion
 
