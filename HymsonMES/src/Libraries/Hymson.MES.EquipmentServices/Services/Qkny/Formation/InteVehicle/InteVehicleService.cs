@@ -359,44 +359,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
         /// <returns></returns>
         public async Task ContainerNgReportAsync(InteVehicleNgSfcDto param)
         {
-            //获取托盘
-            //InteVehicleCodeQuery vehicleQuery = new InteVehicleCodeQuery();
-            //vehicleQuery.SiteId = param.SiteId;
-            //vehicleQuery.Code = param.ContainerCode;
-            //var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(vehicleQuery);
-            //if (inteVehicleEntity == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES45110))
-            //        .WithData("ContainerCode", param.ContainerCode);
-            //}
-
-            ////查数据库中在制品条码
-            //List<string> sfcList = param.NgSfcList.Select(m => m.Sfc).ToList();
-            //ManuSfcProduceBySfcsQuery sfcQuery = new ManuSfcProduceBySfcsQuery();
-            //sfcQuery.SiteId = param.SiteId;
-            //sfcQuery.Sfcs = sfcList;
-            //var sfcProductList = (await _manuSfcProduceRepository.GetListBySfcsAsync(sfcQuery)).ToList(); ;
-            //if (sfcProductList == null || sfcProductList.Count == 0)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES45112))
-            //        .WithData("SfcListStr", string.Join(",", sfcList));
-            //}
-            ////数量校验
-            //var dbSfcList = sfcProductList.Select(m => m.SFC).ToList();
-            //if (dbSfcList.Count != sfcList.Count)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES45113))
-            //        .WithData("ContainerCode", param.ContainerCode)
-            //        .WithData("SfcCount", sfcList.Count)
-            //        .WithData("DbSfcCount", dbSfcList.Count);
-            //}
-            ////条码差异校验
-            //var exceptList = dbSfcList.Except(sfcList).ToList();
-            //if (exceptList != null && exceptList.Count > 0)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES45114));
-            //}
-
             List<string> ngCodeList = param.NgSfcList.Select(m => m.NgCode).Distinct().ToList();
             QualUnqualifiedCodeByCodesQuery ngCodeQuery = new QualUnqualifiedCodeByCodesQuery();
             ngCodeQuery.SiteId = param.SiteId;
@@ -432,26 +394,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             List<ManuProductNgRecordEntity> ngList = new List<ManuProductNgRecordEntity>();
             foreach (var item in param.NgSfcList)
             {
-                //UpdateVehicleFreightStackCommand updateModel = new UpdateVehicleFreightStackCommand();
-                //updateModel.BarCode = item.Sfc;
-                //updateModel.VehicleId = inteVehicleEntity.Id;
-                //updateModel.UpdatedOn = curDate;
-                //updateModel.UpdatedBy = param.UserName;
-                //updateList.Add(updateModel);
-
-                //InteVehicleFreightRecordEntity recordEntity = new InteVehicleFreightRecordEntity();
-                //recordEntity.Id = IdGenProvider.Instance.CreateId();
-                //recordEntity.BarCode = item.Sfc;
-                //recordEntity.LocationId = 0;
-                //recordEntity.SiteId = param.SiteId;
-                //recordEntity.CreatedBy = param.UserName;
-                //recordEntity.UpdatedBy = param.UserName;
-                //recordEntity.CreatedOn = curDate;
-                //recordEntity.UpdatedOn = curDate;
-                //recordEntity.VehicleId = inteVehicleEntity.Id;
-                //recordEntity.OperateType = (int)VehicleOperationEnum.NgUnbind;
-                //recordList.Add(recordEntity);
-
                 ManuProductBadRecordEntity badModel = new ManuProductBadRecordEntity();
                 badModel.SiteId = param.SiteId;
                 badModel.CreatedBy = param.UserName;
@@ -459,7 +401,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
                 badModel.UpdatedBy = param.UserName;
                 badModel.UpdatedOn = curDate;
                 badModel.SFC = item.Sfc;
-                badModel.SfcInfoId = sfcInfoList.Where(m => m.Sfc == item.Sfc).FirstOrDefault()?.SfcId;
+                badModel.SfcInfoId = sfcInfoList.Where(m => m.Sfc == item.Sfc).FirstOrDefault()?.Id;
                 badModel.Id = IdGenProvider.Instance.CreateId();
                 badModel.FoundBadOperationId = item.OperationId;
                 badModel.FoundBadResourceId = item.ResourceId;
