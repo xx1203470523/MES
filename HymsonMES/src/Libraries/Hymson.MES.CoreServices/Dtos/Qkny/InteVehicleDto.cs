@@ -107,5 +107,10 @@ namespace Hymson.MES.CoreServices.Dtos.Qkny
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备id
+        /// </summary>
+        public long EquipmentId { get; set; }
     }
 }

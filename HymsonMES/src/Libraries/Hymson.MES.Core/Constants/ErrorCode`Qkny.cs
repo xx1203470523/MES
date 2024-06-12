@@ -293,7 +293,12 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 托盘NG中上传的不合格代码在系统中不存在
         /// </summary>
-        public const string MES45121 = "托盘NG中上传的不合格代码在系统中都不存在";
+        public const string MES45121 = "托盘NG上报中上传的【{ngCode}】不合格代码在系统中都不存在";
+
+        /// <summary>
+        /// 托盘NG中上传的不合格代码在系统中不存在
+        /// </summary>
+        public const string MES45122 = "托盘NG上报中上传的条码在manu_sfc_info表中不存在";
 
         #endregion
 

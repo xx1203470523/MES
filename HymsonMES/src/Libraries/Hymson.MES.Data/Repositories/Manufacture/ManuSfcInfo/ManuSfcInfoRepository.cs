@@ -379,6 +379,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetUsedBySFC, new { sfc });
         }
+
+        /// <summary>
+        /// 根据SFC获取已经使用的
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcInfoSfcView>> GetUsedBySFCsAsync(List<string> sfcList)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcInfoSfcView>(GetUsedBySFCs, new { sfcList });
+        }
     }
 
     /// <summary>
@@ -453,6 +464,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                                Left join manu_sfc s on s.id=si.SfcId
                                                where si.IsDeleted=0 and si.IsUsed=1 
                                                and s.sfc=@sfc ";
+        const string GetUsedBySFCs = @"select si.*, s.sfc 
+                                               from manu_sfc_info  si
+                                               Left join manu_sfc s on s.id=si.SfcId
+                                               where si.IsDeleted=0 and si.IsUsed=1 
+                                               and s.sfc in @sfcList ";
 
         const string GetPagedInfoWorkshopJobControlReportOptimizeDataSqlTemplate = @"
                         select 

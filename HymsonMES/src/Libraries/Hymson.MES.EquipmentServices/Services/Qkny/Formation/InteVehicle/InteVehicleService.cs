@@ -22,6 +22,7 @@ using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Quality;
 using Microsoft.IdentityModel.Tokens;
 using Google.Protobuf.WellKnownTypes;
+using System.Collections;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
 {
@@ -76,6 +77,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
         private readonly IManuProductNgRecordRepository _manuProductNgRecordRepository;
 
         /// <summary>
+        /// 条码信息表
+        /// </summary>
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public InteVehicleService(IInteVehicleRepository inteVehicleRepository,
@@ -86,7 +92,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
             IMasterDataService masterDataService,
-            IManuProductNgRecordRepository manuProductNgRecordRepository)
+            IManuProductNgRecordRepository manuProductNgRecordRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository)
         {
             _inteVehicleRepository = inteVehicleRepository;
             _inteVehicleRepository = inteVehicleRepository;
@@ -98,6 +105,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _masterDataService = masterDataService;
             _manuProductNgRecordRepository = manuProductNgRecordRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
         }
 
         /// <summary>
@@ -352,55 +360,68 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
         public async Task ContainerNgReportAsync(InteVehicleNgSfcDto param)
         {
             //获取托盘
-            InteVehicleCodeQuery vehicleQuery = new InteVehicleCodeQuery();
-            vehicleQuery.SiteId = param.SiteId;
-            vehicleQuery.Code = param.ContainerCode;
-            var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(vehicleQuery);
-            if (inteVehicleEntity == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45110))
-                    .WithData("ContainerCode", param.ContainerCode);
-            }
+            //InteVehicleCodeQuery vehicleQuery = new InteVehicleCodeQuery();
+            //vehicleQuery.SiteId = param.SiteId;
+            //vehicleQuery.Code = param.ContainerCode;
+            //var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(vehicleQuery);
+            //if (inteVehicleEntity == null)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES45110))
+            //        .WithData("ContainerCode", param.ContainerCode);
+            //}
 
-            //查数据库中在制品条码
-            List<string> sfcList = param.NgSfcList.Select(m => m.Sfc).ToList();
-            ManuSfcProduceBySfcsQuery sfcQuery = new ManuSfcProduceBySfcsQuery();
-            sfcQuery.SiteId = param.SiteId;
-            sfcQuery.Sfcs = sfcList;
-            var sfcProductList = (await _manuSfcProduceRepository.GetListBySfcsAsync(sfcQuery)).ToList(); ;
-            if (sfcProductList == null || sfcProductList.Count == 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45112))
-                    .WithData("SfcListStr", string.Join(",", sfcList));
-            }
-            //数量校验
-            var dbSfcList = sfcProductList.Select(m => m.SFC).ToList();
-            if (dbSfcList.Count != sfcList.Count)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45113))
-                    .WithData("ContainerCode", param.ContainerCode)
-                    .WithData("SfcCount", sfcList.Count)
-                    .WithData("DbSfcCount", dbSfcList.Count);
-            }
-            //条码差异校验
-            var exceptList = dbSfcList.Except(sfcList).ToList();
-            if (exceptList != null && exceptList.Count > 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45114));
-            }
+            ////查数据库中在制品条码
+            //List<string> sfcList = param.NgSfcList.Select(m => m.Sfc).ToList();
+            //ManuSfcProduceBySfcsQuery sfcQuery = new ManuSfcProduceBySfcsQuery();
+            //sfcQuery.SiteId = param.SiteId;
+            //sfcQuery.Sfcs = sfcList;
+            //var sfcProductList = (await _manuSfcProduceRepository.GetListBySfcsAsync(sfcQuery)).ToList(); ;
+            //if (sfcProductList == null || sfcProductList.Count == 0)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES45112))
+            //        .WithData("SfcListStr", string.Join(",", sfcList));
+            //}
+            ////数量校验
+            //var dbSfcList = sfcProductList.Select(m => m.SFC).ToList();
+            //if (dbSfcList.Count != sfcList.Count)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES45113))
+            //        .WithData("ContainerCode", param.ContainerCode)
+            //        .WithData("SfcCount", sfcList.Count)
+            //        .WithData("DbSfcCount", dbSfcList.Count);
+            //}
+            ////条码差异校验
+            //var exceptList = dbSfcList.Except(sfcList).ToList();
+            //if (exceptList != null && exceptList.Count > 0)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES45114));
+            //}
 
             List<string> ngCodeList = param.NgSfcList.Select(m => m.NgCode).Distinct().ToList();
             QualUnqualifiedCodeByCodesQuery ngCodeQuery = new QualUnqualifiedCodeByCodesQuery();
             ngCodeQuery.SiteId = param.SiteId;
             ngCodeQuery.Codes = ngCodeList;
             var ngEntityList = await _masterDataService.GetUnqualifiedEntitiesByCodesAsync(ngCodeQuery);
-            if(ngEntityList.IsNullOrEmpty() == true)
+            if (ngEntityList.IsNullOrEmpty() == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45121))
+                    .WithData("ngCode", string.Join(",", ngCodeList));
+            }
+            if (ngEntityList.Count() != ngCodeList.Count())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45121));
             }
-            if(ngEntityList.Count() != ngCodeList.Count())
+
+            //查询条码信息表数据
+            List<string> ngSfcList = param.NgSfcList.Select(m => m.Sfc).ToList();
+            List<ManuSfcInfoSfcView> sfcInfoList = (await _manuSfcInfoRepository.GetUsedBySFCsAsync(ngSfcList)).ToList();
+            if (sfcInfoList.IsNullOrEmpty() == true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45121));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45122));
+            }
+            if(sfcInfoList.Count != ngSfcList.Count())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45122));
             }
 
             //数据组装
@@ -411,25 +432,25 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             List<ManuProductNgRecordEntity> ngList = new List<ManuProductNgRecordEntity>();
             foreach (var item in param.NgSfcList)
             {
-                UpdateVehicleFreightStackCommand updateModel = new UpdateVehicleFreightStackCommand();
-                updateModel.BarCode = item.Sfc;
-                updateModel.VehicleId = inteVehicleEntity.Id;
-                updateModel.UpdatedOn = curDate;
-                updateModel.UpdatedBy = param.UserName;
-                updateList.Add(updateModel);
+                //UpdateVehicleFreightStackCommand updateModel = new UpdateVehicleFreightStackCommand();
+                //updateModel.BarCode = item.Sfc;
+                //updateModel.VehicleId = inteVehicleEntity.Id;
+                //updateModel.UpdatedOn = curDate;
+                //updateModel.UpdatedBy = param.UserName;
+                //updateList.Add(updateModel);
 
-                InteVehicleFreightRecordEntity recordEntity = new InteVehicleFreightRecordEntity();
-                recordEntity.Id = IdGenProvider.Instance.CreateId();
-                recordEntity.BarCode = item.Sfc;
-                recordEntity.LocationId = 0;
-                recordEntity.SiteId = param.SiteId;
-                recordEntity.CreatedBy = param.UserName;
-                recordEntity.UpdatedBy = param.UserName;
-                recordEntity.CreatedOn = curDate;
-                recordEntity.UpdatedOn = curDate;
-                recordEntity.VehicleId = inteVehicleEntity.Id;
-                recordEntity.OperateType = (int)VehicleOperationEnum.NgUnbind;
-                recordList.Add(recordEntity);
+                //InteVehicleFreightRecordEntity recordEntity = new InteVehicleFreightRecordEntity();
+                //recordEntity.Id = IdGenProvider.Instance.CreateId();
+                //recordEntity.BarCode = item.Sfc;
+                //recordEntity.LocationId = 0;
+                //recordEntity.SiteId = param.SiteId;
+                //recordEntity.CreatedBy = param.UserName;
+                //recordEntity.UpdatedBy = param.UserName;
+                //recordEntity.CreatedOn = curDate;
+                //recordEntity.UpdatedOn = curDate;
+                //recordEntity.VehicleId = inteVehicleEntity.Id;
+                //recordEntity.OperateType = (int)VehicleOperationEnum.NgUnbind;
+                //recordList.Add(recordEntity);
 
                 ManuProductBadRecordEntity badModel = new ManuProductBadRecordEntity();
                 badModel.SiteId = param.SiteId;
@@ -438,11 +459,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
                 badModel.UpdatedBy = param.UserName;
                 badModel.UpdatedOn = curDate;
                 badModel.SFC = item.Sfc;
+                badModel.SfcInfoId = sfcInfoList.Where(m => m.Sfc == item.Sfc).FirstOrDefault()?.SfcId;
                 badModel.Id = IdGenProvider.Instance.CreateId();
                 badModel.FoundBadOperationId = item.OperationId;
                 badModel.FoundBadResourceId = item.ResourceId;
                 badModel.OutflowOperationId = param.OperationId;
-                badModel.UnqualifiedId = 0;
+                badModel.UnqualifiedId = ngEntityList.Where(m => m.UnqualifiedCode == item.NgCode).FirstOrDefault()!.Id;
                 badModel.Status = Core.Enums.Manufacture.ProductBadRecordStatusEnum.Open;
                 badModel.Source = Core.Enums.Manufacture.ProductBadRecordSourceEnum.EquipmentReBad;
                 badModel.Qty = 1;
@@ -469,10 +491,19 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
                 }
             }
 
+            //托盘和电芯解绑
+            InteVehicleUnBindDto unBind = new InteVehicleUnBindDto();
+            unBind.ContainerCode = param.ContainerCode;
+            unBind.SfcList = param.NgSfcList.Select(m => m.Sfc).ToList();
+            unBind.SiteId = param.SiteId;
+            unBind.UserName = param.UserName;
+            //电芯设备上报NG出站
+
             //数据库操作
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
-            await _inteVehiceFreightStackRepository.DeleteByVehiceBarCode(updateList);
-            await _inteVehicleFreightRecordRepository.InsertsAsync(recordList);
+            await VehicleUnBindOperationAsync(unBind);
+            //await _inteVehiceFreightStackRepository.DeleteByVehiceBarCode(updateList);
+            //await _inteVehicleFreightRecordRepository.InsertsAsync(recordList);
             await _manuProductBadRecordRepository.InsertRangeAsync(badList);
             await _manuProductNgRecordRepository.InsertRangeAsync(ngList);
             trans.Complete();

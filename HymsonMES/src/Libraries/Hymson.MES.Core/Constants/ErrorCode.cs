@@ -919,7 +919,7 @@
         public const string MES15412 = "条码{sfcs}已取消报废,不能重复取消!";
         public const string MES15413 = "条码{sfcs}已报废,不能重复报废!";
         public const string MES15414 = "条码{sfcs}标识已取消,不能重复取消!";
-        public const string MES15415 = "条码不存在";
+        public const string MES15415 = "生产(type=1)条码不存在";
         public const string MES15416 = "条码已经被锁定";
         public const string MES15417 = "条码已报废";
         public const string MES15418 = "条码工单未激活,无法返修";
@@ -1280,7 +1280,7 @@
         public const string MES16500 = "下达条码失败。";
         public const string MES16501 = "产品{product}未维护编码规则,无法下达条码。";
         public const string MES16502 = "产品{product}批次大写为0,无法下达条码。";
-        public const string MES16503 = "工单{workorder}超过计划数量,下达条码失败。";
+        public const string MES16503 = "工单{workorder}超过计划数量,下达/产出条码失败。";
         public const string MES16504 = "条码已经存在。";
         public const string MES16505 = "条码不存在，无法复用。";
         public const string MES16506 = "条码不为已完成状态，无法复用。";
