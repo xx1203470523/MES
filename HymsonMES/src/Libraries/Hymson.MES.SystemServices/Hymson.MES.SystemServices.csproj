@@ -22,4 +22,9 @@
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DependencyInjection\" />
+    <Folder Include="Mapper\" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,6 @@
 ﻿using Hymson.MES.SystemServices.Dtos;
+using Hymson.MES.SystemServices.Services.Plan;
+using Hymson.MES.SystemServices.Services.Process;
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -15,9 +17,18 @@ namespace Hymson.MES.System.Api.Controllers
     public class ProcessController : ControllerBase
     {
         /// <summary>
+        /// 接口（BOM）
+        /// </summary>
+        private readonly IProcBomService _procBomService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcessController() { }
+        /// <param name="procBomService"></param>
+        public ProcessController(IProcBomService procBomService)
+        {
+            _procBomService = procBomService;
+        }
 
         /// <summary>
         /// 读取BOM信息
@@ -28,7 +39,7 @@ namespace Hymson.MES.System.Api.Controllers
         [LogDescription("读取BOM信息", BusinessType.INSERT)]
         public async Task<IEnumerable<BomDto>> GetBomAsync()
         {
-            return await Task.FromResult<IEnumerable<BomDto>>(default);
+            return await _procBomService.GetBomListAsync();
         }
 
     }

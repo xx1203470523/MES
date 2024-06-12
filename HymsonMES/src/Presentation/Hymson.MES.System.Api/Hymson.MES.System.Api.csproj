@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Libraries\Hymson.MES.Services\Hymson.MES.Services.csproj" />
     <ProjectReference Include="..\..\Libraries\Hymson.MES.SystemServices\Hymson.MES.SystemServices.csproj" />
   </ItemGroup>
 
