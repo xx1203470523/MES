@@ -103,6 +103,7 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
+using Hymson.MES.Data.Repositories.Equipment.View;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -342,6 +343,12 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<EquMaintenancePlanDto, EquMaintenancePlanEntity>();
             CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
+            #endregion
+
+
+            #region  EquSparepartEquipmentBindRecord
+            CreateMap<EquSparepartEquipmentBindRecordPagedQueryDto, EquSparepartEquipmentBindRecordPagedQuery>();
+            CreateMap<EquSparepartEquipmentBindRecordView, EquSparepartEquipmentBindRecordViewDto>();
             #endregion
 
         }
