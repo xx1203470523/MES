@@ -192,8 +192,10 @@ namespace Hymson.MES.Services.Services.Plan
             // 验证DTO
             await _validationCreatePrintRules.ValidateAndThrowAsync(createDto);
 
-            var resourceEntity = await _procResourceRepository.GetResByIdAsync(createDto.ResourceId);
-            var procedureEntity = await _procProcedureRepository.GetByIdAsync(createDto.ProcedureId);
+            var resourceEntity = await _procResourceRepository.GetResByIdAsync(createDto.ResourceId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16337));
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(createDto.ProcedureId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16352));
 
             // 对工序资源类型和资源的资源类型校验
             if (resourceEntity != null && procedureEntity != null && procedureEntity.ResourceTypeId.HasValue && resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
@@ -212,6 +214,19 @@ namespace Hymson.MES.Services.Services.Plan
             // 读取条码信息
             var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdAsync(sfcEntity.Id);
             if (sfcInfoEntity == null) return;
+
+            // 校验工序是否配置当前物料的打印模板
+            var procProcedurePrintReleationEnties = await _procProcedurePrintRelationRepository.GetProcProcedurePrintReleationEntitiesAsync(new ProcProcedurePrintReleationQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = createDto.ProcedureId,
+                MaterialId = sfcInfoEntity.ProductId
+            });
+            if (procProcedurePrintReleationEnties == null || !procProcedurePrintReleationEnties.Where(x => x.TemplateId != 0).Any())
+            {
+                var materialEntity = await _procMaterialRepository.GetByIdAsync(sfcInfoEntity.ProductId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", procedureEntity?.Code ?? "").WithData("MaterialCode", materialEntity?.MaterialCode ?? "");
+            }
 
             _eventBus.Publish(new PrintIntegrationEvent
             {
@@ -473,6 +488,20 @@ namespace Hymson.MES.Services.Services.Plan
                     BarCode = item.SFC,
                     MateriaId = work.ProductId
                 });
+            }
+
+            // 校验工序是否配置当前物料的打印模板
+            var procProcedurePrintReleationEnties = await _procProcedurePrintRelationRepository.GetProcProcedurePrintReleationEntitiesAsync(new ProcProcedurePrintReleationQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = parm.ProcedureId,
+                MaterialId = work.ProductId
+            });
+            if (procProcedurePrintReleationEnties == null || !procProcedurePrintReleationEnties.Where(x => x.TemplateId != 0).Any())
+            {
+                var procedureEntity = await _procProcedureRepository.GetByIdAsync(parm.ProcedureId);
+                var materialEntity = await _procMaterialRepository.GetByIdAsync(work.ProductId);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", procedureEntity?.Code ?? "").WithData("MaterialCode", materialEntity?.MaterialCode ?? "");
             }
 
             _eventBus.Publish(new PrintIntegrationEvent

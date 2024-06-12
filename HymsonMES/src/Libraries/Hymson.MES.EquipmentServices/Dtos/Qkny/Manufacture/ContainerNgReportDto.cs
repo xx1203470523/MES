@@ -36,7 +36,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// <summary>
         /// 不合格代码
         /// </summary>
-        public string NgCode { get; set; } = string.Empty;
+        public string? NgCode { get; set; } = string.Empty;
 
         /// <summary>
         /// NG发生的设备
