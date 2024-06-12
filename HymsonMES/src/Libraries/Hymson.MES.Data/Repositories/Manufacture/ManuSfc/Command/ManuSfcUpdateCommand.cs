@@ -33,11 +33,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 条码状态
         /// </summary>
         public SfcStatusEnum? Status { get; set; }
-
-        /// <summary>   
-        /// 条码类型 1、生产条码 2、非生产条码
-        /// </summary>
-        public SfcTypeEnum Type { get; set; } = SfcTypeEnum.Produce;
     }
 
     /// <summary>
