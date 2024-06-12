@@ -10,6 +10,7 @@ using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
 using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 using Hymson.MES.EquipmentServices.Dtos.SingleBarCodeLoadingVerification;
+using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Services;
 using Hymson.MES.EquipmentServices.Services.BindContainer;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
@@ -29,6 +30,7 @@ using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
 using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hymson.MES.Equipment.Api.Controllers
 {
@@ -745,6 +747,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task EquipmentBootupParamVersonCheckAsync(EquipmentBootupParamVersonCheckDto dto)
         {
             await _equipmentService.EquipmentBootupParamVersonCheckAsync(dto);
+        }
+
+        /// <summary>
+        /// 查询条码生产记录状态
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetManuSfcStatus")]
+        [AllowAnonymous]
+        public async Task<ManuSfcStatusOutputDto> GetManuSfcStatusByProcedureAsync([FromQuery] ManuSfcStatusQueryDto queryDto)
+        {
+            return await _equipmentService.GetManuSfcStatusByProcedureAsync(queryDto); 
         }
     }
 }

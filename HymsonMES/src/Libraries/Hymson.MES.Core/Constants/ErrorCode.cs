@@ -1033,6 +1033,7 @@
         public const string MES19007 = "SFC条码不允许重复";
         public const string MES19008 = "资源不匹配";
         public const string MES19009 = "SFC：{SFC}条码已经存在";
+        public const string MES19010 = "工序编码不能为空";
         #endregion
 
         public const string MES19101 = "条码列表不能为空";

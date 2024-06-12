@@ -16,12 +16,14 @@ using Hymson.MES.Data.Repositories.Process.Parameter.Query;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.EquipmentServices.Bos;
+using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Services.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect;
 
@@ -92,6 +94,8 @@ public class EquipmentCollectService : IEquipmentCollectService
 
     private readonly IProcBootupparamService _procBootupparamService;
 
+    private readonly IProcProcedureRepository _procProcedureRepository;
+
 
     /// <summary>
     /// 构造函数
@@ -125,7 +129,8 @@ public class EquipmentCollectService : IEquipmentCollectService
         IManuSfcStepRepository manuSfcStepRepository,
         IManuSfcSummaryRepository manuSfcSummaryRepository,
         IProcBootuprecipeService procBootuprecipeService,
-        IProcBootupparamService procBootupparamService)
+        IProcBootupparamService procBootupparamService,
+        IProcProcedureRepository procProcedureRepository)
     {
         _currentEquipment = currentEquipment;
         _equipmentHeartbeatRepository = equipmentHeartbeatRepository;
@@ -143,6 +148,7 @@ public class EquipmentCollectService : IEquipmentCollectService
         _manuSfcSummaryRepository = manuSfcSummaryRepository;
         _procBootuprecipeService = procBootuprecipeService;
         _procBootupparamService = procBootupparamService;
+        _procProcedureRepository = procProcedureRepository;
     }
 
 
@@ -810,5 +816,38 @@ public class EquipmentCollectService : IEquipmentCollectService
     public async Task<BootupParamDetail> GetEquipmentBootupRecipeDetailAsync(GetEquipmentBootupParamDetailDto dto)
     {
         return await _procBootupparamService.GetEquipmentBootupRecipeDetailAsync(dto);
+    }
+
+    /// <summary>
+    /// 获取条码记录状态
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    public async Task<ManuSfcStatusOutputDto> GetManuSfcStatusByProcedureAsync(ManuSfcStatusQueryDto queryDto)
+    {
+        if (queryDto.SFC == null) throw new CustomerValidationException(ErrorCode.MES19003);
+        if (queryDto.ProcedureCode == null) throw new CustomerValidationException(ErrorCode.MES19010);
+
+        var procedureEntity = await _procProcedureRepository.GetByCodeAsync(queryDto.ProcedureCode ?? "", 123456);
+
+        var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new()
+        {
+            SFCS = new string[] { queryDto.SFC },
+            QualityStatus = 0,
+            ProcedureIds = new long[] { procedureEntity.Id }
+        });
+
+        var manuSfcSummaryEntity = manuSfcSummaryEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault();
+
+        ManuSfcStatusOutputDto result = new ManuSfcStatusOutputDto()
+        {
+            SFC = queryDto.SFC,
+            ProcedureCode = procedureEntity.Code ?? "",
+            ProcedureName = procedureEntity.Name ?? "",
+            FirstQualityStatus = manuSfcSummaryEntity?.FirstQualityStatus ?? 1,
+            QualityStatus = manuSfcSummaryEntity?.QualityStatus ?? 1
+        };
+
+        return result;
     }
 }

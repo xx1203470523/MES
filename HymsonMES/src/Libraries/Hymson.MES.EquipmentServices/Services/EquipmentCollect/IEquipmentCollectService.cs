@@ -1,4 +1,6 @@
-﻿using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
+﻿using Hymson.MES.EquipmentServices.Dtos;
+using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 {
@@ -94,5 +96,11 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         Task EquipmentBootupParamVersonCheckAsync(EquipmentBootupParamVersonCheckDto dto);
 
+        /// <summary>
+        /// 条码生产记录
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<ManuSfcStatusOutputDto> GetManuSfcStatusByProcedureAsync(ManuSfcStatusQueryDto queryDto);
     }
 }
