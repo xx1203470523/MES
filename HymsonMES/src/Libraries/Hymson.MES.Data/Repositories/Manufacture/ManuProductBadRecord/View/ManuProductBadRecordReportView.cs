@@ -46,6 +46,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string ProcedureCode { get; set; }
 
         /// <summary>
+        /// 实际NG工序
+        /// </summary>
+        public string FactProcdedureCode { get; set; }
+
+        /// <summary>
         /// 资源编码
         /// </summary>
         public string ResCode { get; set; }

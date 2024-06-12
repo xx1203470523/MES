@@ -179,7 +179,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
 
             //3. 出站和补液记录
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
-            await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
+            //await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
             await _manuFillingDataRecordService.AddAsync(saveDto);
             trans.Complete();
 

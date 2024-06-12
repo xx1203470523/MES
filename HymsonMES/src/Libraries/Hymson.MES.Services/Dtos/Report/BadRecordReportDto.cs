@@ -161,9 +161,14 @@ namespace Hymson.MES.Services.Dtos.Report
         public string OrderCode { get; set; }
 
         /// <summary>
-        /// 工序编码
+        /// 流出工序编码
         /// </summary>
         public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 实际NG工序
+        /// </summary>
+        public string FactProcdedureCode { get; set; }
 
         /// <summary>
         /// 资源编码

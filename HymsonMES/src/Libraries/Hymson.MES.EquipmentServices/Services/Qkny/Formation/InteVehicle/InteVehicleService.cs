@@ -423,7 +423,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
                         ngRecord.BadRecordId = badModel.Id;
                         ngRecord.UnqualifiedId = ngEntityList.Where(m => m.UnqualifiedCode == sfcCode.NgCode).FirstOrDefault()!.Id;
                         ngRecord.NGCode = sfcCode.NgCode;
-                        ngRecord.Remark = "";
+                        ngRecord.Remark = "托盘NG电芯上报";
                         ngRecord.CreatedOn = curDate;
                         ngRecord.CreatedBy = param.UserName;
                         ngRecord.UpdatedOn = curDate;
@@ -444,8 +444,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             //数据库操作
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             await VehicleUnBindOperationAsync(unBind);
-            //await _inteVehiceFreightStackRepository.DeleteByVehiceBarCode(updateList);
-            //await _inteVehicleFreightRecordRepository.InsertsAsync(recordList);
             await _manuProductBadRecordRepository.InsertRangeAsync(badList);
             await _manuProductNgRecordRepository.InsertRangeAsync(ngList);
             trans.Complete();

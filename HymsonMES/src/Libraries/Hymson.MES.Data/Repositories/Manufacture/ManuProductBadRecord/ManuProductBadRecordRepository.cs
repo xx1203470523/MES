@@ -548,6 +548,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         m.MaterialCode,m.MaterialName,
                         o.OrderCode,
                         p.`Code` as ProcedureCode,
+                        pp.Code AS FactProcdedureCode,  
                         r.ResCode,
                         uc.UnqualifiedCode,
                         uc.Type as UnqualifiedType,
@@ -560,6 +561,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 
                 FROM manu_product_bad_record rbr
                 LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
+                LEFT JOIN proc_procedure pp ON PP.Id = RBR.FoundBadOperationId
                 LEFT JOIN proc_resource r on r.id=rbr.FoundBadResourceId  -- 为了查询资源
                 LEFT JOIN qual_unqualified_code uc on uc.id=rbr.UnqualifiedId -- 为了查询不合格代码
 

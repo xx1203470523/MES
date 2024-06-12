@@ -345,7 +345,13 @@ namespace Hymson.MES.Services.Services.Warehouse
             var entity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = barCode });
             if (entity == null) throw new CustomerValidationException(nameof(ErrorCode.MES15124));
 
-            if (new MaterialInventorySourceEnum[] { MaterialInventorySourceEnum.ManualEntry, MaterialInventorySourceEnum.WMS, MaterialInventorySourceEnum.LoadingPoint }.Contains(entity.Source))
+            List<MaterialInventorySourceEnum> allowList = new List<MaterialInventorySourceEnum>() 
+            {
+                MaterialInventorySourceEnum.ManualEntry,
+                MaterialInventorySourceEnum.WMS,
+                MaterialInventorySourceEnum.LoadingPoint
+            };
+            if (allowList.Contains(entity.Source))
             {
                 var detailDto = entity.ToModel<WhMaterialInventoryDetailDto>();
 
