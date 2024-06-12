@@ -184,7 +184,7 @@ namespace Hymson.MES.Data.Repositories.ManuEquipmentStatusTime
         const string GetByIdsSql = @"SELECT * FROM manu_equipment_status_time WHERE Id IN @Ids ";
 
         const string manuEquipmentStatusSqlTemplate = @"SELECT ee.Id,iwc.`Name` AS WorkCenterName ,iwc.Code AS WorkCenterCode,pp.Code AS ProcedureCode,
-                      pp.`Name` AS ProcedureName,ee.EquipmentCode,ee.EquipmentName,es.CurrentStatus,es.UpdatedOn 
+                      pp.`Name` AS ProcedureName,ee.EquipmentCode,ee.EquipmentName,es.CurrentStatus,es.UpdatedOn ,es.StatusDuration,es.BeginTime,es.EndTime
                       FROM equ_equipment ee
                       LEFT JOIN  manu_equipment_status_time es  ON ee.Id=es.EquipmentId AND ee.IsDeleted=es.IsDeleted
                       LEFT JOIN proc_resource_equipment_bind  preb ON ee.Id=preb.EquipmentId
