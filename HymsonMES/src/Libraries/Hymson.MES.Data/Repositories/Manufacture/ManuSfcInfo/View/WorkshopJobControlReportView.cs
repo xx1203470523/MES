@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -121,4 +122,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public decimal Qty { get; set; }
     }
+
+    /// <summary>
+    /// 条码信息和条码
+    /// </summary>
+    public class ManuSfcInfoSfcView : ManuSfcInfoEntity
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; }
+    }
+
+
 }

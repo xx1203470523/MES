@@ -154,5 +154,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="sfc"></param>
         /// <returns></returns>
         Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc);
+
+        /// <summary>
+        /// 根据SFC获取已经使用的
+        /// </summary>
+        /// <param name="sfcList"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcInfoSfcView>> GetUsedBySFCsAsync(List<string> sfcList);
     }
 }

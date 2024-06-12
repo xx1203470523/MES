@@ -31,6 +31,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Minio.DataModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -381,11 +382,81 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
                 ngModel.Sfc = item.Sfc;
                 ngModel.OperationId = sfcEquResModel.ProcedureId;
                 ngModel.ResourceId = sfcEquResModel.ResId;
+                ngModel.EquipmentId = sfcEquResModel.EquipmentId;
                 ngDto.NgSfcList.Add(ngModel);
             }
             ngDto.SiteId = equResModel.SiteId;
             ngDto.UserName = equResModel.EquipmentName;
             ngDto.OperationId = equResModel.ProcedureId;
+
+            #region 在绑盘时，在NG工序出站（前面会正常进出站-理论不可行）
+
+            //解绑数据
+            InteVehicleUnBindDto bindDto = new InteVehicleUnBindDto();
+            bindDto.ContainerCode = dto.ContainerCode;
+            bindDto.SfcList = dto.NgSfcList.Select(m => m.Sfc).ToList();
+            bindDto.SiteId = equResModel.SiteId;
+            bindDto.UserName = dto.EquipmentCode;
+
+            List<SFCOutStationBo> outList = new List<SFCOutStationBo>();
+            //会存在多个不同的NG设备
+            List<string> equList = dto.NgSfcList.Select(m => m.NgEquipmentCode).Distinct().ToList();
+            foreach(var equ in equList)
+            {
+                var curNgList = dto.NgSfcList.Where(m => m.NgEquipmentCode == equ).ToList();
+                if(curNgList.IsNullOrEmpty() == true)
+                {
+                    continue;
+                }
+                string curEquipmentCode = curNgList[0].NgEquipmentCode;
+                string curResourceCode = curNgList[0].NgResourceCode;
+
+                var sfcEquResModel = factList.Where(m => m.EquipmentCode == curEquipmentCode && m.ResCode == curResourceCode).FirstOrDefault();
+                if (sfcEquResModel == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45001));
+                }
+
+                //多个出站
+                SFCOutStationBo outBo = new SFCOutStationBo();
+                outBo.SiteId = equResModel.SiteId;
+                outBo.EquipmentId = sfcEquResModel.EquipmentId;
+                outBo.ResourceId = sfcEquResModel.ResId;
+                outBo.ProcedureId = sfcEquResModel.ProcedureId;
+                outBo.UserName = sfcEquResModel.EquipmentCode;
+                List<OutStationRequestBo> outStationRequestBos = new();
+                foreach (var item in curNgList)
+                {
+                    //出站数据
+                    var outStationRequestBo = new OutStationRequestBo
+                    {
+                        SFC = item.Sfc,
+                        IsQualified = false
+                    };
+                    // 不合格代码
+                    if (string.IsNullOrEmpty(item.NgCode) == false)
+                    {
+                        OutStationUnqualifiedBo ngCode = new OutStationUnqualifiedBo() { UnqualifiedCode = item.NgCode };
+                        outStationRequestBo.OutStationUnqualifiedList = new List<OutStationUnqualifiedBo>() { ngCode };
+                    }
+                    outStationRequestBos.Add(outStationRequestBo);
+                }
+                outBo.OutStationRequestBos = outStationRequestBos;
+
+                outList.Add(outBo);
+            }
+
+            //托盘解绑+NG出站
+            //using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            //await _inteVehicleService.VehicleUnBindOperationAsync(bindDto);
+            //foreach(var outBo in outList)
+            //{
+            //    var outResult = await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
+            //}
+            //trans.Complete();
+
+            #endregion
+
             //数据库
             await _inteVehicleService.ContainerNgReportAsync(ngDto);
         }

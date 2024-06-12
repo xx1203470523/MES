@@ -1432,6 +1432,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             //更新极组条码为完成状态
             await _manuSfcRepository.UpdateStatusAsync(new ManuSfcUpdateCommand
             {
+                Type = SfcTypeEnum.Produce,
                 SiteId = bo.SiteId,
                 Sfcs = bo.Barcodes.ToArray(),
                 Status = Core.Enums.SfcStatusEnum.Complete,
