@@ -26,17 +26,31 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         private readonly IManuDowngradingRuleRepository _manuDowngradingRuleRepository;
 
         /// <summary>
+        /// 条码生产信息（物理删除） 仓储
+        /// </summary>
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 条码信息表 仓储
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuDowngradingRepository"></param>
         /// <param name="manuDowngradingRecordRepository"></param>
         public ManuDegradedProductExtendService(IManuDowngradingRepository manuDowngradingRepository,
             IManuDowngradingRuleRepository manuDowngradingRuleRepository,
-            IManuDowngradingRecordRepository manuDowngradingRecordRepository)
+            IManuDowngradingRecordRepository manuDowngradingRecordRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcRepository manuSfcRepository)
         {
             _manuDowngradingRepository = manuDowngradingRepository;
             _manuDowngradingRecordRepository = manuDowngradingRecordRepository;
             _manuDowngradingRuleRepository = manuDowngradingRuleRepository;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcRepository = manuSfcRepository;
         }
 
         /// <summary>
@@ -130,6 +144,15 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SiteId = bo.SiteId,
                 Codes = downgradingEntities.Select(d => d.Grade).ToArray()
             });
+
+            //查询sfc对应的过程
+            var sfcs = bo.KeyValues.Select(x=>x.SFC).Distinct().ToList();
+            var sfcProduces = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
+            {
+                SiteId =bo.SiteId,
+                Sfcs = sfcs,
+            });
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { SiteId = bo.SiteId , Sfcs = sfcs });
             foreach (var groupitem in bo.KeyValues.GroupBy(k => k.SFC))
             {
                 var targetdowngrads = downgradingEntities.Where(d => groupitem.ToList().Exists(c => c.BarCode == d.SFC)).Select(s => s.Grade);
@@ -156,16 +179,13 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                             Grade = targetrulecode.Code,
                             SiteId = bo.SiteId,
                             IsCancellation = Core.Enums.Manufacture.ManuDowngradingRecordTypeEnum.Entry,
-                            CreatedBy = bo.UserName ?? ""
+                            CreatedBy = bo.UserName ?? "",
+                            SfcInfoId= sfcList.FirstOrDefault(x => x.SFC == groupitem.Key)?.SFCInfoId ?? 0,
+                            ProcedureId = sfcProduces.FirstOrDefault(x => x.SFC ==groupitem.Key)?.ProcedureId??0
                         });
                     }
-
                 }
-
-
             }
-
-
             return await Task.FromResult((manuDowngradingEntities, manuDowngradingRecordEntities));
         }
     }

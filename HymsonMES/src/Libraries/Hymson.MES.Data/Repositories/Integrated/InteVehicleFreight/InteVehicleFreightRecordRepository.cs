@@ -204,7 +204,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class InteVehicleFreightRecordRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_vehicle_freight_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_vehicle_freight_record` /**innerjoin**/ /**leftjoin**/ /**where**/ORDER BY Id DESC  LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_vehicle_freight_record` /**where**/ ";
         const string GetInteVehicleFreightRecordEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
