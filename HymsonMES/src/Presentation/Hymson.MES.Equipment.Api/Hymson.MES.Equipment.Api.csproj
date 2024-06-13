@@ -22,8 +22,4 @@
     <ProjectReference Include="..\..\Libraries\Hymson.MES.EquipmentServices\Hymson.MES.EquipmentServices.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\Qkny\" />
-  </ItemGroup>
-
 </Project>

@@ -1,9 +1,11 @@
 ﻿using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos;
+using Hymson.MES.EquipmentServices.Dtos.Equipment;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
+using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +20,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
     public partial class EquipmentController : ControllerBase
     {
         /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<EquipmentController> _logger;
+
+        /// <summary>
         /// 生产服务接口
         /// </summary>
         private readonly IManufactureService _manufactureService;
@@ -30,14 +37,79 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="manufactureService"></param>
         /// <param name="sfcBindingService"></param>
-        public EquipmentController(IManufactureService manufactureService,
+        public EquipmentController(ILogger<EquipmentController> logger,
+            IManufactureService manufactureService,
             ISfcBindingService sfcBindingService)
         {
+            _logger = logger;
             _manufactureService = manufactureService;
             _sfcBindingService = sfcBindingService;
         }
+
+
+        /// <summary>
+        /// 设备心跳
+        /// HY-MES-EQU-002
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("Heartbeat")]
+        public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatDto request)
+        {
+            _logger.LogDebug(request.ToSerialize());
+            await Task.CompletedTask;
+
+            //await _equipmentService.EquipmentHeartbeatAsync(request);
+        }
+
+        /// <summary>
+        /// 设备状态监控
+        /// HY-MES-EQU-003
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("State")]
+        public async Task EquipmentStateAsync(EquipmentStateDto request)
+        {
+            _logger.LogDebug(request.ToSerialize());
+            await Task.CompletedTask;
+
+            //await _equipmentService.EquipmentStateAsync(request);
+        }
+
+        /// <summary>
+        /// 设备报警
+        /// HY-MES-EQU-004
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("Alarm")]
+        public async Task EquipmentAlarmAsync(EquipmentAlarmDto request)
+        {
+            _logger.LogDebug(request.ToSerialize());
+            await Task.CompletedTask;
+
+            //await _equipmentService.EquipmentAlarmAsync(request);
+        }
+
+        /// <summary>
+        /// 设备停机原因
+        /// HY-MES-EQU-005
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("DownReason")]
+        public async Task EquipmentDownReasonAsync(EquipmentDownReasonDto request)
+        {
+            _logger.LogDebug(request.ToSerialize());
+            await Task.CompletedTask;
+
+            //await _equipmentService.EquipmentDownReasonAsync(request);
+        }
+
 
         /// <summary>
         /// 创建条码（半成品）
@@ -149,11 +221,18 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _manufactureService.OutBoundCarrierAsync(request);
         }
+
+        /// <summary>
+        /// 生成国标码
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("CreateGBCode")]
         [LogDescription("生成国标码", BusinessType.OTHER, "CreateGBCode", ReceiverTypeEnum.MES)]
         public async Task<string> CreateGBCodeAsync(ManuMergeRequestDto request)
         {
             return await _manufactureService.MergeAsync(request);
         }
+
     }
 }
