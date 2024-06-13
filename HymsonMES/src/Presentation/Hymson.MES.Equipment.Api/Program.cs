@@ -1,7 +1,6 @@
 using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Web.Framework.Filters;
 using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -116,12 +115,12 @@ namespace Hymson.MES.Equipment.Api
                     TermsOfService = new Uri("https://www.hymson.com/"),
                     Contact = new OpenApiContact
                     {
-                        Name = "QknyMes",
+                        Name = "Mavel",
                         Url = new Uri("https://www.hymson.com/")
                     },
                     License = new OpenApiLicense
                     {
-                        Name = "hymson",
+                        Name = "Mavel",
                         Url = new Uri("https://www.hymson.com/")
                     }
                 });

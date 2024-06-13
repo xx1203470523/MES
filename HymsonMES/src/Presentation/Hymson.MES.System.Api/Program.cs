@@ -40,14 +40,14 @@ namespace Hymson.MES.System.Api
             }).AddJsonOptions((jsonOptions) =>
             {
                 jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
-            }); 
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
             builder.Services.AddEventBusRabbitMQService(builder.Configuration);
 #if DEBUG
-           // builder.Services.AddHostedService<HostedService>();
+            // builder.Services.AddHostedService<HostedService>();
 #endif
             AddSwaggerGen(builder.Services);
 
@@ -75,18 +75,10 @@ namespace Hymson.MES.System.Api
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
-         
-            app.UseHttpLogging();
-            //app.UseSwagger();
-            //app.UseSwaggerUI();
 
-            app.UseSwagger(options =>
-            {
-                options.RouteTemplate = "SystemService/swagger/{documentName}/swagger.{json|yaml}";
-            });
-            app.UseSwaggerUI(options => {
-                options.RoutePrefix = "SystemService/swagger";
-            });
+            app.UseHttpLogging();
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             #region snippet_ConfigureLocalization
             var supportedCultures = new List<CultureInfo>
@@ -123,7 +115,7 @@ namespace Hymson.MES.System.Api
         /// <param name="services"></param>
         private static void AddSwaggerGen(IServiceCollection services)
         {
-//#if DEBUG
+            //#if DEBUG
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddSwaggerGen(options =>
             {
@@ -135,12 +127,12 @@ namespace Hymson.MES.System.Api
                     TermsOfService = new Uri("https://www.xnebula.com/"),
                     Contact = new OpenApiContact
                     {
-                        Name = "芯享",
+                        Name = "Mavel",
                         Url = new Uri("https://www.xnebula.com/")
                     },
                     License = new OpenApiLicense
                     {
-                        Name = "芯享",
+                        Name = "Mavel",
                         Url = new Uri("https://www.xnebula.com/")
                     }
                 });
@@ -181,7 +173,7 @@ namespace Hymson.MES.System.Api
                 //options.OperationFilter<SecurityRequirementsOperationFilter>();
                 //options.OperationFilter<AuthorizationOperationFilter>();
             });
-//#endif
+            //#endif
         }
 
         /// <summary>
