@@ -55,7 +55,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         
     }

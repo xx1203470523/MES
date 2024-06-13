@@ -81,5 +81,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         Task<PagedInfo<EquSparepartEquipmentBindRecordView>> GetPagedListAsync(EquSparepartEquipmentBindRecordPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+       Task<EquSparepartEquipmentBindRecordEntity> GetIsBindAsync(EquSparepartEquipmentBindRecordQuery query);
+
     }
 }

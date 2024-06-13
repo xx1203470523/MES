@@ -2172,5 +2172,10 @@
         public const string MES17504 = "物料条码库存数量为0!";
         public const string MES17505 = "物料条码已录入不良且未进行不良处置!";
         #endregion
+
+        #region 备件安装卸载 17600
+        public const string MES17601 = "备件不存在!";
+        public const string MES17602 = "备件编码已绑定设备,位置{position}!";
+        #endregion
     }
 }

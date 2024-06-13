@@ -6,6 +6,7 @@
  *build datetime: 2024-06-12 10:53:50
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.EquEquipmentRecord
 {
@@ -18,9 +19,9 @@ namespace Hymson.MES.Core.Domain.EquEquipmentRecord
     public class EquEquipmentRecordEntity : BaseEntity
     {
         /// <summary>
-        /// 设备 idequ_equipment的id
+        /// 设备 id equ_equipment的id
         /// </summary>
-        public string EquipmentId { get; set; }
+        public long EquipmentId { get; set; }
 
        /// <summary>
         /// 设备编码
@@ -62,22 +63,24 @@ namespace Hymson.MES.Core.Domain.EquEquipmentRecord
         /// </summary>
         public string Location { get; set; }
 
-       /// <summary>
-        /// 设备类型
+        /// <summary>
+        /// 描述 :设备类型 
+        /// 空值 : true  
         /// </summary>
-        public bool? EquipmentType { get; set; }
+        public EquipmentTypeEnum? EquipmentType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 使用部门
         /// </summary>
         public long? UseDepartment { get; set; }
 
-       /// <summary>
-        /// 使用状态
+        /// <summary>
+        /// 描述 :使用状态 
+        /// 空值 : false  
         /// </summary>
-        public bool UseStatus { get; set; }
+        public EquipmentUseStatusEnum UseStatus { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 入场日期
         /// </summary>
         public DateTime? EntryDate { get; set; }
@@ -122,10 +125,10 @@ namespace Hymson.MES.Core.Domain.EquEquipmentRecord
         /// </summary>
         public int? TakeTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 站点Id

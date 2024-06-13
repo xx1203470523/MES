@@ -349,6 +349,7 @@ namespace Hymson.MES.Services.Mapper
             #region  EquSparepartEquipmentBindRecord
             CreateMap<EquSparepartEquipmentBindRecordPagedQueryDto, EquSparepartEquipmentBindRecordPagedQuery>();
             CreateMap<EquSparepartEquipmentBindRecordView, EquSparepartEquipmentBindRecordViewDto>();
+            CreateMap<EquSparepartEquipmentBindRecordEntity, EquSparepartEquipmentBindRecordDto>();
             #endregion
 
         }

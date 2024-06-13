@@ -79,7 +79,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 数量
         /// </summary>
-        public long Qty { get; set; }
+        public int Qty { get; set; }
 
         /// <summary>
         /// 描述

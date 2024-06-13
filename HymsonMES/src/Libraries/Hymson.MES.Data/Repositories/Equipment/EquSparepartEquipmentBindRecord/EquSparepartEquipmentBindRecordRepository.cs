@@ -1,10 +1,12 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.View;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Options;
 
@@ -118,6 +120,24 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.EquipmentId.HasValue)
+            {
+                sqlBuilder.Where(" EquipmentId=@EquipmentId ");
+            }
+            if (query.SparepartId.HasValue)
+            {
+                sqlBuilder.Where(" SparepartId=@SparepartId ");
+            }
+            if (query.OperationType.HasValue)
+            {
+                sqlBuilder.Where(" OperationType=@OperationType ");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquSparepartEquipmentBindRecordEntity>(template.RawSql, query);
         }
@@ -202,6 +222,16 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return new PagedInfo<EquSparepartEquipmentBindRecordView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<EquSparepartEquipmentBindRecordEntity> GetIsBindAsync(EquSparepartEquipmentBindRecordQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquSparepartEquipmentBindRecordEntity>(IsBindSql, query);
+        }
     }
 
 
@@ -226,5 +256,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetByIdSql = @"SELECT * FROM equ_sparepart_equipment_bind_record WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM equ_sparepart_equipment_bind_record WHERE Id IN @Ids ";
 
+        const string IsBindSql = "SELECT Id,Position FROM equ_sparepart_equipment_bind_record WHERE IsDeleted= 0 AND SiteId=@SiteId AND EquipmentId=@EquipmentId and SparepartId=@SparepartId and OperationType=@OperationType";
     }
 }

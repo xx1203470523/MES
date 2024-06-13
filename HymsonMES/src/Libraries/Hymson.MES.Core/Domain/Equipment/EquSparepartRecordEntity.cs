@@ -6,6 +6,7 @@
  *build datetime: 2024-06-12 10:29:55
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.EquSparepartRecord
 {
@@ -45,7 +46,7 @@ namespace Hymson.MES.Core.Domain.EquSparepartRecord
        /// <summary>
         /// 备件/工装
         /// </summary>
-        public bool Type { get; set; }
+        public int Type { get; set; }
 
        /// <summary>
         /// 单位ID
@@ -55,17 +56,17 @@ namespace Hymson.MES.Core.Domain.EquSparepartRecord
        /// <summary>
         /// 是否关键备件
         /// </summary>
-        public bool IsKey { get; set; }
+        public YesOrNoEnum IsKey { get; set; }
 
        /// <summary>
-        /// 是否标准件;0、否 1、是
+        /// 是否标准件; 1、是 2.否
         /// </summary>
-        public bool? IsStandard { get; set; }
+        public YesOrNoEnum? IsStandard { get; set; }
 
        /// <summary>
         /// 状态;0 禁用 1、启用
         /// </summary>
-        public bool Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
        /// <summary>
         /// 图纸编号
@@ -80,12 +81,12 @@ namespace Hymson.MES.Core.Domain.EquSparepartRecord
        /// <summary>
         /// 管理方式
         /// </summary>
-        public bool ManagementMode { get; set; }
+        public int? ManagementMode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 站点Id
