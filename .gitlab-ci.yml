@@ -33,9 +33,6 @@ sonarqube-vulnerability-report:
   allow_failure: true
   only:
     - dev-battery
-    - master
-    - main
-    - develop
   artifacts:
     expire_in: 1 day
     reports:
