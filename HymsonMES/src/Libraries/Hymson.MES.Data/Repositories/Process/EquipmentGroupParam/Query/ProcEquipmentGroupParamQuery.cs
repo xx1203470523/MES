@@ -18,7 +18,6 @@ namespace Hymson.MES.Data.Repositories.Process
         public long? ProductId { get; set; }
 
         public long? ProcedureId { get; set;}
-
     }
 
     public class ProcEquipmentGroupParamCodeQuery 

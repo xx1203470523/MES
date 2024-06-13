@@ -377,7 +377,13 @@ namespace Hymson.MES.Services.Services.Process
         {
             var resultZero = new PagedInfo<ProcParameterDto>(new List<ProcParameterDto>(), 1, queryDto.PageSize, 0);
 
-            var procEquipmentGroupParams = await _procEquipmentGroupParamRepository.GetProcEquipmentGroupParamEntitiesAsync(new ProcEquipmentGroupParamQuery { SiteId = _currentSite.SiteId ?? 0, ProductId = queryDto.ProductId, ProcedureId = queryDto.ProcedureId });
+            var procEquipmentGroupParams = await _procEquipmentGroupParamRepository
+                .GetProcEquipmentGroupParamEntitiesAsync(new ProcEquipmentGroupParamQuery 
+                { 
+                    SiteId = _currentSite.SiteId ?? 0, 
+                    ProductId = queryDto.ProductId, 
+                    ProcedureId = queryDto.ProcedureId
+                });
 
             if (procEquipmentGroupParams == null || !procEquipmentGroupParams.Any()) return resultZero;
 
@@ -391,7 +397,8 @@ namespace Hymson.MES.Services.Services.Process
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 Ids = procEquipmentGroupParamDetails.Select(x => x.ParamId).ToArray(),
-
+                ParameterCode = queryDto.ParameterCode,
+                ParameterName = queryDto.ParameterName,
                 PageIndex = queryDto.PageIndex,
                 PageSize = queryDto.PageSize,
             });
