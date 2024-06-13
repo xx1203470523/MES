@@ -25,9 +25,6 @@ sonarqube-check:
   allow_failure: true
   only:
     - dev-battery
-    - master
-    - main
-    - develop
 
 sonarqube-vulnerability-report:
   stage: sonarqube-vulnerability-report
