@@ -285,6 +285,35 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// ID编码查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoAsyncCode(PlanWorkOrderPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("wo.IsDeleted = 0");
+            sqlBuilder.Where("wo.SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(pageQuery.OrderCode))
+            {
+                sqlBuilder.Where("wo.OrderCode = @OrderCode");
+            }           
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = GetMESDbConnection();
+            var entities = await conn.QueryAsync<PlanWorkOrderListDetailView>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            return new PagedInfo<PlanWorkOrderListDetailView>(entities, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>
