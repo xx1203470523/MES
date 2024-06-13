@@ -39,8 +39,18 @@ namespace Hymson.MES.Data.Repositories.Equipment.Qkny
         public ManuEquipmentStatusEnum CurrentStatus { get; set; }
 
         /// <summary>
-        /// 时间
+        /// 状态开始时间
         /// </summary>
-        public DateTime LocalTime { get; set; }
+        public DateTime BeginTime { get; set; }
+
+        /// <summary>
+        /// 状态结束时间
+        /// </summary>
+        public DateTime EndTime { get; set; }
+
+        /// <summary>
+        /// 状态持续时间（单位秒）
+        /// </summary>
+        public int StatusDuration { get; set; }
     }
 }
