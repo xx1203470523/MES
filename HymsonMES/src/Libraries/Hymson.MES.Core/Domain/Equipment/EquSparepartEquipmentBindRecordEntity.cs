@@ -57,6 +57,14 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public string Remark { get; set; } = "";
 
-        
+        /// <summary>
+        /// 卸载人
+        /// </summary>
+        public string? UninstallBy { get; set; }
+
+        /// <summary>
+        /// 卸载时间
+        /// </summary>
+        public DateTime? UninstallOn { get; set; }
     }
 }

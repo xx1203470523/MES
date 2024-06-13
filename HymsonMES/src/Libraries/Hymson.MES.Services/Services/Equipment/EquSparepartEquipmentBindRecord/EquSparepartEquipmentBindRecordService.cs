@@ -76,7 +76,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquSparepartEquipmentBindRecordCreateDto saveDto)
+        public async Task<int> InstallAsync(EquSparepartEquipmentBindRecordCreateDto saveDto)
         {
             #region 验证
 
@@ -132,8 +132,8 @@ namespace Hymson.MES.Services.Services.Equipment
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SparepartId = sparePartsEntity.Id,
-                SparePartCode=sparePartsEntity.Code,
-                SparePartName=sparePartsEntity.Name,
+                Code=sparePartsEntity.Code,
+                Name=sparePartsEntity.Name,
                 SparePartTypeId=sparePartsEntity.SparePartTypeId,
                 ProcMaterialId=0,
                 Type=1,//备件/工装
@@ -180,6 +180,7 @@ namespace Hymson.MES.Services.Services.Equipment
 
                 await _equipmentRecordRepository.InsertAsync(equRecordEntity);
                 rows += await _equSparepartEquipmentBindRecordRepository.InsertAsync(bindRecordEntity);
+                ts.Complete();
             }
             return rows;
         }
@@ -208,6 +209,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 Supplier = equEquipmentEntity.Supplier,
                 Power = equEquipmentEntity.Power,
                 EnergyLevel = equEquipmentEntity.EnergyLevel,
+                OperationType= 5,
                 Ip = equEquipmentEntity.Ip,
                 TakeTime = equEquipmentEntity.TakeTime,
                 Remark = equEquipmentEntity.Remark,
@@ -224,7 +226,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquSparepartEquipmentBindRecordSaveDto saveDto)
+        public async Task<int> UninstallAsync(EquSparepartEquipmentBindRecordSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -235,11 +237,16 @@ namespace Hymson.MES.Services.Services.Equipment
                 throw new CustomerValidationException(nameof(ErrorCode.MES10104));
             }
 
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
             // DTO转换实体
             recordEntity.UninstallReason = saveDto.UninstallReason;
             recordEntity.Remark = saveDto.Remark;
-            recordEntity.UpdatedBy = _currentUser.UserName;
-            recordEntity.UpdatedOn = HymsonClock.Now();
+            recordEntity.UpdatedBy = updatedBy;
+            recordEntity.UpdatedOn = updatedOn;
+            recordEntity.UninstallBy = updatedBy;
+            recordEntity.UninstallOn = updatedOn;
 
             return await _equSparepartEquipmentBindRecordRepository.UpdateAsync(recordEntity);
         }

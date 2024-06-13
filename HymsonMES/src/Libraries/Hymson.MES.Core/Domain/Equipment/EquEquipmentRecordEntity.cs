@@ -138,7 +138,7 @@ namespace Hymson.MES.Core.Domain.EquEquipmentRecord
        /// <summary>
         /// 操作类型;1、设备注册2、设备点检3，设备保养4，设备维修，5、备件绑定6、备件解绑
         /// </summary>
-        public string OperationType { get; set; }
+        public int OperationType { get; set; }
 
        
     }

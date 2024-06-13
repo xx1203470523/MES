@@ -24,16 +24,6 @@ namespace Hymson.MES.Core.Domain.EquSparepartRecord
         public long SparepartId { get; set; }
 
        /// <summary>
-        /// 备件/工装编码
-        /// </summary>
-        public string SparePartCode { get; set; }
-
-       /// <summary>
-        /// 备件/工装名称
-        /// </summary>
-        public string SparePartName { get; set; }
-
-       /// <summary>
         /// 备件类型Id;同一个备件只允许分配至一个备件类型中
         /// </summary>
         public long? SparePartTypeId { get; set; }

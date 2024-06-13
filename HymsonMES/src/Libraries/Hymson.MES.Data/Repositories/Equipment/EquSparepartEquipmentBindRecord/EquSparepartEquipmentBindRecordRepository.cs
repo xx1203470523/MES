@@ -64,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         public async Task<int> UpdateRangeAsync(IEnumerable<EquSparepartEquipmentBindRecordEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("select es.code as SparepartCode,es.`Name`as SparepartName,est.`Code` as SparePartType,est.`Name` as SparePartTypeName,es.SparePartTypeId,ee.EquipmentCode,ee.EquipmentName,ee.Id, ese.CreatedBy,ese.CreatedOn,ese.Position,ese.OperationType,ese.UninstallReason,ese.UninstallBy,ese.UninstallOn");
+            sqlBuilder.Select("es.code as SparepartCode,es.`Name`as SparepartName,est.`Code` as SparePartType,est.`Name` as SparePartTypeName,es.SparePartTypeId,ee.EquipmentCode,ee.EquipmentName,ee.Id, ese.CreatedBy,ese.CreatedOn,ese.Position,ese.OperationType,ese.UninstallReason,ese.UninstallBy,ese.UninstallOn");
 
             sqlBuilder.LeftJoin(" equ_equipment ee on ee.Id=ese.EquipmentId");
             sqlBuilder.LeftJoin(" equ_sparepart es on es.Id=ese.SparepartId");
@@ -247,8 +247,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string InsertSql = "INSERT INTO equ_sparepart_equipment_bind_record(  `Id`, `SiteId`, `SparepartId`, `SparepartRecordId`, `EquipmentId`, `EquipmentRecordId`, `Position`, `OperationType`, `UninstallReason`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @SparepartId, @SparepartRecordId, @EquipmentId, @EquipmentRecordId, @Position, @OperationType, @UninstallReason, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO equ_sparepart_equipment_bind_record(  `Id`, `SiteId`, `SparepartId`, `SparepartRecordId`, `EquipmentId`, `EquipmentRecordId`, `Position`, `OperationType`, `UninstallReason`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @SparepartId, @SparepartRecordId, @EquipmentId, @EquipmentRecordId, @Position, @OperationType, @UninstallReason, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE equ_sparepart_equipment_bind_record SET   SiteId = @SiteId, SparepartId = @SparepartId, SparepartRecordId = @SparepartRecordId, EquipmentId = @EquipmentId, EquipmentRecordId = @EquipmentRecordId, Position = @Position, OperationType = @OperationType, UninstallReason = @UninstallReason, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE equ_sparepart_equipment_bind_record SET   SiteId = @SiteId, SparepartId = @SparepartId, SparepartRecordId = @SparepartRecordId, EquipmentId = @EquipmentId, EquipmentRecordId = @EquipmentRecordId, Position = @Position, OperationType = @OperationType, UninstallReason = @UninstallReason, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE equ_sparepart_equipment_bind_record SET  SparepartId = @SparepartId, SparepartRecordId = @SparepartRecordId, EquipmentId = @EquipmentId, EquipmentRecordId = @EquipmentRecordId, Position = @Position, OperationType = @OperationType, UninstallReason = @UninstallReason, Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn,UninstallBy=@UninstallBy,UninstallOn=@UninstallOn  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE equ_sparepart_equipment_bind_record SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE equ_sparepart_equipment_bind_record SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquSparepartEquipmentBindRecordCreateDto saveDto);
+        Task<int> InstallAsync(EquSparepartEquipmentBindRecordCreateDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(EquSparepartEquipmentBindRecordSaveDto saveDto);
+        Task<int> UninstallAsync(EquSparepartEquipmentBindRecordSaveDto saveDto);
 
         /// <summary>
         /// 删除
