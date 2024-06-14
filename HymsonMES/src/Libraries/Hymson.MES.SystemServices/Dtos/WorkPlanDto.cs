@@ -8,6 +8,11 @@ namespace Hymson.MES.SystemServices.Dtos
     public record WorkPlanDto : BaseEntityDto
     {
         /// <summary>
+        /// 产线编码
+        /// </summary>
+        public string LineCode { get; set; } = "";
+
+        /// <summary>
         /// 工单号 
         /// </summary>
         public string OrderCode { get; set; } = "";
@@ -72,7 +77,5 @@ namespace Hymson.MES.SystemServices.Dtos
         /// </summary>
         public string BomVersion { get; set; } = "";
 
-
     }
-
 }

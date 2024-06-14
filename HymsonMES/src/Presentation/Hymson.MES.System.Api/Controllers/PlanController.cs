@@ -30,16 +30,16 @@ namespace Hymson.MES.System.Api.Controllers
         }
 
         /// <summary>
-        /// 生产计划下发
+        /// 生产计划（同步）
         /// </summary>
-        /// <param name="requestDto"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        [HttpPost("WorkPlan/create")]
+        [HttpPost("WorkPlan/sync")]
         [ProducesResponseType(typeof(ResultDto), 200)]
-        [LogDescription("生产计划下发", BusinessType.INSERT)]
-        public async Task CreateWorkOrderAsync(WorkPlanDto requestDto)
+        [LogDescription("生产计划（同步）", BusinessType.INSERT)]
+        public async Task SyncWorkOrderAsync(IEnumerable<WorkPlanDto> requestDtos)
         {
-            await _planWorkPlanService.CreateAsync(requestDto);
+            _ = await _planWorkPlanService.SyncWorkOrderAsync(requestDtos);
         }
 
     }

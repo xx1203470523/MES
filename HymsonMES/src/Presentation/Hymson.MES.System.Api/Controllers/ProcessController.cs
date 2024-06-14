@@ -1,5 +1,4 @@
 ﻿using Hymson.MES.SystemServices.Dtos;
-using Hymson.MES.SystemServices.Services.Plan;
 using Hymson.MES.SystemServices.Services.Process;
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
@@ -31,15 +30,15 @@ namespace Hymson.MES.System.Api.Controllers
         }
 
         /// <summary>
-        /// 读取BOM信息
+        /// BOM信息（同步）
         /// </summary>
         /// <returns></returns>
         [HttpPost("Bom/sync")]
         [ProducesResponseType(typeof(ResultDto), 200)]
-        [LogDescription("读取BOM信息", BusinessType.INSERT)]
-        public async Task<IEnumerable<BomDto>> GetBomAsync()
+        [LogDescription("BOM信息（同步）", BusinessType.INSERT)]
+        public async Task SyncBomAsync(IEnumerable<BomDto> requestDtos)
         {
-            return await _procBomService.GetBomListAsync();
+            _ = await _procBomService.SyncBomAsync(requestDtos);
         }
 
     }

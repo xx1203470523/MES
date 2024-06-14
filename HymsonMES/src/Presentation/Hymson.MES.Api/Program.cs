@@ -132,12 +132,12 @@ namespace Hymson.MES.Api
                     TermsOfService = new Uri("https://www.hymson.com/"),
                     Contact = new OpenApiContact
                     {
-                        Name = "靳毅",
+                        Name = "Mavel",
                         Url = new Uri("https://www.hymson.com/")
                     },
                     License = new OpenApiLicense
                     {
-                        Name = "海目星激光",
+                        Name = "马威电动力",
                         Url = new Uri("https://www.hymson.com/")
                     }
                 });

@@ -9,6 +9,11 @@ namespace Hymson.MES.SystemServices.Dtos
     public record BomDto : BaseEntityDto
     {
         /// <summary>
+        /// 产线编码
+        /// </summary>
+        public string LineCode { get; set; } = "";
+
+        /// <summary>
         /// Bom编码
         /// </summary>
         public string BomCode { get; set; } = "";
@@ -71,5 +76,4 @@ namespace Hymson.MES.SystemServices.Dtos
         public decimal MaterialLoss { get; set; }
 
     }
-
 }

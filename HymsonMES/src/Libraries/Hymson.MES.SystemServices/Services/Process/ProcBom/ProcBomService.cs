@@ -1,3 +1,4 @@
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.SystemServices.Dtos;
 
 namespace Hymson.MES.SystemServices.Services.Process
@@ -8,21 +9,28 @@ namespace Hymson.MES.SystemServices.Services.Process
     public class ProcBomService : IProcBomService
     {
         /// <summary>
+        /// 仓储接口（BOM表）
+        /// </summary>
+        private readonly IProcBomRepository _procBomRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcBomService()
+        /// <param name="procBomRepository"></param>
+        public ProcBomService(IProcBomRepository procBomRepository)
         {
-            // TODO 
+            _procBomRepository = procBomRepository;
         }
 
         /// <summary>
-        /// 获取集合
+        /// BOM信息（同步）
         /// </summary>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<BomDto>> GetBomListAsync()
+        public async Task<int> SyncBomAsync(IEnumerable<BomDto> requestDtos)
         {
             // TODO 
-            return await Task.FromResult(new List<BomDto>());
+            return await Task.FromResult(0);
         }
 
     }

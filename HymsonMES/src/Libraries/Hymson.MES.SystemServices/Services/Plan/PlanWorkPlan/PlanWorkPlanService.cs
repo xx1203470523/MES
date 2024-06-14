@@ -16,11 +16,11 @@ namespace Hymson.MES.SystemServices.Services.Plan
         }
 
         /// <summary>
-        /// 创建
+        /// 生产计划（同步）
         /// </summary>
-        /// <param name="requestDto"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        public async Task<long> CreateAsync(WorkPlanDto requestDto)
+        public async Task<int> SyncWorkOrderAsync(IEnumerable<WorkPlanDto> requestDtos)
         {
             // TODO 
             return await Task.FromResult(0);

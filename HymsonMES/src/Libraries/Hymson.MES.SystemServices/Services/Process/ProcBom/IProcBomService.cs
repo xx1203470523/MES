@@ -8,10 +8,11 @@ namespace Hymson.MES.SystemServices.Services.Process
     public interface IProcBomService
     {
         /// <summary>
-        /// 获取集合
+        /// BOM信息（同步）
         /// </summary>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        Task<IEnumerable<BomDto>> GetBomListAsync();
+        Task<int> SyncBomAsync(IEnumerable<BomDto> requestDtos);
 
     }
 }

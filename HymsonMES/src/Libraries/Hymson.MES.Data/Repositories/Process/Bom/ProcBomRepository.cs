@@ -120,7 +120,7 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcBomEntitiesSqlTemplate);
-            sqlBuilder.Where(" IsDeleted=0 ");
+            sqlBuilder.Where(" IsDeleted = 0 ");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 

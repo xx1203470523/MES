@@ -8,11 +8,11 @@ namespace Hymson.MES.SystemServices.Services.Plan
     public interface IPlanWorkPlanService
     {
         /// <summary>
-        /// 新增
+        /// 生产计划（同步）
         /// </summary>
-        /// <param name="requestDto"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-        Task<long> CreateAsync(WorkPlanDto requestDto);
+        Task<int> SyncWorkOrderAsync(IEnumerable<WorkPlanDto> requestDtos);
 
     }
 }
