@@ -152,7 +152,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("es.code as SparepartCode,es.`Name`as SparepartName,est.`Code` as SparePartType,est.`Name` as SparePartTypeName,es.SparePartTypeId,ee.EquipmentCode,ee.EquipmentName,ee.Id, ese.CreatedBy,ese.CreatedOn,ese.Position,ese.OperationType,ese.UninstallReason,ese.UninstallBy,ese.UninstallOn");
+            sqlBuilder.Select("es.code as SparepartCode,es.`Name`as SparepartName,est.`Code` as SparePartType,est.`Name` as SparePartTypeName,es.SparePartTypeId,ee.EquipmentCode,ee.EquipmentName,ese.Id, ese.CreatedBy,ese.CreatedOn,ese.Position,ese.OperationType,ese.UninstallReason,ese.UninstallBy,ese.UninstallOn");
 
             sqlBuilder.LeftJoin(" equ_equipment ee on ee.Id=ese.EquipmentId");
             sqlBuilder.LeftJoin(" equ_sparepart es on es.Id=ese.SparepartId");
@@ -200,7 +200,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             if (pagedQuery.InstallTimeRange != null && pagedQuery.InstallTimeRange.Length >= 2)
             {
                 sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.InstallTimeRange[0], CreatedOnEnd = pagedQuery.InstallTimeRange[1].AddDays(1) });
-                sqlBuilder.Where(" ese.CreatedOn >= @CreatedOnStart AND wmi.CreatedOn < @CreatedOnEnd");
+                sqlBuilder.Where(" ese.CreatedOn >= @CreatedOnStart AND ese.CreatedOn < @CreatedOnEnd");
             }
 
             if (pagedQuery.UninstallTimeRange != null && pagedQuery.UninstallTimeRange.Length >= 2)

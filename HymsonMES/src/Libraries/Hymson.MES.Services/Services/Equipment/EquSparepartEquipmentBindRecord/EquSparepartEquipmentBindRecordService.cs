@@ -241,6 +241,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
             // DTO转换实体
+            recordEntity.OperationType=BindOperationTypeEnum.Uninstall;
             recordEntity.UninstallReason = saveDto.UninstallReason;
             recordEntity.Remark = saveDto.Remark;
             recordEntity.UpdatedBy = updatedBy;

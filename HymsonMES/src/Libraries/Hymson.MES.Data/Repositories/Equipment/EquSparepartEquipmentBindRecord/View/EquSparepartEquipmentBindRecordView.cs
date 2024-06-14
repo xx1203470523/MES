@@ -64,12 +64,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.View
         /// <summary>
         /// 卸载人
         /// </summary>
-        public string UninstallBy { get; set; }
+        public string? UninstallBy { get; set; }
 
         /// <summary>
         /// 卸载时间
         /// </summary>
-        public DateTime UninstallOn { get; set; }
+        public DateTime? UninstallOn { get; set; }
 
         /// <summary>
         /// 位置号
