@@ -103,6 +103,7 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -580,6 +581,20 @@ namespace Hymson.MES.Services.Mapper
             #region PlanShift
             CreateMap<PlanShiftPagedQueryDto, PlanShiftPagedQuery>();
             #endregion
+
+            #region InteBusinessField
+            CreateMap<InteBusinessFieldEntity, InteBusinessFieldSaveDto>();
+            CreateMap<InteBusinessFieldPagedQueryDto, InteBusinessFieldPagedQuery>();
+
+            #endregion
+
+            #region InteBusinessFieldDistribute
+            CreateMap<InteBusinessFieldDistributeEntity, InteBusinessFieldDistributeSaveDto>();
+            CreateMap<InteBusinessFieldDistributePagedQueryDto, InteBusinessFieldDistributePagedQuery>();
+
+            #endregion
+
+            
         }
 
         /// <summary>
@@ -1302,6 +1317,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuProductBarCodeDto, ManuCompromiseBarCodeDto>();
             CreateMap<ManuProductNGBarCodeDto, ManuMisjudgmentBarCodeDto>();
             CreateMap<ManuProductBarCodeDto, ManuReworkBarCodeDto>();
+            #endregion
+
+            #region ManuJointProductAndByproductsReceiveRecord
+            CreateMap<ManuJointProductAndByproductsReceiveRecordEntity, ManuJointProductAndByproductsReceiveRecordSaveDto>();
+            CreateMap<ManuJointProductAndByproductsReceiveRecordPagedQueryDto, ManuJointProductAndByproductsReceiveRecordPagedQuery>();
+            
             #endregion
         }
 
