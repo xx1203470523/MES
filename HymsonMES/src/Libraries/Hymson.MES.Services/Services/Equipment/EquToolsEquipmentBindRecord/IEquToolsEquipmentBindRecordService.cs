@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquToolsEquipmentBindRecordSaveDto saveDto);
+        Task<int> InstallAsync(EquToolsEquipmentBindRecordCreateDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(EquToolsEquipmentBindRecordSaveDto saveDto);
+        Task<int> UninstallAsync(EquToolsEquipmentBindRecordSaveDto saveDto);
 
         /// <summary>
         /// 删除
@@ -48,7 +48,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquToolsEquipmentBindRecordDto>> GetPagedListAsync(EquToolsEquipmentBindRecordPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<EquToolsEquipmentBindRecordViewDto>> GetPagedListAsync(EquToolsEquipmentBindRecordPagedQueryDto pagedQueryDto);
 
     }
 }

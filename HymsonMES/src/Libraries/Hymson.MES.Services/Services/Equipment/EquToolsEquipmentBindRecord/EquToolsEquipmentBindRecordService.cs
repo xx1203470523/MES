@@ -5,13 +5,22 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.EquSparepartRecord;
+using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using System.Net.NetworkInformation;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -34,46 +43,172 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         private readonly IEquToolsEquipmentBindRecordRepository _equToolsEquipmentBindRecordRepository;
 
+        private readonly IEquToolsRecordRepository _toolsRecordRepository;
+        private readonly IEquToolsRepository _toolsRepository;
+        private readonly IEquEquipmentRecordRepository _equipmentRecordRepository;
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="equToolsEquipmentBindRecordRepository"></param>
-        public EquToolsEquipmentBindRecordService(ICurrentUser currentUser, ICurrentSite currentSite, 
-            IEquToolsEquipmentBindRecordRepository equToolsEquipmentBindRecordRepository)
+        public EquToolsEquipmentBindRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IEquToolsEquipmentBindRecordRepository equToolsEquipmentBindRecordRepository,
+            IEquToolsRecordRepository toolsRecordRepository,
+            IEquToolsRepository toolsRepository,
+            IEquEquipmentRecordRepository equipmentRecordRepository,
+            IEquEquipmentRepository equEquipmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _equToolsEquipmentBindRecordRepository = equToolsEquipmentBindRecordRepository;
+            _toolsRecordRepository = toolsRecordRepository;
+            _toolsRepository = toolsRepository;
+            _equipmentRecordRepository = equipmentRecordRepository;
+            _equEquipmentRepository = equEquipmentRepository;
         }
-
 
         /// <summary>
         /// 创建
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquToolsEquipmentBindRecordSaveDto saveDto)
+        public async Task<int> InstallAsync(EquToolsEquipmentBindRecordCreateDto saveDto)
         {
+            #region 验证
+
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            //查询工具信息
+            var toolsEntity = await _toolsRepository.GetByIdAsync(saveDto.ToolId);
+            if (toolsEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17601));
+            }
+            //查询设备信息
+            var equEquipmentEntity = await _equEquipmentRepository.GetByIdAsync(saveDto.EquipmentId);
+            if (equEquipmentEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16338));
+            }
+
+            //备件能安装的数量
+            var siteId = _currentSite.SiteId ?? 0;
+
+            //指定位置是否已经绑定设备
+            var recordEntities = await _equToolsEquipmentBindRecordRepository.GetEntitiesAsync(new EquToolsEquipmentBindRecordQuery
+            {
+                SiteId = siteId,
+                ToolId = saveDto.ToolId,
+                //EquipmentId = saveDto.EquipmentId,
+                OperationType = BindOperationTypeEnum.Install
+            });
+            if (recordEntities != null && recordEntities.Any())
+            {
+                var position = recordEntities.FirstOrDefault()?.Position ?? "";
+                throw new CustomerValidationException(nameof(ErrorCode.MES17602)).WithData("position", position);
+            }
+            #endregion
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // DTO转换实体
-            var entity = saveDto.ToEntity<EquToolsEquipmentBindRecordEntity>();
-            entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = updatedBy;
-            entity.CreatedOn = updatedOn;
-            entity.UpdatedBy = updatedBy;
-            entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            #region 组装数据
+            var toolsRecordEntity = new EquToolsRecordEntity()
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                ToolId = toolsEntity.Id,
+                Code = toolsEntity.Code,
+                Name = toolsEntity.Name,
+                ToolsId = toolsEntity.ToolsId,
+                RatedLife = toolsEntity.RatedLife,
+                RatedLifeUnit=toolsEntity.RatedLifeUnit,
+                CumulativeUsedLife=toolsEntity.CumulativeUsedLife,
+                CurrentUsedLife=toolsEntity.CurrentUsedLife,
+                LastVerificationTime= toolsEntity.LastVerificationTime,
+                IsCalibrated=toolsEntity.IsCalibrated,
+                CalibrationCycle=toolsEntity.CalibrationCycle,
+                CalibrationCycleUnit=toolsEntity.CalibrationCycleUnit,
+                Status=toolsEntity.Status,
+                Remark=toolsEntity.Remark,
+                EquipmentId=saveDto.EquipmentId,
+                OperationType="2",
+                OperationRemark="",
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn,
+                SiteId = siteId
+            };
 
-            // 保存
-            return await _equToolsEquipmentBindRecordRepository.InsertAsync(entity);
+            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn);
+
+            //安装记录
+            var bindRecordEntity = new EquToolsEquipmentBindRecordEntity()
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                ToolId = saveDto.ToolId,
+                ToolsRecordId = 0,
+                EquipmentId = saveDto.EquipmentId,
+                EquipmentRecordId = equRecordEntity.Id,
+                Position = saveDto.Position,
+                OperationType = BindOperationTypeEnum.Install,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn,
+                SiteId = siteId
+            };
+            #endregion
+
+            var rows = 0;
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                // 保存
+                await _toolsRecordRepository.InsertAsync(toolsRecordEntity);
+
+                await _equipmentRecordRepository.InsertAsync(equRecordEntity);
+                rows += await _equToolsEquipmentBindRecordRepository.InsertAsync(bindRecordEntity);
+                ts.Complete();
+            }
+            return rows;
+        }
+
+        private EquEquipmentRecordEntity GetEquRecord(EquEquipmentEntity equEquipmentEntity, string updatedBy, DateTime updatedOn)
+        {
+            return new EquEquipmentRecordEntity()
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                EquipmentId = equEquipmentEntity.Id,
+                EquipmentCode = equEquipmentEntity.EquipmentCode,
+                EquipmentName = equEquipmentEntity.EquipmentName,
+                EquipmentGroupId = equEquipmentEntity.EquipmentGroupId,
+                EquipmentDesc = equEquipmentEntity.EquipmentDesc,
+                WorkCenterFactoryId = equEquipmentEntity.WorkCenterFactoryId,
+                WorkCenterShopId = equEquipmentEntity.WorkCenterShopId,
+                WorkCenterLineId = equEquipmentEntity.WorkCenterLineId,
+                Location = equEquipmentEntity.Location,
+                EquipmentType = equEquipmentEntity.EquipmentType,
+                UseDepartment = equEquipmentEntity.UseDepartment,
+                UseStatus = equEquipmentEntity.UseStatus,
+                EntryDate = equEquipmentEntity.EntryDate,
+                QualTime = equEquipmentEntity.QualTime,
+                ExpireDate = equEquipmentEntity.ExpireDate,
+                Manufacturer = equEquipmentEntity.Manufacturer,
+                Supplier = equEquipmentEntity.Supplier,
+                Power = equEquipmentEntity.Power,
+                EnergyLevel = equEquipmentEntity.EnergyLevel,
+                OperationType = 5,
+                Ip = equEquipmentEntity.Ip,
+                TakeTime = equEquipmentEntity.TakeTime,
+                Remark = equEquipmentEntity.Remark,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn,
+                SiteId = _currentSite.SiteId ?? 0
+            };
         }
 
         /// <summary>
@@ -81,17 +216,30 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquToolsEquipmentBindRecordSaveDto saveDto)
+        public async Task<int> UninstallAsync(EquToolsEquipmentBindRecordSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // DTO转换实体
-            var entity = saveDto.ToEntity<EquToolsEquipmentBindRecordEntity>();
-            entity.UpdatedBy = _currentUser.UserName;
-            entity.UpdatedOn = HymsonClock.Now();
+            var recordEntity = await _equToolsEquipmentBindRecordRepository.GetByIdAsync(saveDto.Id);
+            if (recordEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
 
-            return await _equToolsEquipmentBindRecordRepository.UpdateAsync(entity);
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+            // DTO转换实体
+            recordEntity.OperationType = BindOperationTypeEnum.Uninstall;
+            recordEntity.UninstallReason = saveDto.UninstallReason;
+            recordEntity.Remark = saveDto.Remark;
+            recordEntity.UpdatedBy = updatedBy;
+            recordEntity.UpdatedOn = updatedOn;
+            recordEntity.UninstallBy = updatedBy;
+            recordEntity.UninstallOn = updatedOn;
+
+            return await _equToolsEquipmentBindRecordRepository.UpdateAsync(recordEntity);
         }
 
         /// <summary>
@@ -124,12 +272,23 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquToolsEquipmentBindRecordDto?> QueryByIdAsync(long id) 
+        public async Task<EquToolsEquipmentBindRecordDto?> QueryByIdAsync(long id)
         {
-           var equToolsEquipmentBindRecordEntity = await _equToolsEquipmentBindRecordRepository.GetByIdAsync(id);
-           if (equToolsEquipmentBindRecordEntity == null) return null;
-           
-           return equToolsEquipmentBindRecordEntity.ToModel<EquToolsEquipmentBindRecordDto>();
+            var bindRecordEntity = await _equToolsEquipmentBindRecordRepository.GetByIdAsync(id);
+            if (bindRecordEntity == null) return null;
+
+            var bindRecordDto = bindRecordEntity.ToModel<EquToolsEquipmentBindRecordDto>();
+            //查询备件信息
+            var toolsEntity = await _toolsRepository.GetByIdAsync(bindRecordEntity.ToolId);
+
+            //查询设备信息
+            var equEquipmentEntity = await _equEquipmentRepository.GetByIdAsync(bindRecordEntity.EquipmentId);
+
+            bindRecordDto.ToolCode = toolsEntity?.Code ?? "";
+            bindRecordDto.ToolName = toolsEntity?.Name ?? "";
+            bindRecordDto.EquipmentCode = equEquipmentEntity?.EquipmentCode ?? "";
+            bindRecordDto.EquipmentName = equEquipmentEntity?.EquipmentName ?? "";
+            return bindRecordDto;
         }
 
         /// <summary>
@@ -137,15 +296,15 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquToolsEquipmentBindRecordDto>> GetPagedListAsync(EquToolsEquipmentBindRecordPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquToolsEquipmentBindRecordViewDto>> GetPagedListAsync(EquToolsEquipmentBindRecordPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquToolsEquipmentBindRecordPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equToolsEquipmentBindRecordRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquToolsEquipmentBindRecordDto>());
-            return new PagedInfo<EquToolsEquipmentBindRecordDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquToolsEquipmentBindRecordViewDto>());
+            return new PagedInfo<EquToolsEquipmentBindRecordViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
     }

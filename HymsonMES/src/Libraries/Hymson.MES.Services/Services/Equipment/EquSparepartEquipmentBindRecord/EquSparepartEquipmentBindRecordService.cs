@@ -1,4 +1,3 @@
-using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -8,9 +7,8 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.EquSparepartRecord;
-using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
-using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -21,9 +19,6 @@ using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System;
-using System.Net.NetworkInformation;
-using System.Reactive;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Equipment
@@ -97,7 +92,6 @@ namespace Hymson.MES.Services.Services.Equipment
             }
 
             //备件能安装的数量
-            var qty = sparePartsEntity.Qty;
             var siteId = _currentSite.SiteId ?? 0;
 
             //指定位置是否已经绑定设备
@@ -110,16 +104,13 @@ namespace Hymson.MES.Services.Services.Equipment
             });
             if (recordEntities != null && recordEntities.Any())
             {
-                if (qty == 1 && recordEntities.Count() > qty)
-                {
-                    var position = recordEntities.FirstOrDefault()?.Position;
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17602)).WithData("position", saveDto.Position);
-                }
+                var position = recordEntities.FirstOrDefault()?.Position??"";
+                throw new CustomerValidationException(nameof(ErrorCode.MES17602)).WithData("position", position);
 
-                if (recordEntities.Any(x => x.EquipmentId == saveDto.EquipmentId && x.Position.ToLowerInvariant() == saveDto.Position.ToLowerInvariant()))
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17602)).WithData("position", saveDto.Position);
-                }
+                //if (recordEntities.Any(x => x.EquipmentId == saveDto.EquipmentId && x.Position.ToLowerInvariant() == saveDto.Position.ToLowerInvariant()))
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES17602)).WithData("position", saveDto.Position);
+                //}
             }
             #endregion
 
@@ -136,9 +127,9 @@ namespace Hymson.MES.Services.Services.Equipment
                 Name=sparePartsEntity.Name,
                 SparePartTypeId=sparePartsEntity.SparePartTypeId,
                 ProcMaterialId=0,
-                Type=1,//备件/工装
+                Type= EquipmentPartTypeEnum.SparePart,
                 UnitId=0,
-                IsKey= sparePartsEntity.IsCritical??Core.Enums.YesOrNoEnum.No,
+                IsKey= sparePartsEntity.IsCritical??YesOrNoEnum.No,
                 IsStandard= sparePartsEntity.IsStandard,
                 Status =sparePartsEntity.Status,
                 BluePrintNo=sparePartsEntity.DrawCode??"",
@@ -159,7 +150,7 @@ namespace Hymson.MES.Services.Services.Equipment
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SparepartId = saveDto.SparepartId,
-                SparepartRecordId = 0,
+                SparepartRecordId = spareRecordEntity.Id,
                 EquipmentId = saveDto.EquipmentId,
                 EquipmentRecordId = equRecordEntity.Id,
                 Position = saveDto.Position,

@@ -36,7 +36,7 @@ namespace Hymson.MES.Core.Domain.EquSparepartRecord
        /// <summary>
         /// 备件/工装
         /// </summary>
-        public int Type { get; set; }
+        public EquipmentPartTypeEnum Type { get; set; }
 
        /// <summary>
         /// 单位ID

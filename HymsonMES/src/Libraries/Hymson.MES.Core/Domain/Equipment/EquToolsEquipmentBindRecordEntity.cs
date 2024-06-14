@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Equipment;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -18,7 +20,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 工具id
         /// </summary>
-        public long? ToolId { get; set; }
+        public long ToolId { get; set; }
 
         /// <summary>
         /// 工具记录表id equ_tools_record 的Id
@@ -28,7 +30,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 设备id equ_equipment的 id
         /// </summary>
-        public long? EquipmentId { get; set; }
+        public long EquipmentId { get; set; }
 
         /// <summary>
         /// 设备记录id equ_equipment_record
@@ -43,12 +45,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 操作类型1、绑定 2、卸载
         /// </summary>
-        public bool? OperationType { get; set; }
+        public BindOperationTypeEnum OperationType { get; set; }
 
         /// <summary>
         /// 卸载原因 1、正常2、异常
         /// </summary>
-        public bool? UninstallReason { get; set; }
+        public EquUninstallReasonEnum? UninstallReason { get; set; }
 
         /// <summary>
         /// 备注

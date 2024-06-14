@@ -44,9 +44,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddAsync([FromBody] EquToolsEquipmentBindRecordSaveDto saveDto)
+        public async Task InstallAsync([FromBody] EquToolsEquipmentBindRecordCreateDto saveDto)
         {
-             await _equToolsEquipmentBindRecordService.CreateAsync(saveDto);
+             await _equToolsEquipmentBindRecordService.InstallAsync(saveDto);
         }
 
         /// <summary>
@@ -56,9 +56,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task UpdateAsync([FromBody] EquToolsEquipmentBindRecordSaveDto saveDto)
+        public async Task UninstallAsync([FromBody] EquToolsEquipmentBindRecordSaveDto saveDto)
         {
-             await _equToolsEquipmentBindRecordService.ModifyAsync(saveDto);
+             await _equToolsEquipmentBindRecordService.UninstallAsync(saveDto);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<EquToolsEquipmentBindRecordDto>> QueryPagedListAsync([FromQuery] EquToolsEquipmentBindRecordPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquToolsEquipmentBindRecordViewDto>> QueryPagedListAsync([FromQuery] EquToolsEquipmentBindRecordPagedQueryDto pagedQueryDto)
         {
             return await _equToolsEquipmentBindRecordService.GetPagedListAsync(pagedQueryDto);
         }

@@ -3,37 +3,32 @@ using Hymson.MES.Core.Enums.Equipment;
 
 namespace Hymson.MES.Data.Repositories.Equipment.View
 {
-    public class EquSparepartEquipmentBindRecordView:BaseEntity
+    public class EquToolsEquipmentBindRecordView:BaseEntity
     {
-        /// <summary>
-        /// 主键Id
-        /// </summary>
-        public long Id { get; set; }
+        ///// <summary>
+        ///// 主键Id
+        ///// </summary>
+        //public long Id { get; set; }
 
         /// <summary>
-        /// 备件编码
+        /// 工具编码
         /// </summary>
-        public string SparepartCode { get; set; }
+        public string ToolCode { get; set; }
 
         /// <summary>
         /// 备件名称
         /// </summary>
-        public string? SparepartName { get; set; }
+        public string? ToolName { get; set; }
 
         /// <summary>
-        /// 备件记录表id equ_sparepart_record 的Id
+        /// 工具类型
         /// </summary>
-        public long SparepartRecordId { get; set; }
+        public string ToolType { get; set; }
 
         /// <summary>
-        /// 备件类型
+        /// 工具类型名称
         /// </summary>
-        public string SparePartType { get; set; }
-
-        /// <summary>
-        /// 备件类型名称
-        /// </summary>
-        public string SparePartTypeName { get; set; }
+        public string ToolTypeName { get; set; }
 
         /// <summary>
         /// 设备编码
@@ -45,15 +40,25 @@ namespace Hymson.MES.Data.Repositories.Equipment.View
         /// </summary>
         public string EquipmentName { get; set; }
 
-        /// <summary>
-        /// 安装时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
+        ///// <summary>
+        ///// 安装时间
+        ///// </summary>
+        //public DateTime CreatedOn { get; set; }
+
+        ///// <summary>
+        ///// 安装人
+        ///// </summary>
+        //public string CreatedBy { get; set; }
 
         /// <summary>
-        /// 安装人
+        /// 额定寿命
         /// </summary>
-        public string CreatedBy { get; set; }
+        public decimal RatedLife { get; set; }
+
+        /// <summary>
+        /// 当前使用寿命
+        /// </summary>
+        public decimal? CurrentUsedLife { get; set; }
 
         /// <summary>
         /// 卸载人

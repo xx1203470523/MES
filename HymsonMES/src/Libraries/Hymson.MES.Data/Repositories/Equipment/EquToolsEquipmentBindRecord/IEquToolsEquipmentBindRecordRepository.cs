@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.Equipment.View;
 
 namespace Hymson.MES.Data.Repositories.Equipment
 {
@@ -78,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquToolsEquipmentBindRecordEntity>> GetPagedListAsync(EquToolsEquipmentBindRecordPagedQuery pagedQuery);
+        Task<PagedInfo<EquToolsEquipmentBindRecordView>> GetPagedListAsync(EquToolsEquipmentBindRecordPagedQuery pagedQuery);
 
     }
 }

@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.Equipment.View;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -14,7 +15,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     public partial class EquToolsEquipmentBindRecordRepository : BaseRepository, IEquToolsEquipmentBindRecordRepository
     {
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         public EquToolsEquipmentBindRecordRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
@@ -38,7 +39,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         public async Task<int> InsertRangeAsync(IEnumerable<EquToolsEquipmentBindRecordEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(InsertSql, entities);
         }
 
         /// <summary>
@@ -60,7 +61,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         public async Task<int> UpdateRangeAsync(IEnumerable<EquToolsEquipmentBindRecordEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
         /// <summary>
@@ -116,6 +117,24 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.EquipmentId.HasValue)
+            {
+                sqlBuilder.Where(" EquipmentId=@EquipmentId ");
+            }
+            if (query.ToolId.HasValue)
+            {
+                sqlBuilder.Where(" ToolId=@ToolId ");
+            }
+            if (query.OperationType.HasValue)
+            {
+                sqlBuilder.Where(" OperationType=@OperationType ");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquToolsEquipmentBindRecordEntity>(template.RawSql, query);
         }
@@ -125,15 +144,68 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquToolsEquipmentBindRecordEntity>> GetPagedListAsync(EquToolsEquipmentBindRecordPagedQuery pagedQuery)
+
+        public async Task<PagedInfo<EquToolsEquipmentBindRecordView>> GetPagedListAsync(EquToolsEquipmentBindRecordPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("es.code as ToolCode,es.`Name`as ToolName,est.`Code` as ToolType,est.`Name` as ToolTypeName,es.ToolsId as ToolTypeId,ee.EquipmentCode,ee.EquipmentName,ese.Id, ese.CreatedBy,ese.CreatedOn,ese.Position,ese.OperationType,ese.UninstallReason,ese.UninstallBy,ese.UninstallOn,es.RatedLife,es.CurrentUsedLife");
+
+            sqlBuilder.LeftJoin(" equ_equipment ee on ee.Id=ese.EquipmentId");
+            sqlBuilder.LeftJoin(" equ_tools es on es.Id=ese.ToolId");
+            sqlBuilder.LeftJoin(" equ_tools_type est on est.Id=es.ToolsId");
+
+            sqlBuilder.OrderBy("ese.UpdatedOn DESC");
+            sqlBuilder.Where("ese.IsDeleted = 0");
+            sqlBuilder.Where("ese.SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ToolCode))
+            {
+                pagedQuery.ToolCode = $"%{pagedQuery.ToolCode}%";
+                sqlBuilder.Where(" es.code like @ToolCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ToolName))
+            {
+                pagedQuery.ToolName = $"%{pagedQuery.ToolName}%";
+                sqlBuilder.Where(" es.Name like @ToolName");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ToolType))
+            {
+                pagedQuery.ToolType = $"%{pagedQuery.ToolType}%";
+                sqlBuilder.Where(" est.Code like @ToolType");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
+            {
+                pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
+                sqlBuilder.Where(" ee.EquipmentCode like @EquipmentCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Position))
+            {
+                pagedQuery.Position = $"%{pagedQuery.Position}%";
+                sqlBuilder.Where(" ese.Position like @Position");
+            }
+
+            if (pagedQuery.OperationType.HasValue)
+            {
+                sqlBuilder.Where(" ese.OperationType= @OperationType");
+            }
+
+            if (pagedQuery.InstallTimeRange != null && pagedQuery.InstallTimeRange.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.InstallTimeRange[0], CreatedOnEnd = pagedQuery.InstallTimeRange[1].AddDays(1) });
+                sqlBuilder.Where(" ese.CreatedOn >= @CreatedOnStart AND ese.CreatedOn < @CreatedOnEnd");
+            }
+
+            if (pagedQuery.UninstallTimeRange != null && pagedQuery.UninstallTimeRange.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { UninstallTimeStart = pagedQuery.UninstallTimeRange[0], UninstallTimeEnd = pagedQuery.UninstallTimeRange[1].AddDays(1) });
+                sqlBuilder.Where(" ese.UninstallOn >= @UninstallTimeStart AND ese.UninstallOn < @UninstallTimeEnd");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -141,18 +213,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<EquToolsEquipmentBindRecordEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<EquToolsEquipmentBindRecordView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<EquToolsEquipmentBindRecordEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<EquToolsEquipmentBindRecordView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
     }
 
 
     /// <summary>
-    /// 
+    /// 仓存储sql
     /// </summary>
     public partial class EquToolsEquipmentBindRecordRepository
     {
@@ -161,10 +232,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_tools_equipment__bind_record /**where**/  ";
 
         const string InsertSql = "INSERT INTO equ_tools_equipment__bind_record(  `Id`, `SiteId`, `ToolId`, `ToolsRecordId`, `EquipmentId`, `EquipmentRecordId`, `Position`, `OperationType`, `UninstallReason`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `UninstallBy`, `UninstallOn`) VALUES (  @Id, @SiteId, @ToolId, @ToolsRecordId, @EquipmentId, @EquipmentRecordId, @Position, @OperationType, @UninstallReason, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @UninstallBy, @UninstallOn) ";
-        const string InsertsSql = "INSERT INTO equ_tools_equipment__bind_record(  `Id`, `SiteId`, `ToolId`, `ToolsRecordId`, `EquipmentId`, `EquipmentRecordId`, `Position`, `OperationType`, `UninstallReason`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `UninstallBy`, `UninstallOn`) VALUES (  @Id, @SiteId, @ToolId, @ToolsRecordId, @EquipmentId, @EquipmentRecordId, @Position, @OperationType, @UninstallReason, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @UninstallBy, @UninstallOn) ";
 
         const string UpdateSql = "UPDATE equ_tools_equipment__bind_record SET   SiteId = @SiteId, ToolId = @ToolId, ToolsRecordId = @ToolsRecordId, EquipmentId = @EquipmentId, EquipmentRecordId = @EquipmentRecordId, Position = @Position, OperationType = @OperationType, UninstallReason = @UninstallReason, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, UninstallBy = @UninstallBy, UninstallOn = @UninstallOn WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE equ_tools_equipment__bind_record SET   SiteId = @SiteId, ToolId = @ToolId, ToolsRecordId = @ToolsRecordId, EquipmentId = @EquipmentId, EquipmentRecordId = @EquipmentRecordId, Position = @Position, OperationType = @OperationType, UninstallReason = @UninstallReason, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, UninstallBy = @UninstallBy, UninstallOn = @UninstallOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE equ_tools_equipment__bind_record SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE equ_tools_equipment__bind_record SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
