@@ -98,7 +98,7 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
             sqlBuilder.LeftJoin("equ_equipment ee ON ee.Id = emper.EquipmentId");
             sqlBuilder.Where("emp.IsDeleted=0");
             sqlBuilder.Where("emp.SiteId=@SiteId");
-            sqlBuilder.Select("emp.*");
+            sqlBuilder.Select("DISTINCT emp.*");
             sqlBuilder.OrderBy("emp.CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Code))
             {
@@ -223,7 +223,7 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
     public partial class EquMaintenancePlanRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_plan` emp /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_plan` emp /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/   /**groupby**/   LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_Maintenance_plan` emp /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/ ";
         const string GetEquMaintenancePlanEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
