@@ -77,13 +77,13 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateEquSparePartsGroupAsync(EquSparePartsGroupSaveDto saveDto)
+        public async Task<int> CreateEquSparePartsGroupAsync(EquToolingTypeSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -190,13 +190,13 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyEquSparePartsGroupAsync(EquSparePartsGroupSaveDto saveDto)
+        public async Task<int> ModifyEquSparePartsGroupAsync(EquToolingTypeSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
             var entity = saveDto.ToEntity<EquSparePartsGroupEntity>();

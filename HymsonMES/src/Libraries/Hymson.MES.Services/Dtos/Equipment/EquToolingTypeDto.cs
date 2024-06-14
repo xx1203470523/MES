@@ -33,7 +33,22 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 是否需要校准
+        /// </summary>
+        public YesOrNoEnum Calibration { get; set; }
+
+        /// <summary>
+        /// 额定使用寿命
+        /// </summary>
+        public int LifeSpan { get; set; }
+
+        /// <summary>
+        /// 校准周期
+        /// </summary>
+        public string Cycle { get; set; }
+
+        /// <summary>
         /// 描述
         /// </summary>
         public string? Remark { get; set; } = "";

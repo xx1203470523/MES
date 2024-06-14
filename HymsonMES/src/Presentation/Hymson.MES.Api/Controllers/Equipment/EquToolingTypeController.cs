@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         [HttpPost]
         [Route("create")]
         [LogDescription("工具类型", BusinessType.INSERT)]
-        public async Task AddEquSparePartsGroupAsync([FromBody] EquSparePartsGroupSaveDto saveDto)
+        public async Task AddEquSparePartsGroupAsync([FromBody] EquToolingTypeSaveDto saveDto)
         {
              await _equToolingTypeService.CreateEquSparePartsGroupAsync(saveDto);
         }
@@ -61,7 +61,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         [HttpPut]
         [Route("update")]
         [LogDescription("工具类型", BusinessType.UPDATE)]
-        public async Task UpdateEquSparePartsGroupAsync([FromBody] EquSparePartsGroupSaveDto saveDto)
+        public async Task UpdateEquSparePartsGroupAsync([FromBody] EquToolingTypeSaveDto saveDto)
         {
              await _equToolingTypeService.ModifyEquSparePartsGroupAsync(saveDto);
         }
