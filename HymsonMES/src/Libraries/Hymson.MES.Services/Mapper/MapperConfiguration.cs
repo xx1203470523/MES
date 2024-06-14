@@ -103,6 +103,18 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
+using Hymson.MES.Services.Dtos.EquRepairOrder;
+using Hymson.MES.Core.Domain.EquRepairOrder;
+using Hymson.MES.Data.Repositories.EquRepairOrder;
+using Hymson.MES.Core.Domain.EquSparepartInventory;
+using Hymson.MES.Data.Repositories.EquSparepartInventory;
+using Hymson.MES.Services.Dtos.EquEquipmentRecord;
+using Hymson.MES.Core.Domain.EquEquipmentRecord;
+using Hymson.MES.Data.Repositories.EquEquipmentRecord;
+using Hymson.MES.Services.Dtos.EquSparepartRecord;
+using Hymson.MES.Core.Domain.EquSparepartRecord;
+using Hymson.MES.Data.Repositories.EquSparepartRecord;
+using Hymson.MES.Services.Dtos.EquSparepartInventory;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -344,6 +356,40 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
             #endregion
 
+            #region EquRepairOrder
+            CreateMap<EquRepairOrderCreateDto, EquRepairOrderEntity>();
+            CreateMap<EquRepairOrderModifyDto, EquRepairOrderEntity>();
+            CreateMap<EquRepairOrderPagedQueryDto, EquRepairOrderPagedQuery>();
+            CreateMap<EquRepairOrderEntity, EquRepairOrderDto>();
+
+            CreateMap<EquRepairOrderDto, EquRepairOrderEntity>();
+            #endregion
+
+            #region EquSparepartInventory
+            CreateMap<EquSparepartInventoryCreateDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparepartInventoryModifyDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparepartInventoryPagedQueryDto, EquSparepartInventoryPagedQuery>();
+            CreateMap<EquSparepartInventoryEntity, EquSparepartInventoryDto>();
+            CreateMap<EquSparepartInventoryPageView, EquSparepartInventoryPageDto>();
+
+            CreateMap<EquSparepartInventoryDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparePartEntity, EquSparepartRecordEntity>();
+            #endregion
+
+            #region EquEquipmentRecord
+            CreateMap<EquEquipmentRecordPagedQueryDto, EquEquipmentRecordPagedQuery>();
+            CreateMap<EquEquipmentRecordEntity, EquEquipmentRecordDto>();
+
+            CreateMap<EquEquipmentRecordDto, EquEquipmentRecordEntity>();
+            #endregion
+
+
+            #region EquSparepartRecord
+            CreateMap<EquSparepartRecordPagedQueryDto, EquSparepartRecordPagedQuery>();
+            CreateMap<EquSparepartRecordEntity, EquSparepartRecordDto>();
+
+            CreateMap<EquSparepartRecordDto, EquSparepartRecordEntity>();
+            #endregion
         }
 
         /// <summary>

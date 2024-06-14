@@ -1,165 +1,198 @@
 /*
  *creator: Karl
  *
- *describe: 设备备件记录表    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
+ *describe: 设备备件记录表    Dto | 代码由框架生成
  *builder:  pengxin
- *build datetime: 2024-06-12 10:29:55
+ *build datetime: 2024-06-14 04:03:04
  */
-using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Core.Domain.EquSparepartRecord
+using Hymson.Infrastructure;
+
+namespace Hymson.MES.Services.Dtos.EquSparepartRecord
 {
     /// <summary>
-    /// 设备备件记录表，数据实体对象   
-    /// equ_sparepart_record
-    /// @author pengxin
-    /// @date 2024-06-12 10:29:55
+    /// 设备备件记录表Dto 
     /// </summary>
-    public class EquSparepartRecordEntity : BaseEntity
+    public record EquSparepartRecordDto : BaseEntityDto
     {
         /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+       /// <summary>
         /// 备件id equ_sparepart的id
         /// </summary>
         public long SparepartId { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 备件类型Id;同一个备件只允许分配至一个备件类型中
         /// </summary>
         public long? SparePartTypeId { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 物料ID
         /// </summary>
         public long ProcMaterialId { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 备件/工装
         /// </summary>
-        public EquipmentPartTypeEnum Type { get; set; }
+        public bool Type { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 单位ID
         /// </summary>
         public long UnitId { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 是否关键备件
         /// </summary>
-        public TrueOrFalseEnum IsKey { get; set; }
+        public bool IsKey { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 是否标准件;0、否 1、是
         /// </summary>
-        public TrueOrFalseEnum? IsStandard { get; set; }
+        public bool? IsStandard { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 状态;0 禁用 1、启用
         /// </summary>
-        public DisableOrEnableEnum Status { get; set; }
+        public bool Status { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 图纸编号
         /// </summary>
         public string BluePrintNo { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 品牌
         /// </summary>
         public string Brand { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 管理方式
         /// </summary>
-        public int ManagementMode { get; set; }
+        public bool? ManagementMode { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 描述
         /// </summary>
         public string Remark { get; set; }
 
-        /// <summary>
+       /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+       /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+       /// <summary>
+        /// 最后修改人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+       /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
+       /// <summary>
+        /// 是否逻辑删除
+        /// </summary>
+        public long IsDeleted { get; set; }
+
+       /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 备件编码
         /// </summary>
         public string Code { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 备件名称
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 供应商ID;wh_supplier表的Id
         /// </summary>
         public long? SupplierId { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 厂商
         /// </summary>
         public string Manufacturer { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 图纸编号
         /// </summary>
         public string DrawCode { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 规格型号
         /// </summary>
         public string Specifications { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 存放位置;自动带出
         /// </summary>
         public string Position { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 是否关键设备;0、否 1、是
         /// </summary>
-        public TrueOrFalseEnum? IsCritical { get; set; }
+        public bool? IsCritical { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 数量
         /// </summary>
         public int Qty { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 操作类型 1、注册 2、入库 3、出库4、绑定5、解绑
         /// </summary>
-        public EquOperationTypeEnum OperationType { get; set; }
+        public string OperationType { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 操作数量
         /// </summary>
         public decimal? OperationQty { get; set; }
 
-        /// <summary>
+       /// <summary>
         /// 设备id equ_equipment的 id
         /// </summary>
         public long? EquipmentId { get; set; }
 
-
-        /// <summary>
-        /// 工作中心 id
+       /// <summary>
+        /// 工作中心Id
         /// </summary>
         public long? WorkCenterId { get; set; }
 
-
-        /// <summary>
+       /// <summary>
         /// 工作中心编码
         /// </summary>
         public string WorkCenterCode { get; set; }
 
-
-        /// <summary>
+       /// <summary>
         /// 领用人
         /// </summary>
         public string Recipients { get; set; }
 
+       
+    }
+
+
+    /// <summary>
+    /// 设备备件记录表分页Dto
+    /// </summary>
+    public class EquSparepartRecordPagedQueryDto : PagerInfo
+    {
     }
 }
