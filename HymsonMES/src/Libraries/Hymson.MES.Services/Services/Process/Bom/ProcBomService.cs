@@ -204,7 +204,7 @@ namespace Hymson.MES.Services.Services.Process
                             Loss = item.Loss ?? 0,
                             CreatedBy = procBomEntity.CreatedBy,
                             UpdatedBy = procBomEntity.CreatedBy,
-
+                            BomProductType = item.BomProductType,
                             DataCollectionWay = item.DataCollectionWay,
                             IsEnableReplace = item.IsEnableReplace ?? false,
                             Seq = (int)item.Seq

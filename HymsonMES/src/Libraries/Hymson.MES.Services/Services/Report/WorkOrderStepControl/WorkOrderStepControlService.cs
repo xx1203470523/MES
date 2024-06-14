@@ -92,8 +92,8 @@ namespace Hymson.MES.Services.Services.Report
             {
                 return null;
             }
-
-            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
+            //查询工单表信息
+            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsyncCode(pagedQuery);
 
             List<WorkOrderStepControlViewDto> listDto = new();
             if (pagedInfo.Data == null || !pagedInfo.Data.Any())
