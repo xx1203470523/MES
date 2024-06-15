@@ -9,7 +9,7 @@ namespace Hymson.MES.SystemServices.Dtos
     public record BomDto : BaseEntityDto
     {
         /// <summary>
-        /// 产线编码
+        /// 产线编码（隔离转子线和定子线数据）
         /// </summary>
         public string LineCode { get; set; } = "";
 

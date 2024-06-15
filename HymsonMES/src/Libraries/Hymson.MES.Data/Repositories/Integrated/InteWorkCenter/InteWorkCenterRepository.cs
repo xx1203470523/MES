@@ -1,16 +1,14 @@
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.View;
-using IdGen;
+using Hymson.MES.Data.Repositories.Integrated.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -170,6 +168,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetByCodeSql, param);
+        }
+
+        /// <summary>
+        /// 根据编码获取数据（慎用）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<InteWorkCenterEntity> GetByAllSiteCodeAsync(EntityByCodeQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetByAllSiteSql, param);
         }
 
         /// <summary>
@@ -423,12 +432,33 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
 
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
             if (workCenterQuery.Codes != null && workCenterQuery.Codes.Any())
             {
-                sqlBuilder.Where(" Code in @Codes ");
+                sqlBuilder.Where(" Code IN @Codes ");
+            }
+            using var conn = GetMESDbConnection();
+            var inteWorkCenters = await conn.QueryAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
+            return inteWorkCenters;
+        }
+
+        /// <summary>
+        /// 根据条件查询（慎用）
+        /// </summary>
+        /// <param name="workCenterQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteWorkCenterEntity>> GetAllSiteEntitiesAsync(InteWorkCenterQuery workCenterQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted = 0");
+
+            if (workCenterQuery.Codes != null && workCenterQuery.Codes.Any())
+            {
+                sqlBuilder.Where(" Code IN @Codes ");
             }
             using var conn = GetMESDbConnection();
             var inteWorkCenters = await conn.QueryAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
@@ -494,7 +524,8 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string GetInteWorkCenterRelationEntitiesSqlTemplate = "SELECT /**select**/ FROM inte_work_center_relation /**where**/";
 
         const string GetByTypeSql = "SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Type = @Type AND Status = @Status AND SiteId = @SiteId ";
-        const string GetByCodeSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
+        const string GetByCodeSql = @"SELECT * FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
+        const string GetByAllSiteSql = @"SELECT * FROM `inte_work_center` WHERE Code = @Code AND IsDeleted = 0 ";
         const string GetByResourceId = "SELECT IWC.* FROM inte_work_center_resource_relation IWCRR LEFT JOIN inte_work_center IWC ON IWCRR.WorkCenterId = IWC.Id WHERE IWC.IsDeleted = 0 AND IWCRR.ResourceId = @resourceId";
 
         const string InsertInteWorkCenterRelationRangSql = "INSERT INTO  `inte_work_center_relation` (  Id,WorkCenterId,SubWorkCenterId,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted,SiteId) VALUES ( @Id,@WorkCenterId,@SubWorkCenterId,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted,@SiteId) ";

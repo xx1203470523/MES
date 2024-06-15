@@ -261,7 +261,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除关联的BomId的数据
         /// </summary>
-        const string DeleteBomIDsSql = "UPDATE `proc_bom_detail` SET IsDeleted = Id,UpdatedBy = @UserId,UpdatedOn = @DeleteOn WHERE BomId in @bomIds";
+        const string DeleteBomIDsSql = "UPDATE `proc_bom_detail` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE BomId IN @bomIds";
         const string GetByIdSql = @"SELECT * FROM `proc_bom_detail`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_bom_detail`  WHERE Id IN @ids ";
 

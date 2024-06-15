@@ -18,14 +18,11 @@ using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
+using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.QualEnvOrder;
 using Hymson.MES.Services.Dtos.QualEnvOrder;
-using Hymson.Snowflake;
 using Hymson.Utils;
-using Org.BouncyCastle.Pqc.Crypto.Frodo;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.QualEnvOrder
 {
