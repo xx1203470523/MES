@@ -5,7 +5,14 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
     /// </summary>
     public class PlanWorkPlanQuery
     {
-        // TODO
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
 
+        /// <summary>
+        /// 编码集合
+        /// </summary>
+        public IEnumerable<string?> Codes { get; set; }
     }
 }

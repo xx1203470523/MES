@@ -9,6 +9,7 @@ using Hymson.MES.SystemServices.Dtos;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.SystemServices.Services.Process
 {
@@ -17,6 +18,11 @@ namespace Hymson.MES.SystemServices.Services.Process
     /// </summary>
     public class ProcBomService : IProcBomService
     {
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<ProcBomService> _logger;
+
         /// <summary>
         /// 仓储接口（BOM表）
         /// </summary>
@@ -40,15 +46,18 @@ namespace Hymson.MES.SystemServices.Services.Process
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
-        public ProcBomService(IProcBomRepository procBomRepository,
+        public ProcBomService(ILogger<ProcBomService> logger,
+            IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IInteWorkCenterRepository inteWorkCenterRepository)
         {
+            _logger = logger;
             _procBomRepository = procBomRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
@@ -57,7 +66,7 @@ namespace Hymson.MES.SystemServices.Services.Process
 
 
         /// <summary>
-        /// BOM信息（同步）
+        /// 同步信息（BOM）
         /// </summary>
         /// <param name="requestDtos"></param>
         /// <returns></returns>
@@ -82,7 +91,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                     continue;
                 }
 
-                var resposeBo = await GetBomListAsync(lineEntity, lineDict);
+                var resposeBo = await ConvertBomListAsync(lineEntity, lineDict);
                 if (resposeBo == null) continue;
 
                 // 添加到集合
@@ -110,12 +119,12 @@ namespace Hymson.MES.SystemServices.Services.Process
         }
 
         /// <summary>
-        /// 转换BOM信息集合
+        /// 转换信息集合（BOM）
         /// </summary>
         /// <param name="lineEntity"></param>
         /// <param name="lineDtoDict"></param>
         /// <returns></returns>
-        private async Task<SyncBomSummaryBo> GetBomListAsync(InteWorkCenterEntity lineEntity, IEnumerable<BomDto> lineDtoDict)
+        private async Task<SyncBomSummaryBo> ConvertBomListAsync(InteWorkCenterEntity lineEntity, IEnumerable<BomDto> lineDtoDict)
         {
             var resposeBo = new SyncBomSummaryBo();
 
@@ -136,9 +145,11 @@ namespace Hymson.MES.SystemServices.Services.Process
                 return resposeBo;
             }
 
-            // 判断BOM编码是否存在
+            // 读取已存在的BOM记录
             var bomCodes = lineDtoDict.Select(s => s.BomCode).Distinct();
             var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = lineEntity.SiteId, Codes = bomCodes });
+
+            // 遍历数据
             foreach (var bomDto in lineDtoDict)
             {
                 var bomEntity = bomEntities.FirstOrDefault(f => f.BomCode == bomDto.BomCode);
@@ -158,7 +169,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                         CreatedBy = updateUser,
                         CreatedOn = updateTime,
                         UpdatedBy = updateUser,
-                        UpdatedOn = updateTime,
+                        UpdatedOn = updateTime
                     };
 
                     // 添加BOM
@@ -179,7 +190,11 @@ namespace Hymson.MES.SystemServices.Services.Process
                 foreach (var bomMaterialDto in bomDto.BomMaterials)
                 {
                     var materialEntity = materialEntities.FirstOrDefault(f => f.MaterialCode == bomMaterialDto.MaterialCode);
-                    if (materialEntity == null) continue;
+                    if (materialEntity == null)
+                    {
+                        // 这里应该提示物料不存在
+                        continue;
+                    }
 
                     resposeBo.BomDetailAdds.Add(new ProcBomDetailEntity
                     {
@@ -211,7 +226,7 @@ namespace Hymson.MES.SystemServices.Services.Process
     }
 
     /// <summary>
-    /// 同步Bom信息BO对象
+    /// 同步信息BO对象（BOM）
     /// </summary>
     public class SyncBomSummaryBo
     {

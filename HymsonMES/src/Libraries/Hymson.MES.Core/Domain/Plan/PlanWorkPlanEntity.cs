@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Plan
 {
@@ -9,6 +10,11 @@ namespace Hymson.MES.Core.Domain.Plan
     /// </summary>
     public partial class PlanWorkPlanEntity : BaseEntity
     {
+        /// <summary>
+        /// 工厂
+        /// </summary>
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 计划单号
         /// </summary>
@@ -32,7 +38,7 @@ namespace Hymson.MES.Core.Domain.Plan
         /// <summary>
         /// BOM编码
         /// </summary>
-        public long BomCode { get; set; }
+        public string BomCode { get; set; }
 
         /// <summary>
         /// BOM版本
@@ -57,12 +63,12 @@ namespace Hymson.MES.Core.Domain.Plan
         /// <summary>
         /// 计划状态
         /// </summary>
-        public int Status { get; set; }
+        public PlanWorkPlanStatusEnum Status { get; set; }
 
         /// <summary>
         /// 需求单号
         /// </summary>
-        public string Requirementnumber { get; set; } = "";
+        public string? RequirementNumber { get; set; } = "";
 
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例

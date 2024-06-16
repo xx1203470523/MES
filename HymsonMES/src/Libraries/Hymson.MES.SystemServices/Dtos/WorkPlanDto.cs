@@ -55,12 +55,12 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 计划生产时间
         /// </summary>
-        public string StartTime { get; set; } = "";
+        public DateTime? StartTime { get; set; }
 
         /// <summary>
         /// 计划结束时间
         /// </summary>
-        public string EndTime { get; set; } = "";
+        public DateTime? EndTime { get; set; }
 
     }
 }

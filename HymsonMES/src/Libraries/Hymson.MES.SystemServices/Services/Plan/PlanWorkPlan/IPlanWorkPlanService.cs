@@ -8,7 +8,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
     public interface IPlanWorkPlanService
     {
         /// <summary>
-        /// 生产计划（同步）
+        /// 同步信息（生产计划）
         /// </summary>
         /// <param name="requestDtos"></param>
         /// <returns></returns>

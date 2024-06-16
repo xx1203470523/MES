@@ -12,9 +12,14 @@ namespace Hymson.MES.System.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [AllowAnonymous]
     public class ProcessController : ControllerBase
     {
+        /// <summary>
+        /// 接口（物料）
+        /// </summary>
+        private readonly IProcMaterialService _procMaterialService;
+
         /// <summary>
         /// 接口（BOM）
         /// </summary>
@@ -23,10 +28,24 @@ namespace Hymson.MES.System.Api.Controllers
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="procMaterialService"></param>
         /// <param name="procBomService"></param>
-        public ProcessController(IProcBomService procBomService)
+        public ProcessController(IProcMaterialService procMaterialService, IProcBomService procBomService)
         {
+            _procMaterialService = procMaterialService;
             _procBomService = procBomService;
+        }
+
+        /// <summary>
+        /// 物料信息（同步）
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("Material/sync")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("物料信息（同步）", BusinessType.INSERT)]
+        public async Task SyncMaterialAsync(IEnumerable<MaterialDto> requestDtos)
+        {
+            _ = await _procMaterialService.SyncMaterialAsync(requestDtos);
         }
 
         /// <summary>
