@@ -34,7 +34,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procBomEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ProcBomEntity> procBomEntitys);
+        Task<int> InsertsAsync(IEnumerable<ProcBomEntity> procBomEntitys);
 
         /// <summary>
         /// 更新
@@ -48,7 +48,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procBomEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<ProcBomEntity> procBomEntitys);
+        Task<int> UpdatesAsync(IEnumerable<ProcBomEntity> procBomEntitys);
 
         /// <summary>
         /// 更新 BOM IsCurrentVersion 为 false

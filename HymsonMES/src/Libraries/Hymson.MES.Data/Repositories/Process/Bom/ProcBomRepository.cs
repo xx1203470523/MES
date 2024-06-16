@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -141,45 +142,53 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procBomEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(ProcBomEntity procBomEntity)
+        public async Task<int> InsertAsync(ProcBomEntity entity)
         {
+            if (entity == null) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, procBomEntity);
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="procBomEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ProcBomEntity> procBomEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<ProcBomEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, procBomEntitys);
+            return await conn.ExecuteAsync(InsertSql, entities);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procBomEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ProcBomEntity procBomEntity)
+        public async Task<int> UpdateAsync(ProcBomEntity entity)
         {
+            if (entity == null) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, procBomEntity);
+            return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="procBomEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ProcBomEntity> procBomEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<ProcBomEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, procBomEntitys);
+            return await conn.ExecuteAsync(UpdatesSql, entities);
         }
 
         /// <summary>

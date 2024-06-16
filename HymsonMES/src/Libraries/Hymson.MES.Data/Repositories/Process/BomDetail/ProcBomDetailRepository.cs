@@ -3,9 +3,9 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -205,49 +205,60 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procBomDetailEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(ProcBomDetailEntity procBomDetailEntity)
+        public async Task<int> InsertAsync(ProcBomDetailEntity entity)
         {
+            if (entity == null) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, procBomDetailEntity);
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="procBomDetailEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ProcBomDetailEntity> procBomDetailEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<ProcBomDetailEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, procBomDetailEntitys);
+            return await conn.ExecuteAsync(InsertSql, entities);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procBomDetailEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ProcBomDetailEntity procBomDetailEntity)
+        public async Task<int> UpdateAsync(ProcBomDetailEntity entity)
         {
+            if (entity == null) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, procBomDetailEntity);
+            return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="procBomDetailEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ProcBomDetailEntity> procBomDetailEntitys)
+        public async Task<int> UpdatesAsync(List<ProcBomDetailEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, procBomDetailEntitys);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcBomDetailRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_bom_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";

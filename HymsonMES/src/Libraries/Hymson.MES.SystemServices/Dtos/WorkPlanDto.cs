@@ -3,7 +3,7 @@
 namespace Hymson.MES.SystemServices.Dtos
 {
     /// <summary>
-    /// 工单计划Dto
+    /// 工作计划 Dto
     /// </summary>
     public record WorkPlanDto : BaseEntityDto
     {
@@ -13,14 +13,9 @@ namespace Hymson.MES.SystemServices.Dtos
         public string LineCode { get; set; } = "";
 
         /// <summary>
-        /// 工单号 
+        /// 计划单号 
         /// </summary>
-        public string OrderCode { get; set; } = "";
-
-        /// <summary>
-        /// 分录号内码
-        /// </summary>
-        public string? FentryId { get; set; }
+        public string PlanCode { get; set; } = "";
 
         /// <summary>
         /// 需求单号
@@ -38,14 +33,19 @@ namespace Hymson.MES.SystemServices.Dtos
         public string ProductVersion { get; set; } = "";
 
         /// <summary>
-        /// 工作中心编码 
+        /// Bom编码
         /// </summary>
-        public string WorkCenterCode { get; set; } = "";
+        public string BomCode { get; set; } = "";
 
         /// <summary>
-        /// 工单类型
+        /// Bom版本
         /// </summary>
-        public int OrderType { get; set; }
+        public string BomVersion { get; set; } = "";
+
+        /// <summary>
+        /// 计划类型
+        /// </summary>
+        public int Type { get; set; }
 
         /// <summary>
         /// 工单数量
@@ -55,27 +55,12 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 计划生产时间
         /// </summary>
-        public string PlanStart { get; set; } = "";
+        public string StartTime { get; set; } = "";
 
         /// <summary>
         /// 计划结束时间
         /// </summary>
-        public string PlanEnd { get; set; } = "";
-
-        /// <summary>
-        /// Bom编码
-        /// </summary>
-        public string BomCode { get; set; } = "";
-
-        /// <summary>
-        /// Bom名称
-        /// </summary>
-        public string BomName { get; set; } = "";
-
-        /// <summary>
-        /// Bom版本
-        /// </summary>
-        public string BomVersion { get; set; } = "";
+        public string EndTime { get; set; } = "";
 
     }
 }

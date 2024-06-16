@@ -28,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procBomDetailEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ProcBomDetailEntity> procBomDetailEntitys);
+        Task<int> InsertsAsync(IEnumerable<ProcBomDetailEntity> procBomDetailEntitys);
 
         /// <summary>
         /// 更新

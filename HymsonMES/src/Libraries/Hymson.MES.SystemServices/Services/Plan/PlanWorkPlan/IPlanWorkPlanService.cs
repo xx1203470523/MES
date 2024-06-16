@@ -12,7 +12,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// </summary>
         /// <param name="requestDtos"></param>
         /// <returns></returns>
-        Task<int> SyncWorkOrderAsync(IEnumerable<WorkPlanDto> requestDtos);
+        Task<int> SyncWorkPlanAsync(IEnumerable<WorkPlanDto> requestDtos);
 
     }
 }

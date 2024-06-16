@@ -37,9 +37,9 @@ namespace Hymson.MES.System.Api.Controllers
         [HttpPost("WorkPlan/sync")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("生产计划（同步）", BusinessType.INSERT)]
-        public async Task SyncWorkOrderAsync(IEnumerable<WorkPlanDto> requestDtos)
+        public async Task SyncWorkPlanAsync(IEnumerable<WorkPlanDto> requestDtos)
         {
-            _ = await _planWorkPlanService.SyncWorkOrderAsync(requestDtos);
+            _ = await _planWorkPlanService.SyncWorkPlanAsync(requestDtos);
         }
 
     }
