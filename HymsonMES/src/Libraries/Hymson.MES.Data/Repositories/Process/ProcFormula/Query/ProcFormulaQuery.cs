@@ -13,6 +13,8 @@ namespace Hymson.MES.Data.Repositories.Process.Query
 
         public long? ProcedureId { get; set; }
 
+        public long? EquipmentGroupId {  get; set; }
+
         public SysDataStatusEnum? Status { get; set; }
     }
 

@@ -124,7 +124,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (query.MaterialId.HasValue && query.MaterialId.Value>0)
+            if (query.MaterialId.HasValue && query.MaterialId.Value > 0)
             {
                 sqlBuilder.Where(" MaterialId = @MaterialId ");
             }
@@ -132,7 +132,11 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" ProcedureId = @ProcedureId ");
             }
-            if (query.Status.HasValue )
+            if (query.EquipmentGroupId.HasValue && query.EquipmentGroupId.Value > 0)
+            {
+                sqlBuilder.Where(" EquipmentGroupId = @EquipmentGroupId ");
+            }
+            if (query.Status.HasValue)
             {
                 sqlBuilder.Where(" Status = @Status ");
             }

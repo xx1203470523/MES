@@ -302,7 +302,7 @@ namespace Hymson.MES.Services.Services.Process
                     //校验上下限
                     if ((detailEntity.UpperLimit - detailEntity.LowLimit) < 0)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15730)).WithData("line", index+1);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15730)).WithData("line", index + 1);
                     }
 
                     detailEntity.Id = IdGenProvider.Instance.CreateId();
@@ -548,17 +548,25 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
-            //当是需要更改为启用状态时 判断是否 物料 + 工序 是否已经有启用状态的的配方
+            //当是需要更改为启用状态时 判断是否 物料 + 工序 + 工艺设备组 是否已经有启用状态的的配方
             if (changeStatusCommand.Status == SysDataStatusEnum.Enable)
             {
-                var sameEnableFormulas = await _procFormulaRepository.GetEntitiesAsync(new ProcFormulaQuery { SiteId = _currentSite.SiteId ?? 0, MaterialId = entity.MaterialId, ProcedureId = entity.ProcedureId, Status = SysDataStatusEnum.Enable });
+                var sameEnableFormulas = await _procFormulaRepository.GetEntitiesAsync(new ProcFormulaQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    MaterialId = entity.MaterialId,
+                    ProcedureId = entity.ProcedureId,
+                    EquipmentGroupId = entity.EquipmentGroupId,
+                    Status = SysDataStatusEnum.Enable
+                });
 
                 if (sameEnableFormulas != null && sameEnableFormulas.Any())
                 {
                     var material = await _procMaterialRepository.GetByIdAsync(entity.MaterialId);
                     var procedure = await _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
+                    var equipmentGroup = await _procProcessEquipmentGroupRepository.GetByIdAsync(entity.EquipmentGroupId);
 
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15702)).WithData("materialCode", material?.MaterialCode ?? "").WithData("procedureCode", procedure?.Code ?? "");
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15702)).WithData("materialCode", material?.MaterialCode ?? "").WithData("procedureCode", procedure?.Code ?? "").WithData("equipmentGroupCode", equipmentGroup?.Code ?? "");
                 }
             }
 
