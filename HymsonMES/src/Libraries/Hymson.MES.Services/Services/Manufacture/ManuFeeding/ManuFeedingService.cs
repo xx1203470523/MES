@@ -367,7 +367,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             }
 
             // 已加载的物料ID
-            if (manuFeedings != null) manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
+            if (manuFeedings != null)
+            {
+                manuFeedings = manuFeedings.Where(x => x.Qty > 0);
+                manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
+            }
 
             // 不在集合里面的物料ID
             var notIncludeIds = manuFeedingsDictionary.Keys.Except(materialIds);
