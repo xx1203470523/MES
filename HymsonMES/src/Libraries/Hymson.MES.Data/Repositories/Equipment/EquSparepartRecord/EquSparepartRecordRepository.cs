@@ -135,7 +135,7 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
         public async Task<int> InsertsAsync(List<EquSparepartRecordEntity> equSparepartRecordEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, equSparepartRecordEntitys);
+            return await conn.ExecuteAsync(InsertSql, equSparepartRecordEntitys);
         }
 
         /// <summary>

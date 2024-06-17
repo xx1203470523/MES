@@ -2189,5 +2189,10 @@
 
 
         #endregion
+
+        #region 备件安装卸载 17600
+        public const string MES17601 = "备件不存在!";
+        public const string MES17602 = "备件已绑定设备,位置{position}!";
+        #endregion
     }
 }

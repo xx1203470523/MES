@@ -115,6 +115,7 @@ using Hymson.MES.Services.Dtos.EquSparepartRecord;
 using Hymson.MES.Core.Domain.EquSparepartRecord;
 using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.EquSparepartInventory;
+using Hymson.MES.Data.Repositories.Equipment.View;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -390,6 +391,13 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<EquSparepartRecordDto, EquSparepartRecordEntity>();
             #endregion
+
+            #region  EquSparepartEquipmentBindRecord
+            CreateMap<EquSparepartEquipmentBindRecordPagedQueryDto, EquSparepartEquipmentBindRecordPagedQuery>();
+            CreateMap<EquSparepartEquipmentBindRecordView, EquSparepartEquipmentBindRecordViewDto>();
+            CreateMap<EquSparepartEquipmentBindRecordEntity, EquSparepartEquipmentBindRecordDto>();
+            #endregion
+
         }
 
         /// <summary>

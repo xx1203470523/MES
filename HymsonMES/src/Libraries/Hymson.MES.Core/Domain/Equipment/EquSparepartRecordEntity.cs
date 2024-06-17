@@ -71,12 +71,12 @@ namespace Hymson.MES.Core.Domain.EquSparepartRecord
         /// <summary>
         /// 管理方式
         /// </summary>
-        public int ManagementMode { get; set; }
+        public int? ManagementMode { get; set; }
 
         /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 站点Id
