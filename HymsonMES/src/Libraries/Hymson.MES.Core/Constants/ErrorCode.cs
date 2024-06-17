@@ -173,7 +173,7 @@
         public const string MES10410 = "作业关联点不合法，请检查！";
         public const string MES10411 = "关联物料不能为空，请检查！";
         public const string MES10412 = "作业参数不能为空！";
-        public const string MES10413 = "资源类型已被{Code}工序绑定"; 
+        public const string MES10413 = "资源类型已被{Code}工序绑定";
 
         public const string MES10430 = $"不能删除启用和保留状态的工艺路线！";
         public const string MES10431 = $"此工艺路线在系统中已经存在!";
@@ -466,7 +466,7 @@
 
         public const string MES11717 = "检验单明细为空！";
         public const string MES11718 = "{materialId}参数项目为空检验单明细为空！";
-        public const string MES11719 = "记录数量小于批次数量，不予生成";
+        public const string MES11719 = "输入的待收货数量小于批次数量，不予生成!";
         public const string MES11720 = "重复提交，条码已存在FQC检验单条码记录表中!";
         public const string MES11721 = "FQC创建保存错误!";
 
@@ -603,8 +603,8 @@
         public const string MES12321 = "结束时间需大于开始时间";
         public const string MES12322 = "请维护设备{Code}执行人/责任人";
         public const string MES12323 = "截止执行时间必须填写一个";
-        public const string MES12324 = "完成时间必须填写一个"; 
-        public const string MES12325 = "已过结束时间，不执行"; 
+        public const string MES12324 = "完成时间必须填写一个";
+        public const string MES12325 = "已过结束时间，不执行";
 
 
         #endregion
@@ -2171,6 +2171,33 @@
         public const string MES17503 = "物料条码不可用!";
         public const string MES17504 = "物料条码库存数量为0!";
         public const string MES17505 = "物料条码已录入不良且未进行不良处置!";
+        #endregion
+
+        #region 备件出入库管理 17900
+        public const string MES17901 = "未查询到备件信息";
+        public const string MES17902 = "备件{Code}没有库存信息";
+        public const string MES17903 = "不存在{Code}备件";
+        public const string MES17904 = "类型{OperationType}不存在";
+        public const string MES17905 = "请选择备件";
+        public const string MES17906 = "请正确填写数量";
+        public const string MES17907 = "备件{Code}不存在或未启用";
+        public const string MES17908 = "备件编码{Code}无可入库数量";
+        public const string MES17909 = "库存总数量不允许大于备件注册数量";
+        public const string MES17910 = "备件{Code}库存不足";
+        public const string MES17911 = "未查询到备件库存信息";
+        public const string MES17912 = "库存不足"; 
+
+
+        #endregion
+
+        #region 备件安装卸载 17600
+        public const string MES17601 = "备件不存在!";
+        public const string MES17602 = "备件已绑定设备,位置{position}!";
+        public const string MES17603 = "备件没有设置备件类型!";
+        public const string MES17604 = "设备没有设置设备组!";
+        public const string MES17605 = "备件对应的备件类型没有关联设备组!";
+        public const string MES17606 = "备件关联的设备组不包含当前设备!";
+        public const string MES17607 = "备件在设备上的安装数量不能超过备件注册数量!";
         #endregion
     }
 }
