@@ -15,9 +15,19 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long SparepartId { get; set; }
 
         /// <summary>
+        /// 备件编码
+        /// </summary>
+        public string SparepartCode { get; set; }
+
+        /// <summary>
         /// 设备id equ_equipment的 id
         /// </summary>
         public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
 
         /// <summary>
         /// 位置号
