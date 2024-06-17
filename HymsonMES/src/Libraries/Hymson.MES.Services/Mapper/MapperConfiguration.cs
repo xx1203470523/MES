@@ -690,6 +690,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProductDetailReportView, ProductDetailReportOutputDto>();
 
             #endregion
+
+            CreateMap<ProductionDetailsReportQueryDto, ProductionDetailsReportQuery>();
+            CreateMap<ProductionDetailsReportPageQueryDto, ProductionDetailsReportPageQuery>();
+
         }
 
         /// <summary>

@@ -271,6 +271,9 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Report
             services.AddSingleton<IProductDetailReportRepository, ProductDetailReportRepository>();
             services.AddSingleton<IPackTraceSFCParameterRepository, PackTraceSFCParameterRepository>();
+
+            services.AddSingleton<IProductionDetailsReportRepository, ProductionDetailsReportRepository>();
+
             #endregion
 
             return services;

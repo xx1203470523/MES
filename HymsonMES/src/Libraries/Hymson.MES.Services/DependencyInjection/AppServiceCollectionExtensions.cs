@@ -60,6 +60,7 @@ using Hymson.Minio;
 using Microsoft.Extensions.Configuration;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Services.Report.PackTraceSfc;
+using Hymson.MES.Data.Repositories.Report;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -306,6 +307,12 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PackTraceSfcReport
 
             services.AddSingleton<IPackTraceSfcService, PackTraceSfcService>();
+
+            #endregion
+
+            #region ProductionDetailsReport
+
+            services.AddSingleton<IProductionDetailsReportService, ProductionDetailsReportService>();
 
             #endregion
 
