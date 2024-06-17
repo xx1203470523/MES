@@ -277,6 +277,7 @@ namespace Hymson.MES.Services.Mapper
             #region EquToolingTypeType
             CreateMap<EquToolingTypeQueryDto, EquToolingTypePagedQuery>();
             CreateMap<EquToolingTypeEntity, EquToolingTypeDto>();
+            CreateMap<EquToolingTypeSaveDto, EquToolingTypeEntity>();
 
             #endregion
 
