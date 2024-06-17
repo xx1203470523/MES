@@ -99,6 +99,19 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
             return await conn.QueryFirstOrDefaultAsync<EquSparePartEntity>(GetByIdSql, new { Id = id });
         }
 
+
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquSparePartEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquSparePartEntity>(GetByIdsSql, new { Ids = ids }); 
+        }
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -163,5 +176,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         const string GetByIdSql = @"SELECT 
                                `Id`, `SparePartCode`, `SparePartName`, `SparePartTypeId`, `ProcMaterialId`, `UnitId`, `IsKey`, `IsStandard`, `Status`, `BluePrintNo`, `Brand`, `ManagementMode`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteCode`
                             FROM `equ_sparepart`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT *  FROM `equ_sparepart`  WHERE Id IN @Ids "; 
     }
 }
