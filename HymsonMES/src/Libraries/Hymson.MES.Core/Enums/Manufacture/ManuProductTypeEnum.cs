@@ -16,21 +16,21 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 正常
         /// </summary>
         [Description("正常")]
-        Normal = 0,
+        Normal = 1,
         /// <summary>
         /// 虚拟
         /// </summary>
         [Description("虚拟")]
-        Fictitious = 1,
+        Fictitious = 2,
         /// <summary>
         /// 联产品
         /// </summary>
         [Description("联产品")]
-        JointProducts = 2,
+        JointProducts = 3,
         /// <summary>
-        /// 副产品
+        /// 副产品x
         /// </summary>
         [Description("副产品")]
-        ByProduct = 3,
+        ByProduct = 4,
     }
 }
