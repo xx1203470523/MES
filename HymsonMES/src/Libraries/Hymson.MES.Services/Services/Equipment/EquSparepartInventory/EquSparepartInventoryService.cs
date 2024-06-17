@@ -304,7 +304,10 @@ namespace Hymson.MES.Services.Services.EquSparepartInventory
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES17902)).WithData("Code", item.SparepartCode);
                         }
-
+                        if (equSparepartInventor.Qty <= 0)
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES17906)).WithData("Code", item.SparepartCode);
+                        }
                         if (equSparepartInventor.Qty < item.Qty)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES17910)).WithData("Code", item.SparepartCode);
