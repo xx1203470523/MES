@@ -332,7 +332,7 @@ namespace Hymson.MES.Services.Services.EquSparepartInventory
                     Name = equSparepart.Name, // 备件名称
                     SparePartTypeId = equSparepart.SparePartTypeId, // 备件类型ID
                     Type = EquipmentPartTypeEnum.SparePart, // 备件类型
-                    IsStandard = equSparepart.IsStandard == YesOrNoEnum.Yes ? TrueOrFalseEnum.Yes : TrueOrFalseEnum.No, // 是否标准件
+                    IsStandard = equSparepart.IsStandard,// == YesOrNoEnum.Yes ? TrueOrFalseEnum.Yes : TrueOrFalseEnum.No, // 是否标准件
                     Status = DisableOrEnableEnum.Enable, // 状态
                     Remark = equSparepart.Remark ?? "", // 备注
                     SiteId = siteId, // 站点ID
@@ -340,7 +340,7 @@ namespace Hymson.MES.Services.Services.EquSparepartInventory
                     DrawCode = equSparepart.DrawCode ?? "", // 图纸编号
                     Specifications = equSparepart.Specifications, // 规格
                     Position = equSparepart.Position ?? "", // 位置
-                    IsCritical = equSparepart.IsCritical == YesOrNoEnum.Yes ? TrueOrFalseEnum.Yes : TrueOrFalseEnum.No, // 是否关键
+                    IsCritical = equSparepart.IsCritical,// == YesOrNoEnum.Yes ? TrueOrFalseEnum.Yes : TrueOrFalseEnum.No, // 是否关键
                     Qty = equSparepart.Qty.ParseToInt(), // 数量
                     OperationType = equSparepartInventoryDto.OperationType, // 操作类型
                     OperationQty = item.Qty.ParseToInt(), // 操作数量

@@ -46,12 +46,12 @@ namespace Hymson.MES.Core.Domain.EquSparepartRecord
         /// <summary>
         /// 是否关键备件
         /// </summary>
-        public TrueOrFalseEnum IsKey { get; set; }
+        public YesOrNoEnum IsKey { get; set; }
 
         /// <summary>
         /// 是否标准件;0、否 1、是
         /// </summary>
-        public TrueOrFalseEnum? IsStandard { get; set; }
+        public YesOrNoEnum? IsStandard { get; set; }
 
         /// <summary>
         /// 状态;0 禁用 1、启用
@@ -121,7 +121,7 @@ namespace Hymson.MES.Core.Domain.EquSparepartRecord
         /// <summary>
         /// 是否关键设备;0、否 1、是
         /// </summary>
-        public TrueOrFalseEnum? IsCritical { get; set; }
+        public YesOrNoEnum? IsCritical { get; set; }
 
         /// <summary>
         /// 数量
