@@ -65,5 +65,12 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// </summary>
         [Description("设备保养")]
         Maintain = 10,
+
+        /// <summary>
+        /// 车间库存
+        /// </summary>
+        [Description("车间库存")]
+        WorkshopInventory = 11,
+        
     }
 }

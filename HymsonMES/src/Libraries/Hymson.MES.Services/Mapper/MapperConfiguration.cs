@@ -116,6 +116,7 @@ using Hymson.MES.Core.Domain.EquSparepartRecord;
 using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.EquSparepartInventory;
 using Hymson.MES.Data.Repositories.Equipment.View;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -270,6 +271,12 @@ namespace Hymson.MES.Services.Mapper
             #region EquSparePartsType
             CreateMap<EquSparePartsGroupPagedQueryDto, EquSparePartsGroupPagedQuery>();
             CreateMap<EquSparePartsGroupEntity, EquSparePartsGroupDto>();
+
+            #endregion
+
+            #region EquToolingTypeType
+            CreateMap<EquToolingTypeQueryDto, EquToolingTypePagedQuery>();
+            CreateMap<EquToolingTypeEntity, EquToolingTypeDto>();
 
             #endregion
 
@@ -634,6 +641,20 @@ namespace Hymson.MES.Services.Mapper
             #region PlanShift
             CreateMap<PlanShiftPagedQueryDto, PlanShiftPagedQuery>();
             #endregion
+
+            #region InteBusinessField
+            CreateMap<InteBusinessFieldEntity, InteBusinessFieldSaveDto>();
+            CreateMap<InteBusinessFieldPagedQueryDto, InteBusinessFieldPagedQuery>();
+
+            #endregion
+
+            #region InteBusinessFieldDistribute
+            CreateMap<InteBusinessFieldDistributeEntity, InteBusinessFieldDistributeSaveDto>();
+            CreateMap<InteBusinessFieldDistributePagedQueryDto, InteBusinessFieldDistributePagedQuery>();
+
+            #endregion
+
+            
         }
 
         /// <summary>
@@ -1356,6 +1377,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuProductBarCodeDto, ManuCompromiseBarCodeDto>();
             CreateMap<ManuProductNGBarCodeDto, ManuMisjudgmentBarCodeDto>();
             CreateMap<ManuProductBarCodeDto, ManuReworkBarCodeDto>();
+            #endregion
+
+            #region ManuJointProductAndByproductsReceiveRecord
+            CreateMap<ManuJointProductAndByproductsReceiveRecordEntity, ManuJointProductAndByproductsReceiveRecordSaveDto>();
+            CreateMap<ManuJointProductAndByproductsReceiveRecordPagedQueryDto, ManuJointProductAndByproductsReceiveRecordPagedQuery>();
+            
             #endregion
         }
 

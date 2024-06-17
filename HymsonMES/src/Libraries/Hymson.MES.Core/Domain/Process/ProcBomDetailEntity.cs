@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -73,5 +74,11 @@ namespace Hymson.MES.Core.Domain.Process
         /// 序号
         /// </summary>
         public int Seq { get; set; }
+        
+        /// <summary>
+        /// Bom联副产品类型
+        /// </summary>
+
+        public ManuProductTypeEnum BomProductType {  get; set; }
     }
 }

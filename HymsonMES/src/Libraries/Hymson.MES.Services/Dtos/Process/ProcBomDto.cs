@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using MimeKit;
 
 using OfficeOpenXml.Attributes;
@@ -83,7 +84,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
-
+       
     }
 
 
