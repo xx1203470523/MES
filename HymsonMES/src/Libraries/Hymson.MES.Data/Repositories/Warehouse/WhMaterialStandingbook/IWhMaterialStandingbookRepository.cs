@@ -23,6 +23,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         Task<int> InsertsAsync(IEnumerable<WhMaterialStandingbookEntity>? whMaterialStandingbookEntitys);
 
         /// <summary>
+        /// 批量新增(拼接字符串方式,解决插入速度太慢问题)
+        /// </summary>
+        /// <param name="whMaterialStandingbookEntitys"></param>
+        /// <returns></returns>
+        Task<int> InsertRangeByConcatSqlAsync(IEnumerable<WhMaterialStandingbookEntity> whMaterialStandingbookEntitys);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="whMaterialStandingbookEntity"></param>

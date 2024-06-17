@@ -174,6 +174,44 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 批量新增(拼接字符串方式,解决插入速度太慢问题)
+        /// </summary>
+        /// <param name="ManuSfcInfoEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertRangeByConcatSqlAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntitys)
+        {
+            if (ManuSfcInfoEntitys == null || !ManuSfcInfoEntitys.Any()) return 0;
+
+            var tempSql = $"INSERT INTO `manu_sfc_info`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `ProcessRouteId`,`ProductBOMId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ";
+
+            DynamicParameters parameters = new();
+            for (int i = 0; i < ManuSfcInfoEntitys.Count(); i++)
+            {
+                tempSql += $"(@Id{i}, @SiteId{i}, @SfcId{i}, @WorkOrderId{i}, @ProductId{i}, @ProcessRouteId{i}, @ProductBOMId{i}, @IsUsed{i}, @CreatedBy{i}, @CreatedOn{i}, @UpdatedBy{i}, @UpdatedOn{i}, @IsDeleted{i}),";
+
+                var item = ManuSfcInfoEntitys.ElementAt(i);
+                parameters.Add($"@Id{i}", item.Id);
+                parameters.Add($"@SiteId{i}", item.SiteId);
+                parameters.Add($"@SfcId{i}", item.SfcId);
+                parameters.Add($"@WorkOrderId{i}", item.WorkOrderId);
+                parameters.Add($"@ProductId{i}", item.ProductId);
+                parameters.Add($"@ProcessRouteId{i}", item.ProcessRouteId);
+                parameters.Add($"@ProductBOMId{i}", item.ProductBOMId);
+                parameters.Add($"@IsUsed{i}", item.IsUsed);
+                parameters.Add($"@CreatedBy{i}", item.CreatedBy);
+                parameters.Add($"@CreatedOn{i}", item.CreatedOn);
+                parameters.Add($"@UpdatedBy{i}", item.UpdatedBy);
+                parameters.Add($"@UpdatedOn{i}", item.UpdatedOn);
+                parameters.Add($"@IsDeleted{i}", item.IsDeleted);
+            }
+            tempSql = tempSql.Remove(tempSql.Length - 1);
+            tempSql += ";";
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(tempSql, parameters);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="ManuSfcInfoEntity"></param>

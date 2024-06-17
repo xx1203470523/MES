@@ -160,6 +160,48 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 批量新增(拼接字符串方式,解决插入速度太慢问题)
+        /// </summary>
+        /// <param name="whMaterialStandingbookEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertRangeByConcatSqlAsync(IEnumerable<WhMaterialStandingbookEntity> whMaterialStandingbookEntitys)
+        {
+            if (whMaterialStandingbookEntitys == null || !whMaterialStandingbookEntitys.Any()) return 0;
+
+            var tempSql = $"INSERT INTO `wh_material_standingbook`(`Id`, `MaterialCode`, `MaterialName`, `MaterialVersion`, `MaterialBarCode`, `Batch`, `Quantity`, `Unit`, `SupplierId`, `Type`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES ";
+
+            DynamicParameters parameters = new();
+            for (int i = 0; i < whMaterialStandingbookEntitys.Count(); i++)
+            {
+                tempSql += $"(@Id{i}, @MaterialCode{i}, @MaterialName{i}, @MaterialVersion{i}, @MaterialBarCode{i}, @Batch{i}, @Quantity{i}, @Unit{i}, @SupplierId{i}, @Type{i}, @Source{i}, @CreatedBy{i}, @CreatedOn{i}, @UpdatedBy{i}, @UpdatedOn{i}, @IsDeleted{i}, @SiteId{i}),";
+
+                var item = whMaterialStandingbookEntitys.ElementAt(i);
+                parameters.Add($"@Id{i}", item.Id);
+                parameters.Add($"@MaterialCode{i}", item.MaterialCode);
+                parameters.Add($"@MaterialName{i}", item.MaterialName);
+                parameters.Add($"@MaterialVersion{i}", item.MaterialVersion);
+                parameters.Add($"@MaterialBarCode{i}", item.MaterialBarCode);
+                parameters.Add($"@Batch{i}", item.Batch);
+                parameters.Add($"@Quantity{i}", item.Quantity);
+                parameters.Add($"@Unit{i}", item.Unit);
+                parameters.Add($"@SupplierId{i}", item.SupplierId);
+                parameters.Add($"@Type{i}", item.Type);
+                parameters.Add($"@Source{i}", item.Source);
+                parameters.Add($"@CreatedBy{i}", item.CreatedBy);
+                parameters.Add($"@CreatedOn{i}", item.CreatedOn);
+                parameters.Add($"@UpdatedBy{i}", item.UpdatedBy);
+                parameters.Add($"@UpdatedOn{i}", item.UpdatedOn);
+                parameters.Add($"@IsDeleted{i}", item.IsDeleted);
+                parameters.Add($"@SiteId{i}", item.SiteId);
+            }
+            tempSql = tempSql.Remove(tempSql.Length - 1);
+            tempSql += ";";
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(tempSql, parameters);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="whMaterialStandingbookEntity"></param>

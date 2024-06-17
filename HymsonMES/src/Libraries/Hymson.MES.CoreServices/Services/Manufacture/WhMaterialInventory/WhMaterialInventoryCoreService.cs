@@ -74,6 +74,18 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory
             if (procMaterials == null || !procMaterials.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15101));
             var procMaterialDict = procMaterials.ToDictionary(node => node.Id);
 
+            //查询条码是否已存在
+            var inventoryEntities = await _whMaterialInventoryRepository.GetWhMaterialInventoryEntitiesAsync(new WhMaterialInventoryQuery
+            {
+                SiteId = bo.SiteId,
+                MaterialBarCodes = bo.BarCodeList.Select(x => x.MaterialBarCode).Distinct()
+            });
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SiteId = bo.SiteId,
+                SFCs = bo.BarCodeList.Select(x => x.MaterialBarCode).Distinct()
+            });
+
             var validationFailures = new List<ValidationFailure>();
             foreach (var item in bo.BarCodeList)
             {
@@ -117,7 +129,13 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory
                 var materialEntity = procMaterialDict[item.MaterialId];
 
                 // 查询是否已存在物料条码
-                await CheckMaterialBarCodeAnyAsync(item.MaterialBarCode, bo.SiteId);
+                //await CheckMaterialBarCodeAnyAsync(item.MaterialBarCode, bo.SiteId);
+                if (inventoryEntities.Any(x => x.MaterialBarCode == item.MaterialBarCode || sfcEntities.Any(x => x.SFC == item.MaterialBarCode)))
+                {
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES152016);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
 
                 #region 数据组装
 
@@ -206,10 +224,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory
             // 保存实体
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
-            rows += await _whMaterialInventoryRepository.InsertsAsync(materialInventories);
-            rows += await _whMaterialStandingbookRepository.InsertsAsync(materialStandingBooks);
-            rows += await _manuSfcRepository.InsertRangeAsync(manuSfcEntities);
-            rows += await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoEntities);
+            rows += await _whMaterialInventoryRepository.InsertRangeByConcatSqlAsync(materialInventories);
+            rows += await _whMaterialStandingbookRepository.InsertRangeByConcatSqlAsync(materialStandingBooks);
+            rows += await _manuSfcRepository.InsertRangeByConcatSqlAsync(manuSfcEntities);
+            rows += await _manuSfcInfoRepository.InsertRangeByConcatSqlAsync(manuSfcInfoEntities);
             trans.Complete();
 
             return rows;

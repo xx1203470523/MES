@@ -429,6 +429,43 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 批量新增(拼接字符串方式,解决插入速度太慢问题)
+        /// </summary>
+        /// <param name="manuSfcEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertRangeByConcatSqlAsync(IEnumerable<ManuSfcEntity> manuSfcEntitys)
+        {
+            if (manuSfcEntitys == null || !manuSfcEntitys.Any()) return 0;
+
+            var tempSql = $"INSERT INTO `manu_sfc`(`Id`, `SiteId`, `SFC`, Type, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ";
+
+            DynamicParameters parameters = new();
+            for (int i = 0; i < manuSfcEntitys.Count(); i++)
+            {
+                tempSql += $"(@Id{i}, @SiteId{i}, @SFC{i}, @Type{i}, @Qty{i}, @Status{i}, @IsUsed{i}, @CreatedBy{i}, @CreatedOn{i}, @UpdatedBy{i}, @UpdatedOn{i}, @IsDeleted{i}),";
+
+                var item = manuSfcEntitys.ElementAt(i);
+                parameters.Add($"@Id{i}", item.Id);
+                parameters.Add($"@SiteId{i}", item.SiteId);
+                parameters.Add($"@SFC{i}", item.SFC);
+                parameters.Add($"@Type{i}", item.Type);
+                parameters.Add($"@Qty{i}", item.Qty);
+                parameters.Add($"@Status{i}", item.Status);
+                parameters.Add($"@IsUsed{i}", item.IsUsed);
+                parameters.Add($"@CreatedBy{i}", item.CreatedBy);
+                parameters.Add($"@CreatedOn{i}", item.CreatedOn);
+                parameters.Add($"@UpdatedBy{i}", item.UpdatedBy);
+                parameters.Add($"@UpdatedOn{i}", item.UpdatedOn);
+                parameters.Add($"@IsDeleted{i}", item.IsDeleted);
+            }
+            tempSql = tempSql.Remove(tempSql.Length - 1);
+            tempSql += ";";
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(tempSql, parameters);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuSfcEntity"></param>

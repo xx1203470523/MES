@@ -223,6 +223,50 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 批量新增(拼接字符串方式,解决插入速度太慢问题)
+        /// </summary>
+        /// <param name="whMaterialInventoryEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertRangeByConcatSqlAsync(IEnumerable<WhMaterialInventoryEntity> whMaterialInventoryEntitys)
+        {
+            if (whMaterialInventoryEntitys == null || !whMaterialInventoryEntitys.Any()) return 0;
+
+            var tempSql = $"INSERT INTO `wh_material_inventory`(`Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`,`ScrapQty`, `Status`, `DueDate`, `Source`, `MaterialType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkOrderId) VALUES ";
+
+            DynamicParameters parameters = new();
+            for (int i = 0; i < whMaterialInventoryEntitys.Count(); i++)
+            {
+                tempSql += $"(@Id{i}, @SupplierId{i}, @MaterialId{i}, @MaterialBarCode{i}, @Batch{i}, @QuantityResidue{i}, @ReceivedQty{i}, @ScrapQty{i}, @Status{i}, @DueDate{i}, @Source{i}, @MaterialType{i}, @CreatedBy{i}, @CreatedOn{i}, @UpdatedBy{i}, @UpdatedOn{i}, @IsDeleted{i}, @SiteId{i}, @WorkOrderId{i}),";
+
+                var item = whMaterialInventoryEntitys.ElementAt(i);
+                parameters.Add($"@Id{i}", item.Id);
+                parameters.Add($"@SupplierId{i}", item.SupplierId);
+                parameters.Add($"@MaterialId{i}", item.MaterialId);
+                parameters.Add($"@MaterialBarCode{i}", item.MaterialBarCode);
+                parameters.Add($"@Batch{i}", item.Batch);
+                parameters.Add($"@QuantityResidue{i}", item.QuantityResidue);
+                parameters.Add($"@ReceivedQty{i}", item.ReceivedQty);
+                parameters.Add($"@ScrapQty{i}", item.ScrapQty);
+                parameters.Add($"@Status{i}", item.Status);
+                parameters.Add($"@DueDate{i}", item.DueDate);
+                parameters.Add($"@Source{i}", item.Source);
+                parameters.Add($"@MaterialType{i}", item.MaterialType);
+                parameters.Add($"@CreatedBy{i}", item.CreatedBy);
+                parameters.Add($"@CreatedOn{i}", item.CreatedOn);
+                parameters.Add($"@UpdatedBy{i}", item.UpdatedBy);
+                parameters.Add($"@UpdatedOn{i}", item.UpdatedOn);
+                parameters.Add($"@IsDeleted{i}", item.IsDeleted);
+                parameters.Add($"@SiteId{i}", item.SiteId);
+                parameters.Add($"@WorkOrderId{i}", item.WorkOrderId);
+            }
+            tempSql = tempSql.Remove(tempSql.Length - 1);
+            tempSql += ";";
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(tempSql, parameters);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="whMaterialInventoryEntity"></param>

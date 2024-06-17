@@ -27,6 +27,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> InsertRangeAsync(IEnumerable<ManuSfcEntity> manuSfcEntitys);
 
         /// <summary>
+        /// 批量新增(拼接字符串方式,解决插入速度太慢问题)
+        /// </summary>
+        /// <param name="manuSfcEntitys"></param>
+        /// <returns></returns>
+        Task<int> InsertRangeByConcatSqlAsync(IEnumerable<ManuSfcEntity> manuSfcEntitys);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuSfcEntity"></param>
