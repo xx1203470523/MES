@@ -1,45 +1,43 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquToolingTypeMaterialRelation.Query.View;
 using Hymson.MES.Data.Repositories.Equipment.Query;
-using Hymson.MES.Data.Repositories.Plan.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment
 {
     /// <summary>
-    /// 仓储接口（工具类型）
+    /// 仓储接口（工具类型和物料关联关系表）
     /// </summary>
-    public interface IEquToolingTypeGroupRepository
+    public interface IEquToolingTypeMaterialRelationRepository
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(EquToolingTypeEntity entity);
+        Task<int> InsertAsync(EquToolingTypeEquipmentGroupRelationEntity entity);
         
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<EquSparePartsGroupEntity> entities);
+        Task<int> InsertRangeAsync(IEnumerable<EquToolingTypeMaterialRelationEntity> entities);
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquSparePartsGroupEntity entity);
+        Task<int> UpdateAsync(EquSparePartsGroupEquipmentGroupRelationEntity entity);
         
         /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<EquSparePartsGroupEntity> entities);
+        Task<int> UpdateRangeAsync(IEnumerable<EquSparePartsGroupEquipmentGroupRelationEntity> entities);
 
         /// <summary>
         /// 软删除  
@@ -56,39 +54,46 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
-        /// 根据Code查询对象
+        /// 删除（批量）
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<EquSparePartsGroupEntity> GetByCodeAsync(EntityByCodeQuery query);
+        Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command);
 
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquToolingTypeEntity> GetByIdAsync(long id);
+        Task<EquSparePartsGroupEquipmentGroupRelationEntity> GetByIdAsync(long id);
     
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquSparePartsGroupEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<EquSparePartsGroupEquipmentGroupRelationEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 获取设备组关联备件维护
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ToolingTypeMaterialRelationView>> GetSparePartsEquipmentGroupRelationAsync(long Id);
 
         /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquSparePartsGroupEntity>> GetEntitiesAsync(EquSparePartsGroupQuery query);
+        Task<IEnumerable<EquSparePartsGroupEquipmentGroupRelationEntity>> GetEntitiesAsync(EquSparePartsGroupEquipmentGroupRelationQuery query);
         
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquToolingTypeEntity>> GetPagedInfoAsync(EquToolingTypePagedQuery pagedQuery);
+        Task<PagedInfo<EquSparePartsGroupEquipmentGroupRelationEntity>> GetPagedInfoAsync(EquSparePartsGroupEquipmentGroupRelationPagedQuery pagedQuery);
 
     }
 }

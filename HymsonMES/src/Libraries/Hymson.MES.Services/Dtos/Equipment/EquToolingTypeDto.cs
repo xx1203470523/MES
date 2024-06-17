@@ -59,9 +59,14 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public IEnumerable<long>? EquipmentGroupIds { get; set; }
 
         /// <summary>
-        /// 关联备件
+        /// 关联物料
         /// </summary>
         public IEnumerable<long>? SparePartIds { get; set; }
+
+        /// <summary>
+        /// 关联物料
+        /// </summary>
+        public IEnumerable<long>? MaterialIdIds { get; set; }
 
     }
 

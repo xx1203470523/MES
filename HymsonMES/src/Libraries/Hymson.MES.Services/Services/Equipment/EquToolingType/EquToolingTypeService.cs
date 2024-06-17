@@ -49,6 +49,10 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly IEquSparePartsRepository _equSparePartsRepository;
         private readonly IEquToolingTypeGroupRepository _equToolingTypeGroupRepository;
         private readonly IEquSparePartsGroupEquipmentGroupRelationRepository _equSparePartsGroupEquipmentGroupRelationRepository;
+        //工具类型与设备组
+        private readonly IEquToolingTypeEquipmentGroupRelationRepository _equToolingTypeEquipmentGroupRelationRepository;
+        //工具类型与物料
+        private readonly IEquToolingTypeMaterialRelationRepository _equToolingTypeMateriaRelationRepository;
 
         /// <summary>
         /// 构造函数
@@ -59,9 +63,11 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="equToolingTypeGroupRepository"></param>
         /// <param name="equSparePartsGroupEquipmentGroupRelationRepository"></param>
         /// <param name="equSparePartsRepository"></param>
+        /// <param name="equToolingTypeEquipmentGroupRelationRepository"></param>
+        /// <param name="equToolingTypeMateriaRelationRepository"></param>
         public EquToolingTypeService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSparePartsGroupSaveDto> validationSaveRules,
             IEquToolingTypeGroupRepository equToolingTypeGroupRepository,
-            IEquSparePartsGroupEquipmentGroupRelationRepository equSparePartsGroupEquipmentGroupRelationRepository, IEquSparePartsRepository equSparePartsRepository)
+            IEquSparePartsGroupEquipmentGroupRelationRepository equSparePartsGroupEquipmentGroupRelationRepository, IEquSparePartsRepository equSparePartsRepository, IEquToolingTypeEquipmentGroupRelationRepository equToolingTypeEquipmentGroupRelationRepository, IEquToolingTypeMaterialRelationRepository equToolingTypeMateriaRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -69,6 +75,8 @@ namespace Hymson.MES.Services.Services.Equipment
             _equToolingTypeGroupRepository = equToolingTypeGroupRepository;
             _equSparePartsGroupEquipmentGroupRelationRepository = equSparePartsGroupEquipmentGroupRelationRepository;
             _equSparePartsRepository = equSparePartsRepository;
+            _equToolingTypeEquipmentGroupRelationRepository = equToolingTypeEquipmentGroupRelationRepository;
+            _equToolingTypeMateriaRelationRepository = equToolingTypeMateriaRelationRepository;
         }
 
 
@@ -90,7 +98,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var updatedOn = HymsonClock.Now();
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<EquSparePartsGroupEntity>();
+            var entity = saveDto.ToEntity<EquToolingTypeEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
@@ -106,32 +114,39 @@ namespace Hymson.MES.Services.Services.Equipment
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
 
             //关联的设备组
-            List<EquSparePartsGroupEquipmentGroupRelationEntity> list = new();
+            List<EquToolingTypeEquipmentGroupRelationEntity> list = new();
 
             if (saveDto.EquipmentGroupIds != null)
                 foreach (var item in saveDto.EquipmentGroupIds)
                 {
-                    var equipmentGroupEntity = new EquSparePartsGroupEquipmentGroupRelationEntity
+                    var equipmentGroupEntity = new EquToolingTypeEquipmentGroupRelationEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = _currentSite.SiteId ?? 0,
-                        SparePartsGroupId = entity.Id,
-                        EquipmentGroupId = item,
-                        CreatedBy = updatedBy,
-                        CreatedOn = updatedOn,
-                        UpdatedBy = updatedBy,
-                        UpdatedOn = updatedOn
+                        ToolTypeId = entity.Id,
+                        EquipmentGroupId = item
                     };
                     list.Add(equipmentGroupEntity);
                 }
-            //关联备件
-            var updatedTypeEntity = new UpdateSparePartsTypeEntity
-            {
-                Id = entity.Id,
-                SparePartIds = saveDto.SparePartIds,
-                UpdatedBy = updatedBy,
-                UpdatedOn = updatedOn
-            };
+            //工具类型关联物料
+            List<EquToolingTypeMaterialRelationEntity> Materiallist = new();
+            if (saveDto.MaterialIdIds != null)
+                foreach (var item in saveDto.MaterialIdIds)
+                {
+                    var materialIdEntity = new EquToolingTypeMaterialRelationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ToolTypeId = entity.Id,
+                        MaterialId = item
+                    };
+                    Materiallist.Add(materialIdEntity);
+                }
+            //var updatedTypeEntity = new UpdateSparePartsTypeEntity
+            //{
+            //    Id = entity.Id,
+            //    SparePartIds = saveDto.SparePartIds,
+            //    UpdatedBy = updatedBy,
+            //    UpdatedOn = updatedOn
+            //};
             //保存
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
@@ -144,8 +159,8 @@ namespace Hymson.MES.Services.Services.Equipment
                 else
                 {
                     var rowArray = await Task.WhenAll(new List<Task<int>>() {
-                        _equSparePartsGroupEquipmentGroupRelationRepository.InsertRangeAsync(list),
-                        _equSparePartsRepository.UpdateTypeAsync(updatedTypeEntity),
+                        _equToolingTypeEquipmentGroupRelationRepository.InsertRangeAsync(list),
+                        _equToolingTypeMateriaRelationRepository.InsertRangeAsync(Materiallist),
 
                     });
                     rows += rowArray.Sum();
