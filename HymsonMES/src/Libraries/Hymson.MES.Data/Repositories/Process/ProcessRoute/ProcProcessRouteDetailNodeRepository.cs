@@ -148,6 +148,21 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据工艺路线获取尾工序
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ProcProcessRouteDetailNodeEntity> GetLastProcedureByProcessRouteIdAsync(long processRouteId)
+        {
+            var key = $"proc_process_route_detail_node&LastProcedure&{processRouteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteDetailNodeEntity>(GetLastProcedureByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
+            });
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>  
         /// <param name="ids"></param>
@@ -223,5 +238,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE ProcessRouteId = @ProcessRouteId ORDER BY SerialNo; ";
         const string GetByIdsSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id IN @ids ";
         const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_node` WHERE ProcessRouteId = @ProcessRouteId ";
+
+        const string GetLastProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE ProcessRouteId = @ProcessRouteId  ORDER BY SerialNo DESC LIMIT 1";
     }
 }

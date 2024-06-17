@@ -719,6 +719,8 @@
         public const string MES16354 = "电芯条码{SFC}已经存在！不允许重复导入！";
         public const string MES16355 = "箱码{BoxCode}已经存在于其它批次！不允许导入当前批次！";
 
+        public const string MES16356 = "获取尾工序失败。";
+
         //绑定解绑 MES16370
         public const string MES16371 = "绑定的条码{BindSFC}信息不存在！";
         #endregion
@@ -1072,7 +1074,7 @@
         public const string MES19134 = "条码：{SFCS}没找到关联虚拟码绑定关系";
         public const string MES19135 = "IsBindVirtualSFC为True时不能传递多个条码";
         public const string MES19136 = "条码：{SFCS}出站存在NG信息，Passed字段应传0";
-        public const string MES19137 = "条码：{SFCS}状态为不合格，不允许进站";
+        public const string MES19137 = "条码：{SFCS}工序Pack段存在不合格记录，不允许进站！";
         public const string MES19138 = "条码：{SFCS}已经存在绑定记录";
         public const string MES19139 = "位置：{Location}已经存在条码：{SFCS}绑定记录";
         public const string MES19140 = "错误的Location {SFCLocation}，只能为：{Location}";
@@ -1092,7 +1094,7 @@
         public const string MES19153 = "{SFC}流转查不到数据";
 
         public const string MES19154 = "补料确认：更新{SFC}是否补料状态失败！";
-        public const string MES19155 = "该条码{SFCs}已存在绑定关系，不可重复绑！";
+        public const string MES19155 = "条码{SFC}和条码{SFCs}已存在绑定关系，不可重复绑！";
         public const string MES19156 = "该条码{BindSFC}已存在绑定关系，请先解绑！";
         public const string MES19157 = "未查到条码{SFC}批次信息,无法正常校验电芯批次,请检查该条码是否导入";
         #endregion

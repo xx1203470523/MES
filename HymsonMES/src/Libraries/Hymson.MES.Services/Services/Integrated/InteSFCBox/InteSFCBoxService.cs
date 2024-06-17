@@ -25,6 +25,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using IdGen;
 using Microsoft.AspNetCore.Http;
+using System.Drawing.Printing;
 using ValidationException = FluentValidation.ValidationException;
 using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
@@ -298,7 +299,9 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             var pagedInfo = await _inteSFCBoxRepository.GetBoxCodeAsync(rep);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(x => new InteSFCBoxRView { BatchNo = x.BatchNo, CreatedOn = x.CreatedOn });
+            var dtos = pagedInfo.Data.Select(x => new InteSFCBoxRView { BatchNo = x.BatchNo, CreatedOn = x.CreatedOn }).ToList()
+                .Skip((pagedInfo.PageIndex-1)*pagedInfo.PageSize)
+                .Take(pagedInfo.PageSize);
             //var dtos = pagedInfo.Data.Select(s => s.ToModel<InteSFCBoxRView>());
 
             return new PagedInfo<InteSFCBoxRView>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);

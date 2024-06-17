@@ -242,13 +242,20 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 SFCS = inBoundMoreDto.SFCs
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
-            //进站不允许不合格产品
-            //var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
-            //if (includeNoQuality.Any())
-            //{
-            //    //允许进站不合格产品
-            //    //throw new CustomerValidationException(nameof(ErrorCode.MES19137)).WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
-            //}
+
+            //尾工序进站不允许Pack段出现不合格记录（出现后需要复测）
+            var LastProcedureEntity = await GetLastProcedureAsync(planWorkOrderEntity.ProcessRouteId);
+            var isLast = !sfcProduceList.Any(a => a.ProcedureId != LastProcedureEntity.ProcedureId);
+            if (isLast)
+            {
+                var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
+                if (includeNoQuality.Any())
+                {
+                    //允许进站不合格产品
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19137))
+                        .WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
+                }
+            }
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
@@ -272,32 +279,33 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             decimal firstProcedureQty = 0;//首工序进站数量
             foreach (var sfc in inBoundMoreDto.SFCs)
             {
-                //只用校验电芯码是否导入过系统
-                //电芯校验同属批次
                 if (validateBatch)
                 {
-                    //var currenWorkBatch = bindSFCbox.FirstOrDefault()?.BatchNo;
-                    //if (currenWorkBatch != null)
-                    //{
-                    var sfcBatch = sfcBoxInfo.Where(x => x.SFC == sfc).FirstOrDefault();
-                    if (sfcBatch != null)
+                    //校验工单是否绑定过电芯批次
+                    var currenWorkBatch = bindSFCbox.FirstOrDefault()?.BatchNo;
+                    if (currenWorkBatch != null)
                     {
-                        //if (!currenWorkBatch.Equals(sfcBatch.BatchNo))
-                        //{
-                        //    throw new CustomerValidationException(nameof(ErrorCode.MES19149)).WithData("SFC", sfc).WithData("sfcBatchNo", sfcBatch.BatchNo).WithData("workBatchNo", currenWorkBatch);
-                        //}
+                        //校验电芯码批次是否导入过系统
+                        var sfcBatch = sfcBoxInfo.Where(x => x.SFC == sfc).FirstOrDefault();
+                        if (sfcBatch != null)
+                        {
+                            //校验工单和条码是否同批次
+                            if (!currenWorkBatch.Equals(sfcBatch.BatchNo))
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES19149)).WithData("SFC", sfc).WithData("sfcBatchNo", sfcBatch.BatchNo).WithData("workBatchNo", currenWorkBatch);
+                            }
+                        }
+                        else
+                        {
+                            //未查到条码{sfc}批次信息,无法正常校验电芯批次
+                            throw new CustomerValidationException(nameof(ErrorCode.MES19157)).WithData("SFC", sfc);
+                        }
                     }
                     else
                     {
-                        //未查到条码{sfc}批次信息,无法正常校验电芯批次
+                        //未查到当前工单{planWorkOrder.code}批次信息,无法正常校验电芯批次
                         throw new CustomerValidationException(nameof(ErrorCode.MES19157)).WithData("SFC", sfc);
                     }
-                    //}
-                    //else
-                    //{
-                    //    //未查到当前工单{planWorkOrder.code}批次信息,无法正常校验电芯批次
-                    //    throw new CustomerValidationException(nameof(ErrorCode.MES19157)).WithData("SFC", sfc);
-                    //}
                 }
 
                 //汇总信息
@@ -641,6 +649,37 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         {
             var procProcessRouteDetailNodeEntity = await _processRouteDetailNodeRepository.GetFirstProcedureByProcessRouteIdAsync(processRouteId);
             if (procProcessRouteDetailNodeEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16304));
+
+            var procProcedureEntity = await _procedureRepository.GetByIdAsync(procProcessRouteDetailNodeEntity.ProcedureId);
+            if (procProcedureEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES10406));
+
+            return new ProcessRouteProcedureDto
+            {
+                ProcessRouteId = processRouteId,
+                SerialNo = procProcessRouteDetailNodeEntity.SerialNo,
+                ProcedureId = procProcessRouteDetailNodeEntity.ProcedureId,
+                CheckType = procProcessRouteDetailNodeEntity.CheckType,
+                CheckRate = procProcessRouteDetailNodeEntity.CheckRate,
+                IsWorkReport = procProcessRouteDetailNodeEntity.IsWorkReport,
+                ProcedureCode = procProcedureEntity.Code,
+                ProcedureName = procProcedureEntity.Name,
+                Type = procProcedureEntity.Type,
+                PackingLevel = procProcedureEntity.PackingLevel,
+                ResourceTypeId = procProcedureEntity.ResourceTypeId,
+                Cycle = procProcedureEntity.Cycle,
+                IsRepairReturn = procProcedureEntity.IsRepairReturn
+            };
+        }
+
+        /// <summary>
+        /// 获取尾工序
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        public async Task<ProcessRouteProcedureDto> GetLastProcedureAsync(long processRouteId)
+        {
+            var procProcessRouteDetailNodeEntity = await _processRouteDetailNodeRepository.GetLastProcedureByProcessRouteIdAsync(processRouteId);
+            if (procProcessRouteDetailNodeEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16356));
 
             var procProcedureEntity = await _procedureRepository.GetByIdAsync(procProcessRouteDetailNodeEntity.ProcedureId);
             if (procProcedureEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES10406));

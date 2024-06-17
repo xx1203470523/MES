@@ -142,19 +142,23 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <returns></returns>
         private async Task VerifyDuplicate(SfcCirculationBindDto sfcCirculationBindDto, SfcCirculationTypeEnum bindType = SfcCirculationTypeEnum.Merge)
         {
-            ////查找当前已有的绑定记录
-            //var sfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
-            //{
-            //    SiteId = _currentEquipment.SiteId,
-            //    Sfcs = sfcCirculationBindDto.BindSFCs.Select(c => c.SFC).ToArray(),
-            //    IsDisassemble = TrueOrFalseEnum.No,
-            //    CirculationType = bindType
-            //});
-            //if (sfcCirculationEntities.Any())
-            //{
-            //    //条码：{SFCS}已经存在绑定记录
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES19155)).WithData("SFCs", string.Join(",", sfcCirculationEntities.Select(c => c.SFC)));
-            //}
+            //查找当前已有的绑定记录
+            var sfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                Sfcs = sfcCirculationBindDto.BindSFCs.Select(c => c.SFC).ToArray(),
+                IsDisassemble = TrueOrFalseEnum.No,
+                CirculationBarCode = sfcCirculationBindDto.SFC,
+                CirculationType = bindType
+            });
+
+            if (sfcCirculationEntities.Any())
+            {
+                //条码：{SFCS}已经存在绑定记录
+                throw new CustomerValidationException(nameof(ErrorCode.MES19155))
+                    .WithData("SFC", sfcCirculationBindDto.SFC)
+                    .WithData("SFCs", string.Join(",", sfcCirculationEntities.Select(c => c.SFC)));
+            }
 
             ////查找当前已有的绑定记录
             //var bindSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery

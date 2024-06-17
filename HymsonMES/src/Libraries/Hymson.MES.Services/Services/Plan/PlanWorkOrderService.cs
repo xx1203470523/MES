@@ -279,7 +279,7 @@ namespace Hymson.MES.Services.Services.Plan
             if (current != null)
             {
                 //判断当前状态  
-                if (current.Status != PlanWorkOrderStatusEnum.NotStarted)
+                if (current.Status != PlanWorkOrderStatusEnum.NotStarted || current.Status == PlanWorkOrderStatusEnum.InProduction)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16046));
                 }
