@@ -28,9 +28,9 @@ namespace Hymson.MES.Core.Enums
         [Description("绑定")]
         Bind = 5,
         /// <summary>
-        /// 绑定
+        /// 解绑
         /// </summary>
-        [Description("绑定")]
+        [Description("解绑")]
         Unbind = 6,
     }
 }

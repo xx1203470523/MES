@@ -9,20 +9,20 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// </summary>
     public record EquSparepartEquipmentBindRecordCreateDto : BaseEntityDto
     {
-        /// <summary>
-        /// 备件id equ_sparepart的id
-        /// </summary>
-        public long SparepartId { get; set; }
+        ///// <summary>
+        ///// 备件id equ_sparepart的id
+        ///// </summary>
+        //public long SparepartId { get; set; }
 
         /// <summary>
         /// 备件编码
         /// </summary>
         public string SparepartCode { get; set; }
 
-        /// <summary>
-        /// 设备id equ_equipment的 id
-        /// </summary>
-        public long EquipmentId { get; set; }
+        ///// <summary>
+        ///// 设备id equ_equipment的 id
+        ///// </summary>
+        //public long EquipmentId { get; set; }
 
         /// <summary>
         /// 设备编码
