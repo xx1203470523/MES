@@ -6,6 +6,7 @@ using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Parameter;
+using MailKit;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -141,13 +142,34 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (manuSfcStepEntities == null || !manuSfcStepEntities.Any()) return 0;
             var keyValuePairs = TableGrouping(manuSfcStepEntities);
             using var conn = GetMESDbConnection();
+            StringBuilder sbSql = new StringBuilder();
             //插入分表数据
+            int index = 0;
+            DynamicParameters dynamicParameters = new();
+            var propertyInfos = typeof(ManuSfcStepEntity).GetProperties();
             foreach (var item in keyValuePairs)
             {
-                await conn.ExecuteAsync(string.Format(InsertSql, item.Key), item.Value);
+                foreach (var  manuSfcStepEntity in item.Value)
+                {
+                    sbSql.AppendFormat(InsertsSql, item.Key, index);
+                    foreach (var  propertyInfo in propertyInfos)
+                    {
+                        dynamicParameters.Add($"{propertyInfo.Name}{index}", propertyInfo.GetValue(manuSfcStepEntity));
+                    }
+                    index++;
+                }
+            }
+            foreach (var  manuSfcStepEntity1 in manuSfcStepEntities)
+            {
+                sbSql.AppendFormat(InsertsSql, TEMPLATETABLENAME, index);
+                foreach (var propertyInfo in propertyInfos)
+                {
+                    dynamicParameters.Add($"{propertyInfo.Name}{index}", propertyInfo.GetValue(manuSfcStepEntity1));
+                }
+                index++;
             }
             //插入主表数据
-            return await conn.ExecuteAsync(string.Format(InsertSql, TEMPLATETABLENAME), manuSfcStepEntities);
+            return await conn.ExecuteAsync(sbSql.ToString(), dynamicParameters);
         }
 
         /// <summary>
@@ -431,6 +453,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetManuSfcStepEntitiesSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**where**/  ";
         const string InsertSfcStepBusinessSql = "INSERT INTO `manu_sfc_step_business`(`Id`, `SiteId`, `SfcStepId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcStepId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertSql = "INSERT INTO `{0}`(Id, SFC, ProductId, WorkOrderId, WorkCenterId, ProductBOMId, Qty, ScrapQty,EquipmentId, VehicleCode, ResourceId, ProcedureId, Operatetype, CurrentStatus, AfterOperationStatus, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (   @Id, @SFC, @ProductId, @WorkOrderId, @WorkCenterId, @ProductBOMId, @Qty,@ScrapQty, @EquipmentId, @VehicleCode, @ResourceId, @ProcedureId, @Operatetype, @CurrentStatus, @AfterOperationStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertsSql = "INSERT INTO `{0}`(Id, SFC, ProductId, WorkOrderId, WorkCenterId, ProductBOMId, Qty, ScrapQty,EquipmentId, VehicleCode, ResourceId, ProcedureId, Operatetype, CurrentStatus, AfterOperationStatus, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (   @Id{1}, @SFC{1}, @ProductId{1}, @WorkOrderId{1}, @WorkCenterId{1}, @ProductBOMId{1}, @Qty{1},@ScrapQty{1}, @EquipmentId{1}, @VehicleCode{1}, @ResourceId{1}, @ProcedureId{1}, @Operatetype{1}, @CurrentStatus{1}, @AfterOperationStatus{1}, @Remark{1}, @CreatedBy{1}, @CreatedOn{1}, @UpdatedBy{1}, @UpdatedOn{1}, @IsDeleted{1}, @SiteId{1} );";
+
         const string UpdateSql = "UPDATE `{0}` SET SFC = @SFC, ProductId = @ProductId, WorkOrdeId = @WorkOrdeId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Type = @Type, Status = @Status, Lock = @Lock, IsMultiplex = @IsMultiplex, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_sfc_step` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT * FROM `manu_sfc_step`  WHERE Id = @Id ";
