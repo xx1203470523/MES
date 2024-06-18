@@ -65,11 +65,6 @@ namespace Hymson.MES.SystemServices.Dtos
         public string? UnitCode { get; set; }
 
         /// <summary>
-        /// 属性分类 1:自制，2:采购，3:自制/采购
-        /// </summary>
-        public MaterialBuyTypeEnum AttributeClassification { get; set; }
-
-        /// <summary>
         /// 标包数量
         /// </summary>
         public int? Quantity { get; set; }

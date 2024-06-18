@@ -4,10 +4,9 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using System.Security.Policy;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -60,8 +59,8 @@ namespace Hymson.MES.Data.Repositories.Process
             //var key = $"proc_material&proc_material_group&proc_process_route&proc_bom&{id}";
             //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             //{
-                using var conn = GetMESDbConnection();
-                return await conn.QueryFirstOrDefaultAsync<ProcMaterialView>(GetViewByIdSql, new { Id = id, SiteId = SiteId });
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialView>(GetViewByIdSql, new { Id = id, SiteId = SiteId });
             //});
         }
 
@@ -324,56 +323,62 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procMaterialEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(ProcMaterialEntity procMaterialEntity)
+        public async Task<int> InsertAsync(ProcMaterialEntity entity)
         {
+            if (entity == null) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, procMaterialEntity);  
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procMaterialEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ProcMaterialEntity procMaterialEntity)
+        public async Task<int> UpdateAsync(ProcMaterialEntity entity)
         {
+            if (entity == null) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, procMaterialEntity);
+            return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="procMaterialEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ProcMaterialEntity> procMaterialEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<ProcMaterialEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, procMaterialEntitys);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
         /// <summary>
         /// 更新 同编码的其他物料设置为非当前版本
         /// </summary>
-        /// <param name="procMaterialEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateSameMaterialCodeToNoVersionAsync(ProcMaterialEntity procMaterialEntity)
+        public async Task<int> UpdateSameMaterialCodeToNoVersionAsync(ProcMaterialEntity entity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSameMaterialCodeToNoVersionSql, procMaterialEntity);
+            return await conn.ExecuteAsync(UpdateSameMaterialCodeToNoVersionSql, entity);
         }
 
         /// <summary>
         /// 更新物料的物料组
         /// </summary>
-        /// <param name="procMaterialEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdateProcMaterialGroupAsync(IEnumerable<ProcMaterialEntity> procMaterialEntitys)
+        public async Task<int> UpdateProcMaterialGroupAsync(IEnumerable<ProcMaterialEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateProcMaterialGroupSql, procMaterialEntitys);
+            return await conn.ExecuteAsync(UpdateProcMaterialGroupSql, entities);
         }
 
         /// <summary>
