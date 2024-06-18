@@ -20,6 +20,10 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 设备Id
         /// </summary>
         public long EquipmentId { get; set; }
+        public long ProcedureId { get; set; }
+
+        public long ResourceId { get; set; }
+        public long WorkCenterId { get; set; }
 
         /// <summary>
         /// 状态;0.自动运行、1.手动运行、2.停机、3.故障、4.离线

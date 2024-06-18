@@ -74,6 +74,8 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// 工作中心
         /// </summary>
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        private readonly IProcProcedureRepository _procProcedureRepository;
         /// <summary>
         /// 工单
         /// </summary>
@@ -99,6 +101,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             IEquStatusRepository equipmentStatusRepository,
             IEquProductParameterRepository equProductParameterRepository,
             IProcResourceRepository procResourceRepository,
+            IProcProcedureRepository procProcedureRepository,
             IProcParameterRepository procParameterRepository,
             Data.Repositories.Manufacture.IManuProductParameterRepository manuProductParameterRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
@@ -114,6 +117,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             _manuProductParameterRepository = manuProductParameterRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _procProcedureRepository = procProcedureRepository;
         }
 
 
@@ -163,8 +167,33 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         public async Task EquipmentStateAsync(EquipmentStateDto request)
         {
-            var nowTime = HymsonClock.Now();
+            var rr = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery()
+            {
+                Site = _currentEquipment.SiteId,
+                Code = request.ResourceCode,
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19109)).WithData("Code", request.ResourceCode);
+            var pr = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery()
+            {
+                SiteId = _currentEquipment.SiteId,
+                ResourceId = rr.Id
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19601)).WithData("ResCode", request.ResourceCode);
+            var wcr = await _inteWorkCenterRepository.GetByResourceIdAsync(rr.Id);
 
+            var nowTime = HymsonClock.Now();
+            
+
+            //await UpdateEquipmentStatusAsync(new EquStatusEntity
+            //{
+            //    Id = IdGenProvider.Instance.CreateId(),
+            //    SiteId = _currentEquipment.SiteId,
+            //    CreatedBy = _currentEquipment.Code,
+            //    UpdatedBy = _currentEquipment.Code,
+            //    CreatedOn = nowTime,
+            //    UpdatedOn = nowTime,
+            //    EquipmentId = _currentEquipment.Id ?? 0,
+            //    LocalTime = request.LocalTime,
+            //    EquipmentStatus = request.StateCode
+            //});
             await UpdateEquipmentStatusAsync(new EquStatusEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
@@ -173,6 +202,9 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 UpdatedBy = _currentEquipment.Code,
                 CreatedOn = nowTime,
                 UpdatedOn = nowTime,
+                ProcedureId = pr.Id,
+                ResourceId = rr.Id,
+                WorkCenterId = wcr.Id,
                 EquipmentId = _currentEquipment.Id ?? 0,
                 LocalTime = request.LocalTime,
                 EquipmentStatus = request.StateCode

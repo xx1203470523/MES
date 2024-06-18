@@ -30,7 +30,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="query"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcProcedureEntity>> GetPagedInfoByProcessRouteIdAsync(ProcProcedurePagedQuery query);
-
+        /// <summary>
+        /// 根据资源ID获取工序（这个方法是有问题的，因为程序没有限制一个资源可以绑定多个工序）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity> GetProcProdureByResourceIdAsync(ProcProdureByResourceIdQuery param);
         /// <summary>
         /// 根据ID获取数据
         /// </summary>

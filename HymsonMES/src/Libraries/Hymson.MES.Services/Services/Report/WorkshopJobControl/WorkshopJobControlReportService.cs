@@ -61,11 +61,11 @@ namespace Hymson.MES.Services.Services.Report
 
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
-        private readonly IManuProductParameterRepository _manuProductParameterRepository;
+        private readonly Data.Repositories.Parameter.IManuProductParameterRepository _manuProductParameterRepository;
 
         private readonly IProcParameterRepository _procParameterRepository;
 
-        public WorkshopJobControlReportService(ICurrentUser currentUser, ICurrentSite currentSite, ILocalizationService localizationService, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository, IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository, IProcBomRepository procBomRepository, IManuSfcRepository manuSfcRepository, IProcResourceRepository procResourceRepository, IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository, IManuDowngradingRecordRepository manuDowngradingRecordRepository, IManuProductBadRecordRepository manuProductBadRecordRepository, IManuBarCodeRelationRepository manuBarCodeRelationRepository, IManuFacePlateRepairRepository manuFacePlateRepairRepository, IManuSfcProduceRepository manuSfcProduceRepository, IManuProductParameterRepository manuProductParameterRepository, IProcParameterRepository procParameterRepository)
+        public WorkshopJobControlReportService(ICurrentUser currentUser, ICurrentSite currentSite, ILocalizationService localizationService, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository, IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository, IProcBomRepository procBomRepository, IManuSfcRepository manuSfcRepository, IProcResourceRepository procResourceRepository, IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository, IManuDowngradingRecordRepository manuDowngradingRecordRepository, IManuProductBadRecordRepository manuProductBadRecordRepository, IManuBarCodeRelationRepository manuBarCodeRelationRepository, IManuFacePlateRepairRepository manuFacePlateRepairRepository, IManuSfcProduceRepository manuSfcProduceRepository, Data.Repositories.Parameter.IManuProductParameterRepository manuProductParameterRepository, IProcParameterRepository procParameterRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;

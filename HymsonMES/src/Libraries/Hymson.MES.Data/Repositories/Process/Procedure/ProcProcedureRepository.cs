@@ -1,6 +1,7 @@
 using Dapper;
+using Hymson.DbConnection.Abstractions;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
+
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -8,6 +9,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -23,7 +25,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ProcProcedureRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        public ProcProcedureRepository(IOptions<Options.ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _memoryCache = memoryCache;
         }
@@ -167,7 +169,11 @@ namespace Hymson.MES.Data.Repositories.Process
             var totalCount = await totalCountTask;
             return new PagedInfo<ProcProcedureEntity>(procProcedureEntities, query.PageIndex, query.PageSize, totalCount);
         }
-
+        public async Task<ProcProcedureEntity> GetProcProdureByResourceIdAsync(ProcProdureByResourceIdQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(GetProcProdureByResourceIdSql, param);
+        }
         /// <summary>
         /// 根据ID获取数据
         /// </summary>

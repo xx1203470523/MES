@@ -73,12 +73,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcResourceEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
-            var key = $"{CachedTables.PROC_RESOURCE}&{query.Site}&{query.Code}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = GetMESDbConnection();
-                return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByCodeSql, query);
-            });
+           
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByCodeSql, query);
+           
         }
 
         /// <summary>

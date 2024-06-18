@@ -148,8 +148,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
             try
             {
                 var conn = GetMESDbConnection();
-               // return await conn.ExecuteAsync(stringBuilder.ToString(), entity);
-                return await conn.ExecuteAsync(InsertSql, entity);
+                return await conn.ExecuteAsync(stringBuilder.ToString(), entity);
+              
             }
             catch (Exception ex)
             {

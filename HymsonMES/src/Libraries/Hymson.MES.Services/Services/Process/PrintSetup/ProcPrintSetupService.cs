@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <summary>
         /// 参数收集仓储
         /// </summary>
-        private readonly IManuProductParameterRepository _manuProductParameterRepository;
+        private readonly Data.Repositories.Parameter.IManuProductParameterRepository _manuProductParameterRepository;
 
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcedureModifyDto> _validationModifyRules;
@@ -137,7 +137,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             IInteJobRepository inteJobRepository,
             IProcLabelTemplateRepository procLabelTemplateRepository,
             IProcProductSetRepository procProductSetRepository,
-            IManuProductParameterRepository manuProductParameterRepository,
+            Data.Repositories.Parameter.IManuProductParameterRepository manuProductParameterRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
             IProcProcedureRejudgeRepository procProcedureRejudgeRepository,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
