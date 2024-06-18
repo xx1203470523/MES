@@ -9,11 +9,6 @@ namespace Hymson.MES.SystemServices.Dtos
     public record MaterialDto : BaseEntityDto
     {
         /// <summary>
-        /// 产线编码（隔离转子线和定子线数据）
-        /// </summary>
-        public string LineCode { get; set; } = "";
-
-        /// <summary>
         /// 编码
         /// </summary>
         public string Code { get; set; } = "";
