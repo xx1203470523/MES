@@ -15,6 +15,7 @@ using Hymson.Excel.Abstractions;
 using Hymson.Minio;
 using Hymson.MES.Services.Dtos.Report.Excel;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.CoreServices.Dtos.Common;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -205,6 +206,22 @@ namespace Hymson.MES.Services.Services.Report
             outputQty = await _productDetailRepository.GetOutputSumAsyc(query);
 
             return outputQty;
+        }
+
+        /// <summary>
+        /// 获取所有工序
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> GetProcdureListAsync()
+        {
+            var procducesInfo = await _productDetailRepository.GetProcdureInfoAsync();
+
+            return procducesInfo.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = $"【{s.Code}】 {s.Name}",
+                Value = $"{s.Id}"
+            });
         }
     }
 }

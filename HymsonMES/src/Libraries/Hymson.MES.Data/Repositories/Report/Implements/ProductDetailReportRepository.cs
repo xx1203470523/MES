@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.SysSetting;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Report;
@@ -123,6 +124,18 @@ public partial class ProductDetailReportRepository : BaseRepository, IProductDet
         using var conn = GetMESDbConnection();
         return await conn.QueryFirstOrDefaultAsync<decimal>(getSql.RawSql, getSql.Parameters);
     }
+
+    /// <summary>
+    /// 获取工序列表的信息
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<ProcProcedureEntity>> GetProcdureInfoAsync()
+    {
+        SqlBuilder sqlBuilder = new SqlBuilder();
+        using var conn = GetMESDbConnection();
+        return await conn.QueryAsync<ProcProcedureEntity>(GetProcdureSql);
+    }
 }
 
 /// <summary>
@@ -172,4 +185,6 @@ ORDER BY T1.startDate
 ";
 
     private readonly string GetSumQtySql = "SELECT ifnull(SUM(ifnull(Qty,0)),0) FROM manu_sfc_summary mss  /**where**/";
+
+    private readonly string GetProcdureSql = "SELECT DISTINCT `Name`,`CODE`,`Id` FROM proc_procedure  /**where**/ ";
 }
