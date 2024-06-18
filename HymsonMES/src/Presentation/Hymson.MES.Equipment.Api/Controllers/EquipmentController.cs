@@ -1,9 +1,12 @@
 ﻿using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos;
-using Hymson.MES.EquipmentServices.Dtos.Equipment;
+
+using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
+using Hymson.MES.EquipmentServices.Services.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
+
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
@@ -23,6 +26,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// 日志对象
         /// </summary>
         private readonly ILogger<EquipmentController> _logger;
+        private readonly IEquipmentCollectService _equipmentService;
 
         /// <summary>
         /// 生产服务接口
@@ -42,11 +46,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="sfcBindingService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
             IManufactureService manufactureService,
+            IEquipmentCollectService equCommonService,
             ISfcBindingService sfcBindingService)
         {
             _logger = logger;
             _manufactureService = manufactureService;
             _sfcBindingService = sfcBindingService;
+            _equipmentService = equCommonService;
         }
 
 
@@ -60,9 +66,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatDto request)
         {
             _logger.LogDebug(request.ToSerialize());
-            await Task.CompletedTask;
+            
 
-            //await _equipmentService.EquipmentHeartbeatAsync(request);
+            await _equipmentService.EquipmentHeartbeatAsync(request);
         }
 
         /// <summary>
@@ -72,12 +78,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("State")]
-        public async Task EquipmentStateAsync(EquipmentStateDto request)
+        public async Task EquipmentStateAsync(EquipmentServices.Dtos.EquipmentCollect.EquipmentStateDto request)
         {
             _logger.LogDebug(request.ToSerialize());
-            await Task.CompletedTask;
+         
 
-            //await _equipmentService.EquipmentStateAsync(request);
+            await _equipmentService.EquipmentStateAsync(request);
         }
 
         /// <summary>
@@ -90,9 +96,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task EquipmentAlarmAsync(EquipmentAlarmDto request)
         {
             _logger.LogDebug(request.ToSerialize());
-            await Task.CompletedTask;
+           // await Task.CompletedTask;
 
-            //await _equipmentService.EquipmentAlarmAsync(request);
+            await _equipmentService.EquipmentAlarmAsync(request);
         }
 
         /// <summary>
@@ -105,9 +111,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task EquipmentDownReasonAsync(EquipmentDownReasonDto request)
         {
             _logger.LogDebug(request.ToSerialize());
-            await Task.CompletedTask;
+            //await Task.CompletedTask;
 
-            //await _equipmentService.EquipmentDownReasonAsync(request);
+            await _equipmentService.EquipmentDownReasonAsync(request);
         }
 
 

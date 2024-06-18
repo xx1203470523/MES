@@ -177,7 +177,7 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <summary>
         ///产品参数采集
         /// </summary>
-        private readonly IManuProductParameterRepository _productParameterRepository;
+        private readonly Data.Repositories.Parameter.IManuProductParameterRepository _productParameterRepository;
 
         /// <summary>
         /// 仓储接口（产品工序时间）
@@ -241,7 +241,7 @@ namespace Hymson.MES.CoreServices.Services.Common
             IProcSortingRuleRepository sortingRuleRepository,
             IProcSortingRuleDetailRepository sortingRuleDetailRepository,
             IEquEquipmentRepository equEquipmentRepository,
-            IManuProductParameterRepository productParameterRepository,
+            Data.Repositories.Parameter.IManuProductParameterRepository productParameterRepository,
             IProcProductTimecontrolRepository procProductTimecontrolRepository)
         {
             _logger = logger;
@@ -1650,7 +1650,7 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// </summary>
         /// <param name="parameterBySfcQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery)
+        public async Task<IEnumerable<Core.Domain.Parameter.ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery)
         {
             //获取到条码的参数信息
             var parameterList = await _productParameterRepository.GetProductParameterBySFCEntitiesAsync(parameterBySfcQuery);

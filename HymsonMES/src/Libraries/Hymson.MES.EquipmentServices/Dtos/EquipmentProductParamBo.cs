@@ -1,26 +1,19 @@
-﻿using Hymson.Infrastructure;
-
-namespace Hymson.MES.EquipmentServices
+﻿namespace Hymson.MES.EquipmentServices.Bos
 {
-    /// <summary>
-    /// 
+    /// 请求参数（设备产品参数）
     /// </summary>
-    public record BaseDto : BaseEntityDto
+    public class EquipmentProductParamBo
     {
         /// <summary>
-        /// 资源编码
+        /// 条码
         /// </summary>
-        public string ResourceCode { get; set; } = "";
+        public string SFC { get; set; } = "";
 
         /// <summary>
-        /// 设备调用本地时间
+        ///  参数Id
         /// </summary>
-        public DateTime LocalTime { get; set; }
-    }
-    /// 请求参数（设备参数信息）
-    /// </summary>
-    public class EquipmentProcessParamInfoDto
-    {
+        public long ParameterId { get; set; }
+
         /// <summary>
         ///  参数编码
         /// </summary>
@@ -65,6 +58,6 @@ namespace Hymson.MES.EquipmentServices
         ///  时间戳（参数采集到的时间）
         /// </summary>
         public DateTime Timestamp { get; set; }
-    }
 
+    }
 }

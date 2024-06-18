@@ -1083,5 +1083,9 @@ namespace Hymson.MES.Services.Services.Warehouse
             return number != Math.Truncate(number);
         }
 
+        public Task<WhMaterialInventoryPickDto> WhMaterialInventoryPick(string workorder, int qty)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
