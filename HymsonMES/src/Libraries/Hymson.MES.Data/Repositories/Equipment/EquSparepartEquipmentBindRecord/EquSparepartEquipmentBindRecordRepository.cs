@@ -205,7 +205,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             if (pagedQuery.UninstallTimeRange != null && pagedQuery.UninstallTimeRange.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { UninstallTimeStart = pagedQuery.UninstallTimeRange[0], UninstallTimeEnd = pagedQuery.UninstallTimeRange[1].AddDays(1) });
+                sqlBuilder.AddParameters(new { UninstallTimeStart = pagedQuery.UninstallTimeRange[0], UninstallTimeEnd = pagedQuery.UninstallTimeRange[1] });
                 sqlBuilder.Where(" ese.UninstallOn >= @UninstallTimeStart AND ese.UninstallOn < @UninstallTimeEnd");
             }
 

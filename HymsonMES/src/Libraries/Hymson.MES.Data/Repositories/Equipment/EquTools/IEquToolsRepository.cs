@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -16,7 +17,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(EquToolsEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquToolsEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -58,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquToolsEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -72,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<EquToolsEntity>> GetEntitiesAsync(EquToolsQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -80,5 +81,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         Task<PagedInfo<EquToolsEntity>> GetPagedListAsync(EquToolsPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<EquToolsEntity> GetByCodeAsync(EntityByCodeQuery query);
     }
 }

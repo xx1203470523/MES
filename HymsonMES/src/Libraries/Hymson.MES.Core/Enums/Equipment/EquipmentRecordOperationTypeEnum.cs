@@ -35,12 +35,24 @@ namespace Hymson.MES.Core.Enums.Equipment
         /// 备件绑定
         /// </summary>
         [Description("备件绑定")]
-        SparepartsBind = 5,
+        SparepartBind = 5,
 
         /// <summary>
         /// 备件解绑
         /// </summary>
         [Description("备件解绑")]
-        SparepartsUnbind = 6
+        SparepartUnbind = 6,
+
+        /// <summary>
+        /// 工具绑定
+        /// </summary>
+        [Description("工具绑定")]
+        ToolBind = 7,
+
+        /// <summary>
+        /// 工具解绑
+        /// </summary>
+        [Description("工具解绑")]
+        ToolUnbind = 8
     }
 }
