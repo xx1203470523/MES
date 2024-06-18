@@ -59,10 +59,36 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
         public async Task OutBoundTestAsync()
         {
 
-            string request = "{\"SFC\":\"ES01B20020048202309220052\",\"Passed\":1,\"ParamList\":null,\"BindFeedingCodes\":null,\"NG\":null,\"IsPassingStation\":true,\"ResourceCode\":\"YTLPACK01ER025\",\"EquipmentCode\":\"YTLPACK01AE025\",\"LocalTime\":\"2023-09-27T08:37:47\"}";
-            string resourceCode = "YTLPACK01ER025";
-            string equipmentCode = "YTLPACK01AE025";
-            string prefix = "YTP280024A23970001EVE";
+            //string request = "{\"SFC\":\"ES01B20020048202309220052\",\"Passed\":1,\"ParamList\":null,\"BindFeedingCodes\":null,\"NG\":null,\"IsPassingStation\":true,\"ResourceCode\":\"YTLPACK01ER025\",\"EquipmentCode\":\"YTLPACK01AE025\",\"LocalTime\":\"2023-09-27T08:37:47\"}";
+            //电芯OCV
+            //string resourceCode = "YTLPACK01ER004";
+            //string equipmentCode = "YTLPACK01AE004";
+            //激光刻码
+            //string resourceCode = "YTLPACK01ER014";
+            //string equipmentCode = "YTLPACK01AE014";
+            ////CCS安装
+            //string resourceCode = "YTLPACK01ER016";
+            //string equipmentCode = "YTLPACK01AE016";
+            ////CCS焊接
+            //string resourceCode = "YTLPACK01ER017";
+            //string equipmentCode = "YTLPACK01AE017";
+            ////模组OCV
+            //string resourceCode = "YTLPACK01ER018";
+            //string equipmentCode = "YTLPACK01AE018";
+
+            //焊缝清洗
+            string resourceCode = "YTLPACK01ER026";
+            string equipmentCode = "YTLPACK01VIR01";
+
+            ////气密性
+            //string resourceCode = "YTLPACK01ER021";
+            //string equipmentCode = "YTLPACK01AE021";
+
+            ////涂胶
+            //string resourceCode = "YTLPACK01ER022";
+            //string equipmentCode = "YTLPACK01AE022";
+
+            //string prefix = "YTLSM20240618001";
             List<OutBoundParam> outBoundParams = new List<OutBoundParam>();
             for (int i = 1; i <= 1; i++)
             {
@@ -72,26 +98,18 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
                     ParamValue = i.ToString()
                 });
             }
-            try
+
+            await SetEquInfoAsync(equipmentCode);
+            await _outBoundService.OutBoundAsync(new OutBoundDto
             {
+                ResourceCode = resourceCode,
+                Passed = 1,
+                LocalTime = HymsonClock.Now(),
+                SFC = "YTLSM20240618004",
+                //SFC = "BMU20240618006",
+                ParamList = outBoundParams.ToArray()
+            });
 
-
-                await SetEquInfoAsync(equipmentCode);
-                await _outBoundService.OutBoundAsync(new OutBoundDto
-                {
-                    ResourceCode = resourceCode,
-                    Passed = 1,
-                    LocalTime = HymsonClock.Now(),
-                    SFC = "ES01B20020048202310040042",
-                    ParamList = outBoundParams.ToArray()
-                });
-
-            }
-            catch (Exception ex)
-            {
-                int ss = 1;
-                //throw;
-            }
             Assert.IsTrue(true);
         }
 

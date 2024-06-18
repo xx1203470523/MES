@@ -239,6 +239,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE Id IN @ids ";
         const string DeleteByProcessRouteIdSql = "delete from `proc_process_route_detail_node` WHERE ProcessRouteId = @ProcessRouteId ";
 
-        const string GetLastProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node`  WHERE ProcessRouteId = @ProcessRouteId  ORDER BY SerialNo DESC LIMIT 1";
+        const string GetLastProcedureByProcessRouteIdSql = @"SELECT * FROM `proc_process_route_detail_node` WHERE ProcessRouteId = @ProcessRouteId AND ProcedureId <> 999999999 ORDER BY SerialNo DESC LIMIT 1";
     }
 }

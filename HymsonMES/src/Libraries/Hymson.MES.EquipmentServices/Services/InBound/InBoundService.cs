@@ -246,7 +246,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             //尾工序进站不允许Pack段出现不合格记录（出现后需要复测）
             var LastProcedureEntity = await GetLastProcedureAsync(planWorkOrderEntity.ProcessRouteId);
             var isLast = !sfcProduceList.Any(a => a.ProcedureId != LastProcedureEntity.ProcedureId);
-            if (isLast)
+            if (isLast && sfcProduceList?.Any() == true)
             {
                 var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
                 if (includeNoQuality.Any())

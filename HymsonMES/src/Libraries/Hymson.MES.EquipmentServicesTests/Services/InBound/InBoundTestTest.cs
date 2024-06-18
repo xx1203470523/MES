@@ -61,13 +61,42 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
 
         /// <summary>
         /// 进站测试
+        /// 电芯段：电芯OCV，电芯绑模组（端板刻码）
+        /// 模组段：端板刻码，CCS安装,CCS焊接，模组OCVR,焊缝清洁，绑定Pack码（和BMU一起）
+        /// BMU：液冷板气密性检测，液冷板涂胶，绑定Pack码（和模组码一起）
+        /// Pack段:人工组件安装(2),线束固定与连接排固定,EOL测试,箱体气密性测试,下线
         /// </summary>
         [TestMethod()]
         public async Task LYPInBoundTestAsync()
         {
-            string resourceCode = "YTLPACK01ER004";
-            string equipmentCode = "YTLPACK01AE004";
-            string prefix = "YTLSM202312130134A";
+            //string resourceCode = "YTLPACK01ER004";
+            //string equipmentCode = "YTLPACK01AE004";
+
+            //string resourceCode = "YTLPACK01ER016";
+            //string equipmentCode = "YTLPACK01AE016";
+
+            //string resourceCode = "YTLPACK01ER017";
+            //string equipmentCode = "YTLPACK01AE017";
+
+            //string resourceCode = "YTLPACK01ER018";
+            //string equipmentCode = "YTLPACK01AE018";
+
+            //焊缝清洗
+            string resourceCode = "YTLPACK01ER026";
+            string equipmentCode = "YTLPACK01VIR01";
+
+            ////气密性
+            //string resourceCode = "YTLPACK01ER021";
+            //string equipmentCode = "YTLPACK01AE021";
+
+            ////涂胶
+            //string resourceCode = "YTLPACK01ER022";
+            //string equipmentCode = "YTLPACK01AE022";
+
+            string prefix = "YTLSM20240618004";
+
+            ////BMU进站测试
+            //string prefix = "BMU20240618006";
 
             await SetEquInfoAsync(equipmentCode);
             await _inBoundService.InBoundAsync(new InBoundDto

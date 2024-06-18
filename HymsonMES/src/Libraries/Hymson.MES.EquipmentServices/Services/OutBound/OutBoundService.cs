@@ -242,7 +242,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //已经进站条码不允许过站
             if (sfcProduceList.Any())
             {
-                
+
                 var outBoundMoreSfcs = outBoundMoreDto.SFCs.Where(w =>
                                             sfcProduceList.Where(c => c.Status == SfcProduceStatusEnum.Activity)
                                             .Select(s => s.SFC)
@@ -252,7 +252,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
             //保存条码当前所在工序,出站条码去一个即可
-            var currentProcedureId = sfcProduceList.OrderByDescending(x=>x.CreatedOn).First().ProcedureId;
+            var currentProcedureId = sfcProduceList.OrderByDescending(x => x.CreatedOn).First().ProcedureId;
 
             //查询已有汇总信息
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
@@ -283,7 +283,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     throw new CustomerValidationException(nameof(ErrorCode.MES18023)).WithData("SFC", outBoundSFCDto.SFC).WithData("OrderCode", planWorkOrderEntity.OrderCode);
                 }
                 //汇总信息
-                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC ).FirstOrDefault();
+                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC).FirstOrDefault();
                 // 更新时间
                 sfcProduceEntity.UpdatedBy = _currentEquipment.Name;
                 sfcProduceEntity.UpdatedOn = HymsonClock.Now();
@@ -644,6 +644,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// <returns></returns>
         public async Task<ProcProcedureEntity?> GetNextProcedureAsync(long workOrderId, long processRouteId, long procedureId)
         {
+            ProcProcedureEntity result = new();
+
             // 因为可能有分叉，所以返回的下一步工序是集合
             var netxtProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetNextProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
             {
@@ -658,8 +660,6 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 ProcessRouteId = processRouteId,
                 ProcedureIds = netxtProcessRouteDetailLinks.Select(s => s.ProcessRouteDetailId)
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
-
-            
 
             // 这个Key太长了
             //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
@@ -715,7 +715,15 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
 
             // 获取下一工序
             if (defaultNextProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
-            return await _procProcedureRepository.GetByIdAsync(defaultNextProcedure.ProcedureId);
+            result = await _procProcedureRepository.GetByIdAsync(defaultNextProcedure.ProcedureId);
+
+            //是否报工（该工序设备是否上传），如果该工序不上传则继续获取下一个工序
+            //不上报工序：OP12挤压，OP23模组入箱，OP24模组人工固定，OP32模组固定2，组件安装OP25
+            //BMU是从气密检测进站，涂胶出站，
+            if (defaultNextProcedure.IsWorkReport == 0)
+                return await GetNextProcedureAsync(workOrderId, processRouteId, defaultNextProcedure.ProcedureId);
+            else
+                return result;
         }
 
         /// <summary>
