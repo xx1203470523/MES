@@ -259,7 +259,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
 
             //查询Bom中得物料信息
             var procBomDetails = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrder.ProductBOMId);
-            if (procBomDetails == null || !procBomDetails.Any()) return manuJointProductAndByproductsReceiveRecordResult;
+            if (procBomDetails == null || !procBomDetails.Any())
+            {
+                manuJointProductAndByproductsReceiveRecordResult.ProductCodeVersion = procMaterialEntity.MaterialCode + "/" + procMaterialEntity.Version;
+                manuJointProductAndByproductsReceiveRecordResult.ProductName = procMaterialEntity.MaterialName;
+                return manuJointProductAndByproductsReceiveRecordResult;
+            }
 
             //查询组件物料信息
             var procMaterialIds = procBomDetails.Select(s => s.MaterialId).ToArray();
@@ -327,12 +332,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
-
+            // 工单信息
             var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
             {
                 WorkOrderId = saveDto.WorkOrderid,
                 IsVerifyActivation = false
             });
+            // 查询已下发数量
+            var workOrderRecordEntity = await _planWorkOrderRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id);
             // 产品ID
             var productId = saveDto.ProductId;
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(productId);
@@ -362,7 +369,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
             switch (procMaterialEntity.QuantityLimit)
             {
                 case MaterialQuantityLimitEnum.AnyNumber:
-                    if (saveDto.Qty <= qty)
+                    if (saveDto.Qty > workOrderRecordEntity.PassDownQuantity)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES14603));
+                    }
+
+                    if (saveDto.Qty < qty)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES11719));
                     }
@@ -464,7 +476,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
                             Batch = procMaterialEntity.Batch,
                             Quantity = decimal.Parse(itemList),
                             Unit = procMaterialEntity.Unit ?? "",
-                            Type = WhMaterialInventoryTypeEnum.MaterialScrapping,
+                            Type = WhMaterialInventoryTypeEnum.ManuComplete,
                             Source = MaterialInventorySourceEnum.ManualEntry,
                             SiteId = _currentSite.SiteId ?? 0,
                             CreatedBy = _currentUser.UserName,

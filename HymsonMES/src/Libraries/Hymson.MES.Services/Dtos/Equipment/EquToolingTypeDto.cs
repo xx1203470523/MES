@@ -33,7 +33,22 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 是否需要校准
+        /// </summary>
+        public YesOrNoEnum Calibration { get; set; }
+
+        /// <summary>
+        /// 额定使用寿命
+        /// </summary>
+        public int LifeSpan { get; set; }
+
+        /// <summary>
+        /// 校准周期
+        /// </summary>
+        public string Cycle { get; set; }
+
+        /// <summary>
         /// 描述
         /// </summary>
         public string? Remark { get; set; } = "";
@@ -44,9 +59,14 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public IEnumerable<long>? EquipmentGroupIds { get; set; }
 
         /// <summary>
-        /// 关联备件
+        /// 关联物料
         /// </summary>
         public IEnumerable<long>? SparePartIds { get; set; }
+
+        /// <summary>
+        /// 关联物料
+        /// </summary>
+        public IEnumerable<long>? MaterialIdIds { get; set; }
 
     }
 

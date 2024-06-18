@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         [HttpPost]
         [Route("create")]
         [LogDescription("工具类型", BusinessType.INSERT)]
-        public async Task AddEquSparePartsGroupAsync([FromBody] EquSparePartsGroupSaveDto saveDto)
+        public async Task AddEquSparePartsGroupAsync([FromBody] EquToolingTypeSaveDto saveDto)
         {
              await _equToolingTypeService.CreateEquSparePartsGroupAsync(saveDto);
         }
@@ -61,7 +61,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         [HttpPut]
         [Route("update")]
         [LogDescription("工具类型", BusinessType.UPDATE)]
-        public async Task UpdateEquSparePartsGroupAsync([FromBody] EquSparePartsGroupSaveDto saveDto)
+        public async Task UpdateEquSparePartsGroupAsync([FromBody] EquToolingTypeSaveDto saveDto)
         {
              await _equToolingTypeService.ModifyEquSparePartsGroupAsync(saveDto);
         }
@@ -97,6 +97,17 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet("{id}/equipmentGroupList")]
         public async Task<List<EquSparePartsGroupEquipmentGroupRelationSaveDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id)
+        {
+            return await _equToolingTypeService.GetSparePartsEquipmentGroupRelationByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询容器关联的物料
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/MaterialList")]
+        public async Task<List<EquSparePartsGroupEquipmentGroupRelationSaveDto>> GetQualUnqualifiedCodeMaterialRelationByIdAsync(long id)
         {
             return await _equToolingTypeService.GetSparePartsEquipmentGroupRelationByIdAsync(id);
         }
