@@ -38,24 +38,24 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 添加（工具绑定设备操作记录表）
+        /// 安装（工具绑定设备操作记录表）
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
+        [Route("install")]
         public async Task InstallAsync([FromBody] EquToolsEquipmentBindRecordCreateDto saveDto)
         {
              await _equToolsEquipmentBindRecordService.InstallAsync(saveDto);
         }
 
         /// <summary>
-        /// 更新（工具绑定设备操作记录表）
+        /// 卸载（工具绑定设备操作记录表）
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("update")]
+        [Route("uninstall")]
         public async Task UninstallAsync([FromBody] EquToolsEquipmentBindRecordSaveDto saveDto)
         {
              await _equToolsEquipmentBindRecordService.UninstallAsync(saveDto);

@@ -183,7 +183,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 SiteId = siteId
             };
 
-            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquipmentRecordOperationTypeEnum.SparepartsBind);
+            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquipmentRecordOperationTypeEnum.SparepartBind);
 
             //安装记录
             var bindRecordEntity = new EquSparepartEquipmentBindRecordEntity()
@@ -323,7 +323,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 SiteId = siteId
             };
 
-            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquipmentRecordOperationTypeEnum.SparepartsBind);
+            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquipmentRecordOperationTypeEnum.SparepartUnbind);
 
             var rows = 0;
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())

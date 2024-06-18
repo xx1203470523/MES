@@ -9,15 +9,25 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// </summary>
     public record EquToolsEquipmentBindRecordCreateDto : BaseEntityDto
     {
-        /// <summary>
-        /// 工具id equ_tools的id
-        /// </summary>
-        public long ToolId { get; set; }
+        ///// <summary>
+        ///// 工具id equ_tools的id
+        ///// </summary>
+        //public long ToolId { get; set; }
 
         /// <summary>
-        /// 设备id equ_equipment的 id
+        /// 工具编码
         /// </summary>
-        public long EquipmentId { get; set; }
+        public string ToolCode { get; set; }
+
+        ///// <summary>
+        ///// 设备id equ_equipment的 id
+        ///// </summary>
+        //public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
 
         /// <summary>
         /// 位置号
@@ -48,7 +58,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; }="";
     }
 
     /// <summary>
@@ -105,6 +115,21 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 额定寿命
+        /// </summary>
+        public decimal RatedLife { get; set; }
+
+        /// <summary>
+        /// 剩余寿命
+        /// </summary>
+        public decimal RemainingUsedLife { get; set; }
+
+        /// <summary>
+        /// 本次使用寿命
+        /// </summary>
+        public decimal CurrentUsedLife { get; set; }
     }
 
     /// <summary>

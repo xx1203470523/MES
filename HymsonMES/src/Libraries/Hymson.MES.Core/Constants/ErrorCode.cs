@@ -2199,5 +2199,14 @@
         public const string MES17606 = "备件关联的设备组不包含当前设备!";
         public const string MES17607 = "备件在设备上的安装数量不能超过备件注册数量!";
         #endregion
+
+        #region 工具安装卸载 17700
+        public const string MES17701 = "工具不存在!";
+        public const string MES17702 = "工具{code}不可使用!";
+        public const string MES17703 = "工具{code}已在设备{position}位置安装!";
+        public const string MES17704 = "设备{code}位置{position}已安装工具，请卸载后再进行操作!";
+        public const string MES17705 = "工具无剩余寿命，不可使用!";
+        public const string MES17706 = "工具本次使用寿命需大于0";
+        #endregion
     }
 }
