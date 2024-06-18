@@ -28,10 +28,19 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquSparePartsGroupEntity entity)
+        public async Task<int> InsertAsync(EquToolingTypeEntity entity)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, entity);
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(InsertSql, entity);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
         }
 
         /// <summary>
@@ -114,10 +123,19 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquSparePartsGroupEntity> GetByIdAsync(long id)
+        public async Task<EquToolingTypeEntity> GetByIdAsync(long id)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<EquSparePartsGroupEntity>(GetByIdSql, new { Id = id });
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryFirstOrDefaultAsync<EquToolingTypeEntity>(GetByIdSql, new { Id = id });
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+          
         }
 
         /// <summary>
@@ -201,17 +219,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
                                             /**select**/
                                            FROM `equ_sparepart_type` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `equ_tooling_type_manage`(  `Id`, `Code`, `Name`, `Status`, `Calibration`, `LifeSpan`, `Cycle`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Calibration, @LifeSpan, @Cycle, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `equ_sparepart_type` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `equ_sparepart_type` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
-        const string GetByCodeSql = "SELECT * FROM `equ_sparepart_type` WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
-        const string GetByIdSql = @"SELECT * FROM `equ_sparepart_type`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM `equ_sparepart_type`  WHERE Id IN @Ids ";
+        const string DeletesSql = "UPDATE `equ_tooling_type_manage` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string GetByCodeSql = "SELECT * FROM `equ_tooling_type_manage` WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
+        const string GetByIdSql = @"SELECT * FROM `equ_tooling_type_manage`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `equ_tooling_type_manage`  WHERE Id IN @Ids ";
 
     }
 }

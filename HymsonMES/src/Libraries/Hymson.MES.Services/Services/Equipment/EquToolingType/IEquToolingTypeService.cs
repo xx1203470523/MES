@@ -14,14 +14,14 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateEquSparePartsGroupAsync(EquSparePartsGroupSaveDto saveDto);
+        Task<int> CreateEquSparePartsGroupAsync(EquToolingTypeSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyEquSparePartsGroupAsync(EquSparePartsGroupSaveDto saveDto);
+        Task<int> ModifyEquSparePartsGroupAsync(EquToolingTypeSaveDto saveDto);
 
         /// <summary>
         /// 删除
