@@ -46,6 +46,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<PlanWorkPlanEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkPlanEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pageQuery"></param>

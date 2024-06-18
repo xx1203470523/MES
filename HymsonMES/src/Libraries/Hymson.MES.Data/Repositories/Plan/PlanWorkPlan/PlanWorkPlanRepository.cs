@@ -83,6 +83,19 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkPlanEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            if (!ids.Any()) return Array.Empty<PlanWorkPlanEntity>();
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<PlanWorkPlanEntity>(GetByIdsSql, new { ids });
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pageQuery"></param>
@@ -145,6 +158,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string DeletesSql = "UPDATE plan_work_plan SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @ids ";
 
         const string GetByIdSql = "SELECT * FROM plan_work_plan WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM plan_work_plan WHERE Id IN @ids ";
 
     }
 }
