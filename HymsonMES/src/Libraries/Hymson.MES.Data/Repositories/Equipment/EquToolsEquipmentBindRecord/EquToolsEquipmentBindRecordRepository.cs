@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.View;
 using Microsoft.Extensions.Options;
@@ -144,13 +145,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-
         public async Task<PagedInfo<EquToolsEquipmentBindRecordView>> GetPagedListAsync(EquToolsEquipmentBindRecordPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("es.code as ToolCode,es.`Name`as ToolName,est.`Code` as ToolType,est.`Name` as ToolTypeName,es.ToolsId as ToolTypeId,ee.EquipmentCode,ee.EquipmentName,ese.Id, ese.CreatedBy,ese.CreatedOn,ese.Position,ese.OperationType,ese.UninstallReason,ese.UninstallBy,ese.UninstallOn,es.RatedLife,es.CurrentUsedLife");
+            sqlBuilder.Select("es.code as ToolCode,es.`Name`as ToolName,est.`Code` as ToolType,est.`Name` as ToolTypeName,es.ToolsId as ToolTypeId,ee.EquipmentCode,ee.EquipmentName,ese.Id, ese.CreatedBy,ese.CreatedOn,ese.Position,ese.OperationType,ese.UninstallReason,ese.UninstallBy,ese.UninstallOn,es.RatedLife,ese.CurrentUsedLife");
 
             sqlBuilder.LeftJoin(" equ_equipment ee on ee.Id=ese.EquipmentId");
             sqlBuilder.LeftJoin(" equ_tools es on es.Id=ese.ToolId");
@@ -197,13 +197,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             if (pagedQuery.InstallTimeRange != null && pagedQuery.InstallTimeRange.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.InstallTimeRange[0], CreatedOnEnd = pagedQuery.InstallTimeRange[1].AddDays(1) });
+                sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.InstallTimeRange[0], CreatedOnEnd = pagedQuery.InstallTimeRange[1] });
                 sqlBuilder.Where(" ese.CreatedOn >= @CreatedOnStart AND ese.CreatedOn < @CreatedOnEnd");
             }
 
             if (pagedQuery.UninstallTimeRange != null && pagedQuery.UninstallTimeRange.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { UninstallTimeStart = pagedQuery.UninstallTimeRange[0], UninstallTimeEnd = pagedQuery.UninstallTimeRange[1].AddDays(1) });
+                sqlBuilder.AddParameters(new { UninstallTimeStart = pagedQuery.UninstallTimeRange[0], UninstallTimeEnd = pagedQuery.UninstallTimeRange[1]});
                 sqlBuilder.Where(" ese.UninstallOn >= @UninstallTimeStart AND ese.UninstallOn < @UninstallTimeEnd");
             }
 
@@ -219,6 +219,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var totalCount = await totalCountTask;
             return new PagedInfo<EquToolsEquipmentBindRecordView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
+
+        /// <summary>
+        /// 查询指定位置是否已经绑定工具
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<EquToolsEquipmentBindRecordEntity> GetIsPostionBindAsync(EquToolsEquipmentBindRecordQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquToolsEquipmentBindRecordEntity>(GetIsPostionBindSql, query);
+        }
     }
 
 
@@ -227,19 +238,20 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>
     public partial class EquToolsEquipmentBindRecordRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_tools_equipment__bind_record /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_tools_equipment__bind_record /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_tools_equipment__bind_record ese /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_tools_equipment__bind_record ese /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_tools_equipment__bind_record /**where**/  ";
 
         const string InsertSql = "INSERT INTO equ_tools_equipment__bind_record(  `Id`, `SiteId`, `ToolId`, `ToolsRecordId`, `EquipmentId`, `EquipmentRecordId`, `Position`, `OperationType`, `UninstallReason`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `UninstallBy`, `UninstallOn`) VALUES (  @Id, @SiteId, @ToolId, @ToolsRecordId, @EquipmentId, @EquipmentRecordId, @Position, @OperationType, @UninstallReason, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @UninstallBy, @UninstallOn) ";
 
-        const string UpdateSql = "UPDATE equ_tools_equipment__bind_record SET   SiteId = @SiteId, ToolId = @ToolId, ToolsRecordId = @ToolsRecordId, EquipmentId = @EquipmentId, EquipmentRecordId = @EquipmentRecordId, Position = @Position, OperationType = @OperationType, UninstallReason = @UninstallReason, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, UninstallBy = @UninstallBy, UninstallOn = @UninstallOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE equ_tools_equipment__bind_record SET Position=@Position,OperationType=@OperationType, UninstallReason=@UninstallReason, Remark=@Remark, UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn,UninstallBy=@UninstallBy,UninstallOn=@UninstallOn,CurrentUsedLife=@CurrentUsedLife WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE equ_tools_equipment__bind_record SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE equ_tools_equipment__bind_record SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM equ_tools_equipment__bind_record WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM equ_tools_equipment__bind_record WHERE Id IN @Ids ";
+        const string GetIsPostionBindSql = "select * from equ_tools_equipment__bind_record where SiteId=@SiteId and EquipmentId=@EquipmentId and Position=@Position and OperationType=@OperationType limit 1";
 
     }
 }

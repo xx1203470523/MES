@@ -14,7 +14,7 @@ namespace Hymson.MES.Core.Enums.Equipment
         Install = 1,
 
         /// <summary>
-        /// 绑定
+        /// 卸载
         /// </summary>
         [Description("卸载")]
         Uninstall = 2

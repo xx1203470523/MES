@@ -67,6 +67,9 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public DateTime? UninstallOn { get; set; }
 
-        
+        /// <summary>
+        /// 本次使用寿命
+        /// </summary>
+        public decimal? CurrentUsedLife { get; set; }
     }
 }
