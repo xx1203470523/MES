@@ -1,17 +1,14 @@
 using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.Query;
-using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.SystemServices.Dtos;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
-using System.Data.SqlTypes;
 
 namespace Hymson.MES.SystemServices.Services.Process
 {
@@ -132,10 +129,16 @@ namespace Hymson.MES.SystemServices.Services.Process
                     {
                         MaterialCode = materialDto.Code,
                         MaterialName = materialDto.Name,
+                        Version = materialDto.Version,
+                        Batch = materialDto.Batch,
+                        ShelfLife = materialDto.ShelfLife,
+                        ValidTime = materialDto.ValidTime,
+                        BuyType = materialDto.BuyType,
+                        SerialNumber = materialDto.SerialNumber,
+                        Remark = materialDto.Description,
 
                         // TODO: 这里需要根据物料编码获取物料信息
 
-                        Remark = "",
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = siteId,
                         CreatedBy = updateUser,
@@ -158,6 +161,13 @@ namespace Hymson.MES.SystemServices.Services.Process
                     }
 
                     materialEntity.MaterialName = materialDto.Name;
+                    materialEntity.Version = materialDto.Version;
+                    materialEntity.Batch = materialDto.Batch;
+                    materialEntity.ShelfLife = materialDto.ShelfLife;
+                    materialEntity.ValidTime = materialDto.ValidTime;
+                    materialEntity.BuyType = materialDto.BuyType;
+                    materialEntity.SerialNumber = materialDto.SerialNumber;
+                    materialEntity.Remark = materialDto.Description;
 
                     // TODO: 这里需要根据物料编码获取物料信息
 
@@ -185,5 +195,6 @@ namespace Hymson.MES.SystemServices.Services.Process
         /// 更新（物料）
         /// </summary>
         public List<ProcMaterialEntity> MaterialUpdates { get; set; } = new();
+
     }
 }

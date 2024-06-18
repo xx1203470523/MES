@@ -13,37 +13,37 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procMaterialEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(ProcMaterialEntity procMaterialEntity);
+        Task<int> InsertAsync(ProcMaterialEntity entity);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procMaterialEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(ProcMaterialEntity procMaterialEntity);
+        Task<int> UpdateAsync(ProcMaterialEntity entity);
 
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="procMaterialEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<ProcMaterialEntity> procMaterialEntitys);
+        Task<int> UpdatesAsync(IEnumerable<ProcMaterialEntity> entities);
 
         /// <summary>
         /// 更新 同编码的其他物料设置为非当前版本
         /// </summary>
-        /// <param name="procMaterialEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateSameMaterialCodeToNoVersionAsync(ProcMaterialEntity procMaterialEntity);
+        Task<int> UpdateSameMaterialCodeToNoVersionAsync(ProcMaterialEntity entity);
 
         /// <summary>
         /// 更新物料的物料组
         /// </summary>
-        /// <param name="procMaterialEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateProcMaterialGroupAsync(IEnumerable<ProcMaterialEntity> procMaterialEntitys);
+        Task<int> UpdateProcMaterialGroupAsync(IEnumerable<ProcMaterialEntity> entities);
 
         /// <summary>
         /// 更新某物料组下的物料为未绑定的
