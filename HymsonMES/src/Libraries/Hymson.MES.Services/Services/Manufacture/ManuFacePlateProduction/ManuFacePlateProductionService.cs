@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
@@ -6,11 +7,13 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Utils;
+using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -33,6 +36,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
+        private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
 
         /// <summary>
         /// 构造函数
@@ -46,7 +50,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
         /// <param name="procReplaceMaterialRepository"></param>
-        public ManuFacePlateProductionService(ICurrentSite currentSite, IManuSfcProduceRepository manuSfcProduceRepository, IProcBomDetailRepository procBomDetailRepository, IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository, IManuSfcCirculationRepository manuSfcCirculationRepository, IProcMaterialRepository procMaterialRepository, IWhMaterialInventoryRepository whMaterialInventoryRepository, IProcMaskCodeRuleRepository procMaskCodeRuleRepository, IProcReplaceMaterialRepository procReplaceMaterialRepository)
+        /// <param name="manuBarCodeRelationRepository"></param>
+        public ManuFacePlateProductionService(ICurrentSite currentSite, IManuSfcProduceRepository manuSfcProduceRepository, IProcBomDetailRepository procBomDetailRepository, IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository, IManuSfcCirculationRepository manuSfcCirculationRepository, IProcMaterialRepository procMaterialRepository, IWhMaterialInventoryRepository whMaterialInventoryRepository, IProcMaskCodeRuleRepository procMaskCodeRuleRepository, IProcReplaceMaterialRepository procReplaceMaterialRepository, IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _currentSite = currentSite;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -54,6 +59,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _procMaterialRepository = procMaterialRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
+            _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
         }
 
 
@@ -81,28 +87,37 @@ namespace Hymson.MES.Services.Services.Manufacture
             var replaceBomDetails = (await _procBomDetailRepository.GetListReplaceAsync(manuSfcProduceEntity.ProductBOMId)).Where(x => x.ProcedureId == param.ProcedureId).ToList();
 
             //获取对应 条码流转表 里已经组装过的数据
-            var types = new List<SfcCirculationTypeEnum>();
-            types.Add(SfcCirculationTypeEnum.Consume);
-            types.Add(SfcCirculationTypeEnum.ModuleAdd);
-            types.Add(SfcCirculationTypeEnum.ModuleReplace);
+            //var types = new List<SfcCirculationTypeEnum>();
+            //types.Add(SfcCirculationTypeEnum.Consume);
+            //types.Add(SfcCirculationTypeEnum.ModuleAdd);
+            //types.Add(SfcCirculationTypeEnum.ModuleReplace);
 
-            var query = new ManuSfcCirculationQuery
+            //var query = new ManuSfcCirculationQuery
+            //{
+            //   Sfc = param.SFC,
+            //    SiteId = _currentSite.SiteId ?? 0,
+            //    CirculationTypes = types.ToArray(),
+            //    ProcedureId = param.ProcedureId,
+            //    IsDisassemble = TrueOrFalseEnum.No
+
+            //    //CirculationMainProductId = manuSfcProduceEntity.ProductId
+            //};
+            //var manuSfcCirculationEntitys = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(query);
+
+            //获取对应数据 条码关系表
+            var manuSfcCirculationEntitys = await _manuBarCodeRelationRepository.GetSfcMoudulesAsync(new ManuComponentBarcodeRelationQuery
             {
-                Sfc = param.SFC,
                 SiteId = _currentSite.SiteId ?? 0,
-                CirculationTypes = types.ToArray(),
-                ProcedureId = param.ProcedureId,
-                IsDisassemble = TrueOrFalseEnum.No
+                Sfc = param.SFC,
+                IsDisassemble = SFCCirculationReportTypeEnum.Activity,
+            });
 
-                //CirculationMainProductId = manuSfcProduceEntity.ProductId
-            };
-            var manuSfcCirculationEntitys = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(query);
 
             //按bom主物料顺序处理
             foreach (var item in mainBomDetails)
             {
                 //查找每个主物料是否已经完成组装 --根据装配数量来判断
-                var hasAssembleNum = manuSfcCirculationEntitys.Where(x => x.CirculationMainProductId == item.MaterialId).Sum(x => x.CirculationQty);
+                var hasAssembleNum = manuSfcCirculationEntitys.Where(x => x.InputBarCodeMaterialId == item.MaterialId).Sum(x => x.InputQty);
                 if (hasAssembleNum >= item.Usages)
                 {
 
@@ -176,7 +191,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         MaterialVersion = item.Version,
                         SerialNumber = item.DataCollectionWay,
                         Usages = item.Usages,
-                        HasAssembleNum = hasAssembleNum.HasValue ? hasAssembleNum.Value : 0,
+                        HasAssembleNum = hasAssembleNum,
 
                         BomMainMaterialNum = mainBomDetails.Count,
                         CurrentMainMaterialIndex = mainBomDetails.IndexOf(item) + 1,
