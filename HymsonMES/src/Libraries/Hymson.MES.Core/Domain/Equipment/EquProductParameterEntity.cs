@@ -1,35 +1,49 @@
-﻿using Hymson.Infrastructure;
+using Hymson.Infrastructure;
 
-namespace Hymson.MES.EquipmentServices
+namespace Hymson.MES.Core.Domain.Equipment
 {
     /// <summary>
-    /// 
+    /// 设备生产参数，数据实体对象   
+    /// equ_product_parameter
+    /// @author Czhipu
+    /// @date 2023-05-17 01:36:24
     /// </summary>
-    public record BaseDto : BaseEntityDto
+    public class EquProductParameterEntity : BaseEntity
     {
         /// <summary>
-        /// 资源编码
+        /// 站点Id
         /// </summary>
-        public string ResourceCode { get; set; } = "";
+        public long SiteId { get; set; }
 
         /// <summary>
-        /// 设备调用本地时间
+        /// 当前工序id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 传输时间
         /// </summary>
         public DateTime LocalTime { get; set; }
-    }
-    /// 请求参数（设备参数信息）
-    /// </summary>
-    public class EquipmentProcessParamInfoDto
-    {
-        /// <summary>
-        ///  参数编码
-        /// </summary>
-        public string ParamCode { get; set; } = "";
 
         /// <summary>
-        ///  参数值
+        /// 标准参数Id
         /// </summary>
-        public string ParamValue { get; set; } = "";
+        public long ParameterId { get; set; }
+
+        /// <summary>
+        /// 参数值
+        /// </summary>
+        public string ParamValue { get; set; }
 
         /// <summary>
         /// 标准上限
@@ -62,9 +76,9 @@ namespace Hymson.MES.EquipmentServices
         public string? TestResult { get; set; }
 
         /// <summary>
-        ///  时间戳（参数采集到的时间）
+        /// 参数采集到的时间
         /// </summary>
         public DateTime Timestamp { get; set; }
-    }
 
+    }
 }

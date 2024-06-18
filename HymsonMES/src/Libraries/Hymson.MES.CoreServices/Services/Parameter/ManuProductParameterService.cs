@@ -29,7 +29,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <summary>
         /// 产品参数
         /// </summary>
-        private readonly IManuProductParameterRepository _manuProductParameterRepository;
+        private readonly Data.Repositories.Parameter.IManuProductParameterRepository _manuProductParameterRepository;
 
         /// <summary>
         /// 仓储接口（参数维护）
@@ -51,7 +51,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <param name="procParameterRepository"></param>
         /// <param name="procProcedureRepository"></param>
         public ManuProductParameterService(IManuCommonService manuCommonService,
-            IManuProductParameterRepository manuProductParameterRepository,
+            Data.Repositories.Parameter.IManuProductParameterRepository manuProductParameterRepository,
             IProcParameterRepository procParameterRepository,
             IProcProcedureRepository procProcedureRepository, IManuSfcProduceRepository manuSfcProduceRepository, IManuSfcStepRepository manuSfcStepRepository)
         {
@@ -68,7 +68,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>?> GetProductParameterListByProcedureAsync(QueryParameterByProcedureDto param)
+        public async Task<IEnumerable<Core.Domain.Parameter.ManuProductParameterEntity>?> GetProductParameterListByProcedureAsync(QueryParameterByProcedureDto param)
         {
             return await _manuProductParameterRepository.GetProductParameterByProcedureIdEntitiesAsync(new ManuProductParameterByProcedureIdQuery
             {
@@ -131,7 +131,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                 Codes = bo.Parameters.Select(x => x.ParameterCode)
             });
 
-            List<ManuProductParameterEntity> list = new();
+            List<Core.Domain.Parameter.ManuProductParameterEntity> list = new();
             var errorParameter = new List<string>();
 
             foreach (var parameter in bo.Parameters)
@@ -143,7 +143,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                     continue;
                 }
 
-                list.AddRange(bo.SFCs.Select(SFC => new ManuProductParameterEntity
+                list.AddRange(bo.SFCs.Select(SFC => new Core.Domain.Parameter.ManuProductParameterEntity
                 {
                     ProcedureId = bo.ProcedureId,
                     SFC = SFC,
@@ -177,7 +177,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySFCListAsync(QueryParameterByProcedureDto param)
+        public async Task<IEnumerable<Core.Domain.Parameter.ManuProductParameterEntity>> GetProductParameterBySFCListAsync(QueryParameterByProcedureDto param)
         {
             return await _manuProductParameterRepository.GetProductParameterBySFCEntitiesAsync(new ManuProductParameterBySfcQuery
             {

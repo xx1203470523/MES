@@ -356,7 +356,7 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// </summary>
         /// <param name="parameterBySfcQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery);
+        Task<IEnumerable<Core.Domain.Parameter.ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery);
 
     }
 }

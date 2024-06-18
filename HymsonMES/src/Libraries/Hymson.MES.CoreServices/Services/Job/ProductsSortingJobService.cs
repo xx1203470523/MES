@@ -320,7 +320,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="parameter">产品参数</param>
         /// <param name="sortingRuleDetailEntities">分选规则</param>
         /// <returns></returns>
-        private ProcSortingRuleDetailEntity GetParameterRating(ManuProductParameterEntity parameter, IEnumerable<ProcSortingRuleDetailEntity> sortingRuleDetailEntities)
+        private ProcSortingRuleDetailEntity GetParameterRating(Core.Domain.Parameter.ManuProductParameterEntity parameter, IEnumerable<ProcSortingRuleDetailEntity> sortingRuleDetailEntities)
         {
             var procSortingRuleDetail = new ProcSortingRuleDetailEntity
             {
