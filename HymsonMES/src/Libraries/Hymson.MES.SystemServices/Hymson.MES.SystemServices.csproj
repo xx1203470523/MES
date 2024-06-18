@@ -9,13 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hymson.Excel" Version="2.1.165" />
+    <PackageReference Include="Hymson.Excel" Version="2.1.167" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.165" />
-    <PackageReference Include="Hymson.Snowflake" Version="2.1.165" />
-    <PackageReference Include="Hymson.Web.Framework" Version="2.1.165" />
+    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.167" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.167" />
+    <PackageReference Include="Hymson.Web.Framework" Version="2.1.167" />
   </ItemGroup>
 
   <ItemGroup>

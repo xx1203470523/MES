@@ -162,7 +162,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                         BomCode = bomDto.BomCode,
                         BomName = bomDto.BomName,
                         Version = bomDto.BomVersion,
-                        Status = SysDataStatusEnum.Enable, // 这个是直接启用，还是需要在MES去点启用？
+                        Status = SysDataStatusEnum.Build, // 因为ERP不传工序，数据有缺陷，所以需要在MES去点启用
                         Remark = "",
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = siteId,
