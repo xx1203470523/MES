@@ -118,9 +118,9 @@ namespace Hymson.MES.Data.Repositories.Common
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("Type = @Type");
 
+            if (query.SiteId.HasValue) sqlBuilder.Where("SiteId = @SiteId");
             if (query.Codes != null && query.Codes.Any()) sqlBuilder.Where("Code IN @Codes");
 
             using var conn = GetMESDbConnection();

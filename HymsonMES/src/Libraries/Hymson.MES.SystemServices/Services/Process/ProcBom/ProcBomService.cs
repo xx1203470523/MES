@@ -1,11 +1,14 @@
+using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.SystemServices.Dtos;
+using Hymson.MES.SystemServices.Services.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -24,6 +27,11 @@ namespace Hymson.MES.SystemServices.Services.Process
         private readonly ILogger<ProcBomService> _logger;
 
         /// <summary>
+        /// 仓储接口（系统配置）
+        /// </summary>
+        private readonly ISysConfigRepository _sysConfigRepository;
+
+        /// <summary>
         /// 仓储接口（BOM表）
         /// </summary>
         private readonly IProcBomRepository _procBomRepository;
@@ -39,29 +47,24 @@ namespace Hymson.MES.SystemServices.Services.Process
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
-        /// 仓储接口（工作中心）
-        /// </summary>
-        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="sysConfigRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
-        /// <param name="inteWorkCenterRepository"></param>
         public ProcBomService(ILogger<ProcBomService> logger,
+            ISysConfigRepository sysConfigRepository,
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository,
-            IProcMaterialRepository procMaterialRepository,
-            IInteWorkCenterRepository inteWorkCenterRepository)
+            IProcMaterialRepository procMaterialRepository)
         {
             _logger = logger;
+            _sysConfigRepository = sysConfigRepository;
             _procBomRepository = procBomRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
-            _inteWorkCenterRepository = inteWorkCenterRepository;
         }
 
 
@@ -74,31 +77,18 @@ namespace Hymson.MES.SystemServices.Services.Process
         {
             if (requestDtos == null || !requestDtos.Any()) return 0;
 
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
+            if (configEntities == null || !configEntities.Any()) return 0;
+
+            var resposeBo = await ConvertBomListAsync(configEntities.FirstOrDefault(), requestDtos);
+            if (resposeBo == null) return 0;
+
+            // 添加到集合
             var resposeSummaryBo = new SyncBomSummaryBo();
+            resposeSummaryBo.BomAdds.AddRange(resposeBo.BomAdds);
+            resposeSummaryBo.BomUpdates.AddRange(resposeBo.BomUpdates);
+            resposeSummaryBo.BomDetailAdds.AddRange(resposeBo.BomDetailAdds);
 
-            // 判断产线是否存在
-            var lineCodes = requestDtos.Select(s => s.LineCode).Distinct();
-            var lineEntities = await _inteWorkCenterRepository.GetAllSiteEntitiesAsync(new InteWorkCenterQuery { Codes = lineCodes });
-
-            // 通过产线分组数据（支持一次传多个站点的数据，但是不建议这么传）
-            var requestDict = requestDtos.GroupBy(g => g.LineCode);
-            foreach (var lineDict in requestDict)
-            {
-                var lineEntity = lineEntities.FirstOrDefault(f => f.Code == lineDict.Key);
-                if (lineEntity == null)
-                {
-                    // 这里应该提示产线不存在
-                    continue;
-                }
-
-                var resposeBo = await ConvertBomListAsync(lineEntity, lineDict);
-                if (resposeBo == null) continue;
-
-                // 添加到集合
-                resposeSummaryBo.BomAdds.AddRange(resposeBo.BomAdds);
-                resposeSummaryBo.BomUpdates.AddRange(resposeBo.BomUpdates);
-                resposeSummaryBo.BomDetailAdds.AddRange(resposeBo.BomDetailAdds);
-            }
 
             // 删除参数
             var deleteCommand = new DeleteCommand
@@ -121,24 +111,24 @@ namespace Hymson.MES.SystemServices.Services.Process
         /// <summary>
         /// 转换信息集合（BOM）
         /// </summary>
-        /// <param name="lineEntity"></param>
+        /// <param name="configEntity"></param>
         /// <param name="lineDtoDict"></param>
         /// <returns></returns>
-        private async Task<SyncBomSummaryBo> ConvertBomListAsync(InteWorkCenterEntity lineEntity, IEnumerable<BomDto> lineDtoDict)
+        private async Task<SyncBomSummaryBo?> ConvertBomListAsync(SysConfigEntity? configEntity, IEnumerable<BomDto> lineDtoDict)
         {
-            var resposeBo = new SyncBomSummaryBo();
-
-            // 判断产线是否存在
-            if (lineEntity == null) return resposeBo;
+            // 判断是否存在（配置）
+            if (configEntity == null) return default;
 
             // 初始化
-            var siteId = lineEntity.SiteId ?? 0;
+            var siteId = configEntity.Value.ParseToLong();
             var updateUser = "ERP";
             var updateTime = HymsonClock.Now();
 
+            var resposeBo = new SyncBomSummaryBo();
+
             // 判断是否有不存在的物料编码
             var materialCodes = lineDtoDict.SelectMany(s => s.BomMaterials).Select(s => s.MaterialCode).Distinct();
-            var materialEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = lineEntity.SiteId, MaterialCodes = materialCodes });
+            var materialEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = siteId, MaterialCodes = materialCodes });
             if (materialEntities == null || materialEntities.Any())
             {
                 // 这里应该提示物料不存在
@@ -147,7 +137,7 @@ namespace Hymson.MES.SystemServices.Services.Process
 
             // 读取已存在的BOM记录
             var bomCodes = lineDtoDict.Select(s => s.BomCode).Distinct();
-            var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = lineEntity.SiteId, Codes = bomCodes });
+            var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = siteId, Codes = bomCodes });
 
             // 遍历数据
             foreach (var bomDto in lineDtoDict)

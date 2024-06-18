@@ -10,7 +10,7 @@ namespace Hymson.MES.Data.Repositories.Common.Query
         /// <summary>
         /// 站点ID
         /// </summary>
-        public long SiteId { get; set; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 配置类型

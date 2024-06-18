@@ -16,6 +16,11 @@ namespace Hymson.MES.Core.Enums
         /// AQL检验计划
         /// </summary>
         [Description("AQLPlan")]
-        AQLPlan = 2
+        AQLPlan = 2,
+        /// <summary>
+        /// ERP请求站点（默认值）
+        /// </summary>
+        [Description("ERPSite")]
+        ERPSite = 3
     }
 }

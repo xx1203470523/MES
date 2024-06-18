@@ -1,9 +1,9 @@
-using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Integrated.Query;
+using Hymson.MES.Data.Repositories.Common;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -27,14 +27,14 @@ namespace Hymson.MES.SystemServices.Services.Plan
         private readonly ILogger<PlanWorkPlanService> _logger;
 
         /// <summary>
+        /// 仓储接口（系统配置）
+        /// </summary>
+        private readonly ISysConfigRepository _sysConfigRepository;
+
+        /// <summary>
         /// 仓储接口（生产计划）
         /// </summary>
         private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
-
-        /// <summary>
-        /// 仓储接口（工作中心）
-        /// </summary>
-        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
         /// <summary>
         /// 仓储接口（BOM表）
@@ -50,19 +50,19 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="sysConfigRepository"></param>
         /// <param name="planWorkPlanRepository"></param>
-        /// <param name="inteWorkCenterRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procMaterialRepository"></param>
         public PlanWorkPlanService(ILogger<PlanWorkPlanService> logger,
+            ISysConfigRepository sysConfigRepository,
             IPlanWorkPlanRepository planWorkPlanRepository,
-            IInteWorkCenterRepository inteWorkCenterRepository,
             IProcBomRepository procBomRepository,
             IProcMaterialRepository procMaterialRepository)
         {
             _logger = logger;
+            _sysConfigRepository = sysConfigRepository;
             _planWorkPlanRepository = planWorkPlanRepository;
-            _inteWorkCenterRepository = inteWorkCenterRepository;
             _procBomRepository = procBomRepository;
             _procMaterialRepository = procMaterialRepository;
         }
@@ -76,30 +76,16 @@ namespace Hymson.MES.SystemServices.Services.Plan
         {
             if (requestDtos == null || !requestDtos.Any()) return 0;
 
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
+            if (configEntities == null || !configEntities.Any()) return 0;
+
+            var resposeBo = await ConvertWorkPlanListAsync(configEntities.FirstOrDefault(), requestDtos);
+            if (resposeBo == null) return 0;
+
+            // 添加到集合
             var resposeSummaryBo = new SyncWorkPlanSummaryBo();
-
-            // 判断产线是否存在
-            var lineCodes = requestDtos.Select(s => s.LineCode).Distinct();
-            var lineEntities = await _inteWorkCenterRepository.GetAllSiteEntitiesAsync(new InteWorkCenterQuery { Codes = lineCodes });
-
-            // 通过产线分组数据（支持一次传多个站点的数据，但是不建议这么传）
-            var requestDict = requestDtos.GroupBy(g => g.LineCode);
-            foreach (var lineDict in requestDict)
-            {
-                var lineEntity = lineEntities.FirstOrDefault(f => f.Code == lineDict.Key);
-                if (lineEntity == null)
-                {
-                    // 这里应该提示产线不存在
-                    continue;
-                }
-
-                var resposeBo = await ConvertWorkPlanListAsync(lineEntity, lineDict);
-                if (resposeBo == null) continue;
-
-                // 添加到集合
-                resposeSummaryBo.PlanAdds.AddRange(resposeBo.PlanAdds);
-                resposeSummaryBo.PlanUpdates.AddRange(resposeBo.PlanUpdates);
-            }
+            resposeSummaryBo.PlanAdds.AddRange(resposeBo.PlanAdds);
+            resposeSummaryBo.PlanUpdates.AddRange(resposeBo.PlanUpdates);
 
             // 插入数据
             var rows = 0;
@@ -112,24 +98,24 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// <summary>
         /// 转换信息集合（生产计划）
         /// </summary>
-        /// <param name="lineEntity"></param>
+        /// <param name="configEntity"></param>
         /// <param name="lineDtoDict"></param>
         /// <returns></returns>
-        private async Task<SyncWorkPlanSummaryBo> ConvertWorkPlanListAsync(InteWorkCenterEntity lineEntity, IEnumerable<WorkPlanDto> lineDtoDict)
+        private async Task<SyncWorkPlanSummaryBo?> ConvertWorkPlanListAsync(SysConfigEntity? configEntity, IEnumerable<WorkPlanDto> lineDtoDict)
         {
-            var resposeBo = new SyncWorkPlanSummaryBo();
-
-            // 判断产线是否存在
-            if (lineEntity == null) return resposeBo;
+            // 判断是否存在（配置）
+            if (configEntity == null) return default;
 
             // 初始化
-            var siteId = lineEntity.SiteId ?? 0;
+            var siteId = configEntity.Value.ParseToLong();
             var updateUser = "ERP";
             var updateTime = HymsonClock.Now();
 
+            var resposeBo = new SyncWorkPlanSummaryBo();
+
             // 判断是否有不存在的产品编码
             var productCodes = lineDtoDict.Select(s => s.ProductCode).Distinct();
-            var productEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = lineEntity.SiteId, MaterialCodes = productCodes });
+            var productEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = siteId, MaterialCodes = productCodes });
             if (productEntities == null || productEntities.Any())
             {
                 // 这里应该提示产品不存在
@@ -138,7 +124,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
             // 判断BOM编码是否存在
             var bomCodes = lineDtoDict.Select(s => s.BomCode).Distinct();
-            var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = lineEntity.SiteId, Codes = bomCodes });
+            var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = siteId, Codes = bomCodes });
             if (bomEntities == null || bomEntities.Any())
             {
                 // 这里应该提示BOM不存在
@@ -147,7 +133,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
             // 读取已存在的生产计划记录
             var planCodes = lineDtoDict.Select(s => s.PlanCode).Distinct();
-            var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = lineEntity.SiteId, Codes = planCodes });
+            var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = siteId, Codes = planCodes });
 
             // 遍历数据
             foreach (var planDto in lineDtoDict)
