@@ -5,7 +5,7 @@ namespace Hymson.MES.Core.Domain.Equipment
 {
     /// <summary>
     /// 数据实体（备件类型）   
-    /// equ_spare_parts_group
+    /// equ_sparepart_type
     /// @author kongaomeng
     /// @date 2023-12-15 10:56:56
     /// </summary>

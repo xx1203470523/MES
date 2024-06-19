@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.CoreServices.Services.EquMaintenancePlan;
 using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
+using Newtonsoft.Json;
 using Quartz;
 using System;
 using System.Collections.Generic;
@@ -24,14 +25,19 @@ namespace Hymson.MES.BackgroundServices.Tasks.Equipment.GenerateMaintenance
 
         public async Task Execute(IJobExecutionContext context)
         {
-            var jobDataObj = context.JobDetail.JobDataMap.Get("param");
-            if (jobDataObj is GenerateEquMaintenanceTaskDto jobData)
+            var jobDataObj = context.JobDetail.JobDataMap.Get("param").ToString();
+            if (!string.IsNullOrWhiteSpace(jobDataObj))
             {
-                await _equMaintenancePlanCoreService.GenerateEquMaintenanceTaskAsync(jobData);
+                if (JsonConvert.DeserializeObject<GenerateEquMaintenanceTaskDto>(jobDataObj) is GenerateEquMaintenanceTaskDto jobData)
+                {
+                    await _equMaintenancePlanCoreService.GenerateEquMaintenanceTaskAsync(jobData);
+                }
+                else
+                {
+
+                }
             }
-            else
-            {
-            }
+
         }
     }
 }

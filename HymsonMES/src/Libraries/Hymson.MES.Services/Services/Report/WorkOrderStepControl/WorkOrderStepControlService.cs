@@ -1,23 +1,18 @@
-using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Services.Dtos.Report;
-using Minio.DataModel;
+using System.Collections.Generic;
+using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -33,7 +28,7 @@ namespace Hymson.MES.Services.Services.Report
         /// 表 仓储
         /// </summary>
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+        private readonly IManuSfcScrapRepository _sfcScrapRepository;
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
@@ -53,20 +48,25 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcSummaryRepository"></param>
         /// <param name="procProcedureRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="sfcScrapRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procBomRepository"></param>
 
-        public WorkOrderStepControlService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository, IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository, IProcBomRepository procBomRepository, IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository, IManuSfcProduceRepository manuSfcProduceRepository, IManuSfcSummaryRepository manuSfcSummaryRepository)
+        public WorkOrderStepControlService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcScrapRepository sfcScrapRepository, IProcProcedureRepository procProcedureRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository,
+            IProcProcessRouteRepository procProcessRouteRepository, IProcBomRepository procBomRepository,
+            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository, IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcSummaryRepository manuSfcSummaryRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
 
             _manuSfcInfoRepository = manuSfcInfoRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
+            _sfcScrapRepository = sfcScrapRepository;
             _procProcedureRepository = procProcedureRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procMaterialRepository = procMaterialRepository;
@@ -92,70 +92,102 @@ namespace Hymson.MES.Services.Services.Report
             {
                 return null;
             }
-
-            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
+            //查询工单表信息
+            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsyncCode(pagedQuery);
 
             List<WorkOrderStepControlViewDto> listDto = new();
-            if (pagedInfo.Data.Any())
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                // 查询物料
-                var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId));
-                // 查询工序节点明细
-                var procProcessRouteDetailNodeTask = _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(pagedInfo.Data.First().ProcessRouteId ?? 0);
-                //查询工序
-                var procProceduresTask = _procProcedureRepository.GetByIdsAsync(procProcessRouteDetailNodeTask.Result.Select(x => x.ProcedureId));
-
-                var materials = await materialsTask;
-                var procProcessRouteDetailNode = await procProcessRouteDetailNodeTask;
-                var procProcedures = await procProceduresTask;
-
-                foreach (var item in procProcessRouteDetailNode.ToList())
-                {
-                    var material = materials.FirstOrDefault(x => x.Id == pagedInfo.Data.First().ProductId);
-                    var PassDownQuantityquery = new ManuSfcProduceVehiclePagedQuery()
-                    {
-                        WorkOrderId = pagedInfo.Data.First().Id,
-                        ProductId = pagedInfo.Data.First().ProductId,
-                        ProcessRouteId = pagedInfo.Data.First().ProcessRouteId,
-                        ProcedureId = item.ProcedureId,
-                        Status = (SfcStatusEnum)1
-                    };
-                    var PassDownQuantity = _manuSfcProduceRepository.GetStepPageListAsync(PassDownQuantityquery).Result.Data.Count();
-
-                    var ProcessDownQuantityquery = new ManuSfcProduceVehiclePagedQuery()
-                    {
-                        WorkOrderId = pagedInfo.Data.First().Id,
-                        ProductId = pagedInfo.Data.First().ProductId,
-                        ProcessRouteId = pagedInfo.Data.First().ProcessRouteId,
-                        ProcedureId = item.ProcedureId,
-                        Status = (SfcStatusEnum)2
-                    };
-                    var ProcessDownQuantity = _manuSfcProduceRepository.GetStepPageListAsync(PassDownQuantityquery).Result.Data.Count();
-
-                    var FinishProductQuantityquery = new ManuSfcProduceVehiclePagedQuery()
-                    {
-                        WorkOrderId = pagedInfo.Data.First().Id,
-                        ProductId = pagedInfo.Data.First().ProductId,
-                        ProcedureId = item.ProcedureId,
-                        SiteId = _currentSite.SiteId
-                    };
-                    var summaryResult = await _manuSfcSummaryRepository.GetWorkOrderAsync(FinishProductQuantityquery);
-                    var FinishProductQuantity = summaryResult.FirstOrDefault()?.OutputQty;
-
-                    listDto.Add(new WorkOrderStepControlViewDto
-                    {
-                        Serialno = item.SerialNo,
-                        ProcedureCode = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Code,
-                        MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
-                        ProcessRout = pagedInfo.Data.First().ProcessRouteCode + "/" + pagedInfo.Data.First().ProcessRouteVersion,
-                        OrderCode = pagedInfo.Data.First()?.OrderCode ?? "",
-                        PassDownQuantity = PassDownQuantity,
-                        ProcessDownQuantity = PassDownQuantity,
-                        FinishProductQuantity = FinishProductQuantity ?? 0,
-                    });
-                }
+                return new PagedInfo<WorkOrderStepControlViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, listDto.Count());
             }
-            return new PagedInfo<WorkOrderStepControlViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+
+            var siteId = _currentSite.SiteId ?? 0;
+            var orderId = pagedInfo.Data.FirstOrDefault()?.Id ?? 0;
+            var manuSfcProduceResultquery = new ManuSfcProduceVehiclePagedQuery()
+            {
+                WorkOrderId = orderId,
+                //ProductId = pagedInfo.Data.First().ProductId,
+                ProcessRouteId = pagedInfo.Data.First().ProcessRouteId,
+                PageIndex = 1,
+                PageSize = 100000,
+                SiteId = siteId
+            };
+            var summaryResultquery = new ManuSfcProduceVehiclePagedQuery()
+            {
+                WorkOrderId = orderId,
+                //ProductId = pagedInfo.Data.First().ProductId,
+                PageIndex = 1,
+                PageSize = 100000,
+                SiteId = siteId
+            };
+            // 查询物料
+            var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId));
+            // 查询工序节点明细
+            var procProcessRouteDetailNodeTask = _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(pagedInfo.Data.First().ProcessRouteId ?? 0);
+            //查询工序
+            var procProceduresTask = _procProcedureRepository.GetByIdsAsync(procProcessRouteDetailNodeTask.Result.Select(x => x.ProcedureId));
+
+            var materials = await materialsTask;
+            var procProcessRouteDetailNode = await procProcessRouteDetailNodeTask;
+            var procProcedures = await procProceduresTask;
+            var SummaryResult = await _manuSfcSummaryRepository.GetWorkOrderAsync(summaryResultquery);
+            var manuSfcProduceResult = await _manuSfcProduceRepository.GetStepPageListAsync(manuSfcProduceResultquery);
+
+            var sfcIds = manuSfcProduceResult.Data.Where(x => x.Status == SfcStatusEnum.Scrapping).Select(x => x.SFCId.GetValueOrDefault()).Distinct().ToList();
+            IEnumerable<ManuSfcInfoEntity> sfcInfoEntities = new List<ManuSfcInfoEntity>();
+            IEnumerable<ManuSfcScrapEntity> sfcScrapEntities = new List<ManuSfcScrapEntity>();
+            if (sfcIds.Any())
+            {
+                sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcIds);
+                var sfcInfoIds = sfcInfoEntities.Select(x => x.Id).Distinct().ToList();
+                sfcScrapEntities = await _sfcScrapRepository.GetEntitiesAsync(new ManuSfcScrapQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SfcinfoIds = sfcInfoIds
+                });
+            }
+
+            var list = procProcessRouteDetailNode.ToList();
+            list.RemoveAt(list.Count - 1);
+            foreach (var item in list)
+            {
+                var passViews = manuSfcProduceResult.Data.Where(x => x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.lineUp);
+                var activityViews = manuSfcProduceResult.Data.Where(x => x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.Activity);
+                var lockViews = manuSfcProduceResult.Data.Where(x => x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.Locked);
+                var material = materials.FirstOrDefault(x => x.Id == pagedInfo.Data.First().ProductId);
+                var passDownQuantity = passViews.Sum(x => x.Qty);
+                var processDownQuantity = activityViews.Sum(x => x.Qty);
+                var lockQuantity = lockViews.Sum(x => x.Qty);
+                var finishProductQuantity = SummaryResult.Where(x => x.WorkOrderId == orderId && x.ProcedureId == item.ProcedureId).FirstOrDefault()?.OutputQty;
+
+                var scrapViews = manuSfcProduceResult.Data.Where(x => x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.Scrapping);
+                var scrapQuantity = 0m;
+                if (scrapViews.Any())
+                {
+                    var sfcids = scrapViews.Select(x => x.SFCId.GetValueOrDefault()).Distinct().ToArray();
+                    var sfcInfoIds = sfcInfoEntities.Where(x => sfcids.Contains(x.SfcId)).Select(x => x.Id).ToArray();
+                    scrapQuantity = sfcScrapEntities.Where(x => sfcInfoIds.Contains(x.SfcinfoId)).ToArray().Sum(x => x.ScrapQty) ?? 0;
+                }
+
+                var procedures = procProcedures?.FirstOrDefault(x => x.Id == item.ProcedureId);
+                listDto.Add(new WorkOrderStepControlViewDto
+                {
+                    OrderId = orderId,
+                    ProcedureId = procedures?.Id ?? 0,
+                    Serialno = item.ManualSortNumber,
+                    ProcedureCode = procedures?.Code ?? "",
+                    MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
+                    ProcessRout = pagedInfo.Data.First().ProcessRouteCode + "/" + pagedInfo.Data.First().ProcessRouteVersion,
+                    OrderCode = pagedInfo.Data.FirstOrDefault()?.OrderCode ?? "",
+                    PassDownQuantity = passDownQuantity,
+                    ProcessDownQuantity = processDownQuantity,
+                    ScrapQuantity = scrapQuantity,
+                    LockQuantity = lockQuantity,
+                    FinishProductQuantity = finishProductQuantity ?? 0,
+                });
+            }
+
+            return new PagedInfo<WorkOrderStepControlViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, listDto.Count());
         }
     }
 }

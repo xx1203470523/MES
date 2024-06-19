@@ -10,9 +10,19 @@ namespace Hymson.MES.Services.Dtos.Report
     public record WorkOrderControlReportViewDto : BaseEntityDto
     {
         /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 物料编码/版本
         /// </summary>
         public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
 
         /// <summary>
         /// 工单编码
@@ -147,8 +157,8 @@ namespace Hymson.MES.Services.Dtos.Report
         public PlanWorkOrderStatusEnum? Status { get; set; }
 
         /// <summary>
-        /// 录入时间
+        /// 创建时间  数组 ：时间范围 
         /// </summary>
-        public DateTime? CreatedOn { get; set; }
+        public DateTime[]? CreatedOn { get; set; }
     }
 }

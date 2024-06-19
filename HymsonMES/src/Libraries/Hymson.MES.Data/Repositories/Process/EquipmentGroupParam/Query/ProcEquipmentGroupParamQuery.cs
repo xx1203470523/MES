@@ -51,6 +51,48 @@ namespace Hymson.MES.Data.Repositories.Process
         public long EquipmentGroupId { get; set; }
     }
 
+    /// <summary>
+    ///更具编码查询参数
+    /// </summary>
+    public class ProcEquipmentGroupParamByCodeQuery
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 编码集合
+        /// </summary>
+        public IEnumerable<string> Codes { get; set; }
+    }
+
+    /// <summary>
+    ///更具编码查询参数
+    /// </summary>
+    public class ProcEquipmentGroupParamByIdsQuery
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 产品集合
+        /// </summary>
+        public IEnumerable<long> ProductIds { get; set; }
+
+        /// <summary>
+        /// 工序集合
+        /// </summary>
+        public IEnumerable<long> ProcedureIds { get; set; }
+
+        /// <summary>
+        /// 工艺设备集合
+        /// </summary>
+        public IEnumerable<long> EquipmentGroupIds { get; set; }
+    }
+
     #region 顷刻
 
     /// <summary>

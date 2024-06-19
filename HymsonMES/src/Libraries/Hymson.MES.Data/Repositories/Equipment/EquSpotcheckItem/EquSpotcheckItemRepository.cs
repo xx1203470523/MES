@@ -146,17 +146,24 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
-                sqlBuilder.Where("Name = @Name");
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("Name like @Name");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
-                sqlBuilder.Where("Code = @Code");
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("Code like @Code");
             }
 
             if (pagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
+            }
+
+            if (pagedQuery.DataType.HasValue)
+            {
+                sqlBuilder.Where("DataType = @DataType");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;

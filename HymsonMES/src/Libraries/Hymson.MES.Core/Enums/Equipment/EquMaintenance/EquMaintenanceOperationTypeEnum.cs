@@ -18,6 +18,9 @@ namespace Hymson.MES.Core.Enums.Equipment
         /// 关闭检验
         /// </summary>
         [Description("关闭保养")]
-        Close = 3
+        Close = 3,
+
+        [Description("保养延期")]
+        Defer = 4
     }
 }

@@ -153,6 +153,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            if (query.EventTypeCode != null)
+            {
+                sqlBuilder.Where("Code = @EventTypeCode");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteEventTypeEntity>(template.RawSql, query);
         }

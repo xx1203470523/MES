@@ -122,7 +122,7 @@
         public const string MES14600 = "半成品记录未找到!";
         public const string MES14601 = "查询的工单不存在!";
         public const string MES14602 = "该半成品ID不存在物料BOM明细表中!";
-        public const string MES14603 = "计划下达数量不可大于可下达量!";
+        public const string MES14603 = "收货数量超出工单的已下达数量,不予生成!";
         public const string MES14604 = "下达数量必须大于0!";
         public const string MES14605 = "请先配置资源打印信息!";
         public const string MES14606 = "实际数量必须要大于0!";

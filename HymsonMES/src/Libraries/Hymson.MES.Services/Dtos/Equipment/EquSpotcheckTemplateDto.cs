@@ -339,7 +339,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckTemplate
         /// <summary>
         /// 数据类型
         /// </summary>
-        public DataTypeEnum? DataType { get; set; }
+        public EquSpotcheckDataTypeEnum? DataType { get; set; }
 
         /// <summary>
         /// 规格下限

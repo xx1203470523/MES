@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 using IdGen;
 using Microsoft.Extensions.Options;
 using System.Net.NetworkInformation;
@@ -219,6 +220,28 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
 
+        /// <summary>
+        /// 更具编码获取参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcEquipmentGroupParamEntity>> GetByCodesAsync(ProcEquipmentGroupParamByCodeQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcEquipmentGroupParamEntity>(GetByCodesSql, param);
+        }
+
+        /// <summary>
+        /// 更具编码获取参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcEquipmentGroupParamEntity>> GetByProductIdsAndProcedureIdsAsync(ProcEquipmentGroupParamByIdsQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcEquipmentGroupParamEntity>(GetByProductIdsAndProcedureIdsAndEquipmentGroupIdSql, param);
+        }
+        
         #region 顷刻
 
         /// <summary>
@@ -325,6 +348,10 @@ namespace Hymson.MES.Data.Repositories.Process
                             AND IsDeleted=0 AND SiteId=@SiteId ";
 
         const string UpdateStatusSql = "UPDATE `proc_equipment_group_param` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+
+        const string GetByCodesSql = @"SELECT * FROM `proc_equipment_group_param` WHERE Code IN @Codes AND SiteId= @SiteId  AND IsDeleted=0 ";
+
+        const string GetByProductIdsAndProcedureIdsAndEquipmentGroupIdSql = @"SELECT * FROM `proc_equipment_group_param` WHERE ProductId IN @ProductIds AND SiteId= @SiteId  AND IsDeleted=0 AND ProcedureId IN @ProcedureIds AND EquipmentGroupId IN @EquipmentGroupIds";
 
         #region 顷刻
         /// <summary>

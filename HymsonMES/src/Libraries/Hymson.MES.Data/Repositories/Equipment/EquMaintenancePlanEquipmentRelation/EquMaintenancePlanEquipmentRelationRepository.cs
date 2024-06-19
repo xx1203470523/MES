@@ -95,6 +95,17 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlanEquipmentRelation
             return await conn.QueryAsync<EquMaintenancePlanEquipmentRelationEntity>(GetByMaintenancePlanIdsSql, new { MaintenancePlanId = MaintenancePlanId });
         }
 
+        /// <summary>
+        /// 根据MaintenanceTemplateId批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns> 
+        public async Task<IEnumerable<EquMaintenancePlanEquipmentRelationEntity>> GetByMaintenanceTemplateIdsAsync(IEnumerable<long> maintenanceTemplateIds)
+        {
+            using var conn = GetMESDbConnection();  
+            return await conn.QueryAsync<EquMaintenancePlanEquipmentRelationEntity>(GetByMaintenanceTemplateIdsSql, new { MaintenanceTemplateIds = maintenanceTemplateIds });
+        }
+
 
         /// <summary>
         /// 分页查询
@@ -216,6 +227,10 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlanEquipmentRelation
         const string GetByMaintenancePlanIdsSql = @"SELECT  
                                           `MaintenancePlanId`, `MaintenanceTemplateId`, `EquipmentId`, `CreatedBy`, `CreatedOn`, `ExecutorIds`, `LeaderIds`
                             FROM `equ_Maintenance_plan_equipment_relation`  WHERE MaintenancePlanId = @MaintenancePlanId ";
+
+        const string GetByMaintenanceTemplateIdsSql = @"SELECT   
+                                          `MaintenancePlanId`, `MaintenanceTemplateId`, `EquipmentId`, `CreatedBy`, `CreatedOn`, `ExecutorIds`, `LeaderIds`
+                            FROM `equ_Maintenance_plan_equipment_relation`  WHERE MaintenanceTemplateId IN @MaintenanceTemplateIds ";
         #endregion
     }
 }

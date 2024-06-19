@@ -36,6 +36,11 @@ namespace Hymson.MES.CoreServices.Events.Equipment
         /// 首次执行时间
         /// </summary>
         public DateTime FirstExecuteTime { get; set; }
+
+        /// <summary>
+        /// 任务结束时间
+        /// </summary>
+        public DateTime EndTime { get; set; }
     }
 
     /// <summary>

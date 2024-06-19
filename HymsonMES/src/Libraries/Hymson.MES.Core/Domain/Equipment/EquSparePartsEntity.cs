@@ -16,27 +16,27 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备件编码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备件名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 厂商
         /// </summary>
         public string? Manufacturer { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 供应商
         /// </summary>
         public string? Supplier { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;0 禁用 1、启用
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
@@ -56,22 +56,22 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public string? DrawCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 规格型号
         /// </summary>
         public string? Model { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 存放位置
         /// </summary>
         public string? Position { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否关联设备;0、否 1、是
         /// </summary>
         public YesOrNoEnum? IsAssociatedDevice { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否标准件;0、否 1、是
         /// </summary>
         public YesOrNoEnum? IsStandardPart { get; set; }
@@ -79,7 +79,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 数量
         /// </summary>
-        public long Qty { get; set; }
+        public int Qty { get; set; }
 
         /// <summary>
         /// 描述
@@ -115,14 +115,28 @@ namespace Hymson.MES.Core.Domain.Equipment
 
     public class UpdateSparePartsTypeEntity : BaseEntity
     {
-     /// <summary>
-     /// 关联备件
-      /// </summary>
+        /// <summary>
+        /// 关联备件
+        /// </summary>
         public IEnumerable<long>? SparePartIds { get; set; }
 
         /// <summary>
         /// 备件类型
         /// </summary>
         public IEnumerable<long>? SparePartGroupIds { get; set; }
+    }
+
+
+    public class UpdateSparePartsQtyEntity : BaseEntity
+    {
+        /// <summary>
+        /// 关联备件
+        /// </summary>
+        public IEnumerable<long> SparePartIds { get; set; }
+
+        /// <summary>
+        /// 备件类型
+        /// </summary>
+        public IEnumerable<decimal> Qty { get; set; }
     }
 }

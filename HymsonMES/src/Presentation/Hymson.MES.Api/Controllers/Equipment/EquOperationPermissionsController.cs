@@ -66,6 +66,20 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
+        /// 添加（设备维保权限）
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateRange")]
+        [LogDescription("设备维保权限", BusinessType.UPDATE)]
+        [PermissionDescription("equ:equOperationPermissions:update")]
+        public async Task UpdateRangeAsync([FromBody] EquOperationPermissionsBatchSaveDto saveDto)
+        {
+            await _equOperationPermissionsService.BatchModifyAsync(saveDto);
+        }
+
+        /// <summary>
         /// 删除（设备维保权限）
         /// </summary>
         /// <param name="ids"></param>
@@ -85,7 +99,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquOperationPermissionsDto?> QueryByIdAsync(long id)
+        public async Task<EquOperationPermissionsDetailDto?> QueryByIdAsync(long id)
         {
             return await _equOperationPermissionsService.QueryByIdAsync(id);
         }

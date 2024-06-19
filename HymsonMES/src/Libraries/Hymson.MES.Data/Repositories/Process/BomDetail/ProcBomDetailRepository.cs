@@ -88,12 +88,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomDetailEntity>> GetByBomIdAsync(long bomId)
         {
-            var key = $"{CachedTables.PROC_BOM_DETAIL}&{bomId}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
+          //  var key = $"{CachedTables.PROC_BOM_DETAIL}&{bomId}";
+         ////   return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+          //  {
                 using var conn = GetMESDbConnection();
                 return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIdSql, new { bomId });
-            });
+          //  });
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_bom_detail` /**where**/ ";
         const string GetProcBomDetailEntitiesSqlTemplate = @"SELECT  /**select**/  FROM `proc_bom_detail` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_bom_detail`(`Id`, `SiteId`, `BomId`, `ProcedureId`, `MaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, DataCollectionWay,IsEnableReplace,Seq) VALUES (@Id, @SiteId, @BomId, @ProcedureId, @MaterialId, @ReferencePoint, @Usages, @Loss, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted , @DataCollectionWay,@IsEnableReplace,@Seq )  ";
+        const string InsertSql = "INSERT INTO `proc_bom_detail`(`Id`, `SiteId`, `BomId`, `ProcedureId`, `MaterialId`, `ReferencePoint`, `Usages`, `Loss`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, DataCollectionWay,IsEnableReplace,Seq,`BomProductType`) VALUES (@Id, @SiteId, @BomId, @ProcedureId, @MaterialId, @ReferencePoint, @Usages, @Loss, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted , @DataCollectionWay,@IsEnableReplace,@Seq,@BomProductType )  ";
         const string UpdateSql = "UPDATE `proc_bom_detail` SET  ProcedureId = @ProcedureId, MaterialId = @MaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , DataCollectionWay=@DataCollectionWay,IsEnableReplace=@IsEnableReplace,Seq=@Seq WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_bom_detail` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_bom_detail` SET IsDeleted = Id,UpdatedBy = @UserId,UpdatedOn = @DeleteOn  WHERE Id in @ids";
@@ -280,7 +280,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 查询主物料表列表
         /// </summary>
         const string GetListMainSql = @"SELECT 
-                                          a.`Id`,a.MaterialId, 0 as BomDetailId,  a.`Usages`, a.`Loss`,a.`ReferencePoint`, a.`ProcedureId`, a.DataCollectionWay,a.IsEnableReplace,a.Seq,
+                                          a.`Id`,a.MaterialId, 0 as BomDetailId,  a.`Usages`, a.`Loss`,a.`ReferencePoint`, a.`ProcedureId`, a.DataCollectionWay,a.IsEnableReplace,a.Seq,a.BomProductType,
                      1 as IsMain, b.MaterialCode, b.MaterialName,
                      b.Version, c.Name as ProcedureName, c.Code 
                             FROM `proc_bom_detail` a
@@ -307,6 +307,5 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByBomIdsSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId IN @bomIds ";
 
         const string GetByBomIdAndProcedureIdSql = @"SELECT * FROM proc_bom_detail WHERE IsDeleted = 0 AND BomId = @bomId AND ProcedureId=@ProcedureId order by Seq";
-
     }
 }

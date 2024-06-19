@@ -23,6 +23,11 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation
         /// </summary>
         public IEnumerable<long>? SpotCheckTemplateIds { get; set; }
 
+        /// <summary>
+        /// 项目ID
+        /// </summary>
+        public IEnumerable<long>? SpotCheckItemIds { get; set; }
+
     }
 
     /// <summary>

@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using MimeKit;
 
 using OfficeOpenXml.Attributes;
@@ -70,12 +71,19 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 是否启用替代物料
         /// </summary>
-        public bool? IsEnableReplace { get; set; }=false;
+        public bool? IsEnableReplace { get; set; } = false;
 
         /// <summary>
         /// 序号
         /// </summary>
         public decimal Seq { get; set; }
+
+
+        /// <summary>
+        /// Bom类型
+        /// </summary>
+
+        public ManuProductTypeEnum BomProductType { get; set; }
     }
 
 
