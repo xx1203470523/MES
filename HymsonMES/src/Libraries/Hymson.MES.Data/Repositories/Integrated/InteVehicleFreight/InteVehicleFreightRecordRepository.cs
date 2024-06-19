@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -76,7 +77,45 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("OperateType <> 2"); //不查询清盘数据
             sqlBuilder.Select("*");
+
+            if (inteVehicleFreightRecordPagedQuery.WorkCenterId.HasValue)
+            {
+                sqlBuilder.Where(" WorkCenterId=@WorkCenterId ");
+            }
+            if (inteVehicleFreightRecordPagedQuery.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where(" ProcedureId=@ProcedureId ");
+            }
+            if (inteVehicleFreightRecordPagedQuery.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where(" WorkOrderId=@WorkOrderId ");
+            }
+            if (inteVehicleFreightRecordPagedQuery.EquipmentId.HasValue)
+            {
+                sqlBuilder.Where(" EquipmentId=@EquipmentId ");
+            }
+            if (inteVehicleFreightRecordPagedQuery.ResourceId.HasValue)
+            {
+                sqlBuilder.Where(" ResourceId=@ResourceId ");
+            }
+            if (inteVehicleFreightRecordPagedQuery.VehicleId.HasValue)
+            {
+                sqlBuilder.Where(" VehicleId=@VehicleId ");
+            }
+            if (!string.IsNullOrWhiteSpace(inteVehicleFreightRecordPagedQuery.BarCode))
+            {
+                inteVehicleFreightRecordPagedQuery.BarCode = $"%{inteVehicleFreightRecordPagedQuery.BarCode}%";
+                sqlBuilder.Where(" BarCode like @BarCode ");
+            }
+
+            if (inteVehicleFreightRecordPagedQuery.CreatedOn != null && inteVehicleFreightRecordPagedQuery.CreatedOn.Length > 0 && inteVehicleFreightRecordPagedQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = inteVehicleFreightRecordPagedQuery.CreatedOn[0], CreatedOnEnd = inteVehicleFreightRecordPagedQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where(" CreatedOn >= @CreatedOnStart AND  CreatedOn < @CreatedOnEnd ");
+            }
 
             var offSet = (inteVehicleFreightRecordPagedQuery.PageIndex - 1) * inteVehicleFreightRecordPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -135,7 +174,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<int> InsertsAsync(List<InteVehicleFreightRecordEntity> inteVehicleFreightRecordEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, inteVehicleFreightRecordEntitys);
+            return await conn.ExecuteAsync(InsertSql, inteVehicleFreightRecordEntitys);
         }
 
         /// <summary>
@@ -166,14 +205,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class InteVehicleFreightRecordRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_vehicle_freight_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_vehicle_freight_record` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY  CreatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_vehicle_freight_record` /**where**/ ";
         const string GetInteVehicleFreightRecordEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `inte_vehicle_freight_record` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_vehicle_freight_record`(  `Id`, `SiteId`, `VehicleId`, `LocationId`, `BarCode`, `OperateType`,`CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @VehicleId, @LocationId, @BarCode, @OperateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn )  ";
-        const string InsertsSql = "INSERT INTO `inte_vehicle_freight_record`(  `Id`, `SiteId`, `VehicleId`, `LocationId`, `BarCode`, `OperateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @VehicleId, @LocationId, @BarCode, @OperateType,@CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn )  ";
+        const string InsertSql = "INSERT INTO `inte_vehicle_freight_record`(  `Id`, `SiteId`, `VehicleId`, `LocationId`, `BarCode`, `OperateType`,`CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`,`ProductId`, `WorkOrderId`,`WorkCenterId`, `EquipmentId`, `ResourceId`, `ProcedureId`) VALUES (   @Id, @SiteId, @VehicleId, @LocationId, @BarCode, @OperateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn,@ProductId, @WorkOrderId, @WorkCenterId, @EquipmentId, @ResourceId, @ProcedureId )  ";
 
         const string UpdateSql = "UPDATE `inte_vehicle_freight_record` SET   SiteId = @SiteId, VehicleId = @VehicleId, LocationId = @LocationId, BarCode = @BarCode, OperateType = @OperateType, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `inte_vehicle_freight_record` SET   SiteId = @SiteId, VehicleId = @VehicleId, LocationId = @LocationId, BarCode = @BarCode, OperateType = @OperateType, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";

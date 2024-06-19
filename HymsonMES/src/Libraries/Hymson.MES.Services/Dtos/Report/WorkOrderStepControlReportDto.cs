@@ -20,9 +20,19 @@ namespace Hymson.MES.Services.Dtos.Report
         public string OrderCode { get; set; }
 
         /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
         /// 步骤标识
         /// </summary>
-        public long Serialno { get; set; }
+        public string Serialno { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 工序
@@ -48,6 +58,16 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 完成数量
         /// </summary>
         public decimal FinishProductQuantity { get; set; }
+
+        /// <summary>
+        /// 锁定数量
+        /// </summary>
+        public decimal LockQuantity { get; set; }
+
+        /// <summary>
+        /// 报废数量
+        /// </summary>
+        public decimal ScrapQuantity { get; set; }
     }
 
     /// <summary>

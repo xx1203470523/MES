@@ -129,6 +129,32 @@ namespace Hymson.MES.Api.Controllers.Process
             return await _procEquipmentGroupParamService.GetDetailParamByProductIdAndProcedureIdPagedAsync(queryDto);
         }
 
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _procEquipmentGroupParamService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Recipe参数导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导入客户数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        public async Task ImportEquipmentGroupParamAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+
+            await _procEquipmentGroupParamService.ImportInteEquipmentGroupParamAsync(formFile);
+        }
+
         #region 状态变更
         /// <summary>
         /// 启用（设备组参数详情维护）

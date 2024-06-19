@@ -102,6 +102,15 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
 
+        /// <summary>
+        /// 更具编码获取参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcEquipmentGroupParamEntity>> GetByCodesAsync(ProcEquipmentGroupParamByCodeQuery param);
+
+        Task<IEnumerable<ProcEquipmentGroupParamEntity>> GetByProductIdsAndProcedureIdsAsync(ProcEquipmentGroupParamByIdsQuery param);
+
         #region 顷刻
         /// <summary>
         /// 根据设备ID和产品型号查询

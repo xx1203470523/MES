@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Common;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -67,7 +68,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public TrueOrFalseEnum? IsQualified { get; set; }
+        public TrueFalseEmptyEnum? IsQualified { get; set; }
         public string? IsQualifiedText { get; set; }
 
         /// <summary>
@@ -165,6 +166,21 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// </summary>
         public string? LeaderIds { get; set; }
 
+        /// <summary>
+        /// 是否延期
+        /// </summary>
+        public TrueOrFalseEnum? IsDefer { get; set; }
+
+        /// <summary>
+        /// 计划备注
+        /// </summary>
+        public string? PlanRemark { get; set; }
+
+        /// <summary>
+        /// 延期原因
+        /// </summary>
+        public string? DeferReason { get; set; }
+
     }
 
 
@@ -212,7 +228,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 计划开始时间  时间范围  数组
         /// </summary>
-        public DateTime[]? PlanStartTime { get; set; }
+        public DateTime[]? PlanBeginTime { get; set; }
     }
 
 
@@ -272,7 +288,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 是否合格;(0-否 1-是)
         /// </summary>
-        public TrueOrFalseEnum? IsQualified { get; set; }
+        public TrueFalseEmptyEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 描述
@@ -394,7 +410,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public TrueOrFalseEnum IsQualified { get; set; }
+        public TrueFalseEmptyEnum IsQualified { get; set; }
 
         /// <summary>
         /// 备注
@@ -441,6 +457,31 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         public string? Remark { get; set; }
 
     }
+
+    /// <summary>
+    /// 保养延期
+    /// </summary>
+    public record EquMaintenanceTaskDeferDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long MaintenanceTaskId { get; set; }
+
+        /// <summary>
+        /// 延期日期 截止日期
+        /// </summary>
+        public DateTime? PlanBeginTime { get; set; }
+
+        /// <summary>
+        ///延期原因  备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+    }
+
+
+
 
     /// <summary>
     /// 附件保存dto

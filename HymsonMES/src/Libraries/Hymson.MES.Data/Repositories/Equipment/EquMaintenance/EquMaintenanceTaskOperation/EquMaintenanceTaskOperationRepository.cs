@@ -116,6 +116,21 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
+
+            if (query.MaintenanceTaskIds != null)
+            {
+                sqlBuilder.Where("MaintenanceTaskId IN @MaintenanceTaskIds");
+            }
+
+            if (query.OperationType.HasValue)
+            {
+                sqlBuilder.Where("OperationType = @OperationType");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquMaintenanceTaskOperationEntity>(template.RawSql, query);
         }

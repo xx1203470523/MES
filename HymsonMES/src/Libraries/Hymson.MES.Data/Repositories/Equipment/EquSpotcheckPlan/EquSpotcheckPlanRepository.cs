@@ -94,42 +94,56 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId=@SiteId");
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("CreatedOn DESC");
+            sqlBuilder.LeftJoin("equ_spotcheck_plan_equipment_relation esper ON esper.SpotCheckPlanId = esp.Id");
+            sqlBuilder.LeftJoin("equ_equipment ee ON ee.Id = esper.EquipmentId");
+            sqlBuilder.Where("esp.IsDeleted=0");
+            sqlBuilder.Where("esp.SiteId=@SiteId");
+            sqlBuilder.Select("esp.*");
+            sqlBuilder.OrderBy("esp.CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Code))
             {
                 equSpotcheckPlanPagedQuery.Code = $"%{equSpotcheckPlanPagedQuery.Code}%";
-                sqlBuilder.Where("Code LIKE @Code");
+                sqlBuilder.Where("esp.Code LIKE @Code");
             }
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Name))
             {
                 equSpotcheckPlanPagedQuery.Name = $"%{equSpotcheckPlanPagedQuery.Name}%";
-                sqlBuilder.Where("Name LIKE @Name");
+                sqlBuilder.Where("esp.Name LIKE @Name");
             }
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Version))
             {
                 equSpotcheckPlanPagedQuery.Version = $"%{equSpotcheckPlanPagedQuery.Version}%";
-                sqlBuilder.Where("Version LIKE @Version");
+                sqlBuilder.Where("esp.Version LIKE @Version");
             }
             if (equSpotcheckPlanPagedQuery.Status.HasValue)
             {
-                sqlBuilder.Where("Status=@Status");
+                sqlBuilder.Where("esp.Status=@Status");
             }
             if (equSpotcheckPlanPagedQuery.Type.HasValue)
             {
-                sqlBuilder.Where("Type=@Type");
+                sqlBuilder.Where("esp.Type=@Type");
             }
-            //if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.EquipmentCode))
-            //{
-            //    sqlBuilder.Where("EquipmentCode=@EquipmentCode");
-            //}
-            //if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.EquipmentName))
-            //{
-            //    sqlBuilder.Where("EquipmentName=@EquipmentName");
-            //}
 
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.EquipmentCode))
+            {
+                equSpotcheckPlanPagedQuery.EquipmentCode = $"%{equSpotcheckPlanPagedQuery.EquipmentCode}%";
+                sqlBuilder.Where("ee.EquipmentCode LIKE @EquipmentCode");
+            }
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.EquipmentName))
+            {
+                equSpotcheckPlanPagedQuery.EquipmentName = $"%{equSpotcheckPlanPagedQuery.EquipmentName}%";
+                sqlBuilder.Where("ee.EquipmentName LIKE @EquipmentName");
+            }
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.ExecutorIds))
+            {
+                equSpotcheckPlanPagedQuery.ExecutorIds = $"%{equSpotcheckPlanPagedQuery.ExecutorIds}%";
+                sqlBuilder.Where("esper.ExecutorIds LIKE @ExecutorIds");
+            }
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.LeaderIds))
+            {
+                equSpotcheckPlanPagedQuery.LeaderIds = $"%{equSpotcheckPlanPagedQuery.LeaderIds}%";
+                sqlBuilder.Where("esper.LeaderIds LIKE @LeaderIds");
+            }
 
             var offSet = (equSpotcheckPlanPagedQuery.PageIndex - 1) * equSpotcheckPlanPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -208,8 +222,8 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
     public partial class EquSpotcheckPlanRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spotcheck_plan` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spotcheck_plan` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spotcheck_plan`  esp /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spotcheck_plan` esp  /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEquSpotcheckPlanEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `equ_spotcheck_plan` /**where**/  ";

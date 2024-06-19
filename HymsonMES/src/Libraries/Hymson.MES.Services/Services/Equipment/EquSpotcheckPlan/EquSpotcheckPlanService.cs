@@ -148,6 +148,10 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
             }
+            if (!equSpotcheckPlanCreateDto.CompletionHour.HasValue && !equSpotcheckPlanCreateDto.CompletionHour.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12323));
+            }
 
             var equSpotcheckPlan = await _equSpotcheckPlanRepository.GetByCodeAsync(new EquSpotcheckPlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = equSpotcheckPlanCreateDto.Code, Version = equSpotcheckPlanCreateDto.Version });
             if (equSpotcheckPlan != null)
@@ -205,6 +209,8 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             trans.Complete();
 
+            //TODO 这里要另外加入口 先这样用着
+            ExecPublish(equSpotcheckPlanEntity);
         }
 
         /// <summary>
@@ -309,6 +315,10 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
             }
+            if (!equSpotcheckPlanModifyDto.CompletionHour.HasValue && !equSpotcheckPlanModifyDto.CompletionHour.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12323));
+            }
             var equSpotcheckPlan = await _equSpotcheckPlanRepository.GetByCodeAsync(new EquSpotcheckPlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = equSpotcheckPlanModifyDto.Code, Version = equSpotcheckPlanModifyDto.Version });
             if (equSpotcheckPlan != null && equSpotcheckPlan.Id != equSpotcheckPlanModifyDto.Id)
             {
@@ -316,6 +326,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             }
 
             //DTO转换实体
+            equSpotcheckPlanModifyDto.Type = equSpotcheckPlanModifyDto.Type.HasValue ? equSpotcheckPlanModifyDto.Type : 0;
             var equSpotcheckPlanEntity = equSpotcheckPlanModifyDto.ToEntity<EquSpotcheckPlanEntity>();
             equSpotcheckPlanEntity.UpdatedBy = _currentUser.UserName;
             equSpotcheckPlanEntity.UpdatedOn = HymsonClock.Now();
@@ -364,6 +375,8 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
 
             trans.Complete();
 
+            //TODO 这里要另外加入口 先这样用着
+            ExecPublish(equSpotcheckPlanEntity, true);
         }
 
         /// <summary>
@@ -376,6 +389,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             var equSpotcheckPlanEntity = await _equSpotcheckPlanRepository.GetByIdAsync(id);
             if (equSpotcheckPlanEntity != null)
             {
+                equSpotcheckPlanEntity.Type = equSpotcheckPlanEntity.Type == 0 ? null : equSpotcheckPlanEntity.Type;
                 return equSpotcheckPlanEntity.ToModel<EquSpotcheckPlanDto>();
             }
             return null;
@@ -509,7 +523,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                         Code = thisEquSpotcheckItem.Code ?? "",
                         Name = thisEquSpotcheckItem.Name ?? "",
                         Status = thisEquSpotcheckItem.Status ?? DisableOrEnableEnum.Enable,
-                        DataType = thisEquSpotcheckItem.DataType ?? DataTypeEnum.Text,
+                        DataType = thisEquSpotcheckItem.DataType ?? EquSpotcheckDataTypeEnum.Text,
                         CheckType = thisEquSpotcheckItem.CheckType,
                         CheckMethod = thisEquSpotcheckItem.CheckMethod ?? "",
                         UnitId = thisEquSpotcheckItem.UnitId,
@@ -562,6 +576,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         }
 
         #region 关联信息
+
 
         /// <summary>
         /// 获取模板关联信息（项目）
@@ -631,6 +646,40 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             }
             var expression = $"{second} {minute} {hour} {day} {tail}";
             return expression;
+        }
+
+
+        /// <summary>
+        /// 执行发送任务
+        /// </summary>
+        /// <param name="equSpotcheckPlanEntity"></param>
+        /// <param name="isEdit"></param>
+        private void ExecPublish(EquSpotcheckPlanEntity equSpotcheckPlanEntity, bool isEdit = false)
+        {
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanEntity.CornExpression) && equSpotcheckPlanEntity.FirstExecuteTime.HasValue && equSpotcheckPlanEntity.EndTime.HasValue)
+            {
+                if (equSpotcheckPlanEntity.Status == DisableOrEnableEnum.Enable)
+                {
+                    EquSpotcheckAutoCreateIntegrationEvent equSpotcheckAutoCreateIntegrationEvent = new()
+                    {
+                        SiteId = _currentSite.SiteId ?? 0,
+                        CornExpression = equSpotcheckPlanEntity.CornExpression,
+                        FirstExecuteTime = (DateTime)equSpotcheckPlanEntity.FirstExecuteTime,
+                        SpotCheckPlanId = equSpotcheckPlanEntity.Id,
+                        UserName = _currentUser.UserName,
+                        EndTime = (DateTime)equSpotcheckPlanEntity.EndTime
+                    };
+                    _eventBus.Publish(equSpotcheckAutoCreateIntegrationEvent);
+                }
+                else if (isEdit)
+                {
+                    EquSpotcheckAutoStopIntegrationEvent equSpotcheckAutoCreateIntegrationEvent = new()
+                    {
+                        SpotCheckPlanId = equSpotcheckPlanEntity.Id,
+                    };
+                    _eventBus.Publish(equSpotcheckAutoCreateIntegrationEvent);
+                }
+            }
         }
         #endregion
     }

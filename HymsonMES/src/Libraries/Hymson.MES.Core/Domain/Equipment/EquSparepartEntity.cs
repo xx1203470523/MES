@@ -40,12 +40,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 是否关键备件
         /// </summary>
-        public int IsKey { get; set; } = DbDefaultValueConstant.IntDefaultValue;
+        public TrueOrFalseEnum IsKey { get; set; }
 
         /// <summary>
         /// 是否标准件
         /// </summary>
-        public int IsStandard { get; set; } = DbDefaultValueConstant.IntDefaultValue;
+        public TrueOrFalseEnum IsStandard { get; set; }
 
         /// <summary>
         /// 备件/工装
@@ -55,7 +55,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 状态
         /// </summary>
-        public int Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
         /// <summary>
         /// 图纸编号
@@ -76,6 +76,11 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述
         /// </summary>
         public string? Remark { get; set; } = "";
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int Qty { get; set; } = 0;
 
         /// <summary>
         /// 站点ID 

@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Common;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -29,7 +30,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 是否合格;(0-否 1-是)
         /// </summary>
-        public TrueOrFalseEnum IsQualified { get; set; }
+        public TrueFalseEmptyEnum IsQualified { get; set; }
 
         /// <summary>
         /// 描述

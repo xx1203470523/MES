@@ -29,7 +29,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 点检计划名称
         /// </summary>
-        public string Name { get; set; } 
+        public string Name { get; set; }
 
         /// <summary>
         /// 版本
@@ -50,7 +50,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 点检类型;天/小时
         /// </summary>
-        public EquipmentSpotcheckTypeEnum Type { get; set; }
+        public EquipmentSpotcheckTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 点检计划状态
@@ -247,7 +247,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 点检类型;天/小时
         /// </summary>
-        public EquipmentSpotcheckTypeEnum Type { get; set; }
+        public EquipmentSpotcheckTypeEnum? Type { get; set; } = 0;
 
         /// <summary>
         /// 点检计划状态
@@ -376,7 +376,7 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// <summary>
         /// 设备Id
         /// </summary>
-        public IEnumerable<long> Ids { get; set; } 
+        public IEnumerable<long> Ids { get; set; }
     }
 
     #region  关联信息

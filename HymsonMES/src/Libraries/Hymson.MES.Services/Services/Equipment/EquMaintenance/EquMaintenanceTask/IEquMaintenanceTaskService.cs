@@ -95,6 +95,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         Task<int> CloseOrderAsync(EquMaintenanceTaskCloseDto requestDto);
 
         /// <summary>
+        /// 保养延期
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> DeferOrderAsync(EquMaintenanceTaskDeferDto requestDto);
+
+        /// <summary>
         /// 保存检验单附件
         /// </summary>
         /// <param name="requestDto"></param>

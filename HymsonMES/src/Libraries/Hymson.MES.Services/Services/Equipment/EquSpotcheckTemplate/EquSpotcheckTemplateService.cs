@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
+using Hymson.MES.Data.Repositories.EquSpotcheckPlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelation;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation;
@@ -50,10 +51,12 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         private readonly IEquSpotcheckItemRepository _equSpotcheckItemRepository;
         private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
+        private readonly IEquSpotcheckPlanEquipmentRelationRepository _equSpotcheckPlanEquipmentRelationRepository;
+
         private readonly AbstractValidator<EquSpotcheckTemplateCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquSpotcheckTemplateModifyDto> _validationModifyRules;
 
-        public EquSpotcheckTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, AbstractValidator<EquSpotcheckTemplateCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckTemplateModifyDto> validationModifyRules, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository, IEquEquipmentRepository equEquipmentRepository)
+        public EquSpotcheckTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, AbstractValidator<EquSpotcheckTemplateCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckTemplateModifyDto> validationModifyRules, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository, IEquEquipmentRepository equEquipmentRepository, IEquSpotcheckPlanEquipmentRelationRepository equSpotcheckPlanEquipmentRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -65,6 +68,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             _equSpotcheckTemplateItemRelationRepository = equSpotcheckTemplateItemRelationRepository;
             _equSpotcheckTemplateEquipmentGroupRelationRepository = equSpotcheckTemplateEquipmentGroupRelationRepository;
             _equEquipmentRepository = equEquipmentRepository;
+            _equSpotcheckPlanEquipmentRelationRepository = equSpotcheckPlanEquipmentRelationRepository;
         }
 
         /// <summary>
@@ -122,7 +126,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                 var groupRelation = new EquSpotcheckTemplateEquipmentGroupRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    EquipmentGroupId = item.Id,
+                    EquipmentGroupId = item.EquipmentGroupId == 0 ? item.Id : item.EquipmentGroupId,
                     SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
 
                     IsDeleted = 0,
@@ -145,7 +149,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                     SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
                     Center = item.Center,
                     LowerLimit = item.LowerLimit,
-                    SpotCheckItemId = item.Id,
+                    SpotCheckItemId = item.SpotCheckItemId == 0 ? item.Id : item.SpotCheckItemId,
                     UpperLimit = item.UpperLimit,
 
                     IsDeleted = 0,
@@ -188,20 +192,29 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         public async Task<int> DeletesEquSpotcheckTemplateAsync(EquSpotcheckTemplateDeleteDto param)
         {
             var ids = param.Ids;
-            var templateList = await _equSpotcheckTemplateRepository.GetByIdsAsync(ids.ToArray());
 
-            var codeEnabiles = "";
-            foreach (var item in templateList)
-            {
-                if (item.Status == DisableOrEnableEnum.Enable)
-                {
-                    codeEnabiles += item.Code + ",";
-                }
-            }
+            //5203
+            //var templateList = await _equSpotcheckTemplateRepository.GetByIdsAsync(ids.ToArray());
 
-            if (!string.IsNullOrWhiteSpace(codeEnabiles))
+            //var codeEnabiles = "";
+            //foreach (var item in templateList)
+            //{
+            //    if (item.Status == DisableOrEnableEnum.Enable)
+            //    {
+            //        codeEnabiles += item.Code + ",";
+            //    }
+            //}
+
+            //if (!string.IsNullOrWhiteSpace(codeEnabiles))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
+            //}
+
+            var equSpotcheckPlanEquipmentRelations = await _equSpotcheckPlanEquipmentRelationRepository.GetBySpotCheckSpotCheckTemplateIdsAsync(ids);
+            if (equSpotcheckPlanEquipmentRelations != null && equSpotcheckPlanEquipmentRelations.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
+                var equSpotcheckTemplates = await _equSpotcheckTemplateRepository.GetByIdsAsync(equSpotcheckPlanEquipmentRelations.Select(it => it.SpotCheckTemplateId).ToArray());
+                throw new CustomerValidationException(nameof(ErrorCode.MES12204)).WithData("Code", string.Join(",", equSpotcheckTemplates.Select(it => it.Code).ToArray()));
             }
 
             int row = 0;

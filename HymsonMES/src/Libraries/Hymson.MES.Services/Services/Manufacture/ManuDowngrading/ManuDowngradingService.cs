@@ -194,8 +194,6 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             foreach (var item in manuDowngradingSaveDto.Sfcs)
             {
-
-
                 //条码步骤记录
                 var sfcInfo = sfcList.FirstOrDefault(x => x.SFC == item);
                 var sfcProduce = sfcProduces.FirstOrDefault(x => x.SFC == item);
@@ -205,7 +203,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SiteId = _currentSite.SiteId ?? 0,
                     SFC = item,
                     ProductId = sfcInfo?.ProductId ?? 0,
-                    ResourceId= sfcProduce?.ResourceId,
+                    ResourceId = sfcProduce?.ResourceId,
                     WorkOrderId = sfcInfo?.WorkOrderId ?? 0,
                     ProductBOMId = sfcProduce?.ProductBOMId,
                     ProcessRouteId = sfcProduce?.ProcessRouteId,
@@ -226,7 +224,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Grade = manuDowngradingSaveDto.Grade,
                     IsCancellation = ManuDowngradingRecordTypeEnum.Entry,
                     Remark = manuDowngradingSaveDto.Remark,
-                    SFCStepId= stepEntity.Id,
+                    SfcInfoId = sfcInfo?.SFCInfoId ?? 0,
+                    // SFCStepId= stepEntity.Id,
+                    ProcedureId = sfcProduce?.ProcedureId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = _currentUser.UserName,
@@ -242,7 +242,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     currentDowngrading.Grade = manuDowngradingSaveDto.Grade;
                     currentDowngrading.Remark = manuDowngradingSaveDto.Remark ?? "";
-
                     currentDowngrading.UpdatedOn = HymsonClock.Now();
                     currentDowngrading.UpdatedBy = _currentUser.UserName;
                     updateEntities.Add(currentDowngrading);
@@ -254,7 +253,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                         SFC = item,
                         Grade = manuDowngradingSaveDto.Grade,
                         Remark = manuDowngradingSaveDto.Remark ?? "",
-
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = _currentUser.UserName,
@@ -396,8 +394,6 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             foreach (var item in manuDowngradingSaveRemoveDto.Sfcs)
             {
-            
-
                 //条码步骤记录
                 var sfcInfo = sfcList.FirstOrDefault(x => x.SFC == item);
                 var sfcProduce = sfcProduces.FirstOrDefault(x => x.SFC == item);
@@ -429,6 +425,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     IsCancellation = ManuDowngradingRecordTypeEnum.Remove,
                     Remark = manuDowngradingSaveRemoveDto.Remark,
                     SFCStepId= stepEntity.Id,
+                    SfcInfoId = sfcInfo?.SFCInfoId ?? 0,
+                    ProcedureId = sfcProduce?.ProcedureId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = _currentUser.UserName,

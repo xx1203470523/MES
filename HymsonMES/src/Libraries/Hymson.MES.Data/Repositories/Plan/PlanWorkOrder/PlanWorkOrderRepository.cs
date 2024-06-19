@@ -259,10 +259,48 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
             }
 
+            if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length > 0 && pageQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where(" wo.CreatedOn >= @CreatedOnStart AND  wo.CreatedOn < @CreatedOnEnd ");
+
+                //sqlBuilder.AddParameters(new { StartId = IdGenProvider.GenerateStartId(pageQuery.CreatedOn[0]), EndId = IdGenProvider.GenerateEndId(pageQuery.CreatedOn[1].AddDays(1),false) });
+                //sqlBuilder.Where(" rbr.Id >= @StartId AND  rbr.Id < @EndId");
+            }
+
             if (pageQuery.Statuss != null && pageQuery.Statuss.Any())
             {
                 sqlBuilder.Where("wo.Status IN @Statuss");
             }
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = GetMESDbConnection();
+            var entities = await conn.QueryAsync<PlanWorkOrderListDetailView>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            return new PagedInfo<PlanWorkOrderListDetailView>(entities, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
+
+        /// <summary>
+        /// ID编码查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoAsyncCode(PlanWorkOrderPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("wo.IsDeleted = 0");
+            sqlBuilder.Where("wo.SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(pageQuery.OrderCode))
+            {
+                sqlBuilder.Where("wo.OrderCode = @OrderCode");
+            }           
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

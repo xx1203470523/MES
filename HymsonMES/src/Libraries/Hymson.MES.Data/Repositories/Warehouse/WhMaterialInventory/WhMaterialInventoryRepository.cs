@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Options;
@@ -113,7 +114,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select(@" wmi.Id, wmi.MaterialBarCode,wmi.Batch, wmi.QuantityResidue,wmi.DueDate,wmi.Source,wmi.CreatedOn,wmi.Status,
-                                pm.Unit,pm.GroupId,pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName,pwo.OrderCode as WorkOrderCode");
+                                pm.Unit,pm.GroupId,pm.MaterialCode, pm.MaterialName, pm.Version, ws.Code as SupplierCode, ws.Name as SupplierName,pwo.OrderCode as WorkOrderCode,wmi.UpdatedBy,wmi.UpdatedOn");
             sqlBuilder.LeftJoin(" wh_supplier ws ON  ws.Id= wmi.SupplierId");
             sqlBuilder.LeftJoin(" proc_material pm ON  pm.Id= wmi.MaterialId");
             sqlBuilder.LeftJoin(" plan_work_order pwo ON  pwo.Id= wmi.WorkOrderId");
@@ -134,8 +135,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialBarCode))
             {
-                whMaterialInventoryPagedQuery.MaterialBarCode = whMaterialInventoryPagedQuery.MaterialBarCode;
-                sqlBuilder.Where(" wmi.MaterialBarCode = @MaterialBarCode");
+                //whMaterialInventoryPagedQuery.MaterialBarCode = whMaterialInventoryPagedQuery.MaterialBarCode;
+                //sqlBuilder.Where(" wmi.MaterialBarCode = @MaterialBarCode");
+
+                whMaterialInventoryPagedQuery.MaterialBarCode = $"%{whMaterialInventoryPagedQuery.MaterialBarCode}%";
+                sqlBuilder.Where(" wmi.MaterialBarCode like @MaterialBarCode");
             }
             if (whMaterialInventoryPagedQuery.MaterialBarCodes != null && whMaterialInventoryPagedQuery.MaterialBarCodes.Any())
             {
@@ -143,8 +147,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialCode))
             {
-                whMaterialInventoryPagedQuery.MaterialCode = whMaterialInventoryPagedQuery.MaterialCode;
-                sqlBuilder.Where(" pm.MaterialCode = @MaterialCode");
+                //whMaterialInventoryPagedQuery.MaterialCode = whMaterialInventoryPagedQuery.MaterialCode;
+                whMaterialInventoryPagedQuery.MaterialCode = $"%{whMaterialInventoryPagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" pm.MaterialCode like @MaterialCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.MaterialName))
             {

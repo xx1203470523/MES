@@ -138,11 +138,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("st.*,stsp.Code as PlanCode,stsp.Name as PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.Type as PlanType,stsp.BeginTime as PlanBeginTime,stsp.EndTime PlanEndTime");
+            sqlBuilder.Select("st.*,stsp.Code as PlanCode,stsp.Name as PlanName,stsp.Version,stsp.EquipmentId,stsp.ExecutorIds,stsp.LeaderIds,stsp.Type as PlanType,stsp.BeginTime as PlanBeginTime,stsp.EndTime PlanEndTime,stsp.Remark as PlanRemark");
             sqlBuilder.OrderBy("st.UpdatedOn DESC");
             sqlBuilder.Where("st.IsDeleted = 0");
             sqlBuilder.Where("st.SiteId = @SiteId");
-            sqlBuilder.LeftJoin("equ_spotcheck_task_snapshot_plan stsp on st.Id=stsp.SpotCheckTaskId");
+            sqlBuilder.LeftJoin("equ_maintenance_task_snapshot_plan stsp on st.Id=stsp.MaintenanceTaskId");
 
             if (pagedQuery.TaskIds != null && pagedQuery.TaskIds.Any())
             {
@@ -151,18 +151,22 @@ namespace Hymson.MES.Data.Repositories.Equipment
             //任务编码
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
-                sqlBuilder.Where("st.Code = @Code");
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("st.Code like @Code");
             }
             //任务名
             if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
-                sqlBuilder.Where("st.Name = @Name");
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("st.Name like @Name");
             }
             //负责人
             if (!string.IsNullOrWhiteSpace(pagedQuery.LeaderIds))
             {
-                sqlBuilder.Where("stsp.LeaderIds = @LeaderIds");
+                pagedQuery.LeaderIds = $"%{pagedQuery.LeaderIds}%";
+                sqlBuilder.Where("stsp.LeaderIds like @LeaderIds");
             }
+
             //设备
             if (pagedQuery.EquipmentId.HasValue)
             {
@@ -179,10 +183,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
                 sqlBuilder.Where("st.IsQualified = @IsQualified");
             }
             //计划开始结束时间
-            if (pagedQuery.PlanStartTime != null && pagedQuery.PlanStartTime.Length >= 2)
+            if (pagedQuery.PlanBeginTime != null && pagedQuery.PlanBeginTime.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { PlanStartTimeStart = pagedQuery.PlanStartTime[0], PlanStartTimeEnd = pagedQuery.PlanStartTime[1].AddDays(1) });
-                sqlBuilder.Where("stsp.BeginTime >= @PlanStartTimeStart AND stsp.EndTime < @PlanStartTimeEnd");
+                sqlBuilder.AddParameters(new { PlanStartTimeStart = pagedQuery.PlanBeginTime[0], PlanStartTimeEnd = pagedQuery.PlanBeginTime[1].AddDays(1) });
+                sqlBuilder.Where("stsp.BeginTime >= @PlanStartTimeStart AND stsp.BeginTime <= @PlanStartTimeEnd");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
