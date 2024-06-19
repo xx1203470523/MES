@@ -52,7 +52,7 @@ namespace Hymson.MES.System.Api
 
             builder.Services.AddJwtBearerService(builder.Configuration);
             builder.Services.AddCoreService(builder.Configuration);
-            //builder.Services.AddSystemService(builder.Configuration);
+            builder.Services.AddSystemService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddPrintService(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
