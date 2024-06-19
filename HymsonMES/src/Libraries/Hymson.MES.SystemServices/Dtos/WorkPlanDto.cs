@@ -8,6 +8,11 @@ namespace Hymson.MES.SystemServices.Dtos
     public record WorkPlanDto : BaseEntityDto
     {
         /// <summary>
+        /// 部门编号（用这个来区分是哪个产线的工单，值维护成跟产线编码一样） 
+        /// </summary>
+        public string DepartmentCode { get; set; } = "";
+
+        /// <summary>
         /// 计划单号 
         /// </summary>
         public string PlanCode { get; set; } = "";
