@@ -803,7 +803,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                 })
             };
             //3. 出站
-            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            using var trans = TransactionHelper.GetTransactionScope(timeout: 120);
             var outResult = await _manuPassStationService.OutStationRangeBySFCAsync(outBo, RequestSourceEnum.EquipmentApi);
             await _manuProductParameterService.ProductProcessCollectAsync(parameterCollectBo);
             trans.Complete();

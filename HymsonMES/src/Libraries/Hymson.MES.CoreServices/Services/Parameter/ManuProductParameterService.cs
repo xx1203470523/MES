@@ -73,10 +73,14 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <returns></returns>
         public async Task<int> ProductProcessCollectAsync(ProductProcessParameterBo bo)
         {
+            if (bo == null || !bo.Parameters.Any())
+            {
+                return 0;
+            }
             var parameterEntities = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
             {
                 SiteId = bo.SiteId,
-                Codes = bo.Parameters.Select(x => x.ParameterCode)
+                Codes = bo.Parameters.Select(x => x.ParameterCode).Distinct()
             });
 
             List<ManuProductParameterEntity> list = new();
@@ -126,6 +130,10 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <returns></returns>
         public async Task<int> ProductProcessCollectAsync(ProductParameterCollectBo bo)
         {
+            if (bo == null || !bo.SFCList.Any(x => x.Parameters.Any()))
+            {
+                return 0;
+            }
             //校验参数是否存在
             var parameterCodes = bo.SFCList.SelectMany(x => x.Parameters).Select(x => x.ParameterCode.ToUpper()).Distinct();
             var parameterEntities = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
