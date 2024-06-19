@@ -140,22 +140,9 @@ namespace Hymson.MES.Data.Repositories.Equipment
             stringBuilder.Append(" UpdatedBy = @UpdatedBy, ");
             stringBuilder.Append(" UpdatedOn = @UpdatedOn ");
 
-            /*
-            var sqlBuilder = new SqlBuilder();
-            var sqlTemplate = sqlBuilder.AddTemplate(stringBuilder.ToString());
-            return await conn.ExecuteAsync(sqlTemplate.RawSql, entity);
-            */
-            try
-            {
-                var conn = GetMESDbConnection();
-                return await conn.ExecuteAsync(stringBuilder.ToString(), entity);
-              
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            
+            var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(stringBuilder.ToString(), entity);
            
         }
 
