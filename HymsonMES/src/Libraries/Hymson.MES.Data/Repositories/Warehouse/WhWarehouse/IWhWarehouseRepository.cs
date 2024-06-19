@@ -111,7 +111,7 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<WhWarehouseEntity>> GetPagedListCopyAsync(WhWarehousePagedQuery pagedQuery);
-
+        Task<IEnumerable<WhWarehouseEntity>> GetWhWarehouseEntitiesAsync(WhWarehouseQuery whWarehouseQuery);
         #endregion
 
     }

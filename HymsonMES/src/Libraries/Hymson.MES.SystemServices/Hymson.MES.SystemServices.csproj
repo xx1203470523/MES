@@ -25,6 +25,7 @@
   <ItemGroup>
     <Folder Include="DependencyInjection\" />
     <Folder Include="Mapper\" />
+    <Folder Include="Services\Manufacture\" />
   </ItemGroup>
 
 </Project>

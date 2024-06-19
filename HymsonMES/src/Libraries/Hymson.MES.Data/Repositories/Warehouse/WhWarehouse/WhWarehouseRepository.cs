@@ -273,7 +273,26 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
             var totalCount = await totalCountTask;
             return new PagedInfo<WhWarehouseEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="whWarehouseQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WhWarehouseEntity>> GetWhWarehouseEntitiesAsync(WhWarehouseQuery whWarehouseQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted =0");
+            sqlBuilder.Select("*");
+            if (whWarehouseQuery.WareHouseCodes != null && whWarehouseQuery.WareHouseCodes.Any())
+            {
+                sqlBuilder.Where(" WareHouseCode   in @WareHouseCodes ");
+            }
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            using var conn = GetMESDbConnection();
+            var whWarehouseEntities = await conn.QueryAsync<WhWarehouseEntity>(template.RawSql, whWarehouseQuery);
+            return whWarehouseEntities;
+        }
         #endregion
 
     }

@@ -14,6 +14,14 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse.Query
         /// 仓库Ids
         /// </summary>
         public IEnumerable<long> Ids { get; set; }
+        /// <summary>
+        /// 仓库编码
+        /// </summary>
+        public string WareHouseCode { get; set; }
+        // <summary>
+        /// 仓库编码列表
+        /// </summary>
+        public string[] WareHouseCodes { get; set; }
 
         /// <summary>
         /// 仓库编码
