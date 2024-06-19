@@ -886,7 +886,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     SiteId = _currentSite.SiteId ?? 0,
                     SFC = manuSfcEntity.SFC,
                     ProductId = manuSfcInfoEntity?.ProductId ?? 0,
-                    ProcedureId = manuSfcProduceEntity?.ProcedureId,
+                    ProcedureId = sfcProduceStepDto.ProcedureId,
                     Remark = sfcProduceStepDto.Remark ?? "",
                     WorkOrderId = manuSfcInfoEntity?.WorkOrderId ?? 0,
                     WorkCenterId = manuSfcProduceEntity?.WorkCenterId,
