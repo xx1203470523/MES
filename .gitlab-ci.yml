@@ -4,7 +4,7 @@ stages:
 
 sonarqube-check:
   stage: sonarqube-check
-  image: harbor.xnebula.com/new-energy/dotnet-sdk-withjava:20240506192357
+  image: harbor.xnebula.com/new-energy/dotnet-sdk-withjava@sha256:86391d1f3d45bf03fe86e5fd458cd2f22bb0ad16e85a9faf8549720bfad0819a
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
@@ -18,7 +18,7 @@ sonarqube-check:
       - ls
       - cd HymsonMES
  #     - "dotnet tool install --global dotnet-sonarscanner"
- #     - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
+      - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
       - "dotnet sonarscanner begin /k:\"MES-backend\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=$SONAR_HOST_URL\" "
       - "dotnet build"
       - "dotnet sonarscanner end /d:sonar.token=\"$SONAR_TOKEN\""
