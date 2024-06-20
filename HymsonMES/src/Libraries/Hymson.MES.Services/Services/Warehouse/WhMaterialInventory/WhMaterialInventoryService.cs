@@ -1151,7 +1151,12 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
             await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
             //下达WMS领料申请
-            await _wmsRequest.MaterialPickingAsync(new HttpClients.Requests.Print.MaterialPickingRequest());
+            await _wmsRequest.MaterialPickingAsync(new HttpClients.Requests.Print.MaterialPickingRequest
+            {
+                sendOn = HymsonClock.Now().ToString(),
+                syncCode = $"{request.WorkCode}_{manuRequistionOrderEntity.Id}",
+
+            });
 
 
         }

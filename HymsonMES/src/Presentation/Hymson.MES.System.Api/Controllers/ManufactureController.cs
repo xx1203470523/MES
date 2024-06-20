@@ -28,7 +28,7 @@ namespace Hymson.MES.System.Api.Controllers
             _manuRequistionOrderService = manuRequistionOrderService;
         }
         /// <summary>
-        /// 生产领料(人工在ERP领料单完成后)
+        /// 生产领料(WMS领料单完成后)
         /// </summary>
         /// <param name="productionPickDto"></param>
         /// <returns></returns>
