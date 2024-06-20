@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.EquOpenParamRecord;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.EquOpenParamRecord.Query;
+using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.EquOpenParamRecord
@@ -37,8 +38,12 @@ namespace Hymson.MES.Data.Repositories.EquOpenParamRecord
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<EquOpenParamRecordEntity> entities)
         {
+            //var sqlBuilder = new SqlBuilder();
+            //var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            var (sql, param) = SqlHelper.JoinInsertSql(InsertsSqlInsert, insertsSqlValue, entities);
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(sql, param);
         }
 
         /// <summary>
@@ -162,6 +167,8 @@ namespace Hymson.MES.Data.Repositories.EquOpenParamRecord
 
         const string InsertSql = "INSERT INTO equ_open_param_record(  `Id`, `EquipmentId`, `ParamId`, `ParamCode`, `ParamValue`, `BatchId`, `RecipeId`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (  @Id, @EquipmentId, @ParamId, @ParamCode, @ParamValue, @BatchId, @RecipeId, @CollectionTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId) ";
         const string InsertsSql = "INSERT INTO equ_open_param_record(  `Id`, `EquipmentId`, `ParamId`, `ParamCode`, `ParamValue`, `BatchId`, `RecipeId`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (  @Id, @EquipmentId, @ParamId, @ParamCode, @ParamValue, @BatchId, @RecipeId, @CollectionTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId) ";
+        const string InsertsSqlInsert = "INSERT INTO equ_open_param_record(  `Id`, `EquipmentId`, `ParamId`, `ParamCode`, `ParamValue`, `BatchId`, `RecipeId`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES ";
+        const string insertsSqlValue = "(  @Id, @EquipmentId, @ParamId, @ParamCode, @ParamValue, @BatchId, @RecipeId, @CollectionTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId) ";
 
         const string UpdateSql = "UPDATE equ_open_param_record SET   EquipmentId = @EquipmentId, Sfc = @Sfc, ParamId = @ParamId, ParamCode = @ParamCode, ParamValue = @ParamValue, BatchId = @BatchId, ProductId = @ProductId, RecipeId = @RecipeId, CollectionTime = @CollectionTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteId = @SiteId WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE equ_open_param_record SET   EquipmentId = @EquipmentId, Sfc = @Sfc, ParamId = @ParamId, ParamCode = @ParamCode, ParamValue = @ParamValue, BatchId = @BatchId, ProductId = @ProductId, RecipeId = @RecipeId, CollectionTime = @CollectionTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteId = @SiteId WHERE Id = @Id ";
