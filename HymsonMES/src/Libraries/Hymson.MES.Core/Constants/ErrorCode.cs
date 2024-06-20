@@ -466,7 +466,7 @@
 
         public const string MES11717 = "检验单明细为空！";
         public const string MES11718 = "{materialId}参数项目为空检验单明细为空！";
-        public const string MES11719 = "记录数量小于批次数量，不予生成";
+        public const string MES11719 = "输入的待收货数量小于批次数量，不予生成!";
         public const string MES11720 = "重复提交，条码已存在FQC检验单条码记录表中!";
         public const string MES11721 = "FQC创建保存错误!";
 
@@ -2210,6 +2210,20 @@
         #region 备件安装卸载 17600
         public const string MES17601 = "备件不存在!";
         public const string MES17602 = "备件已绑定设备,位置{position}!";
+        public const string MES17603 = "备件没有设置备件类型!";
+        public const string MES17604 = "设备没有设置设备组!";
+        public const string MES17605 = "备件对应的备件类型没有关联设备组!";
+        public const string MES17606 = "备件关联的设备组不包含当前设备!";
+        public const string MES17607 = "备件在设备上的安装数量不能超过备件注册数量!";
+        #endregion
+
+        #region 工具安装卸载 17700
+        public const string MES17701 = "工具不存在!";
+        public const string MES17702 = "工具{code}不可使用!";
+        public const string MES17703 = "工具{code}已在设备{position}位置安装!";
+        public const string MES17704 = "设备{code}位置{position}已安装工具，请卸载后再进行操作!";
+        public const string MES17705 = "工具无剩余寿命，不可使用!";
+        public const string MES17706 = "工具本次使用寿命需大于0";
         #endregion
     }
 }

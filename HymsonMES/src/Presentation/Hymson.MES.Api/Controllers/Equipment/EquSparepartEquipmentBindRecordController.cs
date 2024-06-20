@@ -37,7 +37,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 添加（工具绑定设备操作记录表）
+        /// 安装（工具绑定设备操作记录表）
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
@@ -49,7 +49,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 更新（工具绑定设备操作记录表）
+        /// 卸载（工具绑定设备操作记录表）
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>

@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Microsoft.Extensions.Options;
 
@@ -148,6 +149,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return new PagedInfo<EquToolsEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<EquToolsEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquToolsEntity>(GetByCodeSql, query);
+        }
+
     }
 
 
@@ -159,6 +171,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_tools /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_tools /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_tools /**where**/  ";
+        const string GetByCodeSql = "SELECT * FROM equ_tools WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
 
         const string InsertSql = "INSERT INTO equ_tools(  `Id`, `SiteId`, `Code`, `Name`, `ToolsId`, `RatedLife`, `RatedLifeUnit`, `CumulativeUsedLife`, `CurrentUsedLife`, `LastVerificationTime`, `IsCalibrated`, `CalibrationCycle`, `CalibrationCycleUnit`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @ToolsId, @RatedLife, @RatedLifeUnit, @CumulativeUsedLife, @CurrentUsedLife, @LastVerificationTime, @IsCalibrated, @CalibrationCycle, @CalibrationCycleUnit, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO equ_tools(  `Id`, `SiteId`, `Code`, `Name`, `ToolsId`, `RatedLife`, `RatedLifeUnit`, `CumulativeUsedLife`, `CurrentUsedLife`, `LastVerificationTime`, `IsCalibrated`, `CalibrationCycle`, `CalibrationCycleUnit`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @ToolsId, @RatedLife, @RatedLifeUnit, @CumulativeUsedLife, @CurrentUsedLife, @LastVerificationTime, @IsCalibrated, @CalibrationCycle, @CalibrationCycleUnit, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";

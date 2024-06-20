@@ -8,8 +8,10 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.EquSparepartRecord;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -79,35 +81,68 @@ namespace Hymson.MES.Services.Services.Equipment
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
+            var siteId = _currentSite.SiteId ?? 0;
             //查询工具信息
-            var toolsEntity = await _toolsRepository.GetByIdAsync(saveDto.ToolId);
+            var toolsEntity = await _toolsRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = siteId,
+                Code = saveDto.ToolCode.Trim()
+            });
             if (toolsEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17601));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17701));
             }
+            //工具未启用
+            if (toolsEntity.Status != Core.Enums.DisableOrEnableEnum.Enable)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17702)).WithData("code", toolsEntity.Code);
+            }
+            if (toolsEntity.CurrentUsedLife<=0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17705));
+            }
+
             //查询设备信息
-            var equEquipmentEntity = await _equEquipmentRepository.GetByIdAsync(saveDto.EquipmentId);
+            var equEquipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = siteId,
+                Code = saveDto.EquipmentCode.Trim()
+            });
             if (equEquipmentEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16338));
             }
-
-            //备件能安装的数量
-            var siteId = _currentSite.SiteId ?? 0;
-
-            //指定位置是否已经绑定设备
+            //是否已经绑定设备
             var recordEntities = await _equToolsEquipmentBindRecordRepository.GetEntitiesAsync(new EquToolsEquipmentBindRecordQuery
             {
                 SiteId = siteId,
-                ToolId = saveDto.ToolId,
-                //EquipmentId = saveDto.EquipmentId,
+                ToolId = toolsEntity.Id,
+                EquipmentId = equEquipmentEntity.Id,
                 OperationType = BindOperationTypeEnum.Install
             });
             if (recordEntities != null && recordEntities.Any())
             {
                 var position = recordEntities.FirstOrDefault()?.Position ?? "";
-                throw new CustomerValidationException(nameof(ErrorCode.MES17602)).WithData("position", position);
+                throw new CustomerValidationException(nameof(ErrorCode.MES17703)).WithData("code", toolsEntity.Code).WithData("position", position);
             }
+
+            //校验工具所属工具类型是否允许在设备使用（工具类型在所有设备组均可使用或工具类型分配的设备组包含该设备所属的设备组），若不允许，则报错：工具XXX不允许在设备XXX使用；
+
+            //校验工具所属工具类型是否允许对设备生产的产品使用（工具类型对所有产品均可使用或工具类型分配的产品料号包含该设备所在线体当前已激活工单的产品料号），若不允许，则报错：工具XXX不允许对产品XXX使用；
+
+            //验证某个位置是否已经安装了其他工具
+            var toolsEquipmentBindRecordEntity = await _equToolsEquipmentBindRecordRepository.GetIsPostionBindAsync(new EquToolsEquipmentBindRecordQuery
+            {
+                SiteId = siteId,
+                Position = saveDto.Position.Trim(),
+                EquipmentId = equEquipmentEntity.Id,
+                OperationType = BindOperationTypeEnum.Install
+            });
+            if (toolsEquipmentBindRecordEntity != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17704)).WithData("code", equEquipmentEntity.EquipmentCode).WithData("position", saveDto.Position);
+            }
+
             #endregion
 
             // 更新时间
@@ -123,18 +158,18 @@ namespace Hymson.MES.Services.Services.Equipment
                 Name = toolsEntity.Name,
                 ToolsId = toolsEntity.ToolsId,
                 RatedLife = toolsEntity.RatedLife,
-                RatedLifeUnit=toolsEntity.RatedLifeUnit,
-                CumulativeUsedLife=toolsEntity.CumulativeUsedLife,
-                CurrentUsedLife=toolsEntity.CurrentUsedLife,
-                LastVerificationTime= toolsEntity.LastVerificationTime,
-                IsCalibrated=toolsEntity.IsCalibrated,
-                CalibrationCycle=toolsEntity.CalibrationCycle,
-                CalibrationCycleUnit=toolsEntity.CalibrationCycleUnit,
-                Status=toolsEntity.Status,
-                Remark=toolsEntity.Remark,
-                EquipmentId=saveDto.EquipmentId,
-                OperationType="2",
-                OperationRemark="",
+                RatedLifeUnit = toolsEntity.RatedLifeUnit,
+                CumulativeUsedLife = toolsEntity.CumulativeUsedLife,
+                CurrentUsedLife = toolsEntity.CurrentUsedLife,
+                LastVerificationTime = toolsEntity.LastVerificationTime,
+                IsCalibrated = toolsEntity.IsCalibrated,
+                CalibrationCycle = toolsEntity.CalibrationCycle,
+                CalibrationCycleUnit = toolsEntity.CalibrationCycleUnit,
+                Status = toolsEntity.Status,
+                Remark = toolsEntity.Remark,
+                EquipmentId = equEquipmentEntity.Id,
+                OperationType = ToolRecordOperationTypeEnum.Binding,
+                OperationRemark = "",
                 CreatedBy = updatedBy,
                 CreatedOn = updatedOn,
                 UpdatedBy = updatedBy,
@@ -142,15 +177,15 @@ namespace Hymson.MES.Services.Services.Equipment
                 SiteId = siteId
             };
 
-            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn);
+            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquipmentRecordOperationTypeEnum.ToolBind);
 
             //安装记录
             var bindRecordEntity = new EquToolsEquipmentBindRecordEntity()
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                ToolId = saveDto.ToolId,
+                ToolId = toolsEntity.Id,
                 ToolsRecordId = 0,
-                EquipmentId = saveDto.EquipmentId,
+                EquipmentId = equEquipmentEntity.Id,
                 EquipmentRecordId = equRecordEntity.Id,
                 Position = saveDto.Position,
                 OperationType = BindOperationTypeEnum.Install,
@@ -175,7 +210,7 @@ namespace Hymson.MES.Services.Services.Equipment
             return rows;
         }
 
-        private EquEquipmentRecordEntity GetEquRecord(EquEquipmentEntity equEquipmentEntity, string updatedBy, DateTime updatedOn)
+        private EquEquipmentRecordEntity GetEquRecord(EquEquipmentEntity equEquipmentEntity, string updatedBy, DateTime updatedOn, EquipmentRecordOperationTypeEnum operationType)
         {
             return new EquEquipmentRecordEntity()
             {
@@ -227,6 +262,20 @@ namespace Hymson.MES.Services.Services.Equipment
                 throw new CustomerValidationException(nameof(ErrorCode.MES10104));
             }
 
+            if (saveDto.CurrentUsedLife <= 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17706));
+            }
+
+            #region 组装数据
+
+            //查询设备信息
+            var equEquipmentEntity = await _equEquipmentRepository.GetByIdAsync(recordEntity.EquipmentId);
+            if (equEquipmentEntity == null)
+            {
+                equEquipmentEntity = new EquEquipmentEntity();
+            }
+
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
@@ -238,8 +287,70 @@ namespace Hymson.MES.Services.Services.Equipment
             recordEntity.UpdatedOn = updatedOn;
             recordEntity.UninstallBy = updatedBy;
             recordEntity.UninstallOn = updatedOn;
+            recordEntity.CurrentUsedLife = saveDto.CurrentUsedLife;
 
-            return await _equToolsEquipmentBindRecordRepository.UpdateAsync(recordEntity);
+            var siteId = _currentSite.SiteId ?? 0;
+            //查询工具信息
+            var toolsEntity = await _toolsRepository.GetByIdAsync(recordEntity.ToolId);
+            var toolsRecordEntity = new EquToolsRecordEntity();
+            if (toolsEntity != null)
+            {
+                if ((toolsEntity.CurrentUsedLife - saveDto.CurrentUsedLife) <= 0)
+                {
+                    toolsEntity.Status = DisableOrEnableEnum.Disable;
+                }
+                toolsEntity.UpdatedBy = updatedBy;
+                toolsEntity.UpdatedOn = updatedOn;
+                toolsEntity.CumulativeUsedLife = toolsEntity.CumulativeUsedLife + saveDto.CurrentUsedLife;
+                toolsEntity.CurrentUsedLife = toolsEntity.CurrentUsedLife - saveDto.CurrentUsedLife;
+
+                toolsRecordEntity = new EquToolsRecordEntity()
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    ToolId = toolsEntity.Id,
+                    Code = toolsEntity.Code,
+                    Name = toolsEntity.Name,
+                    ToolsId = toolsEntity.ToolsId,
+                    RatedLife = toolsEntity.RatedLife,
+                    RatedLifeUnit = toolsEntity.RatedLifeUnit,
+                    CumulativeUsedLife = toolsEntity.CumulativeUsedLife,
+                    CurrentUsedLife = toolsEntity.CumulativeUsedLife,
+                    LastVerificationTime = toolsEntity.LastVerificationTime,
+                    IsCalibrated = toolsEntity.IsCalibrated,
+                    CalibrationCycle = toolsEntity.CalibrationCycle,
+                    CalibrationCycleUnit = toolsEntity.CalibrationCycleUnit,
+                    Status = toolsEntity.Status,
+                    Remark = toolsEntity.Remark,
+                    EquipmentId = equEquipmentEntity.Id,
+                    OperationType = ToolRecordOperationTypeEnum.UnBind,
+                    OperationRemark = "",
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn,
+                    SiteId = siteId
+                };
+            }
+
+            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquipmentRecordOperationTypeEnum.ToolUnbind);
+
+            #endregion
+
+            // 保存
+            var rows = 0;
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                if (toolsEntity != null)
+                {
+                    await _toolsRepository.UpdateAsync(toolsEntity);
+                    await _toolsRecordRepository.InsertAsync(toolsRecordEntity);
+                }
+
+                await _equipmentRecordRepository.InsertAsync(equRecordEntity);
+                rows += await _equToolsEquipmentBindRecordRepository.UpdateAsync(recordEntity);
+                ts.Complete();
+            }
+            return rows;
         }
 
         /// <summary>
@@ -288,6 +399,8 @@ namespace Hymson.MES.Services.Services.Equipment
             bindRecordDto.ToolName = toolsEntity?.Name ?? "";
             bindRecordDto.EquipmentCode = equEquipmentEntity?.EquipmentCode ?? "";
             bindRecordDto.EquipmentName = equEquipmentEntity?.EquipmentName ?? "";
+            bindRecordDto.RatedLife = toolsEntity?.RatedLife ?? 0;
+            bindRecordDto.RemainingUsedLife = toolsEntity?.CurrentUsedLife ?? 0;
             return bindRecordDto;
         }
 

@@ -277,6 +277,7 @@ namespace Hymson.MES.Services.Mapper
             #region EquToolingTypeType
             CreateMap<EquToolingTypeQueryDto, EquToolingTypePagedQuery>();
             CreateMap<EquToolingTypeEntity, EquToolingTypeDto>();
+            CreateMap<EquToolingTypeSaveDto, EquToolingTypeEntity>();
 
             #endregion
 
@@ -404,6 +405,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSparepartEquipmentBindRecordPagedQueryDto, EquSparepartEquipmentBindRecordPagedQuery>();
             CreateMap<EquSparepartEquipmentBindRecordView, EquSparepartEquipmentBindRecordViewDto>();
             CreateMap<EquSparepartEquipmentBindRecordEntity, EquSparepartEquipmentBindRecordDto>();
+            #endregion
+
+            #region  EquToolsEquipmentBindRecord
+            CreateMap<EquToolsEquipmentBindRecordPagedQueryDto, EquToolsEquipmentBindRecordPagedQuery>();
+            CreateMap<EquToolsEquipmentBindRecordView, EquToolsEquipmentBindRecordViewDto>();
+            CreateMap<EquToolsEquipmentBindRecordEntity, EquToolsEquipmentBindRecordDto>();
             #endregion
 
         }
@@ -655,7 +662,10 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
-            
+            #region InteQualificationAuthentication
+            CreateMap<InteQualificationAuthenticationPagedQueryDto, InteQualificationAuthenticationPagedQuery>();
+            CreateMap<InteQualificationAuthenticationEntity, InteQualificationAuthenticationDto>();
+            #endregion
         }
 
         /// <summary>
