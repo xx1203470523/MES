@@ -21,7 +21,7 @@ namespace Hymson.MES.HttpClients.Requests.Print
         /// 同步单号
         /// </summary>
         public string syncCode { get; set; }
-        public int type { get; set; } = 101;
+        public int type { get; set; } = 304;
         /// <summary>
         /// 下发日期
         /// </summary>

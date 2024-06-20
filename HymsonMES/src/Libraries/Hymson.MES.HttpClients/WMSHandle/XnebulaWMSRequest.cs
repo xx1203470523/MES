@@ -14,7 +14,7 @@ namespace Hymson.MES.HttpClients
             _httpClient = httpClient;
         }
 
-        public Task MaterialPickingCreateAsync(MaterialPickingRequest request)
+        public Task MaterialPickingAsync(MaterialPickingRequest request)
         {
             throw new NotImplementedException();
         }

@@ -18,7 +18,7 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task MaterialPickingCreateAsync(MaterialPickingRequest request);
+        Task MaterialPickingAsync(MaterialPickingRequest request);
         /// <summary>
         /// 退料 包含工单借料
         /// </summary>

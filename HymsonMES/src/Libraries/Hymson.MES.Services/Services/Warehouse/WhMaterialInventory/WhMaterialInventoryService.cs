@@ -27,6 +27,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using System.Transactions;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.HttpClients;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -77,6 +78,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
+        private readonly IWMSRequest _wmsRequest;
 
         /// <summary>
         /// 构造函数
@@ -111,6 +113,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IManuGenerateBarcodeService manuGenerateBarcodeService,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
+            IWMSRequest wMSRequest,
             IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _currentUser = currentUser;
@@ -133,6 +136,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
             _validationPickMaterialsRequest = validationPickMaterialsRequest;
             _manuRequistionOrderRepository = manuRequistionOrderRepository;
+            _wmsRequest = wMSRequest;
         }
 
 
@@ -1147,7 +1151,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
             await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
             //下达WMS领料申请
-
+            await _wmsRequest.MaterialPickingAsync(new HttpClients.Requests.Print.MaterialPickingRequest());
 
 
         }
