@@ -94,7 +94,8 @@ namespace Hymson.MES.Services.Services.Integrated
                     inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.WhSfcSplitAdjust ||
                     inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.WhSfcMergeAdjust ||
                     inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.Spotcheck ||
-                    inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.Maintain)
+                    inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.Maintain ||
+                    inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.EquRepairOrder)
                 {
                     var Entities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId = _currentSite.SiteId ?? 0, CodeType = inteCodeRulesCreateDto.CodeType });
                     if (Entities.Any())
