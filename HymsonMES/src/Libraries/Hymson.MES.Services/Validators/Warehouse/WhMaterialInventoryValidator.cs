@@ -50,6 +50,15 @@ namespace Hymson.MES.Services.Validators.Warehouse
             RuleFor(x => x.Qty).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15125));
         }
     }
+    internal class PickMaterialsRequestValidator : AbstractValidator<PickMaterialsRequest>
+    {
+        public PickMaterialsRequestValidator()
+        {
+            RuleFor(x => x.WarehouseCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15203));
+            RuleFor(x => x.Qty).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15125));
+            RuleFor(x => x.WorkCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15125));
+        }
+    }
 
-    
+
 }

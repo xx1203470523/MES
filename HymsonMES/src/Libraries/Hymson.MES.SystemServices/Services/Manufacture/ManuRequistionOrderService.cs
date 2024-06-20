@@ -393,9 +393,9 @@ namespace Hymson.MES.SystemServices.Services
             {
                 Id = requistionOrderId,
                 ReqOrderCode = erpRequisitionOrder,
-                WorkOrderId = planWorkOrderEntity.Id,
-                Status = SysDataStatusEnum.Enable,
-                Type = ManuRequistionTypeEnum.PICKING,
+                WorkOrderCode = planWorkOrderEntity.OrderCode,
+                Status = WhWarehouseRequistionStatusEnum.Picked,
+                Type = ManuRequistionTypeEnum.WorkOrderPicking,
                 Remark = "",
                 CreatedBy = _currentSystem.Name,
                 UpdatedBy = _currentSystem.Name,

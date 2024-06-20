@@ -137,13 +137,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="sfcs"></param>
         /// <returns></returns>
         Task<bool> MergeAdjustVerifySfcAsync(string[] sfcs);
-        /// <summary>
-        /// 领料
-        /// </summary>
-        /// <param name="workorder"></param>
-        /// <param name="qty"></param>
-        /// <returns></returns>
-
-        Task<WhMaterialInventoryPickDto> WhMaterialInventoryPick(string workorder, int qty);
+        Task PickMaterialsRequestAsync(PickMaterialsRequest request);
+       
     }
 }

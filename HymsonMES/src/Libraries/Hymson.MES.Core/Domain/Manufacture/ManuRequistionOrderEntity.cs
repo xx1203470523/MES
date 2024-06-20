@@ -24,19 +24,19 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public string ReqOrderCode { get; set; }
 
        /// <summary>
-        /// 工单id
+        /// 工单Code
         /// </summary>
-        public long WorkOrderId { get; set; }
+        public string WorkOrderCode { get; set; }
 
-       /// <summary>
-        /// 领料单类型(1:ERP)
+        /// <summary>
+        /// 领料单类型 0:工单领料 1:工单补料
         /// </summary>
         public ManuRequistionTypeEnum Type { get; set; }
 
        /// <summary>
         /// 状态
         /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        public WhWarehouseRequistionStatusEnum? Status { get; set; }
 
        /// <summary>
         /// 物料描述

@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Warehouse;
 
@@ -602,6 +603,32 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+    }
+    /// <summary>
+    /// 派工单领料申请
+    /// </summary>
+    public record PickMaterialsRequest : BaseEntityDto
+    {
+        /// <summary>
+        /// 仓库编码
+        /// </summary>
+        public string WarehouseCode { get; set; }
+
+        /// <summary>
+        /// 派工单编码
+        /// </summary>
+        public string WorkCode { get; set; }
+
+        /// <summary>
+        /// 领料数量
+        /// </summary>
+        public int Qty { get; set; }
+        
+        /// <summary>
+        /// 领料申请类型 0：工单领料，1：工单补料
+        /// </summary>
+        public ManuRequistionTypeEnum  ManuRequistionType { get; set; }
 
     }
 }

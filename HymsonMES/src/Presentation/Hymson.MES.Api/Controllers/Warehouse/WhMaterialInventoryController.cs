@@ -227,5 +227,15 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.MergeAdjustVerifySfcAsync(sfcs);
         }
+        /// <summary>
+        /// 领料申请
+        /// </summary>
+        /// <param name="sfcs"></param>
+        [HttpPost("PickMaterialsRequest")]
+        [LogDescription("领料申请", BusinessType.INSERT)]
+        public async Task PickMaterialsRequestAsync(PickMaterialsRequest request)
+        {
+            await _whMaterialInventoryService.PickMaterialsRequestAsync(request);
+        }
     }
 }
