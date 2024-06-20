@@ -18,12 +18,20 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task MaterialPickingAsync(MaterialPickingRequest request);
+        Task MaterialPickingRequestAsync(MaterialPickingRequest request);
         /// <summary>
-        /// 退料 包含工单借料
+        /// 领料取消
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task MaterialPickingCancelAsync(MaterialPickingRequest request);
+
+        /// <summary>
+        /// 退料
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         Task MaterialReturnAsync(MaterialReturnRequest request);
+       
     }
 }

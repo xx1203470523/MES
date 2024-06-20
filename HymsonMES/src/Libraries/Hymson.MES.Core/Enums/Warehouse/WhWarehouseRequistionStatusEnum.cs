@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 领料申请状态0:审批中，1：审批失败，2：审批成功3.已收料
+    /// 领料申请状态0:审批中，1：审批失败，2：审批成功3.已收料4.取消领料
     /// </summary>
     public enum WhWarehouseRequistionStatusEnum : byte
     {
@@ -28,6 +28,11 @@ namespace Hymson.MES.Core.Enums
         /// 已收料
         /// </summary>
         [Description("已收料")]
-        Picked = 3
+        Picked = 3,
+        /// <summary>
+        /// 取消领料
+        /// </summary>
+        [Description("取消领料")]
+        Cancel = 4
     }
 }
