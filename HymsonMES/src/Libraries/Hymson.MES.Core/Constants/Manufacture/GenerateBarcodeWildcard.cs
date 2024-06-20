@@ -34,6 +34,12 @@ namespace Hymson.MES.Core.Constants.Manufacture
         public const string YMDWildcard = "%YMD_WILDCARD%";
 
         /// <summary>
+        /// 年月周映射通配符
+        /// </summary>
+        [GenerateBarcodeWildcardDescriptionAttribute("年月周映射通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        public const string YMWWildcard = "%YMW_WILDCARD%";
+
+        /// <summary>
         /// 线别通配符
         /// </summary>
         [GenerateBarcodeWildcardDescriptionAttribute("线别通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
@@ -108,6 +114,12 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// </summary>
         [GenerateBarcodeWildcardDescriptionAttribute("正极极片通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
         public const string PositivePlate = "%POSITIVEPLATE%";
+
+        /// <summary>
+        /// 正极浆料通配符
+        /// </summary>
+        [GenerateBarcodeWildcardDescriptionAttribute("正极浆料通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        public const string PositiveSlurry = "%POSITIVESLURRY%";
 
         /// <summary>
         /// 工单类型映射通配符

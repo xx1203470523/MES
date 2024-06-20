@@ -27,5 +27,10 @@ namespace Hymson.MES.Core.Enums.Process
         [Description("正极极片")]
         PositivePlate = 7,
 
+        /// <summary>
+        /// 正极浆料
+        /// </summary>
+        [Description("正极浆料")]
+        PositiveSlurry = 9
     }
 }

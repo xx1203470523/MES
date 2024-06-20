@@ -1162,6 +1162,7 @@
         public const string MES16216 = "条码【{Barcode}】对应【{MaterialTypeEnum}】追溯信息不存在或对应物料产品型号未维护";
         public const string MES16217 = "条码【{Barcode}】对应正极片生产信息不存在或未正确配置相关信息，请检查数据";
         public const string MES16218 = "工单【{WorkOrderId}】不存在";
+        public const string MES16219 = "条码【{Barcode}】对应正极浆料生产信息不存在或未正确配置相关信息，请检查数据";
         #endregion
 
         #region 生产通用 MES16300
