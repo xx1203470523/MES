@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.InteBusinessField.View;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Microsoft.Extensions.Options;
 
@@ -125,27 +126,55 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteBusinessFieldEntity>> GetPagedListAsync(InteBusinessFieldPagedQuery pagedQuery)
+        public async Task<PagedInfo<InteBusinessFieldView>> GetPagedListAsync(InteBusinessFieldPagedQuery pageQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("v.UpdatedOn DESC");
+            sqlBuilder.Where("v.IsDeleted = 0");
+            sqlBuilder.Where("v.SiteId = @SiteId");
 
-            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            if (!string.IsNullOrEmpty(pageQuery.Code))
+            {
+                pageQuery.Code = $"%{pageQuery.Code}%";
+                sqlBuilder.Where(" v.Code like @Code ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.Name))
+            {
+                pageQuery.Name = $"%{pageQuery.Name}%";
+                sqlBuilder.Where(" v.Name like  @Name ");
+            }
+
+            if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where(" v.CreatedOn >= @CreatedOnStart AND v.CreatedOn < @CreatedOnEnd ");
+            }
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
-            sqlBuilder.AddParameters(pagedQuery);
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<InteBusinessFieldEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<InteBusinessFieldView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<InteBusinessFieldEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<InteBusinessFieldView>(entities, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
+
+        /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<InteBusinessFieldEntity> GetByCodeAsync(InteBusinessFieldQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<InteBusinessFieldEntity>(GetByCodeSql, query);
         }
 
     }
@@ -156,8 +185,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public partial class InteBusinessFieldRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_business_field /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_business_field /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+       // const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_business_field /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+
+        const string GetPagedInfoDataSqlTemplate = @"SELECT 
+                        v.*,vt.Code AS MaskCode,vt.Name AS MaskName  
+                     FROM `inte_business_field` v 
+                     LEFT JOIN `proc_maskcode` vt ON vt.Id=v.MaskCodeId
+                    /**where**/ ORDER BY v.UpdatedOn DESC LIMIT @Offset,@Rows ";
+        //const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_business_field /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+
+        const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(*) 
+                     FROM `inte_business_field` v 
+                     LEFT JOIN `proc_maskcode` vt ON vt.Id=v.MaskCodeId 
+                    /**where**/  ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_business_field /**where**/  ";
 
         const string InsertSql = "INSERT INTO inte_business_field(  `Id`, `SiteId`, `Code`, `Name`, `Type`, `Source`, `MaskCodeId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @Type, @Source, @MaskCodeId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
@@ -171,6 +211,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         const string GetByIdSql = @"SELECT * FROM inte_business_field WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM inte_business_field WHERE Id IN @Ids ";
+
+        const string GetByCodeSql = @"SELECT * 
+                            FROM `inte_business_field`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
 
     }
 }

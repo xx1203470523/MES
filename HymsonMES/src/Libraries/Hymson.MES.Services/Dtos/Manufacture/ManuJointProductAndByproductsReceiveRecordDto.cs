@@ -26,6 +26,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 存储地方wh_warehouse 的id
         /// </summary>
         public long? WarehouseId { get; set; }
+
+        /// <summary>
+        /// 产品类型
+        /// </summary>
+        public string ProductType { get; set; }
     }
 
     /// <summary>

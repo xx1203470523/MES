@@ -13,4 +13,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.Query
         public long SiteId { get; set; }
 
     }
+
+    public class InteBusinessFieldDistributeDetailBusinessFieldIdIdsQuery
+    {
+        public long[] BusinessFieldIds { get; set; }
+
+        public long SiteId { get; set; }
+    }
 }
