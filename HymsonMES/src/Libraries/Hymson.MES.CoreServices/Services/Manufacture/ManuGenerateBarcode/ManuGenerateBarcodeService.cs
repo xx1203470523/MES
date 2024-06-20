@@ -230,11 +230,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                             var day = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Day);
                             rules.Add(new List<string> { $"{year}{month}{day}" });
                             break;
+                        case GenerateBarcodeWildcard.YMWWildcard:
+                            rules.Add(new List<string> { await GenerateYearMonthWeekInfoAsync(bo) });
+                            break;
                         case GenerateBarcodeWildcard.SingleYearMapping:
-
                             rules.Add(new List<string> { await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Year) });
                             break;
-
                         case GenerateBarcodeWildcard.SingleMonthMapping:
                             rules.Add(new List<string> { await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Month) });
                             break;
@@ -242,10 +243,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                             rules.Add(new List<string> { await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Day) });
                             break;
                         case GenerateBarcodeWildcard.SingleYearDirect:
-
                             rules.Add(new List<string> { now.ToString("yy") });
                             break;
-
                         case GenerateBarcodeWildcard.SingleMonthDirect:
                             rules.Add(new List<string> { now.ToString("MM") });
                             break;
@@ -269,6 +268,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                             break;
                         case GenerateBarcodeWildcard.PositivePlate:
                             rules.Add(new List<string> { await GeneratePositiveInfo(bo) });
+                            break;
+                        case GenerateBarcodeWildcard.PositiveSlurry:
+                            rules.Add(new List<string> { await GeneratePositiveSlurryInfo(bo) });
                             break;
                         case GenerateBarcodeWildcard.ElectrodeState:
                             rules.Add(new List<string> { await GenerateElectrodeStateAsync(bo) });
@@ -364,6 +366,146 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             }
 
             return $"{year}{month}{orderType}{lineCode}";
+        }
+
+        /// <summary>
+        /// 生成正极浆料生产信息
+        /// </summary>
+        private async Task<string> GeneratePositiveSlurryInfo(BarCodeSerialNumberBo bo)
+        {
+            if (bo.IsTest) return "PPPP";
+            if (bo.Sfcs == null || !bo.Sfcs.Any())
+            {
+                return string.Empty;
+            }
+            var year = "";
+            var month = "";
+            var orderType = "";
+            var lineCode = "";
+            bool isFound = false;
+            foreach (var sfc in bo.Sfcs)
+            {
+                //追溯
+                var manuSFCNodeSourceEntities = await _tracingSourceCoreService.OriginalSourceAsync(new Data.Repositories.Common.Query.EntityBySFCQuery
+                {
+                    SFC = sfc,
+                    SiteId = bo.SiteId,
+                });
+                //关联物料信息，查询是什么类型的物料
+                var productIds = manuSFCNodeSourceEntities.Select(x => x.ProductId);
+                var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(productIds);
+                //查询正极浆料生产信息
+                var positiveMaterialIds = procMaterialEntities.Where(x => x.MaterialType == MaterialTypeEnum.PositiveSlurry).Select(x => x.Id);
+                var positiveSfcs = manuSFCNodeSourceEntities.Where(x => positiveMaterialIds.Contains(x.ProductId)).Select(x => x.SFC);
+                if (positiveSfcs == null || !positiveSfcs.Any())
+                {
+                    continue;
+                }
+                //条码表
+                var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery { SiteId = bo.SiteId, SFCs = positiveSfcs });
+                //条码信息表
+                var positiveSfcInfos = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
+                if (positiveSfcInfos == null || !positiveSfcInfos.Any())
+                {
+                    continue;
+                }
+                var positiveSfcInfo = positiveSfcInfos.OrderBy(x => x.Id).First();
+                year = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Year, positiveSfcInfo.CreatedOn);
+                month = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Month, positiveSfcInfo.CreatedOn);
+                //正极浆料工单信息
+                var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(positiveSfcInfo.WorkOrderId.GetValueOrDefault());
+                if (workOrderEntity != null)
+                {
+                    orderType = MappingElectrodeState(workOrderEntity.Type);
+                    //正极浆料线体信息
+                    var workCenterEntity = await _inteWorkCenterRepository.GetByIdAsync(workOrderEntity.WorkCenterId.GetValueOrDefault());
+                    lineCode = workCenterEntity.LineCoding ?? "";
+                    isFound = true;
+                    break;
+                }
+
+                if (isFound) break;
+            }
+            if (!isFound)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16219)).WithData("Barcode", string.Join(',', bo.Sfcs));
+            }
+
+            return $"{year}{month}{orderType}{lineCode}";
+        }
+
+        /// <summary>
+        /// 生成年月周映射信息
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        private async Task<string> GenerateYearMonthWeekInfoAsync(BarCodeSerialNumberBo bo, DateTime? dt = null)
+        {
+            var dateTime = dt ?? HymsonClock.Now();
+            var originalDateTime = dateTime;
+            //当月的25日为最后一日，26日凌晨00:00开始记为下一月的开始
+            if (originalDateTime.Day >= 26)
+            {
+                dateTime = dateTime.AddMonths(1);
+            }
+
+            var year = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Year, dateTime);
+            var month = await GenerateSingleDateAsync(bo, TimeWildcardTypeEnum.Month, dateTime);
+            var week = 1;  //当前日期是第几周
+
+            if (originalDateTime.Day >= 26)  //当月25号之后
+            {
+                //查询当月25号之后的日期中是否有周日
+                var isHaveSunday = false;
+                var sunday = 0;
+                for (var day = 26; day <= DateTime.DaysInMonth(dateTime.Year, dateTime.Month); day++)
+                {
+                    if ((new DateTime(dateTime.Year, dateTime.Month, day)).DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        isHaveSunday = true;
+                        sunday = day;
+                        break;
+                    }
+                }
+                if (isHaveSunday && originalDateTime.Day > sunday)
+                {
+                    week = 2;
+                }
+            }
+            else
+            {
+                week = GetWeekOfMonth(dateTime);
+
+                //上月最后一天为周日，则多加一周
+                var lastDayOfLastMonth = (new DateTime(originalDateTime.Year, originalDateTime.Month, 1)).AddDays(-1);
+                if (lastDayOfLastMonth.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    week += 1;
+                }
+            }
+
+            return $"{year}{month}{week}";
+        }
+
+        /// <summary>
+        /// 获取指定日期为当月第几周
+        /// </summary>
+        /// <param name="date">日期</param>
+        /// <param name="weekStart">每周第一天 1:周一 2:周日</param>
+        /// <returns></returns>
+        private static int GetWeekOfMonth(DateTime date, int weekStart = 1)
+        {
+            //查询当月第一天为星期几
+            var firstDayOfWeek = (new DateTime(date.Year, date.Month, 1)).DayOfWeek;
+            //补全第一周需要的天数
+            var offset = (int)firstDayOfWeek;    //星期日为每周第一时
+            if (weekStart == 1)
+            {
+                offset = firstDayOfWeek == DayOfWeek.Sunday ? 6 : (int)firstDayOfWeek - 1;
+            }
+
+            return (int)Math.Ceiling((date.Day + offset) / 7.0);
         }
 
         /// <summary>
