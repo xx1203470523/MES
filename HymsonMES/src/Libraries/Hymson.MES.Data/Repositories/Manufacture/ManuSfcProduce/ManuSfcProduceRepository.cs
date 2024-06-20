@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -377,8 +378,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             if (entities == null || !entities.Any()) return 0;
 
+            var (sql, param) = SqlHelper.JoinSql(UpdateWithStatusCheckSql, entities);
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateWithStatusCheckSql, entities);
+            return await conn.ExecuteAsync(sql, param);
         }
 
         /// <summary>

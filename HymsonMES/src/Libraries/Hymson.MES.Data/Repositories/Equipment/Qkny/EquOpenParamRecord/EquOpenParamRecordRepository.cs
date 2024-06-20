@@ -38,8 +38,6 @@ namespace Hymson.MES.Data.Repositories.EquOpenParamRecord
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<EquOpenParamRecordEntity> entities)
         {
-            //var sqlBuilder = new SqlBuilder();
-            //var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             var (sql, param) = SqlHelper.JoinInsertSql(InsertsSqlInsert, insertsSqlValue, entities);
 
             using var conn = GetMESDbConnection();
