@@ -18,7 +18,7 @@ namespace Hymson.MES.SystemServices.Dtos
         public string ERPRequisitionOrder { get; set; }
 
         /// <summary>
-        /// 工单号
+        /// MES领料申请单号
         /// </summary>
         public string OrderCode { get; set; }
 
@@ -43,7 +43,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 物料版本
         /// </summary>
-        public string MaterialVersion { get; set; }
+        public string? MaterialVersion { get; set; }
 
         /// <summary>
         /// 物料条码

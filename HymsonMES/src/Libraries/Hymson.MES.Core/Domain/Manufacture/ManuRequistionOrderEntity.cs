@@ -31,7 +31,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 领料单类型(1:ERP)
         /// </summary>
-      //  public ManuRequistionTypeEnum Type { get; set; }
+        public ManuRequistionTypeEnum Type { get; set; }
 
        /// <summary>
         /// 状态
