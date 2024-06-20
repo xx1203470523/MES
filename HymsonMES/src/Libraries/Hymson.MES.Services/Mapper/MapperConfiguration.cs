@@ -661,7 +661,10 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
-            
+            #region InteQualificationAuthentication
+            CreateMap<InteQualificationAuthenticationPagedQueryDto, InteQualificationAuthenticationPagedQuery>();
+            CreateMap<InteQualificationAuthenticationEntity, InteQualificationAuthenticationDto>();
+            #endregion
         }
 
         /// <summary>
