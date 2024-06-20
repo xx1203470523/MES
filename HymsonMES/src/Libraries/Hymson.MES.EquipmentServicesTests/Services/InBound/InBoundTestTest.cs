@@ -69,34 +69,44 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
         [TestMethod()]
         public async Task LYPInBoundTestAsync()
         {
+            ////电芯OCV
             //string resourceCode = "YTLPACK01ER004";
             //string equipmentCode = "YTLPACK01AE004";
 
+            //端板刻码
+            //string resourceCode = "YTLPACK01ER014";
+            //string equipmentCode = "YTLPACK01AE014";
+
+            ////CCS安装
             //string resourceCode = "YTLPACK01ER016";
             //string equipmentCode = "YTLPACK01AE016";
 
+            ////CCS焊接
             //string resourceCode = "YTLPACK01ER017";
             //string equipmentCode = "YTLPACK01AE017";
 
+            ////模组OCV
             //string resourceCode = "YTLPACK01ER018";
             //string equipmentCode = "YTLPACK01AE018";
 
-            //焊缝清洗
-            string resourceCode = "YTLPACK01ER026";
-            string equipmentCode = "YTLPACK01VIR01";
+            ////焊缝清洗
+            //string resourceCode = "YTLPACK01ER026";
+            //string equipmentCode = "YTLPACK01VIR01";
 
-            ////气密性
-            //string resourceCode = "YTLPACK01ER021";
-            //string equipmentCode = "YTLPACK01AE021";
+            //气密性
+            string resourceCode = "YTLPACK01ER021";
+            string equipmentCode = "YTLPACK01AE021";
 
             ////涂胶
             //string resourceCode = "YTLPACK01ER022";
             //string equipmentCode = "YTLPACK01AE022";
 
-            string prefix = "YTLSM20240618004";
+            //string prefix = "YTC20240620003";
 
-            ////BMU进站测试
-            //string prefix = "BMU20240618006";
+            //string prefix = "YTM20240620003";
+
+            //BMU进站测试
+            string prefix = "BMU20240620004";
 
             await SetEquInfoAsync(equipmentCode);
             await _inBoundService.InBoundAsync(new InBoundDto

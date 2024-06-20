@@ -65,22 +65,38 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
         [TestMethod()]
         public async Task SfcCirculationBindAsyncTest()
         {
-            string equipmentCode = "YTLPACK01AE014";
+            //string equipmentCode = "YTLPACK01AE014";
+            string equipmentCode = "YTLPACK01AE023";
             await SetEquInfoAsync(equipmentCode);
             SfcCirculationBindDto sfcCirculationCCS = new SfcCirculationBindDto()
             {
-                SFC = "YTLSM20240618004",
+                SFC = "YTP20240620003",
                 ModelCode = "12S",  //ModelCode
                 //IsVirtualSFC=false,
                 BindSFCs = new CirculationBindDto[] {
+                    //new CirculationBindDto{
+                    //    SFC="YTC20240620003",
+                    //    Location="0",
+                    //    //Name="CCS01"
+                    //},
+
                     new CirculationBindDto{
-                        SFC="YTLSM20240618003",
+                        SFC="BMU20240620004",
                         Location="0",
+                        //Name="CCS01"
+                    },
+
+                    new CirculationBindDto{
+                        SFC="YTM20240620003",
+                        Location="1",
                         //Name="CCS01"
                     }
                 },
-                EquipmentCode = "YTLPACK01AE014",
-                ResourceCode = "YTLPACK01ER014",
+                //EquipmentCode = "YTLPACK01AE014",
+                //ResourceCode = "YTLPACK01ER014",
+
+                EquipmentCode = "YTLPACK01AE023",
+                ResourceCode = "YTLPACK01ER023",
                 LocalTime = DateTime.Now
             };
             await _sfcCirculationService.SfcCirculationBindAsync(sfcCirculationCCS);
