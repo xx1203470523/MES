@@ -36,6 +36,11 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// 复选框
         /// </summary>
         [Description("复选框")]
-        Checkbox = 5
+        Checkbox = 5,
+        /// <summary>
+        /// 列表
+        /// </summary>
+        [Description("列表")]
+        List = 6
     }
 }
