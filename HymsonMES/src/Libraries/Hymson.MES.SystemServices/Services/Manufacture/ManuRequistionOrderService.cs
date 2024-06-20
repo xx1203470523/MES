@@ -185,7 +185,11 @@ namespace Hymson.MES.SystemServices.Services
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES14104)).WithData("code", productionPickDto.RequistionId);
             }
-
+            var requistionOrderEntity = await _requistionOrderRepository.GetByIdAsync(int.Parse(productionPickDto.RequistionId.Split('_')[1]));
+            if (requistionOrderEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES14103)).WithData("code", productionPickDto.RequistionId.Split('_')[1]);
+            }
             //验证仓库是否存在,会同时从多个仓库领料
             //var codes = productionPickDto.ReceiveMaterials.Select(x => x.WareHouseCode).Distinct().ToArray();
             //var whWarehouseEntities = await _whWarehouseRepository.GetWhWarehouseEntitiesAsync(new WhWarehouseQuery
