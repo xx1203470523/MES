@@ -1848,6 +1848,7 @@
         public const string MES19158 = "产出数量不能小于等于0。";
         public const string MES19159 = "产出总数不等于良品数和NG数量之和";
         public const string MES19160 = "产出类型异常，参考如下：1制胶 2匀浆 3涂布 4辊分 5模切";
+        public const string MES19161 = "报警等级异常，参考如下：L-提示不停机；M-提示停机；H-故障停机";
 
         #region 产品参数采集
         public const string MES19600 = "产品参数采集异常";

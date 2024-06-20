@@ -56,6 +56,21 @@ namespace Hymson.MES.EquipmentServices.Validators.EquVerifyHelper
         }
 
         /// <summary>
+        /// 设备报警
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <exception cref="CustomerValidationException"></exception>
+        public static void AlarmDto(AlarmDto dto)
+        {
+            Common(dto);
+            List<string> statusList = new List<string>() { "L", "H", "M" };
+            if (statusList.Contains(dto.AlarmLevel) == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19161));
+            }
+        }
+
+        /// <summary>
         /// 获取开机参数明细008
         /// </summary>
         /// <param name="dto"></param>

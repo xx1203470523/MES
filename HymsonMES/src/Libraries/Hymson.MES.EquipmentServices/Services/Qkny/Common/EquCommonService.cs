@@ -402,7 +402,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
         /// <returns></returns>
         public async Task AlarmAsync(AlarmDto dto)
         {
-            await _validationAlarmDto.ValidateAndThrowAsync(dto);
+            //await _validationAlarmDto.ValidateAndThrowAsync(dto);
+            EquVerifyHelper.AlarmDto(dto);
             //1. 获取设备基础信息
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
             //2. 添加故障记录
