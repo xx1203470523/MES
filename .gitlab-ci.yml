@@ -17,8 +17,10 @@ sonarqube-check:
  #     - "apt-get install --yes --no-install-recommends openjdk-17-jre"
       - ls
       - cd HymsonMES
+      - ls
  #     - "dotnet tool install --global dotnet-sonarscanner"
       - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
+      -  echo $PATH
       - "dotnet sonarscanner begin /k:\"MES-backend\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=$SONAR_HOST_URL\" "
       - "dotnet build"
       - "dotnet sonarscanner end /d:sonar.token=\"$SONAR_TOKEN\""
