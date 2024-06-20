@@ -143,7 +143,7 @@ namespace Hymson.MES.SystemServices.Services
                 throw new CustomerValidationException(nameof(ErrorCode.MES14109));
             }
 
-            var erpRequisitionOrder = productionPickDto.ERPRequisitionOrder.Trim();
+            var erpRequisitionOrder = productionPickDto.WMSRequisitionOrder.Trim();
             if (string.IsNullOrWhiteSpace(erpRequisitionOrder))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES14126));
@@ -152,7 +152,7 @@ namespace Hymson.MES.SystemServices.Services
             //记录接收日志
             _traceLogService.WriteLogEntry(new TraceLogEntry
             {
-                Id = productionPickDto.ERPRequisitionOrder.Replace("-", ""),
+                Id = productionPickDto.WMSRequisitionOrder.Replace("-", ""),
                 Type = "PickMaterials",//TODO,增加枚举
                 Timestamp = DateTime.Now,
                 Message = "生产领料单信息接收成功",
@@ -179,11 +179,11 @@ namespace Hymson.MES.SystemServices.Services
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
             {
                 SiteId = siteId,
-                OrderCode = productionPickDto.OrderCode
+                OrderCode = productionPickDto.RequistionId.Split('_')[0]
             });
             if (planWorkOrderEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES14104)).WithData("code", productionPickDto.OrderCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES14104)).WithData("code", productionPickDto.RequistionId);
             }
 
             //验证仓库是否存在,会同时从多个仓库领料
@@ -199,11 +199,11 @@ namespace Hymson.MES.SystemServices.Services
             //}
 
             //获取物料明细
-            var procMaterialsTask = GetMaterialEntitiesAsync(productionPickDto, siteId);
+            var procMaterials = await GetMaterialEntitiesAsync(productionPickDto, siteId);
 
             //仓库
             var wareHouseCodes = productionPickDto.ReceiveMaterials.Select(x => x.WareHouseCode).Distinct().ToArray();
-            var warehouseEntitiesTask = _whWarehouseRepository.GetWhWarehouseEntitiesAsync(new WhWarehouseQuery
+            var warehouseEntities =await _whWarehouseRepository.GetWhWarehouseEntitiesAsync(new WhWarehouseQuery
             {
                 SiteId = _currentSystem.SiteId,
                 WareHouseCodes = wareHouseCodes,
@@ -211,7 +211,7 @@ namespace Hymson.MES.SystemServices.Services
 
             //库存
             var barCodes = productionPickDto.ReceiveMaterials.Select(x => x.MaterialBarCode).ToArray();
-            var inventoryEntitiesTask = _whMaterialInventoryRepository.GetByBarCodesAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryBarCodesQuery
+            var inventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryBarCodesQuery
             {
                 SiteId = siteId,
                 BarCodes = barCodes
@@ -229,9 +229,6 @@ namespace Hymson.MES.SystemServices.Services
                 });
             }
 
-            var procMaterials = await procMaterialsTask;
-            var warehouseEntities = await warehouseEntitiesTask;
-            var inventoryEntities = await inventoryEntitiesTask;
 
             #endregion
 
@@ -398,7 +395,7 @@ namespace Hymson.MES.SystemServices.Services
                 ReqOrderCode = erpRequisitionOrder,
                 WorkOrderId = planWorkOrderEntity.Id,
                 Status = SysDataStatusEnum.Enable,
-                Type = ManuRequistionTypeEnum.ERP,
+                Type = ManuRequistionTypeEnum.PICKING,
                 Remark = "",
                 CreatedBy = _currentSystem.Name,
                 UpdatedBy = _currentSystem.Name,
