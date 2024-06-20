@@ -8,6 +8,16 @@ namespace Hymson.MES.Data.Repositories.Process.Query
     public class ProcFormulaOperationSetPagedQuery : PagerInfo
     {
         public long ? FormulaOperationId { get; set; }
+
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string? Name { get; set; }
     }
 
 }

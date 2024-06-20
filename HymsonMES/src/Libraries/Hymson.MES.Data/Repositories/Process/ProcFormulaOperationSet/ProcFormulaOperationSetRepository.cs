@@ -155,9 +155,19 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
-            if(pagedQuery.FormulaOperationId.HasValue)
+            if (pagedQuery.FormulaOperationId.HasValue)
             {
                 sqlBuilder.Where("FormulaOperationId=@FormulaOperationId");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
+            {
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("Code LIKE @Code");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
+            {
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("Name LIKE @Name");
             }
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
