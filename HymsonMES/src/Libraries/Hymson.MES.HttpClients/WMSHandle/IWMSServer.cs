@@ -9,22 +9,22 @@ using System.Threading.Tasks;
 namespace Hymson.MES.HttpClients
 {
     /// <summary>
-    /// 仓库请求
+    /// 仓库服务
     /// </summary>
-    public interface IWMSRequest
+    public interface IWMSServer
     {
         /// <summary>
         /// 领料申请，包含工单借料
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<(string msg,bool result)> MaterialPickingRequestAsync(MaterialPickingRequest request);
+        Task<(string msg,bool result)> MaterialPickingRequestAsync(MaterialPickingRequestDto request);
         /// <summary>
         /// 领料取消
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<bool> MaterialPickingCancelAsync(MaterialPickingRequest request);
+        Task<bool> MaterialPickingCancelAsync(MaterialPickingCancelDto request);
 
         /// <summary>
         /// 退料申请，请求发送成功之后，库存即刻扣除，后续WMS反馈有问题时候再加回来

@@ -7,25 +7,29 @@ namespace Hymson.MES.HttpClients
     /// <summary>
     /// Xnebula 仓库请求
     /// </summary>
-    public class XnebulaWMSRequest : IWMSRequest
+    public class XnebulaWMSServer : IWMSServer
     {
         private readonly HttpClient _httpClient;
         private readonly WMSOptions _options;
-        public XnebulaWMSRequest(HttpClient httpClient,IOptions<WMSOptions> options)
+        public XnebulaWMSServer(HttpClient httpClient,IOptions<WMSOptions> options)
         {
             _httpClient = httpClient;
             _options = options.Value;
         }
 
-        public async Task<(string msg,bool result)> MaterialPickingRequestAsync(MaterialPickingRequest request)
+        public async Task<(string msg,bool result)> MaterialPickingRequestAsync(MaterialPickingRequestDto request)
         {
-            string api = "Delivery/create";
-            if(!string.IsNullOrEmpty(_options.MaterialPickingRequestUrl.Trim()))
+            
+            MaterialPickingRequest materialPickingRequest = new MaterialPickingRequest()
             {
-                api = _options.MaterialPickingRequestUrl.Trim();
-            }
-            request.warehouseCode = _options.WarehouseCode;
-            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(api, request);
+                SendOn = request.sendOn,
+                SyncCode = request.syncCode,
+                Details = request.details,
+                Type = _options.DeliveryOptions.Type,
+                WarehouseCode = _options.DeliveryOptions.WarehouseCode
+            };
+           
+            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(_options.DeliveryOptions.RoutePath, materialPickingRequest);
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {
@@ -42,7 +46,7 @@ namespace Hymson.MES.HttpClients
 
         
 
-        Task<bool> IWMSRequest.MaterialPickingCancelAsync(MaterialPickingRequest request)
+        public Task<bool> MaterialPickingCancelAsync(MaterialPickingCancelDto request)
         {
             throw new NotImplementedException();
         }
