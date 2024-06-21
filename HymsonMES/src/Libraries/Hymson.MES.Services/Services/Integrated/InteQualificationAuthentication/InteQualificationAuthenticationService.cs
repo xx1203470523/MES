@@ -5,21 +5,16 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.Query;
-using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -133,6 +128,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         model.RoleIds = value;
                     }
+                    detailsEntities.Add(model);
                 }
             }
 
@@ -205,6 +201,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         model.RoleIds = value;
                     }
+                    detailsEntities.Add(model);
                 }
             }
 
