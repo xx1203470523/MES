@@ -2,6 +2,7 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
+using Hymson.Utils.Tools;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -155,8 +156,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             if (whMaterialStandingbookEntitys == null || !whMaterialStandingbookEntitys.Any()) return 0;
 
+            var (sql, param) = SqlHelper.JoinInsertSql(InsertsSqlInsert, InsertsSqlValue, whMaterialStandingbookEntitys);
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, whMaterialStandingbookEntitys);
+            return await conn.ExecuteAsync(sql, param);
         }
 
         /// <summary>
@@ -235,6 +237,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
         const string InsertSql = "INSERT INTO `wh_material_standingbook`(  `Id`, `MaterialCode`, `MaterialName`, `MaterialVersion`, `MaterialBarCode`, `Batch`, `Quantity`, `Unit`, `SupplierId`, `Type`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @MaterialCode, @MaterialName, @MaterialVersion, @MaterialBarCode, @Batch, @Quantity, @Unit, @SupplierId, @Type, @Source, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `wh_material_standingbook`(  `Id`, `MaterialCode`, `MaterialName`, `MaterialVersion`, `MaterialBarCode`, `Batch`, `Quantity`, `Unit`, `SupplierId`, `Type`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @MaterialCode, @MaterialName, @MaterialVersion, @MaterialBarCode, @Batch, @Quantity, @Unit, @SupplierId, @Type, @Source, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertsSqlInsert = "INSERT INTO `wh_material_standingbook`(  `Id`, `MaterialCode`, `MaterialName`, `MaterialVersion`, `MaterialBarCode`, `Batch`, `Quantity`, `Unit`, `SupplierId`, `Type`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES ";
+        const string InsertsSqlValue = "( @Id, @MaterialCode, @MaterialName, @MaterialVersion, @MaterialBarCode, @Batch, @Quantity, @Unit, @SupplierId, @Type, @Source, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+
         const string UpdateSql = "UPDATE `wh_material_standingbook` SET   MaterialCode = @MaterialCode, MaterialName = @MaterialName, MaterialVersion = @MaterialVersion, MaterialBarCode = @MaterialBarCode, Batch = @Batch, Quantity = @Quantity, Unit = @Unit, Type = @Type, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `wh_material_standingbook` SET   MaterialCode = @MaterialCode, MaterialName = @MaterialName, MaterialVersion = @MaterialVersion, MaterialBarCode = @MaterialBarCode, Batch = @Batch, Quantity = @Quantity, Unit = @Unit, Type = @Type, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `wh_material_standingbook` SET IsDeleted = '1' WHERE Id = @Id ";

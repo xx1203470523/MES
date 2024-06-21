@@ -104,7 +104,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Heartbeat")]
-        [LogDescription("设备心跳002", BusinessType.OTHER, "002", ReceiverTypeEnum.MES)]
+        //[LogDescription("设备心跳002", BusinessType.OTHER, "002", ReceiverTypeEnum.MES)]
         public async Task HeartbeatAsync(HeartbeatDto dto)
         {
             if (IS_DEBUG == true)
