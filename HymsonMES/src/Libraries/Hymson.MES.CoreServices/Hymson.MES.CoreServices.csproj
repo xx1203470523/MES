@@ -21,13 +21,13 @@
 
   <ItemGroup>
     <PackageReference Include="Crc32.NET" Version="1.2.0" />
-    <PackageReference Include="Hymson.EventBus.Abstractions" Version="2.1.167" />
-    <PackageReference Include="Hymson.Infrastructure" Version="2.1.167" />
-    <PackageReference Include="Hymson.Localization" Version="2.1.167" />
-    <PackageReference Include="Hymson.Print.Abstractions" Version="2.1.167" />
-    <PackageReference Include="Hymson.Print.DataService" Version="2.1.167" />
-    <PackageReference Include="Hymson.Sequences" Version="2.1.167" />
-    <PackageReference Include="Hymson.Snowflake" Version="2.1.167" />
+    <PackageReference Include="Hymson.EventBus.Abstractions" Version="2.1.171" />
+    <PackageReference Include="Hymson.Infrastructure" Version="2.1.171" />
+    <PackageReference Include="Hymson.Localization" Version="2.1.171" />
+    <PackageReference Include="Hymson.Print.Abstractions" Version="2.1.171" />
+    <PackageReference Include="Hymson.Print.DataService" Version="2.1.171" />
+    <PackageReference Include="Hymson.Sequences" Version="2.1.171" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.171" />
   </ItemGroup>
 
   <ItemGroup>

@@ -30,9 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hymson.Infrastructure" Version="2.1.167" />
-    <PackageReference Include="Hymson.MessagePush" Version="2.1.167" />
-    <PackageReference Include="Hymson.Settings" Version="2.1.167" />
+    <PackageReference Include="Hymson.Infrastructure" Version="2.1.171" />
+    <PackageReference Include="Hymson.MessagePush" Version="2.1.171" />
+    <PackageReference Include="Hymson.Settings" Version="2.1.171" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
