@@ -364,16 +364,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
             }
+            if (saveDto.ProductType == "joinProduct")
+            {
+                if (saveDto.Qty > workOrderRecordEntity.PassDownQuantity)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES14603));
+                }
+            }
             // 判断数量限制
             List<string> list = new List<string>();
             switch (procMaterialEntity.QuantityLimit)
             {
                 case MaterialQuantityLimitEnum.AnyNumber:
-                    if (saveDto.Qty > workOrderRecordEntity.PassDownQuantity)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES14603));
-                    }
-
+                   
                     if (saveDto.Qty < qty)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES11719));

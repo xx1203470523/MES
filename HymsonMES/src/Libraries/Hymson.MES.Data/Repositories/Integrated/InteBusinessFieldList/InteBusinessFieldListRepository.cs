@@ -90,10 +90,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteBusinessFieldListEntity> GetByIdAsync(long id)
+        public async Task<IEnumerable<InteBusinessFieldListEntity>> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteBusinessFieldListEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryAsync<InteBusinessFieldListEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -169,8 +169,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string DeleteSql = "DELETE FROM inte_business_field_list WHERE BusinessFieldId = @Id ";
         const string DeletesSql = "DELETE FROM inte_business_field_list WHERE BusinessFieldId IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM inte_business_field_list WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM inte_business_field_list WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM inte_business_field_list WHERE BusinessFieldId = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM inte_business_field_list WHERE BusinessFieldId IN @Ids ";
 
     }
 }

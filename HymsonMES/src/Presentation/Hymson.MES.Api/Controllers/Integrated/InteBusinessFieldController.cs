@@ -44,9 +44,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddAsync([FromBody] InteBusinessFieldSaveDto saveDto)
+        public async Task<long> AddAsync([FromBody] InteBusinessFieldSaveDto saveDto)
         {
-             await _inteBusinessFieldService.CreateAsync(saveDto);
+            return await _inteBusinessFieldService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<InteBusinessFieldDto?> QueryByIdAsync(long id)
+        public async Task<MaskInfoViewDto?> QueryByIdAsync(long id)
         {
             return await _inteBusinessFieldService.QueryByIdAsync(id);
         }
@@ -91,9 +91,20 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<InteBusinessFieldDto>> QueryPagedListAsync([FromQuery] InteBusinessFieldPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<MaskInfoViewDto>> QueryPagedListAsync([FromQuery] InteBusinessFieldPagedQueryDto pagedQueryDto)
         {
             return await _inteBusinessFieldService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 查询详情（字段定义）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("getBusinessFieldList/{id}")]
+        public async Task<IEnumerable<InteBusinessFieldListDto>> getBusinessFieldListByIdAsync(long id)
+        {
+            return await _inteBusinessFieldService.getBusinessFieldListByIdAsync(id);
         }
 
     }

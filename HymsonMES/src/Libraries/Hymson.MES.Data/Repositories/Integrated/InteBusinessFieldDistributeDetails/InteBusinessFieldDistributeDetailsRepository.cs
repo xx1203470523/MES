@@ -148,6 +148,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
             return new PagedInfo<InteBusinessFieldDistributeDetailsEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据BusinessFieldId获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteBusinessFieldDistributeDetailsEntity>> GetByBusinessFieldIdsAsync(InteBusinessFieldDistributeDetailBusinessFieldIdIdsQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteBusinessFieldDistributeDetailsEntity>(GetByBusinessFieldIdsSql, query);
+        }
+
     }
 
 
@@ -171,6 +182,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         const string GetByIdSql = @"SELECT * FROM inte_business_field_distribute_details WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM inte_business_field_distribute_details WHERE Id IN @Ids ";
+
+        const string GetByBusinessFieldIdsSql = @"SELECT * FROM `inte_business_field_distribute_details` WHERE SiteId=@SiteId AND BusinessFieldId in @BusinessFieldIds";
 
     }
 }
