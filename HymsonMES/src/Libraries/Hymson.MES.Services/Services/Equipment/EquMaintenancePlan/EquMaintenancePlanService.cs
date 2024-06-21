@@ -153,7 +153,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
             }
-            if (!EquMaintenancePlanCreateDto.CompletionHour.HasValue && !EquMaintenancePlanCreateDto.CompletionHour.HasValue)
+            if (!EquMaintenancePlanCreateDto.CompletionHour.HasValue && !EquMaintenancePlanCreateDto.CompletionMinute.HasValue)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12323));
             }
