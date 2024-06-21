@@ -73,6 +73,7 @@ namespace Hymson.MES.SystemServices.Services.Process
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _procMaterialRepository.InsertsAsync(resposeSummaryBo.MaterialAdds);
             rows += await _procMaterialRepository.UpdatesAsync(resposeSummaryBo.MaterialUpdates);
+            trans.Complete();
             return rows;
         }
 

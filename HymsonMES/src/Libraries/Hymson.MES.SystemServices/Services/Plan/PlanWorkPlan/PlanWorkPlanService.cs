@@ -92,6 +92,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _planWorkPlanRepository.InsertsAsync(resposeSummaryBo.PlanAdds);
             rows += await _planWorkPlanRepository.UpdatesAsync(resposeSummaryBo.PlanUpdates);
+            trans.Complete();
             return rows;
         }
 
