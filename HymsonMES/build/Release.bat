@@ -1,0 +1,6 @@
+dotnet publish "../src/Presentation/Hymson.MES.Equipment.Api/Hymson.MES.Equipment.Api.csproj" --framework net6.0 -p:Version=%date:~2,2%%date:~5,2%.%date:~8,2%%time:~0,2%.%time:~3,2%.%time:~6,2%   -c Release --runtime linux-x64 --no-self-contained -o /app/publish/Hymson.MES.Equipment.Api /p:UseAppHost=false
+dotnet publish "../src/Presentation/Hymson.MES.BackgroundTasks/Hymson.MES.BackgroundTasks.csproj"  --framework net6.0   -p:Version=%date:~2,2%%date:~5,2%.%date:~8,2%%time:~0,2%.%time:~3,2%.%time:~6,2%  -c Release --runtime linux-x64 --no-self-contained -o /app/publish/Hymson.MES.BackgroundTasks /p:UseAppHost=false
+dotnet publish "../src/Presentation/Hymson.MES.Api/Hymson.MES.Api.csproj"  --framework net6.0   -p:Version=%date:~2,2%%date:~5,2%.%date:~8,2%%time:~0,2%.%time:~3,2%.%time:~6,2%   -c Release --runtime linux-x64 --no-self-contained -o /app/publish/Hymson.MES.Api /p:UseAppHost=false
+dotnet publish "../src/Presentation/Hymson.MES.System.Api/Hymson.MES.System.Api.csproj"  --framework net6.0   -p:Version=%date:~2,2%%date:~5,2%.%date:~8,2%%time:~0,2%.%time:~3,2%.%time:~6,2%   -c Release --runtime linux-x64 --no-self-contained -o /app/publish/Hymson.MES.System.Api /p:UseAppHost=false
+echo publish success
+pause
