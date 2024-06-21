@@ -19,10 +19,10 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
     /// <summary>
     /// 设备维修记录故障详情仓储
     /// </summary>
-    public partial class EquRepairOrderFaultRepository :BaseRepository, IEquRepairOrderFaultRepository
+    public partial class EquRepairOrderFaultRepository : BaseRepository, IEquRepairOrderFaultRepository
     {
 
-        public EquRepairOrderFaultRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public EquRepairOrderFaultRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
         public async Task<EquRepairOrderFaultEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<EquRepairOrderFaultEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<EquRepairOrderFaultEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +65,21 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquRepairOrderFaultEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquRepairOrderFaultEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquRepairOrderFaultEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<EquRepairOrderFaultEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 根据repairOrderId批量获取数据 
+        /// </summary>
+        /// <param name="repairOrderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquRepairOrderFaultEntity>> GetByRepairOrderIdAsync(long repairOrderId) 
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquRepairOrderFaultEntity>(GetByRepairOrderIdSql, new { RepairOrderId = repairOrderId });
         }
 
         /// <summary>
@@ -88,7 +99,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (equRepairOrderFaultPagedQuery.PageIndex - 1) * equRepairOrderFaultPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = equRepairOrderFaultPagedQuery.PageSize });
@@ -159,6 +170,17 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, equRepairOrderFaultEntitys);
         }
+
+        /// <summary>
+        /// 批量更新（故障原因）
+        /// </summary>
+        /// <param name="equRepairOrderFaultEntitys"></param>
+        /// <returns></returns> 
+        public async Task<int> UpdateFaultReasonsAsync(List<UpdateFaultReasonsQuery> updatesEquRepairOrderFaultQuery) 
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateFaultReasonsSql, updatesEquRepairOrderFaultQuery);
+        }
         #endregion
 
     }
@@ -177,7 +199,8 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
 
         const string UpdateSql = "UPDATE `equ_repair_order_fault` SET   SiteId = @SiteId, RepairOrderId = @RepairOrderId, FaultPhenomenonId = @FaultPhenomenonId, FaultPhenomenon = @FaultPhenomenon, FaultReasonId = @FaultReasonId, FaultReason = @FaultReason, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `equ_repair_order_fault` SET   SiteId = @SiteId, RepairOrderId = @RepairOrderId, FaultPhenomenonId = @FaultPhenomenonId, FaultPhenomenon = @FaultPhenomenon, FaultReasonId = @FaultReasonId, FaultReason = @FaultReason, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-
+        const string UpdateFaultReasonsSql = "UPDATE `equ_repair_order_fault` SET   FaultReasonId = @FaultReasonId, FaultReason = @FaultReason,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn   WHERE Id = @Id ";
+         
         const string DeleteSql = "UPDATE `equ_repair_order_fault` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `equ_repair_order_fault` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
@@ -187,6 +210,10 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `RepairOrderId`, `FaultPhenomenonId`, `FaultPhenomenon`, `FaultReasonId`, `FaultReason`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `equ_repair_order_fault`  WHERE Id IN @Ids ";
+
+        const string GetByRepairOrderIdSql = @"SELECT  
+                               `Id`, `SiteId`, `RepairOrderId`, `FaultPhenomenonId`, `FaultPhenomenon`, `FaultReasonId`, `FaultReason`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `equ_repair_order_fault`  WHERE RepairOrderId = @RepairOrderId ";
         #endregion
     }
 }
