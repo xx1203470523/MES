@@ -7,7 +7,7 @@ namespace Hymson.MES.System.Api.Controllers
     /// 综合
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [Authorize]
     public class IntegratedController : ControllerBase
     {

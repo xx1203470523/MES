@@ -11,7 +11,7 @@ namespace Hymson.MES.System.Api.Controllers
     /// 生产
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [AllowAnonymous]
     //[Authorize]
     public class ManufactureController : ControllerBase

@@ -11,7 +11,7 @@ namespace Hymson.MES.System.Api.Controllers
     /// 计划
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [AllowAnonymous]
     public class PlanController : ControllerBase
     {
