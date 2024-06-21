@@ -298,7 +298,6 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                         }
                     }
                     //是否首工序
-                    //TODO 待优化foreach查询
                     var isFirstProcedure = await IsFirstProcedureAsync(sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
                     if (isFirstProcedure)
                     {
@@ -484,7 +483,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentEquipment.SiteId,
-                        ProcedureId = processRouteFirstProcedure.ProcedureId,
+                        //根据进站工序从创建生产记录
+                        //ProcedureId =  processRouteFirstProcedure.ProcedureId ,
+                        ProcedureId =  procedureEntity.Id,
                         EquipmentId = _currentEquipment.Id ?? 0,
                         ProductId = planWorkOrderEntity.ProductId,
                         WorkOrderId = planWorkOrderEntity.Id,
