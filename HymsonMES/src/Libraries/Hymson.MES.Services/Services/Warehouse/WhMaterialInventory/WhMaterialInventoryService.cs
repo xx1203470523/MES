@@ -1175,7 +1175,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
         public async Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request)
         {
-            await _manuRequistionOrderRepository.GetByCodeAsync();
+           // await _manuRequistionOrderRepository.GetByCodeAsync();
             throw new NotImplementedException();
         }
     }
