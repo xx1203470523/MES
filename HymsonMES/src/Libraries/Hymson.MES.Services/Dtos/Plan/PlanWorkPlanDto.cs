@@ -15,7 +15,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         public long Id { get; set; }
 
         /// <summary>
-        /// 工单号
+        /// 生产计划单号
         /// </summary>
         public string PlanCode { get; set; }
 
