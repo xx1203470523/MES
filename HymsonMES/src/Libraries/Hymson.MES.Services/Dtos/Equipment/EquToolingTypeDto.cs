@@ -164,6 +164,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public string? Name { get; set; }
 
         /// <summary>
+        /// 更新时间  时间范围  数组
+        /// </summary>
+        public DateTime[]? UpdatedOn { get; set; }
+
+        /// <summary>
         /// 状态;0 禁用 1、启用
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
