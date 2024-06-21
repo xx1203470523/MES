@@ -24,14 +24,20 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task MaterialPickingCancelAsync(MaterialPickingRequest request);
+        Task<bool> MaterialPickingCancelAsync(MaterialPickingRequest request);
 
         /// <summary>
-        /// 退料
+        /// 退料申请，请求发送成功之后，库存即刻扣除，后续WMS反馈有问题时候再加回来
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task MaterialReturnAsync(MaterialReturnRequest request);
-       
+        Task MaterialReturnRequestAsync(MaterialReturnRequest request);
+        /// <summary>
+        /// 取消退料
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<bool> MaterialReturnCancelAsync(MaterialReturnRequest request);
+
     }
 }

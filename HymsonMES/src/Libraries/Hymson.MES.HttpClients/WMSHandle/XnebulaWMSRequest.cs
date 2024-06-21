@@ -40,12 +40,19 @@ namespace Hymson.MES.HttpClients
             return ("调用失败", false);
         }
 
-        public Task MaterialPickingCancelAsync(MaterialPickingRequest request)
+        
+
+        Task<bool> IWMSRequest.MaterialPickingCancelAsync(MaterialPickingRequest request)
         {
             throw new NotImplementedException();
         }
 
-        public Task MaterialReturnAsync(MaterialReturnRequest request)
+        public Task MaterialReturnRequestAsync(MaterialReturnRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> MaterialReturnCancelAsync(MaterialReturnRequest request)
         {
             throw new NotImplementedException();
         }
