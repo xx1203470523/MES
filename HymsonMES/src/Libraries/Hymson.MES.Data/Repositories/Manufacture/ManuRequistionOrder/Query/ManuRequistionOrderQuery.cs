@@ -22,5 +22,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 工厂
         /// </summary>
         public long SiteId { get; set; }
+        public string WorkOrder { get; set; }
     }
 }

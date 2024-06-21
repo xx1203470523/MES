@@ -610,10 +610,10 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     /// </summary>
     public record PickMaterialsRequest : BaseEntityDto
     {
-        /// <summary>
-        /// 仓库编码
-        /// </summary>
-        public string WarehouseCode { get; set; }
+        ///// <summary>
+        ///// 仓库编码
+        ///// </summary>
+        //public string WarehouseCode { get; set; }
 
         /// <summary>
         /// 派工单编码
@@ -625,10 +625,27 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public int Qty { get; set; }
         
+        ///// <summary>
+        ///// 领料申请类型 0：工单领料，1：工单补料
+        ///// </summary>
+        //public ManuRequistionTypeEnum  ManuRequistionType { get; set; }
+
+    }
+    /// <summary>
+    /// 派工单领料申请
+    /// </summary>
+    public record PickMaterialsCancel : BaseEntityDto
+    {
         /// <summary>
-        /// 领料申请类型 0：工单领料，1：工单补料
+        /// 派工单编码
         /// </summary>
-        public ManuRequistionTypeEnum  ManuRequistionType { get; set; }
+        public string WorkCode { get; set; }
+        /// <summary>
+        /// 领料单Id
+        /// </summary>
+        public long RequistionOrderId { get; set; }
+
+
 
     }
 }

@@ -1146,15 +1146,19 @@ namespace Hymson.MES.Services.Services.Warehouse
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
                 Status = WhWarehouseRequistionStatusEnum.Approvaling,
-                Type = request.ManuRequistionType,
+                Type =  ManuRequistionTypeEnum.WorkOrderPicking,
                 WorkOrderCode = request.WorkCode,
             };
+            //根据BOM计算领料明细
+            
+            //获取派工单指定BOM记录
             
             //下达WMS领料申请
-            var response = await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.Print.MaterialPickingRequest
+            var response = await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.Print.MaterialPickingRequestDto
             {
-                sendOn = HymsonClock.Now().ToString(),
                 syncCode = $"{request.WorkCode}_{manuRequistionOrderEntity.Id}",
+                sendOn = HymsonClock.Now().ToString(),
+                details = new List<HttpClients.Requests.Print.ProductionPickMaterialDto>()
             });
             if(response.result)
             {
@@ -1167,6 +1171,12 @@ namespace Hymson.MES.Services.Services.Warehouse
 
 
 
+        }
+
+        public async Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request)
+        {
+            await _manuRequistionOrderRepository.GetByCodeAsync();
+            throw new NotImplementedException();
         }
     }
 }

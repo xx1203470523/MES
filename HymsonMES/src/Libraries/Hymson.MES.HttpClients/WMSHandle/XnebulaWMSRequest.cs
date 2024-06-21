@@ -17,15 +17,19 @@ namespace Hymson.MES.HttpClients
             _options = options.Value;
         }
 
-        public async Task<(string msg,bool result)> MaterialPickingRequestAsync(MaterialPickingRequest request)
+        public async Task<(string msg,bool result)> MaterialPickingRequestAsync(MaterialPickingRequestDto request)
         {
-            string api = "Delivery/create";
-            if(!string.IsNullOrEmpty(_options.MaterialPickingRequestUrl.Trim()))
+            
+            MaterialPickingRequest materialPickingRequest = new MaterialPickingRequest()
             {
-                api = _options.MaterialPickingRequestUrl.Trim();
-            }
-            request.warehouseCode = _options.WarehouseCode;
-            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(api, request);
+                sendOn = request.sendOn,
+                syncCode = request.syncCode,
+                details = request.details,
+                type = _options.DeliveryOptions.Type,
+                warehouseCode = _options.DeliveryOptions.WarehouseCode
+            };
+           
+            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(_options.DeliveryOptions.RoutePath, materialPickingRequest);
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {
@@ -42,7 +46,7 @@ namespace Hymson.MES.HttpClients
 
         
 
-        Task<bool> IWMSRequest.MaterialPickingCancelAsync(MaterialPickingRequest request)
+        public Task<bool> MaterialPickingCancelAsync(MaterialPickingCancelDto request)
         {
             throw new NotImplementedException();
         }

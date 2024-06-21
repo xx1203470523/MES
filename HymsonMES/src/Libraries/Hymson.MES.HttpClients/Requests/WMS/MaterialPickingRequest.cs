@@ -11,7 +11,7 @@ namespace Hymson.MES.HttpClients.Requests.Print
     /// <summary>
     /// 生产领料申请单
     /// </summary>
-    public record MaterialPickingRequest
+    internal record MaterialPickingRequest
     {
         /// <summary>
         /// 仓库编号
@@ -30,6 +30,30 @@ namespace Hymson.MES.HttpClients.Requests.Print
         /// 领料信息
         /// </summary>
         public List<ProductionPickMaterialDto> details { get; set; }
+    }
+    public record MaterialPickingRequestDto
+    {
+        
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        public string syncCode { get; set; }
+        /// <summary>
+        /// 下发日期
+        /// </summary>
+        public string sendOn { get; set; }
+        /// <summary>
+        /// 领料信息
+        /// </summary>
+        public List<ProductionPickMaterialDto> details { get; set; }
+    }
+    public record MaterialPickingCancelDto
+    {
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        public string syncCode { get; set; }
+       
     }
 
     public class ProductionPickMaterialDto
