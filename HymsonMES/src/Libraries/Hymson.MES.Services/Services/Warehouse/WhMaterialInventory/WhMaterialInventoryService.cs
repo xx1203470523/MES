@@ -1149,7 +1149,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 Type =  ManuRequistionTypeEnum.WorkOrderPicking,
                 WorkOrderCode = request.WorkCode,
             };
-            //根据BOM计算领料明细
+            //根据BOM计算领料明细 ：TODO
             
             //获取派工单指定BOM记录
             
@@ -1176,6 +1176,16 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request)
         {
            // await _manuRequistionOrderRepository.GetByCodeAsync();
+            throw new NotImplementedException();
+        }
+
+        public Task MaterialReturnRequestAsync(MaterialReturnRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request)
+        {
             throw new NotImplementedException();
         }
     }

@@ -149,6 +149,18 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="request"></param>
         /// <returns></returns>
         Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request);
+        /// <summary>
+        ///  领料申请
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task MaterialReturnRequestAsync(MaterialReturnRequest request);
+        /// <summary>
+        /// 取消领料
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request);
 
     }
 }

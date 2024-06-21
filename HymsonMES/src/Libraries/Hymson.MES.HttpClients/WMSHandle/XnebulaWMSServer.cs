@@ -22,11 +22,11 @@ namespace Hymson.MES.HttpClients
             
             MaterialPickingRequest materialPickingRequest = new MaterialPickingRequest()
             {
-                sendOn = request.sendOn,
-                syncCode = request.syncCode,
-                details = request.details,
-                type = _options.DeliveryOptions.Type,
-                warehouseCode = _options.DeliveryOptions.WarehouseCode
+                SendOn = request.sendOn,
+                SyncCode = request.syncCode,
+                Details = request.details,
+                Type = _options.DeliveryOptions.Type,
+                WarehouseCode = _options.DeliveryOptions.WarehouseCode
             };
            
             var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(_options.DeliveryOptions.RoutePath, materialPickingRequest);
