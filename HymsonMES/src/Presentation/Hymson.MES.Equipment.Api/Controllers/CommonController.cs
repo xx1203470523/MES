@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Concurrent;
 using System.Net;
+using System.Reflection;
 
 namespace Hymson.MES.Equipment.Api.Controllers
 {
@@ -44,7 +45,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
                 ips.Add("IP Address: " + ip.ToString());
             }
             var hostName = Dns.GetHostName();
-            return Ok(new { caches, ips, hostName });
+            return Ok(new { caches, ips, hostName, Assembly.GetEntryAssembly()?.GetName().Version });
         }
 
         /// <summary>
@@ -76,7 +77,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public IActionResult Remove(string key)
         {
             _memoryCache.Remove(key);
-            return Ok();
+            return Ok(Assembly.GetEntryAssembly()?.GetName().Version);
 
         }
 
@@ -90,7 +91,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public IActionResult Clear()
         {
             _memoryCache.RemoveCacheRegex("&");
-            return Ok();
+            return Ok(Assembly.GetEntryAssembly()?.GetName().Version);
 
         }
 

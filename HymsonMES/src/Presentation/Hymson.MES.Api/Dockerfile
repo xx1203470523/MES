@@ -11,7 +11,8 @@ COPY ["HymsonMES/", "HymsonMES/"]
 FROM build AS publish
 ARG PublishEnvironment
 RUN echo ${PublishEnvironment}
-RUN dotnet publish "HymsonMES/src/Presentation/Hymson.MES.Api/Hymson.MES.Api.csproj" -c ${PublishEnvironment} --runtime linux-x64 --no-self-contained -o /app/publish /p:UseAppHost=false
+RUN $version=date "+%y%m%d.%H.%M.%S"
+RUN dotnet publish -p:Version=$(date "+%H.%M.%S.%Y+%m%d") "HymsonMES/src/Presentation/Hymson.MES.Api/Hymson.MES.Api.csproj" -c ${PublishEnvironment} --runtime linux-x64 --no-self-contained -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
