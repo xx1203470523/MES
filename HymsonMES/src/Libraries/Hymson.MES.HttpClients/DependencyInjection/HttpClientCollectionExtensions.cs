@@ -28,7 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             var wmsOptions = new WMSOptions();
             configuration.GetSection("WMSOptions").Bind(wmsOptions);
-            services.AddHttpClient<IWMSRequest, XnebulaWMSRequest>().ConfigureHttpClient(httpClient =>
+            services.AddHttpClient<IWMSServer, XnebulaWMSRequest>().ConfigureHttpClient(httpClient =>
             {
                 httpClient.BaseAddress = new Uri(wmsOptions.BaseAddressUri);
             });

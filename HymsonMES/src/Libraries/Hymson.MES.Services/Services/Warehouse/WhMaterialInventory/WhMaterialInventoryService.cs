@@ -78,7 +78,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
-        private readonly IWMSRequest _wmsRequest;
+        private readonly IWMSServer _wmsRequest;
 
         /// <summary>
         /// 构造函数
@@ -113,7 +113,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IManuGenerateBarcodeService manuGenerateBarcodeService,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
-            IWMSRequest wMSRequest,
+            IWMSServer wMSRequest,
             IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _currentUser = currentUser;
