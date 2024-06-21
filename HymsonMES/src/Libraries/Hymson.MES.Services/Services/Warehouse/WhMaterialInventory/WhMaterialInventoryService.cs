@@ -1149,14 +1149,22 @@ namespace Hymson.MES.Services.Services.Warehouse
                 Type = request.ManuRequistionType,
                 WorkOrderCode = request.WorkCode,
             };
-            await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
+            
             //下达WMS领料申请
-            await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.Print.MaterialPickingRequest
+            var response = await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.Print.MaterialPickingRequest
             {
                 sendOn = HymsonClock.Now().ToString(),
                 syncCode = $"{request.WorkCode}_{manuRequistionOrderEntity.Id}",
-
             });
+            if(response.result)
+            {
+                await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
+            }
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16049)).WithData("msg", response.msg);
+            }
+
 
 
         }

@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.HttpClients.Requests.Print;
+using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
 
 namespace Hymson.MES.HttpClients
@@ -9,17 +10,37 @@ namespace Hymson.MES.HttpClients
     public class XnebulaWMSRequest : IWMSRequest
     {
         private readonly HttpClient _httpClient;
-        public XnebulaWMSRequest(HttpClient httpClient)
+        private readonly WMSOptions _options;
+        public XnebulaWMSRequest(HttpClient httpClient,IOptions<WMSOptions> options)
         {
             _httpClient = httpClient;
+            _options = options.Value;
+        }
+
+        public async Task<(string msg,bool result)> MaterialPickingRequestAsync(MaterialPickingRequest request)
+        {
+            string api = "Delivery/create";
+            if(!string.IsNullOrEmpty(_options.MaterialPickingRequestUrl.Trim()))
+            {
+                api = _options.MaterialPickingRequestUrl.Trim();
+            }
+            request.warehouseCode = _options.WarehouseCode;
+            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(api, request);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                //using var contentStream =
+                //    await httpResponseMessage.Content.ReadAsStreamAsync();
+
+                //var r = await System.Text.Json.JsonSerializer.DeserializeAsync
+                //    <PrintResponse>(contentStream);
+                //return (base64Str: r.Data, result: r.Success);
+                return ("调用成功", true);
+            }
+            return ("调用失败", false);
         }
 
         public Task MaterialPickingCancelAsync(MaterialPickingRequest request)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task MaterialPickingRequestAsync(MaterialPickingRequest request)
         {
             throw new NotImplementedException();
         }

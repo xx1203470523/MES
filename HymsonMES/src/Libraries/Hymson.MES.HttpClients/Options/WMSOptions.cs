@@ -11,6 +11,17 @@ namespace Hymson.MES.HttpClients
     /// </summary>
     public class WMSOptions
     {
+        /// <summary>
+        /// 基础路径
+        /// </summary>
         public string BaseAddressUri { get; set; } = "";
+        /// <summary>
+        /// 仓库编码
+        /// </summary>
+        public string WarehouseCode { get; set; }
+        /// <summary>
+        /// 领料单申请相对路径
+        /// </summary>
+        public string MaterialPickingRequestUrl { get; set; }
     }
 }
