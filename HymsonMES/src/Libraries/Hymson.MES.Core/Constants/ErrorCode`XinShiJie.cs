@@ -66,6 +66,21 @@
         public const string MES14130 = "物料在系统中不存在!";
         public const string MES14131 = "包装条码不能为空!";
         public const string MES14132 = "包装条码在系统中不存在!";
+        public const string MES14133 = "物料条码在系统中不存在!";
+        public const string MES14134 = "物料库存不足!";
+        public const string MES14135 = "工序在系统中不存在!";
+        public const string MES14136 = "替代料在系统中不存在!";
+        public const string MES14137 = "载具条码和包装条码重复,请更换条码!";
+        public const string MES14138 = "产品序列码在系统中不存在!";
+        public const string MES14139 = "载具条码和产品序列码重复,请更换条码!";
+        public const string MES14140 = "入库条码不能为空!";
+        public const string MES14141 = "物料条码找不到库存信息!";
+        public const string MES14142 = "工单{orderCode}已下达,不允许修改!";
+        public const string MES14143 = "物料条码在系统中已存在!";
+        public const string MES14144 = "Bom发料方式为不发料的产出工序必填!";
+        public const string MES14145 = "Bom发料方式不合法，请检查!";
+        public const string MES14146 = "工单{orderCode}的主物料编码+工序不能重复!";
+        public const string MES14147 = "工单{orderCode}的Bom {bomCode}主物料关联的替代物料不能重复!!";
         #endregion
 
         #region 跨工序时间 14200

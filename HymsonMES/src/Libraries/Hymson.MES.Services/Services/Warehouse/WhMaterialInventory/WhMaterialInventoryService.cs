@@ -27,6 +27,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using System.Transactions;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.HttpClients;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -64,7 +65,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
         private readonly AbstractValidator<MaterialBarCodeSplitAdjustDto> _validationBarCodeSplitAdjust;
-
+        private readonly AbstractValidator<PickMaterialsRequest> _validationPickMaterialsRequest;
         private readonly IWhMaterialInventoryCoreService _whMaterialInventoryCoreService;
         //条码生成
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
@@ -76,6 +77,8 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// 条码关系
         /// </summary>
         private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
+        private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
+        private readonly IWMSRequest _wmsRequest;
 
         /// <summary>
         /// 构造函数
@@ -103,11 +106,14 @@ namespace Hymson.MES.Services.Services.Warehouse
             AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
             AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules,
             AbstractValidator<MaterialBarCodeSplitAdjustDto> validationBarCodeSplitAdjust,
+            AbstractValidator<PickMaterialsRequest> validationPickMaterialsRequest,
             IWhMaterialInventoryCoreService whMaterialInventoryCoreService,
             IInteCodeRulesRepository inteCodeRulesRepository,
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
             IManuGenerateBarcodeService manuGenerateBarcodeService,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IManuRequistionOrderRepository manuRequistionOrderRepository,
+            IWMSRequest wMSRequest,
             IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _currentUser = currentUser;
@@ -128,6 +134,9 @@ namespace Hymson.MES.Services.Services.Warehouse
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
+            _validationPickMaterialsRequest = validationPickMaterialsRequest;
+            _manuRequistionOrderRepository = manuRequistionOrderRepository;
+            _wmsRequest = wMSRequest;
         }
 
 
@@ -1104,10 +1113,60 @@ namespace Hymson.MES.Services.Services.Warehouse
         {
             return number != Math.Truncate(number);
         }
-
-        public Task<WhMaterialInventoryPickDto> WhMaterialInventoryPick(string workorder, int qty)
+        /// <summary>
+        /// 派工单领料
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task PickMaterialsRequestAsync(PickMaterialsRequest request)
         {
-            throw new NotImplementedException();
+            //验证DTO
+            await _validationPickMaterialsRequest.ValidateAndThrowAsync(request);
+            //派工单校验
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
+             {
+                 SiteId = _currentSite.SiteId??0,
+                 OrderCode = request.WorkCode,
+             });
+            if(planWorkOrderEntity != null) {
+                if(planWorkOrderEntity.Status== PlanWorkOrderStatusEnum.Finish)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16048)).WithData("WorkOrder", request.WorkCode);
+                }
+            }
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", request.WorkCode);
+            }
+
+            //创建领料申请单
+            ManuRequistionOrderEntity manuRequistionOrderEntity = new ManuRequistionOrderEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                Status = WhWarehouseRequistionStatusEnum.Approvaling,
+                Type = request.ManuRequistionType,
+                WorkOrderCode = request.WorkCode,
+            };
+            
+            //下达WMS领料申请
+            var response = await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.Print.MaterialPickingRequest
+            {
+                sendOn = HymsonClock.Now().ToString(),
+                syncCode = $"{request.WorkCode}_{manuRequistionOrderEntity.Id}",
+            });
+            if(response.result)
+            {
+                await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
+            }
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16049)).WithData("msg", response.msg);
+            }
+
+
+
         }
     }
 }

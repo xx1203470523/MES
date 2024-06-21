@@ -18,14 +18,19 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddHttpClientService(this IServiceCollection services, IConfiguration configuration)
         {
-
-
            
-            var printOptions = new PrintOptions();
-            configuration.GetSection("PrintOptions").Bind(printOptions);
-            services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
+            //var printOptions = new PrintOptions();
+            //configuration.GetSection("PrintOptions").Bind(printOptions);
+            //services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
+            //{
+            //    httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
+            //});
+
+            var wmsOptions = new WMSOptions();
+            configuration.GetSection("WMSOptions").Bind(wmsOptions);
+            services.AddHttpClient<IWMSRequest, XnebulaWMSRequest>().ConfigureHttpClient(httpClient =>
             {
-                httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
+                httpClient.BaseAddress = new Uri(wmsOptions.BaseAddressUri);
             });
 
             return services;

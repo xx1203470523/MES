@@ -4,9 +4,10 @@ using Hymson.MES.EquipmentServices.Dtos;
 
 using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
+using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.EquipmentServices.Services.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
-
+using Hymson.MES.EquipmentServices.Services.Qkny.Common;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
@@ -37,6 +38,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// 条码绑定
         /// </summary>
         private readonly ISfcBindingService _sfcBindingService;
+        private readonly IEquCommonService _equCommonService;
+
 
         /// <summary>
         /// 构造函数
@@ -46,13 +49,15 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="sfcBindingService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
             IManufactureService manufactureService,
-            IEquipmentCollectService equCommonService,
+            IEquCommonService equCommonService,
+            IEquipmentCollectService equipmentCollectService,
             ISfcBindingService sfcBindingService)
         {
             _logger = logger;
             _manufactureService = manufactureService;
             _sfcBindingService = sfcBindingService;
-            _equipmentService = equCommonService;
+            _equipmentService = equipmentCollectService;
+            _equCommonService = equCommonService;
         }
 
 
@@ -238,6 +243,22 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<string> CreateGBCodeAsync(ManuMergeRequestDto request)
         {
             return await _manufactureService.MergeAsync(request);
+        }
+        /// <summary>
+        /// CCD文件上传完成006
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CcdFileUploadComplete")]
+        [LogDescription("CCD文件上传完成006", BusinessType.OTHER, "006", ReceiverTypeEnum.MES)]
+        public async Task CcdFileUploadCompleteAsync(CCDFileUploadCompleteDto dto)
+        {
+
+            await _equCommonService.CcdFileUploadCompleteAsync(dto);
+            //TODO
+            //1. 新增表 ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
+            //  明细和主表记录到一起
         }
 
     }

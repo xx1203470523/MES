@@ -1161,6 +1161,8 @@
         public const string MES16045 = "工单状态不合法！";
         public const string MES16046 = "工单状态不为未开始，不能编辑！";
         public const string MES16047 = "条码{SFC}超过最大复投次数{Cycle}，当前复投次数{RepeatedCount}，不允许生产！";
+        public const string MES16048 = "工单【{WorkOrder}】已完成,不允许申请领料。";
+        public const string MES16049 = "领料单申请失败,错误原因：【{msg}】。";
         #endregion
 
         #region 条码接收 16100

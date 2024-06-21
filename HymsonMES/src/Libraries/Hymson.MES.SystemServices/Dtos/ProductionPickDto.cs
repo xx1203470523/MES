@@ -13,14 +13,14 @@ namespace Hymson.MES.SystemServices.Dtos
     public record ProductionPickDto : BaseEntityDto
     {
         /// <summary>
-        /// ERP领料单据号
+        /// WMS领料出货单据号
         /// </summary>
-        public string ERPRequisitionOrder { get; set; }
+        public string WMSRequisitionOrder { get; set; }
 
         /// <summary>
-        /// 工单号
+        /// MES领料申请单号，格式：派工单code_领料申请单Id
         /// </summary>
-        public string OrderCode { get; set; }
+        public string RequistionId { get; set; }
 
         /// <summary>
         /// 领料信息
@@ -43,7 +43,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 物料版本
         /// </summary>
-        public string MaterialVersion { get; set; }
+        public string? MaterialVersion { get; set; }
 
         /// <summary>
         /// 物料条码
