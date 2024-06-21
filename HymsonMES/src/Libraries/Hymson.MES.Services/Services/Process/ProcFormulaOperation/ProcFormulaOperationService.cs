@@ -379,15 +379,17 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<PagedInfo<ProcFormulaOperationSetDto>> GetFormulaOperationConfigSetListAsync(ProcFormulaOperationSetPagedQueryDto pagedQueryDto)
         {
-            var setPageIndex= new ProcFormulaOperationSetPagedQuery()
+            var setPageIndex = new ProcFormulaOperationSetPagedQuery()
             {
                 FormulaOperationId = pagedQueryDto.FormulaOperationId,
                 PageSize = pagedQueryDto.PageSize,
-                PageIndex = pagedQueryDto.PageIndex
+                PageIndex = pagedQueryDto.PageIndex,
+                Code = pagedQueryDto.Code,
+                Name = pagedQueryDto.Name
             };
 
             var setDtos = await _procFormulaOperationSetRepository.GetPagedInfoAsync(setPageIndex);
-            
+
             // 实体到DTO转换 装载数据
             var dtos = setDtos.Data.Select(s => s.ToModel<ProcFormulaOperationSetDto>());
             return new PagedInfo<ProcFormulaOperationSetDto>(dtos, setDtos.PageIndex, setDtos.PageSize, setDtos.TotalCount);

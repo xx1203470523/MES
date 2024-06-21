@@ -95,12 +95,22 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 配方操作设置分页Dto
     /// </summary>
-    public class ProcFormulaOperationSetPagedQueryDto : PagerInfo 
-    { 
+    public class ProcFormulaOperationSetPagedQueryDto : PagerInfo
+    {
         /// <summary>
         /// 配方操作Id
         /// </summary>
-        public long? FormulaOperationId { get;set; }
+        public long? FormulaOperationId { get; set; }
+
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string? Name { get; set; }
     }
 
 }
