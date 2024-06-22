@@ -241,7 +241,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// 取消领料
         /// </summary>
         /// <param name="sfcs"></param>
-        [HttpPost("PickMaterialsRequest")]
+        [HttpPost("PickMaterialsCancel")]
         [LogDescription("取消领料", BusinessType.INSERT)]
         public async Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request)
         {

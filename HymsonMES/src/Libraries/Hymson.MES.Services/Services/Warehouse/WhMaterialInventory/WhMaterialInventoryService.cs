@@ -1247,7 +1247,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request)
         {
             var returnOrderEntity = await _manuReturnOrderRepository.GetByIdAsync(request.ReturnOrderId);
-            if (returnOrderEntity.Status == WhWarehouseRequistionStatusEnum.Approvaling)
+            if (returnOrderEntity.Status == WhWarehouseReturnStatusEnum.Approvaling)
             {
                 var response = await _wmsRequest.MaterialReturnCancelAsync(new HttpClients.Requests.MaterialReturnCancelDto
                 {

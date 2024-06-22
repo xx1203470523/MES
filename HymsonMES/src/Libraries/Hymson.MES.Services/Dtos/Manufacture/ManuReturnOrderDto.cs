@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -25,17 +26,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 退料单类型0:工单退料 1:工单借料
         /// </summary>
-        public bool Type { get; set; }
+        public int Type { get; set; }
 
        /// <summary>
         /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
         /// </summary>
-        public bool Status { get; set; }
+        public WhWarehouseReturnStatusEnum Status { get; set; }
 
-       /// <summary>
-        /// 
-        /// </summary>
-        public int Qty { get; set; }
+      
 
        /// <summary>
         /// 物料描述
@@ -103,17 +101,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 退料单类型0:工单退料 1:工单借料
         /// </summary>
-        public bool Type { get; set; }
-
-       /// <summary>
-        /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
-        /// </summary>
-        public bool Status { get; set; }
+        public int Type { get; set; }
 
        /// <summary>
         /// 
         /// </summary>
-        public int Qty { get; set; }
+        public WhWarehouseReturnStatusEnum Status { get; set; }
+
+       
 
        /// <summary>
         /// 物料描述

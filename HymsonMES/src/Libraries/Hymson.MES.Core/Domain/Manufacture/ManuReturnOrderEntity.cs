@@ -14,7 +14,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 退料单据号
         /// </summary>
-        public string ReqOrderCode { get; set; }
+        public string? ReqOrderCode { get; set; }
 
        /// <summary>
         /// 工单id，工单借料情况下，接收物料的工单
@@ -29,12 +29,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
         /// </summary>
-        public WhWarehouseRequistionStatusEnum Status { get; set; }
-
-       /// <summary>
-        /// 
-        /// </summary>
-        public decimal Qty { get; set; }
+        public WhWarehouseReturnStatusEnum Status { get; set; }
 
        /// <summary>
         /// 物料描述
