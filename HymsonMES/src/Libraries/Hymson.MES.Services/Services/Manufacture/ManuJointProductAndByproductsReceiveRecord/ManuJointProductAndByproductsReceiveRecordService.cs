@@ -84,7 +84,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
         private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
 
         private readonly IMasterDataService _masterDataService;
-       
+
 
         /// <summary>
         /// 仓储接口（物料库存）
@@ -119,7 +119,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
             IProcBomDetailRepository procBomDetailRepository, IInteCodeRulesRepository inteCodeRulesRepository,
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository, IManuGenerateBarcodeService manuGenerateBarcodeService,
             IMasterDataService masterDataService,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository, 
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
         {
             _inteCodeRulesRepository = inteCodeRulesRepository;
@@ -288,7 +288,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
 
                 jointProductList.Add(new JointProductResult()
                 {
-                    ProductId = procMaterial != null ? procMaterial.Id:0,
+                    ProductId = procMaterial != null ? procMaterial.Id : 0,
                     ProductCodeVersion = procMaterial != null ? procMaterial.MaterialCode + "/" + procMaterial.Version : "",
                     ProductName = procMaterial != null ? procMaterial.MaterialName : "",
                     ReceivedQty = receivedQty,
@@ -348,12 +348,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
                 ProductId = saveDto.ProductId,
                 CodeType = CodeRuleCodeTypeEnum.WorkshopInventory// CodeRuleCodeTypeEnum.ProcessControlSeqCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
-            var BatchQty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
+            var BatchQty = procMaterialEntity.Batch ?? 0;
             if (BatchQty == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
-            var qty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
+            var qty = procMaterialEntity.Batch ?? 0;
             // 读取基础数据
             var codeRulesMakeList = await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery
             {
@@ -390,7 +390,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
                     break;
                 case MaterialQuantityLimitEnum.OnlyOne:
                     var pattern = @"^[1-9]\d*$";
-                    if (!Regex.IsMatch($"{saveDto.Qty}", pattern)) 
+                    if (!Regex.IsMatch($"{saveDto.Qty}", pattern))
                         throw new CustomerValidationException(nameof(ErrorCode.MES16044));
                     decimal quotientOnlyOne = saveDto.Qty / 1;
                     string OnlyOneQty = "1";
@@ -442,7 +442,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
                             WorkOrderid = planWorkOrderEntity.Id,
                             ProductId = productId,
                             BarCode = sfc,
-                            Qty =decimal.Parse(itemList),
+                            Qty = decimal.Parse(itemList),
                             WarehouseId = saveDto.WarehouseId,
                             CreatedBy = _currentUser.UserName,
                             UpdatedBy = _currentUser.UserName
@@ -473,7 +473,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
                             MaterialName = procMaterialEntity.MaterialName,
                             MaterialVersion = procMaterialEntity.Version ?? "",
                             MaterialBarCode = sfc,
-                            Batch = procMaterialEntity.Batch,
+                            Batch = $"{procMaterialEntity.Batch}",
                             Quantity = decimal.Parse(itemList),
                             Unit = procMaterialEntity.Unit ?? "",
                             Type = WhMaterialInventoryTypeEnum.ManuComplete,
@@ -485,14 +485,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
                     }
                 }
             }
-           
+
             // 开启事务
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
 
             await _whMaterialInventoryRepository.InsertsAsync(whMaterialInventorieList);
             await _whMaterialStandingbookRepository.InsertsAsync(materialStandingbookList);
             await _manuJointProductAndByproductsReceiveRecordRepository.InsertRangeAsync(manuJointProductAndByproductsList);
-           
+
             trans.Complete();
 
             ManuJointProductAndByproductsReceiveRecordSaveResultDto manuJointProductAndByproducts = new ManuJointProductAndByproductsReceiveRecordSaveResultDto();

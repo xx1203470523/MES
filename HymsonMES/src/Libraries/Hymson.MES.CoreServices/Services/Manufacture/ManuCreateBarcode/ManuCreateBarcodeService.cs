@@ -4,6 +4,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -205,7 +206,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 CodeType = CodeRuleCodeTypeEnum.ProcessControlSeqCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
 
-            var batchQty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
+            var batchQty = procMaterialEntity.Batch ?? 0;
 
             if (batchQty == 0)
             {
@@ -217,7 +218,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 throw new CustomerValidationException(nameof(ErrorCode.MES16508));
             }
 
-            var discuss = (int)Math.Ceiling(param.Qty / (string.IsNullOrEmpty(procMaterialEntity.Batch) ? 1 : decimal.Parse(procMaterialEntity.Batch)));
+            var discuss = (int)Math.Ceiling(param.Qty / (procMaterialEntity.Batch ?? 1));
 
             var processRouteDetailNodeEntities = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(planWorkOrderEntity.ProcessRouteId);
             var processRouteDetailNodeEntity = processRouteDetailNodeEntities.FirstOrDefault(x => x.ProcedureId == param.ProcedureId);
@@ -276,7 +277,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
 
             foreach (var barCodeInfoBarCodes in barcodeList.Select(barCodeInfo => barCodeInfo.BarCodes))
             {
-                var batch = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
+                var batch = procMaterialEntity.Batch ?? 0; //string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
                 var qty = issQty > batch * barCodeInfoBarCodes.Count() ? batch : issQty / barCodeInfoBarCodes.Count();
 
                 foreach (var sfc in barCodeInfoBarCodes)
@@ -342,11 +343,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         WorkOrderId = planWorkOrderEntity.Id,
                         Qty = qty,
                         Operatetype = ManuSfcStepTypeEnum.Create,
-                        AfterOperationStatus=SfcStatusEnum.lineUp,
+                        AfterOperationStatus = SfcStatusEnum.lineUp,
                         RepeatedCount = 0,
                         IsRepair = TrueOrFalseEnum.No,
                         OperationProcedureId = param.ProcedureId,
-                        OperationResourceId= param.ResourceId,
+                        OperationResourceId = param.ResourceId,
                         CreatedBy = param.UserName,
                         UpdatedBy = param.UserName
                     };
@@ -779,7 +780,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 CodeType = CodeRuleCodeTypeEnum.ProcessControlSeqCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
 
-            var batchQty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
+            var batchQty = procMaterialEntity.Batch ?? 0; //string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
             if (batchQty == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
@@ -842,13 +843,13 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             {
                 foreach (var sfc in barCodeInfoBarCodes)
                 {
-                    qty = qty + (string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch));
+                    qty = qty + (procMaterialEntity.Batch ?? 0);
                     var manuSfcEntity = new ManuSfcEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = param.SiteId,
                         SFC = sfc,
-                        Qty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch),
+                        Qty = procMaterialEntity.Batch ?? 0, //string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch),
                         IsUsed = YesOrNoEnum.No,
                         Status = status,
                         CreatedBy = param.UserName!,
@@ -883,7 +884,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                         WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                         ProductBOMId = planWorkOrderEntity.ProductBOMId,
-                        Qty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch),
+                        Qty = procMaterialEntity.Batch ?? 0,
                         ProcedureId = procProcedureEntity.Id,
                         Status = status,
                         RepeatedCount = 0,
@@ -903,7 +904,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         ProductBOMId = planWorkOrderEntity.ProductBOMId,
                         ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                         WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                        Qty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch),
+                        Qty = procMaterialEntity.Batch ?? 0,
                         ProcedureId = procProcedureEntity.Id,
                         Operatetype = ManuSfcStepTypeEnum.Create,
                         CurrentStatus = SfcStatusEnum.lineUp,
@@ -925,7 +926,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                                 ProductBOMId = planWorkOrderEntity.ProductBOMId,
                                 ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                                 WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                                Qty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch),
+                                Qty = procMaterialEntity.Batch ?? 0,
                                 ProcedureId = procProcedureEntity.Id,
                                 Operatetype = ManuSfcStepTypeEnum.InStock,
                                 CurrentStatus = SfcStatusEnum.lineUp,
@@ -1058,7 +1059,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 CodeType = CodeRuleCodeTypeEnum.ProcessControlSeqCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", mo.MaterialCode);
 
-            var mobatch = string.IsNullOrEmpty(mo.Batch) ? 0 : decimal.Parse(mo.Batch);
+            var mobatch = mo.Batch ?? 0;
 
             //这些取的是半成品的物料批次信息
             if (mobatch <= 0)
@@ -1116,7 +1117,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         Id = sfcId,
                         SiteId = param.SiteId,
                         SFC = sfc,
-                        Qty = string.IsNullOrEmpty(mo.Batch) ? 0 : decimal.Parse(mo.Batch),
+                        Qty = mo.Batch ?? 0,
                         IsUsed = YesOrNoEnum.No,
                         Status = SfcStatusEnum.lineUp,
                         CreatedBy = param.UserName,
@@ -1148,7 +1149,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                         ProductBOMId = planWorkOrderEntity.ProductBOMId,
                         //Qty = mo.Batch ?? 0,
-                        Qty = string.IsNullOrEmpty(mo.Batch) ? 0 : decimal.Parse(mo.Batch),
+                        Qty = mo.Batch ?? 0,
                         ProcedureId = procedureId,
                         Status = SfcStatusEnum.lineUp,
                         RepeatedCount = 0,
@@ -1167,7 +1168,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         ProductBOMId = planWorkOrderEntity.ProductBOMId,
                         ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                         WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                        Qty = string.IsNullOrEmpty(mo.Batch) ? 0 : decimal.Parse(mo.Batch),
+                        Qty = mo.Batch ?? 0, //string.IsNullOrEmpty(mo.Batch) ? 0 : decimal.Parse(mo.Batch),
                         ProcedureId = procedureId,
                         Operatetype = ManuSfcStepTypeEnum.Create,
                         CurrentStatus = SfcStatusEnum.lineUp,
