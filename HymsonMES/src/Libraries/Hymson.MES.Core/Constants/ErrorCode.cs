@@ -90,6 +90,7 @@
         public const string MES10240 = "消耗系数需大于0！";
         public const string MES10241 = "物料只能选择一条数据";
         public const string MES10242 = "物料绑定的模板ID以存在";
+        public const string MES10243 = "BOM物料Id【{MaterialId}】所属物料不存在！";
         #endregion
 
         #region 资源 10300

@@ -28,6 +28,7 @@ using System.Transactions;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.HttpClients;
+using FluentValidation.Results;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -48,6 +49,8 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// 物料维护 仓储
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IProcBomRepository _procBomRepository;
+        private readonly IProcBomDetailRepository _procBomDetailRepository;
 
         /// <summary>
         /// 物料库存 仓储
@@ -78,6 +81,8 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
+        private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
+        private readonly IManuReturnOrderDetailRepository _manuReturnOrderDetailRepository;
         private readonly IWMSServer _wmsRequest;
 
         /// <summary>
@@ -114,6 +119,10 @@ namespace Hymson.MES.Services.Services.Warehouse
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
             IWMSServer wMSRequest,
+            IProcBomRepository procBomRepository,
+            IProcBomDetailRepository procBomDetailRepository,
+            IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
+            IManuReturnOrderRepository manuReturnOrderRepository,
             IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _currentUser = currentUser;
@@ -137,6 +146,10 @@ namespace Hymson.MES.Services.Services.Warehouse
             _validationPickMaterialsRequest = validationPickMaterialsRequest;
             _manuRequistionOrderRepository = manuRequistionOrderRepository;
             _wmsRequest = wMSRequest;
+            _procBomRepository = procBomRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _manuReturnOrderDetailRepository = manuReturnOrderDetailRepository;
+            _manuReturnOrderRepository  = manuReturnOrderRepository;
         }
 
 
@@ -1150,15 +1163,51 @@ namespace Hymson.MES.Services.Services.Warehouse
                 WorkOrderCode = request.WorkCode,
             };
             //根据BOM计算领料明细 ：TODO
-            
+
             //获取派工单指定BOM记录
-            
+           
+            var bomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrderEntity.ProductBOMId);
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(bomDetailEntities.Select(b=>b.MaterialId).Distinct().ToArray());
+            var productionPickMaterialDtos = new List<HttpClients.Requests.ProductionPickMaterialDto>();
+            var validationFailures = new List<ValidationFailure>();
+            foreach (var item in bomDetailEntities)
+            {
+                var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
+                if (materialEntity == null)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", item.MaterialId } };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialId);
+                    }
+                    validationFailure.FormattedMessagePlaceholderValues.Add("MaterialId", item.MaterialId);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES10243);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+
+                HttpClients.Requests.ProductionPickMaterialDto productionPickMaterialDto = new HttpClients.Requests.ProductionPickMaterialDto
+                {
+                    MaterialCode = materialEntity.MaterialCode,
+                    Quantity = (request.Qty * item.Usages*(1+item.Loss??0)).ToString(),
+                    UnitCode = materialEntity.Unit
+                };
+                productionPickMaterialDtos.Add(productionPickMaterialDto);
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException("", validationFailures);
+            }
             //下达WMS领料申请
-            var response = await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.Print.MaterialPickingRequestDto
+            var response = await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.MaterialPickingRequestDto
             {
                 syncCode = $"{request.WorkCode}_{manuRequistionOrderEntity.Id}",
                 sendOn = HymsonClock.Now().ToString(),
-                details = new List<HttpClients.Requests.Print.ProductionPickMaterialDto>()
+                details = productionPickMaterialDtos
             });
             if(response.result)
             {
@@ -1175,8 +1224,19 @@ namespace Hymson.MES.Services.Services.Warehouse
 
         public async Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request)
         {
-           // await _manuRequistionOrderRepository.GetByCodeAsync();
-            throw new NotImplementedException();
+            var requistionOrderEntity = await _manuRequistionOrderRepository.GetByIdAsync(request.RequistionOrderId);
+            if(requistionOrderEntity.Status == WhWarehouseRequistionStatusEnum.Approvaling)
+            {
+                var response = await _wmsRequest.MaterialPickingCancelAsync(new HttpClients.Requests.MaterialPickingCancelDto
+                {
+                    SyncCode = $"{request.WorkCode}_{request.RequistionOrderId}",
+                });
+                return response;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public Task MaterialReturnRequestAsync(MaterialReturnRequest request)
@@ -1184,9 +1244,21 @@ namespace Hymson.MES.Services.Services.Warehouse
             throw new NotImplementedException();
         }
 
-        public Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request)
+        public async Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request)
         {
-            throw new NotImplementedException();
+            var returnOrderEntity = await _manuReturnOrderRepository.GetByIdAsync(request.ReturnOrderId);
+            if (returnOrderEntity.Status == WhWarehouseRequistionStatusEnum.Approvaling)
+            {
+                var response = await _wmsRequest.MaterialReturnCancelAsync(new HttpClients.Requests.MaterialReturnCancelDto
+                {
+                    SyncCode = $"{request.WorkCode}_{request.ReturnOrderId}",
+                });
+                return response;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
