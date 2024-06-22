@@ -87,7 +87,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :批次大小 
         /// 空值 : true  
         /// </summary>
-        public string? Batch { get; set; }
+        public decimal? Batch { get; set; }
 
         /// <summary>
         /// 有效时间
@@ -163,6 +163,6 @@ namespace Hymson.MES.Core.Domain.Process
         /// <summary>
         /// 原材料类型
         /// </summary>
-        public MaterialTypeEnum? MaterialType { get; set;}
+        public MaterialTypeEnum? MaterialType { get; set; }
     }
 }

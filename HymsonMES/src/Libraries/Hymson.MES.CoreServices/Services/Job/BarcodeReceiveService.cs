@@ -12,7 +12,6 @@ using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
@@ -236,7 +235,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     if (material != null)
                     {
                         var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(material.MaterialId);
-                        qty = string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
+                        qty = procMaterialEntity.Batch ?? 0;    //string.IsNullOrEmpty(procMaterialEntity.Batch) ? 0 : decimal.Parse(procMaterialEntity.Batch);
                         if (qty == 0)
                         {
                             var validationFailure = new ValidationFailure();
@@ -403,7 +402,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Operatetype = ManuSfcStepTypeEnum.Receive,
                     CurrentStatus = SfcStatusEnum.lineUp,
                     OperationProcedureId = commonBo.ProcedureId,
-                    OperationResourceId= commonBo.ResourceId,
+                    OperationResourceId = commonBo.ResourceId,
                     CreatedBy = commonBo.UserName,
                     CreatedOn = commonBo.Time,
                     UpdatedBy = commonBo.UserName,

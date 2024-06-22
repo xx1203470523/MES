@@ -1446,7 +1446,7 @@ namespace Hymson.MES.Services.Services.Integrated
                         MaterialName = entity.MaterialName.Trim(),
                         GroupId = 0,
                         Version = entity.Version,
-                        Batch = entity.Batch,
+                        Batch = entity.Batch?.ParseToDecimal(0),
                         BuyType = entity.BuyType,
                         SerialNumber = entity.SerialNumber,
                         IsDefaultVersion = isDefaultVersion,
@@ -1469,7 +1469,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 {
                     materialEntity.MaterialName = entity.MaterialName.Trim();
                     materialEntity.Version = entity.Version;
-                    materialEntity.Batch = entity.Batch;
+                    materialEntity.Batch = entity.Batch?.ParseToDecimal(0);
                     materialEntity.BuyType = entity.BuyType;
                     materialEntity.SerialNumber = entity.SerialNumber;
                     materialEntity.IsDefaultVersion = isDefaultVersion;

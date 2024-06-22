@@ -1789,7 +1789,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var material = await _procMaterialRepository.GetByIdAsync(productId);
             if (material != null && material.Batch != null)
             {
-                qty = string.IsNullOrEmpty(material.Batch) ? 0 : decimal.Parse(material.Batch);
+                qty = material.Batch ?? 0;
             }
             return qty;
         }

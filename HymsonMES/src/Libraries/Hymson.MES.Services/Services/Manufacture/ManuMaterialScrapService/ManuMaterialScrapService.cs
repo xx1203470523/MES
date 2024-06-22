@@ -151,7 +151,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
             var validationFailures = new List<ValidationFailure>();
             List<WhMaterialInventoryScrapEntity> manuSfcScrapEntities = new();
             List<ManuSFCPartialScrapByIdCommand> manuSFCPartialScrapByIdCommandList = new();
-           
+
             List<WhMaterialStandingbookEntity> whMaterialStandingbookEntities = new();
             List<ScrapPartialWhMaterialInventoryByIdCommand> scrapPartialWhMaterialInventoryEmptyByIdCommandList = new();
             List<WhMaterialInventoryScrapNgRelationEntity> whMaterialInventoryScrapNgRelationEntitiesList = new List<WhMaterialInventoryScrapNgRelationEntity>();
@@ -289,7 +289,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     UpdatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentUser.UserName
                 });
-                
+
                 var materialEntity = materialList.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
 
                 // 新增 wh_material_standingbook
@@ -300,7 +300,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
                     MaterialName = materialEntity.MaterialName,
                     MaterialVersion = materialEntity.Version,
                     MaterialBarCode = barcodeItem.SFC ?? "",
-                    Batch = materialEntity.Batch,
+                    Batch = $"{materialEntity.Batch}",
                     Quantity = barcodeItem.Qty,
                     //ScrapQty=item.ScrapQuantity,
                     Unit = materialEntity.Unit ?? "",
@@ -410,7 +410,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcScrapservice
             }
 
             var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdAsync(manuSfcEntity.Id);
-           // var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
+            // var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity.ProductId);
             MaterialScrapBarCodeDto partialScrapBarCodeDto = new MaterialScrapBarCodeDto()
             {

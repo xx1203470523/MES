@@ -1,40 +1,22 @@
 ﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
+using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Job;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-
-using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.Snowflake;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Hymson.Utils;
-using Org.BouncyCastle.Asn1.Cmp;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using System.Runtime.Intrinsics.X86;
-
-using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
-using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.Data.Repositories.Warehouse;
-using FluentValidation.Results;
-using FluentValidation;
-using Hymson.Localization.Services;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
-using Hymson.MES.CoreServices.Bos.Common;
-using Hymson.EventBus.Abstractions;
-using Hymson.MES.Core.Attribute.Job;
-using Hymson.MES.Core.Enums.Job;
-using Hymson.MES.CoreServices.Services.Common;
-using Hymson.MES.Core.Constants.Process;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.Snowflake;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -115,7 +97,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 ResourceId = commonBo.ResourceId
             });
 
-        
+
 
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(planWorkOrderBindEntity.WorkOrderId);
 
@@ -149,13 +131,12 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseBo.manuSfcCirculationEntitys = manuSfcCirculationEntitys;
             foreach (var bo in commonBo.InStationRequestBos)
             {
-                BomMaterial? material = null;
                 decimal qty = 0;
 
                 var materialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
-                qty = string.IsNullOrEmpty(materialEntity.Batch) ? 0 : decimal.Parse(materialEntity.Batch);
+                qty = materialEntity.Batch ?? 0;    //string.IsNullOrEmpty(materialEntity.Batch) ? 0 : decimal.Parse(materialEntity.Batch);
                 var now = HymsonClock.Now();
-                //如果在制已经生成 跳过该条码的数据组装
+                // 如果在制已经生成 跳过该条码的数据组装
                 var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
                 {
                     Sfc = bo.SFC,
@@ -169,7 +150,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 (ManuSfcEntity manusfc, ManuSfcInfoEntity sfcinfo, ManuSfcProduceEntity sfcproduce, ManuSfcStepEntity? sfcstep) cellsfc = new();
                 cellsfc = CreateSFCProduceInfoFromCellSFC(planWorkOrderEntity, bo.SFC, commonBo.ProcedureId, commonBo, qty, SfcStatusEnum.lineUp);
                 cellsfc.sfcinfo.ProductId = productId;
-                cellsfc.sfcproduce.ProductId = productId;   
+                cellsfc.sfcproduce.ProductId = productId;
                 manusfcs.Add(cellsfc.manusfc);
                 sfcinfos.Add(cellsfc.sfcinfo);
                 sfcproduces.Add(cellsfc.sfcproduce);
@@ -178,9 +159,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBo.PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100);
                 responseBo.PassDownQuantity = responseBo.sfcproduces.Sum(x => x.Qty);
                 responseBo.UserName = commonBo.UserName;
-                
-              
-                //新条码 状态变更为开始
+
+                // 新条码 状态变更为开始
                 var manuSfcStepEntity = new ManuSfcStepEntity
                 {
                     Operatetype = ManuSfcStepTypeEnum.Create,
@@ -205,7 +185,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             return responseBo;
-
         }
 
         /// <summary>
@@ -274,7 +253,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 WorkOrderId = planWorkOrderEntity.Id,
                 ProductBOMId = planWorkOrderEntity.ProductBOMId,
                 WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                ProcessRouteId= planWorkOrderEntity.ProcessRouteId,
+                ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                 Qty = qty,
                 ProcedureId = procedureId,
                 Operatetype = ManuSfcStepTypeEnum.Create,
@@ -309,7 +288,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", data.WorkCode);
                 }
             }
-            
+
 
             //生成在制相关信息
 
