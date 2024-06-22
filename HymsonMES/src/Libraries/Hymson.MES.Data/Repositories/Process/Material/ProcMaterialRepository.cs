@@ -295,6 +295,28 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialEntity>> GetEntitiesAsync(ProcMaterialQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetProcMaterialEntitiesSqlTemplate);
+            sqlBuilder.Where(" IsDeleted = 0 ");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (query.MaterialIds != null && query.MaterialIds.Any())
+            {
+                sqlBuilder.Where(" Id IN @MaterialIds ");
+            }
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcMaterialEntity>(template.RawSql, query);
+        }
+
+        /// <summary>
         /// 根据Code查询对象
         /// </summary>
         /// <param name="query"></param>

@@ -24,15 +24,18 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("WMS审批成功")]
         ApprovalingSuccess = 3,
+
         /// <summary>
         /// 已收料
         /// </summary>
         [Description("已收料")]
-        Picked = 3,
+        Picked = 4,
+
         /// <summary>
         /// 取消领料
         /// </summary>
         [Description("取消领料")]
-        Cancel = 4
+        Cancel = 5
+
     }
 }

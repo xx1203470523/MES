@@ -5,6 +5,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Utils;
 
@@ -24,17 +25,33 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
 
         /// <summary>
+        /// 仓储接口（BOM）
+        /// </summary>
+        private readonly IProcBomRepository _procBomRepository;
+
+        /// <summary>
+        /// 仓储接口（物料）
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="planWorkPlanRepository"></param>
+        /// <param name="procBomRepository"></param>
+        /// <param name="procMaterialRepository"></param>
         public PlanWorkPlanService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IPlanWorkPlanRepository planWorkPlanRepository)
+            IPlanWorkPlanRepository planWorkPlanRepository,
+            IProcBomRepository procBomRepository,
+            IProcMaterialRepository procMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _planWorkPlanRepository = planWorkPlanRepository;
+            _procBomRepository = procBomRepository;
+            _procMaterialRepository = procMaterialRepository;
         }
 
 
@@ -77,13 +94,50 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<PagedInfo<PlanWorkPlanDto>> GetPageListAsync(PlanWorkPlanPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<PlanWorkPlanPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _planWorkPlanRepository.GetPagedInfoAsync(pagedQuery);
 
-            // TODO 这个应该在这里组装，不应该的DB查询全部数据，再直接转（看到了，但没时间改 -。-）
+            // 读取BOM
+            var bomIds = pagedInfo.Data.Select(s => s.BomId).Distinct();
+            var bomEntities = await _procBomRepository.GetEntitiesAsync(new ProcBomQuery
+            {
+                SiteId = pagedQuery.SiteId,
+                BomIds = bomIds
+            });
 
-            // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<PlanWorkPlanDto>());
+            // 读取物料
+            var materialIds = pagedInfo.Data.Select(s => s.ProductId).Distinct();
+            var materialEntities = await _procMaterialRepository.GetEntitiesAsync(new ProcMaterialQuery
+            {
+                SiteId = pagedQuery.SiteId,
+                MaterialIds = materialIds
+            });
+
+            List<PlanWorkPlanDto> dtos = new();
+            foreach (var dataItem in pagedInfo.Data)
+            {
+                var dto = dataItem.ToModel<PlanWorkPlanDto>();
+                if (dto == null) continue;
+
+                // 填充BOM
+                var bomEntity = bomEntities.FirstOrDefault(f => f.Id == dto.BomId);
+                if (bomEntity != null)
+                {
+                    dto.BomCode = bomEntity.BomCode;
+                    dto.BomName = bomEntity.BomName;
+                }
+
+                // 填充物料
+                var materialEntity = materialEntities.FirstOrDefault(f => f.Id == dto.ProductId);
+                if (materialEntity != null)
+                {
+                    dto.ProductCode = materialEntity.MaterialCode;
+                    dto.ProductName = materialEntity.MaterialName;
+                }
+
+                dtos.Add(dto);
+            }
+
             return new PagedInfo<PlanWorkPlanDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 

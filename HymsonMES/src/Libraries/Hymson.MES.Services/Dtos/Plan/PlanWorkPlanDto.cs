@@ -25,6 +25,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         public long ProductId { get; set; }
 
         /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string ProductCode { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string ProductName { get; set; }
+
+        /// <summary>
         /// 工作中心类型;和工作中心保持一致
         /// </summary>
         public WorkCenterTypeEnum? WorkCenterType { get; set; }
@@ -40,9 +50,19 @@ namespace Hymson.MES.Services.Dtos.Plan
         public long? ProcessRouteId { get; set; }
 
         /// <summary>
+        /// BOM编码
+        /// </summary>
+        public string BomCode { get; set; }
+
+        /// <summary>
+        /// BOM名称
+        /// </summary>
+        public string BomName { get; set; }
+
+        /// <summary>
         /// 产品bom
         /// </summary>
-        public long? ProductBOMId { get; set; }
+        public long? BomId { get; set; }
 
         /// <summary>
         /// 工单类型
