@@ -1,5 +1,6 @@
 ﻿
-using Hymson.MES.HttpClients.Requests.Print;
+
+using Hymson.MES.HttpClients.Requests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<bool> MaterialReturnCancelAsync(MaterialReturnRequest request);
+        Task<bool> MaterialReturnCancelAsync(MaterialReturnCancelDto request);
 
     }
 }

@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.HttpClients.Requests.Print
+namespace Hymson.MES.HttpClients.Requests
 {
     /// <summary>
     /// 生产领料申请单
@@ -67,17 +67,23 @@ namespace Hymson.MES.HttpClients.Requests.Print
         /// <summary>
         /// 物料编码
         /// </summary>
+        /// 
+        [JsonPropertyName("materialCode")]
         public string MaterialCode { get; set; }
 
         /// <summary>
-        /// 物料版本
+        /// 单位编号
         /// </summary>
-        public string unitCode { get; set; }
+        /// 
+        [JsonPropertyName("unitCode")]
+        public string UnitCode { get; set; }
 
         /// <summary>
         /// 物料条码
         /// </summary>
-        public string quantity { get; set; }
+        /// 
+        [JsonPropertyName("quantity")]
+        public string Quantity { get; set; }
 
     }
    

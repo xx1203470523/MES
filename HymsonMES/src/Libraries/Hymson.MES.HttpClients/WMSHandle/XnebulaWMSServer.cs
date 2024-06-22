@@ -1,4 +1,4 @@
-﻿using Hymson.MES.HttpClients.Requests.Print;
+﻿using Hymson.MES.HttpClients.Requests;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
 
@@ -25,11 +25,11 @@ namespace Hymson.MES.HttpClients
                 SendOn = request.sendOn,
                 SyncCode = request.syncCode,
                 Details = request.details,
-                Type = _options.DeliveryOptions.Type,
-                WarehouseCode = _options.DeliveryOptions.WarehouseCode
+                Type = _options.Delivery.Type,
+                WarehouseCode = _options.Delivery.WarehouseCode
             };
            
-            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(_options.DeliveryOptions.RoutePath, materialPickingRequest);
+            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(_options.Delivery.RoutePath, materialPickingRequest);
 
             if (httpResponseMessage.IsSuccessStatusCode)
             {
@@ -56,7 +56,7 @@ namespace Hymson.MES.HttpClients
             throw new NotImplementedException();
         }
 
-        public Task<bool> MaterialReturnCancelAsync(MaterialReturnRequest request)
+        public Task<bool> MaterialReturnCancelAsync(MaterialReturnCancelDto request)
         {
             throw new NotImplementedException();
         }

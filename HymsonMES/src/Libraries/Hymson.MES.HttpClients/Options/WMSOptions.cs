@@ -18,13 +18,13 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 出库操作配置
         /// </summary>
-        public WMSDeliveryOptions DeliveryOptions { get; set; }
-        public WMSDeliveryCancelOptions DeliveryCancelOptions { get; set; }
+        public WMSDeliveryOptions Delivery { get; set; }
+        public WMSDeliveryCancelOptions DeliveryCancel { get; set; }
         /// <summary>
         /// 入库操作配置
         /// </summary>
-        public WMSReceiptOptions ReceiptOptions { get; set; }
-        public WMSReceiptCancelOptions ReceiptCancelOptions { get; set; }
+        public WMSReceiptOptions Receipt { get; set; }
+        public WMSReceiptCancelOptions ReceiptCancel { get; set; }
     }
     /// <summary>
     /// 出库单操作
