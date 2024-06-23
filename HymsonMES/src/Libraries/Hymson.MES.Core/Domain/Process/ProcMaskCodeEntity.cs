@@ -32,6 +32,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string Remark { get; set; } = "";
+
+         /// <summary>
+        /// 描述 :掩码 
+        /// 空值 : false  
+        /// </summary>
+        public string MaskCode { get; set; }
     }
 
     /// <summary>

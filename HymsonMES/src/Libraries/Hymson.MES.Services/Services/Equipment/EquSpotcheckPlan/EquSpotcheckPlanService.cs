@@ -314,8 +314,8 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             if (equSpotcheckPlanModifyDto.FirstExecuteTime < equSpotcheckPlanModifyDto.BeginTime || equSpotcheckPlanModifyDto.FirstExecuteTime > equSpotcheckPlanModifyDto.EndTime)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
-            }
-            if (!equSpotcheckPlanModifyDto.CompletionHour.HasValue && !equSpotcheckPlanModifyDto.CompletionHour.HasValue)
+            } 
+            if (!equSpotcheckPlanModifyDto.CompletionHour.HasValue && !equSpotcheckPlanModifyDto.CompletionMinute.HasValue)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12323));
             }

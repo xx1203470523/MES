@@ -117,6 +117,7 @@ using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.EquSparepartInventory;
 using Hymson.MES.Data.Repositories.Equipment.View;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteBusinessField.View;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -651,14 +652,19 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region InteBusinessField
-            CreateMap<InteBusinessFieldEntity, InteBusinessFieldSaveDto>();
+            CreateMap<InteBusinessFieldSaveDto, InteBusinessFieldEntity>();
             CreateMap<InteBusinessFieldPagedQueryDto, InteBusinessFieldPagedQuery>();
+            CreateMap<InteBusinessFieldEntity, InteBusinessFieldDto>();
+            CreateMap<InteBusinessFieldEntity, MaskInfoViewDto>();
+            CreateMap<InteBusinessFieldListEntity, InteBusinessFieldListDto>();
+            CreateMap<InteBusinessFieldView, MaskInfoViewDto>();
 
             #endregion
 
             #region InteBusinessFieldDistribute
-            CreateMap<InteBusinessFieldDistributeEntity, InteBusinessFieldDistributeSaveDto>();
+            CreateMap<InteBusinessFieldDistributeSaveDto, InteBusinessFieldDistributeEntity>();
             CreateMap<InteBusinessFieldDistributePagedQueryDto, InteBusinessFieldDistributePagedQuery>();
+            CreateMap<InteBusinessFieldDistributeEntity, InteBusinessFieldDistributeDto>();
 
             #endregion
 

@@ -90,6 +90,8 @@
         public const string MES10240 = "消耗系数需大于0！";
         public const string MES10241 = "物料只能选择一条数据";
         public const string MES10242 = "物料绑定的模板ID以存在";
+        public const string MES10243 = "类型不合法！";
+        public const string MES10244 = "值来源不合法！";
         #endregion
 
         #region 资源 10300
@@ -2008,6 +2010,19 @@
         public const string MES19421 = "检验水准不能为空！";
         public const string MES19422 = "接收水准不能为空！";
         public const string MES19423 = "检验类型列表不能为空！";
+        #endregion
+
+        #region 数据字段定义 19600
+        public const string MES19424 = "一个列表只能有一个缺省标签！";
+        public const string MES19425 = "数据字段已被分配,不能删除！";
+        public const string MES19426 = "数据字段存在非法字符，只能输入数字,大写字母,下划线！";
+        public const string MES19427 = "数据字段已存在！";
+        public const string MES19428 = "数据字段不能为空！";
+        public const string MES19429 = "序号必须为正整数";
+        public const string MES19430 = "一个列表序号不能重复！";
+        public const string MES19431 = "数据字段{code}未设置掩码规则!";
+        public const string MES19432 = "数据字段：{code}不符合掩码规则，请检查配置";
+        public const string MES19433 = "数据字段已被分配，不允许删除!";
         #endregion
 
         #endregion
