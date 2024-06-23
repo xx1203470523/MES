@@ -23,7 +23,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// <summary>
         /// 是否启用  0 未启用 1启用
         /// </summary>
-        public decimal IsEnable { get; set; }
+        public bool IsEnable { get; set; }
 
         
     }

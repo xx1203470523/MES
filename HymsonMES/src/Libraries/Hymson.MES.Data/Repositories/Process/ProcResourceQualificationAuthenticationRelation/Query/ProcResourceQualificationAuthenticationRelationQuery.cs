@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Process.Query
     /// </summary>
     public class ProcResourceQualificationAuthenticationRelationQuery
     {
-    
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long? ResourceId { get; set; }
     }
 }

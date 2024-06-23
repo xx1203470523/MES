@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Dtos.Common;
@@ -166,6 +167,18 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
+        /// 获取资质认证设置
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Route("auth/{id}")]
+        [HttpGet]
+        public async Task<IEnumerable<ProcQualificationAuthenticationDto>> GetResourceAuthSetListAsync(long id)
+        {
+            return await _procResourceService.GetResourceAuthSetListAsync(id);
+        }
+
+        /// <summary>
         /// 添加资源数据
         /// </summary>
         /// <param name="parm"></param>
@@ -189,7 +202,7 @@ namespace Hymson.MES.Api.Controllers
         public async Task UpdateProcResourceAsync([FromBody] ProcResourceModifyDto parm)
         {
             await _procResourceService.UpdateProcResrouceAsync(parm);
-        }   
+        }
 
         /// <summary>
         /// 删除资源维护表

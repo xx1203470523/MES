@@ -129,6 +129,7 @@
         public const string MES10386 = "作业不能为空！";
         public const string MES10387 = "作业参数不能为空！";
         public const string MES10388 = "资源不存在！";
+        public const string MES10389 = $"关联资质中，重复配置资质认证!";
         #endregion
 
         #region 标签模板 10340

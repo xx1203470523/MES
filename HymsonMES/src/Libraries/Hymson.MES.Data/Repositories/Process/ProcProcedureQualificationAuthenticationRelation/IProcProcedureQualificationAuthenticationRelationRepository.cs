@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcProcedureQualificationAuthenticationRelationEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcProcedureQualificationAuthenticationRelationEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -53,12 +53,19 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByProcedureIdAsync(long id);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcProcedureQualificationAuthenticationRelationEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -72,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcProcedureQualificationAuthenticationRelationEntity>> GetEntitiesAsync(ProcProcedureQualificationAuthenticationRelationQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

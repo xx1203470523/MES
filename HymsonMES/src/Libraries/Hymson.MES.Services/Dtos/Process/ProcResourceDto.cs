@@ -209,6 +209,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
 
+       /// <summary>
+       /// 资质认证信息
+       /// </summary>
+        public List<ProcQualificationAuthenticationCreateDto> AuthSetList { get; set; }
     }
 
     /// <summary>
@@ -266,6 +270,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
 
+        /// <summary>
+        /// 资质认证信息
+        /// </summary>
+        public List<ProcQualificationAuthenticationCreateDto> AuthSetList { get; set; }
     }
 
     /// <summary>
@@ -294,5 +302,42 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 资源类型id
         /// </summary>
         public long? ResTypeId { get; set; }
+    }
+
+    public record ProcQualificationAuthenticationCreateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 资质认证Id
+        /// </summary>
+        public long AuthenticationId { get; set; }
+
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool IsEnable { get; set; } = false;
+
+    }
+
+    public record ProcQualificationAuthenticationDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 资质认证Id
+        /// </summary>
+        public long AuthenticationId { get; set; }
+
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool IsEnable { get; set; } = false;
+
+        /// <summary>
+        /// 资质认证编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 资质认证名称
+        /// </summary>
+        public string Name { get; set; }
     }
 }

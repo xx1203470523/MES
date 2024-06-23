@@ -13,7 +13,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// <summary>
         /// proc_resource资源id
         /// </summary>
-        public string ResourceId { get; set; }
+        public long ResourceId { get; set; }
 
         /// <summary>
         /// 资质Id inte_qualification_authentication的Id
@@ -23,7 +23,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// <summary>
         /// 是否启用  0 未启用 1启用
         /// </summary>
-        public decimal IsEnable { get; set; }
+        public bool IsEnable { get; set; }
 
         
     }
