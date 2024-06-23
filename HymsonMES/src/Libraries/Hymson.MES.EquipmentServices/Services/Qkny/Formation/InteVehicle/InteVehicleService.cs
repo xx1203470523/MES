@@ -164,7 +164,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             var dbBindSfc = (await _inteVehiceFreightStackRepository.GetBySfcListAsync(bindSfcQuery)).ToList();
             if (dbBindSfc != null && dbBindSfc.Count > 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45115));
+                string sfcListStr = string.Join(",", dbBindSfc.Select(m => m.BarCode).ToList());
+                throw new CustomerValidationException(nameof(ErrorCode.MES45115)).WithData("SfcList", string.Join(",", sfcListStr));
             }
 
             //托盘数量校验
