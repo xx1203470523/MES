@@ -270,7 +270,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         }
 
         /// <summary>
-        /// 电芯码下发033
+        /// 生成电芯码
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -297,6 +297,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
 
         /// <summary>
         /// 生成24位国标电芯码
+        /// 电芯码下发033
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -320,6 +321,34 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             param.ResourceId = equResModel.ResId;
 
             return await _manuCreateBarcodeService.CreateCellBarCodeBySfcAsync(param);
+        }
+
+        /// <summary>
+        /// 接收24位电芯码
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task Receive24GbCodeAsync(RecviceDxSfcDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
+            //1.1 获取工单
+            PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
+            //接收电芯码参数
+            ReceiveCellBarcodeBo param = new ReceiveCellBarcodeBo();
+            param.EquipmentId = equResModel.EquipmentId;
+            param.ResourceId = equResModel.ResId;
+            param.ProcedureId = equResModel.ProcedureId;
+            param.LineId = equResModel.LineId;
+            param.WorkOrderId = planEntity.Id;
+            param.ProductId = planEntity.ProductId;
+            param.BomId = planEntity.ProductBOMId;
+            param.ProcessRouteId = planEntity.ProcessRouteId;
+            param.SfcList = dto.SfcList;
+            param.SiteId = equResModel.SiteId;
+            param.UserName = dto.EquipmentCode;
+
+            await _manuCreateBarcodeService.ReceiveCellBarCodeBySfcAsync(param);
         }
 
         /// <summary>
@@ -364,6 +393,32 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
                 outStationRequestBo.OutStationUnqualifiedList = dto.NgList.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s });
             }
             outStationRequestBos.Add(outStationRequestBo);
+            //极组出站数据
+            foreach(var item in jzSfcList)
+            {
+                if(dto.JzIsOut == false) //决定极组是否出站
+                {
+                    continue;
+                }
+                var jzOutStationRequestBo = new OutStationRequestBo
+                {
+                    SFC = item,
+                    //电芯极组认为一样，即都合格或者都NG
+                    IsQualified = dto.Passed == 1
+                };
+                // 消耗条码
+                if (dto.BindFeedingCodeList != null && dto.BindFeedingCodeList.Any())
+                {
+                    outStationRequestBo.ConsumeList = dto.BindFeedingCodeList.Select(s => new OutStationConsumeBo { BarCode = s });
+                }
+                // 不合格代码，电芯极组认为一样
+                if (dto.NgList != null && dto.NgList.Any())
+                {
+                    outStationRequestBo.OutStationUnqualifiedList = dto.NgList.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s });
+                }
+                outStationRequestBos.Add(outStationRequestBo);
+            }
+
             outBo.OutStationRequestBos = outStationRequestBos;
 
             //产品过程参数

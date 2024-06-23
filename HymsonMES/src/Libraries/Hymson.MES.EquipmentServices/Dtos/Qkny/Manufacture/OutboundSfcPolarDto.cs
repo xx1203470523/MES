@@ -15,5 +15,10 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// 极组条码
         /// </summary>
         public string JzSfc { get; set; } = "";
+
+        /// <summary>
+        /// 极组是否出站
+        /// </summary>
+        public bool JzIsOut { get; set; } = false;
     }
 }

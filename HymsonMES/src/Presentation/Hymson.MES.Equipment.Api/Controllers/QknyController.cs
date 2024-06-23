@@ -1376,21 +1376,21 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// 生成24位国标码
+        /// 接收24位国标码
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("Create24DxCode")]
-        [LogDescription("生成24位国标码", BusinessType.OTHER, "Create24DxCode099", ReceiverTypeEnum.MES)]
-        public async Task<string> Create24DxCodeAsync(GenerateDxSfcDto dto)
+        [Route("Receive24DxCode099")]
+        [LogDescription("接收24位国标码", BusinessType.OTHER, "099", ReceiverTypeEnum.MES)]
+        public async Task Receive24DxCodeAsync(RecviceDxSfcDto dto)
         {
             if (IS_DEBUG)
             {
-                return "token";
+                return;
             }
 
-            return await _fitTogether.Create24GbCodeAsync(dto);
+            await _fitTogether.Receive24GbCodeAsync(dto);
         }
 
     }

@@ -1850,6 +1850,7 @@
         public const string MES19159 = "产出总数不等于良品数和NG数量之和";
         public const string MES19160 = "产出类型异常，参考如下：1制胶 2匀浆 3涂布 4辊分 5模切";
         public const string MES19161 = "报警等级异常，参考如下：L-提示不停机；M-提示停机；H-故障停机";
+        public const string MES19162 = "停机原因异常，参考如下：1-来料异常;2-工序堵料;3-设备维修;4-过程检验;5-质量异常;6-系统故障;7-环境异常;8-更换物料;9-生产准备;10-计划保养;11-工作休息;12-计划停产";
 
         #region 产品参数采集
         public const string MES19600 = "产品参数采集异常";

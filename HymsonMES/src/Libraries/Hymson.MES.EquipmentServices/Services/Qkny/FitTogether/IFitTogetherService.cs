@@ -62,5 +62,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<string> Create24GbCodeAsync(GenerateDxSfcDto dto);
+
+        /// <summary>
+        /// 接收24位电芯码
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task Receive24GbCodeAsync(RecviceDxSfcDto dto);
     }
 }

@@ -1443,5 +1443,148 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             return cellSFC;
         }
 
+        /// <summary>
+        /// 根据极组码生成电芯码
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task ReceiveCellBarCodeBySfcAsync(ReceiveCellBarcodeBo bo)
+        {
+            //查询电芯在制信息
+            var manuSfcProduceEntities = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
+            {
+                Sfcs = bo.SfcList,
+                SiteId = bo.SiteId
+            });
+            if (manuSfcProduceEntities != null && manuSfcProduceEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19009)).WithData("SFC", string.Join(',', bo.SfcList));
+            }
+
+            var workOrderId = bo.WorkOrderId;
+            var bomId = bo.BomId;
+            var productId = bo.ProductId;
+            var processRouteId = bo.ProcessRouteId;
+            var lineId = bo.LineId;
+
+            #region 组装数据
+
+            List<ManuSfcEntity> sfcList = new List<ManuSfcEntity>();
+            List<ManuSfcInfoEntity> sfcInfoList = new List<ManuSfcInfoEntity>();
+            List<ManuSfcProduceEntity> sfcProduceList = new List<ManuSfcProduceEntity>();
+            List<ManuSfcStepEntity> sfcStepList = new List<ManuSfcStepEntity>();
+            foreach(var item in bo.SfcList)
+            {
+                var sfcEntity = new ManuSfcEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = bo.SiteId,
+                    SFC = item,
+                    Qty = 1,
+                    IsUsed = YesOrNoEnum.Yes,
+                    Status = bo.IsInStock ? SfcStatusEnum.Activity : SfcStatusEnum.lineUp,
+                    Type = SfcTypeEnum.Produce,
+                    CreatedBy = bo.UserName,
+                    UpdatedBy = bo.UserName
+                };
+                sfcList.Add(sfcEntity);
+                var sfcInfoEntity = new ManuSfcInfoEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = bo.SiteId,
+                    SfcId = sfcEntity.Id,
+                    WorkOrderId = workOrderId,
+                    ProductId = productId,
+                    ProductBOMId = bomId,
+                    ProcessRouteId = processRouteId,
+                    IsUsed = true,
+                    CreatedBy = bo.UserName,
+                    UpdatedBy = bo.UserName
+                };
+                sfcInfoList.Add(sfcInfoEntity);
+                var sfcProduceEntity = new ManuSfcProduceEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = bo.SiteId,
+                    SFC = item,
+                    SFCId = sfcEntity.Id,
+                    ProductId = productId,
+                    WorkOrderId = workOrderId,
+                    BarCodeInfoId = sfcInfoEntity.Id,
+                    ResourceId = bo.ResourceId,
+                    EquipmentId = bo.EquipmentId,
+                    ProcessRouteId = processRouteId,
+                    WorkCenterId = lineId,
+                    ProductBOMId = bomId,
+                    Qty = 1,
+                    ProcedureId = bo.ProcedureId,
+                    Status = bo.IsInStock ? SfcStatusEnum.Activity : SfcStatusEnum.lineUp,
+                    RepeatedCount = 0,
+                    IsScrap = TrueOrFalseEnum.No,
+                    CreatedBy = bo.UserName,
+                    UpdatedBy = bo.UserName
+                };
+                sfcProduceList.Add(sfcProduceEntity);
+                //步骤表数据
+                var sfcStepEntities = new List<ManuSfcStepEntity>
+                {
+                    //电芯码下达步骤
+                    new ManuSfcStepEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = bo.SiteId,
+                        SFC = item,
+                        ProductId = productId,
+                        WorkOrderId = workOrderId,
+                        ProductBOMId = bomId,
+                        WorkCenterId = lineId,
+                        EquipmentId = bo.EquipmentId,
+                        ResourceId = bo.ResourceId,
+                        Qty = 1,
+                        ProcedureId = bo.ProcedureId,
+                        Operatetype = ManuSfcStepTypeEnum.Create,
+                        CurrentStatus = SfcStatusEnum.lineUp,
+                        CreatedBy = bo.UserName,
+                        UpdatedBy = bo.UserName
+                    }
+                };
+                if (bo.IsInStock)
+                {
+                    //电芯码进站步骤
+                    sfcStepEntities.Add(new ManuSfcStepEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = bo.SiteId,
+                        SFC = item,
+                        ProductId = productId,
+                        WorkOrderId = workOrderId,
+                        ProductBOMId = bomId,
+                        WorkCenterId = lineId,
+                        EquipmentId = bo.EquipmentId,
+                        ResourceId = bo.ResourceId,
+                        Qty = 1,
+                        ProcedureId = bo.ProcedureId,
+                        Operatetype = ManuSfcStepTypeEnum.InStock,
+                        CurrentStatus = SfcStatusEnum.lineUp,
+                        AfterOperationStatus = SfcStatusEnum.Activity,
+                        CreatedBy = bo.UserName,
+                        UpdatedBy = bo.UserName
+                    });
+                    sfcStepList.Add(sfcStepEntities[0]);
+                }
+            }
+            #endregion
+
+            //数据库操作
+            using var trans = TransactionHelper.GetTransactionScope();
+            await _manuSfcRepository.InsertRangeAsync(sfcList);
+            await _manuSfcInfoRepository.InsertsAsync(sfcInfoList);
+            await _manuSfcProduceRepository.InsertRangeAsync(sfcProduceList);
+            await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+            trans.Complete();
+
+        }
+
     }
 }

@@ -37,4 +37,15 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// </summary>
         public string Sfc { get; set; } = string.Empty;
     }
+
+    /// <summary>
+    /// 接收电芯码
+    /// </summary>
+    public record RecviceDxSfcDto : QknyBaseDto
+    {
+        /// <summary>
+        /// 电芯条码
+        /// </summary>
+        public List<string> SfcList { get; set; } = new List<string>();
+    }
 }
