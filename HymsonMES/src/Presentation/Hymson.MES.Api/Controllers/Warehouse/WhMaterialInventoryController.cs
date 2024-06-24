@@ -233,7 +233,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <param name="sfcs"></param>
         [HttpPost("PickMaterialsRequest")]
         [LogDescription("领料申请", BusinessType.INSERT)]
-        public async Task PickMaterialsRequestAsync(PickMaterialsRequest request)
+        public async Task PickMaterialsRequestAsync([FromBody] PickMaterialsRequest request)
         {
             await _whMaterialInventoryService.PickMaterialsRequestAsync(request);
         }
@@ -243,7 +243,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <param name="sfcs"></param>
         [HttpPost("PickMaterialsCancel")]
         [LogDescription("取消领料", BusinessType.INSERT)]
-        public async Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request)
+        public async Task<bool> PickMaterialsCancelAsync([FromBody] PickMaterialsCancel request)
         {
             return await _whMaterialInventoryService.PickMaterialsCancelAsync(request);
         }
@@ -253,7 +253,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <param name="sfcs"></param>
         [HttpPost("MaterialReturnRequest")]
         [LogDescription("退料申请", BusinessType.INSERT)]
-        public async Task MaterialReturnRequestAsync(MaterialReturnRequest request)
+        public async Task MaterialReturnRequestAsync([FromBody] MaterialReturnRequest request)
         {
             await _whMaterialInventoryService.MaterialReturnRequestAsync(request);
         }
@@ -263,7 +263,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <param name="sfcs"></param>
         [HttpPost("MaterialReturnCancel")]
         [LogDescription("取消退料", BusinessType.INSERT)]
-        public async Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request)
+        public async Task<bool> MaterialReturnCancelAsync([FromBody] MaterialReturnCancel request)
         {
             return await _whMaterialInventoryService.MaterialReturnCancelAsync(request);
         }

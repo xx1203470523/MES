@@ -31,19 +31,29 @@ namespace Hymson.MES.HttpClients.Requests
         /// 下发日期
         /// </summary>
         /// 
-        [JsonPropertyName("syncCode")]
+        [JsonPropertyName("sendOn")]
         public string SendOn { get; set; }
         /// <summary>
-        /// 领料信息
+        /// 退料信息
         /// </summary>
         /// 
         [JsonPropertyName("details")]
-        public List<ProductionReturnMaterialDto> Details { get; set; }
+        public List<ProductionReturnMaterialItemDto> Details { get; set; }
+    }
+    public record MaterialReturnRequestDto
+    {
+ 
+        public string SyncCode { get; set; }
+        
+       
+        public string SendOn { get; set; }
+        
+        public List<ProductionReturnMaterialItemDto> Details { get; set; }
     }
     /// <summary>
     /// 退料item
     /// </summary>
-    public record ProductionReturnMaterialDto
+    public record ProductionReturnMaterialItemDto
     {
         /// <summary>
         /// 物料编码
@@ -67,6 +77,33 @@ namespace Hymson.MES.HttpClients.Requests
         public string Quantity { get; set; }
 
     }
+
+    /// <summary>
+    /// 生产退料申请单
+    /// </summary>
+    public record MaterialReturnCancel
+    {
+        /// <summary>
+        /// 仓库编号
+        /// </summary>
+        [JsonPropertyName("warehouseCode")]
+        public string WarehouseCode { get; set; }
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        /// 
+        [JsonPropertyName("syncCode")]
+        public string SyncCode { get; set; }
+        [JsonPropertyName("type")]
+        public int Type { get; set; } = 101;
+        /// <summary>
+        /// 下发日期
+        /// </summary>
+        /// 
+        [JsonPropertyName("sendOn")]
+        public string SendOn { get; set; }
+
+    }
     /// <summary>
     /// 生产退料DTO
     /// </summary>
@@ -76,7 +113,7 @@ namespace Hymson.MES.HttpClients.Requests
         /// 同步单号
         /// </summary>
         public string SyncCode { get; set; }
-
+        public string SendOn { get; set; }
     }
 
 }
