@@ -133,7 +133,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         ///// <summary>
         ///// 请求时间  时间范围  数组
         ///// </summary>
-        public DateTime[]? TimeStamp { get; set; }
+        public DateTime[]? Timestamp { get; set; }
 
     }
 
