@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Microsoft.Extensions.Options;
 
@@ -86,6 +87,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByProcedureIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByProcedureIdSql, new { ProcedureId = id });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -116,6 +128,14 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Select("*");
+
+            if (query.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcProcedureQualificationAuthenticationRelationEntity>(template.RawSql, query);
         }
@@ -168,6 +188,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string DeleteSql = "UPDATE proc_procedure_qualification_authentication_relation SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE proc_procedure_qualification_authentication_relation SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteByProcedureIdSql = "delete from `proc_procedure_qualification_authentication_relation` WHERE ProcedureId = @ProcedureId ";
 
         const string GetByIdSql = @"SELECT * FROM proc_procedure_qualification_authentication_relation WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM proc_procedure_qualification_authentication_relation WHERE Id IN @Ids ";
