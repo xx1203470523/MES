@@ -131,11 +131,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         //public string? RequestorCode { get; set; }
 
         ///// <summary>
-        ///// 接收方
-        ///// </summary>
-        //public string? Responsetor { get; set; }
-
-        ///// <summary>
         ///// 请求时间  时间范围  数组
         ///// </summary>
         public DateTime[]? TimeStamp { get; set; }
@@ -160,6 +155,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 是否成功
         /// </summary>
         public int? IsSuccess { get; set; }
+
+        ///// <summary>
+        ///// 请求时间
+        ///// </summary>
+        public DateTime[]? RequestTime { get; set; }
 
     }
 }

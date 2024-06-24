@@ -45,13 +45,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             if (pagedQueryDto?.QueryType == InterfaceLogQueryTyeEnum.SystemLog)
             {
                 logDataPagedQuery.ServiceType = ServiceTypeEnum.MES;
-            }
-
-            if (pagedQueryDto?.TimeStamp != null)
-            {
-                logDataPagedQuery.BeginTime = pagedQueryDto.TimeStamp[0];
-                logDataPagedQuery.EndTime = pagedQueryDto.TimeStamp[1].AddDays(1);
-            }
+            }         
 
             if (pagedQueryDto?.Id != null)
             {
@@ -71,6 +65,12 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             if (pagedQueryDto?.Message != null)
             {
                 logDataPagedQuery.Message = pagedQueryDto.Message;
+            }
+
+            if (pagedQueryDto?.Data?.RequestTime != null)
+            {
+                logDataPagedQuery.BeginTime = pagedQueryDto.Data.RequestTime[0];
+                logDataPagedQuery.EndTime = pagedQueryDto.Data.RequestTime[1].AddDays(1);
             }
 
             var data = new Dictionary<string, string> { };
