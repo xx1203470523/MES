@@ -498,11 +498,21 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param> 
         /// <returns></returns>
-        public async Task<int> DeletesEquRepairOrderAsync(long[] ids)
+        public async Task<int> DeletesEquRepairOrderAsync(DeletesDto param)
         {
-            return await _equRepairOrderRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
+            var equRepairOrders = await _equRepairOrderRepository.GetByIdsAsync(param.Ids.ToArray());
+            if (equRepairOrders != null && equRepairOrders.Any())
+            {
+                var equRepairOrderStatuss = equRepairOrders.Where(it => it.Status != EquRepairOrderStatusEnum.PendingRepair);
+                if (equRepairOrderStatuss != null && equRepairOrderStatuss.Any())
+                {
+                    var codes = string.Join(",", equRepairOrderStatuss.Select(it => it.RepairOrder));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17959)).WithData("Code", codes);
+                }
+            }
+            return await _equRepairOrderRepository.DeletesAsync(new DeleteCommand { Ids = param.Ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
         /// <summary>
