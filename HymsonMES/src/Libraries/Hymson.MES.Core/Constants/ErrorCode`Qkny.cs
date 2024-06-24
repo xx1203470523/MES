@@ -263,7 +263,7 @@ namespace Hymson.MES.Core.Constants
         /// <summary>
         /// 存在已经绑定的条码
         /// </summary>
-        public const string MES45115 = "存在已经绑定的条码";
+        public const string MES45115 = "存在已经绑定的【{SfcList}】条码";
 
         /// <summary>
         /// 载具没有关联载具类型
