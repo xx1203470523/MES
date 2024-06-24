@@ -44,7 +44,7 @@ namespace Hymson.MES.System.Api.Controllers
         [HttpPost("iqc")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("来料检验", BusinessType.INSERT)]
-        public async Task SubmitIncomingAsync([FromBody] IQCRequestDto dto)
+        public async Task SubmitIncomingAsync([FromBody] WhMaterialReceiptDto dto)
         {
             await _qualIQCService.SubmitIncomingAsync(dto);
         }

@@ -5,7 +5,7 @@ namespace Hymson.MES.SystemServices.Dtos
     /// <summary>
     /// IQC请求Dto
     /// </summary>
-    public record IQCRequestDto : BaseEntityDto
+    public record WhMaterialReceiptDto : BaseEntityDto
     {
         /// <summary>
         /// 收货单号
@@ -25,14 +25,14 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<IQCMaterialDto>? Details { get; set; }
+        public IEnumerable<WhMaterialReceiptMaterialDto>? Details { get; set; }
 
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public record IQCMaterialDto : BaseEntityDto
+    public record WhMaterialReceiptMaterialDto : BaseEntityDto
     {
         /// <summary>
         /// 物料编码

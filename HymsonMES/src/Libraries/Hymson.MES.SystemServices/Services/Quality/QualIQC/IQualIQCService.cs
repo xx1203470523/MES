@@ -12,7 +12,7 @@ namespace Hymson.MES.SystemServices.Services.Quality
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<int> SubmitIncomingAsync(IQCRequestDto dto);
+        Task<int> SubmitIncomingAsync(WhMaterialReceiptDto dto);
 
     }
 }

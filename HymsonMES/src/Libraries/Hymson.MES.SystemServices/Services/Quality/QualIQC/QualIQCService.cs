@@ -75,7 +75,7 @@ namespace Hymson.MES.SystemServices.Services.Quality
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<int> SubmitIncomingAsync(IQCRequestDto dto)
+        public async Task<int> SubmitIncomingAsync(WhMaterialReceiptDto dto)
         {
             if (dto == null || dto.Details == null) return 0;
             if (!dto.Details.Any()) return 0;
