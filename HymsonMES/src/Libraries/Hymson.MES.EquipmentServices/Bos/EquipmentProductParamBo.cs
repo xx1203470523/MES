@@ -59,5 +59,10 @@
         /// </summary>
         public DateTime Timestamp { get; set; }
 
+        /// <summary>
+        /// 操作员
+        /// </summary>
+        public string? CreatedBy { get; set; }
+
     }
 }
