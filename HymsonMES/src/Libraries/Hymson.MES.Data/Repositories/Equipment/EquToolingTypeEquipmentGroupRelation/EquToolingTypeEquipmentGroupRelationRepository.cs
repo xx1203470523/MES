@@ -116,6 +116,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             try
             {
                 using var conn = GetMESDbConnection();
+                await conn.ExecuteAsync(DeleteByMaterialId, command);
                 return await conn.ExecuteAsync(DeleteBySparePartsId, command);
             }
             catch (Exception)
@@ -211,23 +212,27 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string GetByIdSql = @"SELECT * FROM `equ_sparepart_type_equipment_group_relation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `equ_sparepart_type_equipment_group_relation`  WHERE Id IN @Ids ";
-        const string DeleteBySparePartsId = "DELETE FROM equ_sparepart_type_equipment_group_relation WHERE SparePartTypeId = @ParentId";
 
-        const string GetSparePartsEquipmentGroupRelationSqlTemplate = @"SELECT
-	                                                                        ESPGEGR.SparePartTypeId,
-	                                                                        ESPGEGR.EquipmentGroupId,
-	                                                                        EEG.EquipmentGroupCode,
-	                                                                        EEG.EquipmentGroupName,
-	                                                                        ESPGEGR.CreatedBy,
-	                                                                        ESPGEGR.CreatedOn
-                                                                        FROM
-	                                                                        equ_sparepart_type ESPG
-                                                                         JOIN equ_sparepart_type_equipment_group_relation ESPGEGR ON ESPGEGR.SparePartTypeId = ESPG.Id 
-                                                                         JOIN equ_equipment_group EEG ON EEG.Id=ESPGEGR.EquipmentGroupId
+        const string DeleteBySparePartsId = "DELETE FROM equ_tools_type_equipment_group_relation WHERE ToolTypeId = @ToolTypeId";
+        const string DeleteByMaterialId = "DELETE FROM equ_tools_type_material_relation WHERE ToolTypeId = @ParentId";
 
-                                                                        WHERE
-	                                                                        ESPG.Id = @Id 
-	                                                                        AND ESPG.IsDeleted = 0";
+        const string GetSparePartsEquipmentGroupRelationSqlTemplate = @"SELECT * FROM `equ_tools_type_equipment_group_relation`  WHERE ToolTypeId = @Id ";
+
+        //const string GetSparePartsEquipmentGroupRelationSqlTemplate = @"SELECT
+	       //                                                                 ESPGEGR.SparePartTypeId,
+	       //                                                                 ESPGEGR.EquipmentGroupId,
+	       //                                                                 EEG.EquipmentGroupCode,
+	       //                                                                 EEG.EquipmentGroupName,
+	       //                                                                 ESPGEGR.CreatedBy,
+	       //                                                                 ESPGEGR.CreatedOn
+        //                                                                FROM
+	       //                                                                 equ_sparepart_type ESPG
+        //                                                                 JOIN equ_sparepart_type_equipment_group_relation ESPGEGR ON ESPGEGR.SparePartTypeId = ESPG.Id 
+        //                                                                 JOIN equ_equipment_group EEG ON EEG.Id=ESPGEGR.EquipmentGroupId
+
+        //                                                                WHERE
+	       //                                                                 ESPG.Id = @Id 
+	       //                                                                 AND ESPG.IsDeleted = 0";
 
     }
 }

@@ -59,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquSparePartsGroupEntity entity)
+        public async Task<int> UpdateAsync(EquToolingTypeEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
@@ -223,10 +223,16 @@ namespace Hymson.MES.Data.Repositories.Equipment
                                             /**select**/
                                            FROM `equ_sparepart_type` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_tooling_type_manage`(  `Id`, `Code`, `Name`, `Status`, `Calibration`, `LifeSpan`, `Cycle`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Calibration, @LifeSpan, @Cycle, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `equ_tooling_type_manage`(  `Id`, `Code`, `Name`, `Status`, `Calibration`, `LifeSpan`, `Cycle`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Status, @Calibration, @LifeSpan, @Cycle,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        
+        //更新equ_tools_type_equipment_group_relation 工具类型和设备组关系表
+        const string UpdateEquipmentSql = "UPDATE `equ_tools_type_equipment_group_relation` SET   ToolTypeId = @ToolTypeId  WHERE Id = @Id ";
+        //更新equ_tools_type_material_relation 工具类型和物料关系表     
+        const string UpdateMaterialSql = "UPDATE `equ_sparepart_type` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
-        const string UpdateSql = "UPDATE `equ_sparepart_type` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        //更新equ_tooling_type_manage 工具类型管理
+        const string UpdateSql = "UPDATE `equ_tooling_type_manage` SET   Code = @Code, Name = @Name, Status = @Status, Calibration = @Calibration, LifeSpan = @LifeSpan, Cycle = @Cycle, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `equ_sparepart_type` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id WHERE Id = @Id ";

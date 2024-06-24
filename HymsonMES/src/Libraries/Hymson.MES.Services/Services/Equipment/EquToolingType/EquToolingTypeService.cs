@@ -97,6 +97,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
+
             // DTO转换实体
             var entity = saveDto.ToEntity<EquToolingTypeEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
@@ -105,6 +106,7 @@ namespace Hymson.MES.Services.Services.Equipment
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
+
             // 编码唯一性验证
             var checkEntity = await _equToolingTypeGroupRepository.GetByCodeAsync(new EntityByCodeQuery
             {
@@ -176,24 +178,22 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<List<EquSparePartsGroupEquipmentGroupRelationSaveDto>> GetSparePartsEquipmentGroupRelationByIdAsync(long id)
+        public async Task<List<EquToolingTypeGroupEquipmentGroupRelationSaveDto>> GetSparePartsEquipmentGroupRelationByIdAsync(long id)
         {
-            var unqualifiedCodeGroupRelations = await _equSparePartsGroupEquipmentGroupRelationRepository.GetSparePartsEquipmentGroupRelationAsync(id);
-            var nqualifiedCodeGroupRelationList = new List<EquSparePartsGroupEquipmentGroupRelationSaveDto>();
+            //查数据
+            var unqualifiedCodeGroupRelations = await _equToolingTypeEquipmentGroupRelationRepository.GetSparePartsEquipmentGroupRelationAsync(id);
+            //
+            var nqualifiedCodeGroupRelationList = new List<EquToolingTypeGroupEquipmentGroupRelationSaveDto>();
             if (unqualifiedCodeGroupRelations != null && unqualifiedCodeGroupRelations.Any())
             {
 
                 foreach (var item in unqualifiedCodeGroupRelations)
                 {
-                    nqualifiedCodeGroupRelationList.Add(new EquSparePartsGroupEquipmentGroupRelationSaveDto()
+                    nqualifiedCodeGroupRelationList.Add(new EquToolingTypeGroupEquipmentGroupRelationSaveDto()
                     {
-                        Id = item.Id,
+                        ToolTypeId = item.ToolTypeId,
                         EquipmentGroupId = item.EquipmentGroupId,
-                        SparePartsGroupId = item.SparePartsGroupId,
-                        EquipmentGroupCode = item.EquipmentGroupCode,
-                        EquipmentGroupName = item.EquipmentGroupName,
-                        CreatedBy = item.CreatedBy,
-                        CreatedOn = item.CreatedOn
+                        
                     });
                 }
             }
@@ -214,24 +214,24 @@ namespace Hymson.MES.Services.Services.Equipment
             //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<EquSparePartsGroupEntity>();
+            var entity = saveDto.ToEntity<EquToolingTypeEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
             //获取关联设备
-            List<EquSparePartsGroupEquipmentGroupRelationEntity> list = new();
+            List<EquToolingTypeEquipmentGroupRelationEntity> list = new();
 
             if (saveDto.EquipmentGroupIds != null)
                 foreach (var item in saveDto.EquipmentGroupIds)
                 {
-                    var equipmentGroupEntity = new EquSparePartsGroupEquipmentGroupRelationEntity
+                    var equipmentGroupEntity = new EquToolingTypeEquipmentGroupRelationEntity
                     {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = _currentSite.SiteId ?? 0,
-                        SparePartsGroupId = entity.Id,
+                        //Id = IdGenProvider.Instance.CreateId(),
+                        //SiteId = _currentSite.SiteId ?? 0,
+                        ToolTypeId = entity.Id,
                         EquipmentGroupId = item,
-                        CreatedBy = _currentUser.UserName,
-                        CreatedOn = HymsonClock.Now()
+                        //CreatedBy = _currentUser.UserName,
+                        //CreatedOn = HymsonClock.Now()
                     };
                     list.Add(equipmentGroupEntity);
                 }
@@ -243,27 +243,46 @@ namespace Hymson.MES.Services.Services.Equipment
                 UpdatedOn = HymsonClock.Now()
             };
 
-            //关联备件
-            var updatedTypeEntity = new UpdateSparePartsTypeEntity
-            {
-                Id = entity.Id,
-                SparePartGroupIds = new[] { entity.Id },
-                SparePartIds = saveDto.SparePartIds,
-                UpdatedBy = _currentUser.UserName,
-                UpdatedOn = HymsonClock.Now()
-            };
+            //获取关联物料
+            List<EquToolingTypeMaterialRelationEntity> materialList = new();
+            if (saveDto.MaterialIdIds != null)
+                foreach (var item in saveDto.MaterialIdIds)
+                {
+                    var MaterialGroupEntity = new EquToolingTypeMaterialRelationEntity
+                    {
+                        //Id = IdGenProvider.Instance.CreateId(),
+                        //SiteId = _currentSite.SiteId ?? 0,
+                        ToolTypeId = entity.Id,
+                        MaterialId = item,
+                        //CreatedBy = _currentUser.UserName,
+                        //CreatedOn = HymsonClock.Now()
+                    };
+                    materialList.Add(MaterialGroupEntity);
+                }
+
+            //var updatedTypeEntity = new UpdateSparePartsTypeEntity
+            //{
+            //    Id = entity.Id,
+            //    SparePartGroupIds = new[] { entity.Id },
+            //    SparePartIds = saveDto.SparePartIds,
+            //    UpdatedBy = _currentUser.UserName,
+            //    UpdatedOn = HymsonClock.Now()
+            //};
 
             //保存
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                rows = await _equSparePartsGroupEquipmentGroupRelationRepository.DeleteByParentIdAsync(command);
-                rows += await _equSparePartsRepository.CleanTypeAsync(updatedTypeEntity);
+                //先删除设备组，物料关联的关联
+                rows = await _equToolingTypeEquipmentGroupRelationRepository.DeleteByParentIdAsync(command);
 
                 var rowArray = await Task.WhenAll(new List<Task<int>>() {
+                    //更新主表
                     _equToolingTypeGroupRepository.UpdateAsync(entity),
-                    _equSparePartsGroupEquipmentGroupRelationRepository.InsertRangeAsync(list),
-                    _equSparePartsRepository.UpdateTypeAsync(updatedTypeEntity),
+                    //插入工具类型关联设备组
+                    _equToolingTypeEquipmentGroupRelationRepository.InsertRangeAsync(list),
+                    //插入工具类型关联物料
+                    _equToolingTypeMateriaRelationRepository.InsertRangeAsync(materialList),
 
                     });
                 rows += rowArray.Sum();

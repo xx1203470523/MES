@@ -32,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquSparePartsGroupEntity entity);
+        Task<int> UpdateAsync(EquToolingTypeEntity entity);
         
         /// <summary>
         /// 更新（批量）
