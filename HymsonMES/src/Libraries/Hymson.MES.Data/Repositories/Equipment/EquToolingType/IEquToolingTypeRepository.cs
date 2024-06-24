@@ -56,6 +56,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 软删除（关联数据）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeletesAsyncRelation(DeleteCommand command);
+
+        /// <summary>
         /// 根据Code查询对象
         /// </summary>
         /// <param name="query"></param>

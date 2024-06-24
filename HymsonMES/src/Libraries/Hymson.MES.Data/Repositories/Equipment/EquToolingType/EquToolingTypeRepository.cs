@@ -108,6 +108,20 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
+        /// 软删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesAsyncRelation(DeleteCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            //删除关联物料
+            await conn.ExecuteAsync(DeleteMaterialSql, command);
+            //删除关联设备组
+            return await conn.ExecuteAsync(DeleteEquipmentGroupSql, command);
+        }
+
+        /// <summary>
         /// 根据Code查询对象
         /// </summary>
         /// <param name="query"></param>
@@ -237,6 +251,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `equ_tooling_type_manage` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+
+        const string DeleteEquipmentGroupSql = "DELETE FROM equ_tools_type_equipment_group_relation WHERE ToolTypeId IN @Ids";
+        const string DeleteMaterialSql = "DELETE FROM equ_tools_type_material_relation WHERE ToolTypeId IN @Ids";
+
         const string GetByCodeSql = "SELECT * FROM `equ_tooling_type_manage` WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
         const string GetByIdSql = @"SELECT * FROM `equ_tooling_type_manage`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `equ_tooling_type_manage`  WHERE Id IN @Ids ";

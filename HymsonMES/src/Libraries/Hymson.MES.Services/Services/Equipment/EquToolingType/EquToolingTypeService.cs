@@ -201,6 +201,33 @@ namespace Hymson.MES.Services.Services.Equipment
         }
 
         /// <summary>
+        /// 获取物料
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<EquToolingTypeGroupMaterialRelationSaveDto>> GetToolingTypeGroupMaterialIdRelationByIdAsync(long id)
+        {
+            //查数据
+            var unqualifiedCodeGroupRelations = await _equToolingTypeEquipmentGroupRelationRepository.GetToolingTypeMaterialRelationAsync(id);
+            //
+            var nqualifiedCodeGroupRelationList = new List<EquToolingTypeGroupMaterialRelationSaveDto>();
+            if (unqualifiedCodeGroupRelations != null && unqualifiedCodeGroupRelations.Any())
+            {
+
+                foreach (var item in unqualifiedCodeGroupRelations)
+                {
+                    nqualifiedCodeGroupRelationList.Add(new EquToolingTypeGroupMaterialRelationSaveDto()
+                    {
+                        ToolTypeId = item.ToolTypeId,
+                        MaterialId = item.MaterialId,
+
+                    });
+                }
+            }
+            return nqualifiedCodeGroupRelationList;
+        }
+
+        /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
@@ -322,14 +349,15 @@ namespace Hymson.MES.Services.Services.Equipment
             var nowTime = HymsonClock.Now();
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                //未启用状态的类型删除时解绑备件
-                rows += await _equSparePartsRepository.CleanTypeAsync(new UpdateSparePartsTypeEntity
-                {
-                    SparePartGroupIds = ids,
-                    UpdatedBy = _currentUser.UserName,
-                    UpdatedOn = nowTime
-                });
+                //删主数据
                 rows += await _equToolingTypeGroupRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = ids,
+                    DeleteOn = nowTime,
+                    UserId = _currentUser.UserName,
+                });
+                //删关联数据
+                rows += await _equToolingTypeGroupRepository.DeletesAsyncRelation(new DeleteCommand
                 {
                     Ids = ids,
                     DeleteOn = nowTime,

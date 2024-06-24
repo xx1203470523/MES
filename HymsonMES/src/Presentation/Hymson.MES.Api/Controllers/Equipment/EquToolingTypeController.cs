@@ -101,16 +101,16 @@ namespace Hymson.MES.Api.Controllers.Equipment
             return await _equToolingTypeService.GetSparePartsEquipmentGroupRelationByIdAsync(id);
         }
 
-        ///// <summary>
-        ///// 查询容器关联的物料
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //[HttpGet("{id}/MaterialList")]
-        //public async Task<List<EquSparePartsGroupEquipmentGroupRelationSaveDto>> GetQualUnqualifiedCodeMaterialRelationByIdAsync(long id)
-        //{
-        //    return await _equToolingTypeService.GetSparePartsEquipmentGroupRelationByIdAsync(id);
-        //}
+        /// <summary>
+        /// 查询容器关联的物料
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/MaterialList")]
+        public async Task<List<EquToolingTypeGroupMaterialRelationSaveDto>> GetQualUnqualifiedCodeMaterialRelationByIdAsync(long id)
+        {
+            return await _equToolingTypeService.GetToolingTypeGroupMaterialIdRelationByIdAsync(id);
+        }
 
         /// <summary>
         /// 分页查询列表（工具类型）

@@ -44,12 +44,12 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         Task<List<EquToolingTypeGroupEquipmentGroupRelationSaveDto>> GetSparePartsEquipmentGroupRelationByIdAsync(long id);
 
-        ///// <summary>
-        ///// 获取物料
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //Task<List<EquToolingTypeGroupEquipmentGroupRelationDto>> GetToolingTypeGroupMaterialIdRelationByIdAsync(long id);
+        /// <summary>
+        /// 获取物料
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<EquToolingTypeGroupMaterialRelationSaveDto>> GetToolingTypeGroupMaterialIdRelationByIdAsync(long id);
 
         /// <summary>
         /// 根据ID查询
