@@ -536,10 +536,13 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 throw new CustomerValidationException(nameof(ErrorCode.MES10405)).WithData("Code", procProcedureCreateDto.Procedure.Code);
             }
             //资源类型验证 
-            var procProcedures = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery { SiteId = siteId, ResourceTypeId = procProcedureCreateDto.Procedure.ResourceTypeId });
-            if (procProcedures != null && procProcedures.Any())
+            if (procProcedureCreateDto.Procedure.ResourceTypeId.HasValue && procProcedureCreateDto.Procedure.ResourceTypeId > 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10413)).WithData("Code", procProcedures.FirstOrDefault()?.Code ?? "");
+                var procProcedures = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery { SiteId = siteId, ResourceTypeId = procProcedureCreateDto.Procedure.ResourceTypeId });
+                if (procProcedures != null && procProcedures.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10413)).WithData("Code", procProcedures.FirstOrDefault()?.Code ?? "");
+                }
             }
 
             //判断资质是否重复配置  数据库中 已经存储的情况
@@ -811,10 +814,13 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
 
             //资源类型验证  
-            var procProcedures = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery { SiteId = siteId, ResourceTypeId = procProcedureModifyDto.Procedure.ResourceTypeId });
-            if (procProcedures != null && procProcedures.Any(it => it.Id != procProcedureModifyDto.Procedure.Id))
+            if (procProcedureModifyDto.Procedure.ResourceTypeId.HasValue && procProcedureModifyDto.Procedure.ResourceTypeId > 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10413)).WithData("Code", procProcedures.Where(it => it.Id != procProcedureModifyDto.Procedure.Id).FirstOrDefault()?.Code ?? "");
+                var procProcedures = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery { SiteId = siteId, ResourceTypeId = procProcedureModifyDto.Procedure.ResourceTypeId });
+                if (procProcedures != null && procProcedures.Any(it => it.Id != procProcedureModifyDto.Procedure.Id))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10413)).WithData("Code", procProcedures.Where(it => it.Id != procProcedureModifyDto.Procedure.Id).FirstOrDefault()?.Code ?? "");
+                }
             }
 
             //判断资质是否重复配置  数据库中 已经存储的情况
