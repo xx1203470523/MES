@@ -62,6 +62,16 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<long> SaveAsync(PlanWorkPlanSaveDto dto)
         {
+            // 检查生产计划是否存在
+
+            // 检查生产计划的状态
+
+            // 检查子工单的工单号是否重复
+
+            // 检查子工单的数量是否超出总数量
+
+            // 检查子工单的计划时间是否超出生产计划的时间范围
+
             await Task.CompletedTask;
             return 0;
         }
@@ -151,10 +161,25 @@ namespace Hymson.MES.Services.Services.Plan
             var entity = await _planWorkPlanRepository.GetByIdAsync(id);
             if (entity == null) return default;
 
+            var dto = entity.ToModel<PlanWorkPlanDto>();
 
+            // 读取BOM
+            var bomEntity = await _procBomRepository.GetByIdAsync(entity.BomId);
+            if (bomEntity != null)
+            {
+                dto.BomCode = bomEntity.BomCode;
+                dto.BomName = bomEntity.BomName;
+            }
 
-            await Task.CompletedTask;
-            return default;
+            // 读取物料
+            var materialEntity = await _procMaterialRepository.GetByIdAsync(entity.ProductId);
+            if (materialEntity != null)
+            {
+                dto.ProductCode = materialEntity.MaterialCode;
+                dto.ProductName = materialEntity.MaterialName;
+            }
+
+            return dto;
         }
 
     }

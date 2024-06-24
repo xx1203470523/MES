@@ -13,7 +13,7 @@ namespace Hymson.MES.SystemServices.Dtos
         public string ReceiptNum { get; set; } = "";
 
         /// <summary>
-        /// 供应商Code
+        /// 供应商编码
         /// </summary>
         public string SupplierCode { get; set; } = "";
 
