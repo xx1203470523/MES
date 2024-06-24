@@ -119,7 +119,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             }
 
 
-            return new PagedInfo<HitTraceLogDto>(hitDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalPages);
+            return new PagedInfo<HitTraceLogDto>(hitDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
 
 
         }
