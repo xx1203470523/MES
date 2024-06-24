@@ -1382,7 +1382,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Receive24DxCode")]
-        [LogDescription("接收24位国标码", BusinessType.OTHER, "055", ReceiverTypeEnum.MES)]
+        [LogDescription("接收24位国标码055", BusinessType.OTHER, "055", ReceiverTypeEnum.MES)]
         public async Task Receive24DxCodeAsync(RecviceDxSfcDto dto)
         {
             if (IS_DEBUG)
