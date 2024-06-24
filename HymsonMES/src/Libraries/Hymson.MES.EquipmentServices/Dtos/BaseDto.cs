@@ -71,6 +71,11 @@ namespace Hymson.MES.EquipmentServices
         ///  时间戳（参数采集到的时间）
         /// </summary>
         public DateTime Timestamp { get; set; }
+
+        /// <summary>
+        /// 操作员
+        /// </summary>
+        public string? CreatedBy { get; set; }
     }
 
 }

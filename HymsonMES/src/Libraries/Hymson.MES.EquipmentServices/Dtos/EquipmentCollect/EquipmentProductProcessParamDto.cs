@@ -31,11 +31,6 @@
         ///  故障详细信息
         /// </summary>
         public IEnumerable<EquipmentProcessParamInfoDto> ParamList { get; set; }
-
-        /// <summary>
-        /// 操作员
-        /// </summary>
-        public string? CreatedBy { get; set; }
     }
 
     /// <summary>

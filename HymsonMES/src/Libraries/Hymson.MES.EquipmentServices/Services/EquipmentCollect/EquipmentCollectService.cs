@@ -397,7 +397,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                     TestTime = s.TestTime,
                     TestResult = s.TestResult,
                     TestDuration = s.TestDuration,
-                    CreatedBy = item.CreatedBy
+                    CreatedBy = s.CreatedBy
                 }));
             }
 
@@ -423,7 +423,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                         {
                             Id = IdGenProvider.Instance.CreateId(),
                             SiteId = _currentEquipment.SiteId,
-                            CreatedBy = _currentEquipment.Code,
+                            CreatedBy =  _currentEquipment.Code,
                             UpdatedBy = _currentEquipment.Code,
                             CreatedOn = nowTime,
                             UpdatedOn = nowTime,
