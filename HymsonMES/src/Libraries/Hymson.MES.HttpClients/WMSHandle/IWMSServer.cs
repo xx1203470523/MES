@@ -32,7 +32,7 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task MaterialReturnRequestAsync(MaterialReturnRequest request);
+        Task<bool> MaterialReturnRequestAsync(MaterialReturnRequestDto request);
         /// <summary>
         /// 取消退料
         /// </summary>

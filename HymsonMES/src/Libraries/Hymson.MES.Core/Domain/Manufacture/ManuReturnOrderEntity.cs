@@ -24,7 +24,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 退料单类型0:工单退料 1:工单借料
         /// </summary>
-        public int Type { get; set; }
+        public ManuReturnTypeEnum Type { get; set; }
 
        /// <summary>
         /// 状态0:审批中，1：审批失败，2：审批成功3.已退料

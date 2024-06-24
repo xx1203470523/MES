@@ -185,6 +185,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="barCode"></param>
         /// <returns></returns>
         Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesOfHasQtyAsync(WhMaterialInventoryBarCodesQuery param);
+        Task<IEnumerable<WhMaterialInventoryEntity>> GetByWorkOrderIdAsync(WhMaterialInventoryWorkOrderIdQuery param);
 
         /// <summary>
         /// 根据物料条码获取数据

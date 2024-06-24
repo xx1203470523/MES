@@ -1164,6 +1164,8 @@
         public const string MES16047 = "条码{SFC}超过最大复投次数{Cycle}，当前复投次数{RepeatedCount}，不允许生产！";
         public const string MES16048 = "工单【{WorkOrder}】已完成,不允许申请领料。";
         public const string MES16049 = "领料单申请失败,错误原因：【{msg}】。";
+        public const string MES16050 = "领料单未找到,发送的请求标识为：【{orderId}】。";
+        public const string MES16051 = "退料单申请失败,错误原因：【{msg}】。";
         #endregion
 
         #region 条码接收 16100

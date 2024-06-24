@@ -59,6 +59,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             return await conn.QueryFirstOrDefaultAsync<WhMaterialInventoryEntity>(GetByIdSql, new { Id = id });
         }
 
+
         /// <summary>
         /// 根据物料条码获取数据
         /// </summary>
@@ -79,6 +80,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodesOfHasQtySql, param);
+        }
+        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByWorkOrderIdAsync(WhMaterialInventoryWorkOrderIdQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByWorkOrderIdOfHasQtySql, param);
         }
 
         /// <summary>
@@ -593,7 +599,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string GetByBarCodesSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes";
         const string GetByBarCodesOfHasQtySql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes AND QuantityResidue > 0";
         const string GetByIdsSql = @"SELECT * FROM `wh_material_inventory` WHERE Id IN @ids ";
-
+        const string GetByWorkOrderIdOfHasQtySql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND WorkOrderId = @WorkOrderId AND QuantityResidue > 0";
 
         const string GetMaterialByMaterialCodeSql = @"SELECT   
                                             /**select**/

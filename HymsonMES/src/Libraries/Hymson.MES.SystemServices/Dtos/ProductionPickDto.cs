@@ -27,6 +27,21 @@ namespace Hymson.MES.SystemServices.Dtos
         /// </summary>
         public List<ProductionPickMaterialDto> ReceiveMaterials { get; set; }
     }
+    /// <summary>
+    /// 生产领料单创建结果反馈
+    /// </summary>
+    public record ProductionPickCallBackDto : BaseEntityDto
+    {
+        /// <summary>
+        /// MES领料申请单号，格式：派工单code_领料申请单Id
+        /// </summary>
+        public string RequistionId { get; set; }
+        /// <summary>
+        /// 领料单创建结果
+        /// </summary>
+        public bool PickOrderResult { get; set; }
+
+    }
 
     public class ProductionPickMaterialDto
     {

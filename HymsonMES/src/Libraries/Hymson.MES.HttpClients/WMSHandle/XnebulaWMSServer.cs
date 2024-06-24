@@ -22,8 +22,8 @@ namespace Hymson.MES.HttpClients
             
             MaterialPickingRequest materialPickingRequest = new MaterialPickingRequest()
             {
-                SendOn = request.sendOn,
-                SyncCode = request.syncCode,
+                SendOn = request.SendOn,
+                SyncCode = request.SyncCode,
                 Details = request.details,
                 Type = _options.Delivery.Type,
                 WarehouseCode = _options.Delivery.WarehouseCode
@@ -46,19 +46,70 @@ namespace Hymson.MES.HttpClients
 
         
 
-        public Task<bool> MaterialPickingCancelAsync(MaterialPickingCancelDto request)
+        public async Task<bool> MaterialPickingCancelAsync(MaterialPickingCancelDto request)
         {
-            throw new NotImplementedException();
+
+            MaterialPickingCancel materialPickingCancel = new MaterialPickingCancel()
+            {
+                SendOn = request.SendOn,
+                SyncCode = request.SyncCode,
+                Type = _options.Delivery.Type,
+                WarehouseCode = _options.Delivery.WarehouseCode
+            };
+            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingCancel>(_options.Delivery.RoutePath, materialPickingCancel);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        public Task MaterialReturnRequestAsync(MaterialReturnRequest request)
+        public async Task<bool> MaterialReturnRequestAsync(MaterialReturnRequestDto request)
         {
-            throw new NotImplementedException();
+            MaterialReturnRequest materialReturnRequest = new MaterialReturnRequest()
+            {
+                SendOn = request.SendOn,
+                SyncCode = request.SyncCode,
+                Details = request.Details,
+                Type = _options.Receipt.Type,
+                WarehouseCode = _options.Receipt.WarehouseCode
+            };
+
+            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialReturnRequest>(_options.Delivery.RoutePath, materialReturnRequest);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                
+                return true;
+            }
+            return false;
         }
 
-        public Task<bool> MaterialReturnCancelAsync(MaterialReturnCancelDto request)
+        public async Task<bool> MaterialReturnCancelAsync(MaterialReturnCancelDto request)
         {
-            throw new NotImplementedException();
+            MaterialReturnCancel materialReturnCancel = new MaterialReturnCancel()
+            {
+                SendOn = request.SendOn,
+                SyncCode = request.SyncCode,
+                Type = _options.Delivery.Type,
+                WarehouseCode = _options.Delivery.WarehouseCode
+            };
+            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialReturnCancel>(_options.Delivery.RoutePath, materialReturnCancel);
+
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
 
