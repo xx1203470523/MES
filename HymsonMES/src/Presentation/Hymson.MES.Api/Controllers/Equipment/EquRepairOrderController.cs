@@ -118,7 +118,7 @@ namespace Hymson.MES.Api.Controllers.EquRepairOrder
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteEquRepairOrderAsync(DeletesDto param)
+        public async Task DeleteEquRepairOrderAsync(EquRepairOrderDeletesDto param)
         {
             await _equRepairOrderService.DeletesEquRepairOrderAsync(param);
         }

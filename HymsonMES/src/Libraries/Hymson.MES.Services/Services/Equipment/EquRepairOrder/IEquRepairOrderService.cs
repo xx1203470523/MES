@@ -74,7 +74,7 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesEquRepairOrderAsync(DeletesDto ids);
+        Task<int> DeletesEquRepairOrderAsync(EquRepairOrderDeletesDto ids);
 
         /// <summary>
         /// 根据OrderId查询
