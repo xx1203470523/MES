@@ -19,10 +19,10 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
     /// <summary>
     /// 维修结果仓储
     /// </summary>
-    public partial class EquRepairResultRepository :BaseRepository, IEquRepairResultRepository
+    public partial class EquRepairResultRepository : BaseRepository, IEquRepairResultRepository
     {
 
-        public EquRepairResultRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public EquRepairResultRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +57,18 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
         public async Task<EquRepairResultEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<EquRepairResultEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<EquRepairResultEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据RepairOrderId获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<EquRepairResultEntity> GetByRepairOrderIdAsync(long repairOrderId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquRepairResultEntity>(GetByRepairOrderIdSql, new { RepairOrderId = repairOrderId });
         }
 
         /// <summary>
@@ -65,10 +76,10 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquRepairResultEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquRepairResultEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquRepairResultEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<EquRepairResultEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -88,7 +99,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (equRepairResultPagedQuery.PageIndex - 1) * equRepairResultPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = equRepairResultPagedQuery.PageSize });
@@ -187,6 +198,11 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `RepairOrderId`, `RepairStartTime`, `RepairEndTime`, `LongTermHandlingMeasures`, `TemporaryTermHandlingMeasures`, `RepairPerson`, `ConfirmResult`, `ConfirmOn`, `ConfirmBy`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `equ_repair_result`  WHERE Id IN @Ids ";
+
+
+        const string GetByRepairOrderIdSql = @"SELECT 
+                               `Id`, `SiteId`, `RepairOrderId`, `RepairStartTime`, `RepairEndTime`, `LongTermHandlingMeasures`, `TemporaryTermHandlingMeasures`, `RepairPerson`, `ConfirmResult`, `ConfirmOn`, `ConfirmBy`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `equ_repair_result`  WHERE RepairOrderId = @RepairOrderId ";
         #endregion
     }
 }

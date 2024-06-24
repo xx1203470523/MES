@@ -153,7 +153,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
             }
-            if (!EquMaintenancePlanCreateDto.CompletionHour.HasValue && !EquMaintenancePlanCreateDto.CompletionHour.HasValue)
+            if (!EquMaintenancePlanCreateDto.CompletionHour.HasValue && !EquMaintenancePlanCreateDto.CompletionMinute.HasValue)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12323));
             }
@@ -321,7 +321,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
             }
-            if (!EquMaintenancePlanModifyDto.CompletionHour.HasValue && !EquMaintenancePlanModifyDto.CompletionHour.HasValue)
+            if (!EquMaintenancePlanModifyDto.CompletionHour.HasValue && !EquMaintenancePlanModifyDto.CompletionMinute.HasValue)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12323));
             }
@@ -456,7 +456,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         /// <exception cref="ValidationException"></exception>
         private static string? GetExecuteCycle(EquMaintenancePlanEntity plan)
         {
-            if (!plan.FirstExecuteTime.HasValue || !plan.Type.HasValue || !plan.Cycle.HasValue)
+            if (!plan.FirstExecuteTime.HasValue || !plan.CycleType.HasValue || !plan.Cycle.HasValue)
             {
                 return null;
             }
@@ -465,14 +465,19 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             var hour = plan.FirstExecuteTime.GetValueOrDefault().Hour.ToString();
             var day = "*";
             var tail = "* ?";
-            if (plan.Type == EquipmentMaintenanceTypeEnum.Hour)
+
+            switch (plan.CycleType)
             {
-                hour = $"0/{plan.Cycle}";
+                case EquipmentCycleTypeEnum.Hour:
+                    hour = $"0/{plan.Cycle}";
+                    break;
+                case EquipmentCycleTypeEnum.Day:
+                    day = $"*/{plan.Cycle}";
+                    break;
+                default:
+                    break;
             }
-            else
-            {
-                day = $"*/{day}";
-            }
+
             var expression = $"{second} {minute} {hour} {day} {tail}";
             return expression;
         }

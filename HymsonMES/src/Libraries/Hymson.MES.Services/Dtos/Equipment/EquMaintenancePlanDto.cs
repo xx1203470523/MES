@@ -1,7 +1,7 @@
 /*
  *creator: Karl
  *
- *describe: 设备点检计划    Dto | 代码由框架生成
+ *describe: 设备保养计划    Dto | 代码由框架生成
  *builder:  pengxin
  *build datetime: 2024-05-17 09:36:24
  */
@@ -12,7 +12,7 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
 {
     /// <summary>
-    /// 设备点检计划Dto
+    /// 设备保养计划Dto
     /// </summary>
     public record EquMaintenancePlanDto : BaseEntityDto
     {
@@ -22,12 +22,12 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
         public long Id { get; set; }
 
         /// <summary>
-        /// 点检计划编码
+        /// 保养计划编码
         /// </summary>
         public string Code { get; set; }
 
         /// <summary>
-        /// 点检计划名称
+        /// 保养计划名称
         /// </summary>
         public string Name { get; set; }
 
@@ -37,23 +37,29 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
         public string Version { get; set; }
 
         /// <summary>
-        /// 点检执行人;用户中心UserId集合
+        /// 保养执行人;用户中心UserId集合
         /// </summary>
         public string? ExecutorIds { get; set; }
 
         /// <summary>
-        /// 点检负责人;用户中心UserId集合
+        /// 保养负责人;用户中心UserId集合
         /// </summary>
         public string? LeaderIds { get; set; }
 
 
         /// <summary>
-        /// 点检类型;天/小时
+        /// 保养类型;天/小时
         /// </summary>
         public EquipmentMaintenanceTypeEnum? Type { get; set; }
 
+
         /// <summary>
-        /// 点检计划状态
+        /// 周期类型;天/小时
+        /// </summary>
+        public EquipmentCycleTypeEnum? CycleType { get; set; }
+
+        /// <summary>
+        /// 保养计划状态
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
@@ -143,18 +149,18 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
 
 
     /// <summary>
-    /// 设备点检计划新增Dto
+    /// 设备保养计划新增Dto
     /// </summary>
     public record EquMaintenancePlanCreateDto : BaseEntityDto
     {
 
         /// <summary>
-        /// 点检计划编码
+        /// 保养计划编码
         /// </summary>
         public string Code { get; set; }
 
         /// <summary>
-        /// 点检计划名称
+        /// 保养计划名称
         /// </summary>
         public string Name { get; set; }
 
@@ -164,12 +170,17 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
         public string Version { get; set; }
 
         /// <summary>
-        /// 点检类型;天/小时
+        /// 保养类型;天/小时
         /// </summary>
         public EquipmentMaintenanceTypeEnum Type { get; set; }
 
         /// <summary>
-        /// 点检计划状态
+        /// 周期类型;天/小时
+        /// </summary>
+        public EquipmentCycleTypeEnum? CycleType { get; set; }
+
+        /// <summary>
+        /// 保养计划状态
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
@@ -220,7 +231,7 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
     }
 
     /// <summary>
-    /// 设备点检计划更新Dto
+    /// 设备保养计划更新Dto
     /// </summary>
     public record EquMaintenancePlanModifyDto : BaseEntityDto
     {
@@ -230,12 +241,12 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
         /// </summary>
         public long Id { get; set; }
         /// <summary>
-        /// 点检计划编码
+        /// 保养计划编码
         /// </summary>
         public string Code { get; set; }
 
         /// <summary>
-        /// 点检计划名称
+        /// 保养计划名称
         /// </summary>
         public string Name { get; set; }
 
@@ -245,12 +256,17 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
         public string Version { get; set; }
 
         /// <summary>
-        /// 点检类型;天/小时
+        /// 保养类型;天/小时
         /// </summary>
         public EquipmentMaintenanceTypeEnum? Type { get; set; } = 0;
 
         /// <summary>
-        /// 点检计划状态
+        /// 周期类型;天/小时
+        /// </summary>
+        public EquipmentCycleTypeEnum? CycleType { get; set; }
+
+        /// <summary>
+        /// 保养计划状态
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
@@ -301,17 +317,17 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
     }
 
     /// <summary>
-    /// 设备点检计划分页Dto
+    /// 设备保养计划分页Dto
     /// </summary>
     public class EquMaintenancePlanPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 点检计划编码
+        /// 保养计划编码
         /// </summary>
         public string? Code { get; set; }
 
         /// <summary>
-        /// 点检计划名称
+        /// 保养计划名称
         /// </summary>
         public string? Name { get; set; }
 
@@ -321,14 +337,19 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
         public string? Version { get; set; }
 
         /// <summary>
-        /// 点检计划状态
+        /// 保养计划状态
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
 
         /// <summary>
-        /// 点检类型;天/小时
+        /// 保养类型;天/小时
         /// </summary>
         public EquipmentMaintenanceTypeEnum? Type { get; set; }
+
+        /// <summary>
+        /// 周期类型;天/小时
+        /// </summary>
+        public EquipmentCycleTypeEnum? CycleType { get; set; }
 
         /// <summary>
         /// 设备编码 
@@ -341,18 +362,18 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
         public string? EquipmentName { get; set; }
 
         /// <summary>
-        /// 点检执行人;用户中心UserId集合
+        /// 保养执行人;用户中心UserId集合
         /// </summary>
         public string? ExecutorIds { get; set; }
 
         /// <summary>
-        /// 点检负责人;用户中心UserId集合
+        /// 保养负责人;用户中心UserId集合
         /// </summary>
         public string? LeaderIds { get; set; }
     }
 
     /// <summary>
-    /// 设备点检计划更新Dto
+    /// 设备保养计划更新Dto
     /// </summary>
     public record GenerateDto
     {
@@ -369,7 +390,7 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
 
 
     /// <summary>
-    /// 设备点检计划更新Dto
+    /// 设备保养计划更新Dto
     /// </summary>
     public record DeletesDto
     {
@@ -382,7 +403,7 @@ namespace Hymson.MES.Services.Dtos.EquMaintenancePlan
     #region  关联信息
 
     /// <summary>
-    /// 设备点检计划更新Dto
+    /// 设备保养计划更新Dto
     /// </summary>
     public record EquRelatedDto
     {

@@ -86,7 +86,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrder
         /// </summary>
         /// <param name="equRepairOrderPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquRepairOrderEntity>> GetPagedInfoAsync(EquRepairOrderPagedQuery equRepairOrderPagedQuery);
+        Task<PagedInfo<EquRepairOrderPageView>> GetPagedInfoAsync(EquRepairOrderPagedQuery equRepairOrderPagedQuery);
         #endregion
     }
 }

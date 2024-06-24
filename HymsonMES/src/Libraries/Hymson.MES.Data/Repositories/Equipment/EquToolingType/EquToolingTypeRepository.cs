@@ -191,7 +191,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
             {
                 sqlBuilder.Where("Status = @Status");
             }
-
+            if (pagedQuery.UpdatedOn != null && pagedQuery.UpdatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { StartTime = pagedQuery.UpdatedOn[0], EndTime = pagedQuery.UpdatedOn[1].AddDays(1) });
+                sqlBuilder.Where("UpdatedOn >= @StartTime AND UpdatedOn < @EndTime");
+            }
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
