@@ -81,7 +81,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var updatedOn = HymsonClock.Now();
 
             // 编码唯一性验证
-            var code = saveDto.Code.Trim();
+            var code = saveDto.Code.Trim().ToUpperInvariant();
             var checkEntity = await _inteQualificationAuthenticationRepository.GetByCodeAsync(new EntityByCodeQuery
             {
                 Site = siteId,
@@ -93,8 +93,8 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 Code = code,
-                Name = saveDto.Name,
-                Remark = saveDto.Remark,
+                Name = saveDto.Name.Trim(),
+                Remark = saveDto.Remark.Trim(),
                 Status = saveDto.Status,
                 CreatedBy = updatedBy,
                 CreatedOn = updatedOn,
