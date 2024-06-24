@@ -1232,7 +1232,7 @@
         public const string MES16365 = "获取不到条码【{SFC}】的等级信息";
         public const string MES16366 = "获取不到条码【{SFC}】的最终档次信息";
         public const string MES16367 = "产品序列码【{SFC}】所记录的工单不存在";
-        public const string MES16368 = "产品序列码【{SFC}】已在原工序【{Procedure}】处不合格出站【{Cycle}】次，请继续复投。";
+        public const string MES16368 = "产品序列码【{SFC}】已在原工序【{Procedure}】处不合格或重复出站【{Cycle}】次，请继续复投。";
         public const string MES16369 = "产品序列码【{SFC}】指定的工序【{Procedure}】不存在";
         public const string MES16370 = "产品序列码不能为空，请检查参数";
         public const string MES16371 = "已成功将【{0}】个产品序列码置于工序【{1}】，状态为【{2}】！";
