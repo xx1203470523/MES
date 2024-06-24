@@ -26,7 +26,7 @@ namespace Hymson.MES.Core.Domain.EquRepairResult
        /// <summary>
         /// 维修单idequ_repair_orderid
         /// </summary>
-        public string RepairOrderId { get; set; }
+        public long RepairOrderId { get; set; }
 
        /// <summary>
         /// 维修开始时间

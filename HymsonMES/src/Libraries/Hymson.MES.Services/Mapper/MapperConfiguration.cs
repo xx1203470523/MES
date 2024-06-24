@@ -371,6 +371,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquRepairOrderModifyDto, EquRepairOrderEntity>();
             CreateMap<EquRepairOrderPagedQueryDto, EquRepairOrderPagedQuery>();
             CreateMap<EquRepairOrderEntity, EquRepairOrderDto>();
+            CreateMap<EquRepairOrderPageView, EquRepairOrderDto>();
 
             CreateMap<EquRepairOrderDto, EquRepairOrderEntity>();
             #endregion
@@ -667,7 +668,10 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
-
+            #region InteQualificationAuthentication
+            CreateMap<InteQualificationAuthenticationPagedQueryDto, InteQualificationAuthenticationPagedQuery>();
+            CreateMap<InteQualificationAuthenticationEntity, InteQualificationAuthenticationDto>();
+            #endregion
         }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
         /// <param name="equRepairOrderFaultEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(EquRepairOrderFaultEntity equRepairOrderFaultEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
         /// <param name="equRepairOrderFaultEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquRepairOrderFaultEntity equRepairOrderFaultEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -46,13 +46,20 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
         Task<int> UpdatesAsync(List<EquRepairOrderFaultEntity> equRepairOrderFaultEntitys);
 
         /// <summary>
+        /// 批量更新（故障原因）
+        /// </summary> 
+        /// <param name="equRepairOrderFaultEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateFaultReasonsAsync(List<UpdateFaultReasonsQuery> updatesEquRepairOrderFaultQuery);
+
+        /// <summary>
         /// 删除  
         /// 最好使用批量删除，可以设置更新人和更新时间
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquRepairOrderFaultEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -75,12 +82,20 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrderFault
         Task<IEnumerable<EquRepairOrderFaultEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据repairOrderId批量获取数据 
+        /// </summary>
+        /// <param name="repairOrderId"></param>
+        /// <returns></returns> 
+        Task<IEnumerable<EquRepairOrderFaultEntity>> GetByRepairOrderIdAsync(long repairOrderId);
+
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="equRepairOrderFaultQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<EquRepairOrderFaultEntity>> GetEquRepairOrderFaultEntitiesAsync(EquRepairOrderFaultQuery equRepairOrderFaultQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

@@ -332,6 +332,11 @@ namespace Hymson.MES.Services.Dtos.Process
         ///产出设置信息
         /// </summary>
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
+
+        /// <summary>
+        /// 资质认证信息
+        /// </summary>
+        public List<ProcQualificationAuthenticationCreateDto> AuthSetList { get; set; }
     }
 
     /// <summary>
@@ -359,6 +364,11 @@ namespace Hymson.MES.Services.Dtos.Process
         ///产出设置信息
         /// </summary>
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
+
+        /// <summary>
+        /// 资质认证信息
+        /// </summary>
+        public List<ProcQualificationAuthenticationCreateDto> AuthSetList { get; set; }
     }
 
     /// <summary>

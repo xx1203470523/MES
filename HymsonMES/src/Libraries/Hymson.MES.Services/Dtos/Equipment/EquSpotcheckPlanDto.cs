@@ -53,6 +53,11 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         public EquipmentSpotcheckTypeEnum? Type { get; set; }
 
         /// <summary>
+        /// 周期类型;天/小时
+        /// </summary>
+        public EquipmentCycleTypeEnum? CycleType { get; set; }
+
+        /// <summary>
         /// 点检计划状态
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
@@ -169,6 +174,11 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         public EquipmentSpotcheckTypeEnum Type { get; set; }
 
         /// <summary>
+        /// 周期类型;天/小时
+        /// </summary>
+        public EquipmentCycleTypeEnum? CycleType { get; set; }
+
+        /// <summary>
         /// 点检计划状态
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
@@ -250,6 +260,11 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         public EquipmentSpotcheckTypeEnum? Type { get; set; } = 0;
 
         /// <summary>
+        /// 周期类型;天/小时
+        /// </summary>
+        public EquipmentCycleTypeEnum? CycleType { get; set; }
+
+        /// <summary>
         /// 点检计划状态
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
@@ -329,6 +344,11 @@ namespace Hymson.MES.Services.Dtos.EquSpotcheckPlan
         /// 点检类型;天/小时
         /// </summary>
         public EquipmentSpotcheckTypeEnum? Type { get; set; }
+
+        /// <summary>
+        /// 周期类型;天/小时
+        /// </summary>
+        public EquipmentCycleTypeEnum? CycleType { get; set; }
 
         /// <summary>
         /// 设备编码 
