@@ -53,7 +53,7 @@ namespace Hymson.MES.Core.Domain.Plan
         /// <summary>
         /// 计划类型
         /// </summary>
-        public int Type { get; set; }
+        public PlanWorkOrderTypeEnum Type { get; set; }
 
         /// <summary>
         /// 数量
@@ -76,14 +76,14 @@ namespace Hymson.MES.Core.Domain.Plan
         public decimal OverScale { get; set; } = 0;
 
         /// <summary>
-        /// 计划开始时间
+        /// 开始时间（计划）
         /// </summary>
-        public DateTime StartTime { get; set; }
+        public DateTime PlanStartTime { get; set; }
 
         /// <summary>
-        /// 计划结束时间
+        /// 结束时间（计划）
         /// </summary>
-        public DateTime EndTime { get; set; }
+        public DateTime PlanEndTime { get; set; }
 
         /// <summary>
         /// 备注

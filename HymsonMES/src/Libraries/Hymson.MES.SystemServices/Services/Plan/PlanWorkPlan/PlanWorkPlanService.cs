@@ -171,8 +171,8 @@ namespace Hymson.MES.SystemServices.Services.Plan
                         ProductId = productEntity.Id,
                         BomId = bomEntity.Id,
 
-                        StartTime = planDto.StartTime ?? SqlDateTime.MinValue.Value,
-                        EndTime = planDto.EndTime ?? SqlDateTime.MinValue.Value,
+                        PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value,
+                        PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value,
 
                         // TODO: 这里的字段需要确认
                         OverScale = 0,
@@ -203,8 +203,8 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
                     // 除了数量/时间，好像什么都不能随便改
                     planEntity.Qty = planDto.Qty;
-                    planEntity.StartTime = planDto.StartTime ?? SqlDateTime.MinValue.Value;
-                    planEntity.EndTime = planDto.EndTime ?? SqlDateTime.MinValue.Value;
+                    planEntity.PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value;
+                    planEntity.PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value;
 
                     planEntity.UpdatedBy = updateUser;
                     planEntity.UpdatedOn = updateTime;
