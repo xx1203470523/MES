@@ -64,7 +64,7 @@ namespace Hymson.MES.Api.Controllers.EquRepairOrder
         {
             return await _equRepairOrderService.QueryEquRepairOrderByIdAsync(id);
         }
-        
+
         /// <summary>
         /// 查询详情（详细信息）
         /// </summary>
@@ -114,13 +114,13 @@ namespace Hymson.MES.Api.Controllers.EquRepairOrder
         /// <summary>
         /// 删除（设备维修记录）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteEquRepairOrderAsync([FromBody] long[] ids)
+        public async Task DeleteEquRepairOrderAsync(EquRepairOrderDeletesDto param)
         {
-            await _equRepairOrderService.DeletesEquRepairOrderAsync(ids);
+            await _equRepairOrderService.DeletesEquRepairOrderAsync(param);
         }
 
         #endregion

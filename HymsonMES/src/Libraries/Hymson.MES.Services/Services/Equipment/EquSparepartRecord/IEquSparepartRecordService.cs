@@ -20,7 +20,7 @@ namespace Hymson.MES.Services.Services.EquSparepartRecord
         /// </summary>
         /// <param name="equSparepartRecordPagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquSparepartRecordDto>> GetPagedListAsync(EquSparepartRecordPagedQueryDto equSparepartRecordPagedQueryDto);
+        Task<PagedInfo<EquSparepartRecordPagedViewDto>> GetPagedListAsync(EquSparepartRecordPagedQueryDto equSparepartRecordPagedQueryDto);
 
         /// <summary>
         /// 根据ID查询

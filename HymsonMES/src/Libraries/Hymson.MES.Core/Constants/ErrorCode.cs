@@ -2209,12 +2209,13 @@
         public const string MES17950 = "设备{Code}不存在！";
         public const string MES17951 = "数据已更新,请刷新后重试";
         public const string MES17952 = "设备维修单{Code}未查询到故障明细,请刷新后重试";
-        public const string MES17953 = "设备维修单{Code}不是待维修状态不能维修"; 
+        public const string MES17953 = "设备维修单{Code}不是待维修状态不能维修";
         public const string MES17954 = "设备维修单{Code}不是已维修状态不能确认";
         public const string MES17955 = "设备维修单号生成失败：编码规则错误，不允许同时存在多条设备维修类型编码规则！";
         public const string MES17956 = "设备维修单号生成失败：设备维修类型编码规则未维护！";
-        public const string MES17957 = "维修开始时间不能大于结束时间"; 
+        public const string MES17957 = "维修开始时间不能大于结束时间";
         public const string MES17958 = "请选择故障原因";
+        public const string MES17959 = "{Code}非待维修状态不允许删除";
 
 
 

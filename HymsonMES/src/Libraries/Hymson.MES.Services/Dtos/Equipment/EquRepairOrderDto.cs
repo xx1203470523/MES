@@ -282,6 +282,18 @@ namespace Hymson.MES.Services.Dtos.EquRepairOrder
         /// </summary>
         public string FaultReason { get; set; }
     }
+
+
+    /// <summary>
+    /// 删除
+    /// </summary>
+    public record EquRepairOrderDeletesDto
+    {
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public IEnumerable<long> Ids { get; set; }
+    }
     #endregion
 
 

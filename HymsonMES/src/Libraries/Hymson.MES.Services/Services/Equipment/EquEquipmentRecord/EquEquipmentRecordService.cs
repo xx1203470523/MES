@@ -15,6 +15,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.EquEquipmentRecord;
+using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentRecord;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -46,14 +47,14 @@ namespace Hymson.MES.Services.Services.EquEquipmentRecord
         /// </summary>
         /// <param name="equEquipmentRecordPagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentRecordDto>> GetPagedListAsync(EquEquipmentRecordPagedQueryDto equEquipmentRecordPagedQueryDto)
+        public async Task<PagedInfo<EquEquipmentRecordPagedViewDto>> GetPagedListAsync(EquEquipmentRecordPagedQueryDto equEquipmentRecordPagedQueryDto)
         {
             var equEquipmentRecordPagedQuery = equEquipmentRecordPagedQueryDto.ToQuery<EquEquipmentRecordPagedQuery>();
             var pagedInfo = await _equEquipmentRecordRepository.GetPagedInfoAsync(equEquipmentRecordPagedQuery);
 
             //实体到DTO转换 装载数据
-            List<EquEquipmentRecordDto> equEquipmentRecordDtos = PrepareEquEquipmentRecordDtos(pagedInfo);
-            return new PagedInfo<EquEquipmentRecordDto>(equEquipmentRecordDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            List<EquEquipmentRecordPagedViewDto> equEquipmentRecordDtos = PrepareEquEquipmentRecordDtos(pagedInfo);
+            return new PagedInfo<EquEquipmentRecordPagedViewDto>(equEquipmentRecordDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -61,12 +62,12 @@ namespace Hymson.MES.Services.Services.EquEquipmentRecord
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<EquEquipmentRecordDto> PrepareEquEquipmentRecordDtos(PagedInfo<EquEquipmentRecordEntity> pagedInfo)
+        private static List<EquEquipmentRecordPagedViewDto> PrepareEquEquipmentRecordDtos(PagedInfo<EquEquipmentRecordPagedView> pagedInfo)
         {
-            var equEquipmentRecordDtos = new List<EquEquipmentRecordDto>();
+            var equEquipmentRecordDtos = new List<EquEquipmentRecordPagedViewDto>();
             foreach (var equEquipmentRecordEntity in pagedInfo.Data)
             {
-                var equEquipmentRecordDto = equEquipmentRecordEntity.ToModel<EquEquipmentRecordDto>();
+                var equEquipmentRecordDto = equEquipmentRecordEntity.ToModel<EquEquipmentRecordPagedViewDto>();
                 equEquipmentRecordDtos.Add(equEquipmentRecordDto);
             }
 

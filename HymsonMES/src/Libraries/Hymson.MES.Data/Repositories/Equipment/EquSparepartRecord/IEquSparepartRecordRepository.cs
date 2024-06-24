@@ -86,7 +86,7 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
         /// </summary>
         /// <param name="equSparepartRecordPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquSparepartRecordEntity>> GetPagedInfoAsync(EquSparepartRecordPagedQuery equSparepartRecordPagedQuery);
+        Task<PagedInfo<EquSparepartRecordPagedView>> GetPagedInfoAsync(EquSparepartRecordPagedQuery equSparepartRecordPagedQuery);
         #endregion
     }
 }
