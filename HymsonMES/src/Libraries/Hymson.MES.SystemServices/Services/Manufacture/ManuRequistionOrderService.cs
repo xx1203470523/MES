@@ -29,6 +29,7 @@ using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
 using Newtonsoft.Json;
 using System.Security.Policy;
+using System.Transactions;
 
 namespace Hymson.MES.SystemServices.Services
 {
@@ -155,13 +156,23 @@ namespace Hymson.MES.SystemServices.Services
                 case ManuMaterialFormResponseEnum.ApprovalingFailed:
                     requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.ApprovalingFailed;
                     break;
+                case ManuMaterialFormResponseEnum.CancelFailed:
+                    break;
+                case ManuMaterialFormResponseEnum.CancelSuccess:
+                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.Cancel;
+                    break;
                 default:
                     break;
             }
             await _manuRequistionOrderRepository.UpdateAsync(requistionOrderEntity);
            
         }
-
+        /// <summary>
+        /// WMS退料请求结果反馈
+        /// </summary>
+        /// <param name="productionPickDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
         public async Task ReturnMaterialsCallBackAsync(ProductionReturnCallBackDto productionPickDto)
         {
             //根据结果 标记这个单据是否创建成功
@@ -189,11 +200,45 @@ namespace Hymson.MES.SystemServices.Services
                 case ManuMaterialFormResponseEnum.ApprovalingFailed:
                     returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingFailed;
                     break;
+                case ManuMaterialFormResponseEnum.CancelFailed:
+                    break;
+                case ManuMaterialFormResponseEnum.CancelSuccess:
+                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Cancel;
+                    break;
                 default:
                     break;
             }
-            await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
-            //TODO:当审批通过后进行库存扣减
+            
+            if (returnOrderEntity.Status == WhWarehouseReturnStatusEnum.ApprovalingSuccess)
+            {
+                string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
+                var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
+                {
+                    SiteId = _currentSystem.SiteId,
+                    OrderCode = orderCode,
+                });
+                var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryWorkOrderIdQuery
+                {
+                    SiteId = _currentSystem.SiteId,
+                    WorkOrderId = planWorkOrderEntity.Id
+                });
+                returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Return;
+                using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+                {
+                    
+                    await _whMaterialInventoryRepository.DeletesAsync(whMaterialInventoryEntities.Select(w => w.Id).ToArray());
+                    
+                    await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
+                }
+                
+            }
+            else
+            {
+                await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
+            }
+            
+              
+           
         }
 
         /// <summary>
