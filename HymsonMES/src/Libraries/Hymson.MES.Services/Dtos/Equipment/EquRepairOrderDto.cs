@@ -287,7 +287,7 @@ namespace Hymson.MES.Services.Dtos.EquRepairOrder
     /// <summary>
     /// 删除
     /// </summary>
-    public record DeletesDto
+    public record EquRepairOrderDeletesDto
     {
         /// <summary>
         /// 设备Id

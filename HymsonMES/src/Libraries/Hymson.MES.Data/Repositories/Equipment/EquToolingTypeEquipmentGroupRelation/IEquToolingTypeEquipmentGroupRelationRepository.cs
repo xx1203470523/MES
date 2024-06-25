@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquToolingTypeEquipmentGroupRelation.Query.View;
+using Hymson.MES.Data.Repositories.Equipment.EquToolingTypeMaterialRelation.Query.View;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -80,6 +81,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="Id"></param>
         /// <returns></returns>
         Task<IEnumerable<ToolingTypeEquipmentGroupRelationView>> GetSparePartsEquipmentGroupRelationAsync(long Id);
+
+        /// <summary>
+        /// 获取物料关联工具维护
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ToolingTypeMaterialRelationView>> GetToolingTypeMaterialRelationAsync(long Id);
 
         /// <summary>
         /// 获取List

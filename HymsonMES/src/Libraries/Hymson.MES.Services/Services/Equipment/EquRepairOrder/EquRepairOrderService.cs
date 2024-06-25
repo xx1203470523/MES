@@ -500,7 +500,7 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
         /// </summary>
         /// <param name="param"></param> 
         /// <returns></returns>
-        public async Task<int> DeletesEquRepairOrderAsync(DeletesDto param)
+        public async Task<int> DeletesEquRepairOrderAsync(EquRepairOrderDeletesDto param)
         {
             var equRepairOrders = await _equRepairOrderRepository.GetByIdsAsync(param.Ids.ToArray());
             if (equRepairOrders != null && equRepairOrders.Any())

@@ -390,6 +390,7 @@ namespace Hymson.MES.Services.Mapper
             #region EquEquipmentRecord
             CreateMap<EquEquipmentRecordPagedQueryDto, EquEquipmentRecordPagedQuery>();
             CreateMap<EquEquipmentRecordEntity, EquEquipmentRecordDto>();
+            CreateMap<EquEquipmentRecordPagedView, EquEquipmentRecordPagedViewDto>();
 
             CreateMap<EquEquipmentRecordDto, EquEquipmentRecordEntity>();
             #endregion
@@ -398,6 +399,7 @@ namespace Hymson.MES.Services.Mapper
             #region EquSparepartRecord
             CreateMap<EquSparepartRecordPagedQueryDto, EquSparepartRecordPagedQuery>();
             CreateMap<EquSparepartRecordEntity, EquSparepartRecordDto>();
+            CreateMap<EquSparepartRecordPagedView, EquSparepartRecordPagedViewDto>();
 
             CreateMap<EquSparepartRecordDto, EquSparepartRecordEntity>();
             #endregion
@@ -1399,7 +1401,7 @@ namespace Hymson.MES.Services.Mapper
             #region ManuJointProductAndByproductsReceiveRecord
             CreateMap<ManuJointProductAndByproductsReceiveRecordEntity, ManuJointProductAndByproductsReceiveRecordSaveDto>();
             CreateMap<ManuJointProductAndByproductsReceiveRecordPagedQueryDto, ManuJointProductAndByproductsReceiveRecordPagedQuery>();
-            
+
             #endregion
         }
 
