@@ -40,6 +40,9 @@ namespace Hymson.MES.Core.Enums
         [Description("创建失败")]
         Failed = 5
     }
+    /// <summary>
+    /// 退料申请状态0:单据申请，1：审批失败，2：审批成功3.已收料4.取消退料5. 创建失败
+    /// </summary>
     public enum WhWarehouseReturnStatusEnum : byte
     {
         /// <summary>
