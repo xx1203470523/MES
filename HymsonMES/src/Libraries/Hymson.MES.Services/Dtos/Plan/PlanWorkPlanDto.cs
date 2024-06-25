@@ -136,9 +136,9 @@ namespace Hymson.MES.Services.Dtos.Plan
     public record PlanWorkPlanSaveDto : BaseEntityDto
     {
         /// <summary>
-        /// 生产计划单号
+        /// 生产计划Id
         /// </summary>
-        public string PlanCode { get; set; }
+        public long WorkPlanId { get; set; }
 
         /// <summary>
         /// 工单明细

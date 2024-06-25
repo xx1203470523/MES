@@ -2,12 +2,14 @@ using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Utils;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -25,6 +27,11 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
 
         /// <summary>
+        /// 仓储接口（生产工单）
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        /// <summary>
         /// 仓储接口（BOM）
         /// </summary>
         private readonly IProcBomRepository _procBomRepository;
@@ -40,16 +47,19 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="planWorkPlanRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procMaterialRepository"></param>
         public PlanWorkPlanService(ICurrentUser currentUser, ICurrentSite currentSite,
             IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
             IProcBomRepository procBomRepository,
             IProcMaterialRepository procMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
             _procBomRepository = procBomRepository;
             _procMaterialRepository = procMaterialRepository;
         }
@@ -60,17 +70,46 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<long> SaveAsync(PlanWorkPlanSaveDto dto)
+        public async Task<int> SaveAsync(PlanWorkPlanSaveDto dto)
         {
             // 检查生产计划是否存在
+            var workPlanEntity = await _planWorkPlanRepository.GetByIdAsync(dto.WorkPlanId);
+            if (workPlanEntity == null) return 0;
 
             // 检查生产计划的状态
+            if (workPlanEntity.Status != PlanWorkPlanStatusEnum.NotStarted)
+            {
+                // TODO: 生产计划状态不正确
+            }
 
-            // 检查子工单的工单号是否重复
+            if (dto.Details == null || !dto.Details.Any()) return 0;
 
-            // 检查子工单的数量是否超出总数量
+            // 检查子工单的工单号是否有重复
+            var workOrderCodes = dto.Details.Select(s => s.OrderCode);
+            if (workOrderCodes.Count() != workOrderCodes.Distinct().Count())
+            {
+                // TODO: 工单号存在重复
+            }
+
+            // 查看数据库是否存在相同的工单号
+            var workOrderEntities = await _planWorkOrderRepository.GetEntitiesAsync(new PlanWorkOrderNewQuery
+            {
+                SiteId = workPlanEntity.SiteId,
+                Codes = workOrderCodes,
+            });
+
+            // 检查子工单的总数量是否等于计划数量
+            var sumQuantity = dto.Details.Sum(s => s.Qty);
+            if (sumQuantity != workPlanEntity.Qty)
+            {
+                // TODO: 子工单的总数量不等于计划数量
+            }
 
             // 检查子工单的计划时间是否超出生产计划的时间范围
+            if (dto.Details.Any(a => a.PlanStartTime < workPlanEntity.PlanStartTime || a.PlanStartTime > workPlanEntity.PlanEndTime))
+            {
+                // TODO: 子工单的计划时间超出生产计划的时间范围
+            }
 
             await Task.CompletedTask;
             return 0;
@@ -84,14 +123,12 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<int> DeletesAsync(long[] idsArr)
         {
             // 检查工单状态
-            var workPlans = await _planWorkPlanRepository.GetByIdsAsync(idsArr);
-            //foreach (var item in workPlans)
-            //{
-            //    if (item.Status != PlanWorkPlanStatusEnum.)
-            //    {
-            //        throw new CustomerValidationException(nameof(ErrorCode.MES16013));
-            //    }
-            //}
+            var workPlanEntities = await _planWorkPlanRepository.GetByIdsAsync(idsArr);
+            if (workPlanEntities.Any(a => a.Status != PlanWorkPlanStatusEnum.NotStarted))
+            {
+                // TODO: 存在状态不为“未开始”的工单
+                return 0;
+            }
 
             return await _planWorkPlanRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }

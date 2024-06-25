@@ -65,7 +65,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         [HttpPost("save")]
         [LogDescription("生产计划", BusinessType.INSERT)]
         [PermissionDescription("plan:workPlan:insert")]
-        public async Task<long> SaveAsync([FromBody] PlanWorkPlanSaveDto parm)
+        public async Task<int> SaveAsync([FromBody] PlanWorkPlanSaveDto parm)
         {
             return await _planWorkPlanService.SaveAsync(parm);
         }
