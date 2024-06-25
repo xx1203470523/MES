@@ -1209,15 +1209,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SendOn = HymsonClock.Now().ToString(),
                 details = productionPickMaterialDtos
             });
-            if(response.result)
+            if(response)
             {
                 await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
             }
-            else
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16049)).WithData("msg", response.msg);
-            }
-
 
 
         }
