@@ -34,7 +34,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]  
+        [HttpPost]
         [Route("receive")]
         [LogDescription("条码接收", BusinessType.INSERT)]
         [PermissionDescription("plan:sfcReceive:receive")]
@@ -53,6 +53,18 @@ namespace Hymson.MES.Api.Controllers.Plan
         public async Task<PlanSfcReceiveSfcDto> ScanCodeInfoAsync([FromQuery] PlanSfcReceiveScanCodeDto parm)
         {
             return await _planSfcInfoService.PlanSfcReceiveScanCodeAsync(parm);
+        }
+
+        /// <summary>
+        /// 批量查询条码信息（条码接收）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("scanCodeList")]
+        public async Task<IEnumerable<PlanSfcReceiveSfcDto>> ScanCodeListAsync([FromBody] PlanSfcReceiveScanListDto parm)
+        {
+            return await _planSfcInfoService.PlanSfcReceiveScanListAsync(parm);
         }
     }
 }   

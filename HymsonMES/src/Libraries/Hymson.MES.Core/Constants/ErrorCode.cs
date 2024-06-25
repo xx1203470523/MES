@@ -1140,6 +1140,8 @@
         public const string MES16136 = "库存不足";
         public const string MES16137 = "物料{MaterialCode}批次数量大于0";
         public const string MES16138 = "条码状态不为最新，请刷新后再操作";
+        public const string MES16139 = "条码{sfc}库存数据不存在";
+        public const string MES16140 = "条码{sfc}库存不足";
         #endregion
 
         #region 条码生成 MES16200
@@ -1280,7 +1282,7 @@
         #region 条码下达 MES16500
         public const string MES16500 = "下达条码失败。";
         public const string MES16501 = "产品{product}未维护编码规则,无法下达条码。";
-        public const string MES16502 = "产品{product}批次大写为0,无法下达条码。";
+        public const string MES16502 = "产品{product}批次大小为0,无法下达条码。";
         public const string MES16503 = "工单{workorder}超过计划数量,下达/产出条码失败。";
         public const string MES16504 = "条码已经存在。";
         public const string MES16505 = "条码不存在，无法复用。";

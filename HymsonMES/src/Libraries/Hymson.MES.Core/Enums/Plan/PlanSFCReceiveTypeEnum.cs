@@ -8,7 +8,7 @@ namespace Hymson.MES.Core.Enums
     public enum PlanSFCReceiveTypeEnum : sbyte
     {
         /// <summary>
-        /// 物料条码
+        /// 产品序列码
         /// </summary>
         [Description("产品序列码")]
         MaterialSfc = 1,

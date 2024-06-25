@@ -7,6 +7,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
@@ -51,6 +52,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
         private readonly AbstractValidator<PlanSfcReceiveCreateDto> _validationCreateRules;
         private readonly AbstractValidator<PlanSfcReceiveScanCodeDto> _validationModifyRules;
+        private readonly AbstractValidator<PlanSfcReceiveScanListDto> _validationScanListRules;
 
         /// <summary>
         /// 
@@ -68,6 +70,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="manuContainerPackRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
+        /// <param name="validationScanListRules"></param>
         public PlanSfcReceiveService(ICurrentUser currentUser, ICurrentSite currentSite,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuSfcRepository manuSfcRepository,
@@ -78,8 +81,9 @@ namespace Hymson.MES.Services.Services.Plan
             IManuCommonOldService manuCommonOldService,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuContainerPackRepository manuContainerPackRepository,
-        AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules,
-        AbstractValidator<PlanSfcReceiveScanCodeDto> validationModifyRules)
+            AbstractValidator<PlanSfcReceiveCreateDto> validationCreateRules,
+            AbstractValidator<PlanSfcReceiveScanCodeDto> validationModifyRules,
+            AbstractValidator<PlanSfcReceiveScanListDto> validationScanListRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -95,6 +99,7 @@ namespace Hymson.MES.Services.Services.Plan
             _manuContainerPackRepository = manuContainerPackRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _validationScanListRules = validationScanListRules;
         }
 
         /// <summary>
@@ -451,6 +456,141 @@ namespace Hymson.MES.Services.Services.Plan
                 Qty = qty,
                 RelevanceOrderCode = relevanceOrderCode
             };
+        }
+
+        /// <summary>
+        /// 条码接收扫码
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<List<PlanSfcReceiveSfcDto>> PlanSfcReceiveScanListAsync(PlanSfcReceiveScanListDto param)
+        {
+            await _validationScanListRules.ValidateAndThrowAsync(param);
+
+            var rspList = new List<PlanSfcReceiveSfcDto>();
+
+            var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(param.WorkOrderId);
+            var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
+            if (param.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
+            }
+            var manuSfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFCs = param.SFCs,
+                Type = SfcTypeEnum.Produce
+            });
+
+            var sfcMaterialEntityDic = new Dictionary<string, (decimal, ProcMaterialEntity)>();
+
+            decimal qty = 0;
+            if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
+            {
+                //校验条码是否存在
+                if (manuSfcEntities == null || !manuSfcEntities.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16128)).WithData("sfc", string.Join(',', param.SFCs));
+                }
+                var noExistSfcs = param.SFCs.Except(manuSfcEntities.Select(x => x.SFC));
+                if (noExistSfcs != null && noExistSfcs.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16128)).WithData("sfc", string.Join(',', noExistSfcs));
+                }
+                //校验是否已是在制状态
+                var inProcessSfcs = manuSfcEntities.Where(x => ManuSfcStatus.SfcStatusInProcess.Contains(x.Status)).Select(x => x.SFC);
+                if (inProcessSfcs != null && inProcessSfcs.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16123)).WithData("sfc", string.Join(',', inProcessSfcs));
+                }
+                //校验是否已装箱
+                var manuContainerPackEntities = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    LadeBarCodes = param.SFCs
+                });
+                if (manuContainerPackEntities != null && manuContainerPackEntities.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16132)).WithData("sfc", string.Join(',', manuContainerPackEntities.Select(x => x.LadeBarCode)));
+                }
+                //校验库存数量
+                var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery { SiteId = _currentSite.SiteId ?? 0, BarCodes = param.SFCs });
+                if (whMaterialInventoryEntities == null || !whMaterialInventoryEntities.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16139)).WithData("sfc", string.Join(',', param.SFCs));
+                }
+                var noExistInventorySfcs = param.SFCs.Except(whMaterialInventoryEntities.Select(x => x.MaterialBarCode));
+                if (noExistInventorySfcs != null && noExistInventorySfcs.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16139)).WithData("sfc", string.Join(',', noExistInventorySfcs));
+                }
+                var usderstockSfcs = whMaterialInventoryEntities.Where(x => x.QuantityResidue <= 0).Select(x => x.MaterialBarCode);
+                if (usderstockSfcs != null && usderstockSfcs.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16140)).WithData("sfc", string.Join(',', usderstockSfcs));
+                }
+                //查询条码对应物料信息
+                var materialEntities = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryEntities.Select(x => x.MaterialId).Distinct());
+                foreach (var item in whMaterialInventoryEntities)
+                {
+                    sfcMaterialEntityDic.Add(item.MaterialBarCode, (item.QuantityResidue, materialEntities.First(x => x.Id == item.MaterialId)));
+                }
+            }
+            else
+            {
+                //校验掩码规则
+                foreach (var item in param.SFCs)
+                {
+                    if (!await _manuCommonOldService.CheckBarCodeByMaskCodeRuleAsync(item, procMaterialEntity.Id))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16121)).WithData("product", procMaterialEntity.MaterialCode);
+                    }
+                }
+                //校验条码是否存在
+                if (manuSfcEntities != null && manuSfcEntities.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16122)).WithData("sfc", string.Join(',', manuSfcEntities.Select(x => x.SFC)));
+                }
+                qty = procMaterialEntity.Batch ?? 0;
+                if (qty <= 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16610)).WithData("sfc", param.SFCs[0]);
+                }
+            }
+            var relevanceOrderCode = string.Empty;
+            if (param.RelevanceWorkOrderId.HasValue)
+            {
+                var relevancePlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(param.RelevanceWorkOrderId ?? 0);
+                if (relevancePlanWorkOrderEntity != null)
+                {
+                    relevanceOrderCode = relevancePlanWorkOrderEntity.OrderCode;
+                }
+            }
+
+            rspList = param.SFCs.Select(item =>
+            {
+                var materialEntity = procMaterialEntity;
+                var tmpQty = qty;
+                if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
+                {
+                    (tmpQty, materialEntity) = sfcMaterialEntityDic[item];
+                }
+                var dto = new PlanSfcReceiveSfcDto
+                {
+                    OrderCode = planWorkOrderEntity.OrderCode,
+                    Type = planWorkOrderEntity.Type,
+                    OrderCodeQty = planWorkOrderEntity.Qty,
+                    BarCode = item,
+                    MaterialCode = materialEntity.MaterialCode,
+                    MaterialName = materialEntity.MaterialName,
+                    MaterialVersion = materialEntity.Version ?? "",
+                    Qty = tmpQty,
+                    RelevanceOrderCode = relevanceOrderCode
+                };
+                return dto;
+            }).ToList();
+
+            return rspList;
         }
 
     }

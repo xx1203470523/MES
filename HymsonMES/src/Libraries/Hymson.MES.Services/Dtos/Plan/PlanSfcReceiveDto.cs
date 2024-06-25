@@ -228,4 +228,27 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public PlanSFCReceiveTypeEnum ReceiveType { get; set; }
     }
+
+    public class PlanSfcReceiveScanListDto
+    {
+        /// <summary>
+        /// 条码接收类型
+        /// </summary>
+        public PlanSFCReceiveTypeEnum ReceiveType { get; set; }
+
+        /// <summary>
+        /// 工单id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 关联工单id
+        /// </summary>
+        public long? RelevanceWorkOrderId { get; set; }
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public List<string> SFCs { get; set; }
+    }
 }
