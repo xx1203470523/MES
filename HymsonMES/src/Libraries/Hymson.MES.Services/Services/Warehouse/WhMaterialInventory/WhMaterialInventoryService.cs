@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
         private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
         private readonly IManuReturnOrderDetailRepository _manuReturnOrderDetailRepository;
-        private readonly IWMSServer _wmsRequest;
+        private readonly IXnebulaWMSServer _wmsRequest;
 
         /// <summary>
         /// 构造函数
@@ -118,7 +118,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IManuGenerateBarcodeService manuGenerateBarcodeService,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
-            IWMSServer wMSRequest,
+            IXnebulaWMSServer wMSRequest,
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
