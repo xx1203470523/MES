@@ -38,12 +38,12 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <summary>
         /// 分页查询列表（生产计划）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet("pagelist")]
-        public async Task<PagedInfo<PlanWorkPlanDto>> GetPageListAsync([FromQuery] PlanWorkPlanPagedQueryDto parm)
+        public async Task<PagedInfo<PlanWorkPlanDto>> GetPageListAsync([FromQuery] PlanWorkPlanPagedQueryDto pagedQueryDto)
         {
-            return await _planWorkPlanService.GetPageListAsync(parm);
+            return await _planWorkPlanService.GetPageListAsync(pagedQueryDto);
         }
 
         /// <summary>
