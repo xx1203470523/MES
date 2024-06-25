@@ -9,7 +9,7 @@ namespace Hymson.MES.HttpClients
     /// <summary>
     /// 仓库操作
     /// </summary>
-    public class WMSOptions
+    public class XnebulaWMSOptions
     {
         /// <summary>
         /// 基础路径
@@ -19,11 +19,17 @@ namespace Hymson.MES.HttpClients
         /// 出库操作配置
         /// </summary>
         public WMSDeliveryOptions Delivery { get; set; }
+        /// <summary>
+        /// 取消出库操作配置
+        /// </summary>
         public WMSDeliveryCancelOptions DeliveryCancel { get; set; }
         /// <summary>
         /// 入库操作配置
         /// </summary>
         public WMSReceiptOptions Receipt { get; set; }
+        /// <summary>
+        /// 取消入库操作配置
+        /// </summary>
         public WMSReceiptCancelOptions ReceiptCancel { get; set; }
     }
     /// <summary>

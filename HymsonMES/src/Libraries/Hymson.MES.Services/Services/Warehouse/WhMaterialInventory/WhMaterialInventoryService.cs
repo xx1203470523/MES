@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
         private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
         private readonly IManuReturnOrderDetailRepository _manuReturnOrderDetailRepository;
-        private readonly IWMSServer _wmsRequest;
+        private readonly IXnebulaWMSServer _wmsRequest;
 
         /// <summary>
         /// 构造函数
@@ -118,7 +118,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IManuGenerateBarcodeService manuGenerateBarcodeService,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
-            IWMSServer wMSRequest,
+            IXnebulaWMSServer wMSRequest,
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
@@ -1209,15 +1209,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SendOn = HymsonClock.Now().ToString(),
                 details = productionPickMaterialDtos
             });
-            if(response.result)
+            if(response)
             {
                 await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
             }
-            else
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16049)).WithData("msg", response.msg);
-            }
-
 
 
         }

@@ -43,7 +43,7 @@ namespace Hymson.MES.System.Api.Controllers
         [HttpPost]
         [Route("PickMaterialsCallBack")]
         [ProducesResponseType(typeof(ResultDto), 200)]
-        [LogDescription("生产领料单申请结果反馈", BusinessType.INSERT)]
+        [LogDescription("生产领料单结果反馈", BusinessType.INSERT)]
         public async Task PickMaterialsCallBackAsync([FromBody] ProductionPickCallBackDto callBackDto)
         {
             await _manuRequistionOrderService.PickMaterialsCallBackAsync(callBackDto);
@@ -51,8 +51,8 @@ namespace Hymson.MES.System.Api.Controllers
         [HttpPost]
         [Route("ReturnMaterialsCallBack")]
         [ProducesResponseType(typeof(ResultDto), 200)]
-        [LogDescription("生产退料单申请结果反馈", BusinessType.INSERT)]
-        public async Task ReturnMaterialsCallBackAsync([FromBody] ProductionPickCallBackDto callBackDto)
+        [LogDescription("生产退料单结果反馈", BusinessType.INSERT)]
+        public async Task ReturnMaterialsCallBackAsync([FromBody] ProductionReturnCallBackDto callBackDto)
         {
             await _manuRequistionOrderService.ReturnMaterialsCallBackAsync(callBackDto);
         }
