@@ -59,7 +59,17 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         [Description("WMS审批失败")]
         ApprovalingFailed = 3,
-        
+        /// <summary>
+        /// 取消成功
+        /// </summary>
+        [Description("取消成功")]
+        CancelSuccess = 4,
+        /// <summary>
+        /// 取消失败
+        /// </summary>
+        [Description("取消失败")]
+        CancelFailed = 5,
+
     }
 
 }

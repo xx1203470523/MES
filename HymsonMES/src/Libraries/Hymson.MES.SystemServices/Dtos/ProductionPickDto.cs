@@ -38,7 +38,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// </summary>
         public string RequistionId { get; set; }
         /// <summary>
-        /// 领料单结果 0申请成功 1，申请失败 2 审批成功 3 审批失败
+        /// 领料单结果 0申请成功 1，申请失败 2 审批成功 3 审批失败 4 取消成功 5取消失败
         /// </summary>
         public ManuMaterialFormResponseEnum State { get; set; }
 
@@ -50,7 +50,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// </summary>
         public string RequistionId { get; set; }
         /// <summary>
-        /// 退料单结果0申请成功 1，申请失败 2 审批成功 3 审批失败
+        /// 退料单结果0申请成功 1，申请失败 2 审批成功 3 审批失败 4 取消成功 5取消失败
         /// </summary>
         public ManuMaterialFormResponseEnum State { get; set; }
 

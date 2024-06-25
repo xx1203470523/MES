@@ -83,6 +83,6 @@ namespace Hymson.MES.Core.Enums
         /// 已退料
         /// </summary>
         [Description("已退料")]
-        Picked = 6
+        Return = 6
     }
 }
