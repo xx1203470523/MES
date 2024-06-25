@@ -29,6 +29,6 @@ namespace Hymson.MES.SystemServices.Services
         /// </summary>
         /// <param name="productionPickDto"></param>
         /// <returns></returns>
-        Task ReturnMaterialsCallBackAsync(ProductionPickCallBackDto productionPickDto);
+        Task ReturnMaterialsCallBackAsync(ProductionReturnCallBackDto productionPickDto);
     }
 }

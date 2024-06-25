@@ -52,7 +52,7 @@ namespace Hymson.MES.System.Api.Controllers
         [Route("ReturnMaterialsCallBack")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("生产退料单结果反馈", BusinessType.INSERT)]
-        public async Task ReturnMaterialsCallBackAsync([FromBody] ProductionPickCallBackDto callBackDto)
+        public async Task ReturnMaterialsCallBackAsync([FromBody] ProductionReturnCallBackDto callBackDto)
         {
             await _manuRequistionOrderService.ReturnMaterialsCallBackAsync(callBackDto);
         }

@@ -134,42 +134,66 @@ namespace Hymson.MES.SystemServices.Services
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            if(!productionPickDto.PickOrderResult)
+            var id = productionPickDto.RequistionId.Split('_')[1];
+            var requistionOrderEntity = await _manuRequistionOrderRepository.GetByIdAsync(long.Parse(id));
+            if (requistionOrderEntity == null)
             {
-                var id = productionPickDto.RequistionId.Split('_')[1];
-                var requistionOrderEntity = await _manuRequistionOrderRepository.GetByIdAsync(long.Parse(id));
-                if(requistionOrderEntity == null) {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16050)).WithData("orderId",productionPickDto.RequistionId);
-                }
-                else
-                {
-                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.Failed;
-                    await _manuRequistionOrderRepository.UpdateAsync(requistionOrderEntity);
-                }
+                throw new CustomerValidationException(nameof(ErrorCode.MES16050)).WithData("orderId", productionPickDto.RequistionId);
             }
+            switch (productionPickDto.State)
+            {
+                case ManuMaterialFormResponseEnum.Created:
+                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.Created;
+                    break;
+                case ManuMaterialFormResponseEnum.Failed:
+                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.Failed;
+                   
+                    break;
+                case ManuMaterialFormResponseEnum.ApprovalingSuccess:
+                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.ApprovalingSuccess;
+                    break;
+                case ManuMaterialFormResponseEnum.ApprovalingFailed:
+                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.ApprovalingFailed;
+                    break;
+                default:
+                    break;
+            }
+            await _manuRequistionOrderRepository.UpdateAsync(requistionOrderEntity);
+           
         }
 
-        public async Task ReturnMaterialsCallBackAsync(ProductionPickCallBackDto productionPickDto)
+        public async Task ReturnMaterialsCallBackAsync(ProductionReturnCallBackDto productionPickDto)
         {
             //根据结果 标记这个单据是否创建成功
             if (productionPickDto == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            if (!productionPickDto.PickOrderResult)
+            var id = productionPickDto.RequistionId.Split('_')[1];
+            var returnOrderEntity = await _manuReturnOrderRepository.GetByIdAsync(long.Parse(id));
+            if (returnOrderEntity == null)
             {
-                var id = productionPickDto.RequistionId.Split('_')[1];
-                var returnOrderEntity = await _manuReturnOrderRepository.GetByIdAsync(long.Parse(id));
-                if (returnOrderEntity == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16050)).WithData("orderId", productionPickDto.RequistionId);
-                }
-                else
-                {
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Failed;
-                    await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
-                }
+                throw new CustomerValidationException(nameof(ErrorCode.MES16050)).WithData("orderId", productionPickDto.RequistionId);
             }
+            switch (productionPickDto.State)
+            {
+                case ManuMaterialFormResponseEnum.Created:
+                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Created;
+                    break;
+                case ManuMaterialFormResponseEnum.Failed:
+                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Failed;
+                    break;
+                case ManuMaterialFormResponseEnum.ApprovalingSuccess:
+                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingSuccess;
+                    break;
+                case ManuMaterialFormResponseEnum.ApprovalingFailed:
+                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingFailed;
+                    break;
+                default:
+                    break;
+            }
+            await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
+            //TODO:当审批通过后进行库存扣减
         }
 
         /// <summary>

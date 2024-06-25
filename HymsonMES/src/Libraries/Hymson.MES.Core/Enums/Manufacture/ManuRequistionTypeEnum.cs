@@ -34,4 +34,32 @@ namespace Hymson.MES.Core.Domain.Manufacture
         [Description("工单借料")]
         WorkOrderBorrow = 1
     }
+    public enum ManuMaterialFormResponseEnum : sbyte
+    {
+        /// <summary>
+        /// 创建成功
+        /// </summary>
+        [Description("创建成功")]
+        Created = 0,
+        /// <summary>
+        /// 创建失败
+        /// </summary>
+        [Description("创建失败")]
+        Failed = 1,
+
+       
+
+        /// <summary>
+        /// WMS审批成功
+        /// </summary>
+        [Description("WMS审批成功")]
+        ApprovalingSuccess = 2,
+        /// <summary>
+        /// WMS审批失败
+        /// </summary>
+        [Description("WMS审批失败")]
+        ApprovalingFailed = 3,
+        
+    }
+
 }
