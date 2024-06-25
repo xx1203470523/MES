@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <PackageReference Include="Hymson.Infrastructure" Version="2.1.174" />
 	  <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />    <PackageReference Include="System.Net.Http.Json" Version="6.0.1" />
@@ -15,6 +16,10 @@
 
   <ItemGroup>
     <Folder Include="Responses\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hymson.MES.Core\Hymson.MES.Core.csproj" />
   </ItemGroup>
 
 </Project>

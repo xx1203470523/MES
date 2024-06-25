@@ -1,6 +1,11 @@
 ﻿using Hymson.MES.HttpClients.Requests;
 using Microsoft.Extensions.Options;
+using System.Net.Http;
+using System.Net;
 using System.Net.Http.Json;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
+using MailKit.Net.Smtp;
 
 namespace Hymson.MES.HttpClients
 {
@@ -17,7 +22,7 @@ namespace Hymson.MES.HttpClients
             _options = options.Value;
         }
 
-        public async Task<(string msg,bool result)> MaterialPickingRequestAsync(MaterialPickingRequestDto request)
+        public async Task<bool> MaterialPickingRequestAsync(MaterialPickingRequestDto request)
         {
             
             MaterialPickingRequest materialPickingRequest = new MaterialPickingRequest()
@@ -29,19 +34,11 @@ namespace Hymson.MES.HttpClients
                 WarehouseCode = _options.Delivery.WarehouseCode
             };
            
-            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(_options.Delivery.RoutePath, materialPickingRequest);
+            var httpResponse = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(_options.Delivery.RoutePath, materialPickingRequest);
+            
+            await HandleResponse(httpResponse).ConfigureAwait(false);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                //using var contentStream =
-                //    await httpResponseMessage.Content.ReadAsStreamAsync();
-
-                //var r = await System.Text.Json.JsonSerializer.DeserializeAsync
-                //    <PrintResponse>(contentStream);
-                //return (base64Str: r.Data, result: r.Success);
-                return ("调用成功", true);
-            }
-            return ("调用失败", false);
+            return httpResponse.IsSuccessStatusCode;
         }
 
         
@@ -56,17 +53,9 @@ namespace Hymson.MES.HttpClients
                 Type = _options.Delivery.Type,
                 WarehouseCode = _options.Delivery.WarehouseCode
             };
-            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialPickingCancel>(_options.Delivery.RoutePath, materialPickingCancel);
-
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            var httpResponse = await _httpClient.PostAsJsonAsync<MaterialPickingCancel>(_options.Delivery.RoutePath, materialPickingCancel);
+            await HandleResponse(httpResponse).ConfigureAwait(false);
+            return httpResponse.IsSuccessStatusCode;
         }
 
         public async Task<bool> MaterialReturnRequestAsync(MaterialReturnRequestDto request)
@@ -80,14 +69,10 @@ namespace Hymson.MES.HttpClients
                 WarehouseCode = _options.Receipt.WarehouseCode
             };
 
-            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialReturnRequest>(_options.Delivery.RoutePath, materialReturnRequest);
+            var httpResponse = await _httpClient.PostAsJsonAsync<MaterialReturnRequest>(_options.Delivery.RoutePath, materialReturnRequest);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-                
-                return true;
-            }
-            return false;
+            await HandleResponse(httpResponse).ConfigureAwait(false);
+            return httpResponse.IsSuccessStatusCode;
         }
 
         public async Task<bool> MaterialReturnCancelAsync(MaterialReturnCancelDto request)
@@ -99,20 +84,26 @@ namespace Hymson.MES.HttpClients
                 Type = _options.Delivery.Type,
                 WarehouseCode = _options.Delivery.WarehouseCode
             };
-            var httpResponseMessage = await _httpClient.PostAsJsonAsync<MaterialReturnCancel>(_options.Delivery.RoutePath, materialReturnCancel);
+            var httpResponse = await _httpClient.PostAsJsonAsync<MaterialReturnCancel>(_options.Delivery.RoutePath, materialReturnCancel);
 
-            if (httpResponseMessage.IsSuccessStatusCode)
-            {
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            await HandleResponse(httpResponse).ConfigureAwait(false);
+            return httpResponse.IsSuccessStatusCode;
         }
 
+        private static async Task HandleResponse(HttpResponseMessage response)
+        {
+            if (!response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
+                if (response.StatusCode == HttpStatusCode.Forbidden || response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    throw new CustomerValidationException(response.StatusCode.ToString(), content);
+                }
+
+                throw new NotFoundException(response.StatusCode.ToString(), content);
+            }
+        }
 
         //async Task<(string base64Str, bool result)> ILabelPrintRequest.PreviewFromImageBase64Async(PreviewRequest previewRequest)
         //{
