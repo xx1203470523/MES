@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 领料申请状态0:单据申请，1创建成功,2创建失败,3：审批成功3，4：WMS审批失败5.取消领料6.已收料
+    /// 领料申请状态0:单据申请，1创建成功,2创建失败,3：审批成功4：WMS审批失败5.取消领料6.已收料
     /// </summary>
     public enum WhWarehouseRequistionStatusEnum : byte
     {
@@ -45,7 +45,7 @@ namespace Hymson.MES.Core.Enums
        
     }
     /// <summary>
-    /// 退料申请状态0:单据申请，1创建成功,2创建失败,3：审批成功3，4：WMS审批失败5.取消退料6.已退料
+    /// 退料申请状态0:单据申请，1创建成功,2创建失败,3：审批成功4：WMS审批失败5.取消退料6.已退料
     /// </summary>
     public enum WhWarehouseReturnStatusEnum : byte
     {
