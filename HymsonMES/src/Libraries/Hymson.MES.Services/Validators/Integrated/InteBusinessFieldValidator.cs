@@ -23,7 +23,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10116));
             RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES10117));
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(FieldDefinitionTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES10243));
-            RuleFor(x => x.Source).Must(it => Enum.IsDefined(typeof(FieldDefinitionSourceEnum), it)).WithErrorCode(nameof(ErrorCode.MES10244));
+            //RuleFor(x => x.Source).Must(it => Enum.IsDefined(typeof(FieldDefinitionSourceEnum), it)).WithErrorCode(nameof(ErrorCode.MES10244));
         }
     }
 

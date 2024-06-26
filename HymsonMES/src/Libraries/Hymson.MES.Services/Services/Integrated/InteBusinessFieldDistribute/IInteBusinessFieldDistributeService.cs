@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(InteBusinessFieldDistributeSaveDto saveDto);
+        Task<long> CreateAsync(InteBusinessFieldDistributeSaveDto saveDto);
 
         /// <summary>
         /// 修改
@@ -50,5 +50,11 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         Task<PagedInfo<InteBusinessFieldDistributeDto>> GetPagedListAsync(InteBusinessFieldDistributePagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 根据Id查询详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<BusinessFieldViewDto>> getBusinessFieldDistributeDetailsByIdAsync(long id);
     }
 }
