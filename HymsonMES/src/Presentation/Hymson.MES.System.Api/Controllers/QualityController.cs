@@ -41,7 +41,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPost("iqc")]
+        [HttpPost("iqc/submit")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("来料检验", BusinessType.INSERT)]
         public async Task SubmitIncomingAsync([FromBody] WhMaterialReceiptDto dto)

@@ -17,57 +17,57 @@ namespace Hymson.MES.Core.Domain.Plan
         /// </summary>
         public string OrderCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工作中心类型;和工作中心保持一致
         /// </summary>
         public WorkCenterTypeEnum? WorkCenterType { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工作中心（车间或者线体）
         /// </summary>
         public long? WorkCenterId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工艺路线
         /// </summary>
         public long ProcessRouteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 产品bom
         /// </summary>
         public long ProductBOMId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单类型
         /// </summary>
         public PlanWorkOrderTypeEnum Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 数量
         /// </summary>
         public decimal Qty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
         /// </summary>
         public PlanWorkOrderStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 计划开始时间
         /// </summary>
         public DateTime? PlanStartTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 计划结束时间
         /// </summary>
         public DateTime? PlanEndTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工厂
         /// </summary>
         public long SiteId { get; set; }
@@ -97,5 +97,11 @@ namespace Hymson.MES.Core.Domain.Plan
         /// 锁定状态时锁定前的工单状态
         /// </summary>
         public PlanWorkOrderStatusEnum? LockedStatus { get; set; }
+
+        /// <summary>
+        /// 生产计划id
+        /// </summary>
+        public long? WorkPlanId { get; set; }
+
     }
 }

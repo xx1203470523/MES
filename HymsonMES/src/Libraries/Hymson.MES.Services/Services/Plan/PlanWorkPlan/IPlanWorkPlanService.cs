@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<long> SaveAsync(PlanWorkPlanSaveDto dto);
+        Task<int> SaveAsync(PlanWorkPlanSaveDto dto);
 
         /// <summary>
         /// 批量删除
