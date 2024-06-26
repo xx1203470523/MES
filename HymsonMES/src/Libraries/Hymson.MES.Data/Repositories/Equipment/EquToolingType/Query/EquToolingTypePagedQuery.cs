@@ -33,6 +33,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// </summary>
         public string? SparePartsGroup { get; set; }
 
+        /// <summary>
+        /// 更新时间  时间范围  数组
+        /// </summary>
+        public DateTime[]? UpdatedOn { get; set; }
 
     }
 }

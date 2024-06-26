@@ -385,6 +385,7 @@ namespace Hymson.MES.Services.Services.Integrated
             //if (inteBusinessFieldEntity == null) return null;
             if (inteBusinessFieldEntity.Any())
             {
+                inteBusinessFieldEntity= inteBusinessFieldEntity.OrderBy(x => x.Seq).ToList();
                 foreach (var item in inteBusinessFieldEntity)
                 {
                     var inteVehicleTypeVerifyDto = item.ToModel<InteBusinessFieldListDto>();

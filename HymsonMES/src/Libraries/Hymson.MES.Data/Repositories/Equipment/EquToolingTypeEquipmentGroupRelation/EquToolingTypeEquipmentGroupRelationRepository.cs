@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquToolingTypeEquipmentGroupRelation.Query.View;
+using Hymson.MES.Data.Repositories.Equipment.EquToolingTypeMaterialRelation.Query.View;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Microsoft.Extensions.Options;
 
@@ -42,6 +43,16 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return await conn.QueryAsync<ToolingTypeEquipmentGroupRelationView>(GetSparePartsEquipmentGroupRelationSqlTemplate, new { Id = Id });
         }
 
+        /// <summary>
+        /// 获取物料关联备件维护
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ToolingTypeMaterialRelationView>> GetToolingTypeMaterialRelationAsync(long Id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ToolingTypeMaterialRelationView>(GetSparePartsMaterialRelationSqlTemplate, new { Id = Id });
+        }
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -116,6 +127,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             try
             {
                 using var conn = GetMESDbConnection();
+                await conn.ExecuteAsync(DeleteByMaterialId, command);
                 return await conn.ExecuteAsync(DeleteBySparePartsId, command);
             }
             catch (Exception)
@@ -211,23 +223,28 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string GetByIdSql = @"SELECT * FROM `equ_sparepart_type_equipment_group_relation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `equ_sparepart_type_equipment_group_relation`  WHERE Id IN @Ids ";
-        const string DeleteBySparePartsId = "DELETE FROM equ_sparepart_type_equipment_group_relation WHERE SparePartTypeId = @ParentId";
 
-        const string GetSparePartsEquipmentGroupRelationSqlTemplate = @"SELECT
-	                                                                        ESPGEGR.SparePartTypeId,
-	                                                                        ESPGEGR.EquipmentGroupId,
-	                                                                        EEG.EquipmentGroupCode,
-	                                                                        EEG.EquipmentGroupName,
-	                                                                        ESPGEGR.CreatedBy,
-	                                                                        ESPGEGR.CreatedOn
-                                                                        FROM
-	                                                                        equ_sparepart_type ESPG
-                                                                         JOIN equ_sparepart_type_equipment_group_relation ESPGEGR ON ESPGEGR.SparePartTypeId = ESPG.Id 
-                                                                         JOIN equ_equipment_group EEG ON EEG.Id=ESPGEGR.EquipmentGroupId
+        const string DeleteBySparePartsId = "DELETE FROM equ_tools_type_equipment_group_relation WHERE ToolTypeId = @ParentId";
+        const string DeleteByMaterialId = "DELETE FROM equ_tools_type_material_relation WHERE ToolTypeId = @ParentId";
 
-                                                                        WHERE
-	                                                                        ESPG.Id = @Id 
-	                                                                        AND ESPG.IsDeleted = 0";
+        const string GetSparePartsEquipmentGroupRelationSqlTemplate = @"SELECT * FROM `equ_tools_type_equipment_group_relation`  WHERE ToolTypeId = @Id ";
+        const string GetSparePartsMaterialRelationSqlTemplate = @"SELECT * FROM `equ_tools_type_material_relation`  WHERE ToolTypeId = @Id ";
+
+        //const string GetSparePartsEquipmentGroupRelationSqlTemplate = @"SELECT
+        //                                                                 ESPGEGR.SparePartTypeId,
+        //                                                                 ESPGEGR.EquipmentGroupId,
+        //                                                                 EEG.EquipmentGroupCode,
+        //                                                                 EEG.EquipmentGroupName,
+        //                                                                 ESPGEGR.CreatedBy,
+        //                                                                 ESPGEGR.CreatedOn
+        //                                                                FROM
+        //                                                                 equ_sparepart_type ESPG
+        //                                                                 JOIN equ_sparepart_type_equipment_group_relation ESPGEGR ON ESPGEGR.SparePartTypeId = ESPG.Id 
+        //                                                                 JOIN equ_equipment_group EEG ON EEG.Id=ESPGEGR.EquipmentGroupId
+
+        //                                                                WHERE
+        //                                                                 ESPG.Id = @Id 
+        //                                                                 AND ESPG.IsDeleted = 0";
 
     }
 }
