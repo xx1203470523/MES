@@ -21,6 +21,11 @@ namespace Hymson.MES.CoreServices.Bos.Parameter
         /// 采集时间
         /// </summary>
         public DateTime CollectionTime { get; set; } = HymsonClock.Now();
+
+        /// <summary>
+        /// 产品参数组id
+        /// </summary>
+        public long ParameterGroupId { get; set; } = 0;
     }
 
 }
