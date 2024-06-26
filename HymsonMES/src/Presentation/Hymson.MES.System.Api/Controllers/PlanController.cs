@@ -1,4 +1,5 @@
-﻿using Hymson.MES.SystemServices.Dtos;
+﻿using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.SystemServices.Dtos;
 using Hymson.MES.SystemServices.Services.Plan;
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
@@ -40,6 +41,18 @@ namespace Hymson.MES.System.Api.Controllers
         public async Task SyncWorkPlanAsync(IEnumerable<WorkPlanDto> requestDtos)
         {
             _ = await _planWorkPlanService.SyncWorkPlanAsync(requestDtos);
+        }
+        /// <summary>
+        /// 生产工单（同步）
+        /// </summary>
+        /// <param name="requestDtos"></param>
+        /// <returns></returns>
+        [HttpGet("WorkOrder/{workCenterId}")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("生产工单（同步）", BusinessType.INSERT)]
+        public async Task<IEnumerable<RotorWorkOrder>> SyncWorkOrderAsync(long workCenterId)
+        {
+            return await _planWorkPlanService.SyncWorkOrderAsync(workCenterId);
         }
 
     }

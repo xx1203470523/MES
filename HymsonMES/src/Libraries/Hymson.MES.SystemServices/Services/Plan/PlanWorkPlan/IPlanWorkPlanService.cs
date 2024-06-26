@@ -13,6 +13,12 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// <param name="requestDtos"></param>
         /// <returns></returns>
         Task<int> SyncWorkPlanAsync(IEnumerable<WorkPlanDto> requestDtos);
+        /// <summary>
+        /// 同步工单列表
+        /// </summary>
+        /// <param name="WorkCenterId">工作中心</param>
+        /// <returns></returns>
+        Task<IEnumerable<RotorWorkOrder>> SyncWorkOrderAsync(long WorkCenterId);
 
     }
 }
