@@ -117,6 +117,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 角色、人员选择的组信息
         /// </summary>
         public IEnumerable<string>? Values { get; set; }
+
+        /// <summary>
+        /// 有效期
+        /// </summary>
+        public DateTime DueDate { get; set; }
     }
 
 }

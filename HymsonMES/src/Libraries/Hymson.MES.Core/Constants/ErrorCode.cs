@@ -2229,7 +2229,7 @@
         public const string MES17601 = "备件不存在!";
         public const string MES17602 = "备件已绑定设备,位置{position}!";
         public const string MES17603 = "备件没有设置备件类型!";
-        public const string MES17604 = "设备没有设置设备组!";
+        public const string MES17604 = "待安装的设备不在备件类型所关联的设备组中!";
         public const string MES17605 = "备件对应的备件类型没有关联设备组!";
         public const string MES17606 = "备件关联的设备组不包含当前设备!";
         public const string MES17607 = "备件在设备上的安装数量不能超过备件注册数量!";

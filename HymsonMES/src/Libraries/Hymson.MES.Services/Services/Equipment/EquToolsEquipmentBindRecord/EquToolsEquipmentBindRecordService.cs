@@ -4,6 +4,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Core.Domain.Equipment;
@@ -49,6 +50,10 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly IEquToolsRepository _toolsRepository;
         private readonly IEquEquipmentRecordRepository _equipmentRecordRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
+        /// <summary>
+        /// 多语言服务
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -58,7 +63,8 @@ namespace Hymson.MES.Services.Services.Equipment
             IEquToolsRecordRepository toolsRecordRepository,
             IEquToolsRepository toolsRepository,
             IEquEquipmentRecordRepository equipmentRecordRepository,
-            IEquEquipmentRepository equEquipmentRepository)
+            IEquEquipmentRepository equEquipmentRepository,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -67,6 +73,7 @@ namespace Hymson.MES.Services.Services.Equipment
             _toolsRepository = toolsRepository;
             _equipmentRecordRepository = equipmentRecordRepository;
             _equEquipmentRepository = equEquipmentRepository;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -97,7 +104,7 @@ namespace Hymson.MES.Services.Services.Equipment
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17702)).WithData("code", toolsEntity.Code);
             }
-            if (toolsEntity.CurrentUsedLife<=0)
+            if (toolsEntity.RatedLife - toolsEntity.CurrentUsedLife <= 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17705));
             }
@@ -267,6 +274,12 @@ namespace Hymson.MES.Services.Services.Equipment
                 throw new CustomerValidationException(nameof(ErrorCode.MES17706));
             }
 
+            if (recordEntity.OperationType == BindOperationTypeEnum.Uninstall)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127))
+                   .WithData("status", _localizationService.GetResource($"{typeof(BindOperationTypeEnum).FullName}.{Enum.GetName(typeof(BindOperationTypeEnum), BindOperationTypeEnum.Uninstall)}"));
+            }
+
             #region 组装数据
 
             //查询设备信息
@@ -295,14 +308,15 @@ namespace Hymson.MES.Services.Services.Equipment
             var toolsRecordEntity = new EquToolsRecordEntity();
             if (toolsEntity != null)
             {
-                if ((toolsEntity.CurrentUsedLife - saveDto.CurrentUsedLife) <= 0)
+                var currentUsedLife = toolsEntity.CurrentUsedLife ?? 0;
+                if ((toolsEntity.RatedLife - currentUsedLife - saveDto.CurrentUsedLife) <= 0)
                 {
                     toolsEntity.Status = DisableOrEnableEnum.Disable;
                 }
                 toolsEntity.UpdatedBy = updatedBy;
                 toolsEntity.UpdatedOn = updatedOn;
                 toolsEntity.CumulativeUsedLife = toolsEntity.CumulativeUsedLife + saveDto.CurrentUsedLife;
-                toolsEntity.CurrentUsedLife = toolsEntity.CurrentUsedLife - saveDto.CurrentUsedLife;
+                toolsEntity.CurrentUsedLife = toolsEntity.CurrentUsedLife + saveDto.CurrentUsedLife;
 
                 toolsRecordEntity = new EquToolsRecordEntity()
                 {
