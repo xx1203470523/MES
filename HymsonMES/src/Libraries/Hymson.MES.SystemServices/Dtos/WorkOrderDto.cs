@@ -58,26 +58,32 @@ namespace Hymson.MES.SystemServices.Dtos
         ///
         [JsonPropertyName("workTotal")]
         public decimal Qty { get; set; }
-
-
         /// <summary>
-        /// 计划开始时间
+        /// 生产计划数量
         /// </summary>
-        /// 
-        [JsonPropertyName("planTime")]
-        public DateTime? PlanStartTime { get; set; }
+        ///
+        [JsonPropertyName("orderTotal")]
+        public decimal PlanQty { get; set; }
 
-        /// <summary>
-        /// 计划结束时间
-        /// </summary>
-        /// 
-        [JsonPropertyName("endTime")]
-        public DateTime? PlanEndTime { get; set; }
+
+        ///// <summary>
+        ///// 计划开始时间
+        ///// </summary>
+        ///// 
+        //[JsonPropertyName("planTime")]
+        //public DateTime? PlanStartTime { get; set; }
+
+        ///// <summary>
+        ///// 计划结束时间
+        ///// </summary>
+        ///// 
+        //[JsonPropertyName("endTime")]
+        //public DateTime? PlanEndTime { get; set; }
         /// <summary>
         /// 
         /// </summary>
         [JsonPropertyName("enable")]
-        public bool Enable { get; set; }
+        public bool Enable { get; set; } = true;
         /// <summary>
         /// 版本号
         /// </summary>
