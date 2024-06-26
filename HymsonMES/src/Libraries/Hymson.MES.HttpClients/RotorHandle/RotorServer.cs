@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,26 +16,38 @@ namespace Hymson.MES.HttpClients.RotorHandle
     public class RotorServer : IRotorService
     {
         private readonly HttpClient _httpClient;
-        private readonly RotorOptions _options;
-        public RotorServer(HttpClient httpClient, IOptions<RotorOptions> options)
+        private readonly RotorOption _options;
+        public RotorServer(HttpClient httpClient, IOptions<RotorOption> options)
         {
             _httpClient = httpClient;
             _options = options.Value;
         }
         
-        public Task<bool> WorkOrderStart(string workOrderCode)
+        public async Task<bool> WorkOrderStart(string workOrderCode)
         {
-            throw new NotImplementedException();
+            var httpResponse = await _httpClient.GetAsync($"{_options.StartOrderRoute}{workOrderCode}");
+
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            return httpResponse.IsSuccessStatusCode;
         }
 
-        public Task<bool> WorkOrderStop(string workOrderCode)
+        public async Task<bool> WorkOrderStop(string workOrderCode)
         {
-            throw new NotImplementedException();
+            var httpResponse = await _httpClient.GetAsync($"{_options.StopOrderRoute}{workOrderCode}");
+
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            return httpResponse.IsSuccessStatusCode;
         }
 
-        public Task<bool> WorkOrderSync(RotorWorkOrderSync rotorWorkOrder)
+        public async Task<bool> WorkOrderSync(RotorWorkOrderSync rotorWorkOrder)
         {
-            throw new NotImplementedException();
+            var httpResponse = await _httpClient.PostAsJsonAsync<RotorWorkOrderSync>(_options.CreateOrderRoute, rotorWorkOrder);
+
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            return httpResponse.IsSuccessStatusCode;
         }
     }
 }
