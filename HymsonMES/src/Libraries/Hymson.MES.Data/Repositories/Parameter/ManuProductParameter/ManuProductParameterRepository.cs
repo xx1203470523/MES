@@ -289,6 +289,24 @@ namespace Hymson.MES.Data.Repositories.Parameter
             return new PagedInfo<ManuProductParameterEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        public Task<int> PrepareProductParameterSFCTable(int index)
+        {
+            //获取目标表名
+            var destinationTableName = ProductParameter.ProductParameterPrefix + index;
+            string createTableSql = $"CREATE TABLE `{destinationTableName}` LIKE `{ProductParameter.ProductProcedureParameterTemplateName}`;";
+            using var conn = GetMESParamterDbConnection();
+            return conn.ExecuteScalarAsync<int>(createTableSql, null);
+        }
+
+        public Task<int> PrepareProductParameterProcedureldTable(long siteId, long procedureId)
+        {
+            //获取目标表名
+            var destinationTableName = GetTableNameByProcedureId(siteId, procedureId);
+            string createTableSql = $"CREATE TABLE `{destinationTableName}` LIKE `{ProductParameter.ProductProcedureParameterTemplateName}`;";
+            using var conn = GetMESParamterDbConnection();
+            return conn.ExecuteScalarAsync<int>(createTableSql, null);
+        }
+
         #region 内部方法
         /// <summary>
         /// 更具SFC获取表名

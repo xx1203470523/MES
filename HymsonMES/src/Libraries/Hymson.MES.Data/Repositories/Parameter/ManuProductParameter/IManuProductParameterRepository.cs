@@ -73,5 +73,8 @@ namespace Hymson.MES.Data.Repositories.Parameter
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuProductParameterEntity>> GetParametesEntitiesAsync(ManuProductParameterPagedQuery pagedQuery);
+
+         Task<int> PrepareProductParameterSFCTable(int index);
+         Task<int> PrepareProductParameterProcedureldTable(long siteId, long procedureId);
     }
 }

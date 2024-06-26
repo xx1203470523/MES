@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
@@ -7,6 +8,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
@@ -30,9 +32,12 @@ using Hymson.SqlActuator.Services;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using IdGen;
+using Minio.DataModel;
 using OfficeOpenXml.ConditionalFormatting;
 using Org.BouncyCastle.Crypto;
+using System;
 using System.Security.AccessControl;
+using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.Procedure
@@ -1193,6 +1198,25 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         }
 
         #endregion
+
+        public async Task CreateProductParameterAsync()
+        {
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
+            {
+                for (int index = 0; index < 2048; index++)
+                {
+                    await _manuProductParameterRepository.PrepareProductParameterSFCTable(index);
+                }
+
+                var procProcedureEntities = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery { });
+                foreach (var item in procProcedureEntities)
+                {
+                    await _manuProductParameterRepository.PrepareProductParameterProcedureldTable(item.SiteId, item.Id);
+                }
+                //提交
+                ts.Complete();
+            }
+        }
 
     }
 }
