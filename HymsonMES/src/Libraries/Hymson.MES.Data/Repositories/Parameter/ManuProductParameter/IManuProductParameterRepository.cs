@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Domain.Parameter;
+﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Parameter;
 
 namespace Hymson.MES.Data.Repositories.Parameter
 {
@@ -66,5 +67,11 @@ namespace Hymson.MES.Data.Repositories.Parameter
         /// <returns></returns>
         string PrepareProductParameterProcedureIdTableSql(long siteId, long procedureId);
 
+        /// <summary>
+        /// 根据工序或者条码分页查询产品参数
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuProductParameterEntity>> GetParametesEntitiesAsync(ManuProductParameterPagedQuery pagedQuery);
     }
 }

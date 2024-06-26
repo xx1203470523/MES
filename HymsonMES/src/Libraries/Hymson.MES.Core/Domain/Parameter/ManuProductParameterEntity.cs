@@ -46,5 +46,15 @@ namespace Hymson.MES.Core.Domain.Parameter
         ///步骤表id
         /// </summary>
         public long?  SfcstepId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long ResourceId { get; set; } = 0;
+
+        /// <summary>
+        /// 产品参数组id
+        /// </summary>
+        public long ParameterGroupId { get; set; } = 0;
     }
 }

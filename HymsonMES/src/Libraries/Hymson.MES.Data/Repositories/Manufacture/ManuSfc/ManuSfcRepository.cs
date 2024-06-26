@@ -607,6 +607,46 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(manuSFCPartialScrapByIdSql, commands);
         }
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="produceQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceOrderView>> GetSfcsEntitiesAsync(ManuSfcProduceQuery produceQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("ms.SFC,msi.ProductId,msi.WorkOrderId,pwo.OrderCode,pwo.WorkCenterId");
+            sqlBuilder.Where("ms.IsDeleted = 0");
+            sqlBuilder.Where("ms.SiteId = @SiteId");
+
+            sqlBuilder.LeftJoin("manu_sfc_info msi on ms.Id=msi.SfcId and msi.IsUsed=1");
+            sqlBuilder.LeftJoin("plan_work_order pwo on pwo.Id=msi.WorkOrderId and pwo.IsDeleted=0");
+
+            if (produceQuery.Sfcs != null && produceQuery.Sfcs.Any())
+            {
+                sqlBuilder.Where(" ms.sfc in @Sfcs ");
+            }
+            if (produceQuery.ProductId.HasValue)
+            {
+                sqlBuilder.Where(" msi.ProductId=@ProductId ");
+            }
+            if (produceQuery.WorkCenterId.HasValue)
+            {
+                sqlBuilder.Where(" pwo.WorkCenterId=@WorkCenterId ");
+            }
+            if (!string.IsNullOrWhiteSpace(produceQuery.OrderCode))
+            {
+                produceQuery.OrderCode = $"%{produceQuery.OrderCode}%";
+                sqlBuilder.Where(" pwo.OrderCode LIKE @OrderCode ");
+            }
+            sqlBuilder.AddParameters(produceQuery);
+
+            using var conn = GetMESDbConnection();
+            var produceOrderViews = await conn.QueryAsync<ManuSfcProduceOrderView>(template.RawSql, template.Parameters);
+            return produceOrderViews;
+        }
         #endregion
 
         #region 顷刻
@@ -682,6 +722,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateManuSfcQtyAndCurrentQtyVerifyByIdSql = @"UPDATE `manu_sfc` SET  Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id=@Id  AND Status=@CurrentStatus AND Qty=@CurrentQty ";
         const string manuSFCPartialScrapByIdSql = @"UPDATE `manu_sfc` SET  Qty=@Qty, UpdatedBy = @UpdatedBy,ScrapQty=@ScrapQty,Status=@Status, UpdatedOn = @UpdatedOn  WHERE  Id=@Id  AND Status=@CurrentStatus AND Qty=@CurrentQty ";
 
+        const string GetEntitiesSqlTemplate = "SELECT /**select**/ FROM `manu_sfc` ms /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         #region 顷刻
 
         /// <summary>
