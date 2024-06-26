@@ -65,14 +65,14 @@ namespace Hymson.MES.SystemServices.Services.Process
 
             // 添加到集合
             var resposeSummaryBo = new SyncMaterialSummaryBo();
-            resposeSummaryBo.MaterialAdds.AddRange(resposeBo.MaterialAdds);
-            resposeSummaryBo.MaterialUpdates.AddRange(resposeBo.MaterialUpdates);
+            resposeSummaryBo.Adds.AddRange(resposeBo.Adds);
+            resposeSummaryBo.Updates.AddRange(resposeBo.Updates);
 
             // 插入数据
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
-            rows += await _procMaterialRepository.InsertsAsync(resposeSummaryBo.MaterialAdds);
-            rows += await _procMaterialRepository.UpdatesAsync(resposeSummaryBo.MaterialUpdates);
+            rows += await _procMaterialRepository.InsertsAsync(resposeSummaryBo.Adds);
+            rows += await _procMaterialRepository.UpdatesAsync(resposeSummaryBo.Updates);
             trans.Complete();
             return rows;
         }
@@ -135,7 +135,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                     };
 
                     // 添加物料
-                    resposeBo.MaterialAdds.Add(materialEntity);
+                    resposeBo.Adds.Add(materialEntity);
                 }
                 // 之前已存在的物料
                 else
@@ -160,7 +160,7 @@ namespace Hymson.MES.SystemServices.Services.Process
 
                     materialEntity.UpdatedBy = updateUser;
                     materialEntity.UpdatedOn = updateTime;
-                    resposeBo.MaterialUpdates.Add(materialEntity);
+                    resposeBo.Updates.Add(materialEntity);
                 }
             }
 
@@ -177,11 +177,11 @@ namespace Hymson.MES.SystemServices.Services.Process
         /// <summary>
         /// 新增（物料）
         /// </summary>
-        public List<ProcMaterialEntity> MaterialAdds { get; set; } = new();
+        public List<ProcMaterialEntity> Adds { get; set; } = new();
         /// <summary>
         /// 更新（物料）
         /// </summary>
-        public List<ProcMaterialEntity> MaterialUpdates { get; set; } = new();
+        public List<ProcMaterialEntity> Updates { get; set; } = new();
 
     }
 }

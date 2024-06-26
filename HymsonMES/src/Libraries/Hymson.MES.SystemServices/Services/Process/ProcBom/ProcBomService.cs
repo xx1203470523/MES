@@ -1,14 +1,11 @@
 using Hymson.MES.Core.Domain.Common;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.SystemServices.Dtos;
-using Hymson.MES.SystemServices.Services.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -42,6 +39,11 @@ namespace Hymson.MES.SystemServices.Services.Process
         private readonly IProcBomDetailRepository _procBomDetailRepository;
 
         /// <summary>
+        /// 仓储接口（BOM明细替代料表）
+        /// </summary>
+        private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
+
+        /// <summary>
         /// 仓储接口（物料）
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
@@ -53,17 +55,20 @@ namespace Hymson.MES.SystemServices.Services.Process
         /// <param name="sysConfigRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procBomDetailRepository"></param>
+        /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
         public ProcBomService(ILogger<ProcBomService> logger,
             ISysConfigRepository sysConfigRepository,
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository,
+            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
             IProcMaterialRepository procMaterialRepository)
         {
             _logger = logger;
             _sysConfigRepository = sysConfigRepository;
             _procBomRepository = procBomRepository;
             _procBomDetailRepository = procBomDetailRepository;
+            _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
         }
 
@@ -85,9 +90,9 @@ namespace Hymson.MES.SystemServices.Services.Process
 
             // 添加到集合
             var resposeSummaryBo = new SyncBomSummaryBo();
-            resposeSummaryBo.BomAdds.AddRange(resposeBo.BomAdds);
-            resposeSummaryBo.BomUpdates.AddRange(resposeBo.BomUpdates);
-            resposeSummaryBo.BomDetailAdds.AddRange(resposeBo.BomDetailAdds);
+            resposeSummaryBo.Adds.AddRange(resposeBo.Adds);
+            resposeSummaryBo.Updates.AddRange(resposeBo.Updates);
+            resposeSummaryBo.DetailAdds.AddRange(resposeBo.DetailAdds);
 
 
             // 删除参数
@@ -95,16 +100,19 @@ namespace Hymson.MES.SystemServices.Services.Process
             {
                 UserId = "ERP",
                 DeleteOn = HymsonClock.Now(),
-                Ids = resposeSummaryBo.BomAdds.Select(s => s.Id)
+                Ids = resposeSummaryBo.Adds.Select(s => s.Id)
             };
 
             // 插入数据
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _procBomDetailRepository.DeleteBomIDAsync(deleteCommand);
-            rows += await _procBomDetailRepository.InsertsAsync(resposeSummaryBo.BomDetailAdds);
-            rows += await _procBomRepository.InsertsAsync(resposeSummaryBo.BomAdds);
-            rows += await _procBomRepository.UpdatesAsync(resposeSummaryBo.BomUpdates);
+            rows += await _procBomDetailReplaceMaterialRepository.DeleteBomIDAsync(deleteCommand);
+
+            rows += await _procBomDetailReplaceMaterialRepository.InsertsAsync(resposeSummaryBo.ReplaceDetailAdds);
+            rows += await _procBomDetailRepository.InsertsAsync(resposeSummaryBo.DetailAdds);
+            rows += await _procBomRepository.InsertsAsync(resposeSummaryBo.Adds);
+            rows += await _procBomRepository.UpdatesAsync(resposeSummaryBo.Updates);
             trans.Complete();
             return rows;
         }
@@ -148,14 +156,16 @@ namespace Hymson.MES.SystemServices.Services.Process
                 // 不存在的新BOM
                 if (bomEntity == null)
                 {
+                    var bomId = bomDto.BomId ?? IdGenProvider.Instance.CreateId();
                     bomEntity = new ProcBomEntity
                     {
+                        Id = bomId,
                         BomCode = bomDto.BomCode,
                         BomName = bomDto.BomName,
                         Version = bomDto.BomVersion,
                         Status = SysDataStatusEnum.Build, // 因为ERP不传工序，数据有缺陷，所以需要在MES去点启用
                         Remark = "",
-                        Id = IdGenProvider.Instance.CreateId(),
+
                         SiteId = siteId,
                         CreatedBy = updateUser,
                         CreatedOn = updateTime,
@@ -164,7 +174,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                     };
 
                     // 添加BOM
-                    resposeBo.BomAdds.Add(bomEntity);
+                    resposeBo.Adds.Add(bomEntity);
                 }
                 // 之前已存在的BOM
                 else
@@ -173,7 +183,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                     bomEntity.Version = bomDto.BomVersion;
                     bomEntity.UpdatedBy = updateUser;
                     bomEntity.UpdatedOn = updateTime;
-                    resposeBo.BomUpdates.Add(bomEntity);
+                    resposeBo.Updates.Add(bomEntity);
                 }
 
                 // 添加BOM明细
@@ -187,8 +197,12 @@ namespace Hymson.MES.SystemServices.Services.Process
                         continue;
                     }
 
-                    resposeBo.BomDetailAdds.Add(new ProcBomDetailEntity
+                    var bomDetailId = bomMaterialDto.BomMaterialId ?? IdGenProvider.Instance.CreateId();
+
+                    // BOM明细
+                    resposeBo.DetailAdds.Add(new ProcBomDetailEntity
                     {
+                        Id = bomDetailId,
                         BomId = bomEntity.Id,
                         MaterialId = materialEntity.Id,
                         Usages = bomMaterialDto.MaterialDosage,
@@ -199,13 +213,36 @@ namespace Hymson.MES.SystemServices.Services.Process
                         IsEnableReplace = false,
                         ReferencePoint = "",
                         Remark = "",
-                        Id = IdGenProvider.Instance.CreateId(),
+
                         SiteId = siteId,
                         CreatedBy = updateUser,
                         CreatedOn = updateTime,
                         UpdatedBy = updateUser,
                         UpdatedOn = updateTime,
                     });
+
+                    // BOM明细-替代料
+                    if (bomMaterialDto.ReplaceMaterials != null && bomMaterialDto.ReplaceMaterials.Any())
+                    {
+                        resposeBo.ReplaceDetailAdds.AddRange(bomMaterialDto.ReplaceMaterials.Select(s => new ProcBomDetailReplaceMaterialEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            BomId = bomEntity.Id,
+                            BomDetailId = bomDetailId,
+                            ReplaceMaterialId = s.BomMaterialId ?? IdGenProvider.Instance.CreateId(),
+                            Usages = s.MaterialDosage,
+                            Loss = s.MaterialLoss,
+                            DataCollectionWay = MaterialSerialNumberEnum.Batch,
+                            ReferencePoint = "",
+                            Remark = "",
+
+                            SiteId = siteId,
+                            CreatedBy = updateUser,
+                            CreatedOn = updateTime,
+                            UpdatedBy = updateUser,
+                            UpdatedOn = updateTime,
+                        }));
+                    }
 
                     seq++;
                 }
@@ -224,14 +261,18 @@ namespace Hymson.MES.SystemServices.Services.Process
         /// <summary>
         /// 新增（BOM）
         /// </summary>
-        public List<ProcBomEntity> BomAdds { get; set; } = new();
+        public List<ProcBomEntity> Adds { get; set; } = new();
         /// <summary>
         /// 更新（BOM）
         /// </summary>
-        public List<ProcBomEntity> BomUpdates { get; set; } = new();
+        public List<ProcBomEntity> Updates { get; set; } = new();
         /// <summary>
         /// 新增（BOM明细）
         /// </summary>
-        public List<ProcBomDetailEntity> BomDetailAdds { get; set; } = new();
+        public List<ProcBomDetailEntity> DetailAdds { get; set; } = new();
+        /// <summary>
+        /// 新增（BOM明细-替代料）
+        /// </summary>
+        public List<ProcBomDetailReplaceMaterialEntity> ReplaceDetailAdds { get; set; } = new();
     }
 }

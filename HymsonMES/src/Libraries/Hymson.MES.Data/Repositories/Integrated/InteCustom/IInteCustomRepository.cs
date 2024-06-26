@@ -82,6 +82,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<IEnumerable<InteCustomEntity>> GetInteCustomEntitiesAsync(InteCustomQuery inteCustomQuery);
 
         /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteCustomEntity>> GetEntitiesAsync(InteCustomQuery query);
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="query"></param>

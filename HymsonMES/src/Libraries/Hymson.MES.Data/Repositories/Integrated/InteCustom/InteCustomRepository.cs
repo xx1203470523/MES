@@ -147,6 +147,28 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteCustomEntity>> GetEntitiesAsync(InteCustomQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetInteCustomEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.Codes != null && query.Codes.Any())
+            {
+                sqlBuilder.Where(" Code IN @Codes ");
+            }
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteCustomEntity>(template.RawSql, query);
+        }
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="inteCustomEntity"></param>

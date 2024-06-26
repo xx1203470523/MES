@@ -84,14 +84,14 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
             // 添加到集合
             var resposeSummaryBo = new SyncWorkPlanSummaryBo();
-            resposeSummaryBo.PlanAdds.AddRange(resposeBo.PlanAdds);
-            resposeSummaryBo.PlanUpdates.AddRange(resposeBo.PlanUpdates);
+            resposeSummaryBo.Adds.AddRange(resposeBo.Adds);
+            resposeSummaryBo.Updates.AddRange(resposeBo.Updates);
 
             // 插入数据
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
-            rows += await _planWorkPlanRepository.InsertsAsync(resposeSummaryBo.PlanAdds);
-            rows += await _planWorkPlanRepository.UpdatesAsync(resposeSummaryBo.PlanUpdates);
+            rows += await _planWorkPlanRepository.InsertsAsync(resposeSummaryBo.Adds);
+            rows += await _planWorkPlanRepository.UpdatesAsync(resposeSummaryBo.Updates);
             trans.Complete();
             return rows;
         }
@@ -189,7 +189,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     };
 
                     // 添加生产计划
-                    resposeBo.PlanAdds.Add(planEntity);
+                    resposeBo.Adds.Add(planEntity);
                 }
                 // 之前已存在的生产计划
                 else
@@ -208,7 +208,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
                     planEntity.UpdatedBy = updateUser;
                     planEntity.UpdatedOn = updateTime;
-                    resposeBo.PlanUpdates.Add(planEntity);
+                    resposeBo.Updates.Add(planEntity);
                 }
             }
 
@@ -225,10 +225,10 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// <summary>
         /// 新增（工作计划）
         /// </summary>
-        public List<PlanWorkPlanEntity> PlanAdds { get; set; } = new();
+        public List<PlanWorkPlanEntity> Adds { get; set; } = new();
         /// <summary>
         /// 更新（工作计划）
         /// </summary>
-        public List<PlanWorkPlanEntity> PlanUpdates { get; set; } = new();
+        public List<PlanWorkPlanEntity> Updates { get; set; } = new();
     }
 }

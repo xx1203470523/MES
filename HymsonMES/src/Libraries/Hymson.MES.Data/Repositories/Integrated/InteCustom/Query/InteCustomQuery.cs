@@ -13,7 +13,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 客户编码列表
         /// </summary>
-        public string[]? Codes { get; set; }
+        public IEnumerable<string>? Codes { get; set; }
 
         /// <summary>
         /// 编号

@@ -9,6 +9,11 @@ namespace Hymson.MES.SystemServices.Dtos
     public record BomDto : BaseEntityDto
     {
         /// <summary>
+        /// BomId
+        /// </summary>
+        public long? BomId { get; set; }
+
+        /// <summary>
         /// Bom编码
         /// </summary>
         public string BomCode { get; set; } = "";
@@ -38,12 +43,12 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 发料方式
         /// </summary>
-        public MaterialMethodEnum MaterialMethod { get; set; }
+        public MaterialMethodEnum MaterialMethod { get; set; } = MaterialMethodEnum.Picking;
 
         /// <summary>
-        /// 产出工序
+        /// BOM物料ID
         /// </summary>
-        public string? OutPutProcedure { get; set; }
+        public long? BomMaterialId { get; set; }
 
         /// <summary>
         /// 物料编码
@@ -58,7 +63,12 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 工序编码
         /// </summary>
-        public string OperationCode { get; set; } = "";
+        public string? ProcedureCode { get; set; } = "";
+
+        /// <summary>
+        /// 产出工序
+        /// </summary>
+        public string? OutPutProcedureCode { get; set; } = "";
 
         /// <summary>
         /// 物料用量
@@ -69,6 +79,11 @@ namespace Hymson.MES.SystemServices.Dtos
         /// 物料损耗
         /// </summary>
         public decimal MaterialLoss { get; set; }
+
+        /// <summary>
+        /// 物料的替代料列表
+        /// </summary>
+        public List<BomMaterialDto>? ReplaceMaterials { get; set; } = new();
 
     }
 }

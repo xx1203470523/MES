@@ -7,14 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
