@@ -2023,6 +2023,7 @@
         public const string MES19431 = "数据字段{code}未设置掩码规则!";
         public const string MES19432 = "数据字段：{code}不符合掩码规则，请检查配置";
         public const string MES19433 = "数据字段已被分配，不允许删除!";
+        public const string MES19434 = "列表字段存在非法字符，只能输入数字,大写字母,下划线";
         #endregion
 
         #endregion

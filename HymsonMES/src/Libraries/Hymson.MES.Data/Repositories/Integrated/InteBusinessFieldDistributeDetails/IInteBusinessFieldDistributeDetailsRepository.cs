@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<InteBusinessFieldDistributeDetailsEntity> GetByIdAsync(long id);
+        Task<IEnumerable<InteBusinessFieldDistributeDetailsEntity>> GetByIdAsync(long id);
     
         /// <summary>
         /// 根据IDs获取数据（批量）

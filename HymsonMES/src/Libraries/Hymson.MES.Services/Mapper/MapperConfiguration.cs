@@ -668,6 +668,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteBusinessFieldDistributePagedQueryDto, InteBusinessFieldDistributePagedQuery>();
             CreateMap<InteBusinessFieldDistributeEntity, InteBusinessFieldDistributeDto>();
 
+            CreateMap<InteBusinessFieldDistributeDetailsEntity, InteBusinessFieldDistributeDetailsDto>();
+            CreateMap<InteBusinessFieldDistributeDetailsEntity, BusinessFieldViewDto>();
+
             #endregion
 
             #region InteQualificationAuthentication

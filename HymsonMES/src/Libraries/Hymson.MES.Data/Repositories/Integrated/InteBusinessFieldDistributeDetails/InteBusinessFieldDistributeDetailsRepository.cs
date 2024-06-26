@@ -90,10 +90,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteBusinessFieldDistributeDetailsEntity> GetByIdAsync(long id)
+        public async Task<IEnumerable<InteBusinessFieldDistributeDetailsEntity>> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteBusinessFieldDistributeDetailsEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryAsync<InteBusinessFieldDistributeDetailsEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string DeleteSql = "UPDATE inte_business_field_distribute_details SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE inte_business_field_distribute_details SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM inte_business_field_distribute_details WHERE Id = @Id ";
+        const string GetByIdSql = @"SELECT * FROM inte_business_field_distribute_details WHERE BusinessFieldFistributeid = @Id ";
         const string GetByIdsSql = @"SELECT * FROM inte_business_field_distribute_details WHERE Id IN @Ids ";
 
         const string GetByBusinessFieldIdsSql = @"SELECT * FROM `inte_business_field_distribute_details` WHERE SiteId=@SiteId AND BusinessFieldId in @BusinessFieldIds";
