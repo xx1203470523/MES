@@ -1,7 +1,9 @@
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan;
@@ -9,7 +11,7 @@ using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Utils;
-using Minio.DataModel;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -80,6 +82,7 @@ namespace Hymson.MES.Services.Services.Plan
             if (workPlanEntity.Status != PlanWorkPlanStatusEnum.NotStarted)
             {
                 // TODO: 生产计划状态不正确
+                throw new CustomerValidationException(nameof(ErrorCode.MES16017));
             }
 
             if (dto.Details == null || !dto.Details.Any()) return 0;
@@ -89,6 +92,8 @@ namespace Hymson.MES.Services.Services.Plan
             if (workOrderCodes.Count() != workOrderCodes.Distinct().Count())
             {
                 // TODO: 工单号存在重复
+
+                throw new CustomerValidationException(nameof(ErrorCode.MES16017));
             }
 
             // 查看数据库是否存在相同的工单号
@@ -103,16 +108,23 @@ namespace Hymson.MES.Services.Services.Plan
             if (sumQuantity != workPlanEntity.Qty)
             {
                 // TODO: 子工单的总数量不等于计划数量
+                throw new CustomerValidationException(nameof(ErrorCode.MES16017));
             }
 
             // 检查子工单的计划时间是否超出生产计划的时间范围
             if (dto.Details.Any(a => a.PlanStartTime < workPlanEntity.PlanStartTime || a.PlanStartTime > workPlanEntity.PlanEndTime))
             {
                 // TODO: 子工单的计划时间超出生产计划的时间范围
+                throw new CustomerValidationException(nameof(ErrorCode.MES16017));
             }
 
-            await Task.CompletedTask;
-            return 0;
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            // 保存子工单
+
+            trans.Complete();
+            return rows;
         }
 
         /// <summary>
@@ -126,8 +138,7 @@ namespace Hymson.MES.Services.Services.Plan
             var workPlanEntities = await _planWorkPlanRepository.GetByIdsAsync(idsArr);
             if (workPlanEntities.Any(a => a.Status != PlanWorkPlanStatusEnum.NotStarted))
             {
-                // TODO: 存在状态不为“未开始”的工单
-                return 0;
+                throw new CustomerValidationException(nameof(ErrorCode.MES16017)).WithData("Status", PlanWorkPlanStatusEnum.NotStarted.GetDescription());
             }
 
             return await _planWorkPlanRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });

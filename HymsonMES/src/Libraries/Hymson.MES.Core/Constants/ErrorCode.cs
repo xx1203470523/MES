@@ -1131,7 +1131,8 @@
         public const string MES16014 = "有工单不存在";
         public const string MES16015 = "工单没有锁定前的状态，无法解锁";
         public const string MES16016 = "工单【{WorkOrder}】不存在，具体请查看【生产工单】。";
-
+        public const string MES16017 = "状态不为【{Status}】，不允许删除！";
+        
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";
         public const string MES16022 = "数量 必须大于0！";
@@ -1164,6 +1165,7 @@
         public const string MES16047 = "条码{SFC}超过最大复投次数{Cycle}，当前复投次数{RepeatedCount}，不允许生产！";
         public const string MES16048 = "工单【{WorkOrder}】已完成,不允许申请领料。";
         public const string MES16049 = "领料单申请失败,错误原因：【{msg}】。";
+
         #endregion
 
         #region 条码接收 16100
