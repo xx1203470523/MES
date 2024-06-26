@@ -3,66 +3,86 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 领料申请状态0:审批中，1：审批失败，2：审批成功3.已收料4.取消领料
+    /// 领料申请状态0:单据申请，1创建成功,2创建失败,3：审批成功3，4：WMS审批失败5.取消领料6.已收料
     /// </summary>
     public enum WhWarehouseRequistionStatusEnum : byte
     {
         /// <summary>
-        /// 审批中
+        /// 单据申请
         /// </summary>
-        [Description("审批中")]
+        [Description("单据申请")]
         Approvaling = 0,
-
         /// <summary>
-        /// WMS审批失败
+        /// 创建成功
         /// </summary>
-        [Description("WMS审批失败")]
-        ApprovalingFailed = 1,
-
+        [Description("创建成功")]
+        Created = 1,
+        /// <summary>
+        /// 创建失败
+        /// </summary>
+        [Description("创建失败")]
+        Failed = 2,
         /// <summary>
         /// WMS审批成功
         /// </summary>
         [Description("WMS审批成功")]
-        ApprovalingSuccess = 2,
+        ApprovalingSuccess = 3,
         /// <summary>
-        /// 已收料
+        /// WMS审批失败
         /// </summary>
-        [Description("已收料")]
-        Picked = 3,
+        [Description("WMS审批失败")]
+        ApprovalingFailed = 4,
         /// <summary>
         /// 取消领料
         /// </summary>
         [Description("取消领料")]
-        Cancel = 4
+        Cancel = 5,
+        /// <summary>
+        /// 已收料
+        /// </summary>
+        [Description("已收料")]
+        Picked = 6
+       
     }
+    /// <summary>
+    /// 退料申请状态0:单据申请，1创建成功,2创建失败,3：审批成功3，4：WMS审批失败5.取消退料6.已退料
+    /// </summary>
     public enum WhWarehouseReturnStatusEnum : byte
     {
         /// <summary>
-        /// 审批中
+        /// 单据申请
         /// </summary>
-        [Description("审批中")]
+        [Description("单据申请")]
         Approvaling = 0,
-
         /// <summary>
-        /// WMS审批失败
+        /// 创建成功
         /// </summary>
-        [Description("WMS审批失败")]
-        ApprovalingFailed = 1,
-
+        [Description("创建成功")]
+        Created = 1,
+        /// <summary>
+        /// 创建失败
+        /// </summary>
+        [Description("创建失败")]
+        Failed = 2,
         /// <summary>
         /// WMS审批成功
         /// </summary>
         [Description("WMS审批成功")]
-        ApprovalingSuccess = 2,
+        ApprovalingSuccess = 3,
         /// <summary>
-        /// 已收料
+        /// WMS审批失败
         /// </summary>
-        [Description("已退料")]
-        Picked = 3,
+        [Description("WMS审批失败")]
+        ApprovalingFailed = 4,
         /// <summary>
-        /// 取消领料
+        /// 取消退料
         /// </summary>
         [Description("取消退料")]
-        Cancel = 4
+        Cancel = 5,
+        /// <summary>
+        /// 已退料
+        /// </summary>
+        [Description("已退料")]
+        Return = 6
     }
 }

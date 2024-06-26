@@ -18,5 +18,17 @@ namespace Hymson.MES.SystemServices.Services
         /// <param name="productionPickDto"></param>
         /// <returns></returns>
         Task SavePickMaterialsAsync(ProductionPickDto productionPickDto);
+        /// <summary>
+        /// 生产领料单创建结果反馈
+        /// </summary>
+        /// <param name="productionPickDto"></param>
+        /// <returns></returns>
+        Task PickMaterialsCallBackAsync(ProductionPickCallBackDto productionPickDto);
+        /// <summary>
+        /// 生产退料单创建结果反馈
+        /// </summary>
+        /// <param name="productionPickDto"></param>
+        /// <returns></returns>
+        Task ReturnMaterialsCallBackAsync(ProductionReturnCallBackDto productionPickDto);
     }
 }

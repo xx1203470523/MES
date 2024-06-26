@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
         private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
         private readonly IManuReturnOrderDetailRepository _manuReturnOrderDetailRepository;
-        private readonly IWMSServer _wmsRequest;
+        private readonly IXnebulaWMSServer _wmsRequest;
 
         /// <summary>
         /// 构造函数
@@ -118,7 +118,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IManuGenerateBarcodeService manuGenerateBarcodeService,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
-            IWMSServer wMSRequest,
+            IXnebulaWMSServer wMSRequest,
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
@@ -1162,7 +1162,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 Type =  ManuRequistionTypeEnum.WorkOrderPicking,
                 WorkOrderCode = request.WorkCode,
             };
-            //根据BOM计算领料明细 ：TODO
+            
 
             //获取派工单指定BOM记录
            
@@ -1205,19 +1205,14 @@ namespace Hymson.MES.Services.Services.Warehouse
             //下达WMS领料申请
             var response = await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.MaterialPickingRequestDto
             {
-                syncCode = $"{request.WorkCode}_{manuRequistionOrderEntity.Id}",
-                sendOn = HymsonClock.Now().ToString(),
+                SyncCode = $"{request.WorkCode}_{manuRequistionOrderEntity.Id}",
+                SendOn = HymsonClock.Now().ToString(),
                 details = productionPickMaterialDtos
             });
-            if(response.result)
+            if(response)
             {
                 await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
             }
-            else
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16049)).WithData("msg", response.msg);
-            }
-
 
 
         }
@@ -1229,6 +1224,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 var response = await _wmsRequest.MaterialPickingCancelAsync(new HttpClients.Requests.MaterialPickingCancelDto
                 {
+                    SendOn= HymsonClock.Now().ToString(),
                     SyncCode = $"{request.WorkCode}_{request.RequistionOrderId}",
                 });
                 return response;
@@ -1239,9 +1235,57 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
         }
 
-        public Task MaterialReturnRequestAsync(MaterialReturnRequest request)
+        public async Task MaterialReturnRequestAsync(MaterialReturnRequest request)
         {
-            throw new NotImplementedException();
+            //获取派工单对象
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
+            {
+                SiteId = _currentSite.SiteId??0,
+                OrderCode = request.WorkCode
+            })?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", request.WorkCode);
+            var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new WhMaterialInventoryWorkOrderIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkOrderId = planWorkOrderEntity.Id
+            });
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryEntities.Select(b => b.MaterialId).Distinct().ToArray());
+            var returnMaterialDtos = new List<HttpClients.Requests.ProductionReturnMaterialItemDto>();
+           
+            foreach (var item in whMaterialInventoryEntities)
+            {
+                var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
+               
+
+                HttpClients.Requests.ProductionReturnMaterialItemDto returnMaterialDto = new HttpClients.Requests.ProductionReturnMaterialItemDto
+                {
+                    MaterialCode = materialEntity.MaterialCode,
+                    Quantity = item.QuantityResidue.ToString(),
+                    UnitCode = materialEntity.Unit
+                };
+                returnMaterialDtos.Add(returnMaterialDto);
+            }
+            //创建领料申请单
+            ManuReturnOrderEntity manuReturnOrderEntity = new ManuReturnOrderEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                Status = WhWarehouseReturnStatusEnum.Approvaling,
+                Type = ManuReturnTypeEnum.WorkOrderReturn,
+                SourceWorkOrderCode = request.WorkCode,
+            };
+            var response = await _wmsRequest.MaterialReturnRequestAsync(new HttpClients.Requests.MaterialReturnRequestDto
+            {
+                
+                SyncCode = $"{request.WorkCode}_{manuReturnOrderEntity.Id}",
+                SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
+                Details = returnMaterialDtos
+            });
+            if(response)
+                await _manuReturnOrderRepository.InsertAsync(manuReturnOrderEntity);
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16051)).WithData("msg", "请求发送失败");
+            }
         }
 
         public async Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request)
@@ -1251,6 +1295,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 var response = await _wmsRequest.MaterialReturnCancelAsync(new HttpClients.Requests.MaterialReturnCancelDto
                 {
+                    SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
                     SyncCode = $"{request.WorkCode}_{request.ReturnOrderId}",
                 });
                 return response;

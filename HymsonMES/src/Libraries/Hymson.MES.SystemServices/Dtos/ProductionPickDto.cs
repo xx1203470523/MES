@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,33 @@ namespace Hymson.MES.SystemServices.Dtos
         /// 领料信息
         /// </summary>
         public List<ProductionPickMaterialDto> ReceiveMaterials { get; set; }
+    }
+    /// <summary>
+    /// 生产领料单创建结果反馈
+    /// </summary>
+    public record ProductionPickCallBackDto : BaseEntityDto
+    {
+        /// <summary>
+        /// MES领料申请单号，格式：派工单code_领料申请单Id
+        /// </summary>
+        public string RequistionId { get; set; }
+        /// <summary>
+        /// 领料单结果 0申请成功 1，申请失败 2 审批成功 3 审批失败 4 取消成功 5取消失败
+        /// </summary>
+        public ManuMaterialFormResponseEnum State { get; set; }
+
+    }
+    public record ProductionReturnCallBackDto : BaseEntityDto
+    {
+        /// <summary>
+        /// MES申请单号，格式：[派工单code]_[申请单Id]
+        /// </summary>
+        public string RequistionId { get; set; }
+        /// <summary>
+        /// 退料单结果0申请成功 1，申请失败 2 审批成功 3 审批失败 4 取消成功 5取消失败
+        /// </summary>
+        public ManuMaterialFormResponseEnum State { get; set; }
+
     }
 
     public class ProductionPickMaterialDto

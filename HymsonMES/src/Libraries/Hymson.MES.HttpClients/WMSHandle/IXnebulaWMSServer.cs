@@ -12,14 +12,14 @@ namespace Hymson.MES.HttpClients
     /// <summary>
     /// 仓库服务
     /// </summary>
-    public interface IWMSServer
+    public interface IXnebulaWMSServer
     {
         /// <summary>
         /// 领料申请，包含工单借料
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<(string msg,bool result)> MaterialPickingRequestAsync(MaterialPickingRequestDto request);
+        Task<bool> MaterialPickingRequestAsync(MaterialPickingRequestDto request);
         /// <summary>
         /// 领料取消
         /// </summary>
@@ -32,7 +32,7 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task MaterialReturnRequestAsync(MaterialReturnRequest request);
+        Task<bool> MaterialReturnRequestAsync(MaterialReturnRequestDto request);
         /// <summary>
         /// 取消退料
         /// </summary>
