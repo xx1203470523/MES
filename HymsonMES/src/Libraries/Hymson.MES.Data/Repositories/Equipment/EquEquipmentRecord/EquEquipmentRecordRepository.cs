@@ -84,8 +84,8 @@ namespace Hymson.MES.Data.Repositories.EquEquipmentRecord
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("eer.IsDeleted=0");
             sqlBuilder.Where("eer.SiteId=@SiteId");
-            sqlBuilder.Select("DISTINCT eer.EquipmentId,eer.EquipmentCode,eer.EquipmentName,eer.OperationType,pr.ResCode,pr.ResName,iwc.Code AS WorkCenterCode,iwc.Name AS WorkCenterName");
-            sqlBuilder.OrderBy("esr.CreatedOn DESC");
+            sqlBuilder.Select("DISTINCT eer.EquipmentId,eer.EquipmentCode,eer.EquipmentName,eer.OperationType,pr.ResCode,pr.ResName,iwc.Code AS WorkCenterCode,iwc.Name AS WorkCenterName,eer.CreatedOn,eer.CreatedBy");
+            sqlBuilder.OrderBy("eer.CreatedOn DESC");
 
             sqlBuilder.LeftJoin(" proc_resource_equipment_bind preb ON preb.EquipmentId=eer.EquipmentId");
             sqlBuilder.LeftJoin(" proc_resource pr ON pr.Id=preb.ResourceId");

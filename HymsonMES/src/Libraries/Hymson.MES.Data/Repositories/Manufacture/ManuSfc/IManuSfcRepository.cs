@@ -82,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> MultiUpdateSfcStatusAsync(MultiSFCUpdateStatusCommand command);
 
- 
+
         /// <summary>
         /// 分页查询（查询所有条码信息）
         /// </summary>
@@ -201,6 +201,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> PartialScrapmanuSFCByIdAsync(IEnumerable<ManuSFCPartialScrapByIdCommand> commands);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="produceQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceOrderView>> GetSfcsEntitiesAsync(ManuSfcProduceQuery produceQuery);
 
         Task<ManuSfcEntity> GetSingleAsync(ManuSfcQuery query);
         Task<IEnumerable<ManuSfcEntity>> GetListAsync(ManuSfcQuery query);
