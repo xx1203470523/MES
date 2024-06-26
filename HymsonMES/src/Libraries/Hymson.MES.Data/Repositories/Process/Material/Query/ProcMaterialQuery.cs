@@ -23,6 +23,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 物料名称
         /// </summary>
-        public string? MaterialName {  get; set; }
+        public string? MaterialName { get; set; }
+
+        /// <summary>
+        /// 集合（物料ID）
+        /// </summary>
+        public IEnumerable<long>? MaterialIds { get; set; }
+
     }
 }

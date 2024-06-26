@@ -11,7 +11,7 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
         /// <summary>
         /// 站点编码 
         /// </summary>
-        public long? SiteId { get; set; }
+        public long SiteId { get; set; }
 
         /// <summary>
         /// 工单号

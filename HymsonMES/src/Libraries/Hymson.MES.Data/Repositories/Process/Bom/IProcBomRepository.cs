@@ -28,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procBomEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcBomEntity procBomEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -42,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procBomEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcBomEntity procBomEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -77,7 +77,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcBomEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -91,7 +91,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procBomQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcBomEntity>> GetProcBomEntitiesAsync(ProcBomQuery procBomQuery);
-        
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcBomEntity>> GetEntitiesAsync(ProcBomQuery query);
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -111,7 +118,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-       Task<IEnumerable<ProcBomEntity>> GetByCodesAsync(ProcBomsByCodeQuery param);
+        Task<IEnumerable<ProcBomEntity>> GetByCodesAsync(ProcBomsByCodeQuery param);
 
     }
 }

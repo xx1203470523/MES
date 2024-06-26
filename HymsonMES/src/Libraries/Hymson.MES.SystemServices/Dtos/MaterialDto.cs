@@ -27,7 +27,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 批次大小 
         /// </summary>
-        public string? Batch { get; set; }
+        public decimal? Batch { get; set; }
 
         /// <summary>
         /// 保质期（天）

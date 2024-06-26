@@ -11,7 +11,7 @@ namespace Hymson.MES.System.Api.Controllers
     /// 工艺
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [AllowAnonymous]
     public class ProcessController : ControllerBase
     {

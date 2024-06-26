@@ -140,6 +140,28 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcBomEntity>> GetEntitiesAsync(ProcBomQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetProcBomEntitiesSqlTemplate);
+            sqlBuilder.Where(" IsDeleted = 0 ");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (query.BomIds != null && query.BomIds.Any())
+            {
+                sqlBuilder.Where(" Id IN @BomIds ");
+            }
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcBomEntity>(template.RawSql, query);
+        }
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>

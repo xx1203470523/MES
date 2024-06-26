@@ -4,17 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.System.Api.Controllers
 {
     /// <summary>
-    /// 综合
+    /// 库存
     /// </summary>
     [ApiController]
     [Route("[controller]")]
     [Authorize]
-    public class IntegratedController : ControllerBase
+    public class WarehouseController : ControllerBase
     {
         /// <summary>
         /// 构造函数
         /// </summary>
-        public IntegratedController() { }
+        public WarehouseController() { }
+
 
     }
 }

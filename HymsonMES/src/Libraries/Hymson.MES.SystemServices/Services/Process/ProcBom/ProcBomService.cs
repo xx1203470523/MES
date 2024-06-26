@@ -105,6 +105,7 @@ namespace Hymson.MES.SystemServices.Services.Process
             rows += await _procBomDetailRepository.InsertsAsync(resposeSummaryBo.BomDetailAdds);
             rows += await _procBomRepository.InsertsAsync(resposeSummaryBo.BomAdds);
             rows += await _procBomRepository.UpdatesAsync(resposeSummaryBo.BomUpdates);
+            trans.Complete();
             return rows;
         }
 

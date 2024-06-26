@@ -1493,6 +1493,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanShiftEntity, PlanShiftDto>();
 
             #endregion
+
+            CreateMap<PlanWorkPlanPagedQueryDto, PlanWorkPlanPagedQuery>();
+            CreateMap<PlanWorkPlanEntity, PlanWorkPlanDto>();
+
         }
 
         /// <summary>

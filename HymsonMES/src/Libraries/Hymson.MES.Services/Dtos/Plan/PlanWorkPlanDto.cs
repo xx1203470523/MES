@@ -15,7 +15,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         public long Id { get; set; }
 
         /// <summary>
-        /// 工单号
+        /// 生产计划单号
         /// </summary>
         public string PlanCode { get; set; }
 
@@ -23,6 +23,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
+
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string ProductCode { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string ProductName { get; set; }
 
         /// <summary>
         /// 工作中心类型;和工作中心保持一致
@@ -40,9 +50,19 @@ namespace Hymson.MES.Services.Dtos.Plan
         public long? ProcessRouteId { get; set; }
 
         /// <summary>
+        /// BOM编码
+        /// </summary>
+        public string BomCode { get; set; }
+
+        /// <summary>
+        /// BOM名称
+        /// </summary>
+        public string BomName { get; set; }
+
+        /// <summary>
         /// 产品bom
         /// </summary>
-        public long? ProductBOMId { get; set; }
+        public long? BomId { get; set; }
 
         /// <summary>
         /// 工单类型
@@ -116,49 +136,31 @@ namespace Hymson.MES.Services.Dtos.Plan
     public record PlanWorkPlanSaveDto : BaseEntityDto
     {
         /// <summary>
+        /// 生产计划Id
+        /// </summary>
+        public long WorkPlanId { get; set; }
+
+        /// <summary>
+        /// 工单明细
+        /// </summary>
+        public IEnumerable<PlanWorkPlanDetailSaveDto>? Details { get; set; }
+
+    }
+
+    /// <summary>
+    /// 保存对象（生产计划）
+    /// </summary>
+    public record PlanWorkPlanDetailSaveDto
+    {
+        /// <summary>
         /// 工单号
         /// </summary>
         public string OrderCode { get; set; }
 
         /// <summary>
-        /// 产品id
-        /// </summary>
-        public long ProductId { get; set; }
-
-        /// <summary>
-        /// 工作中心类型;和工作中心保持一致
-        /// </summary>
-        public WorkCenterTypeEnum? WorkCenterType { get; set; }
-
-        /// <summary>
-        /// 工作中心（车间或者线体）
-        /// </summary>
-        public long? WorkCenterId { get; set; }
-
-        /// <summary>
-        /// 工艺路线
-        /// </summary>
-        public long? ProcessRouteId { get; set; }
-
-        /// <summary>
-        /// 产品bom
-        /// </summary>
-        public long? ProductBOMId { get; set; }
-
-        /// <summary>
-        /// 工单类型
-        /// </summary>
-        public PlanWorkOrderTypeEnum Type { get; set; }
-
-        /// <summary>
         /// 数量
         /// </summary>
         public decimal Qty { get; set; }
-
-        /// <summary>
-        /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
-        /// </summary>
-        public PlanWorkOrderStatusEnum Status { get; set; } = PlanWorkOrderStatusEnum.NotStarted;
 
         /// <summary>
         /// 计划开始时间
@@ -170,20 +172,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public DateTime? PlanEndTime { get; set; }
 
-        /// <summary>
-        /// 工厂
-        /// </summary>
-        public long SiteId { get; set; }
-
-        /// <summary>
-        /// 超生产比例;默认是0，若允许超产，则写超产的%比例
-        /// </summary>
-        public decimal OverScale { get; set; } = 0;
-
-        /// <summary>
-        /// 备注
-        /// </summary>
-        public string? Remark { get; set; }
     }
 
     /// <summary>

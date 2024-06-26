@@ -13,6 +13,6 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
         /// <summary>
         /// 编码集合
         /// </summary>
-        public IEnumerable<string?> Codes { get; set; }
+        public IEnumerable<string>? Codes { get; set; }
     }
 }

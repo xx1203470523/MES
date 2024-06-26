@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.SystemServices.Dtos
 {
@@ -7,10 +8,12 @@ namespace Hymson.MES.SystemServices.Dtos
     /// </summary>
     public record WorkPlanDto : BaseEntityDto
     {
+        /*
         /// <summary>
         /// 部门编号（用这个来区分是哪个产线的工单，值维护成跟产线编码一样） 
         /// </summary>
         public string DepartmentCode { get; set; } = "";
+        */
 
         /// <summary>
         /// 计划单号 
@@ -45,7 +48,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 计划类型
         /// </summary>
-        public int Type { get; set; }
+        public PlanWorkOrderTypeEnum Type { get; set; }
 
         /// <summary>
         /// 工单数量
@@ -53,14 +56,14 @@ namespace Hymson.MES.SystemServices.Dtos
         public decimal Qty { get; set; }
 
         /// <summary>
-        /// 计划生产时间
+        /// 生产时间（计划）
         /// </summary>
-        public DateTime? StartTime { get; set; }
+        public DateTime? PlanStartTime { get; set; }
 
         /// <summary>
-        /// 计划结束时间
+        /// 结束时间（计划）
         /// </summary>
-        public DateTime? EndTime { get; set; }
+        public DateTime? PlanEndTime { get; set; }
 
     }
 }
