@@ -1201,21 +1201,17 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
         public async Task CreateProductParameterAsync()
         {
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
+            for (int index = 1905; index < 2048; index++)
             {
-                for (int index = 0; index < 2048; index++)
-                {
-                    await _manuProductParameterRepository.PrepareProductParameterSFCTable(index);
-                }
-
-                var procProcedureEntities = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery { });
-                foreach (var item in procProcedureEntities)
-                {
-                    await _manuProductParameterRepository.PrepareProductParameterProcedureldTable(item.SiteId, item.Id);
-                }
-                //提交
-                ts.Complete();
+                await _manuProductParameterRepository.PrepareProductParameterSFCTable(index);
             }
+
+            var procProcedureEntities = await _procProcedureRepository.GetEntitiesAsync(new ProcProcedureQuery { });
+            foreach (var item in procProcedureEntities)
+            {
+                await _manuProductParameterRepository.PrepareProductParameterProcedureldTable(item.SiteId, item.Id);
+            }
+
         }
 
     }
