@@ -209,6 +209,13 @@ namespace Hymson.MES.Api.Controllers
             await _procProcedureService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
         }
 
+        [HttpPost]
+        [Route("create")]
+        public async Task CreateProductParameterAsync()
+        {
+            await _procProcedureService.CreateProductParameterAsync();
+        }
+
         #endregion
     }
 }

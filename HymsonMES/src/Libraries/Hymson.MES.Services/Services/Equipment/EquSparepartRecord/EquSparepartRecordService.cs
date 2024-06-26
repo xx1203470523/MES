@@ -15,6 +15,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.EquSparepartRecord;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.EquSparepartRecord;
 using Hymson.Snowflake;
@@ -50,6 +51,7 @@ namespace Hymson.MES.Services.Services.EquSparepartRecord
         public async Task<PagedInfo<EquSparepartRecordPagedViewDto>> GetPagedListAsync(EquSparepartRecordPagedQueryDto equSparepartRecordPagedQueryDto)
         {
             var equSparepartRecordPagedQuery = equSparepartRecordPagedQueryDto.ToQuery<EquSparepartRecordPagedQuery>();
+            equSparepartRecordPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equSparepartRecordRepository.GetPagedInfoAsync(equSparepartRecordPagedQuery);
 
             //实体到DTO转换 装载数据

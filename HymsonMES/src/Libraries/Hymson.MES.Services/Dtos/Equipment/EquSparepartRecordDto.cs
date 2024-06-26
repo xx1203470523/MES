@@ -278,12 +278,12 @@ namespace Hymson.MES.Services.Dtos.EquSparepartRecord
         /// <summary>
         /// 备件编号 
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 备件名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 操作类型 1、注册 2、入库 3、出库4、绑定5、解绑
@@ -291,18 +291,23 @@ namespace Hymson.MES.Services.Dtos.EquSparepartRecord
         public EquOperationTypeEnum? OperationType { get; set; }
 
         /// <summary>
+        /// 备件类型
+        /// </summary>
+        public string? SparePartTypeCode { get; set; }
+
+        /// <summary>
         /// 设备编号
         /// </summary>
-        public string EquipmentCode { get; set; }
+        public string? EquipmentCode { get; set; }
 
         /// <summary>
         /// 设备名称
         /// </summary>
-        public string EquipmentName { get; set; }
+        public string? EquipmentName { get; set; }
 
         /// <summary>
         /// 操作时间
         /// </summary>
-        public DateTime[] CreatedOn { get; set; }
+        public DateTime[]? CreatedOn { get; set; }
     }
 }
