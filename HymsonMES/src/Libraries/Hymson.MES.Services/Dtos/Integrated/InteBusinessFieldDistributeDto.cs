@@ -58,9 +58,38 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
-    }
 
+        /// <summary>
+        /// 字段定义分配详情数据
+        /// </summary>
+        public IList<InteBusinessFieldDistributeDetailsCreateDto>? inteBusinessFieldDistributeDetailsCreateDtos { get; set; }
+    }
+    /// <summary>
+    /// 字段定义列表数据新增Dto
+    /// </summary>
+    public record InteBusinessFieldDistributeDetailsCreateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int Seq { get; set; }
+
+        /// <summary>
+        /// 是否必填
+        /// </summary>
+        public bool IsRequired { get; set; } = false;
+
+        /// <summary>
+        /// 字段定义Id
+        /// </summary>
+        public long BusinessFieldId { get; set; }
+
+        /// <summary>
+        /// 字段分配管理id 
+        /// </summary>
+        public long BusinessFieldFistributeid { get; set; }
+
+    }
     /// <summary>
     /// 字段分配管理Dto
     /// </summary>
