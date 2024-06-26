@@ -10,20 +10,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.Report
 {
     /// <summary>
-    /// 控制器（备件记录）
+    /// 控制器（设备记录）
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentRecordController : ControllerBase
     {
         /// <summary>
-        /// 接口（备件记录）
+        /// 接口（设备记录）
         /// </summary> 
         private readonly IEquEquipmentRecordService _equEquipmentRecordService;
         private readonly ILogger<EquEquipmentRecordController> _logger;
 
         /// <summary>
-        /// 构造函数（备件记录）
+        /// 构造函数（设备记录）
         /// </summary>
         /// <param name="equEquipmentRecordService"></param>
         /// <param name="logger"></param>
@@ -35,7 +35,7 @@ namespace Hymson.MES.Api.Controllers.Report
 
 
         /// <summary>
-        /// 分页查询列表（备件记录）
+        /// 分页查询列表（设备记录）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
