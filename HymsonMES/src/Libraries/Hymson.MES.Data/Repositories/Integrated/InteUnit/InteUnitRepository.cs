@@ -114,7 +114,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             return await conn.QueryAsync<InteUnitEntity>(GetByIdsSql, new { Ids = ids });
         }
 
-        
+
 
         /// <summary>
         /// 根据Code查询对象
@@ -137,11 +137,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteUnitEntitiesSqlTemplate);
             sqlBuilder.Select("*");
-            sqlBuilder.Where("IsDeleted =0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
             if (query.Codes != null && query.Codes.Any())
             {
-                sqlBuilder.Where(" Code  in @Codes ");
+                sqlBuilder.Where(" Code IN @Codes ");
             }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteUnitEntity>(template.RawSql, query);
         }

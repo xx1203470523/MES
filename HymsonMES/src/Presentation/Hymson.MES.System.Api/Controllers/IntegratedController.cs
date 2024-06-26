@@ -16,6 +16,11 @@ namespace Hymson.MES.System.Api.Controllers
     public class IntegratedController : ControllerBase
     {
         /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<IntegratedController> _logger;
+
+        /// <summary>
         /// 接口（客户）
         /// </summary>
         private readonly IInteCustomerService _inteCustomerService;
@@ -26,14 +31,26 @@ namespace Hymson.MES.System.Api.Controllers
         private readonly IInteSupplierService _inteSupplierService;
 
         /// <summary>
+        /// 接口（单位）
+        /// </summary>
+        private readonly IInteUnitService _inteUnitService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="inteCustomerService"></param>
         /// <param name="inteSupplierService"></param>
-        public IntegratedController(IInteCustomerService inteCustomerService, IInteSupplierService inteSupplierService)
+        /// <param name="inteUnitService"></param>
+        public IntegratedController(ILogger<IntegratedController> logger,
+            IInteCustomerService inteCustomerService,
+            IInteSupplierService inteSupplierService,
+            IInteUnitService inteUnitService)
         {
+            _logger = logger;
             _inteCustomerService = inteCustomerService;
             _inteSupplierService = inteSupplierService;
+            _inteUnitService = inteUnitService;
         }
 
         /// <summary>
@@ -58,6 +75,18 @@ namespace Hymson.MES.System.Api.Controllers
         public async Task SyncSupplierAsync(IEnumerable<InteSupplierDto> requestDtos)
         {
             _ = await _inteSupplierService.SyncSupplierAsync(requestDtos);
+        }
+
+        /// <summary>
+        /// 单位信息（同步）
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("Unit/sync")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("单位信息（同步）", BusinessType.INSERT)]
+        public async Task SyncUnitAsync(IEnumerable<InteUnitDto> requestDtos)
+        {
+            _ = await _inteUnitService.SyncUnitAsync(requestDtos);
         }
 
     }

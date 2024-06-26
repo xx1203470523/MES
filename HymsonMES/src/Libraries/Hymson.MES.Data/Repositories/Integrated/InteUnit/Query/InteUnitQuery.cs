@@ -5,6 +5,15 @@ namespace Hymson.MES.Data.Repositories.Integrated.Query
     /// </summary>
     public class InteUnitQuery
     {
-        public string[] Codes { get; set; }
+        /// <summary>
+        /// 所属站点id
+        /// </summary>
+        public long? SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 编码集合
+        /// </summary>
+        public IEnumerable<string> Codes { get; set; }
+
     }
 }

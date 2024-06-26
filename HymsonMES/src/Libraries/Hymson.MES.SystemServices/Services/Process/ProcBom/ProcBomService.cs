@@ -94,7 +94,6 @@ namespace Hymson.MES.SystemServices.Services.Process
             resposeSummaryBo.Updates.AddRange(resposeBo.Updates);
             resposeSummaryBo.DetailAdds.AddRange(resposeBo.DetailAdds);
 
-
             // 删除参数
             var deleteCommand = new DeleteCommand
             {
