@@ -199,7 +199,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             if (pagedQuery.InstallTimeRange != null && pagedQuery.InstallTimeRange.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.InstallTimeRange[0], CreatedOnEnd = pagedQuery.InstallTimeRange[1].AddDays(1) });
+                sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.InstallTimeRange[0], CreatedOnEnd = pagedQuery.InstallTimeRange[1] });
                 sqlBuilder.Where(" ese.CreatedOn >= @CreatedOnStart AND ese.CreatedOn < @CreatedOnEnd");
             }
 

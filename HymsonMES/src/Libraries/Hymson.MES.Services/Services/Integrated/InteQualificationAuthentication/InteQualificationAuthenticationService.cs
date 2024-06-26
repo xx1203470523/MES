@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -113,6 +114,7 @@ namespace Hymson.MES.Services.Services.Integrated
                         Id = IdGenProvider.Instance.CreateId(),
                         Type = detail.Type,
                         AuthenticationId = entity.Id,
+                        DueDate = detail.DueDate,
                         CreatedBy = updatedBy,
                         CreatedOn = updatedOn,
                         UpdatedBy = updatedBy,
@@ -186,6 +188,7 @@ namespace Hymson.MES.Services.Services.Integrated
                         Id = IdGenProvider.Instance.CreateId(),
                         Type = detail.Type,
                         AuthenticationId = authenticationEntity.Id,
+                        DueDate = detail.DueDate,
                         CreatedBy = updatedBy,
                         CreatedOn = updatedOn,
                         UpdatedBy = updatedBy,
@@ -239,6 +242,14 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
+
+            var entities = await _inteQualificationAuthenticationRepository.GetByIdsAsync(ids);
+            if (entities != null && entities.Any(a => a.Status == DisableOrEnableEnum.Enable))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10135));
+            }
+
             //判断有没有被引用
             return await _inteQualificationAuthenticationRepository.DeletesAsync(new DeleteCommand
             {
@@ -288,7 +299,8 @@ namespace Hymson.MES.Services.Services.Integrated
                 var detailsDto = new InteQualificationAuthenticationDetailsDto
                 {
                     Type = detailsEntity.Type,
-                    Values = null
+                    Values = null,
+                    DueDate = detailsEntity.DueDate
                 };
                 if (detailsEntity.Type == QualificationAuthenticationTypeEnum.User)
                 {
