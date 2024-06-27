@@ -213,30 +213,29 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         /// 查询是否已存在物料条码
         /// </summary>
-        /// <param name="materialBarCode"></param>
+        /// <param name="barcodes"></param>
         /// <returns></returns>
-        public async Task<bool> CheckMaterialBarCodeAnyAsync(string materialBarCode)
+        public async Task<bool> CheckMaterialBarCodesAnyAsync(IEnumerable<string> barcodes)
         {
-            var pagedInfo = await _whMaterialInventoryRepository.GetWhMaterialInventoryEntitiesAsync(new WhMaterialInventoryQuery
+            var inventoryEntities = await _whMaterialInventoryRepository.GetWhMaterialInventoryEntitiesAsync(new WhMaterialInventoryQuery
             {
-                MaterialBarCode = materialBarCode,
+                MaterialBarCodes = barcodes,
                 SiteId = _currentSite.SiteId ?? 0
             });
-
-            if (pagedInfo != null && pagedInfo.Any())
+            if (inventoryEntities != null && inventoryEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", materialBarCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", string.Join(',', inventoryEntities.Select(x => x.MaterialBarCode)));
             }
 
-            var sfcEntit = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
             {
-                SFC = materialBarCode,
+                SFCs = barcodes,
                 SiteId = _currentSite.SiteId ?? 0,
                 Type = SfcTypeEnum.Produce
             });
-            if (sfcEntit != null)
+            if (sfcEntities != null && sfcEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES152016)).WithData("MaterialCode", materialBarCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES152016)).WithData("MaterialCode", string.Join(',', sfcEntities.Select(x => x.SFC)));
             }
             return false;
         }

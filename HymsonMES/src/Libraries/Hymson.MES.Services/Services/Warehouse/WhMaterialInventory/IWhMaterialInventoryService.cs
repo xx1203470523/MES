@@ -19,9 +19,9 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         /// 查询是否已存在物料条码
         /// </summary>
-        /// <param name="materialBarCode"></param>
+        /// <param name="barcodes"></param>
         /// <returns></returns>
-        Task<bool> CheckMaterialBarCodeAnyAsync(string materialBarCode);
+        Task<bool> CheckMaterialBarCodesAnyAsync(IEnumerable<string> barcodes);
 
         /// <summary>
         /// 根据物料条码查询

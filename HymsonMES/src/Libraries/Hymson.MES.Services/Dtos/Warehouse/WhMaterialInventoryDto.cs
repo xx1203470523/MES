@@ -135,7 +135,16 @@ namespace Hymson.MES.Services.Dtos.Warehouse
 
     }
 
-
+    /// <summary>
+    /// 校验条码是否已存在Dto
+    /// </summary>
+    public record CheckBarcodesForReceiveDto
+    {
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public IEnumerable<string> Barcodes { get; set; }
+    }
 
     /// <summary>
     /// 物料库存Dto

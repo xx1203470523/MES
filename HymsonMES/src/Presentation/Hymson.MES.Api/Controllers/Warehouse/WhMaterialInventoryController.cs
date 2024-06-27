@@ -50,7 +50,18 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [HttpGet("getMaterialBarCodeAny/{materialBarCode}")]
         public async Task<bool> GetMaterialBarCodeAnyAsync(string materialBarCode)
         {
-            return await _whMaterialInventoryService.CheckMaterialBarCodeAnyAsync(materialBarCode);
+            return await _whMaterialInventoryService.CheckMaterialBarCodesAnyAsync(new[] { materialBarCode });
+        }
+
+        /// <summary>
+        /// 校验条码是否已存在
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpPost("checkBarcodesForReceive")]
+        public async Task<bool> CheckBarcodesForReceiveAsync([FromBody] CheckBarcodesForReceiveDto param)
+        {
+            return await _whMaterialInventoryService.CheckMaterialBarCodesAnyAsync(param.Barcodes);
         }
 
         /// <summary>
