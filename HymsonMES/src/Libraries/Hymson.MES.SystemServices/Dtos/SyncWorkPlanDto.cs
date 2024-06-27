@@ -1,19 +1,23 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Plan;
 
 namespace Hymson.MES.SystemServices.Dtos
 {
     /// <summary>
     /// 工作计划 Dto
     /// </summary>
-    public record WorkPlanDto : BaseEntityDto
+    public record SyncWorkPlanDto : BaseEntityDto
     {
-        /*
         /// <summary>
-        /// 部门编号（用这个来区分是哪个产线的工单，值维护成跟产线编码一样） 
+        /// 计划类型
         /// </summary>
-        public string DepartmentCode { get; set; } = "";
-        */
+        public PlanWorkPlanTypeEnum PlanType { get; set; } = PlanWorkPlanTypeEnum.Rotor;
+
+        /// <summary>
+        /// 产线编码 
+        /// </summary>
+        public string LineCode { get; set; } = "";
 
         /// <summary>
         /// 计划单号 
@@ -66,4 +70,5 @@ namespace Hymson.MES.SystemServices.Dtos
         public DateTime? PlanEndTime { get; set; }
 
     }
+
 }

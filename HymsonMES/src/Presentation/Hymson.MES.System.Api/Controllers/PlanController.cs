@@ -37,9 +37,22 @@ namespace Hymson.MES.System.Api.Controllers
         [HttpPost("WorkPlan/sync")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("生产计划（同步）", BusinessType.INSERT)]
-        public async Task SyncWorkPlanAsync(IEnumerable<WorkPlanDto> requestDtos)
+        public async Task SyncWorkPlanAsync(IEnumerable<SyncWorkPlanDto> requestDtos)
         {
             _ = await _planWorkPlanService.SyncWorkPlanAsync(requestDtos);
+        }
+
+        /// <summary>
+        /// 生产计划（单个取消）
+        /// </summary>
+        /// <param name="planCodes"></param>
+        /// <returns></returns>
+        [HttpPost("WorkPlan/cancel")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("生产计划（单个取消）", BusinessType.INSERT)]
+        public async Task CancelWorkPlanAsync(IEnumerable<string> planCodes)
+        {
+            _ = await _planWorkPlanService.CancelWorkPlanAsync(planCodes);
         }
 
     }

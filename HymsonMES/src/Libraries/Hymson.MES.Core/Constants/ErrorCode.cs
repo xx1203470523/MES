@@ -45,6 +45,7 @@
         public const string MES10136 = "操作数据丢失";
         public const string MES10137 = "只允许删除【待检验】状态的数据！";
         public const string MES10138 = "必须要选择一项查询类型！";
+        public const string MES10139 = "配置信息读取失败！";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -80,7 +81,7 @@
         public const string MES10230 = "状态不合法！";
         public const string MES10231 = "版本不能为空！";
         public const string MES10232 = "工艺路线{code}没有找到对应的数据！";
-        public const string MES10233 = "Bom {bomCode}没有找到对应的数据！";
+        public const string MES10233 = "BOM【{bomCode}】没有找到对应的数据！";
         public const string MES10234 = "掩码{code}没有找到对应的数据！";
         public const string MES10235 = "批次需为大于0整数！";
         public const string MES10236 = "是否默认版本不合法！";
@@ -91,6 +92,11 @@
         public const string MES10241 = "物料只能选择一条数据";
         public const string MES10242 = "物料绑定的模板ID以存在";
         public const string MES10243 = "BOM物料Id【{MaterialId}】所属物料不存在！";
+        public const string MES10244 = "物料【{Code}】不存在！";
+        public const string MES10245 = "产品【{Code}】不存在！";
+        public const string MES10246 = "BOM【{Code}】不存在！";
+        public const string MES10247 = "存在不是【{Status}】状态的数据，不允许当前操作！";
+
         #endregion
 
         #region 资源 10300
@@ -1132,7 +1138,7 @@
         public const string MES16015 = "工单没有锁定前的状态，无法解锁";
         public const string MES16016 = "工单【{WorkOrder}】不存在，具体请查看【生产工单】。";
         public const string MES16017 = "状态不为【{Status}】，不允许删除！";
-        
+
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";
         public const string MES16022 = "数量 必须大于0！";
@@ -2191,7 +2197,7 @@
         public const string MES17909 = "库存总数量不允许大于备件注册数量";
         public const string MES17910 = "备件{Code}库存不足";
         public const string MES17911 = "未查询到备件库存信息";
-        public const string MES17912 = "库存不足"; 
+        public const string MES17912 = "库存不足";
 
 
         #endregion
