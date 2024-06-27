@@ -15,8 +15,8 @@ namespace Hymson.MES.HttpClients
     public class XnebulaWMSServer : IXnebulaWMSServer
     {
         private readonly HttpClient _httpClient;
-        private readonly XnebulaWMSOptions _options;
-        public XnebulaWMSServer(HttpClient httpClient,IOptions<XnebulaWMSOptions> options)
+        private readonly XnebulaWMSOption _options;
+        public XnebulaWMSServer(HttpClient httpClient,IOptions<XnebulaWMSOption> options)
         {
             _httpClient = httpClient;
             _options = options.Value;
@@ -36,7 +36,7 @@ namespace Hymson.MES.HttpClients
            
             var httpResponse = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(_options.Delivery.RoutePath, materialPickingRequest);
             
-            await HandleResponse(httpResponse).ConfigureAwait(false);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             return httpResponse.IsSuccessStatusCode;
         }
@@ -54,7 +54,7 @@ namespace Hymson.MES.HttpClients
                 WarehouseCode = _options.Delivery.WarehouseCode
             };
             var httpResponse = await _httpClient.PostAsJsonAsync<MaterialPickingCancel>(_options.Delivery.RoutePath, materialPickingCancel);
-            await HandleResponse(httpResponse).ConfigureAwait(false);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
             return httpResponse.IsSuccessStatusCode;
         }
 
@@ -71,7 +71,7 @@ namespace Hymson.MES.HttpClients
 
             var httpResponse = await _httpClient.PostAsJsonAsync<MaterialReturnRequest>(_options.Delivery.RoutePath, materialReturnRequest);
 
-            await HandleResponse(httpResponse).ConfigureAwait(false);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
             return httpResponse.IsSuccessStatusCode;
         }
 
@@ -86,58 +86,13 @@ namespace Hymson.MES.HttpClients
             };
             var httpResponse = await _httpClient.PostAsJsonAsync<MaterialReturnCancel>(_options.Delivery.RoutePath, materialReturnCancel);
 
-            await HandleResponse(httpResponse).ConfigureAwait(false);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
             return httpResponse.IsSuccessStatusCode;
         }
 
-        private static async Task HandleResponse(HttpResponseMessage response)
-        {
-            if (!response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+       
 
-                if (response.StatusCode == HttpStatusCode.Forbidden || response.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    throw new CustomerValidationException(response.StatusCode.ToString(), content);
-                }
-
-                throw new NotFoundException(response.StatusCode.ToString(), content);
-            }
-        }
-
-        //async Task<(string base64Str, bool result)> ILabelPrintRequest.PreviewFromImageBase64Async(PreviewRequest previewRequest)
-        //{
-        //    string api = "api/LabelPrint/preview";
-        //    var httpResponseMessage = await _httpClient.PostAsJsonAsync<PreviewRequest>(api, previewRequest);
-
-        //    if (httpResponseMessage.IsSuccessStatusCode)
-        //    {
-        //        using var contentStream =
-        //            await httpResponseMessage.Content.ReadAsStreamAsync();
-
-        //        var r = await System.Text.Json.JsonSerializer.DeserializeAsync
-        //            <PrintResponse>(contentStream);
-        //        return (base64Str: r.Data, result: r.Success);
-        //    }
-        //    return ("调用失败", false);
-        //}
-
-        //async Task<(string msg, bool result)> ILabelPrintRequest.PrintAsync(PrintRequest printRequest, bool ShowDialog)
-        //{
-        //    string api = "api/LabelPrint/print";
-        //    var httpResponseMessage = await _httpClient.PostAsJsonAsync<PrintRequest>(api, printRequest);
-
-        //    if (httpResponseMessage.IsSuccessStatusCode)
-        //    {
-        //        using var contentStream =
-        //            await httpResponseMessage.Content.ReadAsStreamAsync();
-
-        //        var r = await System.Text.Json.JsonSerializer.DeserializeAsync
-        //            <PrintResponse>(contentStream);
-        //        return (msg: r.Message, result: r.Success);
-        //    }
-        //    return ("调用失败", false);
-        //}
+       
 
     }
 }

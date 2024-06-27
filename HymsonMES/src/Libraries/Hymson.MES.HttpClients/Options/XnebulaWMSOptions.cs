@@ -9,12 +9,13 @@ namespace Hymson.MES.HttpClients
     /// <summary>
     /// 仓库操作
     /// </summary>
-    public class XnebulaWMSOptions
+    public class XnebulaWMSOption
     {
         /// <summary>
         /// 基础路径
         /// </summary>
         public string BaseAddressUri { get; set; } = "";
+        public string Token { get; set; } = "";
         /// <summary>
         /// 出库操作配置
         /// </summary>

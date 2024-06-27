@@ -69,6 +69,13 @@ namespace Hymson.MES.SystemServices.Services.Plan
             _procMaterialRepository = procMaterialRepository;
         }
 
+        public async Task<IEnumerable<RotorWorkOrder>> SyncWorkOrderAsync(long WorkCenterId)
+        {
+            //获取产品编码
+
+            return null;
+        }
+
         /// <summary>
         /// 同步信息（生产计划）
         /// </summary>

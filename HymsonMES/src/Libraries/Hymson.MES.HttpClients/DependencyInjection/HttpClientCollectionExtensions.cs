@@ -1,5 +1,7 @@
 ﻿
 using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Options;
+using Hymson.MES.HttpClients.RotorHandle;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,11 +28,20 @@ namespace Microsoft.Extensions.DependencyInjection
             //    httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
             //});
 
-            var wmsOptions = new XnebulaWMSOptions();
+            var wmsOptions = new XnebulaWMSOption();
             configuration.GetSection("XnebulaWMSOptions").Bind(wmsOptions);
             services.AddHttpClient<IXnebulaWMSServer, XnebulaWMSServer>().ConfigureHttpClient(httpClient =>
             {
                 httpClient.BaseAddress = new Uri(wmsOptions.BaseAddressUri);
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", wmsOptions.Token);
+            });
+
+            var rotorOptions = new RotorOption();
+            configuration.GetSection("RotorOption").Bind(rotorOptions);
+            services.AddHttpClient<IRotorService, RotorServer>().ConfigureHttpClient(httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(wmsOptions.BaseAddressUri);
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(nameof(RotorOption.SYSTOKEN), rotorOptions.SYSTOKEN);
             });
 
             return services;
