@@ -80,5 +80,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         Task<PagedInfo<InteBusinessFieldDistributeEntity>> GetPagedListAsync(InteBusinessFieldDistributePagedQuery pagedQuery);
 
+        /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<InteBusinessFieldEntity> GetByCodeAsync(InteBusinessFieldDistributeQuery query);
+
     }
 }

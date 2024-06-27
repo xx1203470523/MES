@@ -148,6 +148,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
             return new PagedInfo<InteBusinessFieldDistributeEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<InteBusinessFieldEntity> GetByCodeAsync(InteBusinessFieldDistributeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<InteBusinessFieldEntity>(GetByCodeSql, query);
+        }
+
     }
 
 
@@ -172,5 +183,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdSql = @"SELECT * FROM inte_business_field_distribute WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM inte_business_field_distribute WHERE Id IN @Ids ";
 
+        const string GetByCodeSql = @"SELECT * 
+                            FROM `inte_business_field_distribute`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
     }
 }

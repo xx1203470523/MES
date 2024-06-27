@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Report
             var materials = await materialsTask;
             var procProcessRouteDetailNode = await procProcessRouteDetailNodeTask;
             var procProcedures = await procProceduresTask;
-            var SummaryResult = await _manuSfcSummaryRepository.GetWorkOrderAsync(summaryResultquery);
+            var summaryResult = await _manuSfcSummaryRepository.GetWorkOrderAsync(summaryResultquery);
             var manuSfcProduceResult = await _manuSfcProduceRepository.GetStepPageListAsync(manuSfcProduceResultquery);
 
             var sfcIds = manuSfcProduceResult.Data.Where(x => x.Status == SfcStatusEnum.Scrapping).Select(x => x.SFCId.GetValueOrDefault()).Distinct().ToList();
@@ -158,7 +158,7 @@ namespace Hymson.MES.Services.Services.Report
                 var passDownQuantity = passViews.Sum(x => x.Qty);
                 var processDownQuantity = activityViews.Sum(x => x.Qty);
                 var lockQuantity = lockViews.Sum(x => x.Qty);
-                var finishProductQuantity = SummaryResult.Where(x => x.WorkOrderId == orderId && x.ProcedureId == item.ProcedureId).FirstOrDefault()?.OutputQty;
+                var finishProductQuantity = summaryResult.LastOrDefault(x =>  x.ProcedureId == item.ProcedureId)?.OutputQty;
 
                 var scrapViews = manuSfcProduceResult.Data.Where(x => x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.Scrapping);
                 var scrapQuantity = 0m;
