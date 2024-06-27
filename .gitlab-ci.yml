@@ -18,7 +18,6 @@ sonarqube-check:
       - ls
       - cd HymsonMES
       - ls
-      -  dotnet dev-certs https --trust
  #     - "dotnet tool install --global dotnet-sonarscanner"
       - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
       -  echo $PATH
