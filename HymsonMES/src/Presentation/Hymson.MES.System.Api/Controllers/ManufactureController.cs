@@ -40,6 +40,11 @@ namespace Hymson.MES.System.Api.Controllers
         {
             await _manuRequistionOrderService.SavePickMaterialsAsync(productionPickDto);
         }
+        /// <summary>
+        /// 生产领料单结果反馈
+        /// </summary>
+        /// <param name="callBackDto"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("PickMaterialsCallBack")]
         [ProducesResponseType(typeof(ResultDto), 200)]
@@ -48,6 +53,11 @@ namespace Hymson.MES.System.Api.Controllers
         {
             await _manuRequistionOrderService.PickMaterialsCallBackAsync(callBackDto);
         }
+        /// <summary>
+        /// 生产退料单结果反馈
+        /// </summary>
+        /// <param name="callBackDto"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("ReturnMaterialsCallBack")]
         [ProducesResponseType(typeof(ResultDto), 200)]

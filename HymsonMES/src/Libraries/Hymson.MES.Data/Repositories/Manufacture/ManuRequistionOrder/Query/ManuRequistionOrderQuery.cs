@@ -6,7 +6,7 @@
  *build datetime: 2023-07-04 02:34:15
  */
 
-namespace Hymson.MES.Data.Repositories.Manufacture
+namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
 {
     /// <summary>
     /// 生产领料单 查询参数
@@ -22,6 +22,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 工厂
         /// </summary>
         public long SiteId { get; set; }
-        public string WorkOrder { get; set; }
+        public string? WorkOrder { get; set; }
+    }
+    /// <summary>
+    /// 根据工单集合查询领料单
+    /// </summary>
+    public class ManuRequistionQueryByWorkOrders
+    {
+       
+
+        /// <summary>
+        /// 工厂
+        /// </summary>
+        public long SiteId { get; set; }
+        public string[]? WorkOrders { get; set; }
     }
 }

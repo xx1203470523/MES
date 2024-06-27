@@ -40,4 +40,26 @@ namespace Hymson.MES.Core.Enums
         [Description("暂停中")]
         Pending = 6,
     }
+    /// <summary>
+    /// 工单领料状态
+    /// </summary>
+    public enum PlanWorkOrderPickStatusEnum : sbyte
+    {
+        /// <summary>
+        /// 未领料
+        /// </summary>
+        [Description("未领料")]
+        NotPicked = 1,
+        /// <summary>
+        /// 已领料
+        /// </summary>
+        [Description("已领料")]
+        FinishPicked = 2,
+        /// <summary>
+        /// 部分领料
+        /// </summary>
+        [Description("部分领料")]
+        PartPicked = 3
+        
+    }
 }

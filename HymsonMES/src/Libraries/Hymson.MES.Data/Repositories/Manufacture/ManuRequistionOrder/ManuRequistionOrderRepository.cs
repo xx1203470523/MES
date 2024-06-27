@@ -14,7 +14,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
-namespace Hymson.MES.Data.Repositories.Manufacture
+namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
 {
     /// <summary>
     /// 生产领料单仓储
@@ -107,10 +107,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuRequistionOrderQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuRequistionOrderEntity>> GetManuRequistionOrderEntitiesAsync(ManuRequistionOrderQuery manuRequistionOrderQuery)
+        public async Task<IEnumerable<ManuRequistionOrderEntity>> GetManuRequistionOrderEntitiesAsync(ManuRequistionQueryByWorkOrders manuRequistionOrderQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuRequistionOrderEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Select("*");
+            if (manuRequistionOrderQuery.WorkOrders!=null&&manuRequistionOrderQuery.WorkOrders.Length>0)
+            {
+                sqlBuilder.Where("WorkOrderCode IN @WorkOrders");
+            }
+            sqlBuilder.AddParameters(manuRequistionOrderQuery);
             using var conn = GetMESDbConnection();
             var manuRequistionOrderEntities = await conn.QueryAsync<ManuRequistionOrderEntity>(template.RawSql, manuRequistionOrderQuery);
             return manuRequistionOrderEntities;

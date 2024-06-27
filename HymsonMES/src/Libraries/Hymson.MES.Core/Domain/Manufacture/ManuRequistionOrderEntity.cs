@@ -37,8 +37,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 状态
         /// </summary>
         public WhWarehouseRequistionStatusEnum? Status { get; set; }
+        /// <summary>
+        /// 领料数量
+        /// </summary>
+        public int Qty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料描述
         /// </summary>
         public string Remark { get; set; }
