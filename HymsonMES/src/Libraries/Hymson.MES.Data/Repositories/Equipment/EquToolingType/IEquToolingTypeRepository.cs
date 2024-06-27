@@ -32,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquSparePartsGroupEntity entity);
+        Task<int> UpdateAsync(EquToolingTypeEntity entity);
         
         /// <summary>
         /// 更新（批量）
@@ -54,6 +54,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeletesAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 软删除（关联数据）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeletesAsyncRelation(DeleteCommand command);
 
         /// <summary>
         /// 根据Code查询对象

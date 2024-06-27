@@ -18,6 +18,9 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
 
             RuleFor(x => x.BusinessFieldId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18515));
+
+            RuleFor(x => x.FieldLabel).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19428));
+            RuleFor(x => x.FieldLabel).Matches("^[A-Z0-9_]+$").WithErrorCode(nameof(ErrorCode.MES19434));
         }
     }
 

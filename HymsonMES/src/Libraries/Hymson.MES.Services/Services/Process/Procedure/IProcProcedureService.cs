@@ -94,5 +94,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <returns></returns>
         Task UpdateStatusAsync(ChangeStatusDto param);
 
+        Task CreateProductParameterAsync();
+
     }
 }

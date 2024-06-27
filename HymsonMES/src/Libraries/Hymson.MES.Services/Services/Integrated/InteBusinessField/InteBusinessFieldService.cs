@@ -170,6 +170,9 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES19430));
                     }
+
+                    var patternFieldLabel = @"^[A-Z0-9_]+$";
+                    if (!Regex.IsMatch($"{item.FieldLabel}", patternFieldLabel)) throw new CustomerValidationException(nameof(ErrorCode.MES19434));
                     detailEntities.Add(new InteBusinessFieldListEntity()
                     {
                         BusinessFieldId = inteBusinessFieldEntity.Id,
@@ -282,6 +285,9 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES19424));
                     }
+                    var patternFieldLabel = @"^[A-Z0-9_]+$";
+                    if (!Regex.IsMatch($"{item.FieldLabel}", patternFieldLabel)) throw new CustomerValidationException(nameof(ErrorCode.MES19434));
+                    // RuleFor(x => x.FieldLabel).Matches("^[A-Z0-9_]+$").WithErrorCode(nameof(ErrorCode.MES19434));
 
                     var isSeqCount = saveDto.inteBusinessFieldList.GroupBy(p => p.Seq)
                                         .Any(g => g.Count() > 1);
@@ -385,6 +391,7 @@ namespace Hymson.MES.Services.Services.Integrated
             //if (inteBusinessFieldEntity == null) return null;
             if (inteBusinessFieldEntity.Any())
             {
+                inteBusinessFieldEntity= inteBusinessFieldEntity.OrderBy(x => x.Seq).ToList();
                 foreach (var item in inteBusinessFieldEntity)
                 {
                     var inteVehicleTypeVerifyDto = item.ToModel<InteBusinessFieldListDto>();

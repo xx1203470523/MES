@@ -96,7 +96,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}/equipmentGroupList")]
-        public async Task<List<EquSparePartsGroupEquipmentGroupRelationSaveDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id)
+        public async Task<List<EquToolingTypeGroupEquipmentGroupRelationSaveDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id)
         {
             return await _equToolingTypeService.GetSparePartsEquipmentGroupRelationByIdAsync(id);
         }
@@ -107,9 +107,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}/MaterialList")]
-        public async Task<List<EquSparePartsGroupEquipmentGroupRelationSaveDto>> GetQualUnqualifiedCodeMaterialRelationByIdAsync(long id)
+        public async Task<List<EquToolingTypeGroupMaterialRelationSaveDto>> GetQualUnqualifiedCodeMaterialRelationByIdAsync(long id)
         {
-            return await _equToolingTypeService.GetSparePartsEquipmentGroupRelationByIdAsync(id);
+            return await _equToolingTypeService.GetToolingTypeGroupMaterialIdRelationByIdAsync(id);
         }
 
         /// <summary>

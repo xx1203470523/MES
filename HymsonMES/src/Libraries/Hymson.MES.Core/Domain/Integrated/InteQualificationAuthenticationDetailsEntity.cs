@@ -32,5 +32,10 @@ namespace Hymson.MES.Core.Domain.Integrated
         public string? RoleIds { get; set; }
 
         public long AuthenticationId { get; set; }
+
+        /// <summary>
+        /// 有效期
+        /// </summary>
+        public DateTime DueDate { get; set; }
     }
 }
