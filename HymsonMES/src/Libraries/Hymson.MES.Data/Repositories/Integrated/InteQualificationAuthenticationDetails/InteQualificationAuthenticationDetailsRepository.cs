@@ -183,7 +183,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_qualification_authentication_details /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_qualification_authentication_details /**where**/  ";
 
-        const string InsertSql = "INSERT INTO inte_qualification_authentication_details(  `Id`, `SiteId`, `Type`, `UserNames`, `RoleIds`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `AuthenticationId`) VALUES (  @Id, @SiteId, @Type, @UserNames, @RoleIds, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted,@AuthenticationId) ";
+        const string InsertSql = "INSERT INTO inte_qualification_authentication_details(  `Id`, `SiteId`, `Type`, `UserNames`, `RoleIds`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `AuthenticationId`, `DueDate`) VALUES (  @Id, @SiteId, @Type, @UserNames, @RoleIds, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted,@AuthenticationId,@DueDate) ";
 
         const string UpdateSql = "UPDATE inte_qualification_authentication_details SET   SiteId = @SiteId, Type = @Type, UserName = @UserName, RoleId = @RoleId, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 

@@ -96,5 +96,16 @@ namespace Hymson.MES.Api.Controllers.Integrated
             return await _inteBusinessFieldDistributeService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 查询详情（字段分配详情）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("getBusinessFieldDistributeDetails/{id}")]
+        public async Task<IEnumerable<BusinessFieldViewDto>> getBusinessFieldDistributeDetailsByIdAsync(long id)
+        {
+            return await _inteBusinessFieldDistributeService.getBusinessFieldDistributeDetailsByIdAsync(id);
+        }
+
     }
 }

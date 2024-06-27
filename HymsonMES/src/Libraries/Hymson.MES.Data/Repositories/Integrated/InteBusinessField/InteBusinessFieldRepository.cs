@@ -149,7 +149,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
             if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1] });
                 sqlBuilder.Where(" v.CreatedOn >= @CreatedOnStart AND v.CreatedOn < @CreatedOnEnd ");
             }
 
