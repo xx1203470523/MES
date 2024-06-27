@@ -7,7 +7,7 @@
  */
 using Hymson.Infrastructure;
 
-namespace Hymson.MES.Data.Repositories.Manufacture
+namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
 {
     /// <summary>
     /// 生产领料单明细 分页参数

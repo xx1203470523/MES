@@ -29,6 +29,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.HttpClients;
 using FluentValidation.Results;
+using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
