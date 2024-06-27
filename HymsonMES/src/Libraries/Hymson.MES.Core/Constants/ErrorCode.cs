@@ -2216,6 +2216,7 @@
         public const string MES17957 = "维修开始时间不能大于结束时间";
         public const string MES17958 = "请选择故障原因";
         public const string MES17959 = "{Code}非待维修状态不允许删除";
+        public const string MES17960 = "{Code}已维修过的单据不允许删除";
 
 
 

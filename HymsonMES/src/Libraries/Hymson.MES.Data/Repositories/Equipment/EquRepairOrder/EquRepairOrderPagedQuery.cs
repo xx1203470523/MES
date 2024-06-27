@@ -56,6 +56,16 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrder
         public string? ConfirmBy { get; set; }
 
         /// <summary>
+        /// 维修确认 1、维修完成2、重新维修
+        /// </summary>
+        public EquConfirmResultEnum? ConfirmResult { get; set; }
+
+        /// <summary>
+        /// 报修时间
+        /// </summary>
+        public DateTime[]? CreatedOn { get; set; }
+
+        /// <summary>
         /// 故障时间
         /// </summary>
         public DateTime[]? FaultTime { get; set; }
