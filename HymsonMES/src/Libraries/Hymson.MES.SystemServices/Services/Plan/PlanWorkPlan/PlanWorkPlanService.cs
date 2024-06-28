@@ -100,7 +100,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
         }
 
         /// <summary>
-        /// 单个取消（生产计划）
+        /// 取消（生产计划）
         /// </summary>
         /// <param name="planCodes"></param>
         /// <returns></returns>
@@ -168,7 +168,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
             var resposeBo = new SyncWorkPlanSummaryBo();
 
             // 判断是否有不存在的产品编码
-            var productCodes = lineDtoDict.Select(s => s.ProductCode).Distinct();
+            var productCodes = lineDtoDict.SelectMany(s => s.Products).Select(s => s.ProductCode).Distinct();
             var productEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = siteId, MaterialCodes = productCodes });
             if (productEntities == null || productEntities.Any())
             {
@@ -177,7 +177,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
             }
 
             // 判断BOM编码是否存在
-            var bomCodes = lineDtoDict.Select(s => s.BomCode).Distinct();
+            var bomCodes = lineDtoDict.SelectMany(s => s.Products).Select(s => s.BomCode).Distinct();
             var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = siteId, Codes = bomCodes });
             if (bomEntities == null || bomEntities.Any())
             {
@@ -192,13 +192,29 @@ namespace Hymson.MES.SystemServices.Services.Plan
             // 遍历数据
             foreach (var planDto in lineDtoDict)
             {
+                // 产品不能为空
+                if (planDto.Products.Count == 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10249)).WithData("Code", planDto.PlanCode);
+                }
+
+                // 不支持一个生产计划多个产品
+                if (planDto.Products.Count > 1)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10248)).WithData("Code", planDto.PlanCode);
+                }
+
+                // 获取产品对象
+                var productDto = planDto.Products.FirstOrDefault();
+                if (productDto == null) continue;
+
+                var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == productDto.ProductCode)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10245)).WithData("Code", productDto.ProductCode);
+
+                var bomEntity = bomEntities.FirstOrDefault(f => f.BomCode == productDto.BomCode)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10246)).WithData("Code", productDto.BomCode);
+
                 var planEntity = planEntities.FirstOrDefault(f => f.PlanCode == planDto.PlanCode);
-
-                var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == planDto.ProductCode)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10245)).WithData("Code", planDto.ProductCode);
-
-                var bomEntity = bomEntities.FirstOrDefault(f => f.BomCode == planDto.BomCode)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10246)).WithData("Code", planDto.BomCode);
 
                 // 不存在的新生产计划
                 if (planEntity == null)
@@ -206,11 +222,11 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     planEntity = new PlanWorkPlanEntity
                     {
                         PlanCode = planDto.PlanCode,
-                        ProductCode = planDto.ProductCode,
-                        ProductVersion = planDto.ProductVersion,
-                        BomCode = planDto.BomCode,
-                        BomVersion = planDto.BomVersion,
-                        Qty = planDto.Qty,
+                        ProductCode = productDto.ProductCode,
+                        ProductVersion = productDto.ProductVersion,
+                        BomCode = productDto.BomCode,
+                        BomVersion = productDto.BomVersion,
+                        Qty = planDto.PlanQty,
                         RequirementNumber = planDto.RequirementNumber,
 
                         ProductId = productEntity.Id,
@@ -247,7 +263,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     }
 
                     // 除了数量/时间，好像什么都不能随便改
-                    planEntity.Qty = planDto.Qty;
+                    planEntity.Qty = planDto.PlanQty;
                     planEntity.PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value;
                     planEntity.PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value;
 

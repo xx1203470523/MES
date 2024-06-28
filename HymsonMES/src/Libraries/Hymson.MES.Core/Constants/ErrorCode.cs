@@ -96,7 +96,8 @@
         public const string MES10245 = "产品【{Code}】不存在！";
         public const string MES10246 = "BOM【{Code}】不存在！";
         public const string MES10247 = "存在不是【{Status}】状态的数据，不允许当前操作！";
-
+        public const string MES10248 = "生产计划【{Code}】不支持多个产品！";
+        public const string MES10249 = "生产计划【{Code}】产品不能为空！";
         #endregion
 
         #region 资源 10300

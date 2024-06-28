@@ -9,9 +9,9 @@ namespace Hymson.MES.SystemServices.Dtos
     public record BomDto : BaseEntityDto
     {
         /// <summary>
-        /// BomId
+        /// 主键Id
         /// </summary>
-        public long? BomId { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// Bom编码
@@ -46,9 +46,9 @@ namespace Hymson.MES.SystemServices.Dtos
         public MaterialMethodEnum MaterialMethod { get; set; } = MaterialMethodEnum.Picking;
 
         /// <summary>
-        /// BOM物料ID
+        /// 主键Id
         /// </summary>
-        public long? BomMaterialId { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// 物料编码

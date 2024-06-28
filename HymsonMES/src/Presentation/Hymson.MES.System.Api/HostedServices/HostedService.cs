@@ -22,34 +22,41 @@ namespace Hymson.MES.System.Api.HostedServices
         private readonly IClearCacheService _clearCacheService;
 
         /// <summary>
-        /// ctor
+        /// 构造函数
         /// </summary>
         /// <param name="jwtOptions"></param>
-        public HostedService(IOptions<JwtOptions> jwtOptions, ILogger<HostedService> logger,
+        /// <param name="logger"></param>
+        /// <param name="resourceService"></param>
+        /// <param name="clearCacheService"></param>
+        public HostedService(IOptions<JwtOptions> jwtOptions,
+            ILogger<HostedService> logger,
             IResourceService resourceService,
             IClearCacheService clearCacheService)
         {
             _jwtOptions = jwtOptions.Value;
+            _logger = logger;
             _resourceService = resourceService;
             _clearCacheService = clearCacheService;
         }
+
+
         /// <summary>
         /// 启动时运行
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task StartAsync(CancellationToken cancellationToken)
+        public override async Task StartAsync(CancellationToken cancellationToken)
         {
             var systemModel = new SystemModel
             {
                 FactoryId = 123456,
                 Id = 12870073632952320,
-                Name = "金蝶ERP",
+                Name = "用户ERP",
                 SiteId = 123456
             };
             var token = JwtHelper.GenerateJwtToken(systemModel, _jwtOptions);
             Console.WriteLine(token);
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -81,9 +88,10 @@ namespace Hymson.MES.System.Api.HostedServices
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task StopAsync(CancellationToken cancellationToken)
+        public override async Task StopAsync(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
+
     }
 }

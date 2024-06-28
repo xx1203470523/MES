@@ -155,7 +155,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                 // 不存在的新BOM
                 if (bomEntity == null)
                 {
-                    var bomId = bomDto.BomId ?? IdGenProvider.Instance.CreateId();
+                    var bomId = bomDto.Id ?? IdGenProvider.Instance.CreateId();
                     bomEntity = new ProcBomEntity
                     {
                         Id = bomId,
@@ -196,7 +196,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                         continue;
                     }
 
-                    var bomDetailId = bomMaterialDto.BomMaterialId ?? IdGenProvider.Instance.CreateId();
+                    var bomDetailId = bomMaterialDto.Id ?? IdGenProvider.Instance.CreateId();
 
                     // BOM明细
                     resposeBo.DetailAdds.Add(new ProcBomDetailEntity
@@ -228,7 +228,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                             Id = IdGenProvider.Instance.CreateId(),
                             BomId = bomEntity.Id,
                             BomDetailId = bomDetailId,
-                            ReplaceMaterialId = s.BomMaterialId ?? IdGenProvider.Instance.CreateId(),
+                            ReplaceMaterialId = s.Id ?? IdGenProvider.Instance.CreateId(),
                             Usages = s.MaterialDosage,
                             Loss = s.MaterialLoss,
                             DataCollectionWay = MaterialSerialNumberEnum.Batch,
