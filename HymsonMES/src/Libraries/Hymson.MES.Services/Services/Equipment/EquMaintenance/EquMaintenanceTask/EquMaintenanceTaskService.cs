@@ -29,6 +29,10 @@ using Elastic.Clients.Elasticsearch;
 using Hymson.MES.Core.Enums.Common;
 using System.Linq;
 using Minio.DataModel;
+using Hymson.MES.Data.Repositories.EquEquipmentRecord;
+using Hymson.MES.Services.Services.EquEquipmentRecord;
+using Hymson.MES.Core.Domain.EquEquipmentRecord;
+using Hymson.MES.Services.Dtos.EquEquipmentRecord;
 
 namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTask
 {
@@ -103,6 +107,17 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         /// </summary>
         private readonly IEquMaintenanceTaskSnapshotPlanRepository _equMaintenanceTaskSnapshotPlanRepository;
 
+
+        /// <summary>
+        /// 设备记录
+        /// </summary>
+        private readonly IEquEquipmentRecordService _equEquipmentRecordService;
+
+        /// <summary>
+        /// 设备记录(仓储)
+        /// </summary>
+        private readonly IEquEquipmentRecordRepository _equEquipmentRecordRepository;
+
         /// <summary>
         /// 
         /// </summary>
@@ -128,7 +143,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             IEquMaintenanceTaskItemAttachmentRepository equMaintenanceTaskItemAttachmentRepository,
             IEquMaintenanceTaskOperationRepository equMaintenanceTaskOperationRepository,
             IEquMaintenanceTaskProcessedRepository equMaintenanceTaskProcessedRepository,
-            IEquMaintenanceTaskAttachmentRepository equMaintenanceTaskAttachmentRepository, IEquMaintenanceTaskSnapshotPlanRepository equMaintenanceTaskSnapshotPlanRepository)
+            IEquMaintenanceTaskAttachmentRepository equMaintenanceTaskAttachmentRepository, IEquMaintenanceTaskSnapshotPlanRepository equMaintenanceTaskSnapshotPlanRepository, IEquEquipmentRecordService equEquipmentRecordService, IEquEquipmentRecordRepository equEquipmentRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -144,6 +159,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             _equMaintenanceTaskProcessedRepository = equMaintenanceTaskProcessedRepository;
             _equMaintenanceTaskAttachmentRepository = equMaintenanceTaskAttachmentRepository;
             _equMaintenanceTaskSnapshotPlanRepository = equMaintenanceTaskSnapshotPlanRepository;
+            _equEquipmentRecordService = equEquipmentRecordService;
+            _equEquipmentRecordRepository = equEquipmentRecordRepository;
         }
 
 
@@ -390,11 +407,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 default: return default;
             }
 
+
+            EquEquipmentRecordEntity? equEquipmentRecordEntity = null;
             // 更改状态
             switch (requestDto.OperationType)
             {
                 case EquMaintenanceOperationTypeEnum.Start:
                     entity.Status = EquMaintenanceTaskStautusEnum.Inspecting;
+                    var equSpotcheckTaskSnapshotPlan = await _equMaintenanceTaskSnapshotPlanRepository.GetByTaskIdAsync(entity.Id);
+                    equEquipmentRecordEntity = await _equEquipmentRecordService.GetAddEquRecordByEquEquipmentAsync(new GetAddEquRecordByEquEquipmentDto { EquipmentId = equSpotcheckTaskSnapshotPlan.EquipmentId, operationType = EquEquipmentRecordOperationTypeEnum.Maintenance });
+
                     break;
                 case EquMaintenanceOperationTypeEnum.Complete:
                     entity.Status = entity.IsQualified == TrueOrFalseEnum.Yes ? EquMaintenanceTaskStautusEnum.Closed : EquMaintenanceTaskStautusEnum.Completed;
@@ -410,6 +432,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await CommonOperationAsync(entity, EquMaintenanceOperationTypeEnum.Start);
+            if (equEquipmentRecordEntity != null)
+            {
+                await _equEquipmentRecordRepository.InsertAsync(equEquipmentRecordEntity);
+            }
             trans.Complete();
             return rows;
         }
@@ -737,7 +763,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15914)).WithData("Code", string.Join(',', unQualifiedCodes));
                 }
-               
+
             }
 
             var operationType = EquMaintenanceOperationTypeEnum.Complete;

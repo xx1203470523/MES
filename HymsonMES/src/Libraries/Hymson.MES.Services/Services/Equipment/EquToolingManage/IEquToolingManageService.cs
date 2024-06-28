@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// </summary>
         /// <param name="procConversionFactorCreateDto"></param>
         /// <returns></returns>
-        Task<long> AddProcConversionFactorAsync(AddConversionFactorDto procConversionFactorCreateDto);
+        Task<long> AddProcConversionFactorAsync(AddEquToolingManageDto procConversionFactorCreateDto);
 
         /// <summary>
         /// 批量删除
@@ -45,6 +45,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// </summary>
         /// <param name="procConversionFactorModifyDto"></param>
         /// <returns></returns>
-        Task ModifyProcConversionFactorAsync(ProcConversionFactorModifyDto procConversionFactorModifyDto);
+        Task ModifyProcConversionFactorAsync(EquToolingManageModifyDto procConversionFactorModifyDto);
     }
 }

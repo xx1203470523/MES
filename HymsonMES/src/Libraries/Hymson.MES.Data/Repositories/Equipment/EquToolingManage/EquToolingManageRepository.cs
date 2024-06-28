@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -39,8 +40,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesSql, param);
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(DeletesSql, param);
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+           
         }
 
         /// <summary>
@@ -59,10 +69,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcConversionFactorEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<EquToolingManageView>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ProcConversionFactorEntity>(GetByIdsSql, new { ids = ids });
+            return await conn.QueryAsync<EquToolingManageView>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -176,19 +186,31 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="procLoadPointEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(ProcConversionFactorEntity procConversionFactorEntity)
+        public async Task<int> InsertAsync(EquToolsEntity equToolsEntity)
         {
             try
             {
                 using var conn = GetMESDbConnection();
-                return await conn.ExecuteAsync(InsertSql, procConversionFactorEntity);
+                return await conn.ExecuteAsync(InsertSql, equToolsEntity);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
 
                 throw;
             }
-            
+           
+        }
+
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<EquSparePartsGroupEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquSparePartsGroupEntity>(GetByCodeSql, query);
         }
 
         /// <summary>
@@ -207,10 +229,19 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="procLoadPointEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ProcConversionFactorEntity procLoadPointEntity)
+        public async Task<int> UpdateAsync(EquToolsEntity procLoadPointEntity)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, procLoadPointEntity);
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(UpdateSql, procLoadPointEntity);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+           
         }
 
         /// <summary>
@@ -244,27 +275,31 @@ namespace Hymson.MES.Data.Repositories.Equipment
     public partial class EquToolingManageRepository
     {
 
-        const string GetPagedInfoDataSqlTemplate = @"select A.Code,A.Name,A.Status,A.RatedLife,A.IsCalibrated,A.CalibrationCycle, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, A.Id, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName  from equ_tools A JOIN equ_tooling_type_manage B ON A.ToolsId = B.Id  /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoDataSqlTemplate = @"select A.Code,A.Name,A.Status,A.RatedLife,A.RatedLifeUnit,A.IsCalibrated,A.CalibrationCycle,A.CurrentUsedLife, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, A.Id, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName,B.Id AS ToolsId  from equ_tools A JOIN equ_tooling_type_manage B ON A.ToolsId = B.Id  /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "select COUNT(*) from equ_tools A  JOIN equ_tooling_type_manage B ON A.ToolsId = B.Id /**join**/ /**where**/ ";
 
         const string GetProcConversionFactorEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_product_process_conversion_factor` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_product_process_conversion_factor`( `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `ConversionFactor`, `OpenStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ( @Id, @SiteId, @ProcedureId, @MaterialId, @ConversionFactor,@OpenStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )";
+        const string InsertSql = "INSERT INTO `equ_tools` (`Id`, `SiteId`, `Code`, `Name`, `ToolsId`, `RatedLife`, `RatedLifeUnit`, `CumulativeUsedLife`, `CurrentUsedLife`, `LastVerificationTime`, `IsCalibrated`, `CalibrationCycle`, `CalibrationCycleUnit`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ( @Id , @SiteId , @Code , @Name , @ToolsId , @RatedLife , @RatedLifeUnit , @CumulativeUsedLife , @CurrentUsedLife , @LastVerificationTime , @IsCalibrated , @CalibrationCycle , @CalibrationCycleUnit , @Status , @Remark , @CreatedOn , @CreatedBy , @UpdatedBy , @UpdatedOn , @IsDeleted )";
+        
         const string InsertsSql = "INSERT INTO `proc_product_process_conversion_factor`( `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `ConversionFactor`, `OpenStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @LoadPoint, @LoadPointName, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_product_process_conversion_factor` SET  Remark = @Remark, ConversionFactor = @ConversionFactor,OpenStatus = @OpenStatus, MaterialId=@MaterialId, ProcedureId=@ProcedureId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn   WHERE Id = @Id ";
+       
+        const string UpdateSql = "UPDATE `equ_tools` SET CODE = @CODE, NAME = @NAME, STATUS = @STATUS, ToolsId = @ToolsId, RatedLife = @RatedLife, RatedLifeUnit = @RatedLifeUnit, CumulativeUsedLife = @CumulativeUsedLife, LastVerificationTime = @LastVerificationTime, IsCalibrated = @IsCalibrated, CalibrationCycle = @CalibrationCycle, CalibrationCycleUnit = @CalibrationCycleUnit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id\r\n";
         const string UpdatesSql = "UPDATE `proc_product_process_conversion_factor` SET   SiteId = @SiteId, LoadPoint = @LoadPoint, LoadPointName = @LoadPointName, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_product_process_conversion_factor` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_product_process_conversion_factor` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
-        const string GetByIdSql = @"SELECT A.Code,A.Name,A.Status,A.RatedLife,A.IsCalibrated,A.CalibrationCycle, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, A.Id, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName  from equ_tools A JOIN equ_tooling_type_manage B ON A.ToolsId = B.Id  WHERE A.Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                           `Id`, `SiteId`, `ProcedureId`, `MaterialId`, `ConversionFactor`, `OpenStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_product_process_conversion_factor`  WHERE Id IN @ids ";
+        
+        const string DeletesSql = "UPDATE `equ_tools` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
+        const string GetByIdSql = @"SELECT A.Id, A.Code,A.Name,A.RatedLife,A.RatedLifeUnit,A.CumulativeUsedLife,A.CurrentUsedLife,A.LastVerificationTime,A.IsCalibrated, A.CalibrationCycle,A.CalibrationCycleUnit, A.Status, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName,B.Id AS ToolsId  from equ_tools A JOIN equ_tooling_type_manage B ON A.ToolsId = B.Id  WHERE A.Id = @Id ";
+        const string GetByIdsSql = @"SELECT  `Id`, `SiteId`, `Code`, `Name`, `ToolsId`, `RatedLife`, `RatedLifeUnit`, `CumulativeUsedLife`, `CurrentUsedLife`, `LastVerificationTime`, `IsCalibrated`, `CalibrationCycle`, `CalibrationCycleUnit`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `equ_tools`  WHERE Id IN @ids ";
         const string GetByResourceIdSql = @"SELECT PLP.* FROM proc_product_process_conversion_factor PLP
                                 LEFT JOIN proc_product_process_conversion_factor_link_resource PLPLR ON PLPLR.LoadPointId = PLP.Id
                                 WHERE PLPLR.ResourceId = @resourceId AND PLP.IsDeleted = 0";
 
+
+        const string GetByCodeSql = "SELECT * FROM `equ_tools` WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
 
         const string UpdateStatusSql = "UPDATE `proc_product_process_conversion_factor` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
     }

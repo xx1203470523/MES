@@ -84,7 +84,7 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("esr.IsDeleted=0");
             sqlBuilder.Where("esr.SiteId=@SiteId");
-            sqlBuilder.Select("DISTINCT esr.Code,esr.Name,est.Code AS SparePartTypeCode,est.Name AS SparePartTypeName,esr.Qty,esr.EquipmentId,ee.EquipmentCode,ee.EquipmentName,esr.Position,esr.OperationType,esr.CreatedOn,esr.CreatedBy,iwc.Code AS WorkCenterCode,esr.WorkCenterCode AS RecordWorkCenterCode,esr.Recipients ");
+            sqlBuilder.Select("DISTINCT esr.Code,esr.Name,est.Code AS SparePartTypeCode,est.Name AS SparePartTypeName,esr.Qty,esr.OperationQty,esr.EquipmentId,ee.EquipmentCode,ee.EquipmentName,esr.Position,esr.OperationType,esr.CreatedOn,esr.CreatedBy,iwc.Code AS WorkCenterCode,esr.WorkCenterCode AS RecordWorkCenterCode,esr.Recipients ");
             sqlBuilder.OrderBy("esr.CreatedOn DESC");
 
             sqlBuilder.LeftJoin(" equ_equipment ee ON ee.Id=esr.EquipmentId");
@@ -116,7 +116,7 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
                 equSparepartRecordPagedQuery.EquipmentName = $"%{equSparepartRecordPagedQuery.EquipmentName}%";
                 sqlBuilder.Where("ee.EquipmentName LIKE @EquipmentName");
             }
-            
+
             if (!string.IsNullOrWhiteSpace(equSparepartRecordPagedQuery.SparePartTypeCode))
             {
                 equSparepartRecordPagedQuery.SparePartTypeCode = $"%{equSparepartRecordPagedQuery.SparePartTypeCode}%";

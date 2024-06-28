@@ -13,10 +13,14 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.EquEquipmentRecord;
+using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.EquEquipmentRecord;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentRecord;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Transactions;
@@ -35,11 +39,16 @@ namespace Hymson.MES.Services.Services.EquEquipmentRecord
         /// 设备台账信息 仓储
         /// </summary>
         private readonly IEquEquipmentRecordRepository _equEquipmentRecordRepository;
-        public EquEquipmentRecordService(ICurrentUser currentUser, ICurrentSite currentSite, IEquEquipmentRecordRepository equEquipmentRecordRepository)
+        /// <summary>
+        /// 设备 
+        /// </summary>
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+        public EquEquipmentRecordService(ICurrentUser currentUser, ICurrentSite currentSite, IEquEquipmentRecordRepository equEquipmentRecordRepository, IEquEquipmentRepository equEquipmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _equEquipmentRecordRepository = equEquipmentRecordRepository;
+            _equEquipmentRepository = equEquipmentRepository;
         }
 
         /// <summary>
@@ -89,5 +98,56 @@ namespace Hymson.MES.Services.Services.EquEquipmentRecord
             }
             return null;
         }
+
+
+        /// <summary>
+        /// 获取添加设备记录（根据设备）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>  
+        public async Task<EquEquipmentRecordEntity?> GetAddEquRecordByEquEquipmentAsync(GetAddEquRecordByEquEquipmentDto param)
+        {
+            if (param.EquEquipmentEntity == null && param.EquipmentId != 0)
+            {
+                var equEquipmentEntity = await _equEquipmentRepository.GetByIdAsync(param.EquipmentId);
+                param.EquEquipmentEntity = equEquipmentEntity;
+            }
+
+            if (param.EquEquipmentEntity == null) return null;
+
+            return new EquEquipmentRecordEntity()
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                EquipmentId = param.EquEquipmentEntity.Id,
+                EquipmentCode = param.EquEquipmentEntity.EquipmentCode,
+                EquipmentName = param.EquEquipmentEntity.EquipmentName,
+                EquipmentGroupId = param.EquEquipmentEntity.EquipmentGroupId,
+                EquipmentDesc = param.EquEquipmentEntity.EquipmentDesc,
+                WorkCenterFactoryId = param.EquEquipmentEntity.WorkCenterFactoryId,
+                WorkCenterShopId = param.EquEquipmentEntity.WorkCenterShopId,
+                WorkCenterLineId = param.EquEquipmentEntity.WorkCenterLineId,
+                Location = param.EquEquipmentEntity.Location,
+                EquipmentType = param.EquEquipmentEntity.EquipmentType,
+                UseDepartment = param.EquEquipmentEntity.UseDepartment,
+                UseStatus = param.EquEquipmentEntity.UseStatus,
+                EntryDate = param.EquEquipmentEntity.EntryDate,
+                QualTime = param.EquEquipmentEntity.QualTime,
+                ExpireDate = param.EquEquipmentEntity.ExpireDate,
+                Manufacturer = param.EquEquipmentEntity.Manufacturer,
+                Supplier = param.EquEquipmentEntity.Supplier,
+                Power = param.EquEquipmentEntity.Power,
+                EnergyLevel = param.EquEquipmentEntity.EnergyLevel,
+                OperationType = param.operationType,
+                Ip = param.EquEquipmentEntity.Ip,
+                TakeTime = param.EquEquipmentEntity.TakeTime,
+                Remark = param.EquEquipmentEntity.Remark,
+                CreatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+                SiteId = _currentSite.SiteId ?? 0
+            };
+        }
+
     }
 }
