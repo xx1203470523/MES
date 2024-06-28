@@ -95,6 +95,13 @@ namespace Hymson.MES.Services.Services.Process.Resource
         Task<IEnumerable<ProcProductSetDto>> GetResourceProductSetListAsync(ProcProductSetQueryDto queryDto);
 
         /// <summary>
+        /// 获取资质认证设置
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcQualificationAuthenticationDto>> GetResourceAuthSetListAsync(long resourceId);
+
+        /// <summary>
         /// 添加资源数据
         /// </summary>
         /// <param name="param"></param>

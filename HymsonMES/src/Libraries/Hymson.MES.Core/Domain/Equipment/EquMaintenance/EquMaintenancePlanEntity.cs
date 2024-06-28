@@ -42,6 +42,11 @@ namespace Hymson.MES.Core.Domain.Equipment.EquMaintenance
         public EquipmentMaintenanceTypeEnum? Type { get; set; }
 
         /// <summary>
+        /// 周期类型;天/小时
+        /// </summary>
+        public EquipmentCycleTypeEnum? CycleType { get; set; }
+
+        /// <summary>
         /// 点检计划状态
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }

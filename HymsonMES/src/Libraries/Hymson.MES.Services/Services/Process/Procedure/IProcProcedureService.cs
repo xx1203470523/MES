@@ -53,6 +53,13 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         Task<IEnumerable<ProcProductSetDto>> GetProcedureProductSetListAsync(ProcProductSetQueryDto queryDto);
 
         /// <summary>
+        /// 获取资质认证设置
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcQualificationAuthenticationDto>> GetProcedureAuthSetListAsync(long procedureId);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procProcedureCreateDto"></param>
@@ -86,6 +93,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <param name="param"></param>
         /// <returns></returns>
         Task UpdateStatusAsync(ChangeStatusDto param);
+
+        Task CreateProductParameterAsync();
 
     }
 }

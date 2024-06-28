@@ -32,6 +32,8 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Minio.DataModel;
 using System.Security.Policy;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproductsReceiveRecord
@@ -257,7 +259,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
 
             //查询Bom中得物料信息
             var procBomDetails = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrder.ProductBOMId);
-            if (procBomDetails == null || !procBomDetails.Any()) return manuJointProductAndByproductsReceiveRecordResult;
+            if (procBomDetails == null || !procBomDetails.Any())
+            {
+                manuJointProductAndByproductsReceiveRecordResult.ProductCodeVersion = procMaterialEntity.MaterialCode + "/" + procMaterialEntity.Version;
+                manuJointProductAndByproductsReceiveRecordResult.ProductName = procMaterialEntity.MaterialName;
+                return manuJointProductAndByproductsReceiveRecordResult;
+            }
 
             //查询组件物料信息
             var procMaterialIds = procBomDetails.Select(s => s.MaterialId).ToArray();
@@ -322,15 +329,25 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
-
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
-
+            // 工单信息
             var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
             {
                 WorkOrderId = saveDto.WorkOrderid,
                 IsVerifyActivation = false
             });
+            //查询Bom中得物料信息
+            var procBomDetails = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrderEntity.ProductBOMId);
+            //查询已收货数量
+            var jointProductAndByproductsReceiveRecords = await _manuJointProductAndByproductsReceiveRecordRepository.GetEntitiesAsync(new ManuJointProductAndByproductsReceiveRecordQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkOrderid = saveDto.WorkOrderid,
+                procMaterialIds= procBomDetails.Where(x => x.BomProductType == ManuProductTypeEnum.JointProducts).Select(x => x.MaterialId).ToArray()
+            });
+            // 查询已下发数量
+            var workOrderRecordEntity = await _planWorkOrderRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id);
             // 产品ID
             var productId = saveDto.ProductId;
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(productId);
@@ -355,90 +372,133 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
             }
-
-            var barcodeList = await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
+            if (saveDto.ProductType == "joinProduct")
             {
-                IsTest = false,
-                IsSimulation = false,
-                CodeRulesMakeBos = codeRulesMakeList.Select(s => new CodeRulesMakeBo
+                //已收货数量
+                var receivedQuantity = jointProductAndByproductsReceiveRecords.Sum(x => x.Qty);
+                if (saveDto.Qty + receivedQuantity > workOrderRecordEntity.PassDownQuantity)
                 {
-                    Seq = s.Seq,
-                    ValueTakingType = s.ValueTakingType,
-                    SegmentedValue = s.SegmentedValue,
-                    CustomValue = s.CustomValue,
-                }),
-                ProductId = procMaterialEntity.Id,
-                CodeRuleKey = $"{inteCodeRulesEntity.Id}",
-                Count = 1,
-                Base = inteCodeRulesEntity.Base,
-                Increment = inteCodeRulesEntity.Increment,
-                IgnoreChar = inteCodeRulesEntity.IgnoreChar ?? "",
-                OrderLength = inteCodeRulesEntity.OrderLength,
-                ResetType = inteCodeRulesEntity.ResetType,
-                StartNumber = inteCodeRulesEntity.StartNumber,
-                CodeMode = inteCodeRulesEntity.CodeMode,
-                SiteId = _currentSite.SiteId ?? 0,
-            });
-
+                    throw new CustomerValidationException(nameof(ErrorCode.MES14603));
+                }
+            }
+            // 判断数量限制
+            List<string> list = new List<string>();
+            switch (procMaterialEntity.QuantityLimit)
+            {
+                case MaterialQuantityLimitEnum.AnyNumber:
+                   
+                    if (saveDto.Qty < qty)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES11719));
+                    }
+                    decimal quotient = saveDto.Qty / qty;
+                    // 创建列表，包含整数部分的重复元素
+                    list.AddRange(Enumerable.Repeat(qty.ToString(), (int)Math.Floor(quotient)).ToList());
+                    // 计算余数
+                    decimal remainder = saveDto.Qty - (Math.Floor(quotient) * qty);
+                    if (remainder > 0)
+                    {
+                        list.Add(remainder.ToString());
+                    }
+                    break;
+                case MaterialQuantityLimitEnum.OnlyOne:
+                    var pattern = @"^[1-9]\d*$";
+                    if (!Regex.IsMatch($"{saveDto.Qty}", pattern)) 
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16044));
+                    decimal quotientOnlyOne = saveDto.Qty / 1;
+                    string OnlyOneQty = "1";
+                    // 创建列表，包含整数部分的重复元素
+                    list.AddRange(Enumerable.Repeat(OnlyOneQty, (int)Math.Floor(quotientOnlyOne)).ToList());
+                    break;
+                default:
+                    break;
+            }
             List<ManuJointProductAndByproductsReceiveRecordEntity> manuJointProductAndByproductsList = new List<ManuJointProductAndByproductsReceiveRecordEntity>();
             List<WhMaterialStandingbookEntity> materialStandingbookList = new List<WhMaterialStandingbookEntity>();
             List<WhMaterialInventoryEntity> whMaterialInventorieList = new List<WhMaterialInventoryEntity>();
             var sfcs = new List<string>();
-            foreach (var item in barcodeList)
+            foreach (var itemList in list)
             {
-                foreach (var sfc in item.BarCodes)
+                var barcodeList = await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
                 {
-                    sfcs.Add(sfc);
-                    //联副产品信息
-                    manuJointProductAndByproductsList.Add(new ManuJointProductAndByproductsReceiveRecordEntity
+                    IsTest = false,
+                    IsSimulation = false,
+                    CodeRulesMakeBos = codeRulesMakeList.Select(s => new CodeRulesMakeBo
                     {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = _currentSite.SiteId ?? 0,
-                        WorkOrderid = planWorkOrderEntity.Id,
-                        ProductId = productId,
-                        BarCode = sfc,
-                        Qty = saveDto.Qty,
-                        WarehouseId = saveDto.WarehouseId,
-                        CreatedBy = _currentUser.UserName,
-                        UpdatedBy = _currentUser.UserName
-                    });
+                        Seq = s.Seq,
+                        ValueTakingType = s.ValueTakingType,
+                        SegmentedValue = s.SegmentedValue,
+                        CustomValue = s.CustomValue,
+                    }),
+                    ProductId = procMaterialEntity.Id,
+                    CodeRuleKey = $"{inteCodeRulesEntity.Id}",
+                    Count = 1,
+                    Base = inteCodeRulesEntity.Base,
+                    Increment = inteCodeRulesEntity.Increment,
+                    IgnoreChar = inteCodeRulesEntity.IgnoreChar ?? "",
+                    OrderLength = inteCodeRulesEntity.OrderLength,
+                    ResetType = inteCodeRulesEntity.ResetType,
+                    StartNumber = inteCodeRulesEntity.StartNumber,
+                    CodeMode = inteCodeRulesEntity.CodeMode,
+                    SiteId = _currentSite.SiteId ?? 0,
+                });
+                foreach (var item in barcodeList)
+                {
+                    foreach (var sfc in item.BarCodes)
+                    {
+                        sfcs.Add(sfc);
+                        //联副产品信息
+                        manuJointProductAndByproductsList.Add(new ManuJointProductAndByproductsReceiveRecordEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = _currentSite.SiteId ?? 0,
+                            WorkOrderid = planWorkOrderEntity.Id,
+                            ProductId = productId,
+                            BarCode = sfc,
+                            Qty =decimal.Parse(itemList),
+                            WarehouseId = saveDto.WarehouseId,
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName
+                        });
 
-                    // 新增 wh_material_inventory
-                    whMaterialInventorieList.Add(new WhMaterialInventoryEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        SupplierId = 0,//自制品 没有
-                        MaterialId = productId,
-                        MaterialBarCode = sfc,
-                        Batch = "",//自制品 没有
-                        MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
-                        QuantityResidue = saveDto.Qty,
-                        Status = WhMaterialInventoryStatusEnum.ToBeUsed,
-                        Source = MaterialInventorySourceEnum.ManuComplete,
-                        SiteId = _currentSite.SiteId ?? 0,
-                        CreatedBy = _currentUser.UserName,
-                        UpdatedBy = _currentUser.UserName
-                    });
+                        // 新增 wh_material_inventory
+                        whMaterialInventorieList.Add(new WhMaterialInventoryEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SupplierId = 0,//自制品 没有
+                            MaterialId = productId,
+                            MaterialBarCode = sfc,
+                            Batch = "",//自制品 没有
+                            MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
+                            QuantityResidue = decimal.Parse(itemList),
+                            Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                            Source = MaterialInventorySourceEnum.ManuComplete,
+                            SiteId = _currentSite.SiteId ?? 0,
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName
+                        });
 
-                    // 新增 wh_material_standingbook
-                    materialStandingbookList.Add(new WhMaterialStandingbookEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        MaterialCode = procMaterialEntity.MaterialCode ?? "",
-                        MaterialName = procMaterialEntity.MaterialName,
-                        MaterialVersion = procMaterialEntity.Version??"",
-                        MaterialBarCode = sfc,
-                        Batch = procMaterialEntity.Batch,
-                        Quantity = saveDto.Qty,
-                        Unit = procMaterialEntity.Unit ?? "",
-                        Type = WhMaterialInventoryTypeEnum.MaterialScrapping,
-                        Source = MaterialInventorySourceEnum.ManualEntry,
-                        SiteId = _currentSite.SiteId ?? 0,
-                        CreatedBy = _currentUser.UserName,
-                        UpdatedBy = _currentUser.UserName
-                    });
+                        // 新增 wh_material_standingbook
+                        materialStandingbookList.Add(new WhMaterialStandingbookEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            MaterialCode = procMaterialEntity.MaterialCode ?? "",
+                            MaterialName = procMaterialEntity.MaterialName,
+                            MaterialVersion = procMaterialEntity.Version ?? "",
+                            MaterialBarCode = sfc,
+                            Batch = procMaterialEntity.Batch,
+                            Quantity = decimal.Parse(itemList),
+                            Unit = procMaterialEntity.Unit ?? "",
+                            Type = WhMaterialInventoryTypeEnum.ManuComplete,
+                            Source = MaterialInventorySourceEnum.ManualEntry,
+                            SiteId = _currentSite.SiteId ?? 0,
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName
+                        });
+                    }
                 }
             }
+           
             // 开启事务
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
 

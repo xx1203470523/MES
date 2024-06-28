@@ -14,14 +14,14 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateEquSparePartsGroupAsync(EquSparePartsGroupSaveDto saveDto);
+        Task<int> CreateEquSparePartsGroupAsync(EquToolingTypeSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyEquSparePartsGroupAsync(EquSparePartsGroupSaveDto saveDto);
+        Task<int> ModifyEquSparePartsGroupAsync(EquToolingTypeSaveDto saveDto);
 
         /// <summary>
         /// 删除
@@ -42,7 +42,14 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<List<EquSparePartsGroupEquipmentGroupRelationSaveDto>> GetSparePartsEquipmentGroupRelationByIdAsync(long id);
+        Task<List<EquToolingTypeGroupEquipmentGroupRelationSaveDto>> GetSparePartsEquipmentGroupRelationByIdAsync(long id);
+
+        /// <summary>
+        /// 获取物料
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<EquToolingTypeGroupMaterialRelationSaveDto>> GetToolingTypeGroupMaterialIdRelationByIdAsync(long id);
 
         /// <summary>
         /// 根据ID查询

@@ -13,14 +13,14 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(InteBusinessFieldSaveDto saveDto);
+        Task<long> CreateAsync(InteBusinessFieldSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(InteBusinessFieldSaveDto saveDto);
+        Task ModifyAsync(InteBusinessFieldSaveDto saveDto);
 
         /// <summary>
         /// 删除
@@ -41,14 +41,16 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<InteBusinessFieldDto?> QueryByIdAsync(long id);
+        Task<MaskInfoViewDto?> QueryByIdAsync(long id);
+
+        Task<IEnumerable<InteBusinessFieldListDto>> getBusinessFieldListByIdAsync(long id);
 
         /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteBusinessFieldDto>> GetPagedListAsync(InteBusinessFieldPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<MaskInfoViewDto>> GetPagedListAsync(InteBusinessFieldPagedQueryDto pagedQueryDto);
 
     }
 }

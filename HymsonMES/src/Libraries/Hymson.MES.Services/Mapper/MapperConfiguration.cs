@@ -103,7 +103,21 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
+using Hymson.MES.Services.Dtos.EquRepairOrder;
+using Hymson.MES.Core.Domain.EquRepairOrder;
+using Hymson.MES.Data.Repositories.EquRepairOrder;
+using Hymson.MES.Core.Domain.EquSparepartInventory;
+using Hymson.MES.Data.Repositories.EquSparepartInventory;
+using Hymson.MES.Services.Dtos.EquEquipmentRecord;
+using Hymson.MES.Core.Domain.EquEquipmentRecord;
+using Hymson.MES.Data.Repositories.EquEquipmentRecord;
+using Hymson.MES.Services.Dtos.EquSparepartRecord;
+using Hymson.MES.Core.Domain.EquSparepartRecord;
+using Hymson.MES.Data.Repositories.EquSparepartRecord;
+using Hymson.MES.Services.Dtos.EquSparepartInventory;
+using Hymson.MES.Data.Repositories.Equipment.View;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteBusinessField.View;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -261,9 +275,18 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
-            #region EquToolingTypeType
+            #region EquToolingType
             CreateMap<EquToolingTypeQueryDto, EquToolingTypePagedQuery>();
             CreateMap<EquToolingTypeEntity, EquToolingTypeDto>();
+            CreateMap<EquToolingTypeSaveDto, EquToolingTypeEntity>();
+
+            #endregion
+
+            #region EquToolsManage
+            CreateMap<EquToolingManagePagedQueryDto, IEquToolingManagePagedQuery>();
+            CreateMap<EquToolingManageView, EquToolingManageViewDto>();
+            CreateMap<AddEquToolingManageDto, EquToolsEntity>();
+            CreateMap<EquToolingManageModifyDto, EquToolsEntity>();
 
             #endregion
 
@@ -349,6 +372,56 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<EquMaintenancePlanDto, EquMaintenancePlanEntity>();
             CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
+            #endregion
+
+            #region EquRepairOrder
+            CreateMap<EquRepairOrderCreateDto, EquRepairOrderEntity>();
+            CreateMap<EquRepairOrderModifyDto, EquRepairOrderEntity>();
+            CreateMap<EquRepairOrderPagedQueryDto, EquRepairOrderPagedQuery>();
+            CreateMap<EquRepairOrderEntity, EquRepairOrderDto>();
+            CreateMap<EquRepairOrderPageView, EquRepairOrderDto>();
+
+            CreateMap<EquRepairOrderDto, EquRepairOrderEntity>();
+            #endregion
+
+            #region EquSparepartInventory
+            CreateMap<EquSparepartInventoryCreateDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparepartInventoryModifyDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparepartInventoryPagedQueryDto, EquSparepartInventoryPagedQuery>();
+            CreateMap<EquSparepartInventoryEntity, EquSparepartInventoryDto>();
+            CreateMap<EquSparepartInventoryPageView, EquSparepartInventoryPageDto>();
+
+            CreateMap<EquSparepartInventoryDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparePartEntity, EquSparepartRecordEntity>();
+            #endregion
+
+            #region EquEquipmentRecord
+            CreateMap<EquEquipmentRecordPagedQueryDto, EquEquipmentRecordPagedQuery>();
+            CreateMap<EquEquipmentRecordEntity, EquEquipmentRecordDto>();
+            CreateMap<EquEquipmentRecordPagedView, EquEquipmentRecordPagedViewDto>();
+
+            CreateMap<EquEquipmentRecordDto, EquEquipmentRecordEntity>();
+            #endregion
+
+
+            #region EquSparepartRecord
+            CreateMap<EquSparepartRecordPagedQueryDto, EquSparepartRecordPagedQuery>();
+            CreateMap<EquSparepartRecordEntity, EquSparepartRecordDto>();
+            CreateMap<EquSparepartRecordPagedView, EquSparepartRecordPagedViewDto>();
+
+            CreateMap<EquSparepartRecordDto, EquSparepartRecordEntity>();
+            #endregion
+
+            #region  EquSparepartEquipmentBindRecord
+            CreateMap<EquSparepartEquipmentBindRecordPagedQueryDto, EquSparepartEquipmentBindRecordPagedQuery>();
+            CreateMap<EquSparepartEquipmentBindRecordView, EquSparepartEquipmentBindRecordViewDto>();
+            CreateMap<EquSparepartEquipmentBindRecordEntity, EquSparepartEquipmentBindRecordDto>();
+            #endregion
+
+            #region  EquToolsEquipmentBindRecord
+            CreateMap<EquToolsEquipmentBindRecordPagedQueryDto, EquToolsEquipmentBindRecordPagedQuery>();
+            CreateMap<EquToolsEquipmentBindRecordView, EquToolsEquipmentBindRecordViewDto>();
+            CreateMap<EquToolsEquipmentBindRecordEntity, EquToolsEquipmentBindRecordDto>();
             #endregion
 
         }
@@ -589,18 +662,29 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region InteBusinessField
-            CreateMap<InteBusinessFieldEntity, InteBusinessFieldSaveDto>();
+            CreateMap<InteBusinessFieldSaveDto, InteBusinessFieldEntity>();
             CreateMap<InteBusinessFieldPagedQueryDto, InteBusinessFieldPagedQuery>();
+            CreateMap<InteBusinessFieldEntity, InteBusinessFieldDto>();
+            CreateMap<InteBusinessFieldEntity, MaskInfoViewDto>();
+            CreateMap<InteBusinessFieldListEntity, InteBusinessFieldListDto>();
+            CreateMap<InteBusinessFieldView, MaskInfoViewDto>();
 
             #endregion
 
             #region InteBusinessFieldDistribute
-            CreateMap<InteBusinessFieldDistributeEntity, InteBusinessFieldDistributeSaveDto>();
+            CreateMap<InteBusinessFieldDistributeSaveDto, InteBusinessFieldDistributeEntity>();
             CreateMap<InteBusinessFieldDistributePagedQueryDto, InteBusinessFieldDistributePagedQuery>();
+            CreateMap<InteBusinessFieldDistributeEntity, InteBusinessFieldDistributeDto>();
+
+            CreateMap<InteBusinessFieldDistributeDetailsEntity, InteBusinessFieldDistributeDetailsDto>();
+            CreateMap<InteBusinessFieldDistributeDetailsEntity, BusinessFieldViewDto>();
 
             #endregion
 
-            
+            #region InteQualificationAuthentication
+            CreateMap<InteQualificationAuthenticationPagedQueryDto, InteQualificationAuthenticationPagedQuery>();
+            CreateMap<InteQualificationAuthenticationEntity, InteQualificationAuthenticationDto>();
+            #endregion
         }
 
         /// <summary>
@@ -1328,7 +1412,7 @@ namespace Hymson.MES.Services.Mapper
             #region ManuJointProductAndByproductsReceiveRecord
             CreateMap<ManuJointProductAndByproductsReceiveRecordEntity, ManuJointProductAndByproductsReceiveRecordSaveDto>();
             CreateMap<ManuJointProductAndByproductsReceiveRecordPagedQueryDto, ManuJointProductAndByproductsReceiveRecordPagedQuery>();
-            
+
             #endregion
         }
 

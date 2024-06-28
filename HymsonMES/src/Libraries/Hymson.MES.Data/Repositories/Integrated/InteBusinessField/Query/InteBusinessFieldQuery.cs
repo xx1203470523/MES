@@ -5,6 +5,14 @@ namespace Hymson.MES.Data.Repositories.Integrated.Query
     /// </summary>
     public class InteBusinessFieldQuery
     {
-    
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 工厂id
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }
