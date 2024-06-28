@@ -203,27 +203,44 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
                 };
                 updateFaultReasonsQuerys.Add(updateFaultReasonsQuery);
             }
-
-            EquRepairResultEntity equRepairResultEntity = new()
+            EquRepairResultEntity equRepairResultEntity = new();
+            var equRepairResult = await _equRepairResultRepository.GetByRepairOrderIdAsync(equRepairOrder.Id);
+            if (equRepairResult != null)
             {
-                RepairOrderId = equRepairOrder.Id,
-                RepairStartTime = equMaintenanceDto.RepairStartTime,
-                RepairEndTime = equMaintenanceDto.RepairEndTime,
-                LongTermHandlingMeasures = equMaintenanceDto.LongTermHandlingMeasures,
-                TemporaryTermHandlingMeasures = equMaintenanceDto.TemporaryTermHandlingMeasures,
-                RepairPerson = _currentUser.UserName,
+                equRepairResult.RepairOrderId = equRepairOrder.Id;
+                equRepairResult.RepairStartTime = equMaintenanceDto.RepairStartTime;
+                equRepairResult.RepairEndTime = equMaintenanceDto.RepairEndTime;
+                equRepairResult.LongTermHandlingMeasures = equMaintenanceDto.LongTermHandlingMeasures;
+                equRepairResult.TemporaryTermHandlingMeasures = equMaintenanceDto.TemporaryTermHandlingMeasures;
+                equRepairResult.RepairPerson = _currentUser.UserName;
+                equRepairResult.UpdatedBy = _currentUser.UserName;
+                equRepairResult.UpdatedOn = HymsonClock.Now();
+            }
+            else
+            {
+                equRepairResultEntity = new()
+                {
+                    RepairOrderId = equRepairOrder.Id,
+                    RepairStartTime = equMaintenanceDto.RepairStartTime,
+                    RepairEndTime = equMaintenanceDto.RepairEndTime,
+                    LongTermHandlingMeasures = equMaintenanceDto.LongTermHandlingMeasures,
+                    TemporaryTermHandlingMeasures = equMaintenanceDto.TemporaryTermHandlingMeasures,
+                    RepairPerson = _currentUser.UserName,
 
-                Id = IdGenProvider.Instance.CreateId(),
-                CreatedBy = _currentUser.UserName,
-                UpdatedBy = _currentUser.UserName,
-                CreatedOn = HymsonClock.Now(),
-                UpdatedOn = HymsonClock.Now(),
-                SiteId = siteId
-                // ConfirmResult = _currentUser.UserName,
-                //ConfirmOn = DateTime.Now,
-                //ConfirmBy = "Supervisor",
-                //Remark = "Additional remarks"
-            };
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now(),
+                    SiteId = siteId
+                    // ConfirmResult = _currentUser.UserName,
+                    //ConfirmOn = DateTime.Now,
+                    //ConfirmBy = "Supervisor",
+                    //Remark = "Additional remarks"
+                };
+            }
+
+
             #endregion
 
 
@@ -232,7 +249,14 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
             await _equipmentRecordRepository.InsertAsync(equRecord);
             await _equRepairOrderRepository.UpdateAsync(equRepairOrder);
             await _equRepairOrderFaultRepository.UpdateFaultReasonsAsync(updateFaultReasonsQuerys);
-            await _equRepairResultRepository.InsertAsync(equRepairResultEntity);
+            if (equRepairResult != null)
+            {
+                await _equRepairResultRepository.UpdateAsync(equRepairResult);
+            }
+            else
+            {
+                await _equRepairResultRepository.InsertAsync(equRepairResultEntity);
+            }
 
             trans.Complete();
         }
@@ -510,6 +534,12 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
                 {
                     var codes = string.Join(",", equRepairOrderStatuss.Select(it => it.RepairOrder));
                     throw new CustomerValidationException(nameof(ErrorCode.MES17959)).WithData("Code", codes);
+                } 
+                var equRepairOrderOn = equRepairOrders.Where(it => it.CreatedOn != it.UpdatedOn);
+                if (equRepairOrderOn != null && equRepairOrderOn.Any())
+                {
+                    var codes = string.Join(",", equRepairOrderOn.Select(it => it.RepairOrder));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17960)).WithData("Code", codes);
                 }
             }
             return await _equRepairOrderRepository.DeletesAsync(new DeleteCommand { Ids = param.Ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });

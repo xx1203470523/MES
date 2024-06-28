@@ -42,6 +42,11 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
         public int Qty { get; set; }
 
         /// <summary>
+        /// 操作数量
+        /// </summary>
+        public int OperationQty { get; set; } 
+
+        /// <summary>
         /// 工作中心
         /// </summary>
         public string WorkCenterCode { get; set; }

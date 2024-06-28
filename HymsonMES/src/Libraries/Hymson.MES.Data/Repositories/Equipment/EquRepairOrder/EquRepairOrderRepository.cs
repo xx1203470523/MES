@@ -97,11 +97,12 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrder
             sqlBuilder.Where("ero.IsDeleted=0");
             sqlBuilder.Where("ero.SiteId=@SiteId");
             sqlBuilder.Select("ero.Id,ero.RepairOrder,ee.EquipmentCode,ee.EquipmentName,ero.Status,ero.FaultTime,ero.CreatedBy,ero.CreatedOn,err.RepairPerson,err.RepairStartTime,err.RepairEndTime,err.ConfirmResult,err.ConfirmBy,err.ConfirmOn");
+            sqlBuilder.OrderBy("ero.CreatedOn DESC");
 
             if (!string.IsNullOrWhiteSpace(equRepairOrderPagedQuery.RepairOrder))
             {
                 equRepairOrderPagedQuery.RepairOrder = $"%{equRepairOrderPagedQuery.RepairOrder}%";
-                sqlBuilder.Where("RepairOrder LIKE @RepairOrder");
+                sqlBuilder.Where("ero.RepairOrder LIKE @RepairOrder");
             }
             if (!string.IsNullOrWhiteSpace(equRepairOrderPagedQuery.EquipmentCode))
             {
@@ -132,8 +133,17 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrder
                 equRepairOrderPagedQuery.ConfirmBy = $"%{equRepairOrderPagedQuery.ConfirmBy}%";
                 sqlBuilder.Where("err.ConfirmBy LIKE @ConfirmBy");
             }
+            if (equRepairOrderPagedQuery.ConfirmResult.HasValue)
+            {
+                sqlBuilder.Where("err.ConfirmResult = @ConfirmResult");
+            }
 
 
+            if (equRepairOrderPagedQuery.CreatedOn != null && equRepairOrderPagedQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.CreatedOn[0], EndTime = equRepairOrderPagedQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where("ero.CreatedOn >= @StartTime AND ero.CreatedOn <= @EndTime");
+            }
             if (equRepairOrderPagedQuery.FaultTime != null && equRepairOrderPagedQuery.FaultTime.Length >= 2)
             {
                 sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.FaultTime[0], EndTime = equRepairOrderPagedQuery.FaultTime[1].AddDays(1) });
