@@ -14,9 +14,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// <summary>
         /// 获取分页List
         /// </summary>
-        /// <param name="procConversionFactorPagedQueryDto"></param>
+        /// <param name="equToolingManagePagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquToolingManageViewDto>> GetPageListAsync(EquToolingManagePagedQueryDto procConversionFactorPagedQueryDto);
+        Task<PagedInfo<EquToolingManageViewDto>> GetPageListAsync(EquToolingManagePagedQueryDto equToolingManagePagedQueryDto);
 
 
         /// <summary>
@@ -24,27 +24,27 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquToolingManageViewDto> QueryProcConversionFactorByIdAsync(long id);
+        Task<EquToolingManageViewDto> QueryEquToolingManageByIdAsync(long id);
 
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procConversionFactorCreateDto"></param>
+        /// <param name="procEquToolingManageCreateDto"></param>
         /// <returns></returns>
-        Task<long> AddProcConversionFactorAsync(AddEquToolingManageDto procConversionFactorCreateDto);
+        Task<long> AddEquToolingManageAsync(AddEquToolingManageDto equToolingManageCreateDto);
 
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeleteProcConversionFactorAsync(long[] ids);
+        Task<int> DeleteEquToolingManageAsync(long[] ids);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procConversionFactorModifyDto"></param>
+        /// <param name="procEquToolingManageModifyDto"></param>
         /// <returns></returns>
-        Task ModifyProcConversionFactorAsync(EquToolingManageModifyDto procConversionFactorModifyDto);
+        Task ModifyEquToolingManageAsync(EquToolingManageModifyDto equToolingManageModifyDto);
     }
 }

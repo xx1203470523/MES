@@ -42,7 +42,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("list")]
-        public async Task<PagedInfo<EquToolingManageViewDto>> QueryPagedProcProcedure([FromQuery] EquToolingManagePagedQueryDto parm)
+        public async Task<PagedInfo<EquToolingManageViewDto>> QueryEquToolingManage([FromQuery] EquToolingManagePagedQueryDto parm)
         {
             return await _equToolingManageService.GetPageListAsync(parm);
         }
@@ -54,9 +54,9 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquToolingManageViewDto> QueryProcConversionFactorByIdAsync(long id)
+        public async Task<EquToolingManageViewDto> QueryEquToolingManageByIdAsync(long id)
         {
-            return await _equToolingManageService.QueryProcConversionFactorByIdAsync(id);
+            return await _equToolingManageService.QueryEquToolingManageByIdAsync(id);
         }
 
 
@@ -68,10 +68,10 @@ namespace Hymson.MES.Api.Controllers
         [HttpPost]
         [Route("create")]
         [LogDescription("工序维护", BusinessType.INSERT)]
-        [PermissionDescription("proc:ConversionFactor:insert")]
-        public async Task<long> AddProcConversionFactorAsync([FromBody] AddEquToolingManageDto parm)
+        [PermissionDescription("proc:equToolingManage:insert")]
+        public async Task<long> AddEquToolingManageAsync([FromBody] AddEquToolingManageDto parm)
         {
-            return await _equToolingManageService.AddProcConversionFactorAsync(parm);
+            return await _equToolingManageService.AddEquToolingManageAsync(parm);
         }
 
 
@@ -83,10 +83,10 @@ namespace Hymson.MES.Api.Controllers
         [HttpDelete]
         [Route("delete")]
         [LogDescription("工具管理维护", BusinessType.DELETE)]
-        [PermissionDescription("proc:ConversionFactor:delete")]
-        public async Task DeleteProcConversionFactorAsync([FromBody] long[] ids)
+        [PermissionDescription("proc:equToolingManage:delete")]
+        public async Task DeleteEquToolingManageAsync([FromBody] long[] ids)
         {
-            await _equToolingManageService.DeleteProcConversionFactorAsync(ids);
+            await _equToolingManageService.DeleteEquToolingManageAsync(ids);
         }
 
         /// <summary>
@@ -97,10 +97,10 @@ namespace Hymson.MES.Api.Controllers
         [HttpPut]
         [Route("update")]
         [LogDescription("上料点维护", BusinessType.UPDATE)]
-        [PermissionDescription("proc:conversionFactor:update")]
-        public async Task UpdateProcConversionFactorAsync([FromBody] EquToolingManageModifyDto parm)
+        [PermissionDescription("proc:equToolingManage:update")]
+        public async Task UpdateEquToolingManageAsync([FromBody] EquToolingManageModifyDto parm)
         {
-            await _equToolingManageService.ModifyProcConversionFactorAsync(parm);
+            await _equToolingManageService.ModifyEquToolingManageAsync(parm);
         }
     }
 }

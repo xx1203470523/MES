@@ -232,6 +232,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 工具管理表主键
         /// </summary>
         public long Id { get; set; }
+
+        /// <summary>
+        /// 剩余寿命
+        /// </summary>
+        public decimal? ResidualLife { get; set; }
     }
 
     /// <summary>

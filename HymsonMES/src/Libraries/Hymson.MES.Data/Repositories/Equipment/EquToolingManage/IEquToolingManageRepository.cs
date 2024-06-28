@@ -100,13 +100,5 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="procLoadPointPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<EquToolingManageView>> GetPagedInfoAsync(IEquToolingManagePagedQuery procLoadPointPagedQuery);
-
-        /// <summary>
-        /// 更新状态
-        /// </summary>
-        /// <param name="procMaterialEntitys"></param>
-        /// <returns></returns>
-        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
-
     }
 }
