@@ -192,6 +192,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
             // 遍历数据
             foreach (var planDto in lineDtoDict)
             {
+                /*
                 // 产品不能为空
                 if (planDto.Products.Count == 0)
                 {
@@ -210,9 +211,10 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
                 var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == productDto.ProductCode)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10245)).WithData("Code", productDto.ProductCode);
-
+                
                 var bomEntity = bomEntities.FirstOrDefault(f => f.BomCode == productDto.BomCode)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10246)).WithData("Code", productDto.BomCode);
+                */
 
                 var planEntity = planEntities.FirstOrDefault(f => f.PlanCode == planDto.PlanCode);
 
@@ -222,16 +224,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     planEntity = new PlanWorkPlanEntity
                     {
                         PlanCode = planDto.PlanCode,
-                        ProductCode = productDto.ProductCode,
-                        ProductVersion = productDto.ProductVersion,
-                        BomCode = productDto.BomCode,
-                        BomVersion = productDto.BomVersion,
-                        Qty = planDto.PlanQty,
                         RequirementNumber = planDto.RequirementNumber,
-
-                        ProductId = productEntity.Id,
-                        BomId = bomEntity.Id,
-
                         PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value,
                         PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value,
 
@@ -263,13 +256,29 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     }
 
                     // 除了数量/时间，好像什么都不能随便改
-                    planEntity.Qty = planDto.PlanQty;
                     planEntity.PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value;
                     planEntity.PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value;
 
                     planEntity.UpdatedBy = updateUser;
                     planEntity.UpdatedOn = updateTime;
                     resposeBo.Updates.Add(planEntity);
+                }
+
+                // 遍历产品列表
+                foreach (var productDto in planDto.Products)
+                {
+                    var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == productDto.ProductCode);
+
+                    // 不存在的新产品
+                    if (productEntity == null)
+                    {
+                      
+                    }
+                    // 之前已存在的产品
+                    else
+                    {
+
+                    }
                 }
             }
 
@@ -291,5 +300,22 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// 更新（工作计划）
         /// </summary>
         public List<PlanWorkPlanEntity> Updates { get; set; } = new();
+        /// <summary>
+        /// 新增（工作计划产品）
+        /// </summary>
+        public List<PlanWorkPlanProductEntity> ProductAdds { get; set; } = new();
+        /// <summary>
+        /// 新增（工作计划产品）
+        /// </summary>
+        public List<PlanWorkPlanProductEntity> ProductUpdates { get; set; } = new();
+        /// <summary>
+        /// 新增（工作计划物料）
+        /// </summary>
+        public List<PlanWorkPlanMaterialEntity> MaterialAdds { get; set; } = new();
+        /// <summary>
+        /// 新增（工作计划物料）
+        /// </summary>
+        public List<PlanWorkPlanMaterialEntity> MaterialUpdates { get; set; } = new();
+
     }
 }

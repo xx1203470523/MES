@@ -133,10 +133,12 @@ namespace Hymson.MES.SystemServices.Dtos
         /// </summary>
         public long? PlanBomId { get; set; }
 
+        /*
         /// <summary>
         /// 物料的替代料列表
         /// </summary>
         public List<SyncWorkPlanMaterialDto>? ReplaceMaterials { get; set; } = new();
+        */
 
     }
 

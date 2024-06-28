@@ -103,6 +103,7 @@ namespace Hymson.MES.Services.Services.Plan
                 Codes = workOrderCodes,
             });
 
+            /*
             // 检查子工单的总数量是否等于计划数量
             var sumQuantity = dto.Details.Sum(s => s.Qty);
             if (sumQuantity != workPlanEntity.Qty)
@@ -110,6 +111,7 @@ namespace Hymson.MES.Services.Services.Plan
                 // TODO: 子工单的总数量不等于计划数量
                 throw new CustomerValidationException(nameof(ErrorCode.MES16017));
             }
+            */
 
             // 检查子工单的计划时间是否超出生产计划的时间范围
             if (dto.Details.Any(a => a.PlanStartTime < workPlanEntity.PlanStartTime || a.PlanStartTime > workPlanEntity.PlanEndTime))
@@ -155,6 +157,7 @@ namespace Hymson.MES.Services.Services.Plan
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _planWorkPlanRepository.GetPagedInfoAsync(pagedQuery);
 
+            /*
             // 读取BOM
             var bomIds = pagedInfo.Data.Select(s => s.BomId).Distinct();
             var bomEntities = await _procBomRepository.GetEntitiesAsync(new ProcBomQuery
@@ -170,6 +173,7 @@ namespace Hymson.MES.Services.Services.Plan
                 SiteId = pagedQuery.SiteId,
                 MaterialIds = materialIds
             });
+            */
 
             List<PlanWorkPlanDto> dtos = new();
             foreach (var dataItem in pagedInfo.Data)
@@ -177,6 +181,7 @@ namespace Hymson.MES.Services.Services.Plan
                 var dto = dataItem.ToModel<PlanWorkPlanDto>();
                 if (dto == null) continue;
 
+                /*
                 // 填充BOM
                 var bomEntity = bomEntities.FirstOrDefault(f => f.Id == dto.BomId);
                 if (bomEntity != null)
@@ -192,6 +197,7 @@ namespace Hymson.MES.Services.Services.Plan
                     dto.ProductCode = materialEntity.MaterialCode;
                     dto.ProductName = materialEntity.MaterialName;
                 }
+                */
 
                 dtos.Add(dto);
             }
@@ -211,6 +217,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             var dto = entity.ToModel<PlanWorkPlanDto>();
 
+            /*
             // 读取BOM
             var bomEntity = await _procBomRepository.GetByIdAsync(entity.BomId);
             if (bomEntity != null)
@@ -226,6 +233,7 @@ namespace Hymson.MES.Services.Services.Plan
                 dto.ProductCode = materialEntity.MaterialCode;
                 dto.ProductName = materialEntity.MaterialName;
             }
+            */
 
             return dto;
         }
