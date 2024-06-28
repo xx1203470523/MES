@@ -1,4 +1,5 @@
-﻿using Hymson.MES.HttpClients.Requests;
+﻿using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.HttpClients.Requests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,5 +31,23 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
         Task<bool> WorkOrderStop(string workOrderCode);
+        /// <summary>
+        /// 物料同步
+        /// </summary>
+        /// <param name="materialEntities"></param>
+        /// <returns></returns>
+        Task<bool> MaterialSync(IEnumerable<ProcMaterialEntity> materialEntities);
+        /// <summary>
+        /// 工序同步
+        /// </summary>
+        /// <param name="procedureEntities"></param>
+        /// <returns></returns>
+        Task<bool> ProcedureSync(IEnumerable<ProcProcedureEntity> procedureEntities);
+        /// <summary>
+        /// 工艺路线同步
+        /// </summary>
+        /// <param name="procProcessRouteDetails"></param>
+        /// <returns></returns>
+        Task<bool> ProcedureLineSync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetails);  
     }
 }
