@@ -14,7 +14,7 @@ sonarqube-check:
       - .sonar/cache
   script: 
       - ls
-      - HymsonMES 
+      - cd HymsonMES 
       - "export PATH=\"$PATH:$HOME/.dotnet/tools\""
       - "dotnet sonarscanner begin /k:\"MES-Backend1\" /d:sonar.token=\"$SONAR_TOKEN\" /d:\"sonar.host.url=$SONAR_HOST_URL\" "
       - "dotnet build"
