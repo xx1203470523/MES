@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums.Equipment;
 
 namespace Hymson.MES.Services.Dtos.EquEquipmentRecord
@@ -227,6 +228,28 @@ namespace Hymson.MES.Services.Dtos.EquEquipmentRecord
         /// </summary>
         public string CreatedOn { get; set; }
     }
+
+    /// <summary>
+    /// 设备台账信息Dto
+    /// </summary>
+    public record GetAddEquRecordByEquEquipmentDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 设备Id 
+        /// </summary>
+        public EquEquipmentEntity? EquEquipmentEntity { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public EquEquipmentRecordOperationTypeEnum operationType { get; set; }
+
+    }
     /// <summary>
     /// 设备台账信息分页Dto
     /// </summary>
@@ -268,4 +291,6 @@ namespace Hymson.MES.Services.Dtos.EquEquipmentRecord
         /// </summary>
         public DateTime[]? CreatedOn { get; set; }
     }
+
+
 }

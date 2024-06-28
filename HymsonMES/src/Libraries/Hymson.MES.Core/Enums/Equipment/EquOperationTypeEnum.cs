@@ -33,4 +33,31 @@ namespace Hymson.MES.Core.Enums
         [Description("解绑")]
         Unbind = 6,
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum EquRecordOperationTypeEnum : sbyte
+    {
+        /// <summary>
+        /// 入库
+        /// </summary>
+        [Description("入库")]
+        Inbound = 2,
+        /// <summary>
+        /// 出库
+        /// </summary>
+        [Description("出库")]
+        Outbound = 3,
+        /// <summary>
+        /// 绑定
+        /// </summary>
+        [Description("绑定")]
+        Bind = 5,
+        /// <summary>
+        /// 解绑
+        /// </summary>
+        [Description("解绑")]
+        Unbind = 6,
+    }
 }

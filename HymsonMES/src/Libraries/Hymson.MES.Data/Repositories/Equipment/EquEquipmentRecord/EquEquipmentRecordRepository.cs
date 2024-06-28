@@ -84,12 +84,15 @@ namespace Hymson.MES.Data.Repositories.EquEquipmentRecord
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("eer.IsDeleted=0");
             sqlBuilder.Where("eer.SiteId=@SiteId");
-            sqlBuilder.Select("DISTINCT eer.EquipmentId,eer.EquipmentCode,eer.EquipmentName,eer.OperationType,pr.ResCode,pr.ResName,iwc.Code AS WorkCenterCode,iwc.Name AS WorkCenterName,eer.CreatedOn,eer.CreatedBy");
+            sqlBuilder.Select("DISTINCT eer.EquipmentId,eer.EquipmentCode,eer.EquipmentName,eer.OperationType,pr.ResCode,pr.ResName,IFNULL(iwc.Code,iwc2.Code) AS WorkCenterCode,IFNULL(iwc.Name,iwc2.Name) AS WorkCenterName,eer.CreatedOn,eer.CreatedBy");
             sqlBuilder.OrderBy("eer.CreatedOn DESC");
 
             sqlBuilder.LeftJoin(" proc_resource_equipment_bind preb ON preb.EquipmentId=eer.EquipmentId");
             sqlBuilder.LeftJoin(" proc_resource pr ON pr.Id=preb.ResourceId");
             sqlBuilder.LeftJoin(" inte_work_center iwc ON iwc.Id=eer.WorkCenterLineId");
+
+            sqlBuilder.LeftJoin(" inte_work_center_resource_relation iwcrr ON iwcrr.ResourceId=preb.ResourceId");
+            sqlBuilder.LeftJoin(" inte_work_center iwc2 ON iwc2.Id=iwcrr.WorkCenterId");
 
             if (!string.IsNullOrWhiteSpace(equEquipmentRecordPagedQuery.ResCode))
             {
