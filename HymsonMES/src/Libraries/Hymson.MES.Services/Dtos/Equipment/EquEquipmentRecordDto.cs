@@ -226,7 +226,7 @@ namespace Hymson.MES.Services.Dtos.EquEquipmentRecord
         /// <summary>
         /// 创建时间 
         /// </summary>
-        public string CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
     }
 
     /// <summary>
