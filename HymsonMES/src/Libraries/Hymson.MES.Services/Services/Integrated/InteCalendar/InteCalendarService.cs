@@ -380,8 +380,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         }
 
 
-
-
         /// <summary>
         /// 十进制转二进制
         /// </summary>

@@ -37,7 +37,7 @@ namespace Hymson.MES.Equipment.Api
         /// <returns></returns>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            //await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] { ServiceTypeEnum.MES }, cancellationToken);
+            await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] { ServiceTypeEnum.MES }, cancellationToken);
             //await _resourceService.HotLoadingAsync();
             //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
             //var equipmentModel = new EquipmentModel
