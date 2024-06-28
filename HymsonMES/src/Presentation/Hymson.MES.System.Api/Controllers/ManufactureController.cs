@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.SystemServices.Dtos;
 using Hymson.MES.SystemServices.Services;
+using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -20,12 +21,15 @@ namespace Hymson.MES.System.Api.Controllers
         /// 业务接口（生产领料）
         /// </summary>
         private readonly IManuRequistionOrderService _manuRequistionOrderService;
+        private readonly IManuRotorService _manuRotorService;
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ManufactureController(IManuRequistionOrderService manuRequistionOrderService) 
+        public ManufactureController(IManuRequistionOrderService manuRequistionOrderService
+            , IManuRotorService manuRotorService) 
         { 
             _manuRequistionOrderService = manuRequistionOrderService;
+            _manuRotorService = manuRotorService;
         }
         /// <summary>
         /// 生产领料(WMS领料单完成后)
@@ -40,6 +44,11 @@ namespace Hymson.MES.System.Api.Controllers
         {
             await _manuRequistionOrderService.SavePickMaterialsAsync(productionPickDto);
         }
+        /// <summary>
+        /// 生产领料单结果反馈
+        /// </summary>
+        /// <param name="callBackDto"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("PickMaterialsCallBack")]
         [ProducesResponseType(typeof(ResultDto), 200)]
@@ -48,6 +57,11 @@ namespace Hymson.MES.System.Api.Controllers
         {
             await _manuRequistionOrderService.PickMaterialsCallBackAsync(callBackDto);
         }
+        /// <summary>
+        /// 生产退料单结果反馈
+        /// </summary>
+        /// <param name="callBackDto"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("ReturnMaterialsCallBack")]
         [ProducesResponseType(typeof(ResultDto), 200)]
@@ -55,6 +69,19 @@ namespace Hymson.MES.System.Api.Controllers
         public async Task ReturnMaterialsCallBackAsync([FromBody] ProductionReturnCallBackDto callBackDto)
         {
             await _manuRequistionOrderService.ReturnMaterialsCallBackAsync(callBackDto);
+        }
+        /// <summary>
+        /// 转子线过站上报
+        /// </summary>
+        /// <param name="callBackDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("RotorUploadCrossingStationData")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("转子线过站上报", BusinessType.INSERT)]
+        public async Task RotorUploadCrossingStationDataAsync([FromBody] RotorCrossingStationData stationData)
+        {
+            await _manuRotorService.UploadCrossingStationData(stationData);
         }
     }
 }

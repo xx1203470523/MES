@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
@@ -17,6 +18,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -44,6 +46,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IPlanWorkOrderActivationRecordRepository _planWorkOrderActivationRecordRepository;
 
         private readonly AbstractValidator<PlanWorkOrderChangeStatusDto> _validationChangeStatusRules;
+        private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
 
         /// <summary>
         /// 
@@ -69,6 +72,7 @@ namespace Hymson.MES.Services.Services.Plan
             IProcBomRepository procBomRepository,
             IProcProcessRouteRepository procProcessRouteRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
+            IManuRequistionOrderRepository manuRequistionOrderRepository,
             IPlanWorkOrderStatusRecordRepository planWorkOrderStatusRecordRepository, IPlanWorkOrderActivationRecordRepository planWorkOrderActivationRecordRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, AbstractValidator<PlanWorkOrderChangeStatusDto> validationChangeStatusRules)
         {
@@ -86,6 +90,7 @@ namespace Hymson.MES.Services.Services.Plan
             _planWorkOrderActivationRecordRepository = planWorkOrderActivationRecordRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _validationChangeStatusRules = validationChangeStatusRules;
+            _manuRequistionOrderRepository = manuRequistionOrderRepository;
         }
 
 
@@ -511,10 +516,28 @@ namespace Hymson.MES.Services.Services.Plan
             var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
 
             // TODO 这个应该在这里组装，不应该的DB查询全部数据，再直接转（看到了，但没时间改 -。-）
+           
+            
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<PlanWorkOrderListDetailViewDto>());
-            return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            // 根据工单查找领料记录，汇总已领料数量，根据已领料数量和工单数量 计算出领料状态
+            var manuRequistionOrderEntities = await _manuRequistionOrderRepository.GetManuRequistionOrderEntitiesAsync(new ManuRequistionQueryByWorkOrders
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkOrders = dtos.Select(d=>d.OrderCode).Distinct().ToArray(),
+            });
+            var requistiongroup = manuRequistionOrderEntities.Where(m => m.Type == Core.Domain.Manufacture.ManuRequistionTypeEnum.WorkOrderPicking
+            && (m.Status != WhWarehouseRequistionStatusEnum.ApprovalingFailed
+            || m.Status != WhWarehouseRequistionStatusEnum.Failed)).GroupBy(m => m.WorkOrderCode);
+            var dtolist = dtos.ToList();
+            dtolist.ForEach(d =>
+            {
+                var qty = requistiongroup.First(r => r.Key == d.OrderCode).Sum(r => r.Qty);
+                d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked
+                : qty == d.Qty ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.PartPicked;
+            });
+            return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtolist, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>

@@ -98,4 +98,8 @@ namespace Hymson.MES.SystemServices.Dtos
         /// </summary>
         public DateTime ExpirationDate { get; set; }
     }
+    public record RotorCrossingStationData: BaseEntityDto
+    {
+
+    }
 }

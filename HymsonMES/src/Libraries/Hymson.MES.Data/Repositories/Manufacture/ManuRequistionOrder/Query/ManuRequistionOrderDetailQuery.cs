@@ -6,7 +6,7 @@
  *build datetime: 2023-07-04 02:34:40
  */
 
-namespace Hymson.MES.Data.Repositories.Manufacture
+namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
 {
     /// <summary>
     /// 生产领料单明细 查询参数
