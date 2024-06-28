@@ -115,6 +115,21 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 参数收集时间
         /// </summary>
         public DateTime CollectionTime { get; set; }
+
+        /// <summary>
+        /// 中心值
+        /// </summary>
+        public decimal? CenterValue { get; set; }
+
+        /// <summary>
+        /// 上限
+        /// </summary>
+        public decimal? MaxValue { get; set; }
+
+        /// <summary>
+        /// 下限
+        /// </summary>
+        public decimal? MinValue { get; set; }
     }
 
     public class ProductProcessParameterReportPagedQueryDto : PagerInfo
