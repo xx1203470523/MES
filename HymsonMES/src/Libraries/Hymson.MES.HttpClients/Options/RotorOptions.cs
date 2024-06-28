@@ -20,7 +20,10 @@ namespace Hymson.MES.HttpClients.Options
         /// 创建工单
         /// </summary>
         public string CreateOrderRoute { get; set; } = "api/Order/Create";
-        public string StartOrderRoute { get; set; }= "api/Order/Start?id=";
-        public string StopOrderRoute { get; set; } = "api/Order/Stop?id=";
+        /// <summary>
+        /// 设置工单状态，R 进行中，T 暂停
+        /// </summary>
+        public string SetWorkOrderStatusRoute { get; set; }= "api/Order/SetWorkNoStatus";
+       // public string StopOrderRoute { get; set; } = "api/Order/Stop?id=";
     }
 }
