@@ -91,6 +91,21 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
 
+            if (saveDto.EventTypeCode != null)
+            {
+                var eventTypeEntity = await _inteEventTypeRepository.GetByCodeAsync(new EntityByCodeQuery
+                {
+                    Site = entity.SiteId,
+                    Code = saveDto.EventTypeCode ?? string.Empty
+                });
+
+                if (eventTypeEntity == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10910)).WithData("Code", saveDto.EventTypeCode);
+                }
+            }
+            else { entity.EventTypeId = default; }
+
             // 编码唯一性验证
             var checkEntity = await _inteEventRepository.GetByCodeAsync(new EntityByCodeQuery
             {
@@ -119,6 +134,21 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.SiteId = _currentSite.SiteId ?? 0;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
+
+            if (saveDto.EventTypeCode != null)
+            {
+                var eventTypeEntity = await _inteEventTypeRepository.GetByCodeAsync(new EntityByCodeQuery
+                {
+                    Site = entity.SiteId,
+                    Code = saveDto.EventTypeCode ?? string.Empty
+                });
+
+                if (eventTypeEntity == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10910)).WithData("Code", saveDto.EventTypeCode);
+                }
+            }
+            else { entity.EventTypeId = default; }
 
             // 编码唯一性验证
             var checkEntity = await _inteEventRepository.GetByCodeAsync(new EntityByCodeQuery

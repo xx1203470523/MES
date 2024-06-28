@@ -67,5 +67,10 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         /// 工艺路线组
         /// </summary>
         public IEnumerable<long>? ProcessRouteIds { get; set; }
+
+        /// <summary>
+        /// 创建时间  数组 ：时间范围 
+        /// </summary>
+        public DateTime[]? CreatedOn { get; set; }
     }
 }

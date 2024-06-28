@@ -11,13 +11,13 @@ namespace Hymson.MES.Core.Enums.Equipment.EquMaintenance
         /// <summary>
         /// 目视
         /// </summary>
-        [Description("目视")]
+        [Description("定性")]
         SightCheck = 1,
 
         /// <summary>
         /// 量测
         /// </summary>
-        [Description("量测")]
+        [Description("定量")]
         Quantify = 2,
 
 

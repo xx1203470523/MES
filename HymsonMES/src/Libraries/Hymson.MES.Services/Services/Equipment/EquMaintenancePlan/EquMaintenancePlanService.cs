@@ -8,14 +8,17 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
+using Hymson.MES.CoreServices.Events.Equipment;
 using Hymson.MES.CoreServices.Services.EquMaintenancePlan;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -30,6 +33,8 @@ using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
+using System.Linq;
 
 namespace Hymson.MES.Services.Services.EquMaintenancePlan
 {
@@ -87,10 +92,16 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         private readonly IEquMaintenancePlanCoreService _EquMaintenancePlanCoreService;
 
 
+        /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance2> _eventBus;
+
+
         private readonly AbstractValidator<EquMaintenancePlanCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquMaintenancePlanModifyDto> _validationModifyRules;
 
-        public EquMaintenancePlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquMaintenancePlanRepository EquMaintenancePlanRepository, AbstractValidator<EquMaintenancePlanCreateDto> validationCreateRules, AbstractValidator<EquMaintenancePlanModifyDto> validationModifyRules, IEquMaintenancePlanEquipmentRelationRepository EquMaintenancePlanEquipmentRelationRepository, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceItemRepository equMaintenanceItemRepository, IEquMaintenanceTaskSnapshotItemRepository equMaintenanceTaskSnapshotItemRepository, IEquMaintenanceTaskSnapshotPlanRepository equMaintenanceTaskSnapshotPlanRepository, IEquMaintenanceTaskRepository equMaintenanceTaskRepository, IEquMaintenanceTaskItemRepository equMaintenanceTaskItemRepository, IEquMaintenancePlanCoreService equMaintenancePlanCoreService)
+        public EquMaintenancePlanService(ICurrentUser currentUser, ICurrentSite currentSite, IEquMaintenancePlanRepository EquMaintenancePlanRepository, AbstractValidator<EquMaintenancePlanCreateDto> validationCreateRules, AbstractValidator<EquMaintenancePlanModifyDto> validationModifyRules, IEquMaintenancePlanEquipmentRelationRepository EquMaintenancePlanEquipmentRelationRepository, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, IEquEquipmentRepository equEquipmentRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceItemRepository equMaintenanceItemRepository, IEquMaintenanceTaskSnapshotItemRepository equMaintenanceTaskSnapshotItemRepository, IEquMaintenanceTaskSnapshotPlanRepository equMaintenanceTaskSnapshotPlanRepository, IEquMaintenanceTaskRepository equMaintenanceTaskRepository, IEquMaintenanceTaskItemRepository equMaintenanceTaskItemRepository, IEquMaintenancePlanCoreService equMaintenancePlanCoreService, IEventBus<EventBusInstance2> eventBus)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -107,6 +118,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             _EquMaintenanceTaskRepository = equMaintenanceTaskRepository;
             _EquMaintenanceTaskItemRepository = equMaintenanceTaskItemRepository;
             _EquMaintenancePlanCoreService = equMaintenancePlanCoreService;
+            _eventBus = eventBus;
         }
 
 
@@ -125,13 +137,25 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
 
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(EquMaintenancePlanCreateDto);
-            if (EquMaintenancePlanCreateDto.CompletionMinute > 60)
+            if (EquMaintenancePlanCreateDto.CompletionMinute > 60 || EquMaintenancePlanCreateDto.CompletionMinute < 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12315));
             }
-            if (EquMaintenancePlanCreateDto.PreGeneratedMinute > 60)
+            if (EquMaintenancePlanCreateDto.PreGeneratedMinute > 60 || EquMaintenancePlanCreateDto.PreGeneratedMinute < 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12316));
+            }
+            if (EquMaintenancePlanCreateDto.BeginTime > EquMaintenancePlanCreateDto.EndTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12321));
+            }
+            if (EquMaintenancePlanCreateDto.FirstExecuteTime < EquMaintenancePlanCreateDto.BeginTime || EquMaintenancePlanCreateDto.FirstExecuteTime > EquMaintenancePlanCreateDto.EndTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12320));
+            }
+            if (!EquMaintenancePlanCreateDto.CompletionHour.HasValue && !EquMaintenancePlanCreateDto.CompletionMinute.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12323));
             }
             var EquMaintenancePlan = await _EquMaintenancePlanRepository.GetByCodeAsync(new EquMaintenancePlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = EquMaintenancePlanCreateDto.Code, Version = EquMaintenancePlanCreateDto.Version });
             if (EquMaintenancePlan != null)
@@ -140,17 +164,24 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             }
 
             //DTO转换实体
-            var EquMaintenancePlanEntity = EquMaintenancePlanCreateDto.ToEntity<EquMaintenancePlanEntity>();
-            EquMaintenancePlanEntity.Id = IdGenProvider.Instance.CreateId();
-            EquMaintenancePlanEntity.CreatedBy = _currentUser.UserName;
-            EquMaintenancePlanEntity.UpdatedBy = _currentUser.UserName;
-            EquMaintenancePlanEntity.CreatedOn = HymsonClock.Now();
-            EquMaintenancePlanEntity.UpdatedOn = HymsonClock.Now();
-            EquMaintenancePlanEntity.SiteId = _currentSite.SiteId ?? 0;
-            EquMaintenancePlanEntity.CornExpression = GetExecuteCycle(EquMaintenancePlanEntity);
+            var equMaintenancePlanEntity = EquMaintenancePlanCreateDto.ToEntity<EquMaintenancePlanEntity>();
+            equMaintenancePlanEntity.Id = IdGenProvider.Instance.CreateId();
+            equMaintenancePlanEntity.CreatedBy = _currentUser.UserName;
+            equMaintenancePlanEntity.UpdatedBy = _currentUser.UserName;
+            equMaintenancePlanEntity.CreatedOn = HymsonClock.Now();
+            equMaintenancePlanEntity.UpdatedOn = HymsonClock.Now();
+            equMaintenancePlanEntity.SiteId = _currentSite.SiteId ?? 0;
+            equMaintenancePlanEntity.CornExpression = GetExecuteCycle(equMaintenancePlanEntity);
 
             List<EquMaintenancePlanEquipmentRelationEntity> EquMaintenancePlanEquipmentRelationList = new();
 
+
+            var equMaintenancePlanUser = EquMaintenancePlanCreateDto.RelationDto.Where(it => string.IsNullOrWhiteSpace(it.ExecutorIds) || string.IsNullOrWhiteSpace(it.LeaderIds));
+            if (equMaintenancePlanUser != null && equMaintenancePlanUser.Any())
+            {
+                var equEquipments = await _equEquipmentRepository.GetByIdAsync(equMaintenancePlanUser.Select(item => item.Id == 0 ? item.EquipmentId : item.Id));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12322)).WithData("Code", string.Join(",", equEquipments.Select(it => it.EquipmentCode).ToArray()));
+            }
             foreach (var item in EquMaintenancePlanCreateDto.RelationDto)
             {
                 if (item.TemplateId == 0)
@@ -160,7 +191,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
                 EquMaintenancePlanEquipmentRelationEntity EquMaintenancePlanEquipmentRelation = new()
                 {
                     EquipmentId = item.Id == 0 ? item.EquipmentId : item.Id,
-                    MaintenancePlanId = EquMaintenancePlanEntity.Id,
+                    MaintenancePlanId = equMaintenancePlanEntity.Id,
                     MaintenanceTemplateId = item.TemplateId,
                     ExecutorIds = item.ExecutorIds,
                     LeaderIds = item.LeaderIds,
@@ -177,11 +208,13 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             using var trans = TransactionHelper.GetTransactionScope();
 
             //入库
-            await _EquMaintenancePlanRepository.InsertAsync(EquMaintenancePlanEntity);
+            await _EquMaintenancePlanRepository.InsertAsync(equMaintenancePlanEntity);
             await _EquMaintenancePlanEquipmentRelationRepository.InsertsAsync(EquMaintenancePlanEquipmentRelationList);
 
             trans.Complete();
 
+            //TODO 这里要另外加入口 先这样用着
+            ExecPublish(equMaintenancePlanEntity);
         }
 
         /// <summary>
@@ -280,6 +313,18 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12316));
             }
+            if (EquMaintenancePlanModifyDto.BeginTime > EquMaintenancePlanModifyDto.EndTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12321));
+            }
+            if (EquMaintenancePlanModifyDto.FirstExecuteTime < EquMaintenancePlanModifyDto.BeginTime || EquMaintenancePlanModifyDto.FirstExecuteTime > EquMaintenancePlanModifyDto.EndTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12320));
+            }
+            if (!EquMaintenancePlanModifyDto.CompletionHour.HasValue && !EquMaintenancePlanModifyDto.CompletionMinute.HasValue)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12323));
+            }
             var EquMaintenancePlan = await _EquMaintenancePlanRepository.GetByCodeAsync(new EquMaintenancePlanQuery { SiteId = _currentSite.SiteId ?? 0, Code = EquMaintenancePlanModifyDto.Code, Version = EquMaintenancePlanModifyDto.Version });
             if (EquMaintenancePlan != null && EquMaintenancePlan.Id != EquMaintenancePlanModifyDto.Id)
             {
@@ -287,16 +332,23 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             }
 
             //DTO转换实体
-            var EquMaintenancePlanEntity = EquMaintenancePlanModifyDto.ToEntity<EquMaintenancePlanEntity>();
-            EquMaintenancePlanEntity.UpdatedBy = _currentUser.UserName;
-            EquMaintenancePlanEntity.UpdatedOn = HymsonClock.Now();
-            EquMaintenancePlanEntity.CornExpression = GetExecuteCycle(EquMaintenancePlanEntity);
+            EquMaintenancePlanModifyDto.Type = EquMaintenancePlanModifyDto.Type.HasValue ? EquMaintenancePlanModifyDto.Type : 0;
+            var equMaintenancePlanEntity = EquMaintenancePlanModifyDto.ToEntity<EquMaintenancePlanEntity>();
+            equMaintenancePlanEntity.UpdatedBy = _currentUser.UserName;
+            equMaintenancePlanEntity.UpdatedOn = HymsonClock.Now();
+            equMaintenancePlanEntity.CornExpression = GetExecuteCycle(equMaintenancePlanEntity);
 
             List<EquMaintenancePlanEquipmentRelationEntity> EquMaintenancePlanEquipmentRelationList = new();
             List<long> MaintenancePlanIds = new() { EquMaintenancePlanModifyDto.Id };
-
+            var equMaintenancePlanUser = EquMaintenancePlanModifyDto.RelationDto.Where(it => string.IsNullOrWhiteSpace(it.ExecutorIds) || string.IsNullOrWhiteSpace(it.LeaderIds));
+            if (equMaintenancePlanUser != null && equMaintenancePlanUser.Any())
+            {
+                var equEquipments = await _equEquipmentRepository.GetByIdAsync(equMaintenancePlanUser.Select(item => item.Id == 0 ? item.EquipmentId : item.Id));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12322)).WithData("Code", string.Join(",", equEquipments.Select(it => it.EquipmentCode).ToArray()));
+            }
             foreach (var item in EquMaintenancePlanModifyDto.RelationDto)
             {
+
                 EquMaintenancePlanEquipmentRelationEntity EquMaintenancePlanEquipmentRelation = new()
                 {
                     EquipmentId = item.Id == 0 ? item.EquipmentId : item.Id,
@@ -317,13 +369,15 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             using var trans = TransactionHelper.GetTransactionScope();
 
             //入库
-            await _EquMaintenancePlanRepository.UpdateAsync(EquMaintenancePlanEntity);
+            await _EquMaintenancePlanRepository.UpdateAsync(equMaintenancePlanEntity);
 
             await _EquMaintenancePlanEquipmentRelationRepository.PhysicalDeletesAsync(MaintenancePlanIds);
             await _EquMaintenancePlanEquipmentRelationRepository.InsertsAsync(EquMaintenancePlanEquipmentRelationList);
 
             trans.Complete();
 
+            //TODO 这里要另外加入口 先这样用着
+            ExecPublish(equMaintenancePlanEntity, true);
         }
 
         /// <summary>
@@ -336,6 +390,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             var EquMaintenancePlanEntity = await _EquMaintenancePlanRepository.GetByIdAsync(id);
             if (EquMaintenancePlanEntity != null)
             {
+                EquMaintenancePlanEntity.Type = EquMaintenancePlanEntity.Type == 0 ? null : EquMaintenancePlanEntity.Type;
                 return EquMaintenancePlanEntity.ToModel<EquMaintenancePlanDto>();
             }
             return null;
@@ -401,7 +456,7 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
         /// <exception cref="ValidationException"></exception>
         private static string? GetExecuteCycle(EquMaintenancePlanEntity plan)
         {
-            if (!plan.FirstExecuteTime.HasValue || !plan.Type.HasValue || !plan.Cycle.HasValue)
+            if (!plan.FirstExecuteTime.HasValue || !plan.CycleType.HasValue || !plan.Cycle.HasValue)
             {
                 return null;
             }
@@ -410,16 +465,54 @@ namespace Hymson.MES.Services.Services.EquMaintenancePlan
             var hour = plan.FirstExecuteTime.GetValueOrDefault().Hour.ToString();
             var day = "*";
             var tail = "* ?";
-            if (plan.Type == EquipmentMaintenanceTypeEnum.Hour)
+
+            switch (plan.CycleType)
             {
-                hour = $"0/{plan.Cycle}";
+                case EquipmentCycleTypeEnum.Hour:
+                    hour = $"0/{plan.Cycle}";
+                    break;
+                case EquipmentCycleTypeEnum.Day:
+                    day = $"*/{plan.Cycle}";
+                    break;
+                default:
+                    break;
             }
-            else
-            {
-                day = $"*/{day}";
-            }
+
             var expression = $"{second} {minute} {hour} {day} {tail}";
             return expression;
+        }
+
+        /// <summary>
+        /// 执行发送任务
+        /// </summary>
+        /// <param name="equMaintenancePlanEntity"></param>
+        /// <param name="isEdit"></param>
+        private void ExecPublish(EquMaintenancePlanEntity equMaintenancePlanEntity, bool isEdit = false)
+        {
+            if (!string.IsNullOrWhiteSpace(equMaintenancePlanEntity.CornExpression) && equMaintenancePlanEntity.FirstExecuteTime.HasValue && equMaintenancePlanEntity.EndTime.HasValue)
+            {
+                if (equMaintenancePlanEntity.Status == DisableOrEnableEnum.Enable)
+                {
+                    EquMaintenanceAutoCreateIntegrationEvent equSpotcheckAutoCreateIntegrationEvent = new()
+                    {
+                        SiteId = _currentSite.SiteId ?? 0,
+                        CornExpression = equMaintenancePlanEntity.CornExpression,
+                        FirstExecuteTime = (DateTime)equMaintenancePlanEntity.FirstExecuteTime,
+                        MaintenancePlanId = equMaintenancePlanEntity.Id,
+                        UserName = _currentUser.UserName,
+                        EndTime = (DateTime)equMaintenancePlanEntity.EndTime,
+                    };
+                    _eventBus.Publish(equSpotcheckAutoCreateIntegrationEvent);
+                }
+                else if (isEdit)
+                {
+                    EquMaintenanceAutoStopIntegrationEvent equSpotcheckAutoCreateIntegrationEvent = new()
+                    {
+                        MaintenancePlanId = equMaintenancePlanEntity.Id,
+                    };
+                    _eventBus.Publish(equSpotcheckAutoCreateIntegrationEvent);
+                }
+            }
         }
         #endregion
     }

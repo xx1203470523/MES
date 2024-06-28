@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
+using Hymson.MES.Data.Repositories.EquSpotcheckPlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelation;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation;
@@ -50,10 +51,12 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         private readonly IEquSpotcheckItemRepository _equSpotcheckItemRepository;
         private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
+        private readonly IEquSpotcheckPlanEquipmentRelationRepository _equSpotcheckPlanEquipmentRelationRepository;
+
         private readonly AbstractValidator<EquSpotcheckTemplateCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquSpotcheckTemplateModifyDto> _validationModifyRules;
 
-        public EquSpotcheckTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, AbstractValidator<EquSpotcheckTemplateCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckTemplateModifyDto> validationModifyRules, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository, IEquEquipmentRepository equEquipmentRepository)
+        public EquSpotcheckTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, AbstractValidator<EquSpotcheckTemplateCreateDto> validationCreateRules, AbstractValidator<EquSpotcheckTemplateModifyDto> validationModifyRules, IEquSpotcheckItemRepository equSpotcheckItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository, IEquEquipmentRepository equEquipmentRepository, IEquSpotcheckPlanEquipmentRelationRepository equSpotcheckPlanEquipmentRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -65,6 +68,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             _equSpotcheckTemplateItemRelationRepository = equSpotcheckTemplateItemRelationRepository;
             _equSpotcheckTemplateEquipmentGroupRelationRepository = equSpotcheckTemplateEquipmentGroupRelationRepository;
             _equEquipmentRepository = equEquipmentRepository;
+            _equSpotcheckPlanEquipmentRelationRepository = equSpotcheckPlanEquipmentRelationRepository;
         }
 
         /// <summary>
@@ -107,21 +111,22 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
 
 
             List<EquSpotcheckTemplateEquipmentGroupRelationEntity> groupRelationList = new();
-            var eGroupIds = equSpotcheckTemplateCreateDto.groupRelationDto.Select(it => it.Id).ToArray();
-            var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
-            if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
-            {
-                var groupRelationIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
-                var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
-                var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
-                throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
-            }
+            //暂不验证
+            //var eGroupIds = equSpotcheckTemplateCreateDto.groupRelationDto.Select(it => it.Id).ToArray();
+            //var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
+            //if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
+            //{
+            //    var groupRelationIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
+            //    var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
+            //    var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
+            //}
             foreach (var item in equSpotcheckTemplateCreateDto.groupRelationDto)
             {
                 var groupRelation = new EquSpotcheckTemplateEquipmentGroupRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    EquipmentGroupId = item.Id,
+                    EquipmentGroupId = item.EquipmentGroupId == 0 ? item.Id : item.EquipmentGroupId,
                     SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
 
                     IsDeleted = 0,
@@ -144,7 +149,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
                     SpotCheckTemplateId = equSpotcheckTemplateEntity.Id,
                     Center = item.Center,
                     LowerLimit = item.LowerLimit,
-                    SpotCheckItemId = item.Id,
+                    SpotCheckItemId = item.SpotCheckItemId == 0 ? item.Id : item.SpotCheckItemId,
                     UpperLimit = item.UpperLimit,
 
                     IsDeleted = 0,
@@ -187,20 +192,29 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
         public async Task<int> DeletesEquSpotcheckTemplateAsync(EquSpotcheckTemplateDeleteDto param)
         {
             var ids = param.Ids;
-            var templateList = await _equSpotcheckTemplateRepository.GetByIdsAsync(ids.ToArray());
 
-            var codeEnabiles = "";
-            foreach (var item in templateList)
-            {
-                if (item.Status == DisableOrEnableEnum.Enable)
-                {
-                    codeEnabiles += item.Code + ",";
-                }
-            }
+            //5203
+            //var templateList = await _equSpotcheckTemplateRepository.GetByIdsAsync(ids.ToArray());
 
-            if (!string.IsNullOrWhiteSpace(codeEnabiles))
+            //var codeEnabiles = "";
+            //foreach (var item in templateList)
+            //{
+            //    if (item.Status == DisableOrEnableEnum.Enable)
+            //    {
+            //        codeEnabiles += item.Code + ",";
+            //    }
+            //}
+
+            //if (!string.IsNullOrWhiteSpace(codeEnabiles))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
+            //}
+
+            var equSpotcheckPlanEquipmentRelations = await _equSpotcheckPlanEquipmentRelationRepository.GetBySpotCheckSpotCheckTemplateIdsAsync(ids);
+            if (equSpotcheckPlanEquipmentRelations != null && equSpotcheckPlanEquipmentRelations.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
+                var equSpotcheckTemplates = await _equSpotcheckTemplateRepository.GetByIdsAsync(equSpotcheckPlanEquipmentRelations.Select(it => it.SpotCheckTemplateId).ToArray());
+                throw new CustomerValidationException(nameof(ErrorCode.MES12204)).WithData("Code", string.Join(",", equSpotcheckTemplates.Select(it => it.Code).ToArray()));
             }
 
             int row = 0;
@@ -297,6 +311,18 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(equSpotcheckTemplateModifyDto);
 
+            var equSpotcheckTemplate = await _equSpotcheckTemplateRepository.GetByCodeAsync(new EquSpotcheckTemplateQuery
+            {
+                Code = equSpotcheckTemplateModifyDto.Code,
+                Version = equSpotcheckTemplateModifyDto.Version,
+                SiteId = _currentSite.SiteId,
+            });
+
+            if (equSpotcheckTemplate != null && equSpotcheckTemplate.Id != equSpotcheckTemplateModifyDto.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12202)).WithData("Code", equSpotcheckTemplateModifyDto.Code).WithData("Version", equSpotcheckTemplateModifyDto.Version);
+            }
+
             //DTO转换实体
             var equSpotcheckTemplateEntity = equSpotcheckTemplateModifyDto.ToEntity<EquSpotcheckTemplateEntity>();
             equSpotcheckTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
@@ -338,15 +364,16 @@ namespace Hymson.MES.Services.Services.EquSpotcheckTemplate
 
             List<EquSpotcheckTemplateEquipmentGroupRelationEntity> addGroupRelation = new();
 
-            var eGroupIds = equSpotcheckTemplateModifyDto.groupRelationDto.Select(it => it.Id).ToArray();
-            var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
-            if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
-            {
-                var groupRelationIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
-                var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
-                var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
-                throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
-            }
+            //暂不验证
+            //var eGroupIds = equSpotcheckTemplateModifyDto.groupRelationDto.Select(it => it.Id).ToArray();
+            //var equSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
+            //if (equSpotcheckTemplateEquipmentGroupRelations != null && equSpotcheckTemplateEquipmentGroupRelations.Any())
+            //{
+            //    var groupRelationIds = equSpotcheckTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
+            //    var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
+            //    var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
+            //}
             foreach (var item in equSpotcheckTemplateModifyDto.groupRelationDto)
             {
                 addGroupRelation.Add(new EquSpotcheckTemplateEquipmentGroupRelationEntity

@@ -6,9 +6,13 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Common;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Events.Equipment;
+using Hymson.MES.CoreServices.Events.Quality;
+using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -105,24 +109,29 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
         public async Task GenerateEquMaintenanceTaskAsync(GenerateEquMaintenanceTaskDto param)
         {
             //计划
-            var EquMaintenancePlanEntity = await _EquMaintenancePlanRepository.GetByIdAsync(param.MaintenancePlanId);
-            if (EquMaintenancePlanEntity.Status == DisableOrEnableEnum.Disable)
+            var equMaintenancePlanEntity = await _EquMaintenancePlanRepository.GetByIdAsync(param.MaintenancePlanId);
+            if (equMaintenancePlanEntity.Status == DisableOrEnableEnum.Disable)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12314)).WithData("Code", EquMaintenancePlanEntity.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES12314)).WithData("Code", equMaintenancePlanEntity.Code);
             }
             if (param.ExecType == 0)
             {
-                if (EquMaintenancePlanEntity.FirstExecuteTime < HymsonClock.Now())
+                if (equMaintenancePlanEntity.FirstExecuteTime > HymsonClock.Now())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12303));
                 }
 
-                if (!EquMaintenancePlanEntity.FirstExecuteTime.HasValue || !EquMaintenancePlanEntity.Type.HasValue || EquMaintenancePlanEntity.Cycle.HasValue)
+                if (equMaintenancePlanEntity.EndTime < HymsonClock.Now())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12325));
+                }
+
+                if (!equMaintenancePlanEntity.FirstExecuteTime.HasValue || !equMaintenancePlanEntity.CycleType.HasValue || !equMaintenancePlanEntity.Cycle.HasValue)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12304));
                 }
 
-                if (EquMaintenancePlanEntity.IsSkipHoliday == TrueOrFalseEnum.Yes)
+                if (equMaintenancePlanEntity.IsSkipHoliday == TrueOrFalseEnum.Yes)
                 {
                     var thisDate = HymsonClock.Now();
                     var planCalendar = await _planCalendarRepository.GetOneAsync(new PlanCalendarQuery { SiteId = param.SiteId, Year = thisDate.Year, Month = thisDate.Month });
@@ -178,12 +187,12 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                 EquMaintenanceTaskEntity EquMaintenanceTask = new()
                 {
                     Code = await GenerateMaintenanceOrderCodeAsync(param.SiteId, param.UserName),
-                    Name = EquMaintenancePlanEntity.Name,
-                    BeginTime = HymsonClock.Now(),
-                    EndTime = HymsonClock.Now(),
+                    Name = equMaintenancePlanEntity.Name,
+                    //BeginTime = HymsonClock.Now(),
+                    //EndTime = HymsonClock.Now(),
                     Status = EquMaintenanceTaskStautusEnum.WaitInspect,
                     IsQualified = null,
-                    Remark = EquMaintenancePlanEntity.Remark,
+                    Remark = equMaintenancePlanEntity.Remark,
 
                     Id = equMaintenanceTaskId,
                     CreatedBy = param.UserName,
@@ -194,28 +203,37 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                 };
                 EquMaintenanceTaskList.Add(EquMaintenanceTask);
 
+                var endTime = HymsonClock.Now();
+                if (equMaintenancePlanEntity.CompletionHour.HasValue)
+                {
+                    endTime = endTime.AddHours(equMaintenancePlanEntity.CompletionHour.ParseToDouble());
+                }
+                if (equMaintenancePlanEntity.CompletionMinute.HasValue)
+                {
+                    endTime = endTime.AddMinutes(equMaintenancePlanEntity.CompletionMinute.ParseToDouble());
+                }
                 EquMaintenanceTaskSnapshotPlanEntity EquMaintenanceTaskSnapshotPlan = new()
                 {
                     MaintenanceTaskId = EquMaintenanceTask.Id,
                     MaintenancePlanId = item.MaintenancePlanId,
-                    Code = EquMaintenancePlanEntity.Code,
-                    Name = EquMaintenancePlanEntity.Name,
-                    Version = EquMaintenancePlanEntity.Version,
+                    Code = equMaintenancePlanEntity.Code,
+                    Name = equMaintenancePlanEntity.Name,
+                    Version = equMaintenancePlanEntity.Version,
                     EquipmentId = item.EquipmentId,
                     MaintenanceTemplateId = item.MaintenanceTemplateId,
                     ExecutorIds = item.ExecutorIds ?? "",
                     LeaderIds = item.LeaderIds ?? "",
-                    Type = EquMaintenancePlanEntity.Type ?? 0,
-                    Status = EquMaintenancePlanEntity.Status,
-                    BeginTime = EquMaintenancePlanEntity.BeginTime,
-                    EndTime = EquMaintenancePlanEntity.EndTime,
-                    IsSkipHoliday = EquMaintenancePlanEntity.IsSkipHoliday,
-                    FirstExecuteTime = EquMaintenancePlanEntity.FirstExecuteTime,
-                    Cycle = EquMaintenancePlanEntity.Cycle ?? 1,
-                    CompletionHour = EquMaintenancePlanEntity.CompletionHour,
-                    CompletionMinute = EquMaintenancePlanEntity.CompletionMinute,
-                    PreGeneratedMinute = EquMaintenancePlanEntity.PreGeneratedMinute,
-                    Remark = EquMaintenancePlanEntity.Remark,
+                    Type = equMaintenancePlanEntity.Type ?? 0,
+                    Status = equMaintenancePlanEntity.Status,
+                    BeginTime = HymsonClock.Now(), //EquMaintenancePlanEntity.BeginTime,
+                    EndTime = endTime,//EquMaintenancePlanEntity.EndTime,
+                    IsSkipHoliday = equMaintenancePlanEntity.IsSkipHoliday,
+                    FirstExecuteTime = equMaintenancePlanEntity.FirstExecuteTime,
+                    Cycle = equMaintenancePlanEntity.Cycle ?? 1,
+                    CompletionHour = equMaintenancePlanEntity.CompletionHour,
+                    CompletionMinute = equMaintenancePlanEntity.CompletionMinute,
+                    PreGeneratedMinute = equMaintenancePlanEntity.PreGeneratedMinute,
+                    Remark = equMaintenancePlanEntity.Remark,
 
                     Id = IdGenProvider.Instance.CreateId(),
                     CreatedBy = param.UserName,
@@ -266,7 +284,7 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                         MaintenanceTaskId = EquMaintenanceTask.Id,
                         MaintenanceItemSnapshotId = EquMaintenanceTaskSnapshotItem.Id,
                         InspectionValue = "",
-                        IsQualified = TrueOrFalseEnum.No,
+                        IsQualified = TrueFalseEmptyEnum.Empty,
                         Remark = EquMaintenanceTaskSnapshotItem.Remark,
 
                         Id = IdGenProvider.Instance.CreateId(),
@@ -297,6 +315,31 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
         }
 
 
+        /// <summary>
+        /// 生成保养任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task GenerateEquMaintenanceTaskAsync(EquMaintenanceAutoCreateIntegrationEvent param)
+        {
+            await GenerateEquMaintenanceTaskAsync(new GenerateEquMaintenanceTaskDto
+            {
+                SiteId = param.SiteId,
+                UserName = param.UserName,
+                MaintenancePlanId = param.MaintenancePlanId,
+                ExecType = param.ExecType
+            });
+        }
+
+        /// <summary>
+        /// 停止保养任务
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>  
+        public async Task StopEquMaintenanceTaskAsync(EquMaintenanceAutoStopIntegrationEvent param)
+        {
+
+        }
 
         #region 帮助
         private static string GetWeekToInt(string weekName)
@@ -342,15 +385,15 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
             var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
             {
                 SiteId = siteId,
-                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.Spotcheck
+                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.Maintain
             });
             if (codeRules == null || !codeRules.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12309));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12311));
             }
             if (codeRules.Count() > 1)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12310));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12312));
             }
 
             var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new GenerateBarcodeBo

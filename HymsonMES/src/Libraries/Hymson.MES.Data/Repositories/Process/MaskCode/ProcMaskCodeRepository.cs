@@ -90,7 +90,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Select("*");
+            sqlBuilder.Select("*,code as maskCode");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {

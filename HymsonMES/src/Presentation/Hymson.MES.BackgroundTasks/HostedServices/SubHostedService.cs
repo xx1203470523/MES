@@ -4,8 +4,13 @@ using Hymson.Infrastructure.Enums;
 using Hymson.MES.BackgroundServices.EventHandling;
 using Hymson.MES.BackgroundServices.EventHandling.ManufactureHandling.ManuSfcStepHandling;
 using Hymson.MES.BackgroundServices.EventHandling.ProcessEventHandling.PrintEventHandling;
-using Hymson.MES.BackgroundServices.Quality.FQCOrderAutoCreateIntegration;
+using Hymson.MES.BackgroundServices.Quality.EquMaintenanceAutoCreateIntegration;
+using Hymson.MES.BackgroundServices.Quality.EquMaintenanceAutoStopIntegration;
+using Hymson.MES.BackgroundServices.Quality.EquSpotcheckAutoCreateIntegration;
+using Hymson.MES.BackgroundServices.Quality.EquSpotcheckAutoStopIntegration;
+using Hymson.MES.BackgroundServices.Tasks.Quality.FQCOrderAutoCreateIntegration;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.CoreServices.Events.Equipment;
 using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
 using Hymson.MES.CoreServices.Events.Quality;
@@ -42,7 +47,7 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
         public SubHostedService(IEventBus<EventBusInstance1> eventBus,
             IDeliveryService deliveryService,
             IOptions<ManuSfcStepTableOptions> options,
-            IClearCacheService clearCacheService,ILogger<SubHostedService> logger)
+            IClearCacheService clearCacheService, ILogger<SubHostedService> logger)
         {
             _eventBus = eventBus;
             _deliveryService = deliveryService;
@@ -69,12 +74,16 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
                 _eventBus.Subscribe<MessageHandleUpgradeIntegrationEvent, MessageHandleUpgradeIntegrationEventHandler>();
                 _eventBus.Subscribe<PrintIntegrationEvent, ExecPrintIntegrationEventHandler>();
                 _eventBus.Subscribe<FQCOrderAutoCreateIntegrationEvent, FQCOrderAutoCreateIntegrationEventHandler>();
+                _eventBus.Subscribe<EquSpotcheckAutoCreateIntegrationEvent, EquSpotcheckAutoCreateIntegrationEventHandler>();
+                _eventBus.Subscribe<EquSpotcheckAutoStopIntegrationEvent, EquSpotcheckAutoStopIntegrationEventHandler>();
+                _eventBus.Subscribe<EquMaintenanceAutoCreateIntegrationEvent, EquMaintenanceAutoCreateIntegrationEventHandler>();
+                _eventBus.Subscribe<EquMaintenanceAutoStopIntegrationEvent, EquMaintenanceAutoStopIntegrationEventHandler>();
                 SubscribeManufactureServices();
 
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"启动出错:");
+                _logger.LogError(ex, "启动出错:");
             }
         }
 

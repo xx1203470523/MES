@@ -37,7 +37,5 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             await _manuSfcOperateService.StopStationMoreAsync(request);
         }
-
-
     }
 }

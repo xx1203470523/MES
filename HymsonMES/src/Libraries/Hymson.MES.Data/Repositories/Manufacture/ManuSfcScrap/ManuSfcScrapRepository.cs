@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcScrap.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -150,6 +151,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (query.SfcinfoIds != null && query.SfcinfoIds.Any())
+            {
+                sqlBuilder.Where(" SfcinfoId IN @SfcinfoIds ");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcScrapEntity>(template.RawSql, query);
         }

@@ -50,6 +50,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Code { get; set; } = "";
 
         /// <summary>
+        /// 编码 
+        /// </summary>
+        public string MaskCode { get; set; } = "";
+
+        /// <summary>
         /// 名称 
         /// </summary>
         public string Name { get; set; } = "";

@@ -124,7 +124,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         Task<int> UpdateReduceQuantityResidueRangeAsync(IEnumerable<UpdateQuantityRangeCommand> updateQuantityCommand);
         /// <summary>
-        /// 批更新 按实际传入更新s
+        /// 批更新 按实际传入更新
         /// </summary>
         /// <param name="updateQuantityCommand"></param>
         /// <returns></returns>

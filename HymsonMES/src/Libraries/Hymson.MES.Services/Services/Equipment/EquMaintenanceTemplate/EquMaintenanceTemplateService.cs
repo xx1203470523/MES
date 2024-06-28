@@ -5,7 +5,6 @@
  *builder:  pengxin
  *build datetime: 2024-05-13 03:06:41
  */
-using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -17,22 +16,17 @@ using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem;
+using Hymson.MES.Data.Repositories.EquMaintenancePlanEquipmentRelation;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateEquipmentGroupRelation;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplateItemRelation;
-using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Services.Dtos.EquMaintenanceTemplate;
-using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
-using System.Security.Policy;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
 {
@@ -53,10 +47,11 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
         private readonly IEquMaintenanceItemRepository _EquMaintenanceItemRepository;
         private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
+        private readonly IEquMaintenancePlanEquipmentRelationRepository _equMaintenancePlanEquipmentRelationRepository;
         private readonly AbstractValidator<EquMaintenanceTemplateCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquMaintenanceTemplateModifyDto> _validationModifyRules;
 
-        public EquMaintenanceTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, AbstractValidator<EquMaintenanceTemplateCreateDto> validationCreateRules, AbstractValidator<EquMaintenanceTemplateModifyDto> validationModifyRules, IEquMaintenanceItemRepository EquMaintenanceItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceTemplateEquipmentGroupRelationRepository EquMaintenanceTemplateEquipmentGroupRelationRepository, IEquEquipmentRepository equEquipmentRepository)
+        public EquMaintenanceTemplateService(ICurrentUser currentUser, ICurrentSite currentSite, IEquMaintenanceTemplateRepository EquMaintenanceTemplateRepository, AbstractValidator<EquMaintenanceTemplateCreateDto> validationCreateRules, AbstractValidator<EquMaintenanceTemplateModifyDto> validationModifyRules, IEquMaintenanceItemRepository EquMaintenanceItemRepository, IEquEquipmentGroupRepository equEquipmentGroupRepository, IEquMaintenanceTemplateItemRelationRepository EquMaintenanceTemplateItemRelationRepository, IEquMaintenanceTemplateEquipmentGroupRelationRepository EquMaintenanceTemplateEquipmentGroupRelationRepository, IEquEquipmentRepository equEquipmentRepository, IEquMaintenancePlanEquipmentRelationRepository equMaintenancePlanEquipmentRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -68,6 +63,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
             _EquMaintenanceTemplateItemRelationRepository = EquMaintenanceTemplateItemRelationRepository;
             _EquMaintenanceTemplateEquipmentGroupRelationRepository = EquMaintenanceTemplateEquipmentGroupRelationRepository;
             _equEquipmentRepository = equEquipmentRepository;
+            _equMaintenancePlanEquipmentRelationRepository = equMaintenancePlanEquipmentRelationRepository;
         }
 
         /// <summary>
@@ -110,21 +106,23 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
 
 
             List<EquMaintenanceTemplateEquipmentGroupRelationEntity> groupRelationList = new();
-            var eGroupIds = EquMaintenanceTemplateCreateDto.groupRelationDto.Select(it => it.Id).ToArray();
-            var EquMaintenanceTemplateEquipmentGroupRelations = await _EquMaintenanceTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
-            if (EquMaintenanceTemplateEquipmentGroupRelations != null && EquMaintenanceTemplateEquipmentGroupRelations.Any())
-            {
-                var groupRelationIds = EquMaintenanceTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
-                var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
-                var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
-                throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
-            }
+
+            //暂不验证
+            //var eGroupIds = EquMaintenanceTemplateCreateDto.groupRelationDto.Select(it => it.Id).ToArray();
+            //var EquMaintenanceTemplateEquipmentGroupRelations = await _EquMaintenanceTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
+            //if (EquMaintenanceTemplateEquipmentGroupRelations != null && EquMaintenanceTemplateEquipmentGroupRelations.Any())
+            //{
+            //    var groupRelationIds = EquMaintenanceTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
+            //    var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
+            //    var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
+            //}
             foreach (var item in EquMaintenanceTemplateCreateDto.groupRelationDto)
             {
                 var groupRelation = new EquMaintenanceTemplateEquipmentGroupRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    EquipmentGroupId = item.Id,
+                    EquipmentGroupId = item.EquipmentGroupId == 0 ? item.Id : item.EquipmentGroupId,
                     MaintenanceTemplateId = EquMaintenanceTemplateEntity.Id,
 
                     IsDeleted = 0,
@@ -147,7 +145,7 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
                     MaintenanceTemplateId = EquMaintenanceTemplateEntity.Id,
                     Center = item.Center,
                     LowerLimit = item.LowerLimit,
-                    MaintenanceItemId = item.Id,
+                    MaintenanceItemId = item.MaintenanceItemId == 0 ? item.Id : item.MaintenanceItemId,
                     UpperLimit = item.UpperLimit,
 
                     IsDeleted = 0,
@@ -190,20 +188,27 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
         public async Task<int> DeletesEquMaintenanceTemplateAsync(EquMaintenanceTemplateDeleteDto param)
         {
             var ids = param.Ids;
-            var templateList = await _EquMaintenanceTemplateRepository.GetByIdsAsync(ids.ToArray());
+            //var templateList = await _EquMaintenanceTemplateRepository.GetByIdsAsync(ids.ToArray());
 
-            var codeEnabiles = "";
-            foreach (var item in templateList)
-            {
-                if (item.Status == DisableOrEnableEnum.Enable)
-                {
-                    codeEnabiles += item.Code + ",";
-                }
-            }
+            //var codeEnabiles = "";
+            //foreach (var item in templateList)
+            //{
+            //    if (item.Status == DisableOrEnableEnum.Enable)
+            //    {
+            //        codeEnabiles += item.Code + ",";
+            //    }
+            //}
 
-            if (!string.IsNullOrWhiteSpace(codeEnabiles))
+            //if (!string.IsNullOrWhiteSpace(codeEnabiles))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
+            //}
+
+            var equMaintenancePlanEquipmentRelations = await _equMaintenancePlanEquipmentRelationRepository.GetByMaintenanceTemplateIdsAsync(ids);
+            if (equMaintenancePlanEquipmentRelations != null && equMaintenancePlanEquipmentRelations.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12201)).WithData("Code", codeEnabiles);
+                var equMaintenanceTemplates = await _EquMaintenanceTemplateRepository.GetByIdsAsync(equMaintenancePlanEquipmentRelations.Select(it => it.MaintenanceTemplateId).ToArray());
+                throw new CustomerValidationException(nameof(ErrorCode.MES12204)).WithData("Code", string.Join(",", equMaintenanceTemplates.Select(it => it.Code).ToArray()));
             }
 
             int row = 0;
@@ -303,6 +308,18 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(EquMaintenanceTemplateModifyDto);
 
+            var equSpotcheckTemplate = await _EquMaintenanceTemplateRepository.GetByCodeAsync(new EquMaintenanceTemplateQuery
+            {
+                Code = EquMaintenanceTemplateModifyDto.Code,
+                Version = EquMaintenanceTemplateModifyDto.Version,
+                SiteId = _currentSite.SiteId,
+            });
+
+            if (equSpotcheckTemplate != null && equSpotcheckTemplate.Id != EquMaintenanceTemplateModifyDto.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12202)).WithData("Code", EquMaintenanceTemplateModifyDto.Code).WithData("Version", EquMaintenanceTemplateModifyDto.Version);
+            }
+
             //DTO转换实体
             var EquMaintenanceTemplateEntity = EquMaintenanceTemplateModifyDto.ToEntity<EquMaintenanceTemplateEntity>();
             EquMaintenanceTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
@@ -344,15 +361,16 @@ namespace Hymson.MES.Services.Services.EquMaintenanceTemplate
 
             List<EquMaintenanceTemplateEquipmentGroupRelationEntity> addGroupRelation = new();
 
-            var eGroupIds = EquMaintenanceTemplateModifyDto.groupRelationDto.Select(it => it.Id).ToArray();
-            var EquMaintenanceTemplateEquipmentGroupRelations = await _EquMaintenanceTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
-            if (EquMaintenanceTemplateEquipmentGroupRelations != null && EquMaintenanceTemplateEquipmentGroupRelations.Any())
-            {
-                var groupRelationIds = EquMaintenanceTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
-                var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
-                var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
-                throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
-            }
+            //暂不验证
+            //var eGroupIds = EquMaintenanceTemplateModifyDto.groupRelationDto.Select(it => it.Id).ToArray();
+            //var EquMaintenanceTemplateEquipmentGroupRelations = await _EquMaintenanceTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(eGroupIds);
+            //if (EquMaintenanceTemplateEquipmentGroupRelations != null && EquMaintenanceTemplateEquipmentGroupRelations.Any())
+            //{
+            //    var groupRelationIds = EquMaintenanceTemplateEquipmentGroupRelations.Select(it => it.EquipmentGroupId).ToArray();
+            //    var equipmentGroups = await _equEquipmentGroupRepository.GetByIdsAsync(groupRelationIds);
+            //    var equipmentGroupCodes = string.Join(",", equipmentGroups.Select(it => it.EquipmentGroupCode));
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12203)).WithData("Code", equipmentGroupCodes);
+            //}
             foreach (var item in EquMaintenanceTemplateModifyDto.groupRelationDto)
             {
                 addGroupRelation.Add(new EquMaintenanceTemplateEquipmentGroupRelationEntity

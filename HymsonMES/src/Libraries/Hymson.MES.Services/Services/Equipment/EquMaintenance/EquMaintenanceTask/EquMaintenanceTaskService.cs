@@ -25,6 +25,10 @@ using Hymson.Utils.Tools;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
+using Elastic.Clients.Elasticsearch;
+using Hymson.MES.Core.Enums.Common;
+using System.Linq;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTask
 {
@@ -94,6 +98,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         /// 单据附件
         /// </summary>
         private readonly IEquMaintenanceTaskAttachmentRepository _equMaintenanceTaskAttachmentRepository;
+        /// <summary>
+        /// 仓储接口（设备保养快照任务计划）
+        /// </summary>
+        private readonly IEquMaintenanceTaskSnapshotPlanRepository _equMaintenanceTaskSnapshotPlanRepository;
 
         /// <summary>
         /// 
@@ -120,7 +128,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             IEquMaintenanceTaskItemAttachmentRepository equMaintenanceTaskItemAttachmentRepository,
             IEquMaintenanceTaskOperationRepository equMaintenanceTaskOperationRepository,
             IEquMaintenanceTaskProcessedRepository equMaintenanceTaskProcessedRepository,
-            IEquMaintenanceTaskAttachmentRepository equMaintenanceTaskAttachmentRepository)
+            IEquMaintenanceTaskAttachmentRepository equMaintenanceTaskAttachmentRepository, IEquMaintenanceTaskSnapshotPlanRepository equMaintenanceTaskSnapshotPlanRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -135,6 +143,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             _equMaintenanceTaskOperationRepository = equMaintenanceTaskOperationRepository;
             _equMaintenanceTaskProcessedRepository = equMaintenanceTaskProcessedRepository;
             _equMaintenanceTaskAttachmentRepository = equMaintenanceTaskAttachmentRepository;
+            _equMaintenanceTaskSnapshotPlanRepository = equMaintenanceTaskSnapshotPlanRepository;
         }
 
 
@@ -196,6 +205,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
+            var entitys = await _equMaintenanceTaskRepository.GetByIdAsync(id);
+            if (entitys != null)
+            {
+                if (entitys.Status != EquMaintenanceTaskStautusEnum.WaitInspect)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15904));
+                }
+            }
             return await _equMaintenanceTaskRepository.DeleteAsync(id);
         }
 
@@ -206,6 +223,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            var entitys = await _equMaintenanceTaskRepository.GetByIdsAsync(ids);
+            if (entitys != null)
+            {
+                if (!entitys.Any(x => x.Status == EquMaintenanceTaskStautusEnum.WaitInspect))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15904));
+                }
+            }
+
             return await _equMaintenanceTaskRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
@@ -232,8 +258,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             result.IsQualifiedText = result.IsQualified?.GetDescription() ?? string.Empty;
             result.EquipmentCode = equipmenEntity?.EquipmentCode ?? string.Empty;
             result.Location = equipmenEntity?.Location ?? string.Empty;
-            result.PlanTypeText = result.PlanType?.GetDescription() ?? string.Empty;
-
+            result.ExecutorIds = _currentUser.UserName;
+            if (result.PlanType?.GetDescription() != "0")
+            {
+                result.PlanTypeText = result.PlanType?.GetDescription() ?? string.Empty;
+            }
             return result;
         }
 
@@ -289,6 +318,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
 
                     var processEntities = await _equMaintenanceTaskProcessedRepository.GetEntitiesAsync(new EquMaintenanceTaskProcessedQuery { MaintenanceTaskIds = resultIds });
 
+                    var deferOperations = await _equMaintenanceTaskOperationRepository.GetEntitiesAsync(new EquMaintenanceTaskOperationQuery { MaintenanceTaskIds = resultIds, OperationType = EquMaintenanceOperationTypeEnum.Defer });
+
                     result.Data = result.Data.Select(m =>
                     {
                         //设备处理
@@ -306,6 +337,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                         {
                             m.HandMethod = processEntity.HandMethod;
                             m.ProcessedBy = processEntity.ProcessedBy;
+                        }
+
+                        m.PlanTypeText = m.PlanType == 0 ? string.Empty : m.PlanType?.GetDescription();
+
+                        //保养延期
+                        var deferEntity = deferOperations.FirstOrDefault(f => f.MaintenanceTaskId == m.Id);
+                        if (deferEntity != null)
+                        {
+                            m.IsDefer = TrueOrFalseEnum.Yes;
+                            m.DeferReason = m.PlanRemark;
                         }
 
                         return m;
@@ -384,7 +425,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             var MaintenanceItemSnapshotIds = taskitem.Select(e => e.MaintenanceItemSnapshotId);
             if (!MaintenanceItemSnapshotIds.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15903));
             }
             var taskitemSnap = await _equMaintenanceTaskSnapshotItemRepository.GetEntitiesAsync(new EquMaintenanceTaskSnapshotItemQuery { Ids = MaintenanceItemSnapshotIds });
             //单位
@@ -458,12 +499,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         {
             var result = new PagedInfo<EquMaintenanceTaskItemUnionSnapshotView>(Enumerable.Empty<EquMaintenanceTaskItemUnionSnapshotView>(), dto.PageIndex, dto.PageSize);
             result.Data = await querySnapshotItemAsync(new EquMaintenanceTaskSnapshotItemQueryDto { MaintenanceTaskId = dto.MaintenanceTaskId });
+            result.TotalCount = result.Data.Count();
             return result;
         }
 
 
         /// <summary>
-        /// 保存点检
+        /// 保存保养项
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
@@ -471,14 +513,42 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
         {
             var taskItemids = requestDto.Details.Select(x => x.Id);
 
-            var entitys = await _equMaintenanceTaskItemRepository.GetByIdsAsync(taskItemids.ToArray());
-            if (!entitys.Any()) return 0;
-
-            var site = entitys.FirstOrDefault()?.SiteId ?? 0;
-
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
+
+            var taskEntity = await _equMaintenanceTaskRepository.GetByIdAsync(requestDto.MaintenanceTaskId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15910));
+
+            //单据快照 更新执行人
+            var snapshotPlanEntitys = await _equMaintenanceTaskSnapshotPlanRepository.GetByTaskIdAsync(requestDto.MaintenanceTaskId);
+
+            var entitys = await _equMaintenanceTaskItemRepository.GetByIdsAsync(taskItemids.ToArray());
+            if (!entitys.Any()) return 0;
+
+            taskEntity.UpdatedBy = updatedBy;
+            taskEntity.UpdatedOn = updatedOn;
+
+            if (snapshotPlanEntitys is not null)
+            {
+                //更新执行人
+                snapshotPlanEntitys.ExecutorIds = updatedBy;
+                snapshotPlanEntitys.UpdatedBy = updatedBy;
+                snapshotPlanEntitys.UpdatedOn = updatedOn;
+                //校验是否超期
+                if (updatedOn < snapshotPlanEntitys.BeginTime)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15906)).WithData("time", snapshotPlanEntitys.BeginTime);
+                }
+                if (updatedOn > snapshotPlanEntitys.EndTime)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15907)).WithData("time", snapshotPlanEntitys.EndTime);
+                }
+            }
+
+            var snapshotItemEntitys = await _equMaintenanceTaskSnapshotItemRepository.GetByIdsAsync(taskItemids.ToArray());
+
+            var site = entitys.FirstOrDefault()?.SiteId ?? 0;
 
             // 样本附件
             List<InteAttachmentEntity> attachmentEntities = new();
@@ -495,6 +565,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 entity.Remark = transItem.Remark ?? string.Empty;
                 entity.UpdatedBy = updatedBy;
                 entity.UpdatedOn = updatedOn;
+
+                var currentDataType = snapshotItemEntitys.FirstOrDefault(x => x.Id == entity.MaintenanceItemSnapshotId)?.DataType;
+                if (currentDataType != null && currentDataType == EquMaintenanceDataTypeEnum.Numeric)
+                {
+                    if (!decimal.TryParse(entity.InspectionValue, out var v))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15905));
+                    }
+                }
 
                 var oneDetail = requestDto.Details.Where(x => x.Id == entity.Id).FirstOrDefault();
                 if (oneDetail == null) continue;
@@ -567,6 +646,20 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 });
             }
 
+            //更新task操作时间
+            rows += await _equMaintenanceTaskRepository.UpdateAsync(taskEntity);
+            //更新快照执行人
+            if (snapshotPlanEntitys != null)
+            {
+                rows += await _equMaintenanceTaskSnapshotPlanRepository.UpdateAsync(snapshotPlanEntitys);
+            }
+            //修改检验状态
+            rows += await OperationOrderAsync(new EquMaintenanceTaskOrderOperationStatusDto
+            {
+                OrderId = requestDto.MaintenanceTaskId,
+                OperationType = EquMaintenanceOperationTypeEnum.Start
+            });
+
             if (attachmentEntities.Any())
             {
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
@@ -596,25 +689,24 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11912))
                     .WithData("Before", EquMaintenanceTaskStautusEnum.Inspecting.GetDescription())
-                    .WithData("After", EquMaintenanceTaskStautusEnum.Completed.GetDescription());
+                    .WithData("After", "完成");
             }
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
-
-            // 检查每种类型是否已经录入足够
-            //var sampleEntities = await _equMaintenanceTaskItemRepository.GetEntitiesAsync(new QualFqcOrderSampleQuery
-            //{
-            //    SiteId = entity.SiteId,
-            //    FQCOrderId = entity.Id
-            //});
-
-            ////校验已检数量
-
-            //if (sampleEntities.Count() < entity.SampleQty)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES11716)).WithData("CheckedQty", sampleEntities.Count()).WithData("SampleQty", entity.SampleQty);
-            //}
+            //校验是否超期
+            var snapshotPlanEntitys = await _equMaintenanceTaskSnapshotPlanRepository.GetByTaskIdAsync(requestDto.Id);
+            if (snapshotPlanEntitys is not null)
+            {
+                if (updatedOn < snapshotPlanEntitys.BeginTime)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15906)).WithData("time", snapshotPlanEntitys.BeginTime);
+                }
+                if (updatedOn > snapshotPlanEntitys.EndTime)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15907)).WithData("time", snapshotPlanEntitys.EndTime);
+                }
+            }
 
             // 读取所有明细参数
             var sampleDetailEntities = await _equMaintenanceTaskItemRepository.GetEntitiesAsync(new EquMaintenanceTaskItemQuery
@@ -623,16 +715,35 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 MaintenanceTaskId = entity.Id
             });
 
-            var operationType = EquMaintenanceOperationTypeEnum.Complete;
+            var snapshotItem = await _equMaintenanceTaskSnapshotItemRepository.GetByIdsAsync(sampleDetailEntities.Select(x => x.MaintenanceItemSnapshotId).ToArray());
 
             //检验值是否为空
-            if (sampleDetailEntities.Any(x => string.IsNullOrEmpty(x.InspectionValue)))
+            if (sampleDetailEntities.Any(x => string.IsNullOrEmpty(x.InspectionValue) || x.IsQualified == TrueFalseEmptyEnum.Empty))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15902));
+                var taskItemUnions = from a in sampleDetailEntities
+                                     join b in snapshotItem on a.MaintenanceItemSnapshotId equals b.Id
+                                     select new { b.Code, b.DataType, a.InspectionValue, a.IsQualified };
+
+                //验证数值类型是否为空
+                var emptyAndNumericsCodes = taskItemUnions.Where(x => string.IsNullOrWhiteSpace(x.InspectionValue) && x.DataType == EquMaintenanceDataTypeEnum.Numeric).Select(s => s.Code);
+                if (emptyAndNumericsCodes.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15915)).WithData("Code", emptyAndNumericsCodes);
+                }
+
+                //验证合格是否处理
+                var unQualifiedCodes = taskItemUnions.Where(x => x.IsQualified == TrueFalseEmptyEnum.Empty).Select(s => s.Code);
+                if (unQualifiedCodes.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15914)).WithData("Code", string.Join(',', unQualifiedCodes));
+                }
+               
             }
 
+            var operationType = EquMaintenanceOperationTypeEnum.Complete;
+
             //有任一不合格，完成
-            if (sampleDetailEntities.Any(X => X.IsQualified == TrueOrFalseEnum.No))
+            if (sampleDetailEntities.Any(X => X.IsQualified == TrueFalseEmptyEnum.No))
             {
                 entity.Status = EquMaintenanceTaskStautusEnum.Completed;
                 entity.IsQualified = TrueOrFalseEnum.No;
@@ -642,6 +753,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             {
                 // 默认是关闭
                 entity.Status = EquMaintenanceTaskStautusEnum.Closed;
+                entity.IsQualified = TrueOrFalseEnum.Yes;
                 operationType = EquMaintenanceOperationTypeEnum.Close;
             }
 
@@ -670,8 +782,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             if (entity.Status != EquMaintenanceTaskStautusEnum.Completed)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11912))
-                    .WithData("Before", InspectionStatusEnum.Completed.GetDescription())
-                    .WithData("After", InspectionStatusEnum.Closed.GetDescription());
+                    .WithData("Before", EquMaintenanceTaskStautusEnum.Completed.GetDescription())
+                    .WithData("After", "结果处理");
+                //.WithData("After", EquMaintenanceTaskStautusEnum.Closed.GetDescription());
             }
 
             // 不合格处理完成之后直接关闭（无需变为合格）
@@ -683,6 +796,52 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             trans.Complete();
             return rows;
         }
+
+        /// <summary>
+        /// 保养延期
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<int> DeferOrderAsync(EquMaintenanceTaskDeferDto requestDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            if (!requestDto.PlanBeginTime.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15922));
+
+            //保养单
+            var entity = await _equMaintenanceTaskRepository.GetByIdAsync(requestDto.MaintenanceTaskId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            //当前日期
+            var nowtime = HymsonClock.Now();
+
+            //保养快照单
+            var snapShotPlan = await _equMaintenanceTaskSnapshotPlanRepository.GetByTaskIdAsync(requestDto.MaintenanceTaskId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15908));
+
+            if (nowtime < snapShotPlan.BeginTime)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15909)).WithData("time", snapShotPlan.BeginTime);
+            }
+
+            //时间差
+            TimeSpan timeDifference = snapShotPlan.EndTime.GetValueOrDefault() - snapShotPlan.BeginTime.GetValueOrDefault();
+            snapShotPlan.BeginTime = requestDto.PlanBeginTime;
+            //推算endtime
+            snapShotPlan.EndTime = requestDto.PlanBeginTime!.Value.Add(timeDifference);
+            snapShotPlan.Remark = requestDto.Remark ?? string.Empty;
+
+            if (nowtime > snapShotPlan.EndTime) throw new CustomerValidationException(nameof(ErrorCode.MES15923)).WithData("time", snapShotPlan.BeginTime);
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await CommonOperationAsync(entity, EquMaintenanceOperationTypeEnum.Defer);
+            rows += await _equMaintenanceTaskSnapshotPlanRepository.UpdateAsync(snapShotPlan);
+            trans.Complete();
+            return rows;
+        }
+
 
         /// <summary>
         /// 通用操作（未加事务）
@@ -700,15 +859,18 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             // 更新
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
-            if (operationType == EquMaintenanceOperationTypeEnum.Start)
-            {
-                entity.BeginTime = updatedOn;
-            }
-            else
-            {
-                entity.EndTime = updatedOn;
-            }
 
+            if (operationType != EquMaintenanceOperationTypeEnum.Defer)
+            {
+                if (operationType == EquMaintenanceOperationTypeEnum.Start)
+                {
+                    entity.BeginTime = updatedOn;
+                }
+                else
+                {
+                    entity.EndTime = updatedOn;
+                }
+            }
 
             var rows = 0;
             rows += await _equMaintenanceTaskRepository.UpdateAsync(entity);
@@ -797,7 +959,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
                 rows += await _inteAttachmentRepository.InsertRangeAsync(inteAttachmentEntities);
                 rows += await _equMaintenanceTaskAttachmentRepository.InsertRangeAsync(orderAttachmentEntities);
                 trans.Complete();
-            }catch(Exception ex) { }
+            }
+            catch (Exception ex) { }
             return rows;
         }
 

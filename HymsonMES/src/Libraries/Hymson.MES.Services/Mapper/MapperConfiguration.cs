@@ -44,6 +44,8 @@ using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
+using Hymson.MES.Data.Repositories.Marking.Query;
+using Hymson.MES.Data.Repositories.Marking;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Plan.Query;
@@ -67,6 +69,7 @@ using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionTail.View;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
 using Hymson.MES.Data.Repositories.Query;
+using Hymson.MES.Data.Repositories.Report.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Data.Repositories.WhShipment.Query;
@@ -84,6 +87,7 @@ using Hymson.MES.Services.Dtos.Inte;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
+using Hymson.MES.Services.Dtos.Marking;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Qual;
@@ -99,6 +103,21 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
+using Hymson.MES.Services.Dtos.EquRepairOrder;
+using Hymson.MES.Core.Domain.EquRepairOrder;
+using Hymson.MES.Data.Repositories.EquRepairOrder;
+using Hymson.MES.Core.Domain.EquSparepartInventory;
+using Hymson.MES.Data.Repositories.EquSparepartInventory;
+using Hymson.MES.Services.Dtos.EquEquipmentRecord;
+using Hymson.MES.Core.Domain.EquEquipmentRecord;
+using Hymson.MES.Data.Repositories.EquEquipmentRecord;
+using Hymson.MES.Services.Dtos.EquSparepartRecord;
+using Hymson.MES.Core.Domain.EquSparepartRecord;
+using Hymson.MES.Data.Repositories.EquSparepartRecord;
+using Hymson.MES.Services.Dtos.EquSparepartInventory;
+using Hymson.MES.Data.Repositories.Equipment.View;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteBusinessField.View;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -256,6 +275,20 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            #region EquToolingType
+            CreateMap<EquToolingTypeQueryDto, EquToolingTypePagedQuery>();
+            CreateMap<EquToolingTypeEntity, EquToolingTypeDto>();
+            CreateMap<EquToolingTypeSaveDto, EquToolingTypeEntity>();
+
+            #endregion
+
+            #region EquToolsManage
+            CreateMap<EquToolingManagePagedQueryDto, IEquToolingManagePagedQuery>();
+            CreateMap<EquToolingManageView, EquToolingManageViewDto>();
+            CreateMap<EquToolingTypeSaveDto, EquToolingTypeEntity>();
+
+            #endregion
+
             #region EquSpareParts
             CreateMap<EquSparePartsSaveDto, EquSparePartsEntity>();
             CreateMap<EquSparePartsPagedQueryDto, EquSparePartsPagedQuery>();
@@ -338,6 +371,56 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<EquMaintenancePlanDto, EquMaintenancePlanEntity>();
             CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
+            #endregion
+
+            #region EquRepairOrder
+            CreateMap<EquRepairOrderCreateDto, EquRepairOrderEntity>();
+            CreateMap<EquRepairOrderModifyDto, EquRepairOrderEntity>();
+            CreateMap<EquRepairOrderPagedQueryDto, EquRepairOrderPagedQuery>();
+            CreateMap<EquRepairOrderEntity, EquRepairOrderDto>();
+            CreateMap<EquRepairOrderPageView, EquRepairOrderDto>();
+
+            CreateMap<EquRepairOrderDto, EquRepairOrderEntity>();
+            #endregion
+
+            #region EquSparepartInventory
+            CreateMap<EquSparepartInventoryCreateDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparepartInventoryModifyDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparepartInventoryPagedQueryDto, EquSparepartInventoryPagedQuery>();
+            CreateMap<EquSparepartInventoryEntity, EquSparepartInventoryDto>();
+            CreateMap<EquSparepartInventoryPageView, EquSparepartInventoryPageDto>();
+
+            CreateMap<EquSparepartInventoryDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparePartEntity, EquSparepartRecordEntity>();
+            #endregion
+
+            #region EquEquipmentRecord
+            CreateMap<EquEquipmentRecordPagedQueryDto, EquEquipmentRecordPagedQuery>();
+            CreateMap<EquEquipmentRecordEntity, EquEquipmentRecordDto>();
+            CreateMap<EquEquipmentRecordPagedView, EquEquipmentRecordPagedViewDto>();
+
+            CreateMap<EquEquipmentRecordDto, EquEquipmentRecordEntity>();
+            #endregion
+
+
+            #region EquSparepartRecord
+            CreateMap<EquSparepartRecordPagedQueryDto, EquSparepartRecordPagedQuery>();
+            CreateMap<EquSparepartRecordEntity, EquSparepartRecordDto>();
+            CreateMap<EquSparepartRecordPagedView, EquSparepartRecordPagedViewDto>();
+
+            CreateMap<EquSparepartRecordDto, EquSparepartRecordEntity>();
+            #endregion
+
+            #region  EquSparepartEquipmentBindRecord
+            CreateMap<EquSparepartEquipmentBindRecordPagedQueryDto, EquSparepartEquipmentBindRecordPagedQuery>();
+            CreateMap<EquSparepartEquipmentBindRecordView, EquSparepartEquipmentBindRecordViewDto>();
+            CreateMap<EquSparepartEquipmentBindRecordEntity, EquSparepartEquipmentBindRecordDto>();
+            #endregion
+
+            #region  EquToolsEquipmentBindRecord
+            CreateMap<EquToolsEquipmentBindRecordPagedQueryDto, EquToolsEquipmentBindRecordPagedQuery>();
+            CreateMap<EquToolsEquipmentBindRecordView, EquToolsEquipmentBindRecordViewDto>();
+            CreateMap<EquToolsEquipmentBindRecordEntity, EquToolsEquipmentBindRecordDto>();
             #endregion
 
         }
@@ -575,6 +658,31 @@ namespace Hymson.MES.Services.Mapper
 
             #region PlanShift
             CreateMap<PlanShiftPagedQueryDto, PlanShiftPagedQuery>();
+            #endregion
+
+            #region InteBusinessField
+            CreateMap<InteBusinessFieldSaveDto, InteBusinessFieldEntity>();
+            CreateMap<InteBusinessFieldPagedQueryDto, InteBusinessFieldPagedQuery>();
+            CreateMap<InteBusinessFieldEntity, InteBusinessFieldDto>();
+            CreateMap<InteBusinessFieldEntity, MaskInfoViewDto>();
+            CreateMap<InteBusinessFieldListEntity, InteBusinessFieldListDto>();
+            CreateMap<InteBusinessFieldView, MaskInfoViewDto>();
+
+            #endregion
+
+            #region InteBusinessFieldDistribute
+            CreateMap<InteBusinessFieldDistributeSaveDto, InteBusinessFieldDistributeEntity>();
+            CreateMap<InteBusinessFieldDistributePagedQueryDto, InteBusinessFieldDistributePagedQuery>();
+            CreateMap<InteBusinessFieldDistributeEntity, InteBusinessFieldDistributeDto>();
+
+            CreateMap<InteBusinessFieldDistributeDetailsEntity, InteBusinessFieldDistributeDetailsDto>();
+            CreateMap<InteBusinessFieldDistributeDetailsEntity, BusinessFieldViewDto>();
+
+            #endregion
+
+            #region InteQualificationAuthentication
+            CreateMap<InteQualificationAuthenticationPagedQueryDto, InteQualificationAuthenticationPagedQuery>();
+            CreateMap<InteQualificationAuthenticationEntity, InteQualificationAuthenticationDto>();
             #endregion
         }
 
@@ -1299,6 +1407,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuProductNGBarCodeDto, ManuMisjudgmentBarCodeDto>();
             CreateMap<ManuProductBarCodeDto, ManuReworkBarCodeDto>();
             #endregion
+
+            #region ManuJointProductAndByproductsReceiveRecord
+            CreateMap<ManuJointProductAndByproductsReceiveRecordEntity, ManuJointProductAndByproductsReceiveRecordSaveDto>();
+            CreateMap<ManuJointProductAndByproductsReceiveRecordPagedQueryDto, ManuJointProductAndByproductsReceiveRecordPagedQuery>();
+
+            #endregion
         }
 
         /// <summary>
@@ -1444,6 +1558,17 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             CreateMap<NodeSourceBo, NodeSourceDto>();
+
+            #region ManuDowngradingDetailReport
+            CreateMap<ManuDowngradingDetailReportPagedQueryDto, ManuDowngradingDetailReportPagedQuery>();
+            #endregion
+
+            CreateMap<VehicleFreightRecordQueryDto, InteVehicleFreightRecordPagedQuery>();
+
+            #region MarkingInterceptReport
+            CreateMap<MarkingInterceptReportPagedQueryDto, MarkingReportReportPagedQuery>();
+            CreateMap<MarkingRecordQueryReportView, MarkingRecordReportDto>();
+            #endregion
         }
 
         /// <summary>

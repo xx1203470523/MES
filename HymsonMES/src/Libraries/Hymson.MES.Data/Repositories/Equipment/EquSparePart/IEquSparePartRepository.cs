@@ -61,6 +61,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         Task<EquSparePartEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquSparePartEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>

@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -93,39 +94,56 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId=@SiteId");
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("CreatedOn DESC");
+            sqlBuilder.LeftJoin("equ_spotcheck_plan_equipment_relation esper ON esper.SpotCheckPlanId = esp.Id");
+            sqlBuilder.LeftJoin("equ_equipment ee ON ee.Id = esper.EquipmentId");
+            sqlBuilder.Where("esp.IsDeleted=0");
+            sqlBuilder.Where("esp.SiteId=@SiteId");
+            sqlBuilder.Select("esp.*");
+            sqlBuilder.OrderBy("esp.CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Code))
             {
-                sqlBuilder.Where("Code=@Code");
+                equSpotcheckPlanPagedQuery.Code = $"%{equSpotcheckPlanPagedQuery.Code}%";
+                sqlBuilder.Where("esp.Code LIKE @Code");
             }
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Name))
             {
-                sqlBuilder.Where("Name=@Name");
+                equSpotcheckPlanPagedQuery.Name = $"%{equSpotcheckPlanPagedQuery.Name}%";
+                sqlBuilder.Where("esp.Name LIKE @Name");
             }
             if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.Version))
             {
-                sqlBuilder.Where("Version=@Version");
+                equSpotcheckPlanPagedQuery.Version = $"%{equSpotcheckPlanPagedQuery.Version}%";
+                sqlBuilder.Where("esp.Version LIKE @Version");
             }
             if (equSpotcheckPlanPagedQuery.Status.HasValue)
             {
-                sqlBuilder.Where("Status=@Status");
+                sqlBuilder.Where("esp.Status=@Status");
             }
             if (equSpotcheckPlanPagedQuery.Type.HasValue)
             {
-                sqlBuilder.Where("Type=@Type");
+                sqlBuilder.Where("esp.Type=@Type");
             }
-            //if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.EquipmentCode))
-            //{
-            //    sqlBuilder.Where("EquipmentCode=@EquipmentCode");
-            //}
-            //if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.EquipmentName))
-            //{
-            //    sqlBuilder.Where("EquipmentName=@EquipmentName");
-            //}
 
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.EquipmentCode))
+            {
+                equSpotcheckPlanPagedQuery.EquipmentCode = $"%{equSpotcheckPlanPagedQuery.EquipmentCode}%";
+                sqlBuilder.Where("ee.EquipmentCode LIKE @EquipmentCode");
+            }
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.EquipmentName))
+            {
+                equSpotcheckPlanPagedQuery.EquipmentName = $"%{equSpotcheckPlanPagedQuery.EquipmentName}%";
+                sqlBuilder.Where("ee.EquipmentName LIKE @EquipmentName");
+            }
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.ExecutorIds))
+            {
+                equSpotcheckPlanPagedQuery.ExecutorIds = $"%{equSpotcheckPlanPagedQuery.ExecutorIds}%";
+                sqlBuilder.Where("esper.ExecutorIds LIKE @ExecutorIds");
+            }
+            if (!string.IsNullOrWhiteSpace(equSpotcheckPlanPagedQuery.LeaderIds))
+            {
+                equSpotcheckPlanPagedQuery.LeaderIds = $"%{equSpotcheckPlanPagedQuery.LeaderIds}%";
+                sqlBuilder.Where("esper.LeaderIds LIKE @LeaderIds");
+            }
 
             var offSet = (equSpotcheckPlanPagedQuery.PageIndex - 1) * equSpotcheckPlanPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -204,31 +222,31 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlan
     public partial class EquSpotcheckPlanRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spotcheck_plan` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spotcheck_plan` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spotcheck_plan`  esp /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spotcheck_plan` esp  /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEquSpotcheckPlanEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `equ_spotcheck_plan` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_spotcheck_plan`(  `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`) VALUES (   @Id, @Code, @Name, @Version, @Type, @Status, @BeginTime, @EndTime, @CornExpression, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ExecutorIds, @LeaderIds )  ";
-        const string InsertsSql = "INSERT INTO `equ_spotcheck_plan`(  `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`) VALUES (   @Id, @Code, @Name, @Version, @Type, @Status, @BeginTime, @EndTime, @CornExpression, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ExecutorIds, @LeaderIds )  ";
+        const string InsertSql = "INSERT INTO `equ_spotcheck_plan`(  `Id`, `Code`, `Name`, `Version`, `Type`, `CycleType`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`) VALUES (   @Id, @Code, @Name, @Version, @Type,@CycleType,  @Status, @BeginTime, @EndTime, @CornExpression, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ExecutorIds, @LeaderIds )  ";
+        const string InsertsSql = "INSERT INTO `equ_spotcheck_plan`(  `Id`, `Code`, `Name`, `Version`, `Type`, `CycleType`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`) VALUES (   @Id, @Code, @Name, @Version, @Type,@CycleType,  @Status, @BeginTime, @EndTime, @CornExpression, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ExecutorIds, @LeaderIds )  ";
 
-        const string UpdateSql = "UPDATE `equ_spotcheck_plan` SET   Code = @Code, Name = @Name, Version = @Version, Type = @Type, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, CornExpression = @CornExpression, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_spotcheck_plan` SET   Code = @Code, Name = @Name, Version = @Version, Type = @Type, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, CornExpression = @CornExpression, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_spotcheck_plan` SET   Code = @Code, Name = @Name, Version = @Version, Type = @Type, CycleType = @CycleType, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, CornExpression = @CornExpression, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `equ_spotcheck_plan` SET   Code = @Code, Name = @Name, Version = @Version, Type = @Type, CycleType = @CycleType,  Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, CornExpression = @CornExpression, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `equ_spotcheck_plan` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `equ_spotcheck_plan` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
+                               `Id`, `Code`, `Name`, `Version`, `Type`, `CycleType`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
                             FROM `equ_spotcheck_plan`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
+                                          `Id`, `Code`, `Name`, `Version`, `Type`, `CycleType`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
                             FROM `equ_spotcheck_plan`  WHERE Id IN @Ids ";
 
         const string GetByCodeSql = @"SELECT  
-                               `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
-                            FROM `equ_spotcheck_plan`  WHERE Code = @Code AND Version=@Version AND SiteId=@SiteId";
+                               `Id`, `Code`, `Name`, `Version`, `Type`, `CycleType`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
+                            FROM `equ_spotcheck_plan`  WHERE Code = @Code AND Version=@Version AND SiteId=@SiteId AND IsDeleted=0";
         #endregion
     }
 }

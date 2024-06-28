@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// <summary>
         /// 计划开始时间  时间范围  数组
         /// </summary>
-        public DateTime[]? PlanStartTime { get; set; }
+        public DateTime[]? PlanBeginTime { get; set; }
 
         /// <summary>
         /// 任务Ids

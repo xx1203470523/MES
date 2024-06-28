@@ -275,29 +275,31 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.LeftJoin("proc_resource_equipment_bind preb ON preb.EquipmentId = EE.Id");
-            sqlBuilder.LeftJoin("inte_work_center_resource_relation iwcrr ON iwcrr.ResourceId = preb.ResourceId");
-            sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = iwcrr.WorkCenterId");
-            sqlBuilder.LeftJoin("equ_equipment_group eeg ON eeg.Id = EE.EquipmentGroupId");
-            sqlBuilder.LeftJoin("equ_spotcheck_template_equipment_group_relation estegr ON estegr.EquipmentGroupId = eeg.Id");
-            sqlBuilder.LeftJoin("equ_spotcheck_template est ON est.Id = estegr.SpotCheckTemplateId");
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountCOUNTSqlTemplate);
+            sqlBuilder.LeftJoin("proc_resource_equipment_bind preb ON preb.EquipmentId = EE.Id AND preb.IsDeleted = 0");
+            sqlBuilder.LeftJoin("inte_work_center_resource_relation iwcrr ON iwcrr.ResourceId = preb.ResourceId AND iwcrr.IsDeleted = 0");
+            sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = iwcrr.WorkCenterId AND IWC.IsDeleted = 0");
+            sqlBuilder.LeftJoin("equ_equipment_group eeg ON eeg.Id = EE.EquipmentGroupId AND eeg.IsDeleted = 0");
+
+
             if (pagedQuery.EopType == 1)
             {
-                sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id AND eop.Type=1");
+                sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id AND eop.IsDeleted = 0 AND eop.Type=1");
             }
             else if (pagedQuery.EopType == 2)
             {
-                sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id AND eop.Type=2");
+                sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id  AND eop.IsDeleted = 0 AND eop.Type=2");
             }
             else
             {
                 sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id");
             }
-            sqlBuilder.Select("EE.*,EE.Id as EquipmentId,IWC.Name as WorkCenterShopName,IWC.Code as WorkCenterCode,eeg.EquipmentGroupCode,est.Id as TemplateId,est.Code as TemplateCode,est.Version as TemplateVersion,eop.ExecutorIds,eop.LeaderIds");
+
+            sqlBuilder.Select(" EE.Id, EE.EquipmentCode, EE.EquipmentName,EE.Location,EE.UpdatedBy, EE.UpdatedOn,EE.Id as EquipmentId,EE.EquipmentGroupId,IWC.Name as WorkCenterShopName,IWC.Code as WorkCenterCode,eeg.EquipmentGroupCode,eop.ExecutorIds,eop.LeaderIds");
             sqlBuilder.Where("EE.IsDeleted = 0");
             sqlBuilder.Where("EE.SiteId = @SiteId");
             sqlBuilder.OrderBy("EE.UpdatedOn DESC");
+            sqlBuilder.GroupBy("EE.Id, EE.EquipmentCode, EE.EquipmentName,EE.Location,EE.UpdatedBy, EE.UpdatedOn,EE.EquipmentGroupId,IWC.Name,IWC.Code,eeg.EquipmentGroupCode,eop.ExecutorIds,eop.LeaderIds");
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
             {
                 sqlBuilder.Where("EE.EquipmentCode = @EquipmentCode");
@@ -361,8 +363,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string GetByGroupIdSql = "SELECT * FROM `equ_equipment` WHERE SiteId = @SiteId AND `IsDeleted` = 0 AND (EquipmentGroupId = 0 OR EquipmentGroupId = @EquipmentGroupId);";
         const string GetBaseListSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND SiteId = @SiteId;";
         const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE IsDeleted = 0 AND SiteId = @Site AND EquipmentCode = @Code;";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/ /**groupby**/  /**orderby**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/  /**groupby**/  /**orderby**/ ";
+        const string GetPagedInfoCountCOUNTSqlTemplate = "SELECT COUNT(*) FROM (SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/  /**groupby**/  /**orderby**/)x";
         const string GetEntitiesSqlTemplate = "SELECT * FROM `equ_equipment` /**where**/ ";
         /// <summary>
         /// 

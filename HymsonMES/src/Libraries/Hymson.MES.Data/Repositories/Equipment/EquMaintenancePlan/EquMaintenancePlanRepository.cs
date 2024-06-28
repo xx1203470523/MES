@@ -94,40 +94,56 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId=@SiteId");
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("CreatedOn DESC");
+            sqlBuilder.LeftJoin("equ_maintenance_plan_equipment_relation emper ON emp.Id=emper.MaintenancePlanId");
+            sqlBuilder.LeftJoin("equ_equipment ee ON ee.Id = emper.EquipmentId");
+            sqlBuilder.Where("emp.IsDeleted=0");
+            sqlBuilder.Where("emp.SiteId=@SiteId");
+            sqlBuilder.Select("DISTINCT emp.*");
+            sqlBuilder.OrderBy("emp.CreatedOn DESC");
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Code))
             {
                 EquMaintenancePlanPagedQuery.Code = $"%{EquMaintenancePlanPagedQuery.Code}%";
-                sqlBuilder.Where("Code LIKE @Code");
+                sqlBuilder.Where("emp.Code LIKE @Code");
             }
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Name))
             {
                 EquMaintenancePlanPagedQuery.Name = $"%{EquMaintenancePlanPagedQuery.Name}%";
-                sqlBuilder.Where("Name LIKE @Name");
+                sqlBuilder.Where("emp.Name LIKE @Name");
             }
             if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.Version))
             {
-                sqlBuilder.Where("Version=@Version");
+                EquMaintenancePlanPagedQuery.Version = $"%{EquMaintenancePlanPagedQuery.Version}%";
+                sqlBuilder.Where("emp.Version LIKE @Version");
             }
             if (EquMaintenancePlanPagedQuery.Status.HasValue)
             {
-                sqlBuilder.Where("Status=@Status");
+                sqlBuilder.Where("emp.Status=@Status");
             }
             if (EquMaintenancePlanPagedQuery.Type.HasValue)
             {
-                sqlBuilder.Where("Type=@Type");
+                sqlBuilder.Where("emp.Type=@Type");
             }
-            //if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.EquipmentCode))
-            //{
-            //    sqlBuilder.Where("EquipmentCode=@EquipmentCode");
-            //}
-            //if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.EquipmentName))
-            //{
-            //    sqlBuilder.Where("EquipmentName=@EquipmentName");
-            //}
+
+            if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.EquipmentCode))
+            {
+                EquMaintenancePlanPagedQuery.EquipmentCode = $"%{EquMaintenancePlanPagedQuery.EquipmentCode}%";
+                sqlBuilder.Where("ee.EquipmentCode LIKE @EquipmentCode");
+            }
+            if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.EquipmentName))
+            {
+                EquMaintenancePlanPagedQuery.EquipmentName = $"%{EquMaintenancePlanPagedQuery.EquipmentName}%";
+                sqlBuilder.Where("ee.EquipmentName LIKE @EquipmentName");
+            }
+            if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.ExecutorIds))
+            {
+                EquMaintenancePlanPagedQuery.ExecutorIds = $"%{EquMaintenancePlanPagedQuery.ExecutorIds}%";
+                sqlBuilder.Where("emper.ExecutorIds LIKE @ExecutorIds");
+            }
+            if (!string.IsNullOrWhiteSpace(EquMaintenancePlanPagedQuery.LeaderIds))
+            {
+                EquMaintenancePlanPagedQuery.LeaderIds = $"%{EquMaintenancePlanPagedQuery.LeaderIds}%";
+                sqlBuilder.Where("emper.LeaderIds LIKE @LeaderIds");
+            }
 
 
             var offSet = (EquMaintenancePlanPagedQuery.PageIndex - 1) * EquMaintenancePlanPagedQuery.PageSize;
@@ -207,31 +223,31 @@ namespace Hymson.MES.Data.Repositories.EquMaintenancePlan
     public partial class EquMaintenancePlanRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_plan` /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_Maintenance_plan` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_Maintenance_plan` emp /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/   /**groupby**/   LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_Maintenance_plan` emp /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/ ";
         const string GetEquMaintenancePlanEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `equ_Maintenance_plan` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_Maintenance_plan`(  `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`) VALUES (   @Id, @Code, @Name, @Version, @Type, @Status, @BeginTime, @EndTime, @CornExpression, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ExecutorIds, @LeaderIds )  ";
-        const string InsertsSql = "INSERT INTO `equ_Maintenance_plan`(  `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`) VALUES (   @Id, @Code, @Name, @Version, @Type, @Status, @BeginTime, @EndTime, @CornExpression, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ExecutorIds, @LeaderIds )  ";
+        const string InsertSql = "INSERT INTO `equ_Maintenance_plan`(  `Id`, `Code`, `Name`, `Version`, `Type`, `CycleType`,`Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`) VALUES (   @Id, @Code, @Name, @Version, @Type, @CycleType, @Status, @BeginTime, @EndTime, @CornExpression, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ExecutorIds, @LeaderIds )  ";
+        const string InsertsSql = "INSERT INTO `equ_Maintenance_plan`(  `Id`, `Code`, `Name`, `Version`, `Type`,`CycleType`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`) VALUES (   @Id, @Code, @Name, @Version, @Type, @CycleType, @Status, @BeginTime, @EndTime, @CornExpression, @IsSkipHoliday, @FirstExecuteTime, @Cycle, @CompletionHour, @CompletionMinute, @PreGeneratedMinute, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ExecutorIds, @LeaderIds )  ";
 
-        const string UpdateSql = "UPDATE `equ_Maintenance_plan` SET   Code = @Code, Name = @Name, Version = @Version, Type = @Type, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, CornExpression = @CornExpression, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_Maintenance_plan` SET   Code = @Code, Name = @Name, Version = @Version, Type = @Type, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, CornExpression = @CornExpression, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_Maintenance_plan` SET   Code = @Code, Name = @Name, Version = @Version, Type = @Type,  CycleType = @CycleType, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, CornExpression = @CornExpression, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `equ_Maintenance_plan` SET   Code = @Code, Name = @Name, Version = @Version, Type = @Type,  CycleType = @CycleType, Status = @Status, BeginTime = @BeginTime, EndTime = @EndTime, CornExpression = @CornExpression, IsSkipHoliday = @IsSkipHoliday, FirstExecuteTime = @FirstExecuteTime, Cycle = @Cycle, CompletionHour = @CompletionHour, CompletionMinute = @CompletionMinute, PreGeneratedMinute = @PreGeneratedMinute, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `equ_Maintenance_plan` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `equ_Maintenance_plan` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
+                               `Id`, `Code`, `Name`, `Version`, `Type`, `CycleType`,`Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
                             FROM `equ_Maintenance_plan`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
+                                          `Id`, `Code`, `Name`, `Version`, `Type`,`CycleType`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
                             FROM `equ_Maintenance_plan`  WHERE Id IN @Ids ";
 
         const string GetByCodeSql = @"SELECT  
-                               `Id`, `Code`, `Name`, `Version`, `Type`, `Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
-                            FROM `equ_Maintenance_plan`  WHERE Code = @Code AND Version=@Version AND SiteId=@SiteId";
+                               `Id`, `Code`, `Name`, `Version`, `Type`, `CycleType`,`Status`, `BeginTime`, `EndTime`, `CornExpression`, `IsSkipHoliday`, `FirstExecuteTime`, `Cycle`, `CompletionHour`, `CompletionMinute`, `PreGeneratedMinute`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ExecutorIds`, `LeaderIds`
+                            FROM `equ_Maintenance_plan`  WHERE Code = @Code AND Version=@Version AND SiteId=@SiteId AND IsDeleted=0";
         #endregion
     }
 }

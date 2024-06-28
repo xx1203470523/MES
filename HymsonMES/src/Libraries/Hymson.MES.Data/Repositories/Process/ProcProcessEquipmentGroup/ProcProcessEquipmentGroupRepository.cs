@@ -168,6 +168,16 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryFirstOrDefaultAsync<ProcProcessEquipmentGroupEntity>(GetByCodeSql, query);
         }
 
+        /// <summary>
+        /// 更具编码获取参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcEquipmentGroupParamEntity>> GetByCodesAsync(ProcProcessEquipmentGroupByCodeQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcEquipmentGroupParamEntity>(GetByCodesSql, param);
+        }
     }
 
 
@@ -196,5 +206,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string GetByCodeSql = "SELECT * FROM proc_process_equipment_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
 
+        const string GetByCodesSql = @"SELECT * FROM `proc_process_equipment_group` WHERE Code IN @Codes AND SiteId= @SiteId  AND IsDeleted=0 ";
     }
 }

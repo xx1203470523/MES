@@ -51,12 +51,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 点检执行人;
         /// </summary>
-        public string Executorids { get; set; }
+        public string ExecutorIds { get; set; }
 
         /// <summary>
         /// 点检负责人;
         /// </summary>
-        public string Leaderids { get; set; }
+        public string LeaderIds { get; set; }
 
         /// <summary>
         /// 描述

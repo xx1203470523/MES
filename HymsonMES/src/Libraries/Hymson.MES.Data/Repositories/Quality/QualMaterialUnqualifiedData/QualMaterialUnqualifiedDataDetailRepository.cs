@@ -119,6 +119,14 @@ namespace Hymson.MES.Data.Repositories.Quality
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
 
+            if (query.UnqualifiedGroupId.HasValue)
+            {
+                sqlBuilder.Where(" UnqualifiedGroupId=@UnqualifiedGroupId ");
+            }
+            if (query.UnqualifiedCodeId.HasValue)
+            {
+                sqlBuilder.Where(" UnqualifiedCodeId=@UnqualifiedCodeId ");
+            }
             if (query.MaterialUnqualifiedDataId.HasValue)
             {
                 sqlBuilder.Where(" MaterialUnqualifiedDataId=@MaterialUnqualifiedDataId ");

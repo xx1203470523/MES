@@ -3,8 +3,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.BackgroundTasks;
 using Hymson.MES.BackgroundTasks.HostedServices;
 using Hymson.MES.BackgroundTasks.Jobs;
-using Hymson.MES.BackgroundTasks.Manufacture;
-using Hymson.MES.BackgroundTasks.Quality;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Print.Options;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +12,8 @@ using NLog;
 using Quartz;
 using System.Reflection;
 using AutoMapper;
+using Hymson.MES.BackgroundTasks.Jobs.Manufacture;
+using Hymson.MES.BackgroundTasks.Jobs.Quality;
 
 try
 {

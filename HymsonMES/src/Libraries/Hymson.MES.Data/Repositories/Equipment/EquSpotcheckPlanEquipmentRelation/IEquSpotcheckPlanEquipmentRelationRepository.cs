@@ -89,6 +89,13 @@ namespace Hymson.MES.Data.Repositories.EquSpotcheckPlanEquipmentRelation
         Task<IEnumerable<EquSpotcheckPlanEquipmentRelationEntity>> GetBySpotCheckPlanIdsAsync(long spotCheckPlanId);
 
         /// <summary>
+        /// 根据SpotCheckTemplateIds批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquSpotcheckPlanEquipmentRelationEntity>> GetBySpotCheckSpotCheckTemplateIdsAsync(IEnumerable<long> spotCheckTemplateIds);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="equSpotcheckPlanEquipmentRelationQuery"></param>

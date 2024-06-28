@@ -8,6 +8,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
@@ -98,16 +99,18 @@ namespace Hymson.MES.Services.Services.Report
 
                     listDto.Add(new WorkOrderControlReportViewDto
                     {
+                        Id = item.Id,
+                        WorkOrderId=item.Id,
                         Status = item.Status,
                         Qty = item.Qty,
                         MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
                         WorkCenterId = item.WorkCenterCode ?? "",
                         OrderCode = item?.OrderCode ?? "",
                         Type = item?.Type,
-                        PassDownQuantity = item.PassDownQuantity,
-                        ProcessDownQuantity = item.PassDownQuantity- item.PassDownQuantity- item.FinishProductQuantity,
-                        UnQualifiedQuantity = item.PassDownQuantity,
-                        FinishProductQuantity = item.FinishProductQuantity,
+                        PassDownQuantity = item?.PassDownQuantity ?? 0,
+                        ProcessDownQuantity = item?.PassDownQuantity ?? 0 - item?.UnQualifiedQuantity ?? 0 - item?.FinishProductQuantity ?? 0,
+                        UnQualifiedQuantity = item?.UnQualifiedQuantity ?? 0,
+                        FinishProductQuantity = item?.FinishProductQuantity ?? 0,
                     });
                 }
 

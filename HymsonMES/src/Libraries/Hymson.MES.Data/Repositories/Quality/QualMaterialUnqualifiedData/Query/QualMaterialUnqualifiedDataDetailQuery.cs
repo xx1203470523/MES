@@ -14,5 +14,15 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 不良Id列表
         /// </summary>
         public IEnumerable<long>? MaterialUnqualifiedDataIds { get; set; }
+
+        /// <summary>
+        /// 不合格代码组ID
+        /// </summary>
+        public long? UnqualifiedGroupId { get; set; }
+
+        /// <summary>
+        /// 不合格代码ID
+        /// </summary>
+        public long? UnqualifiedCodeId { get; set; }
     }
 }

@@ -311,6 +311,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("Code IN @Codes");
             }
+            if (query.ResourceTypeId.HasValue)
+            {
+                sqlBuilder.Where(" ResourceTypeId = @ResourceTypeId");
+            }
             sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
@@ -403,6 +407,10 @@ namespace Hymson.MES.Data.Repositories.Process
             if (!string.IsNullOrWhiteSpace(query.Name))
             {
                 sqlBuilder.Where(" Name = @Name ");
+            }
+            if (query.ResourceTypeId.HasValue)
+            {
+                sqlBuilder.Where(" ResourceTypeId = @ResourceTypeId");
             }
             sqlBuilder.AddParameters(query);
 

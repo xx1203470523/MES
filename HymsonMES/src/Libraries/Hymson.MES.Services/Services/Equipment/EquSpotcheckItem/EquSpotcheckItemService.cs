@@ -10,6 +10,8 @@ using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Quality;
@@ -48,6 +50,9 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         private readonly IInteUnitRepository _inteUnitRepository;
 
+        private readonly IEquSpotcheckTemplateItemRelationRepository _equSpotcheckTemplateItemRelationRepository;
+        private readonly IEquSpotcheckTemplateRepository _equSpotcheckTemplateRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -57,13 +62,17 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="equSpotcheckItemRepository"></param>
         public EquSpotcheckItemService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSpotcheckItemSaveDto> validationSaveRules,
             IEquSpotcheckItemRepository equSpotcheckItemRepository,
-            IInteUnitRepository inteUnitRepository)
+            IInteUnitRepository inteUnitRepository,
+            IEquSpotcheckTemplateItemRelationRepository equSpotcheckTemplateItemRelationRepository,
+            IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _equSpotcheckItemRepository = equSpotcheckItemRepository;
             _inteUnitRepository = inteUnitRepository;
+            _equSpotcheckTemplateItemRelationRepository= equSpotcheckTemplateItemRelationRepository;
+            _equSpotcheckTemplateRepository= equSpotcheckTemplateRepository;
         }
 
 
@@ -147,6 +156,27 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            //var equSpotcheckItemEntity = await _equSpotcheckItemRepository.GetByIdsAsync(ids);
+
+            var equSpotcheckTemplateItemRelations = await _equSpotcheckTemplateItemRelationRepository.GetEquSpotcheckTemplateItemRelationEntitiesAsync(new EquSpotcheckTemplateItemRelationQuery
+            {
+                SpotCheckItemIds = ids,
+                SiteId = _currentSite.SiteId
+            });
+
+            if (equSpotcheckTemplateItemRelations != null && equSpotcheckTemplateItemRelations.Any())
+            {
+                var equMaintenanceTemplateEntitys = await _equSpotcheckTemplateRepository.GetByIdsAsync(equSpotcheckTemplateItemRelations.Select(x => x.SpotCheckTemplateId).ToArray());
+
+                var templateCodes = equMaintenanceTemplateEntitys.Select(s => s.Code).ToList();
+
+                if (templateCodes.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15920)).WithData("Code", string.Join(',', templateCodes));
+                }
+
+            }
+
             return await _equSpotcheckItemRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,

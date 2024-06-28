@@ -105,6 +105,18 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
+        /// 获取资质认证设置
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Route("auth/{id}")]
+        [HttpGet]
+        public async Task<IEnumerable<ProcQualificationAuthenticationDto>> GetProcedureAuthSetListAsync(long id)
+        {
+            return await _procProcedureService.GetProcedureAuthSetListAsync(id);
+        }
+
+        /// <summary>
         /// 添加（工序表）
         /// </summary>
         /// <param name="parm"></param>
@@ -195,6 +207,13 @@ namespace Hymson.MES.Api.Controllers
         public async Task UpdateStatusAbolish([FromBody] long id)
         {
             await _procProcedureService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        [HttpPost]
+        [Route("create")]
+        public async Task CreateProductParameterAsync()
+        {
+            await _procProcedureService.CreateProductParameterAsync();
         }
 
         #endregion

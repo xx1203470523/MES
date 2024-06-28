@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 
+    /// 1是/0否
     /// </summary>
     public enum YesOrNoEnum : sbyte
     {

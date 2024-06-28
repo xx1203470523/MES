@@ -1,5 +1,6 @@
 using FluentValidation;
 using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
@@ -13,8 +14,12 @@ using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using MimeKit;
 using Minio.DataModel;
+using System.Net.NetworkInformation;
 using System.Security.Policy;
+using static Dapper.SqlMapper;
+using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -75,21 +80,27 @@ namespace Hymson.MES.Services.Services.Equipment
 
             var siteId = _currentSite.SiteId ?? 0;
             //判断设备点检项目在系统中是否已经存在
-            var equOperationPermissionsQuery = new EquOperationPermissionsQuery { SiteId = siteId, EquipmentId = saveDto.Id };
+            var equOperationPermissionsQuery = new EquOperationPermissionsQuery { SiteId = siteId, EquipmentId = saveDto.Id, Type = saveDto.Type };
             var equOperationPermissions = await _equOperationPermissionsRepository.GetEntitiesAsync(equOperationPermissionsQuery);
             if (equOperationPermissions != null && equOperationPermissions.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15801)).WithData("EquipmentCode", saveDto.EquipmentCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES12615))
+                    .WithData("EquipmentCode", saveDto.EquipmentCode ?? "")
+                    .WithData("Type", saveDto.Type);
             }
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
+            string leaders = saveDto.Leaderids != null ? string.Join(",", saveDto.Leaderids) : "";
+            string executorIds = saveDto.Executorids != null ? string.Join(",", saveDto.Executorids) : "";
 
             // DTO转换实体
             var entity = saveDto.ToEntity<EquOperationPermissionsEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.Equipmentid=saveDto.Id;
+            entity.LeaderIds = leaders;
+            entity.ExecutorIds = executorIds;
+            entity.Equipmentid = saveDto.Id;
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
@@ -117,11 +128,42 @@ namespace Hymson.MES.Services.Services.Equipment
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
+            string leaders = saveDto.Leaderids != null ? string.Join(",", saveDto.Leaderids) : "";
+            string executorIds = saveDto.Executorids != null ? string.Join(",", saveDto.Executorids) : "";
             var entity = saveDto.ToEntity<EquOperationPermissionsEntity>();
+            entity.ExecutorIds = executorIds;
+            entity.LeaderIds = leaders;
+            entity.Equipmentid = saveDto.Id;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
             return await _equOperationPermissionsRepository.UpdateAsync(entity);
+        }
+
+        /// <summary>
+        /// 批量修改
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        public async Task<int> BatchModifyAsync(EquOperationPermissionsBatchSaveDto saveDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            }
+
+            var equOperations = await _equOperationPermissionsRepository.GetByIdsAsync(saveDto.Ids.ToArray());
+            string leaders = saveDto.Leaderids != null ? string.Join(",", saveDto.Leaderids) : "";
+            string executorIds = saveDto.Executorids != null ? string.Join(",", saveDto.Executorids) : "";
+            foreach (var equOperation in equOperations)
+            {
+                equOperation.ExecutorIds = executorIds;
+                equOperation.LeaderIds = leaders;
+                equOperation.UpdatedBy = _currentUser.UserName;
+                equOperation.UpdatedOn= HymsonClock.Now();
+            }
+            return await _equOperationPermissionsRepository.UpdateRangeAsync(equOperations);
         }
 
         /// <summary>
@@ -159,7 +201,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquOperationPermissionsDto?> QueryByIdAsync(long id)
+        public async Task<EquOperationPermissionsDetailDto?> QueryByIdAsync(long id)
         {
             var equInspectionItemEntity = await _equOperationPermissionsRepository.GetByIdAsync(id);
             if (equInspectionItemEntity == null)
@@ -167,7 +209,26 @@ namespace Hymson.MES.Services.Services.Equipment
                 return null;
             }
 
-            return equInspectionItemEntity.ToModel<EquOperationPermissionsDto>();
+            var model = new EquOperationPermissionsDetailDto
+            {
+                Id = equInspectionItemEntity.Id,
+                Equipmentid = equInspectionItemEntity.Equipmentid,
+                Status = equInspectionItemEntity.Status,
+                Type = equInspectionItemEntity.Type,
+                Remark = equInspectionItemEntity.Remark,
+                EquipmentCode = equInspectionItemEntity.EquipmentCode,
+                EquipmentName = equInspectionItemEntity.EquipmentName,
+                EquipmentGroupCode = equInspectionItemEntity.EquipmentGroupCode,
+                EquipmentGroupName = equInspectionItemEntity.EquipmentGroupName,
+                Location = equInspectionItemEntity.Location,
+                ExecutorIds = string.IsNullOrWhiteSpace(equInspectionItemEntity.ExecutorIds) ?null: equInspectionItemEntity.ExecutorIds.Split(','),
+                LeaderIds = string.IsNullOrWhiteSpace(equInspectionItemEntity.LeaderIds) ?null: equInspectionItemEntity.LeaderIds.Split(','),
+                CreatedBy =equInspectionItemEntity.CreatedBy,
+                CreatedOn = equInspectionItemEntity.CreatedOn,
+                UpdatedBy = equInspectionItemEntity.UpdatedBy,
+                UpdatedOn = equInspectionItemEntity.UpdatedOn
+            };
+            return model;
         }
 
         /// <summary>

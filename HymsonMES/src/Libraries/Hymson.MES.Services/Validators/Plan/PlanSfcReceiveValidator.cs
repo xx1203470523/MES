@@ -28,7 +28,7 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.ReceiveType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16101));
             RuleFor(x => x.WorkOrderId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16102));
             RuleFor(x => x.SFCs).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16104));
-            RuleFor(x => x.SFCs).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16126));
+            //RuleFor(x => x.SFCs).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16126));
             RuleFor(x => x).Must(ManuSfcProduceSFCSValidator).WithErrorCode(nameof(ErrorCode.MES16126));
         }
 

@@ -1,4 +1,7 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Equipment;
+using Hymson.MES.Core.Enums.Equipment.EquMaintenance;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem.Query
 {
@@ -21,6 +24,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceIt
         /// 名称
         /// </summary>
         public string? Name { get; set; }
+
+
+        /// <summary>
+        /// 数据类型
+        /// </summary>
+        public EquMaintenanceDataTypeEnum? DataType { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
 
     }
 }
