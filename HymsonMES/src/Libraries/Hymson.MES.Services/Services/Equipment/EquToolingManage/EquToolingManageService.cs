@@ -8,12 +8,14 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
@@ -138,31 +140,29 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// <returns></returns>
         public async Task<EquToolingManageViewDto> QueryProcConversionFactorByIdAsync(long id)
         {
+            //查询工具信息
             var equToolingManageEntity = await _equToolingManageRepository.GetByIdAsync(id);
             if (equToolingManageEntity == null)
             {
                 return new EquToolingManageViewDto();
-
             }
-
+            //对象映射
             EquToolingManageViewDto equToolingManageViewDto = new EquToolingManageViewDto
             {
                 Id = equToolingManageEntity.Id,
                 Status= equToolingManageEntity.Status,
                 Code= equToolingManageEntity.Code,
+                Name = equToolingManageEntity.Name,
+                ToolsId= equToolingManageEntity.ToolsId,
                 CalibrationCycle = equToolingManageEntity.CalibrationCycle,
                 IsCalibrated = equToolingManageEntity.IsCalibrated,
                 RatedLife = equToolingManageEntity.RatedLife,
-                ToolsTypeCode= equToolingManageEntity.ToolsTypeCode,
-                ToolsTypeName= equToolingManageEntity.ToolsTypeName
+                RatedLifeUnit=equToolingManageEntity.RatedLifeUnit,
+                ToolsTypeCode = equToolingManageEntity.ToolsTypeCode,
+                CumulativeUsedLife = equToolingManageEntity.CumulativeUsedLife,
+                ToolsTypeName = equToolingManageEntity.ToolsTypeName
             };
-            //关连的工序
-            //var ConversionFactorLinkProcedure = await _procProcedureRepository.GetByIdAsync(equToolingManageEntity.ToolsId);
-            //if (ConversionFactorLinkProcedure != null)
-            //{
-            //    converdionFactorDto.code = ConversionFactorLinkProcedure.Code;
-            //    converdionFactorDto.name = ConversionFactorLinkProcedure.Name;
-            //}
+         
             //关联物料
             //var ConversionFactorLinkMaterials = await _procMaterialRepository.GetByIdAsync(procConversionFactorEntity.MaterialId);
             //if (ConversionFactorLinkMaterials != null)
@@ -195,55 +195,43 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
             return equToolingManageViewDto;
         }
     
-
-        public async Task<long> AddProcConversionFactorAsync(AddConversionFactorDto AddConversionFactorDto)
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="AddConversionFactorDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<long> AddProcConversionFactorAsync(AddEquToolingManageDto AddConversionFactorDto)
         {
+            //校验
             if (AddConversionFactorDto == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            if (AddConversionFactorDto.code == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10401));
-            }
-            //if (AddConversionFactorDto.MaterialId == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10214));
-            // }
-            //if (AddConversionFactorDto.LinkMaterials.Count > 1)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10241));
-            //}
+           
 
+            var equToolsEntity = AddConversionFactorDto.ToEntity<EquToolsEntity>();
+            equToolsEntity.Id = IdGenProvider.Instance.CreateId();
+            equToolsEntity.CreatedBy = _currentUser.UserName;
+            equToolsEntity.UpdatedBy = _currentUser.UserName;
+            equToolsEntity.CreatedOn = HymsonClock.Now();
+            equToolsEntity.UpdatedOn = HymsonClock.Now();
+            equToolsEntity.SiteId = _currentSite.SiteId ?? 0;
 
-            var procConversionFactorEntity = AddConversionFactorDto.ToEntity<ProcConversionFactorEntity>();
-            procConversionFactorEntity.MaterialId = AddConversionFactorDto.MaterialId;
-            procConversionFactorEntity.Id = IdGenProvider.Instance.CreateId();
-            procConversionFactorEntity.CreatedBy = _currentUser.UserName;
-            procConversionFactorEntity.UpdatedBy = _currentUser.UserName;
-            procConversionFactorEntity.CreatedOn = HymsonClock.Now();
-            procConversionFactorEntity.UpdatedOn = HymsonClock.Now();
-            procConversionFactorEntity.SiteId = _currentSite.SiteId ?? 0;
-
-            //procLoadPointEntity.OpenStatus = SysDataStatusEnum.Build;
 
             #region 数据库验证
-            //var isExists = (await _equToolingManageRepository.GetProcConversionFactorEntitiesAsync(new ProcConversionFactorQuery()
-            //{
-            //    SiteId = procConversionFactorEntity.SiteId,
-            //    ProcedureId = procConversionFactorEntity.ProcedureId,
-            //    MaterialId=procConversionFactorEntity.MaterialId
-            //})).Any();
-            //if (isExists)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10478)).WithData("ProcedureId", procConversionFactorEntity.ProcedureId);
-            //}
+            var checkEntity = await _equToolingManageRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = equToolsEntity.SiteId,
+                Code = equToolsEntity.Code
+            });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", equToolsEntity.Code);
             #endregion
 
             using TransactionScope trans = TransactionHelper.GetTransactionScope();
             int response = 0;
             // 入库
-            response = await _equToolingManageRepository.InsertAsync(procConversionFactorEntity);
+            response = await _equToolingManageRepository.InsertAsync(equToolsEntity);
             if (response == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10704));
@@ -251,7 +239,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
 
             trans.Complete();
 
-            return procConversionFactorEntity.Id;
+            return equToolsEntity.Id;
 
 
         }
@@ -271,7 +259,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
             }
 
             var entitys = await _equToolingManageRepository.GetByIdsAsync(idsAr);
-            if (entitys != null && entitys.Any(a => a.OpenStatus != DisableOrEnableEnum.Disable))
+            if (entitys != null && entitys.Any(a => a.Status != DisableOrEnableEnum.Disable))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10135));
             }
@@ -285,29 +273,29 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
                     DeleteOn = HymsonClock.Now(),
                     UserId = _currentUser.UserName
                 });
-                rows += await _procProcedureRejudgeRepository.DeleteByParentIdAsync(idsAr);
-                rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsAr);
+                //rows += await _procProcedureRejudgeRepository.DeleteByParentIdAsync(idsAr);
+                //rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsAr);
                 ts.Complete();
             }
             return rows;
         }
 
-       
+
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procLoadPointModifyDto"></param>
+        /// <param name="equToolingManageModifyDto"></param>
         /// <returns></returns>
-        public async Task ModifyProcConversionFactorAsync(ProcConversionFactorModifyDto procLoadPointModifyDto)
+        public async Task ModifyProcConversionFactorAsync(EquToolingManageModifyDto equToolingManageModifyDto)
         {
-            if (procLoadPointModifyDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));          
+            if (equToolingManageModifyDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));          
 
             // DTO转换实体
-            var procConversionFactorEntity = procLoadPointModifyDto.ToEntity<ProcConversionFactorEntity>();
-            procConversionFactorEntity.UpdatedBy = _currentUser.UserName;
-            procConversionFactorEntity.UpdatedOn = HymsonClock.Now();
-            procConversionFactorEntity.SiteId = _currentSite.SiteId ?? 0;
-            procConversionFactorEntity.MaterialId = procLoadPointModifyDto.LinkMaterials[0].MaterialId;
+            var equToolsEntity = equToolingManageModifyDto.ToEntity<EquToolsEntity>();
+            equToolsEntity.UpdatedBy = _currentUser.UserName;
+            equToolsEntity.UpdatedOn = HymsonClock.Now();
+            equToolsEntity.SiteId = _currentSite.SiteId ?? 0;
+            //procConversionFactorEntity.MaterialId = procLoadPointModifyDto.LinkMaterials[0].MaterialId;
             #region 数据库验证
             //var isExists = (await _equToolingManageRepository.GetProcConversionFactorEntitiesAsync(new ProcConversionFactorQuery()
             //{
@@ -323,12 +311,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
             
 
 
-          
+            
 
             using TransactionScope ts = TransactionHelper.GetTransactionScope();
             int rows = 0;
             // 入库
-            rows = await _equToolingManageRepository.UpdateAsync(procConversionFactorEntity);
+            rows = await _equToolingManageRepository.UpdateAsync(equToolsEntity);
+
             if (rows == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10704));

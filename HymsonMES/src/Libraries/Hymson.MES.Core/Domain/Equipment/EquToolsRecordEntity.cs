@@ -43,9 +43,9 @@ namespace Hymson.MES.Core.Domain.Equipment
         public decimal RatedLife { get; set; }
 
         /// <summary>
-        /// 额定寿命单位
+        /// 额定使用寿命单位
         /// </summary>
-        public string RatedLifeUnit { get; set; }
+        public ToolingTypeEnum RatedLifeUnit { get; set; }
 
         /// <summary>
         /// 累计使用寿命
@@ -75,7 +75,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 校准周期单位
         /// </summary>
-        public string CalibrationCycleUnit { get; set; }
+        public ToolingTypeEnum CalibrationCycleUnit { get; set; }
 
         /// <summary>
         /// 状态 1、启用  2、禁用
