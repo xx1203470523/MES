@@ -69,7 +69,7 @@ namespace Hymson.MES.Api.Controllers
         [Route("create")]
         [LogDescription("工序维护", BusinessType.INSERT)]
         [PermissionDescription("proc:ConversionFactor:insert")]
-        public async Task<long> AddProcConversionFactorAsync([FromBody] AddConversionFactorDto parm)
+        public async Task<long> AddProcConversionFactorAsync([FromBody] AddEquToolingManageDto parm)
         {
             return await _equToolingManageService.AddProcConversionFactorAsync(parm);
         }
@@ -98,7 +98,7 @@ namespace Hymson.MES.Api.Controllers
         [Route("update")]
         [LogDescription("上料点维护", BusinessType.UPDATE)]
         [PermissionDescription("proc:conversionFactor:update")]
-        public async Task UpdateProcConversionFactorAsync([FromBody] ProcConversionFactorModifyDto parm)
+        public async Task UpdateProcConversionFactorAsync([FromBody] EquToolingManageModifyDto parm)
         {
             await _equToolingManageService.ModifyProcConversionFactorAsync(parm);
         }

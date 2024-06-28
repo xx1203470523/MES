@@ -285,7 +285,8 @@ namespace Hymson.MES.Services.Mapper
             #region EquToolsManage
             CreateMap<EquToolingManagePagedQueryDto, IEquToolingManagePagedQuery>();
             CreateMap<EquToolingManageView, EquToolingManageViewDto>();
-            CreateMap<EquToolingTypeSaveDto, EquToolingTypeEntity>();
+            CreateMap<AddEquToolingManageDto, EquToolsEntity>();
+            CreateMap<EquToolingManageModifyDto, EquToolsEntity>();
 
             #endregion
 
