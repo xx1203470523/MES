@@ -162,6 +162,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public string Name { get; set; }
 
         /// <summary>
+        /// 类型id equ_tools_type的id
+        /// </summary>
+        public string ToolsId { get; set; }
+
+        /// <summary>
         /// 状态
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
@@ -171,6 +176,18 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public decimal? RatedLife { get; set; }
 
+        /// <summary>
+        /// 额定寿命单位
+        /// </summary>
+        public ToolingTypeEnum? RatedLifeUnit { get; set; }
+        /// <summary>
+        /// 累计使用寿命
+        /// </summary>
+        public decimal? CumulativeUsedLife { get; set; }
+        /// <summary>
+        /// 当前使用寿命
+        /// </summary>
+        public decimal? CurrentUsedLife { get; set; }
         /// <summary>
         /// 是否效准
         /// </summary>
@@ -223,46 +240,69 @@ namespace Hymson.MES.Services.Dtos.Equipment
     public record AddEquToolingManageDto : BaseEntityDto
     {
         /// <summary>
-        /// 描述 :工具管理
+        /// 工具类型ID
         /// 空值 : false  
         /// </summary>
-        public decimal conversionFactor { get; set; }
-
+        public string? ToolsId { get; set; }
 
         /// <summary>
-        /// 描述 :工序ID
+        /// 工具类型编码
         /// 空值 : false  
         /// </summary>
-        public long procedureId { get; set; }
+        public string? ToolsTypeCode { get; set; }
 
         /// <summary>
-        /// 工序编码
+        /// 工具类型名称
         /// 空值 : false  
         /// </summary>
-        public string code { get; set; }
+        public string? ToolsTypeName { get; set; }
 
         /// <summary>
-        /// 工序名
+        /// 工具编码
         /// 空值 : false  
         /// </summary>
-        public string name { get; set; }
+        public string Code { get; set; }
 
         /// <summary>
-        /// 工序名
+        /// 工具名称
         /// 空值 : false  
         /// </summary>
-        public string? remark { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// 工具管理状态
+        /// 状态
         /// </summary>
-        public DisableOrEnableEnum OpenStatus { get; set; }
-        /// <summary>
-        /// 所属物料ID
-        /// </summary>
-        public long MaterialId { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
-        public List<ProcLoadPointLinkResourceDto>? LinkResources { get; set; }
+        /// <summary>
+        /// 额定使用寿命
+        /// </summary>
+        public decimal? RatedLife { get; set; }
+
+        /// <summary>
+        /// 额定使用寿命单位
+        /// </summary>
+        public ToolingTypeEnum RatedLifeUnit { get; set; }
+
+        /// <summary>
+        /// 是否效准
+        /// </summary>
+        public YesOrNoEnum? IsCalibrated { get; set; }
+
+        /// <summary>
+        /// 校准周期
+        /// </summary>
+        public decimal? CalibrationCycle { get; set; }
+
+        /// <summary>
+        /// 校准周期单位
+        /// </summary>
+        public ToolingTypeEnum CalibrationCycleUnit { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
 
     }
 
@@ -271,49 +311,51 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// </summary>
     public record EquToolingManageModifyDto : BaseEntityDto
     {
+
         /// <summary>
-        /// 描述 :主建
+        /// 工具ID
         /// 空值 : false  
         /// </summary>
         public long Id { get; set; }
         /// <summary>
-        /// 描述 :工具管理
+        /// 工具编码
         /// 空值 : false  
         /// </summary>
-        public decimal conversionFactor { get; set; }
-
-
+        public string Code { get; set; }
         /// <summary>
-        /// 描述 :工序ID
+        /// 工具名称
         /// 空值 : false  
         /// </summary>
-        public long procedureId { get; set; }
-
+        public string Name { get; set; }
         /// <summary>
-        /// 工序编码
+        /// 工具类型ID
         /// 空值 : false  
         /// </summary>
-        public string code { get; set; }
-
+        public string? ToolsId { get; set; }
         /// <summary>
-        /// 工序名
-        /// 空值 : false  
+        /// 状态
         /// </summary>
-        public string name { get; set; }
-
+        public DisableOrEnableEnum? Status { get; set; }
         /// <summary>
-        /// 工序名
-        /// 空值 : false  
+        /// 额定使用寿命
         /// </summary>
-        public string? Remark { get; set; }
-
-
+        public decimal? RatedLife { get; set; }
         /// <summary>
-        /// 工具管理状态
-        /// </summary>  
-        public DisableOrEnableEnum OpenStatus { get; set; }
-        public List<ProcLoadPointLinkMaterialDto> LinkMaterials { get; set; }
+        /// 额定使用寿命单位
+        /// </summary>
+        public ToolingTypeEnum RatedLifeUnit { get; set; }
+        /// <summary>
+        /// 是否效准
+        /// </summary>
+        public YesOrNoEnum? IsCalibrated { get; set; }
+        /// <summary>
+        /// 校准周期
+        /// </summary>
+        public decimal? CalibrationCycle { get; set; }
+        /// <summary>
+        /// 校准周期单位
+        /// </summary>
+        public ToolingTypeEnum CalibrationCycleUnit { get; set; }
 
-        public List<ProcLoadPointLinkResourceDto>? LinkResources { get; set; }
     }
 }

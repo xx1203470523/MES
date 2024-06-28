@@ -3,7 +3,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-
+using Hymson.MES.Data.Repositories.Common.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="procConversionFactorEntity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(ProcConversionFactorEntity procConversionFactorEntity);
+        Task<int> InsertAsync(EquToolsEntity procConversionFactorEntity);
 
         /// <summary>
         /// 批量新增
@@ -32,11 +32,18 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> InsertsAsync(List<ProcLoadPointEntity> procLoadPointEntitys);
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<EquSparePartsGroupEntity> GetByCodeAsync(EntityByCodeQuery query);
+
+        /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procLoadPointEntity"></param>
+        /// <param name="equToolsEntity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(ProcConversionFactorEntity procLoadPointEntity);
+        Task<int> UpdateAsync(EquToolsEntity equToolsEntity);
 
         /// <summary>
         /// 批量更新 
@@ -71,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcConversionFactorEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<EquToolingManageView>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 根据IDs批量获取数据
