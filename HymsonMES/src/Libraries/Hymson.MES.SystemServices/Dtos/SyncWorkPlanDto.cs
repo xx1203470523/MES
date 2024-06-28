@@ -40,11 +40,6 @@ namespace Hymson.MES.SystemServices.Dtos
         public string PlanCode { get; set; } = "";
 
         /// <summary>
-        /// 工单数量
-        /// </summary>
-        public decimal PlanQty { get; set; }
-
-        /// <summary>
         /// 生产时间（计划）
         /// </summary>
         public DateTime? PlanStartTime { get; set; }
@@ -72,6 +67,11 @@ namespace Hymson.MES.SystemServices.Dtos
         public long? Id { get; set; }
 
         /// <summary>
+        /// 计划产品ID
+        /// </summary>
+        public long ProductId { get; set; }
+
+        /// <summary>
         /// 产品编号 
         /// </summary>
         public string ProductCode { get; set; } = "";
@@ -82,9 +82,9 @@ namespace Hymson.MES.SystemServices.Dtos
         public string ProductVersion { get; set; } = "";
 
         /// <summary>
-        /// 计划BomId
+        /// BomId
         /// </summary>
-        public long? BomId { get; set; }
+        public long BomId { get; set; }
 
         /// <summary>
         /// Bom编码
@@ -95,6 +95,16 @@ namespace Hymson.MES.SystemServices.Dtos
         /// Bom版本
         /// </summary>
         public string BomVersion { get; set; } = "";
+
+        /// <summary>
+        /// 生产数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 超产比例
+        /// </summary>
+        public decimal OverScale { get; set; }
 
         /// <summary>
         /// 物料明细
@@ -114,19 +124,34 @@ namespace Hymson.MES.SystemServices.Dtos
         public long? Id { get; set; }
 
         /// <summary>
-        /// 产品编号 
+        /// 物料Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 物料编号 
         /// </summary>
         public string MaterialCode { get; set; } = "";
 
         /// <summary>
-        /// 物料用量
+        /// 物料版本
         /// </summary>
-        public decimal MaterialDosage { get; set; }
+        public string MaterialVersion { get; set; } = "";
 
         /// <summary>
-        /// 物料损耗
+        /// BomId
         /// </summary>
-        public decimal MaterialLoss { get; set; }
+        public long? BomId { get; set; }
+
+        /// <summary>
+        /// 用量
+        /// </summary>
+        public decimal Usages { get; set; }
+
+        /// <summary>
+        /// 损耗
+        /// </summary>
+        public decimal Loss { get; set; }
 
         /// <summary>
         /// 计划BomId（这里有可能是空，有学问）

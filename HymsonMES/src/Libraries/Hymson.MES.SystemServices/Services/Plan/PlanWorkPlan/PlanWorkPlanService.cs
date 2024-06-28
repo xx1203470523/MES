@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -95,6 +96,15 @@ namespace Hymson.MES.SystemServices.Services.Plan
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _planWorkPlanRepository.InsertsAsync(resposeSummaryBo.Adds);
             rows += await _planWorkPlanRepository.UpdatesAsync(resposeSummaryBo.Updates);
+
+            // TODO: 先删除计划下面的产品和物料
+            // rows += await _planWorkPlanProductRepository.DeletesAsync(resposeSummaryBo.ProductAdds.Select(s => s.PlanId));
+            // rows += await _planWorkPlanMaterialRepository.DeletesAsync(resposeSummaryBo.MaterialAdds.Select(s => s.PlanId));
+
+            // TODO: 这里需要添加产品和物料的插入操作
+            // rows += await _planWorkPlanProductRepository.InsertsAsync(resposeSummaryBo.ProductAdds);
+            // rows += await _planWorkPlanMaterialRepository.InsertsAsync(resposeSummaryBo.MaterialAdds);
+
             trans.Complete();
             return rows;
         }
@@ -267,19 +277,51 @@ namespace Hymson.MES.SystemServices.Services.Plan
                 // 遍历产品列表
                 foreach (var productDto in planDto.Products)
                 {
-                    var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == productDto.ProductCode);
-
-                    // 不存在的新产品
-                    if (productEntity == null)
+                    // 添加生产计划产品
+                    var planProductId = productDto.Id ?? IdGenProvider.Instance.CreateId();
+                    resposeBo.ProductAdds.Add(new PlanWorkPlanProductEntity
                     {
-                      
-                    }
-                    // 之前已存在的产品
-                    else
-                    {
+                        PlanId = planEntity.Id,
+                        ProductId = productDto.ProductId,
+                        ProductCode = productDto.ProductCode,
+                        ProductVersion = productDto.ProductVersion,
+                        BomId = productDto.BomId,
+                        BomCode = productDto.BomCode,
+                        BomVersion = productDto.BomVersion,
+                        Qty = productDto.Qty,
+                        OverScale = productDto.OverScale,
 
-                    }
+                        Remark = "",
+                        Id = planProductId,
+                        SiteId = siteId,
+                        CreatedBy = updateUser,
+                        CreatedOn = updateTime,
+                        UpdatedBy = updateUser,
+                        UpdatedOn = updateTime
+                    });
+
+                    // 添加生产计划物料
+                    resposeBo.MaterialAdds.AddRange(productDto.Materials.Select(s => new PlanWorkPlanMaterialEntity
+                    {
+                        PlanId = planEntity.Id,
+                        PlanProductId = planProductId,
+                        MaterialId = s.MaterialId,
+                        MaterialCode = s.MaterialCode,
+                        MaterialVersion = s.MaterialVersion,
+                        BomId = s.BomId,
+                        Usages = s.Usages,
+                        Loss = s.Loss,
+
+                        Remark = "",
+                        Id = s.Id ?? IdGenProvider.Instance.CreateId(),
+                        SiteId = siteId,
+                        CreatedBy = updateUser,
+                        CreatedOn = updateTime,
+                        UpdatedBy = updateUser,
+                        UpdatedOn = updateTime
+                    }));
                 }
+
             }
 
             return resposeBo;

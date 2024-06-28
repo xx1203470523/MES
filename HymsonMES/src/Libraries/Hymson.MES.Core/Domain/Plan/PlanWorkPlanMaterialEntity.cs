@@ -31,6 +31,16 @@ namespace Hymson.MES.Core.Domain.Plan
         public long MaterialId { get; set; }
 
         /// <summary>
+        /// 物料编号 
+        /// </summary>
+        public string MaterialCode { get; set; } = "";
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string MaterialVersion { get; set; } = "";
+
+        /// <summary>
         /// BomId
         /// </summary>
         public long? BomId { get; set; }
