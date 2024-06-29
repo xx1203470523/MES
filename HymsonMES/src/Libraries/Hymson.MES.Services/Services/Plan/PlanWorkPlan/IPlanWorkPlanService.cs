@@ -27,7 +27,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<PlanWorkPlanDto>> GetPageListAsync(PlanWorkPlanPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<PlanWorkPlanProductDto>> GetPageListAsync(PlanWorkPlanProductPagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 根据ID查询

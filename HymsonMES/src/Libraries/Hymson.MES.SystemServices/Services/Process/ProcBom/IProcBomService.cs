@@ -12,7 +12,7 @@ namespace Hymson.MES.SystemServices.Services.Process
         /// </summary>
         /// <param name="requestDtos"></param>
         /// <returns></returns>
-        Task<int> SyncBomAsync(IEnumerable<BomDto> requestDtos);
+        Task<int> SyncBomAsync(IEnumerable<SyncBomDto> requestDtos);
 
     }
 }

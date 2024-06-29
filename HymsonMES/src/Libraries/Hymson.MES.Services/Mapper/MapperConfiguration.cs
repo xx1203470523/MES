@@ -1496,6 +1496,7 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<PlanWorkPlanPagedQueryDto, PlanWorkPlanPagedQuery>();
             CreateMap<PlanWorkPlanEntity, PlanWorkPlanDto>();
+            CreateMap<PlanWorkPlanProductEntity, PlanWorkPlanProductDto>();
 
         }
 

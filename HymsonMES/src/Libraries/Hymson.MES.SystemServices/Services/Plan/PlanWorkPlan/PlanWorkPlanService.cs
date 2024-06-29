@@ -1,8 +1,12 @@
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
@@ -37,6 +41,16 @@ namespace Hymson.MES.SystemServices.Services.Plan
         private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
 
         /// <summary>
+        /// 仓储接口（生产计划产品）
+        /// </summary>
+        private readonly IPlanWorkPlanProductRepository _planWorkPlanProductRepository;
+
+        /// <summary>
+        /// 仓储接口（生产计划物料）
+        /// </summary>
+        private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
+
+        /// <summary>
         /// 仓储接口（BOM表）
         /// </summary>
         private readonly IProcBomRepository _procBomRepository;
@@ -52,53 +66,127 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// <param name="logger"></param>
         /// <param name="sysConfigRepository"></param>
         /// <param name="planWorkPlanRepository"></param>
+        /// <param name="planWorkPlanProductRepository"></param>
+        /// <param name="planWorkPlanMaterialRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procMaterialRepository"></param>
         public PlanWorkPlanService(ILogger<PlanWorkPlanService> logger,
             ISysConfigRepository sysConfigRepository,
             IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkPlanProductRepository planWorkPlanProductRepository,
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
             IProcBomRepository procBomRepository,
             IProcMaterialRepository procMaterialRepository)
         {
             _logger = logger;
             _sysConfigRepository = sysConfigRepository;
             _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkPlanProductRepository = planWorkPlanProductRepository;
+            _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
             _procBomRepository = procBomRepository;
             _procMaterialRepository = procMaterialRepository;
         }
 
-        public async Task<IEnumerable<RotorWorkOrder>> SyncWorkOrderAsync(long WorkCenterId)
-        {
-            //获取产品编码
-
-            return null;
-        }
 
         /// <summary>
         /// 同步信息（生产计划）
         /// </summary>
         /// <param name="requestDtos"></param>
         /// <returns></returns>
-        public async Task<int> SyncWorkPlanAsync(IEnumerable<WorkPlanDto> requestDtos)
+        public async Task<int> SyncWorkPlanAsync(IEnumerable<SyncWorkPlanDto> requestDtos)
         {
-            if (requestDtos == null || !requestDtos.Any()) return 0;
+            if (requestDtos == null || !requestDtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
-            if (configEntities == null || !configEntities.Any()) return 0;
+            if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 
-            var resposeBo = await ConvertWorkPlanListAsync(configEntities.FirstOrDefault(), requestDtos);
-            if (resposeBo == null) return 0;
+            // 当前对象
+            var currentBo = new BaseBo
+            {
+                User = "ERP",
+                Time = HymsonClock.Now()
+            };
+
+            var resposeBo = await ConvertWorkPlanListAsync(configEntities.FirstOrDefault(), currentBo, requestDtos)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 添加到集合
             var resposeSummaryBo = new SyncWorkPlanSummaryBo();
             resposeSummaryBo.Adds.AddRange(resposeBo.Adds);
             resposeSummaryBo.Updates.AddRange(resposeBo.Updates);
 
+            var planIds = resposeBo.Adds.Select(s => s.Id);
+
+            // 删除数据
+            var command = new DeleteByParentIdsCommand
+            {
+                ParentIds = planIds,
+                UpdatedBy = currentBo.User,
+                UpdatedOn = currentBo.Time
+            };
+
             // 插入数据
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _planWorkPlanRepository.InsertsAsync(resposeSummaryBo.Adds);
             rows += await _planWorkPlanRepository.UpdatesAsync(resposeSummaryBo.Updates);
+
+            rows += await _planWorkPlanProductRepository.DeleteByParentIdsAsync(command);
+            rows += await _planWorkPlanMaterialRepository.DeleteByParentIdsAsync(command);
+
+            rows += await _planWorkPlanProductRepository.InsertsAsync(resposeSummaryBo.ProductAdds);
+            rows += await _planWorkPlanMaterialRepository.InsertsAsync(resposeSummaryBo.MaterialAdds);
+
+            trans.Complete();
+            return rows;
+        }
+
+        /// <summary>
+        /// 取消（生产计划）
+        /// </summary>
+        /// <param name="planCodes"></param>
+        /// <returns></returns>
+        public async Task<int> CancelWorkPlanAsync(IEnumerable<string> planCodes)
+        {
+            if (planCodes == null || !planCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
+            if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
+
+            var configEntity = configEntities.FirstOrDefault()
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10139));
+
+            // 初始化
+            var siteId = configEntity.Value.ParseToLong();
+            var updateUser = "ERP";
+            var updateTime = HymsonClock.Now();
+
+            // 读取生产计划列表
+            var workPlanEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery
+            {
+                SiteId = siteId,
+                Codes = planCodes
+            });
+
+            // 如果存在不是"未开始"的生产计划，不允许取消
+            if (workPlanEntities.Any(a => a.Status != PlanWorkPlanStatusEnum.NotStarted))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10247)).WithData("Status", PlanWorkPlanStatusEnum.NotStarted.GetDescription());
+            }
+
+            List<PlanWorkPlanEntity> updates = new();
+            foreach (var planEntity in workPlanEntities)
+            {
+                planEntity.Status = PlanWorkPlanStatusEnum.Canceled;
+                planEntity.UpdatedBy = updateUser;
+                planEntity.UpdatedOn = updateTime;
+                updates.Add(planEntity);
+            }
+
+            // 更新数据
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _planWorkPlanRepository.UpdatesAsync(updates);
             trans.Complete();
             return rows;
         }
@@ -107,60 +195,69 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// 转换信息集合（生产计划）
         /// </summary>
         /// <param name="configEntity"></param>
+        /// <param name="currentBo"></param>
         /// <param name="lineDtoDict"></param>
         /// <returns></returns>
-        private async Task<SyncWorkPlanSummaryBo?> ConvertWorkPlanListAsync(SysConfigEntity? configEntity, IEnumerable<WorkPlanDto> lineDtoDict)
+        private async Task<SyncWorkPlanSummaryBo?> ConvertWorkPlanListAsync(SysConfigEntity? configEntity, BaseBo currentBo, IEnumerable<SyncWorkPlanDto> lineDtoDict)
         {
             // 判断是否存在（配置）
-            if (configEntity == null) return default;
+            if (configEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 
             // 初始化
-            var siteId = configEntity.Value.ParseToLong();
-            var updateUser = "ERP";
-            var updateTime = HymsonClock.Now();
+            currentBo.SiteId = configEntity.Value.ParseToLong();
 
             var resposeBo = new SyncWorkPlanSummaryBo();
 
             // 判断是否有不存在的产品编码
-            var productCodes = lineDtoDict.Select(s => s.ProductCode).Distinct();
-            var productEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = siteId, MaterialCodes = productCodes });
+            var productCodes = lineDtoDict.SelectMany(s => s.Products).Select(s => s.ProductCode).Distinct();
+            var productEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = currentBo.SiteId, MaterialCodes = productCodes });
             if (productEntities == null || productEntities.Any())
             {
                 // 这里应该提示产品不存在
-                return resposeBo;
+                throw new CustomerValidationException(nameof(ErrorCode.MES10244)).WithData("Code", string.Join(',', productCodes));
             }
 
             // 判断BOM编码是否存在
-            var bomCodes = lineDtoDict.Select(s => s.BomCode).Distinct();
-            var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = siteId, Codes = bomCodes });
+            var bomCodes = lineDtoDict.SelectMany(s => s.Products).Select(s => s.BomCode).Distinct();
+            var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = currentBo.SiteId, Codes = bomCodes });
             if (bomEntities == null || bomEntities.Any())
             {
                 // 这里应该提示BOM不存在
-                return resposeBo;
+                throw new CustomerValidationException(nameof(ErrorCode.MES10233)).WithData("bomCode", string.Join(',', bomCodes));
             }
 
             // 读取已存在的生产计划记录
             var planCodes = lineDtoDict.Select(s => s.PlanCode).Distinct();
-            var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = siteId, Codes = planCodes });
+            var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = currentBo.SiteId, Codes = planCodes });
 
             // 遍历数据
             foreach (var planDto in lineDtoDict)
             {
+                /*
+                // 产品不能为空
+                if (planDto.Products.Count == 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10249)).WithData("Code", planDto.PlanCode);
+                }
+
+                // 不支持一个生产计划多个产品
+                if (planDto.Products.Count > 1)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10248)).WithData("Code", planDto.PlanCode);
+                }
+
+                // 获取产品对象
+                var productDto = planDto.Products.FirstOrDefault();
+                if (productDto == null) continue;
+
+                var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == productDto.ProductCode)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10245)).WithData("Code", productDto.ProductCode);
+                
+                var bomEntity = bomEntities.FirstOrDefault(f => f.BomCode == productDto.BomCode)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10246)).WithData("Code", productDto.BomCode);
+                */
+
                 var planEntity = planEntities.FirstOrDefault(f => f.PlanCode == planDto.PlanCode);
-
-                var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == planDto.ProductCode);
-                if (productEntity == null)
-                {
-                    // 这里应该提示产品不存在
-                    continue;
-                }
-
-                var bomEntity = bomEntities.FirstOrDefault(f => f.BomCode == planDto.BomCode);
-                if (bomEntity == null)
-                {
-                    // 这里应该提示BOM不存在
-                    continue;
-                }
 
                 // 不存在的新生产计划
                 if (planEntity == null)
@@ -168,16 +265,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     planEntity = new PlanWorkPlanEntity
                     {
                         PlanCode = planDto.PlanCode,
-                        ProductCode = planDto.ProductCode,
-                        ProductVersion = planDto.ProductVersion,
-                        BomCode = planDto.BomCode,
-                        BomVersion = planDto.BomVersion,
-                        Qty = planDto.Qty,
                         RequirementNumber = planDto.RequirementNumber,
-
-                        ProductId = productEntity.Id,
-                        BomId = bomEntity.Id,
-
                         PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value,
                         PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value,
 
@@ -188,11 +276,11 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
                         Remark = "",
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = siteId,
-                        CreatedBy = updateUser,
-                        CreatedOn = updateTime,
-                        UpdatedBy = updateUser,
-                        UpdatedOn = updateTime
+                        SiteId = currentBo.SiteId,
+                        CreatedBy = currentBo.User,
+                        CreatedOn = currentBo.Time,
+                        UpdatedBy = currentBo.User,
+                        UpdatedOn = currentBo.Time
                     };
 
                     // 添加生产计划
@@ -205,18 +293,66 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     if (planEntity.Status != PlanWorkPlanStatusEnum.NotStarted)
                     {
                         // 这里应该提示当前的生产计划状态不允许修改
-                        continue;
+                        throw new CustomerValidationException(nameof(ErrorCode.MES10247)).WithData("Status", PlanWorkPlanStatusEnum.NotStarted.GetDescription());
                     }
 
                     // 除了数量/时间，好像什么都不能随便改
-                    planEntity.Qty = planDto.Qty;
                     planEntity.PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value;
                     planEntity.PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value;
 
-                    planEntity.UpdatedBy = updateUser;
-                    planEntity.UpdatedOn = updateTime;
+                    planEntity.UpdatedBy = currentBo.User;
+                    planEntity.UpdatedOn = currentBo.Time;
                     resposeBo.Updates.Add(planEntity);
                 }
+
+                // 遍历产品列表
+                foreach (var productDto in planDto.Products)
+                {
+                    // 添加生产计划产品
+                    var planProductId = productDto.Id ?? IdGenProvider.Instance.CreateId();
+                    resposeBo.ProductAdds.Add(new PlanWorkPlanProductEntity
+                    {
+                        PlanId = planEntity.Id,
+                        ProductId = productDto.ProductId,
+                        ProductCode = productDto.ProductCode,
+                        ProductVersion = productDto.ProductVersion,
+                        BomId = productDto.BomId,
+                        BomCode = productDto.BomCode,
+                        BomVersion = productDto.BomVersion,
+                        Qty = productDto.Qty,
+                        OverScale = productDto.OverScale,
+
+                        Remark = "",
+                        Id = planProductId,
+                        SiteId = currentBo.SiteId,
+                        CreatedBy = currentBo.User,
+                        CreatedOn = currentBo.Time,
+                        UpdatedBy = currentBo.User,
+                        UpdatedOn = currentBo.Time
+                    });
+
+                    // 添加生产计划物料
+                    resposeBo.MaterialAdds.AddRange(productDto.Materials.Select(s => new PlanWorkPlanMaterialEntity
+                    {
+                        PlanId = planEntity.Id,
+                        PlanProductId = planProductId,
+                        MaterialId = s.MaterialId,
+                        MaterialCode = s.MaterialCode,
+                        MaterialVersion = s.MaterialVersion,
+                        BomId = s.BomId,
+                        Usages = s.Usages,
+                        Loss = s.Loss,
+
+                        Remark = "",
+                        Id = s.Id ?? IdGenProvider.Instance.CreateId(),
+                        SiteId = currentBo.SiteId,
+                        CreatedBy = currentBo.User,
+                        CreatedOn = currentBo.Time,
+                        UpdatedBy = currentBo.User,
+                        UpdatedOn = currentBo.Time
+                    }));
+                }
+
             }
 
             return resposeBo;
@@ -237,5 +373,22 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// 更新（工作计划）
         /// </summary>
         public List<PlanWorkPlanEntity> Updates { get; set; } = new();
+        /// <summary>
+        /// 新增（工作计划产品）
+        /// </summary>
+        public List<PlanWorkPlanProductEntity> ProductAdds { get; set; } = new();
+        /// <summary>
+        /// 新增（工作计划产品）
+        /// </summary>
+        public List<PlanWorkPlanProductEntity> ProductUpdates { get; set; } = new();
+        /// <summary>
+        /// 新增（工作计划物料）
+        /// </summary>
+        public List<PlanWorkPlanMaterialEntity> MaterialAdds { get; set; } = new();
+        /// <summary>
+        /// 新增（工作计划物料）
+        /// </summary>
+        public List<PlanWorkPlanMaterialEntity> MaterialUpdates { get; set; } = new();
+
     }
 }

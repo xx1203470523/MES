@@ -55,7 +55,7 @@ namespace Hymson.MES.System.Api.Controllers
         [HttpPost("Bom/sync")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("BOM信息（同步）", BusinessType.INSERT)]
-        public async Task SyncBomAsync(IEnumerable<BomDto> requestDtos)
+        public async Task SyncBomAsync(IEnumerable<SyncBomDto> requestDtos)
         {
             _ = await _procBomService.SyncBomAsync(requestDtos);
         }

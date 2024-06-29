@@ -4,11 +4,11 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Core.Domain.Plan
 {
     /// <summary>
-    /// 数据实体对象（生产计划）
+    /// 数据实体对象（生产计划物料）
     /// @author Czhipu
     /// @date 2024-06-16
     /// </summary>
-    public partial class PlanWorkPlanEntity : BaseEntity
+    public partial class PlanWorkPlanMaterialEntity : BaseEntity
     {
         /// <summary>
         /// 工厂
@@ -16,39 +16,44 @@ namespace Hymson.MES.Core.Domain.Plan
         public long SiteId { get; set; }
 
         /// <summary>
-        /// 计划单号
+        /// 生产计划ID
         /// </summary>
-        public string PlanCode { get; set; }
+        public long PlanId { get; set; }
 
         /// <summary>
-        /// 需求单号
+        /// 生产计划产品ID
         /// </summary>
-        public string? RequirementNumber { get; set; } = "";
+        public long PlanProductId { get; set; }
 
         /// <summary>
-        /// 计划类型
+        /// 物料Id
         /// </summary>
-        public PlanWorkOrderTypeEnum Type { get; set; }
+        public long MaterialId { get; set; }
 
         /// <summary>
-        /// 计划状态
+        /// 物料编号 
         /// </summary>
-        public PlanWorkPlanStatusEnum Status { get; set; }
+        public string MaterialCode { get; set; } = "";
 
         /// <summary>
-        /// 超生产比例;默认是0，若允许超产，则写超产的%比例
+        /// 物料版本
         /// </summary>
-        public decimal OverScale { get; set; } = 0;
+        public string MaterialVersion { get; set; } = "";
 
         /// <summary>
-        /// 开始时间（计划）
+        /// BomId
         /// </summary>
-        public DateTime PlanStartTime { get; set; }
+        public long? BomId { get; set; }
 
         /// <summary>
-        /// 结束时间（计划）
+        /// 用量
         /// </summary>
-        public DateTime PlanEndTime { get; set; }
+        public decimal Usages { get; set; }
+
+        /// <summary>
+        /// 损耗
+        /// </summary>
+        public decimal Loss { get; set; }
 
         /// <summary>
         /// 备注
