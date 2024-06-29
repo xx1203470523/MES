@@ -12,7 +12,7 @@ namespace Hymson.MES.HttpClients
     /// <summary>
     /// Xnebula 仓库请求
     /// </summary>
-    public class XnebulaWMSServer : IXnebulaWMSServer
+    public class XnebulaWMSServer : IXnebulaWMSService
     {
         private readonly HttpClient _httpClient;
         private readonly XnebulaWMSOption _options;

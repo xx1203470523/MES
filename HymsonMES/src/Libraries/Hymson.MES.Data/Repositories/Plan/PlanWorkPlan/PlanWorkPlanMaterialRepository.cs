@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Plan.Query;
 using Microsoft.Extensions.Options;
 
@@ -126,6 +127,18 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.QueryAsync<PlanWorkPlanMaterialEntity>(template.RawSql, query);
         }
 
+        public async Task<IEnumerable<PlanWorkPlanMaterialEntity>> GetEntitiesByPlanIdAsync(PlanWorkPlanByPlanIdQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("PlanProductId = @PlanProductId");
+            sqlBuilder.Where("PlanId = @PlanId");
+            sqlBuilder.Select("*");
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<PlanWorkPlanMaterialEntity>(template.RawSql, query);
+        }
     }
 
 

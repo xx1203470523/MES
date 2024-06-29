@@ -1176,6 +1176,8 @@
         public const string MES16049 = "领料单申请失败,错误原因：【{msg}】。";
         public const string MES16050 = "领料单未找到,发送的请求标识为：【{orderId}】。";
         public const string MES16051 = "退料单申请失败,错误原因：【{msg}】。";
+
+        public const string MES16052 = "指定生产计划未找到,工单编码为：【{WorkOrder}】。";
         #endregion
 
         #region 条码接收 16100
