@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -7,29 +8,28 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Hymson.MES.HttpClients;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
-using Hymson.MES.Data.Repositories.Plan;
 using System.Transactions;
-using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.HttpClients;
-using FluentValidation.Results;
-using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -1171,8 +1171,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 Status = WhWarehouseRequistionStatusEnum.Approvaling,
                 Type =  ManuRequistionTypeEnum.WorkOrderPicking,
                 WorkOrderCode = request.WorkCode,
-                PlanCode = planWorkPlanEntity.PlanCode,
-                PlanId = planWorkPlanEntity.Id
+                WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
+                WorkPlanId = planWorkPlanEntity.Id
             };
             
 

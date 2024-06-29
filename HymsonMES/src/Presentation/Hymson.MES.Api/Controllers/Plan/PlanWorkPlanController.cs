@@ -49,12 +49,23 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <summary>
         /// 查询详情（生产计划）
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="planProductId"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<PlanWorkPlanDto?> QueryByIdAsync(long id)
+        [HttpGet("{planProductId}")]
+        public async Task<PlanWorkPlanProductDto?> QueryByIdAsync(long planProductId)
         {
-            return await _planWorkPlanService.QueryByIdAsync(id);
+            return await _planWorkPlanService.QueryByIdAsync(planProductId);
+        }
+
+        /// <summary>
+        /// 查询ID集合（关联故障现象）
+        /// </summary>
+        /// <param name="planProductId"></param>
+        /// <returns></returns>
+        [HttpGet("materials/{planProductId}")]
+        public async Task<IEnumerable<PlanWorkPlanMaterialDto>?> QueryMaterialsByMainIdAsync(long planProductId)
+        {
+            return await _planWorkPlanService.QueryMaterialsByMainIdAsync(planProductId);
         }
 
         /// <summary>

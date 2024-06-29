@@ -243,36 +243,46 @@ namespace Hymson.MES.Services.Services.Plan
         }
 
         /// <summary>
-        /// 根据ID查询
+        /// 根据planProductId查询
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="planProductId"></param>
         /// <returns></returns>
-        public async Task<PlanWorkPlanDto?> QueryByIdAsync(long id)
+        public async Task<PlanWorkPlanProductDto?> QueryByIdAsync(long planProductId)
         {
-            var entity = await _planWorkPlanRepository.GetByIdAsync(id);
-            if (entity == null) return default;
+            var planProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(planProductId);
+            if (planProductEntity == null) return default;
 
-            var dto = entity.ToModel<PlanWorkPlanDto>();
+            var dto = planProductEntity.ToModel<PlanWorkPlanProductDto>();
 
-            /*
-            // 读取BOM
-            var bomEntity = await _procBomRepository.GetByIdAsync(entity.BomId);
-            if (bomEntity != null)
+            // 填充生产计划
+            var planEntity = await _planWorkPlanRepository.GetByIdAsync(planProductEntity.WorkPlanId);
+            if (planEntity != null)
             {
-                dto.BomCode = bomEntity.BomCode;
-                dto.BomName = bomEntity.BomName;
+                dto.WorkPlanCode = planEntity.WorkPlanCode;
+                dto.PlanStartTime = planEntity.PlanStartTime;
+                dto.PlanEndTime = planEntity.PlanEndTime;
             }
-
-            // 读取物料
-            var materialEntity = await _procMaterialRepository.GetByIdAsync(entity.ProductId);
-            if (materialEntity != null)
-            {
-                dto.ProductCode = materialEntity.MaterialCode;
-                dto.ProductName = materialEntity.MaterialName;
-            }
-            */
 
             return dto;
+        }
+
+        // TODO: 读取生产计划已经下发的子工单
+
+
+        // TODO: 读取生产计划的物料
+        /// <summary>
+        /// 根据planProductId查询
+        /// </summary>
+        /// <param name="planProductId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkPlanMaterialDto>?> QueryMaterialsByMainIdAsync(long planProductId)
+        {
+            var planProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(planProductId);
+            if (planProductEntity == null) return default;
+
+            // TODO: 读取生产计划的物料
+
+            return default;
         }
 
     }

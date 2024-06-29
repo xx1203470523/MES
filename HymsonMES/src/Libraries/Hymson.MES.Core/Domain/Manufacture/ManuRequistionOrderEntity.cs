@@ -40,11 +40,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 计划编码
         /// </summary>
-        public string PlanCode { get; set; }
+        public string WorkPlanCode { get; set; }
         /// <summary>
         /// 计划Id
         /// </summary>
-        public long PlanId { get; set; }
+        public long WorkPlanId { get; set; }
         /// <summary>
         /// 领料数量
         /// </summary>

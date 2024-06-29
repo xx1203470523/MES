@@ -30,11 +30,19 @@ namespace Hymson.MES.Services.Services.Plan
         Task<PagedInfo<PlanWorkPlanProductDto>> GetPageListAsync(PlanWorkPlanProductPagedQueryDto pagedQueryDto);
 
         /// <summary>
-        /// 根据ID查询
+        /// 根据planProductId查询
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="planProductId"></param>
         /// <returns></returns>
-        Task<PlanWorkPlanDto?> QueryByIdAsync(long id);
+        Task<PlanWorkPlanProductDto?> QueryByIdAsync(long planProductId);
+
+        /// <summary>
+        /// 根据planProductId查询
+        /// </summary>
+        /// <param name="planProductId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkPlanMaterialDto>?> QueryMaterialsByMainIdAsync(long planProductId);
+
 
     }
 }   

@@ -257,6 +257,14 @@ namespace Hymson.MES.Services.Dtos.Plan
     }
 
     /// <summary>
+    /// Dto（生产计划物料）
+    /// </summary>
+    public record PlanWorkPlanMaterialDto
+    {
+        // TODO: 属性待补充
+    }
+
+    /// <summary>
     /// 保存对象（生产计划）
     /// </summary>
     public record PlanWorkPlanSaveDto : BaseEntityDto
