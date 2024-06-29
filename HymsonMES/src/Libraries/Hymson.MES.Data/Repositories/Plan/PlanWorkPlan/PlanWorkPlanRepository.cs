@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             if (entities == null || !entities.Any()) return 0;
 
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
         /// <summary>
@@ -151,10 +151,9 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM plan_work_plan /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM plan_work_plan /**where**/  ";
 
-        const string InsertsSql = "INSERT INTO plan_work_plan(Id, PlanCode, ProductCode, ProductVersion, ProductId, BomCode, BomVersion, BomId, Type, Qty, Status, RequirementNumber, OverScale, PlanStartTime, PlanEndTime, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (@Id, @PlanCode, @ProductCode, @ProductVersion, @ProductId, @BomCode, @BomVersion, @BomId, @Type, @Qty, @Status, @RequirementNumber, @OverScale, @PlanStartTime, @PlanEndTime, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT INTO plan_work_plan(Id, PlanCode, Type, Status, RequirementNumber, PlanStartTime, PlanEndTime, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (@Id, @PlanCode, @Type, @Status, @RequirementNumber, @PlanStartTime, @PlanEndTime, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE plan_work_plan SET ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE plan_work_plan SET PlanCode = @PlanCode, ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, Status = @Status, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, IsLocked = @IsLocked, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE plan_work_plan SET RequirementNumber = @RequirementNumber, Type = @Type, Status = @Status, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeletesSql = "UPDATE plan_work_plan SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @ids ";
 

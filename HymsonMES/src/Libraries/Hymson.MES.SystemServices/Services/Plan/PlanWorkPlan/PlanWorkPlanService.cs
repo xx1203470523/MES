@@ -4,8 +4,9 @@ using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
@@ -40,6 +41,16 @@ namespace Hymson.MES.SystemServices.Services.Plan
         private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
 
         /// <summary>
+        /// 仓储接口（生产计划产品）
+        /// </summary>
+        private readonly IPlanWorkPlanProductRepository _planWorkPlanProductRepository;
+
+        /// <summary>
+        /// 仓储接口（生产计划物料）
+        /// </summary>
+        private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
+
+        /// <summary>
         /// 仓储接口（BOM表）
         /// </summary>
         private readonly IProcBomRepository _procBomRepository;
@@ -55,17 +66,23 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// <param name="logger"></param>
         /// <param name="sysConfigRepository"></param>
         /// <param name="planWorkPlanRepository"></param>
+        /// <param name="planWorkPlanProductRepository"></param>
+        /// <param name="planWorkPlanMaterialRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procMaterialRepository"></param>
         public PlanWorkPlanService(ILogger<PlanWorkPlanService> logger,
             ISysConfigRepository sysConfigRepository,
             IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkPlanProductRepository planWorkPlanProductRepository,
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
             IProcBomRepository procBomRepository,
             IProcMaterialRepository procMaterialRepository)
         {
             _logger = logger;
             _sysConfigRepository = sysConfigRepository;
             _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkPlanProductRepository = planWorkPlanProductRepository;
+            _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
             _procBomRepository = procBomRepository;
             _procMaterialRepository = procMaterialRepository;
         }
@@ -83,7 +100,14 @@ namespace Hymson.MES.SystemServices.Services.Plan
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
             if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 
-            var resposeBo = await ConvertWorkPlanListAsync(configEntities.FirstOrDefault(), requestDtos)
+            // 当前对象
+            var currentBo = new BaseBo
+            {
+                User = "ERP",
+                Time = HymsonClock.Now()
+            };
+
+            var resposeBo = await ConvertWorkPlanListAsync(configEntities.FirstOrDefault(), currentBo, requestDtos)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 添加到集合
@@ -91,19 +115,27 @@ namespace Hymson.MES.SystemServices.Services.Plan
             resposeSummaryBo.Adds.AddRange(resposeBo.Adds);
             resposeSummaryBo.Updates.AddRange(resposeBo.Updates);
 
+            var planIds = resposeBo.Adds.Select(s => s.Id);
+
+            // 删除数据
+            var command = new DeleteByParentIdsCommand
+            {
+                ParentIds = planIds,
+                UpdatedBy = currentBo.User,
+                UpdatedOn = currentBo.Time
+            };
+
             // 插入数据
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _planWorkPlanRepository.InsertsAsync(resposeSummaryBo.Adds);
             rows += await _planWorkPlanRepository.UpdatesAsync(resposeSummaryBo.Updates);
 
-            // TODO: 先删除计划下面的产品和物料
-            // rows += await _planWorkPlanProductRepository.DeletesAsync(resposeSummaryBo.ProductAdds.Select(s => s.PlanId));
-            // rows += await _planWorkPlanMaterialRepository.DeletesAsync(resposeSummaryBo.MaterialAdds.Select(s => s.PlanId));
+            rows += await _planWorkPlanProductRepository.DeleteByParentIdsAsync(command);
+            rows += await _planWorkPlanMaterialRepository.DeleteByParentIdsAsync(command);
 
-            // TODO: 这里需要添加产品和物料的插入操作
-            // rows += await _planWorkPlanProductRepository.InsertsAsync(resposeSummaryBo.ProductAdds);
-            // rows += await _planWorkPlanMaterialRepository.InsertsAsync(resposeSummaryBo.MaterialAdds);
+            rows += await _planWorkPlanProductRepository.InsertsAsync(resposeSummaryBo.ProductAdds);
+            rows += await _planWorkPlanMaterialRepository.InsertsAsync(resposeSummaryBo.MaterialAdds);
 
             trans.Complete();
             return rows;
@@ -163,23 +195,22 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// 转换信息集合（生产计划）
         /// </summary>
         /// <param name="configEntity"></param>
+        /// <param name="currentBo"></param>
         /// <param name="lineDtoDict"></param>
         /// <returns></returns>
-        private async Task<SyncWorkPlanSummaryBo?> ConvertWorkPlanListAsync(SysConfigEntity? configEntity, IEnumerable<SyncWorkPlanDto> lineDtoDict)
+        private async Task<SyncWorkPlanSummaryBo?> ConvertWorkPlanListAsync(SysConfigEntity? configEntity, BaseBo currentBo, IEnumerable<SyncWorkPlanDto> lineDtoDict)
         {
             // 判断是否存在（配置）
             if (configEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 
             // 初始化
-            var siteId = configEntity.Value.ParseToLong();
-            var updateUser = "ERP";
-            var updateTime = HymsonClock.Now();
+            currentBo.SiteId = configEntity.Value.ParseToLong();
 
             var resposeBo = new SyncWorkPlanSummaryBo();
 
             // 判断是否有不存在的产品编码
             var productCodes = lineDtoDict.SelectMany(s => s.Products).Select(s => s.ProductCode).Distinct();
-            var productEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = siteId, MaterialCodes = productCodes });
+            var productEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = currentBo.SiteId, MaterialCodes = productCodes });
             if (productEntities == null || productEntities.Any())
             {
                 // 这里应该提示产品不存在
@@ -188,7 +219,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
             // 判断BOM编码是否存在
             var bomCodes = lineDtoDict.SelectMany(s => s.Products).Select(s => s.BomCode).Distinct();
-            var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = siteId, Codes = bomCodes });
+            var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = currentBo.SiteId, Codes = bomCodes });
             if (bomEntities == null || bomEntities.Any())
             {
                 // 这里应该提示BOM不存在
@@ -197,7 +228,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
             // 读取已存在的生产计划记录
             var planCodes = lineDtoDict.Select(s => s.PlanCode).Distinct();
-            var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = siteId, Codes = planCodes });
+            var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = currentBo.SiteId, Codes = planCodes });
 
             // 遍历数据
             foreach (var planDto in lineDtoDict)
@@ -245,11 +276,11 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
                         Remark = "",
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = siteId,
-                        CreatedBy = updateUser,
-                        CreatedOn = updateTime,
-                        UpdatedBy = updateUser,
-                        UpdatedOn = updateTime
+                        SiteId = currentBo.SiteId,
+                        CreatedBy = currentBo.User,
+                        CreatedOn = currentBo.Time,
+                        UpdatedBy = currentBo.User,
+                        UpdatedOn = currentBo.Time
                     };
 
                     // 添加生产计划
@@ -269,8 +300,8 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     planEntity.PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value;
                     planEntity.PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value;
 
-                    planEntity.UpdatedBy = updateUser;
-                    planEntity.UpdatedOn = updateTime;
+                    planEntity.UpdatedBy = currentBo.User;
+                    planEntity.UpdatedOn = currentBo.Time;
                     resposeBo.Updates.Add(planEntity);
                 }
 
@@ -293,11 +324,11 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
                         Remark = "",
                         Id = planProductId,
-                        SiteId = siteId,
-                        CreatedBy = updateUser,
-                        CreatedOn = updateTime,
-                        UpdatedBy = updateUser,
-                        UpdatedOn = updateTime
+                        SiteId = currentBo.SiteId,
+                        CreatedBy = currentBo.User,
+                        CreatedOn = currentBo.Time,
+                        UpdatedBy = currentBo.User,
+                        UpdatedOn = currentBo.Time
                     });
 
                     // 添加生产计划物料
@@ -314,11 +345,11 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
                         Remark = "",
                         Id = s.Id ?? IdGenProvider.Instance.CreateId(),
-                        SiteId = siteId,
-                        CreatedBy = updateUser,
-                        CreatedOn = updateTime,
-                        UpdatedBy = updateUser,
-                        UpdatedOn = updateTime
+                        SiteId = currentBo.SiteId,
+                        CreatedBy = currentBo.User,
+                        CreatedOn = currentBo.Time,
+                        UpdatedBy = currentBo.User,
+                        UpdatedOn = currentBo.Time
                     }));
                 }
 

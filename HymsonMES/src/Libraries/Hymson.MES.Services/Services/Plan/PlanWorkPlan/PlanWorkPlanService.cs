@@ -29,6 +29,16 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
 
         /// <summary>
+        /// 仓储接口（生产计划产品）
+        /// </summary>
+        private readonly IPlanWorkPlanProductRepository _planWorkPlanProductRepository;
+
+        /// <summary>
+        /// 仓储接口（生产计划物料）
+        /// </summary>
+        private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
+
+        /// <summary>
         /// 仓储接口（生产工单）
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
@@ -49,11 +59,15 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="planWorkPlanRepository"></param>
+        /// <param name="planWorkPlanProductRepository"></param>
+        /// <param name="planWorkPlanMaterialRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procMaterialRepository"></param>
         public PlanWorkPlanService(ICurrentUser currentUser, ICurrentSite currentSite,
             IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkPlanProductRepository planWorkPlanProductRepository,
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcBomRepository procBomRepository,
             IProcMaterialRepository procMaterialRepository)
@@ -61,6 +75,8 @@ namespace Hymson.MES.Services.Services.Plan
             _currentUser = currentUser;
             _currentSite = currentSite;
             _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkPlanProductRepository = planWorkPlanProductRepository;
+            _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procBomRepository = procBomRepository;
             _procMaterialRepository = procMaterialRepository;
@@ -151,11 +167,11 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<PlanWorkPlanDto>> GetPageListAsync(PlanWorkPlanPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<PlanWorkPlanProductDto>> GetPageListAsync(PlanWorkPlanProductPagedQueryDto pagedQueryDto)
         {
-            var pagedQuery = pagedQueryDto.ToQuery<PlanWorkPlanPagedQuery>();
+            var pagedQuery = pagedQueryDto.ToQuery<PlanWorkPlanProductPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _planWorkPlanRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _planWorkPlanProductRepository.GetPagedInfoAsync(pagedQuery);
 
             /*
             // 读取BOM
@@ -175,10 +191,10 @@ namespace Hymson.MES.Services.Services.Plan
             });
             */
 
-            List<PlanWorkPlanDto> dtos = new();
+            List<PlanWorkPlanProductDto> dtos = new();
             foreach (var dataItem in pagedInfo.Data)
             {
-                var dto = dataItem.ToModel<PlanWorkPlanDto>();
+                var dto = dataItem.ToModel<PlanWorkPlanProductDto>();
                 if (dto == null) continue;
 
                 /*
@@ -202,7 +218,7 @@ namespace Hymson.MES.Services.Services.Plan
                 dtos.Add(dto);
             }
 
-            return new PagedInfo<PlanWorkPlanDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<PlanWorkPlanProductDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
