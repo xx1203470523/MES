@@ -37,6 +37,10 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
         /// </summary>
         public PlanWorkOrderStatusEnum? Status { get; set; }
+        /// <summary>
+        /// 领料状态 1：未领料；2：已领料；3：部分领料
+        /// </summary>
+        public PlanWorkOrderPickStatusEnum? PickStatus { get; set; }
 
         /// <summary>
         /// 计划开始时间  时间范围  数组

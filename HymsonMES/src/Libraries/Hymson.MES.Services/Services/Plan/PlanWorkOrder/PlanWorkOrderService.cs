@@ -516,7 +516,7 @@ namespace Hymson.MES.Services.Services.Plan
             var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
 
             // TODO 这个应该在这里组装，不应该的DB查询全部数据，再直接转（看到了，但没时间改 -。-）
-           
+            
             
 
             // 实体到DTO转换 装载数据
@@ -530,10 +530,16 @@ namespace Hymson.MES.Services.Services.Plan
             var requistiongroup = manuRequistionOrderEntities.Where(m => m.Type == Core.Domain.Manufacture.ManuRequistionTypeEnum.WorkOrderPicking
             && (m.Status != WhWarehouseRequistionStatusEnum.ApprovalingFailed
             || m.Status != WhWarehouseRequistionStatusEnum.Failed)).GroupBy(m => m.WorkOrderCode);
-            var dtolist = dtos.ToList();
+            List<PlanWorkOrderListDetailViewDto> dtolist = new List<PlanWorkOrderListDetailViewDto>();
+            if (planWorkOrderPagedQueryDto.PickStatus != null)
+                dtolist = dtos.Where(d => d.PickStatus == planWorkOrderPagedQueryDto.PickStatus).ToList();
+            else
+            {
+                dtolist = dtos.ToList();
+            }
             dtolist.ForEach(d =>
             {
-                var qty = requistiongroup.First(r => r.Key == d.OrderCode).Sum(r => r.Qty);
+                var qty = requistiongroup.FirstOrDefault(r => r.Key == d.OrderCode)?.Sum(r => r.Qty)??0;
                 d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked
                 : qty == d.Qty ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.PartPicked;
             });
