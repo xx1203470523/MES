@@ -1,11 +1,6 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Equipment.EquToolingManage;
-using Hymson.MES.Services.Services.Process.Procedure;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,7 +42,6 @@ namespace Hymson.MES.Api.Controllers
             return await _equToolingManageService.GetPageListAsync(parm);
         }
 
-
         /// <summary>
         /// 查询详情（工具管理表）
         /// </summary>
@@ -58,7 +52,6 @@ namespace Hymson.MES.Api.Controllers
         {
             return await _equToolingManageService.QueryEquToolingManageByIdAsync(id);
         }
-
 
         /// <summary>
         /// 新增（工具管理表）
@@ -73,7 +66,6 @@ namespace Hymson.MES.Api.Controllers
         {
             return await _equToolingManageService.AddEquToolingManageAsync(parm);
         }
-
 
         /// <summary>
         /// 删除（工具管理表）
@@ -96,7 +88,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        [LogDescription("上料点维护", BusinessType.UPDATE)]
+        [LogDescription("工具管理维护", BusinessType.UPDATE)]
         [PermissionDescription("proc:equToolingManage:update")]
         public async Task UpdateEquToolingManageAsync([FromBody] EquToolingManageModifyDto parm)
         {

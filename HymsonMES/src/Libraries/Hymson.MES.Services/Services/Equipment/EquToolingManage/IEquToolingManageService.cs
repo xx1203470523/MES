@@ -18,7 +18,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// <returns></returns>
         Task<PagedInfo<EquToolingManageViewDto>> GetPageListAsync(EquToolingManagePagedQueryDto equToolingManagePagedQueryDto);
 
-
         /// <summary>
         /// 根据ID查询
         /// </summary>
@@ -29,7 +28,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procEquToolingManageCreateDto"></param>
+        /// <param name="equToolingManageCreateDto"></param>
         /// <returns></returns>
         Task<long> AddEquToolingManageAsync(AddEquToolingManageDto equToolingManageCreateDto);
 
@@ -43,7 +42,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procEquToolingManageModifyDto"></param>
+        /// <param name="equToolingManageModifyDto"></param>
         /// <returns></returns>
         Task ModifyEquToolingManageAsync(EquToolingManageModifyDto equToolingManageModifyDto);
     }
