@@ -35,7 +35,7 @@ namespace Hymson.MES.Core.Domain.Parameter
         /// <summary>
         /// 参数值
         /// </summary>
-        public string ParameterValue { get; set; }    
+        public string ParameterValue { get; set; } = ""; 
 
         /// <summary>
         /// 采集时间
