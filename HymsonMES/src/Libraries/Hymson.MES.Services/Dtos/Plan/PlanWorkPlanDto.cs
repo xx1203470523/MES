@@ -259,9 +259,42 @@ namespace Hymson.MES.Services.Dtos.Plan
     /// <summary>
     /// Dto（生产计划物料）
     /// </summary>
-    public record PlanWorkPlanMaterialDto
+    public record PlanWorkPlanMaterialDto : BaseEntityDto
     {
-        // TODO: 属性待补充
+        /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 物料编号 
+        /// </summary>
+        public string MaterialCode { get; set; } = "";
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string MaterialVersion { get; set; } = "";
+
+        /// <summary>
+        /// BomId
+        /// </summary>
+        public long? BomId { get; set; }
+
+        /// <summary>
+        /// 用量
+        /// </summary>
+        public decimal Usages { get; set; }
+
+        /// <summary>
+        /// 损耗
+        /// </summary>
+        public decimal Loss { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
     }
 
     /// <summary>
@@ -287,7 +320,7 @@ namespace Hymson.MES.Services.Dtos.Plan
     public record PlanWorkPlanDetailSaveDto
     {
         /// <summary>
-        /// 工单号
+        /// 工单编码
         /// </summary>
         public string WorkOrderCode { get; set; }
 

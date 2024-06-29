@@ -94,18 +94,17 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<int> SaveAsync(PlanWorkPlanSaveDto dto)
         {
             // 检查生产计划是否存在
-            var workPlanProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(dto.WorkPlanProductId);
-            if (workPlanProductEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16018));
+            var workPlanProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(dto.WorkPlanProductId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16018));
 
             // 检查生产计划是否存在
-            var workPlanEntity = await _planWorkPlanRepository.GetByIdAsync(workPlanProductEntity.WorkPlanId);
-            if (workPlanEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16018));
+            var workPlanEntity = await _planWorkPlanRepository.GetByIdAsync(workPlanProductEntity.WorkPlanId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16018));
 
             // 检查生产计划的状态
             if (workPlanEntity.Status != PlanWorkPlanStatusEnum.NotStarted)
             {
-                // TODO: 生产计划状态不正确
-                throw new CustomerValidationException(nameof(ErrorCode.MES16017));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10247)).WithData("Status", PlanWorkPlanStatusEnum.NotStarted.GetDescription());
             }
 
             if (dto.Details == null || !dto.Details.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16019));
@@ -114,9 +113,7 @@ namespace Hymson.MES.Services.Services.Plan
             var workOrderCodes = dto.Details.Select(s => s.WorkOrderCode);
             if (workOrderCodes.Count() != workOrderCodes.Distinct().Count())
             {
-                // TODO: 工单号存在重复
-
-                throw new CustomerValidationException(nameof(ErrorCode.MES16017));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16053));
             }
 
             // 查看数据库是否存在相同的工单号
@@ -270,6 +267,7 @@ namespace Hymson.MES.Services.Services.Plan
 
 
         // TODO: 读取生产计划的物料
+
         /// <summary>
         /// 根据planProductId查询
         /// </summary>
@@ -280,9 +278,14 @@ namespace Hymson.MES.Services.Services.Plan
             var planProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(planProductId);
             if (planProductEntity == null) return default;
 
-            // TODO: 读取生产计划的物料
+            var workPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesAsync(new PlanWorkPlanQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkPlanProductId = planProductId
+            });
+            if (workPlanMaterialEntities == null || !workPlanMaterialEntities.Any()) return default;
 
-            return default;
+            return workPlanMaterialEntities.Select(s => s.ToModel<PlanWorkPlanMaterialDto>());
         }
 
     }

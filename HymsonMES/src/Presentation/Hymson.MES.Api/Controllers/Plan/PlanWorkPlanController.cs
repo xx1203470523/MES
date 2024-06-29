@@ -58,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
-        /// 查询ID集合（关联故障现象）
+        /// 查询ID集合（生产计划物料）
         /// </summary>
         /// <param name="planProductId"></param>
         /// <returns></returns>

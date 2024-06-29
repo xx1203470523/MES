@@ -11,10 +11,24 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
         public long? SiteId { get; set; }
 
         /// <summary>
+        /// 生产计划ID
+        /// </summary>
+        public long? WorkPlanId { get; set; }
+
+        /// <summary>
+        /// 生产计划产品ID
+        /// </summary>
+        public long? WorkPlanProductId { get; set; }
+
+        /// <summary>
         /// 编码集合
         /// </summary>
         public IEnumerable<string>? Codes { get; set; }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class PlanWorkPlanByPlanIdQuery
     {
         /// <summary>

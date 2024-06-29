@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
+using Hymson.MES.Core.Domain.EquRepairOrder;
+using Hymson.MES.Core.Domain.EquSparepartInventory;
+using Hymson.MES.Core.Domain.EquSparepartRecord;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
@@ -21,6 +25,7 @@ using Hymson.MES.Core.Domain.WhWarehouseRegion;
 using Hymson.MES.Core.Domain.WhWarehouseShelf;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Integrated;
+using Hymson.MES.Data.Repositories.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
@@ -30,8 +35,12 @@ using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem.Q
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.Equipment.View;
 using Hymson.MES.Data.Repositories.EquMaintenancePlan;
 using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
+using Hymson.MES.Data.Repositories.EquRepairOrder;
+using Hymson.MES.Data.Repositories.EquSparepartInventory;
+using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Data.Repositories.EquSpotcheckPlan;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.Inte;
@@ -44,8 +53,9 @@ using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
-using Hymson.MES.Data.Repositories.Marking.Query;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Marking;
+using Hymson.MES.Data.Repositories.Marking.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Plan.Query;
@@ -77,10 +87,14 @@ using Hymson.MES.Data.Repositories.WhWareHouse.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseRegion.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseShelf.Query;
+using Hymson.MES.Services.Dtos.EquEquipmentRecord;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Equipment.EquMaintenance;
 using Hymson.MES.Services.Dtos.EquMaintenancePlan;
 using Hymson.MES.Services.Dtos.EquMaintenanceTemplate;
+using Hymson.MES.Services.Dtos.EquRepairOrder;
+using Hymson.MES.Services.Dtos.EquSparepartInventory;
+using Hymson.MES.Services.Dtos.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.EquSpotcheckPlan;
 using Hymson.MES.Services.Dtos.EquSpotcheckTemplate;
 using Hymson.MES.Services.Dtos.Inte;
@@ -103,20 +117,6 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
-using Hymson.MES.Services.Dtos.EquRepairOrder;
-using Hymson.MES.Core.Domain.EquRepairOrder;
-using Hymson.MES.Data.Repositories.EquRepairOrder;
-using Hymson.MES.Core.Domain.EquSparepartInventory;
-using Hymson.MES.Data.Repositories.EquSparepartInventory;
-using Hymson.MES.Services.Dtos.EquEquipmentRecord;
-using Hymson.MES.Core.Domain.EquEquipmentRecord;
-using Hymson.MES.Data.Repositories.EquEquipmentRecord;
-using Hymson.MES.Services.Dtos.EquSparepartRecord;
-using Hymson.MES.Core.Domain.EquSparepartRecord;
-using Hymson.MES.Data.Repositories.EquSparepartRecord;
-using Hymson.MES.Services.Dtos.EquSparepartInventory;
-using Hymson.MES.Data.Repositories.Equipment.View;
-using Hymson.MES.Data.Repositories.Manufacture.Query;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -661,7 +661,7 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
-            
+
         }
 
         /// <summary>
@@ -1389,7 +1389,7 @@ namespace Hymson.MES.Services.Mapper
             #region ManuJointProductAndByproductsReceiveRecord
             CreateMap<ManuJointProductAndByproductsReceiveRecordEntity, ManuJointProductAndByproductsReceiveRecordSaveDto>();
             CreateMap<ManuJointProductAndByproductsReceiveRecordPagedQueryDto, ManuJointProductAndByproductsReceiveRecordPagedQuery>();
-            
+
             #endregion
         }
 
@@ -1498,6 +1498,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<PlanWorkPlanEntity, PlanWorkPlanDto>();
             CreateMap<PlanWorkPlanProductPagedQueryDto, PlanWorkPlanProductPagedQuery>();
             CreateMap<PlanWorkPlanProductEntity, PlanWorkPlanProductDto>();
+            CreateMap<PlanWorkPlanMaterialEntity, PlanWorkPlanMaterialDto>();
 
         }
 

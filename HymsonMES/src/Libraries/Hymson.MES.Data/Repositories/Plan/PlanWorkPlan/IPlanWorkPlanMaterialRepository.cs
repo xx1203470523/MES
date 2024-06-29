@@ -58,6 +58,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<PlanWorkPlanMaterialEntity>> GetEntitiesAsync(PlanWorkPlanQuery query);
+
+
         Task<IEnumerable<PlanWorkPlanMaterialEntity>> GetEntitiesByPlanIdAsync(PlanWorkPlanByPlanIdQuery query);
 
     }
