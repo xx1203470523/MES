@@ -52,6 +52,7 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
         private readonly IProcProductParameterGroupRepository _parameterGroupRepository;
 
         private readonly IManuSfcRepository _manuSfcRepository;
+        private readonly IProcEquipmentGroupParamDetailRepository _groupParamDetailRepository;
 
         public ProductProcessParameterService(ICurrentSite currentSite,
         IManuProductParameterRepository productParameterRepository,
@@ -61,7 +62,8 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
         IProcParameterRepository procParameterRepository,
         IManuSfcRepository manuSfcRepository,
         IProcResourceRepository procResourceRepository,
-        IProcProductParameterGroupRepository parameterGroupRepository)
+        IProcProductParameterGroupRepository parameterGroupRepository,
+        IProcEquipmentGroupParamDetailRepository groupParamDetailRepository)
         {
             _currentSite = currentSite;
             _productParameterRepository = productParameterRepository;
@@ -72,6 +74,7 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
             _manuSfcRepository = manuSfcRepository;
             _procResourceRepository = procResourceRepository;
             _parameterGroupRepository = parameterGroupRepository;
+            _groupParamDetailRepository= groupParamDetailRepository;
         }
 
         /// <summary>
@@ -174,6 +177,7 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
             var groupIds = pagedInfo.Data.Select(x => x.ParameterGroupId).Distinct().ToArray();
             var parameterGroupTask = _parameterGroupRepository.GetByIdsAsync(groupIds);
 
+           // await _groupParamDetailRepository.GetEntitiesByRecipeIdsAsync(groupIds);
             var procMaterials = await procMaterialsTask;
             var inteWorkCenters = await inteWorkCentersTask;
             var procProcedures = await procProceduresTask;
