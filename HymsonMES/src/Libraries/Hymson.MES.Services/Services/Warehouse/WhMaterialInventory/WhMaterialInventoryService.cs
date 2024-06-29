@@ -84,7 +84,9 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
         private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
         private readonly IManuReturnOrderDetailRepository _manuReturnOrderDetailRepository;
-        private readonly IXnebulaWMSServer _wmsRequest;
+        private readonly IXnebulaWMSService _wmsRequest;
+        private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
+        private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
 
         /// <summary>
         /// 构造函数
@@ -119,11 +121,13 @@ namespace Hymson.MES.Services.Services.Warehouse
             IManuGenerateBarcodeService manuGenerateBarcodeService,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
-            IXnebulaWMSServer wMSRequest,
+            IXnebulaWMSService wMSRequest,
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
             IManuReturnOrderRepository manuReturnOrderRepository,
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
+            IPlanWorkPlanRepository planWorkPlanRepository,
             IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _currentUser = currentUser;
@@ -151,6 +155,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             _procMaterialRepository = procMaterialRepository;
             _manuReturnOrderDetailRepository = manuReturnOrderDetailRepository;
             _manuReturnOrderRepository  = manuReturnOrderRepository;
+            _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
         }
 
 
@@ -1153,6 +1159,9 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", request.WorkCode);
             }
+            //查询生产计划
+            var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", request.WorkCode);
 
             //创建领料申请单
             ManuRequistionOrderEntity manuRequistionOrderEntity = new ManuRequistionOrderEntity
@@ -1162,16 +1171,26 @@ namespace Hymson.MES.Services.Services.Warehouse
                 Status = WhWarehouseRequistionStatusEnum.Approvaling,
                 Type =  ManuRequistionTypeEnum.WorkOrderPicking,
                 WorkOrderCode = request.WorkCode,
+                PlanCode = planWorkPlanEntity.PlanCode,
+                PlanId = planWorkPlanEntity.Id
             };
             
 
             //获取派工单指定BOM记录
            
             var bomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrderEntity.ProductBOMId);
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(bomDetailEntities.Select(b=>b.MaterialId).Distinct().ToArray());
+
+            var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                PlanId = planWorkPlanEntity.Id,
+                PlanProductId = planWorkOrderEntity.ProductId,
+            });
+
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkPlanMaterialEntities.Select(b=>b.MaterialId).Distinct().ToArray());
             var productionPickMaterialDtos = new List<HttpClients.Requests.ProductionPickMaterialDto>();
             var validationFailures = new List<ValidationFailure>();
-            foreach (var item in bomDetailEntities)
+            foreach (var item in planWorkPlanMaterialEntities)
             {
                 var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
                 if (materialEntity == null)
@@ -1194,7 +1213,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 HttpClients.Requests.ProductionPickMaterialDto productionPickMaterialDto = new HttpClients.Requests.ProductionPickMaterialDto
                 {
                     MaterialCode = materialEntity.MaterialCode,
-                    Quantity = (request.Qty * item.Usages*(1+item.Loss??0)).ToString(),
+                    Quantity = (request.Qty * item.Usages*(1+item.Loss)).ToString(),
                     UnitCode = materialEntity.Unit
                 };
                 productionPickMaterialDtos.Add(productionPickMaterialDto);

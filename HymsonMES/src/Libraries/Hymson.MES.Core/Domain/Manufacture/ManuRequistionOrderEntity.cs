@@ -38,6 +38,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public WhWarehouseRequistionStatusEnum? Status { get; set; }
         /// <summary>
+        /// 计划编码
+        /// </summary>
+        public string PlanCode { get; set; }
+        /// <summary>
+        /// 计划Id
+        /// </summary>
+        public long PlanId { get; set; }
+        /// <summary>
         /// 领料数量
         /// </summary>
         public int Qty { get; set; }

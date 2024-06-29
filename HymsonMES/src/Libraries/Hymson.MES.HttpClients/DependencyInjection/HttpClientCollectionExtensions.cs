@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             var wmsOptions = new XnebulaWMSOption();
             configuration.GetSection("XnebulaWMSOptions").Bind(wmsOptions);
-            services.AddHttpClient<IXnebulaWMSServer, XnebulaWMSServer>().ConfigureHttpClient(httpClient =>
+            services.AddHttpClient<IXnebulaWMSService, XnebulaWMSServer>().ConfigureHttpClient(httpClient =>
             {
                 httpClient.BaseAddress = new Uri(wmsOptions.BaseAddressUri);
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", wmsOptions.Token);

@@ -15,4 +15,20 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
         /// </summary>
         public IEnumerable<string>? Codes { get; set; }
     }
+    public class PlanWorkPlanByPlanIdQuery
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 计划Id
+        /// </summary>
+        public long PlanId { get; set; }
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long PlanProductId { get; set; }
+    }
 }
