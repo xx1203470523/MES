@@ -115,12 +115,12 @@ namespace Hymson.MES.SystemServices.Services.Plan
             resposeSummaryBo.Adds.AddRange(resposeBo.Adds);
             resposeSummaryBo.Updates.AddRange(resposeBo.Updates);
 
-            var planIds = resposeBo.Adds.Select(s => s.Id);
+            var WorkPlanIds = resposeBo.Adds.Select(s => s.Id);
 
             // 删除数据
             var command = new DeleteByParentIdsCommand
             {
-                ParentIds = planIds,
+                ParentIds = WorkPlanIds,
                 UpdatedBy = currentBo.User,
                 UpdatedOn = currentBo.Time
             };
@@ -144,11 +144,11 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// <summary>
         /// 取消（生产计划）
         /// </summary>
-        /// <param name="planCodes"></param>
+        /// <param name="WorkPlanCodes"></param>
         /// <returns></returns>
-        public async Task<int> CancelWorkPlanAsync(IEnumerable<string> planCodes)
+        public async Task<int> CancelWorkPlanAsync(IEnumerable<string> WorkPlanCodes)
         {
-            if (planCodes == null || !planCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            if (WorkPlanCodes == null || !WorkPlanCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
             if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
@@ -165,7 +165,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
             var workPlanEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery
             {
                 SiteId = siteId,
-                Codes = planCodes
+                Codes = WorkPlanCodes
             });
 
             // 如果存在不是"未开始"的生产计划，不允许取消
@@ -227,8 +227,8 @@ namespace Hymson.MES.SystemServices.Services.Plan
             }
 
             // 读取已存在的生产计划记录
-            var planCodes = lineDtoDict.Select(s => s.PlanCode).Distinct();
-            var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = currentBo.SiteId, Codes = planCodes });
+            var WorkPlanCodes = lineDtoDict.Select(s => s.WorkPlanCode).Distinct();
+            var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = currentBo.SiteId, Codes = WorkPlanCodes });
 
             // 遍历数据
             foreach (var planDto in lineDtoDict)
@@ -237,13 +237,13 @@ namespace Hymson.MES.SystemServices.Services.Plan
                 // 产品不能为空
                 if (planDto.Products.Count == 0)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10249)).WithData("Code", planDto.PlanCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10249)).WithData("Code", planDto.WorkPlanCode);
                 }
 
                 // 不支持一个生产计划多个产品
                 if (planDto.Products.Count > 1)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10248)).WithData("Code", planDto.PlanCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10248)).WithData("Code", planDto.WorkPlanCode);
                 }
 
                 // 获取产品对象
@@ -257,14 +257,14 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10246)).WithData("Code", productDto.BomCode);
                 */
 
-                var planEntity = planEntities.FirstOrDefault(f => f.PlanCode == planDto.PlanCode);
+                var planEntity = planEntities.FirstOrDefault(f => f.WorkPlanCode == planDto.WorkPlanCode);
 
                 // 不存在的新生产计划
                 if (planEntity == null)
                 {
                     planEntity = new PlanWorkPlanEntity
                     {
-                        PlanCode = planDto.PlanCode,
+                        WorkPlanCode = planDto.WorkPlanCode,
                         RequirementNumber = planDto.RequirementNumber,
                         PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value,
                         PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value,
@@ -309,10 +309,10 @@ namespace Hymson.MES.SystemServices.Services.Plan
                 foreach (var productDto in planDto.Products)
                 {
                     // 添加生产计划产品
-                    var planProductId = productDto.Id ?? IdGenProvider.Instance.CreateId();
+                    var WorkPlanProductId = productDto.Id ?? IdGenProvider.Instance.CreateId();
                     resposeBo.ProductAdds.Add(new PlanWorkPlanProductEntity
                     {
-                        PlanId = planEntity.Id,
+                        WorkPlanId = planEntity.Id,
                         ProductId = productDto.ProductId,
                         ProductCode = productDto.ProductCode,
                         ProductVersion = productDto.ProductVersion,
@@ -323,7 +323,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                         OverScale = productDto.OverScale,
 
                         Remark = "",
-                        Id = planProductId,
+                        Id = WorkPlanProductId,
                         SiteId = currentBo.SiteId,
                         CreatedBy = currentBo.User,
                         CreatedOn = currentBo.Time,
@@ -334,8 +334,8 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     // 添加生产计划物料
                     resposeBo.MaterialAdds.AddRange(productDto.Materials.Select(s => new PlanWorkPlanMaterialEntity
                     {
-                        PlanId = planEntity.Id,
-                        PlanProductId = planProductId,
+                        WorkPlanId = planEntity.Id,
+                        WorkPlanProductId = WorkPlanProductId,
                         MaterialId = s.MaterialId,
                         MaterialCode = s.MaterialCode,
                         MaterialVersion = s.MaterialVersion,

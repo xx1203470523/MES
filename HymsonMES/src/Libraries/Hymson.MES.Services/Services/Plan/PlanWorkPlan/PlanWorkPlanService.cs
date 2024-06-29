@@ -4,12 +4,15 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Plan;
+using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 
@@ -91,8 +94,12 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<int> SaveAsync(PlanWorkPlanSaveDto dto)
         {
             // 检查生产计划是否存在
-            var workPlanEntity = await _planWorkPlanRepository.GetByIdAsync(dto.WorkPlanId);
-            if (workPlanEntity == null) return 0;
+            var workPlanProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(dto.WorkPlanProductId);
+            if (workPlanProductEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16018));
+
+            // 检查生产计划是否存在
+            var workPlanEntity = await _planWorkPlanRepository.GetByIdAsync(workPlanProductEntity.WorkPlanId);
+            if (workPlanEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES16018));
 
             // 检查生产计划的状态
             if (workPlanEntity.Status != PlanWorkPlanStatusEnum.NotStarted)
@@ -101,10 +108,10 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new CustomerValidationException(nameof(ErrorCode.MES16017));
             }
 
-            if (dto.Details == null || !dto.Details.Any()) return 0;
+            if (dto.Details == null || !dto.Details.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16019));
 
             // 检查子工单的工单号是否有重复
-            var workOrderCodes = dto.Details.Select(s => s.OrderCode);
+            var workOrderCodes = dto.Details.Select(s => s.WorkOrderCode);
             if (workOrderCodes.Count() != workOrderCodes.Distinct().Count())
             {
                 // TODO: 工单号存在重复
@@ -136,11 +143,49 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new CustomerValidationException(nameof(ErrorCode.MES16017));
             }
 
+            // 当前对象
+            var currentBo = new BaseBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                User = "ERP",
+                Time = HymsonClock.Now()
+            };
+
+            // 修改生产计划的状态
+            workPlanEntity.Status = PlanWorkPlanStatusEnum.Distributed;
+            workPlanEntity.UpdatedBy = currentBo.User;
+            workPlanEntity.UpdatedOn = currentBo.Time;
+
+            List<PlanWorkOrderEntity> workOrderEntites = new();
+            workOrderEntites.AddRange(dto.Details.Select(s => new PlanWorkOrderEntity
+            {
+                OrderCode = s.WorkOrderCode,
+                WorkCenterType = s.WorkCenterType,
+                WorkCenterId = s.WorkCenterId,
+                PlanStartTime = s.PlanStartTime,
+                PlanEndTime = s.PlanEndTime,
+                Qty = s.Qty,
+
+                ProductId = workPlanProductEntity.ProductId,
+                WorkPlanId = workPlanEntity.Id,
+                ProcessRouteId = 0,
+                ProductBOMId = 0,
+                Type = workPlanEntity.Type,
+                OverScale = workPlanProductEntity.OverScale,
+                Status = PlanWorkOrderStatusEnum.NotStarted,
+
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = currentBo.SiteId,
+                CreatedBy = currentBo.User,
+                CreatedOn = currentBo.Time,
+                UpdatedBy = currentBo.User,
+                UpdatedOn = currentBo.Time
+            }));
+
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
-
-            // 保存子工单
-
+            rows += await _planWorkPlanRepository.UpdateAsync(workPlanEntity);
+            rows += await _planWorkOrderRepository.InsertsAsync(workOrderEntites);
             trans.Complete();
             return rows;
         }
@@ -173,23 +218,8 @@ namespace Hymson.MES.Services.Services.Plan
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _planWorkPlanProductRepository.GetPagedInfoAsync(pagedQuery);
 
-            /*
-            // 读取BOM
-            var bomIds = pagedInfo.Data.Select(s => s.BomId).Distinct();
-            var bomEntities = await _procBomRepository.GetEntitiesAsync(new ProcBomQuery
-            {
-                SiteId = pagedQuery.SiteId,
-                BomIds = bomIds
-            });
-
-            // 读取物料
-            var materialIds = pagedInfo.Data.Select(s => s.ProductId).Distinct();
-            var materialEntities = await _procMaterialRepository.GetEntitiesAsync(new ProcMaterialQuery
-            {
-                SiteId = pagedQuery.SiteId,
-                MaterialIds = materialIds
-            });
-            */
+            // 读取生产计划
+            var planEntities = await _planWorkPlanRepository.GetByIdsAsync(pagedInfo.Data.Select(s => s.WorkPlanId));
 
             List<PlanWorkPlanProductDto> dtos = new();
             foreach (var dataItem in pagedInfo.Data)
@@ -197,23 +227,14 @@ namespace Hymson.MES.Services.Services.Plan
                 var dto = dataItem.ToModel<PlanWorkPlanProductDto>();
                 if (dto == null) continue;
 
-                /*
-                // 填充BOM
-                var bomEntity = bomEntities.FirstOrDefault(f => f.Id == dto.BomId);
-                if (bomEntity != null)
+                // 填充生产计划
+                var planEntity = planEntities.FirstOrDefault(f => f.Id == dto.BomId);
+                if (planEntity != null)
                 {
-                    dto.BomCode = bomEntity.BomCode;
-                    dto.BomName = bomEntity.BomName;
+                    dto.WorkPlanCode = planEntity.WorkPlanCode;
+                    dto.PlanStartTime = planEntity.PlanStartTime;
+                    dto.PlanEndTime = planEntity.PlanEndTime;
                 }
-
-                // 填充物料
-                var materialEntity = materialEntities.FirstOrDefault(f => f.Id == dto.ProductId);
-                if (materialEntity != null)
-                {
-                    dto.ProductCode = materialEntity.MaterialCode;
-                    dto.ProductName = materialEntity.MaterialName;
-                }
-                */
 
                 dtos.Add(dto);
             }

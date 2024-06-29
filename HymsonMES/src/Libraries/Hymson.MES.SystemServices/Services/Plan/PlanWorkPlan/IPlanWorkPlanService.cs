@@ -17,9 +17,9 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// <summary>
         /// 取消（生产计划）
         /// </summary>
-        /// <param name="planCodes"></param>
+        /// <param name="WorkPlanCodes"></param>
         /// <returns></returns>
-        Task<int> CancelWorkPlanAsync(IEnumerable<string> planCodes);
+        Task<int> CancelWorkPlanAsync(IEnumerable<string> WorkPlanCodes);
 
     }
 }

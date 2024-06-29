@@ -18,12 +18,12 @@ namespace Hymson.MES.Core.Domain.Plan
         /// <summary>
         /// 生产计划ID
         /// </summary>
-        public long PlanId { get; set; }
+        public long WorkPlanId { get; set; }
 
         /// <summary>
         /// 生产计划产品ID
         /// </summary>
-        public long PlanProductId { get; set; }
+        public long WorkPlanProductId { get; set; }
 
         /// <summary>
         /// 物料Id

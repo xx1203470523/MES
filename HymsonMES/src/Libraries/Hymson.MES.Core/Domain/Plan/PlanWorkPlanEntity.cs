@@ -18,7 +18,7 @@ namespace Hymson.MES.Core.Domain.Plan
         /// <summary>
         /// 计划单号
         /// </summary>
-        public string PlanCode { get; set; }
+        public string WorkPlanCode { get; set; }
 
         /// <summary>
         /// 需求单号

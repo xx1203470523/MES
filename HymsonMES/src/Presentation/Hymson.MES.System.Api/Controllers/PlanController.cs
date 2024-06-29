@@ -46,14 +46,14 @@ namespace Hymson.MES.System.Api.Controllers
         /// <summary>
         /// 生产计划（取消）
         /// </summary>
-        /// <param name="planCodes"></param>
+        /// <param name="WorkPlanCodes"></param>
         /// <returns></returns>
         [HttpPost("WorkPlan/cancel")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("生产计划（取消）", BusinessType.INSERT)]
-        public async Task CancelWorkPlanAsync(IEnumerable<string> planCodes)
+        public async Task CancelWorkPlanAsync(IEnumerable<string> WorkPlanCodes)
         {
-            _ = await _planWorkPlanService.CancelWorkPlanAsync(planCodes);
+            _ = await _planWorkPlanService.CancelWorkPlanAsync(WorkPlanCodes);
         }
 
     }

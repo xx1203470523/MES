@@ -37,7 +37,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 计划单号 
         /// </summary>
-        public string PlanCode { get; set; } = "";
+        public string WorkPlanCode { get; set; } = "";
 
         /// <summary>
         /// 生产时间（计划）

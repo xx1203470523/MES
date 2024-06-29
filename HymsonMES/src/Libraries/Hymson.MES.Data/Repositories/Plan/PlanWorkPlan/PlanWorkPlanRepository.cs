@@ -151,7 +151,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM plan_work_plan /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM plan_work_plan /**where**/  ";
 
-        const string InsertsSql = "INSERT INTO plan_work_plan(Id, PlanCode, Type, Status, RequirementNumber, PlanStartTime, PlanEndTime, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (@Id, @PlanCode, @Type, @Status, @RequirementNumber, @PlanStartTime, @PlanEndTime, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT INTO plan_work_plan(Id, WorkPlanCode, Type, Status, RequirementNumber, PlanStartTime, PlanEndTime, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (@Id, @WorkPlanCode, @Type, @Status, @RequirementNumber, @PlanStartTime, @PlanEndTime, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
         const string UpdateSql = "UPDATE plan_work_plan SET RequirementNumber = @RequirementNumber, Type = @Type, Status = @Status, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 

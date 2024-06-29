@@ -17,7 +17,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 生产计划单号
         /// </summary>
-        public string PlanCode { get; set; }
+        public string WorkPlanCode { get; set; }
 
         /// <summary>
         /// 产品id
@@ -143,7 +143,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 生产计划单号
         /// </summary>
-        public string PlanCode { get; set; }
+        public string WorkPlanCode { get; set; }
 
         /// <summary>
         /// 产品id
@@ -262,9 +262,9 @@ namespace Hymson.MES.Services.Dtos.Plan
     public record PlanWorkPlanSaveDto : BaseEntityDto
     {
         /// <summary>
-        /// 生产计划Id
+        /// 生产计划产品Id
         /// </summary>
-        public long WorkPlanId { get; set; }
+        public long WorkPlanProductId { get; set; }
 
         /// <summary>
         /// 工单明细
@@ -281,7 +281,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 工单号
         /// </summary>
-        public string OrderCode { get; set; }
+        public string WorkOrderCode { get; set; }
 
         /// <summary>
         /// 数量
@@ -298,6 +298,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public DateTime? PlanEndTime { get; set; }
 
+        /// <summary>
+        /// 工作中心类型;和工作中心保持一致
+        /// </summary>
+        public WorkCenterTypeEnum? WorkCenterType { get; set; }
+
+        /// <summary>
+        /// 工作中心（车间或者线体）
+        /// </summary>
+        public long? WorkCenterId { get; set; }
+
     }
 
     /// <summary>
@@ -308,7 +318,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 工单号
         /// </summary>
-        public string? OrderCode { get; set; }
+        public string? WorkOrderCode { get; set; }
 
         /// <summary>
         /// 物料编码
@@ -359,7 +369,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 工单号
         /// </summary>
-        public string? OrderCode { get; set; }
+        public string? WorkOrderCode { get; set; }
 
         /// <summary>
         /// 物料编码

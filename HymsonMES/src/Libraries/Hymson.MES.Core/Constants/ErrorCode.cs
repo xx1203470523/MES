@@ -1139,6 +1139,8 @@
         public const string MES16015 = "工单没有锁定前的状态，无法解锁";
         public const string MES16016 = "工单【{WorkOrder}】不存在，具体请查看【生产工单】。";
         public const string MES16017 = "状态不为【{Status}】，不允许删除！";
+        public const string MES16018 = "生产计划数据不存在！";
+        public const string MES16019 = "未设置生产工单明细！";
 
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";
