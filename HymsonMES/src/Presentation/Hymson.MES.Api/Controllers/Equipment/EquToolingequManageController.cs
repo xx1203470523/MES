@@ -60,8 +60,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        [LogDescription("工序维护", BusinessType.INSERT)]
-        [PermissionDescription("proc:equToolingManage:insert")]
+        [LogDescription("工具管理", BusinessType.INSERT)]
         public async Task<long> AddEquToolingManageAsync([FromBody] AddEquToolingManageDto parm)
         {
             return await _equToolingManageService.AddEquToolingManageAsync(parm);
@@ -74,8 +73,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        [LogDescription("工具管理维护", BusinessType.DELETE)]
-        [PermissionDescription("proc:equToolingManage:delete")]
+        [LogDescription("工具管理", BusinessType.DELETE)]
         public async Task DeleteEquToolingManageAsync([FromBody] long[] ids)
         {
             await _equToolingManageService.DeleteEquToolingManageAsync(ids);
@@ -88,9 +86,8 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        [LogDescription("工具管理维护", BusinessType.UPDATE)]
-        [PermissionDescription("proc:equToolingManage:update")]
-        public async Task UpdateEquToolingManageAsync([FromBody] EquToolingManageModifyDto parm)
+        [LogDescription("工具管理", BusinessType.UPDATE)]
+        public async Task ModifyEquToolingManageAsync([FromBody] EquToolingManageModifyDto parm)
         {
             await _equToolingManageService.ModifyEquToolingManageAsync(parm);
         }

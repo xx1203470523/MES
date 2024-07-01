@@ -122,7 +122,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             IEquEquipmentRepository equEquipmentRepository,
             IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
             IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository,
-            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, AbstractValidator<EquEquipmentVerifyCreateDto> verifyValidationRules, IProcResourceRepository procResourceRepository, IEquMaintenanceTemplateRepository equMaintenanceTemplateRepository, IEquMaintenanceTemplateEquipmentGroupRelationRepository equMaintenanceTemplateEquipmentGroupRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository)
+            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, AbstractValidator<EquEquipmentVerifyCreateDto> verifyValidationRules, IProcResourceRepository procResourceRepository, IEquMaintenanceTemplateRepository equMaintenanceTemplateRepository, IEquMaintenanceTemplateEquipmentGroupRelationRepository equMaintenanceTemplateEquipmentGroupRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository, IEquEquipmentRecordService equEquipmentRecordService, IEquEquipmentRecordRepository equEquipmentRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -139,6 +139,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             _equMaintenanceTemplateEquipmentGroupRelationRepository = equMaintenanceTemplateEquipmentGroupRelationRepository;
             _equSpotcheckTemplateRepository = equSpotcheckTemplateRepository;
             _equSpotcheckTemplateEquipmentGroupRelationRepository = equSpotcheckTemplateEquipmentGroupRelationRepository;
+            _equEquipmentRecordService = equEquipmentRecordService;
+            _equEquipmentRecordRepository = equEquipmentRecordRepository;
         }
 
 
