@@ -1,6 +1,11 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Equipment.EquToolingManage;
+using Hymson.MES.Services.Services.Process.Procedure;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,7 +42,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("list")]
-        public async Task<PagedInfo<EquToolingManageViewDto>> QueryEquToolingManage([FromQuery] EquToolingManagePagedQueryDto parm)
+        public async Task<PagedInfo<EquToolingManageViewDto>> QueryPagedProcProcedure([FromQuery] EquToolingManagePagedQueryDto parm)
         {
             return await _equToolingManageService.GetPageListAsync(parm);
         }
@@ -60,12 +65,12 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        [LogDescription("工序维护", BusinessType.INSERT)]
-        [PermissionDescription("proc:equToolingManage:insert")]
+        [LogDescription("工具管理", BusinessType.INSERT)]
         public async Task<long> AddEquToolingManageAsync([FromBody] AddEquToolingManageDto parm)
         {
             return await _equToolingManageService.AddEquToolingManageAsync(parm);
         }
+
 
         /// <summary>
         /// 删除（工具管理表）
@@ -74,8 +79,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        [LogDescription("工具管理维护", BusinessType.DELETE)]
-        [PermissionDescription("proc:equToolingManage:delete")]
+        [LogDescription("工具管理", BusinessType.DELETE)]
         public async Task DeleteEquToolingManageAsync([FromBody] long[] ids)
         {
             await _equToolingManageService.DeleteEquToolingManageAsync(ids);
@@ -88,9 +92,8 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        [LogDescription("工具管理维护", BusinessType.UPDATE)]
-        [PermissionDescription("proc:equToolingManage:update")]
-        public async Task UpdateEquToolingManageAsync([FromBody] EquToolingManageModifyDto parm)
+        [LogDescription("工具管理", BusinessType.UPDATE)]
+        public async Task ModifyEquToolingManageAsync([FromBody] EquToolingManageModifyDto parm)
         {
             await _equToolingManageService.ModifyEquToolingManageAsync(parm);
         }
