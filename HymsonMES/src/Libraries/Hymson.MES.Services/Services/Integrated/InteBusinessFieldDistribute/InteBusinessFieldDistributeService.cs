@@ -89,8 +89,8 @@ namespace Hymson.MES.Services.Services.Integrated
                     if (inteVehicleTypeVerifyDto.BusinessFieldId > 0)
                     {
                         var inteBusinessField = await _inteBusinessFieldRepository.GetByIdAsync(inteVehicleTypeVerifyDto.BusinessFieldId);
-                        inteVehicleTypeVerifyDto.BusinessFieldCode = inteBusinessField.Code;
-                        inteVehicleTypeVerifyDto.BusinessFieldName = inteBusinessField.Name;
+                        inteVehicleTypeVerifyDto.Code = inteBusinessField.Code;
+                        inteVehicleTypeVerifyDto.Name = inteBusinessField.Name;
                     }
                     inteBusinessFieldLists.Add(inteVehicleTypeVerifyDto);
                 }
@@ -138,18 +138,25 @@ namespace Hymson.MES.Services.Services.Integrated
 
             #region 处理 载具类型验证数据
             List<InteBusinessFieldDistributeDetailsEntity> detailEntities = new();
-            if (saveDto.inteBusinessFieldDistributeDetailsCreateDtos != null && saveDto.inteBusinessFieldDistributeDetailsCreateDtos.Any())
+            if (saveDto.InteBusinessFieldDistributeDetailList != null && saveDto.InteBusinessFieldDistributeDetailList.Any())
             {
-                foreach (var item in saveDto.inteBusinessFieldDistributeDetailsCreateDtos)
+                foreach (var item in saveDto.InteBusinessFieldDistributeDetailList)
                 {
                     //验证数据
                     var pattern = @"^[1-9]\d*$";
-                    if (!Regex.IsMatch($"{item.Seq}", pattern)) throw new CustomerValidationException(nameof(ErrorCode.MES19429));
-                    var isSeqCount = saveDto.inteBusinessFieldDistributeDetailsCreateDtos.GroupBy(p => p.Seq)
+                    if (!Regex.IsMatch($"{item.Seq}", pattern)) throw new CustomerValidationException(nameof(ErrorCode.MES19438));
+                    var isSeqCount = saveDto.InteBusinessFieldDistributeDetailList.GroupBy(p => p.Seq)
                                          .Any(g => g.Count() > 1);
                     if (isSeqCount)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19430));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19439));
+                    }
+
+                    var isBusinessFieldIds = saveDto.InteBusinessFieldDistributeDetailList.GroupBy(p => p.BusinessFieldId)
+                                         .Any(g => g.Count() > 1);
+                    if (isBusinessFieldIds)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19440));
                     }
                     detailEntities.Add(new InteBusinessFieldDistributeDetailsEntity()
                     {
@@ -198,18 +205,25 @@ namespace Hymson.MES.Services.Services.Integrated
 
             #region 处理 载具类型验证数据
             List<InteBusinessFieldDistributeDetailsEntity> detailEntities = new();
-            if (saveDto.inteBusinessFieldDistributeDetailsCreateDtos != null && saveDto.inteBusinessFieldDistributeDetailsCreateDtos.Any())
+            if (saveDto.InteBusinessFieldDistributeDetailList != null && saveDto.InteBusinessFieldDistributeDetailList.Any())
             {
-                foreach (var item in saveDto.inteBusinessFieldDistributeDetailsCreateDtos)
+                foreach (var item in saveDto.InteBusinessFieldDistributeDetailList)
                 {
                     //验证数据
                     var pattern = @"^[1-9]\d*$";
-                    if (!Regex.IsMatch($"{item.Seq}", pattern)) throw new CustomerValidationException(nameof(ErrorCode.MES19429));
-                    var isSeqCount = saveDto.inteBusinessFieldDistributeDetailsCreateDtos.GroupBy(p => p.Seq)
+                    if (!Regex.IsMatch($"{item.Seq}", pattern)) throw new CustomerValidationException(nameof(ErrorCode.MES19438));
+                    var isSeqCount = saveDto.InteBusinessFieldDistributeDetailList.GroupBy(p => p.Seq)
                                          .Any(g => g.Count() > 1);
                     if (isSeqCount)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19430));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19439));
+                    }
+
+                    var isBusinessFieldIds = saveDto.InteBusinessFieldDistributeDetailList.GroupBy(p => p.BusinessFieldId)
+                                         .Any(g => g.Count() > 1);
+                    if (isBusinessFieldIds)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19440));
                     }
                     detailEntities.Add(new InteBusinessFieldDistributeDetailsEntity()
                     {
@@ -218,9 +232,7 @@ namespace Hymson.MES.Services.Services.Integrated
                         BusinessFieldFistributeid = entity.Id,
                         Id = IdGenProvider.Instance.CreateId(),
                         IsRequired = item.IsRequired,
-                        CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName,
-                        CreatedOn = HymsonClock.Now(),
                         UpdatedOn = HymsonClock.Now(),
                         SiteId = _currentSite.SiteId ?? 0,
                     });

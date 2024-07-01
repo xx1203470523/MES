@@ -303,9 +303,7 @@ namespace Hymson.MES.Services.Services.Integrated
                         FieldValue = item.FieldValue,
                         iSDefault = item.ISDefault,
                         Id = IdGenProvider.Instance.CreateId(),
-                        CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName,
-                        CreatedOn = HymsonClock.Now(),
                         UpdatedOn = HymsonClock.Now(),
                         SiteId = _currentSite.SiteId ?? 0,
                     });

@@ -2026,6 +2026,14 @@
         public const string MES19434 = "列表字段存在非法字符，只能输入数字,大写字母,下划线";
         #endregion
 
+        #region 数据字段定义 19600
+        public const string MES19435 = "分配类型存在非法字符，只能输入数字,大写字母,下划线！";
+        public const string MES19436 = "分配类型已存在！";
+        public const string MES19437 = "分配类型不能为空！";
+        public const string MES19438 = "序号必须为正整数";
+        public const string MES19439 = "序号不能重复！";
+        public const string MES19440 = "数据字段不能重复！";
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错
