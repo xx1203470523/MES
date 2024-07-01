@@ -151,7 +151,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                     SFC = SFC,
                     SfcstepId = manuSfcStepEntities.FirstOrDefault(x => x.SFC == SFC)?.Id,
                     ParameterId = parameterEntity.Id,
-                    ParameterValue = parameter.ParameterValue,
+                    ParameterValue = parameter.ParameterValue== "undefined" ? "": parameter.ParameterValue,
                     CollectionTime = bo.Time,
                     SiteId = bo.SiteId,
                     CreatedBy = bo.UserName,
