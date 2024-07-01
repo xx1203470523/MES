@@ -201,9 +201,9 @@ namespace Hymson.MES.Services.Dtos.Plan
         public decimal Qty { get; set; }
 
         /// <summary>
-        /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
+        /// 生产计划状态 1：待派发；2：已派发；3：已取消；
         /// </summary>
-        public PlanWorkOrderStatusEnum Status { get; set; }
+        public PlanWorkPlanStatusEnum Status { get; set; }
 
         /// <summary>
         /// 计划开始时间
@@ -234,16 +234,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-        /// <summary>
-        /// 工厂
-        /// </summary>
-        public long SiteId { get; set; }
 
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例

@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// 工单状态 1：待派发；2：已派发；3：已取消；
+    /// 生产计划状态 1：待派发；2：已派发；3：已取消；
     /// </summary>
     public enum PlanWorkPlanStatusEnum : sbyte
     {

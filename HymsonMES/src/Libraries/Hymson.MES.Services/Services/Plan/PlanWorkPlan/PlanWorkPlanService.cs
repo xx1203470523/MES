@@ -15,6 +15,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Net.NetworkInformation;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -218,6 +219,12 @@ namespace Hymson.MES.Services.Services.Plan
             // 读取生产计划
             var planEntities = await _planWorkPlanRepository.GetByIdsAsync(pagedInfo.Data.Select(s => s.WorkPlanId));
 
+            // 读取产品
+            var productEntities = await _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(s => s.ProductId));
+
+            // 读取BOM
+            var bomEntities = await _procBomRepository.GetByIdsAsync(pagedInfo.Data.Select(s => s.BomId));
+
             List<PlanWorkPlanProductDto> dtos = new();
             foreach (var dataItem in pagedInfo.Data)
             {
@@ -225,12 +232,30 @@ namespace Hymson.MES.Services.Services.Plan
                 if (dto == null) continue;
 
                 // 填充生产计划
-                var planEntity = planEntities.FirstOrDefault(f => f.Id == dto.BomId);
+                var planEntity = planEntities.FirstOrDefault(f => f.Id == dataItem.WorkPlanId);
                 if (planEntity != null)
                 {
                     dto.WorkPlanCode = planEntity.WorkPlanCode;
                     dto.PlanStartTime = planEntity.PlanStartTime;
                     dto.PlanEndTime = planEntity.PlanEndTime;
+                    dto.Type = planEntity.Type;
+                    dto.Status = planEntity.Status;
+                }
+
+                // 填充产品
+                var productEntity = productEntities.FirstOrDefault(f => f.Id == dataItem.ProductId);
+                if (productEntity != null)
+                {
+                    dto.ProductCode = productEntity.MaterialCode;
+                    dto.ProductName = productEntity.MaterialName;
+                }
+
+                // 填充BOM
+                var bomEntity = bomEntities.FirstOrDefault(f => f.Id == dataItem.BomId);
+                if (bomEntity != null)
+                {
+                    dto.BomCode = bomEntity.BomCode;
+                    dto.BomName = bomEntity.BomName;
                 }
 
                 dtos.Add(dto);
