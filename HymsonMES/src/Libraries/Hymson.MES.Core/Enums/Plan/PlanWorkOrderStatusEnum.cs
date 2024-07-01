@@ -49,17 +49,17 @@ namespace Hymson.MES.Core.Enums
         /// 未领料
         /// </summary>
         [Description("未领料")]
-        NotPicked = 1,
+        NotPicked = 0,
         /// <summary>
         /// 已领料
         /// </summary>
         [Description("已领料")]
-        FinishPicked = 2,
+        FinishPicked = 1,
         /// <summary>
         /// 部分领料
         /// </summary>
         [Description("部分领料")]
-        PartPicked = 3
+        PartPicked = 2
         
     }
 }

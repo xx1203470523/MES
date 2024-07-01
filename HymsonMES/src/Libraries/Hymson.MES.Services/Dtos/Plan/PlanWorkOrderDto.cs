@@ -519,7 +519,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public PlanWorkOrderStatusEnum Status { get; set; }
         /// <summary>
-        /// 领料状态 1：未领料；2：已领料；3：部分领料
+        /// 领料状态 0：未领料；1：已领料；2：部分领料
         /// </summary>
         public PlanWorkOrderPickStatusEnum PickStatus { get; set; }
 
