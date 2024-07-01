@@ -191,7 +191,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 SiteId = siteId
             };
 
-            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquipmentRecordOperationTypeEnum.SparepartBind);
+            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquEquipmentRecordOperationTypeEnum.SparePartsBinding);
 
             //安装记录
             var bindRecordEntity = new EquSparepartEquipmentBindRecordEntity()
@@ -224,7 +224,7 @@ namespace Hymson.MES.Services.Services.Equipment
             return rows;
         }
 
-        private EquEquipmentRecordEntity GetEquRecord(EquEquipmentEntity equEquipmentEntity, string updatedBy, DateTime updatedOn, EquipmentRecordOperationTypeEnum operationType)
+        private EquEquipmentRecordEntity GetEquRecord(EquEquipmentEntity equEquipmentEntity, string updatedBy, DateTime updatedOn, EquEquipmentRecordOperationTypeEnum operationType)
         {
             return new EquEquipmentRecordEntity()
             {
@@ -248,7 +248,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 Supplier = equEquipmentEntity.Supplier,
                 Power = equEquipmentEntity.Power,
                 EnergyLevel = equEquipmentEntity.EnergyLevel,
-                OperationType= EquEquipmentRecordOperationTypeEnum.SparePartsBinding,
+                OperationType= operationType,
                 Ip = equEquipmentEntity.Ip,
                 TakeTime = equEquipmentEntity.TakeTime,
                 Remark = equEquipmentEntity.Remark,
@@ -338,7 +338,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 SiteId = siteId
             };
 
-            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquipmentRecordOperationTypeEnum.SparepartUnbind);
+            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquEquipmentRecordOperationTypeEnum.SparePartsUnbinding);
 
             var rows = 0;
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())

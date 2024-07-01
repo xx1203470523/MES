@@ -9,6 +9,7 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.Report;
 using System.Collections.Generic;
 
@@ -52,6 +53,7 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
         private readonly IProcProductParameterGroupRepository _parameterGroupRepository;
 
         private readonly IManuSfcRepository _manuSfcRepository;
+        private readonly IProcProductParameterGroupDetailRepository _groupDetailRepository;
 
         public ProductProcessParameterService(ICurrentSite currentSite,
         IManuProductParameterRepository productParameterRepository,
@@ -61,7 +63,8 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
         IProcParameterRepository procParameterRepository,
         IManuSfcRepository manuSfcRepository,
         IProcResourceRepository procResourceRepository,
-        IProcProductParameterGroupRepository parameterGroupRepository)
+        IProcProductParameterGroupRepository parameterGroupRepository,
+        IProcProductParameterGroupDetailRepository groupDetailRepository)
         {
             _currentSite = currentSite;
             _productParameterRepository = productParameterRepository;
@@ -72,6 +75,7 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
             _manuSfcRepository = manuSfcRepository;
             _procResourceRepository = procResourceRepository;
             _parameterGroupRepository = parameterGroupRepository;
+            _groupDetailRepository = groupDetailRepository;
         }
 
         /// <summary>
@@ -169,11 +173,15 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
             var procParametersTask = _procParameterRepository.GetByIdsAsync(parameterIds);
 
             var resourceId = pagedInfo.Data.Select(x => x.ResourceId).Distinct().ToList();
-            var  procResourceTask= _procResourceRepository.GetResByIdsAsync(resourceId);
+            var procResourceTask = _procResourceRepository.GetResByIdsAsync(resourceId);
 
             var groupIds = pagedInfo.Data.Select(x => x.ParameterGroupId).Distinct().ToArray();
             var parameterGroupTask = _parameterGroupRepository.GetByIdsAsync(groupIds);
 
+            var paramDetailEntities = await _groupDetailRepository.GetEntitiesAsync(new ProcProductParameterGroupDetailQuery
+            {
+                ParameterGroupIds=groupIds
+            });
             var procMaterials = await procMaterialsTask;
             var inteWorkCenters = await inteWorkCentersTask;
             var procProcedures = await procProceduresTask;
@@ -191,13 +199,14 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
                 var parameter = procParameters.FirstOrDefault(x => x.Id == item.ParameterId);
                 var resource = procResources.FirstOrDefault(x => x.Id == item.ResourceId);
                 var group = parameterGroups.FirstOrDefault(x => x.Id == item.ParameterGroupId);
+                var detail = paramDetailEntities.FirstOrDefault(x => x.ParameterGroupId == item.ParameterGroupId && x.ParameterId == item.ParameterId);
 
                 reportDtos.Add(new ProductProcessParameterReportDto
                 {
                     Sfc = item.SFC,
-                    ParameterGroupCode= group?.Code??"",
-                    ParameterGroupVersion=group?.Version??"",
-                    ResCode = resource?.ResCode??"",
+                    ParameterGroupCode = group?.Code ?? "",
+                    ParameterGroupVersion = group?.Version ?? "",
+                    ResCode = resource?.ResCode ?? "",
                     ProductCode = procMaterial?.MaterialCode ?? "",
                     ProductName = procMaterial?.MaterialName ?? "",
                     OrderCode = produceOrderView?.OrderCode ?? "",
@@ -208,7 +217,10 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
                     ParameterName = parameter?.ParameterName ?? "",
                     ParameterUnit = parameter?.ParameterUnit ?? "",
                     ParameterValue = item.ParameterValue,
-                    CollectionTime = item.CollectionTime
+                    CollectionTime = item.CollectionTime,
+                    CenterValue= detail?.CenterValue,
+                    MaxValue= detail?.UpperLimit,
+                    MinValue = detail?.LowerLimit
                 });
             }
             return new PagedInfo<ProductProcessParameterReportDto>(reportDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
