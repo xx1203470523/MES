@@ -177,8 +177,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string UpdateSql = "UPDATE inte_business_field_distribute_details SET   SiteId = @SiteId, BusinessFieldFistributeid = @BusinessFieldFistributeid, BusinessFieldId = @BusinessFieldId, Seq = @Seq, IsRequired = @IsRequired WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE inte_business_field_distribute_details SET   SiteId = @SiteId, BusinessFieldFistributeid = @BusinessFieldFistributeid, BusinessFieldId = @BusinessFieldId, Seq = @Seq, IsRequired = @IsRequired WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE inte_business_field_distribute_details SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE inte_business_field_distribute_details SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteSql = "DELETE FROM inte_business_field_distribute_details WHERE BusinessFieldFistributeid = @Id ";
+        const string DeletesSql = "DELETE FROM inte_business_field_distribute_details WHERE BusinessFieldFistributeid IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM inte_business_field_distribute_details WHERE BusinessFieldFistributeid = @Id ";
         const string GetByIdsSql = @"SELECT * FROM inte_business_field_distribute_details WHERE Id IN @Ids ";

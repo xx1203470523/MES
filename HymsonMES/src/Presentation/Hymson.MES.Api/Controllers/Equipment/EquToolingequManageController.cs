@@ -47,18 +47,16 @@ namespace Hymson.MES.Api.Controllers
             return await _equToolingManageService.GetPageListAsync(parm);
         }
 
-
         /// <summary>
         /// 查询详情（工具管理表）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquToolingManageViewDto> QueryProcConversionFactorByIdAsync(long id)
+        public async Task<EquToolingManageViewDto> QueryEquToolingManageByIdAsync(long id)
         {
-            return await _equToolingManageService.QueryProcConversionFactorByIdAsync(id);
+            return await _equToolingManageService.QueryEquToolingManageByIdAsync(id);
         }
-
 
         /// <summary>
         /// 新增（工具管理表）
@@ -68,9 +66,9 @@ namespace Hymson.MES.Api.Controllers
         [HttpPost]
         [Route("create")]
         [LogDescription("工具管理", BusinessType.INSERT)]
-        public async Task<long> AddProcConversionFactorAsync([FromBody] AddEquToolingManageDto parm)
+        public async Task<long> AddEquToolingManageAsync([FromBody] AddEquToolingManageDto parm)
         {
-            return await _equToolingManageService.AddProcConversionFactorAsync(parm);
+            return await _equToolingManageService.AddEquToolingManageAsync(parm);
         }
 
 
@@ -82,9 +80,9 @@ namespace Hymson.MES.Api.Controllers
         [HttpDelete]
         [Route("delete")]
         [LogDescription("工具管理", BusinessType.DELETE)]
-        public async Task DeleteProcConversionFactorAsync([FromBody] long[] ids)
+        public async Task DeleteEquToolingManageAsync([FromBody] long[] ids)
         {
-            await _equToolingManageService.DeleteProcConversionFactorAsync(ids);
+            await _equToolingManageService.DeleteEquToolingManageAsync(ids);
         }
 
         /// <summary>
@@ -95,9 +93,9 @@ namespace Hymson.MES.Api.Controllers
         [HttpPut]
         [Route("update")]
         [LogDescription("工具管理", BusinessType.UPDATE)]
-        public async Task UpdateProcConversionFactorAsync([FromBody] EquToolingManageModifyDto parm)
+        public async Task ModifyEquToolingManageAsync([FromBody] EquToolingManageModifyDto parm)
         {
-            await _equToolingManageService.ModifyProcConversionFactorAsync(parm);
+            await _equToolingManageService.ModifyEquToolingManageAsync(parm);
         }
     }
 }
