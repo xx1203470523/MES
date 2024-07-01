@@ -1,11 +1,6 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Equipment.EquToolingManage;
-using Hymson.MES.Services.Services.Process.Procedure;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,7 +37,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("list")]
-        public async Task<PagedInfo<EquToolingManageViewDto>> QueryPagedProcProcedure([FromQuery] EquToolingManagePagedQueryDto parm)
+        public async Task<PagedInfo<EquToolingManageViewDto>> QueryEquToolingManage([FromQuery] EquToolingManagePagedQueryDto parm)
         {
             return await _equToolingManageService.GetPageListAsync(parm);
         }
@@ -70,7 +65,6 @@ namespace Hymson.MES.Api.Controllers
         {
             return await _equToolingManageService.AddEquToolingManageAsync(parm);
         }
-
 
         /// <summary>
         /// 删除（工具管理表）
