@@ -346,7 +346,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 };
             }
 
-            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquEquipmentRecordOperationTypeEnum.了ToolUnbind);
+            var equRecordEntity = GetEquRecord(equEquipmentEntity, updatedBy, updatedOn, EquEquipmentRecordOperationTypeEnum.ToolUnbind);
 
             #endregion
 
