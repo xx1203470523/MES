@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 值来源 物料条码，供应商，客户，产品序列码，
         /// </summary>
-        public FieldDefinitionSourceEnum Source { get; set; }
+        public FieldDefinitionSourceEnum? Source { get; set; }
 
         /// <summary>
         /// 掩码组id proc_maskcode id
@@ -151,7 +151,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 值来源 物料条码，供应商，客户，产品序列码，
         /// </summary>
-        public FieldDefinitionSourceEnum Source { get; set; }
+        public FieldDefinitionSourceEnum? Source { get; set; }
 
        /// <summary>
         /// 掩码组id proc_maskcode id

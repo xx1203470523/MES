@@ -83,9 +83,9 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public record BusinessFieldViewDto : InteBusinessFieldDistributeDetailsDto
     {
-        public string BusinessFieldCode { get; set; } = "";
+        public string Code { get; set; } = "";
 
-        public string BusinessFieldName { get; set; } = "";
+        public string Name { get; set; } = "";
     }
 
     /// <summary>
