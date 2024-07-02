@@ -1178,7 +1178,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             //获取派工单指定BOM记录
            
-            var bomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrderEntity.ProductBOMId);
+            //var bomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrderEntity.ProductBOMId);
 
             var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
             {

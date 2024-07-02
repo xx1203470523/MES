@@ -531,11 +531,19 @@ namespace Hymson.MES.Services.Services.Plan
             && (m.Status != WhWarehouseRequistionStatusEnum.ApprovalingFailed
             || m.Status != WhWarehouseRequistionStatusEnum.Failed)).GroupBy(m => m.WorkOrderCode);
             List<PlanWorkOrderListDetailViewDto> dtolist = dtos.ToList();
+            //dtolist.ForEach(d =>
+            //{
+            //    var qty = requistiongroup.FirstOrDefault(r => r.Key == d.OrderCode)?.Sum(r => r.Qty)??0;
+            //    d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked
+            //    : qty == d.Qty ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.PartPicked;
+            //    d.PassDownQuantity = d.Qty;
+            //});
             dtolist.ForEach(d =>
             {
-                var qty = requistiongroup.FirstOrDefault(r => r.Key == d.OrderCode)?.Sum(r => r.Qty)??0;
-                d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked
-                : qty == d.Qty ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.PartPicked;
+                // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
+                var qty = requistiongroup.FirstOrDefault(r => r.Key == d.OrderCode)?.Count()??0;
+                d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked : PlanWorkOrderPickStatusEnum.FinishPicked;
+                
                 d.PassDownQuantity = d.Qty;
             });
             if (planWorkOrderPagedQueryDto.PickStatus != null)
