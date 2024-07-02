@@ -2016,7 +2016,7 @@
         public const string MES19424 = "一个列表只能有一个缺省标签！";
         public const string MES19425 = "数据字段已被分配,不能删除！";
         public const string MES19426 = "数据字段存在非法字符，只能输入数字,大写字母,下划线！";
-        public const string MES19427 = "数据字段已存在！";
+        public const string MES19427 = "类别【{type}】和分配类型【{code}】已存在,不允许重复创建！";
         public const string MES19428 = "数据字段不能为空！";
         public const string MES19429 = "序号必须为正整数";
         public const string MES19430 = "一个列表序号不能重复！";
