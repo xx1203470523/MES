@@ -1369,10 +1369,17 @@ namespace Hymson.MES.Services.Services.Manufacture
             var distinctSfcs = sfcs.Distinct();//去重的条码
 
             //1. 在条码信息（manu_sfc）中查询是否有数据
+            var siteId = _currentSite.SiteId ?? 0;
+
             //var manuSfcs= await _manuSfcRepository.GetBySFCsAsync(distinctSfcs);
-            var manuSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery()
+            //var manuSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery()
+            //{
+            //    SiteId = _currentSite.SiteId ?? 0,
+            //    Sfcs = distinctSfcs.ToArray()
+            //});
+            var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = siteId,
                 Sfcs = distinctSfcs.ToArray()
             });
             if (manuSfcs.Count() != distinctSfcs.Count())

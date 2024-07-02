@@ -191,7 +191,7 @@ namespace Hymson.MES.Services.Services.Equipment
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 ToolId = toolsEntity.Id,
-                ToolsRecordId = 0,
+                ToolsRecordId = toolsRecordEntity.Id,
                 EquipmentId = equEquipmentEntity.Id,
                 EquipmentRecordId = equRecordEntity.Id,
                 Position = saveDto.Position,
@@ -328,7 +328,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     RatedLife = toolsEntity.RatedLife,
                     RatedLifeUnit = toolsEntity.RatedLifeUnit,
                     CumulativeUsedLife = toolsEntity.CumulativeUsedLife,
-                    CurrentUsedLife = toolsEntity.CumulativeUsedLife,
+                    CurrentUsedLife = toolsEntity.CurrentUsedLife,
                     LastVerificationTime = toolsEntity.LastVerificationTime,
                     IsCalibrated = toolsEntity.IsCalibrated,
                     CalibrationCycle = toolsEntity.CalibrationCycle,
@@ -337,7 +337,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     Remark = toolsEntity.Remark,
                     EquipmentId = equEquipmentEntity.Id,
                     OperationType = ToolRecordOperationTypeEnum.UnBind,
-                    OperationRemark = "",
+                    OperationRemark = saveDto.Remark??"",
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
                     UpdatedBy = updatedBy,
@@ -403,7 +403,7 @@ namespace Hymson.MES.Services.Services.Equipment
             if (bindRecordEntity == null) return null;
 
             var bindRecordDto = bindRecordEntity.ToModel<EquToolsEquipmentBindRecordDto>();
-            //查询备件信息
+            //查询工具信息
             var toolsEntity = await _toolsRepository.GetByIdAsync(bindRecordEntity.ToolId);
 
             //查询设备信息
