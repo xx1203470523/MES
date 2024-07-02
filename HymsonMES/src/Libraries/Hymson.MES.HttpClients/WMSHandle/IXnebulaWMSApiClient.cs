@@ -12,7 +12,7 @@ namespace Hymson.MES.HttpClients
     /// <summary>
     /// 仓库服务
     /// </summary>
-    public interface IXnebulaWMSService
+    public interface IXnebulaWMSApiClient
     {
         /// <summary>
         /// 领料申请，包含工单借料

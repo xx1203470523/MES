@@ -15,11 +15,11 @@ namespace Hymson.MES.HttpClients.RotorHandle
     /// <summary>
     /// 转子线交互服务
     /// </summary>
-    public class RotorServer : IRotorService
+    public class RotorApiClient : IRotorApiClient
     {
         private readonly HttpClient _httpClient;
         private readonly RotorOption _options;
-        public RotorServer(HttpClient httpClient, IOptions<RotorOption> options)
+        public RotorApiClient(HttpClient httpClient, IOptions<RotorOption> options)
         {
             _httpClient = httpClient;
             _options = options.Value;
