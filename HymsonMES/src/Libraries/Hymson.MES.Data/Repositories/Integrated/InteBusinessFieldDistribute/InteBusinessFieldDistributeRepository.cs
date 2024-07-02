@@ -206,6 +206,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdsSql = @"SELECT * FROM inte_business_field_distribute WHERE Id IN @Ids ";
 
         const string GetByCodeSql = @"SELECT * 
-                            FROM `inte_business_field_distribute`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
+                            FROM `inte_business_field_distribute`  WHERE Code = @Code AND Type = @Type AND IsDeleted=0 AND SiteId=@SiteId ";
     }
 }
