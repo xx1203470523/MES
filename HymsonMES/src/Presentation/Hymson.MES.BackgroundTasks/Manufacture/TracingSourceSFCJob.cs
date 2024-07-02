@@ -36,7 +36,7 @@ namespace Hymson.MES.BackgroundTasks.Manufacture
             try
             {
 #if DM
-                await _tracingSourceSFCService.ExecuteForDMAsync(100);
+                await _tracingSourceSFCService.ExecuteForDMAsync(1000);
 #else
                 await _tracingSourceSFCService.ExecuteAsync(100);
 #endif

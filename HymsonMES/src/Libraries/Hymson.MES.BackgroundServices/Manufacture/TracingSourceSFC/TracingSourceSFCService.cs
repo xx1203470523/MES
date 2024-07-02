@@ -309,7 +309,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         {
             // 等待进入信号量
             await _semaphore.WaitAsync();
-
+            
             try
             {
                 var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.TracingSourceSFC);
@@ -450,7 +450,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     }
                     else
                     {
-                        if (!nodeSourceEntities.Any(a => a.NodeId == afterNode.Id && a.SourceId == beforeNode.Id))
+                        if (!nodeSourceEntities.Any(a => a.NodeId == afterNode.Id && a.SourceId == beforeNode.Id) && !addNodeSourceEntities.Any(a => a.NodeId == afterNode.Id && a.SourceId == beforeNode.Id))
                         {
                             // 将流转记录的条码ID追加到节点的来源集合中
                             addNodeSourceEntities.Add(new ManuSFCNodeSourceEntity
@@ -467,7 +467,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                             });
                         }
 
-                        if (!nodeDestinationEntities.Any(a => a.NodeId == beforeNode.Id && a.DestinationId == afterNode.Id))
+                        if (!nodeDestinationEntities.Any(a => a.NodeId == beforeNode.Id && a.DestinationId == afterNode.Id) && !addNodeDestinationEntities.Any(a => a.NodeId == beforeNode.Id && a.DestinationId == afterNode.Id))
                         {
                             // 将流转记录的条码ID追加到节点的去向集合中
                             addNodeDestinationEntities.Add(new ManuSFCNodeDestinationEntity
@@ -498,10 +498,12 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
                 // 保存节点的来源信息
                 rows += await _manuSFCNodeSourceRepository.DeleteAsync(removeNodeSourceEntities);
+                rows += await _manuSFCNodeSourceRepository.DeleteAsync(addNodeSourceEntities);
                 rows += await _manuSFCNodeSourceRepository.InsertRangeAsync(addNodeSourceEntities);
 
                 // 保存节点的去向信息
                 rows += await _manuSFCNodeDestinationRepository.DeleteAsync(removeNodeDestinationEntities);
+                rows += await _manuSFCNodeDestinationRepository.DeleteAsync(addNodeDestinationEntities);
                 rows += await _manuSFCNodeDestinationRepository.InsertRangeAsync(addNodeDestinationEntities);
 
                 // 更新水位
