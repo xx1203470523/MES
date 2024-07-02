@@ -99,7 +99,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 类型id equ_tools_type的id
         /// </summary>
-        public string ToolsId { get; set; }
+        public long ToolsId { get; set; }
         /// <summary>
         /// 状态
         /// </summary>

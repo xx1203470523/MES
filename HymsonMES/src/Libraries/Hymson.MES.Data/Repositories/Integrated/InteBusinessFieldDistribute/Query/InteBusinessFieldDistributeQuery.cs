@@ -1,3 +1,5 @@
+using Hymson.MES.Core.Enums.Integrated;
+
 namespace Hymson.MES.Data.Repositories.Integrated.Query
 {
     /// <summary>
@@ -14,5 +16,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.Query
         /// 工厂id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 类型 1、装配，2、不合格，3、包装
+        /// </summary>
+        public FieldAssignmentTypeEnum? Type { get; set; }
     }
 }
