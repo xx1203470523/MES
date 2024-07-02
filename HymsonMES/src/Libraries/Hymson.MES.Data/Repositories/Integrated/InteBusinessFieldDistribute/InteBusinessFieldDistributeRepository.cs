@@ -125,7 +125,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteBusinessFieldDistributeEntity>> GetPagedListAsync(InteBusinessFieldDistributePagedQuery pagedQuery)
+        public async Task<PagedInfo<InteBusinessFieldDistributeEntity>> GetPagedListAsync(InteBusinessFieldDistributePagedQuery pageQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -135,17 +135,39 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
-            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            if (!string.IsNullOrEmpty(pageQuery.Code))
+            {
+                pageQuery.Code = $"%{pageQuery.Code}%";
+                sqlBuilder.Where(" Code like @Code ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.Name))
+            {
+                pageQuery.Name = $"%{pageQuery.Name}%";
+                sqlBuilder.Where(" Name like  @Name ");
+            }
+
+            if (pageQuery.Type.HasValue)
+            {
+                sqlBuilder.Where(" Type =  @Type ");
+            }
+
+            if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1] });
+                sqlBuilder.Where(" CreatedOn >= @CreatedOnStart AND CreatedOn < @CreatedOnEnd ");
+            }
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
-            sqlBuilder.AddParameters(pagedQuery);
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
 
             using var conn = GetMESDbConnection();
             var entitiesTask = conn.QueryAsync<InteBusinessFieldDistributeEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<InteBusinessFieldDistributeEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<InteBusinessFieldDistributeEntity>(entities, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -174,8 +196,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string InsertSql = "INSERT INTO inte_business_field_distribute(  `Id`, `SiteId`, `Type`, `Code`, `Name`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Type, @Code, @Name, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO inte_business_field_distribute(  `Id`, `SiteId`, `Type`, `Code`, `Name`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Type, @Code, @Name, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE inte_business_field_distribute SET   SiteId = @SiteId, Type = @Type, Code = @Code, Name = @Name, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE inte_business_field_distribute SET   SiteId = @SiteId, Type = @Type, Code = @Code, Name = @Name, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE inte_business_field_distribute SET   SiteId = @SiteId, Type = @Type, Code = @Code, Name = @Name, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE inte_business_field_distribute SET   SiteId = @SiteId, Type = @Type, Code = @Code, Name = @Name, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE inte_business_field_distribute SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE inte_business_field_distribute SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -184,6 +206,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdsSql = @"SELECT * FROM inte_business_field_distribute WHERE Id IN @Ids ";
 
         const string GetByCodeSql = @"SELECT * 
-                            FROM `inte_business_field_distribute`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
+                            FROM `inte_business_field_distribute`  WHERE Code = @Code AND Type = @Type AND IsDeleted=0 AND SiteId=@SiteId ";
     }
 }

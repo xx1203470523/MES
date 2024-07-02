@@ -16,8 +16,8 @@ namespace Hymson.MES.Services.Validators.Integrated
         public InteBusinessFieldDistributeSaveValidator()
         {
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
-            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19428));
-            RuleFor(x => x.Code).Matches("^[A-Z0-9_]+$").WithErrorCode(nameof(ErrorCode.MES19426));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19436));
+            RuleFor(x => x.Code).Matches("^[A-Z0-9_]+$").WithErrorCode(nameof(ErrorCode.MES19435));
 
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10116));
             RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES10117));
