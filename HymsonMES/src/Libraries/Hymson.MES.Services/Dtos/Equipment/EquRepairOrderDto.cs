@@ -8,6 +8,8 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Equipment;
+using Hymson.MES.Services.Dtos.Integrated;
 using Org.BouncyCastle.Asn1;
 
 namespace Hymson.MES.Services.Dtos.EquRepairOrder
@@ -18,6 +20,11 @@ namespace Hymson.MES.Services.Dtos.EquRepairOrder
     /// </summary>
     public record EquReportRepairDto
     {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 设备Code
         /// </summary>
@@ -296,6 +303,51 @@ namespace Hymson.MES.Services.Dtos.EquRepairOrder
     }
     #endregion
 
+    #region 附件
+    /// <summary>
+    /// 附件dto
+    /// </summary>
+    public record EquRepairOrderAttachmentDto
+    {
+        /// <summary>
+        /// 单据id
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
+        /// 单据id 
+        /// </summary>
+        //public long OrderAttachmentId { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public EquRepairOrderAttachmentTypeEnum Type { get; set; }
+
+    }
+    /// <summary>
+    /// 附件保存dto
+    /// </summary>
+    public record EquRepairOrderSaveAttachmentDto
+    {
+        /// <summary>
+        /// 单据id
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public EquRepairOrderAttachmentTypeEnum Type { get; set; }
+
+        /// <summary>
+        /// 检验单（附件）
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto> Attachments { get; set; }
+
+    }
+
+    #endregion
 
     /// <summary>
     /// 设备维修记录Dto
