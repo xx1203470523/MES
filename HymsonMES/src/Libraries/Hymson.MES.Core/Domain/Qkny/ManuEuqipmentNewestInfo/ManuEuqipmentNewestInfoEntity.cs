@@ -15,47 +15,47 @@ namespace Hymson.MES.Core.Domain.ManuEuqipmentNewestInfoEntity
         /// </summary>
         public long EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 登录结果 0：通过，1不通过
         /// </summary>
         public string LoginResult { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 登录结果更新时间
         /// </summary>
-        public DateTime ?LoginResultUpdatedOn { get; set; }
+        public DateTime? LoginResultUpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备状态
         /// </summary>
         public string Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态更新时间
         /// </summary>
-        public DateTime ?StatusUpdatedOn { get; set; }
+        public DateTime? StatusUpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 心跳
         /// </summary>
         public string Heart { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 心跳更新时间
         /// </summary>
-        public DateTime ?HeartUpdatedOn { get; set; }
+        public DateTime? HeartUpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 停机原因
         /// </summary>
         public string DownReason { get; set; }

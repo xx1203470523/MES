@@ -93,7 +93,7 @@ namespace Hymson.MES.Services.Services.ManuEquipmentStatusTime
             dbModel.Id = IdGenProvider.Instance.CreateId();
             dbModel.EquipmentId = saveDto.EquipmentId;
             dbModel.CurrentStatus = (ManuEquipmentStatusEnum)Enum.Parse(typeof(ManuEquipmentStatusEnum), newestModel.Status); //newestModel.Status;
-            dbModel.BeginTime = (DateTime)newestModel.StatusUpdatedOn;
+            dbModel.BeginTime = newestModel.StatusUpdatedOn.GetValueOrDefault();
             dbModel.NextStatus = (ManuEquipmentStatusEnum)Enum.Parse(typeof(ManuEquipmentStatusEnum), saveDto.NextStatus);//saveDto.NextStatus;
             dbModel.EndTime = dateNow;
             TimeSpan span = dbModel.EndTime - dbModel.BeginTime;

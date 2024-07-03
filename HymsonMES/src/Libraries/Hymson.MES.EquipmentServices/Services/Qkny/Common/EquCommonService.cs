@@ -375,6 +375,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Common
             statusDto.NextStatus = dto.StateCode.ToUpper();
             statusDto.CreatedBy = equResModel.EquipmentCode;
             statusDto.EquipmentDownReason = dto.DownReason;
+            statusDto.SiteId = equResModel.SiteId;
             //3. 记录最新状态
             ManuEuqipmentNewestInfoSaveDto newestDto = new ManuEuqipmentNewestInfoSaveDto();
             newestDto.Id = IdGenProvider.Instance.CreateId();

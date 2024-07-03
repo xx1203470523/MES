@@ -49,12 +49,16 @@ namespace Hymson.MES.EquipmentServices.Validators.EquVerifyHelper
         {
             Common(dto);
             List<string> statusList = new List<string>() { "1", "2", "3" };
-            if(statusList.Contains(dto.StateCode) == false)
+            if (statusList.Contains(dto.StateCode) == false)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19154));
             }
             List<string> downList = new List<string>() { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
-            if(dto.StateCode == "3" && downList.Contains(dto.DownReason)  == false)
+            //if(dto.StateCode == "3" && downList.Contains(dto.DownReason)  == false)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19162));
+            //}
+            if (!string.IsNullOrWhiteSpace(dto.DownReason) && !downList.Contains(dto.DownReason))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19162));
             }
