@@ -530,19 +530,24 @@ namespace Hymson.MES.Services.Services.Plan
             var requistiongroup = manuRequistionOrderEntities.Where(m => m.Type == Core.Domain.Manufacture.ManuRequistionTypeEnum.WorkOrderPicking
             && (m.Status != WhWarehouseRequistionStatusEnum.ApprovalingFailed
             || m.Status != WhWarehouseRequistionStatusEnum.Failed)).GroupBy(m => m.WorkOrderCode);
-            List<PlanWorkOrderListDetailViewDto> dtolist = new List<PlanWorkOrderListDetailViewDto>();
-            if (planWorkOrderPagedQueryDto.PickStatus != null)
-                dtolist = dtos.Where(d => d.PickStatus == planWorkOrderPagedQueryDto.PickStatus).ToList();
-            else
-            {
-                dtolist = dtos.ToList();
-            }
+            List<PlanWorkOrderListDetailViewDto> dtolist = dtos.ToList();
+            //dtolist.ForEach(d =>
+            //{
+            //    var qty = requistiongroup.FirstOrDefault(r => r.Key == d.OrderCode)?.Sum(r => r.Qty)??0;
+            //    d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked
+            //    : qty == d.Qty ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.PartPicked;
+            //    d.PassDownQuantity = d.Qty;
+            //});
             dtolist.ForEach(d =>
             {
-                var qty = requistiongroup.FirstOrDefault(r => r.Key == d.OrderCode)?.Sum(r => r.Qty)??0;
-                d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked
-                : qty == d.Qty ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.PartPicked;
+                // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
+                var qty = requistiongroup.FirstOrDefault(r => r.Key == d.OrderCode)?.Count()??0;
+                d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked : PlanWorkOrderPickStatusEnum.FinishPicked;
+                
+                d.PassDownQuantity = d.Qty;
             });
+            if (planWorkOrderPagedQueryDto.PickStatus != null)
+                dtolist = dtos.Where(d => d.PickStatus == planWorkOrderPagedQueryDto.PickStatus).ToList();
             return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtolist, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 

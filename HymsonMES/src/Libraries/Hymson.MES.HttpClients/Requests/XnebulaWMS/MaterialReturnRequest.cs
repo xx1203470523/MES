@@ -70,11 +70,23 @@ namespace Hymson.MES.HttpClients.Requests
         public string UnitCode { get; set; }
 
         /// <summary>
-        /// 物料条码
+        /// 物料数量
         /// </summary>
         /// 
         [JsonPropertyName("quantity")]
         public string Quantity { get; set; }
+        /// <summary>
+        /// 物料批次号
+        /// </summary>
+        /// 
+        [JsonPropertyName("lotCode")]
+        public string LotCode { get; set; }
+        /// <summary>
+        /// 物料条码
+        /// </summary>
+        /// 
+        [JsonPropertyName("sfc")]
+        public string SFC { get; set; }
 
     }
 

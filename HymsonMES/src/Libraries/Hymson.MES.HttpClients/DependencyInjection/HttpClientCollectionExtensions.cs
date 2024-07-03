@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             var wmsOptions = new XnebulaWMSOption();
             configuration.GetSection("XnebulaWMSOptions").Bind(wmsOptions);
-            services.AddHttpClient<IXnebulaWMSService, XnebulaWMSServer>().ConfigureHttpClient(httpClient =>
+            services.AddHttpClient<IXnebulaWMSApiClient, XnebulaWMSApiClient>().ConfigureHttpClient(httpClient =>
             {
                 httpClient.BaseAddress = new Uri(wmsOptions.BaseAddressUri);
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", wmsOptions.Token);
@@ -38,9 +38,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             var rotorOptions = new RotorOption();
             configuration.GetSection("RotorOption").Bind(rotorOptions);
-            services.AddHttpClient<IRotorService, RotorServer>().ConfigureHttpClient(httpClient =>
+            services.AddHttpClient<IRotorApiClient, RotorApiClient>().ConfigureHttpClient(httpClient =>
             {
-                httpClient.BaseAddress = new Uri(wmsOptions.BaseAddressUri);
+                httpClient.BaseAddress = new Uri(rotorOptions.BaseAddressUri);
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(nameof(RotorOption.SYSTOKEN), rotorOptions.SYSTOKEN);
             });
 

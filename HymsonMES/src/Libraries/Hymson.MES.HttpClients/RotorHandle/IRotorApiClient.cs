@@ -11,7 +11,7 @@ namespace Hymson.MES.HttpClients.RotorHandle
     /// <summary>
     /// 转子线服务
     /// </summary>
-    public interface IRotorService
+    public interface IRotorApiClient
     {
         /// <summary>
         /// 下发派工单
