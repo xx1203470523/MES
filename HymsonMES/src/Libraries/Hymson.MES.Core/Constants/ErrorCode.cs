@@ -1226,7 +1226,7 @@
         public const string MES16357 = "当前工序是【{Current}】，产品序列码【{SFC}】应在工序【{Procedure}】处排队进站，请检查。";
         public const string MES16358 = "指定的工序【{Procedure}】不存在";
         public const string MES16359 = "产品序列码【{SFC}】由工序【{InProcedure}】进站，与当前出站工序【{OutProcedure}】不一致，不允许出站操作。";
-        public const string MES16360 = "产品序列码【{SFC}】循环次数【{Current}】不允许启动！";//"条码【{SFC}】当前循环次数【{Current}】已达到当前工序的循环次数上限【{Cycle}】，不允许操作。";
+        public const string MES16360 = "产品序列码【{SFC}】当前循环次数【{Current}】已达到当前工序的循环次数上限【{Cycle}】，不允许操作。";
         public const string MES16361 = "产品序列码【{SFC}】当前状态【{Current}】，不是【{Status}】状态，不允许操作。";
         public const string MES16362 = "产品序列码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
         public const string MES16363 = "参数收集开始！";
@@ -1234,7 +1234,7 @@
         public const string MES16365 = "获取不到条码【{SFC}】的等级信息";
         public const string MES16366 = "获取不到条码【{SFC}】的最终档次信息";
         public const string MES16367 = "产品序列码【{SFC}】所记录的工单不存在";
-        public const string MES16368 = "产品序列码【{SFC}】已在原工序【{Procedure}】处不合格或重复出站【{Cycle}】次，请继续复投。";
+        public const string MES16368 = "产品序列码【{SFC}】已在原工序【{Procedure}】处不合格或重复进站【{Cycle}】次，请继续复投。";
         public const string MES16369 = "产品序列码【{SFC}】指定的工序【{Procedure}】不存在";
         public const string MES16370 = "产品序列码不能为空，请检查参数";
         public const string MES16371 = "已成功将【{0}】个产品序列码置于工序【{1}】，状态为【{2}】！";
