@@ -10,14 +10,14 @@ namespace Hymson.MES.Services.Validators.Process
     internal class ProcProcedureSubstepSaveValidator: AbstractValidator<ProcProcedureSubstepSaveDto>
     {
         /// <summary>
-        /// 
+        /// 验证
         /// </summary>
         public ProcProcedureSubstepSaveValidator()
         {
-            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10301));
-            RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES10302));
-            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10303));
-            RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES10304));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10113));
+            RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES10115));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10116));
+            RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES10117));
         }
     }
 

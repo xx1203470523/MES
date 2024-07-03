@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -10,12 +11,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 主键
         /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
+        public long Id { get; set; } = 0;
 
        /// <summary>
         /// 编码
@@ -30,39 +26,17 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 类型 1、正常，2、可选
         /// </summary>
-        public long? Type { get; set; }
+        public ProcedureSubstepTypeEnum? Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
-       /// <summary>
-        /// 创建时间
+        /// <summary>
+        /// 工作
         /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       
+        public List<ProcResourceConfigJobCreateDto> JobList { get; set; }
     }
 
     /// <summary>
@@ -76,11 +50,6 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
-
-       /// <summary>
         /// 编码
         /// </summary>
         public string Code { get; set; }
@@ -93,12 +62,12 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 类型 1、正常，2、可选
         /// </summary>
-        public long? Type { get; set; }
+        public ProcedureSubstepTypeEnum? Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 创建时间
@@ -118,19 +87,33 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 更新时间
         /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       
+        public DateTime? UpdatedOn { get; set; }       
     }
 
     /// <summary>
     /// 子步骤分页Dto
     /// </summary>
-    public class ProcProcedureSubstepPagedQueryDto : PagerInfo { }
+    public class ProcProcedureSubstepPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string? CreatedBy { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime[]? CreatedOnRange { get; set; }
+    }
 
 }

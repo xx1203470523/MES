@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Services.Process
@@ -42,6 +43,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcProcedureSubstepDto?> QueryByIdAsync(long id);
+
+        /// <summary>
+        /// 获取子步骤配置Job信息
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcedureJobReleationDto>> GetSubstepConfigJobListAsync(InteJobBusinessRelationPagedQueryDto queryDto);
 
         /// <summary>
         /// 获取分页List

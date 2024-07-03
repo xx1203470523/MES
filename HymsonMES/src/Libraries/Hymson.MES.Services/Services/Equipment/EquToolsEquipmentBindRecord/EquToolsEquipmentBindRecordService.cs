@@ -241,7 +241,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 Supplier = equEquipmentEntity.Supplier,
                 Power = equEquipmentEntity.Power,
                 EnergyLevel = equEquipmentEntity.EnergyLevel,
-                OperationType = EquEquipmentRecordOperationTypeEnum.SparePartsBinding,
+                OperationType = operationType,
                 Ip = equEquipmentEntity.Ip,
                 TakeTime = equEquipmentEntity.TakeTime,
                 Remark = equEquipmentEntity.Remark,
