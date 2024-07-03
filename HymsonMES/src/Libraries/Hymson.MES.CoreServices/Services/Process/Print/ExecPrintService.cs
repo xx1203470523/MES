@@ -179,7 +179,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
         {
             long? printId = null;
             //一般情况下是单台打印机
-            if (@event.PrintId.HasValue )
+            if (@event.PrintId.HasValue)
             {
                 printId = @event.PrintId.Value;
             }
@@ -219,7 +219,9 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                 var procProcedurePrintReleationByMaterialIdEnties = procProcedurePrintReleationEnties.Where(x => x.MaterialId == groupItem.Key);
                 if (procProcedurePrintReleationByMaterialIdEnties == null || !procProcedurePrintReleationByMaterialIdEnties.Any())
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10390));
+                    var procrdureCode = (await _procProcedureRepository.GetByIdAsync(@event.ProcedureId))?.Code ?? "";
+                    var materialCode = (await _procMaterialRepository.GetByIdAsync(groupItem.Key))?.MaterialCode ?? "";
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10391)).WithData("ProcedureCode", procrdureCode).WithData("MaterialCode", materialCode);
                 }
                 foreach (var procProcedurePrintReleation in procProcedurePrintReleationByMaterialIdEnties)
                 {
