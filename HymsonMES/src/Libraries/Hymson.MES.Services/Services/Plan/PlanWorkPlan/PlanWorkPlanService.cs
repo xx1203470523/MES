@@ -15,7 +15,6 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Net.NetworkInformation;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -86,6 +85,46 @@ namespace Hymson.MES.Services.Services.Plan
             _procMaterialRepository = procMaterialRepository;
         }
 
+
+        /// <summary>
+        /// 根据数量生成拆分预览（生产计划）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkPlanSplitResponseDto>> SplitAsync(PlanWorkPlanSplitRequestDto dto)
+        {
+            List<PlanWorkPlanSplitResponseDto> list = new();
+
+            // 生产计划产品
+            var planProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(dto.WorkPlanProductId);
+            if (planProductEntity == null) return list;
+
+            // 生产计划
+            var planEntity = await _planWorkPlanRepository.GetByIdAsync(planProductEntity.WorkPlanId);
+            if (planEntity == null) return list;
+
+            // 根据传入的数量生成拆分预览
+
+            // 根据Qty生成子工单
+            dto.Qty = dto.Qty < 1 ? 1 : dto.Qty;
+
+
+
+            for (int i = 1; i <= dto.Qty; i++)
+            {
+                var responseDto = new PlanWorkPlanSplitResponseDto
+                {
+                    WorkOrderCode = $"{planEntity}-{i}",
+                    Qty = planProductEntity.Qty / dto.Qty,
+                    PlanStartDate = planEntity.PlanStartTime,
+                    PlanEndDate = planEntity.PlanEndTime
+                };
+
+                list.Add(responseDto);
+            }
+
+            return list;
+        }
 
         /// <summary>
         /// 生成子工单
@@ -269,20 +308,47 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="planProductId"></param>
         /// <returns></returns>
-        public async Task<PlanWorkPlanProductDto?> QueryByIdAsync(long planProductId)
+        public async Task<PlanWorkPlanProductDetailDto?> QueryByIdAsync(long planProductId)
         {
             var planProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(planProductId);
             if (planProductEntity == null) return default;
 
-            var dto = planProductEntity.ToModel<PlanWorkPlanProductDto>();
+            // 当前对象
+            var dto = new PlanWorkPlanProductDetailDto
+            {
+                Id = planProductEntity.Id,
+                ProductId = planProductEntity.ProductId,
+                BomId = planProductEntity.BomId,
+                Qty = planProductEntity.Qty,
+                OverScale = planProductEntity.OverScale,
+                Remark = planProductEntity.Remark
+            };
 
             // 填充生产计划
             var planEntity = await _planWorkPlanRepository.GetByIdAsync(planProductEntity.WorkPlanId);
             if (planEntity != null)
             {
                 dto.WorkPlanCode = planEntity.WorkPlanCode;
-                dto.PlanStartTime = planEntity.PlanStartTime;
-                dto.PlanEndTime = planEntity.PlanEndTime;
+                dto.Type = planEntity.Type.GetDescription();
+                dto.Status = planEntity.Status.GetDescription();
+                dto.PlanStartTime = planEntity.PlanStartTime.ToString("yyyy-MM-dd HH:mm:ss");
+                dto.PlanEndTime = planEntity.PlanEndTime.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+
+            // 填充产品
+            var productEntity = await _procMaterialRepository.GetByIdAsync(planProductEntity.ProductId);
+            if (productEntity != null)
+            {
+                dto.ProductCode = productEntity.MaterialCode;
+                dto.ProductName = productEntity.MaterialName;
+            }
+
+            // 填充BOM
+            var bomEntity = await _procBomRepository.GetByIdAsync(planProductEntity.BomId);
+            if (bomEntity != null)
+            {
+                dto.BomCode = bomEntity.BomCode;
+                dto.BomName = bomEntity.BomName;
             }
 
             return dto;

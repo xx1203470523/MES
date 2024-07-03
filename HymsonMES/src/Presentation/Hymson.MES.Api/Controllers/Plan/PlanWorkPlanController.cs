@@ -52,7 +52,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <param name="planProductId"></param>
         /// <returns></returns>
         [HttpGet("{planProductId}")]
-        public async Task<PlanWorkPlanProductDto?> QueryByIdAsync(long planProductId)
+        public async Task<PlanWorkPlanProductDetailDto?> QueryByIdAsync(long planProductId)
         {
             return await _planWorkPlanService.QueryByIdAsync(planProductId);
         }
@@ -69,16 +69,27 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
+        /// 根据数量生成拆分预览（生产计划）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("split")]
+        [PermissionDescription("plan:workPlan:insert")]
+        public async Task<IEnumerable<PlanWorkPlanSplitResponseDto>> SplitAsync([FromBody] PlanWorkPlanSplitRequestDto dto)
+        {
+            return await _planWorkPlanService.SplitAsync(dto);
+        }
+
+        /// <summary>
         /// 添加（生产计划）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("save")]
-        [LogDescription("生产计划", BusinessType.INSERT)]
         [PermissionDescription("plan:workPlan:insert")]
-        public async Task<int> SaveAsync([FromBody] PlanWorkPlanSaveDto parm)
+        public async Task<int> SaveAsync([FromBody] PlanWorkPlanSaveDto dto)
         {
-            return await _planWorkPlanService.SaveAsync(parm);
+            return await _planWorkPlanService.SaveAsync(dto);
         }
 
         /// <summary>
@@ -87,7 +98,6 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete("delete")]
-        [LogDescription("生产计划", BusinessType.DELETE)]
         [PermissionDescription("plan:workPlan:delete")]
         public async Task DeletesAsync([FromBody] long[] ids)
         {
