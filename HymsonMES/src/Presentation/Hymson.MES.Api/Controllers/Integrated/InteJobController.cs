@@ -113,5 +113,16 @@ namespace Hymson.MES.Api.Controllers.Integrated
         {
             await _inteJobService.DeleteRangInteJobAsync(ids);
         }
+
+        /// <summary>
+        /// 查询详情（规则）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("rule/{id}")]
+        public async Task<IEnumerable<InteJobConfigDto>> GetConfigByJobIdAsync(long id)
+        {
+            return await _inteJobService.GetConfigByJobIdAsync(id);
+        }
     }
 }
