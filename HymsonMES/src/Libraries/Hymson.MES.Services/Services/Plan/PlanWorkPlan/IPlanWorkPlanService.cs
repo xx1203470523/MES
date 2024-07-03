@@ -9,6 +9,13 @@ namespace Hymson.MES.Services.Services.Plan
     public interface IPlanWorkPlanService
     {
         /// <summary>
+        /// 根据数量生成拆分预览（生产计划）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkPlanSplitResponseDto>> SplitAsync(PlanWorkPlanSplitRequestDto dto);
+
+        /// <summary>
         /// 生成子工单
         /// </summary>
         /// <param name="dto"></param>
@@ -34,7 +41,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="planProductId"></param>
         /// <returns></returns>
-        Task<PlanWorkPlanProductDto?> QueryByIdAsync(long planProductId);
+        Task<PlanWorkPlanProductDetailDto?> QueryByIdAsync(long planProductId);
 
         /// <summary>
         /// 根据planProductId查询
@@ -45,4 +52,4 @@ namespace Hymson.MES.Services.Services.Plan
 
 
     }
-}   
+}

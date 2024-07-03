@@ -247,6 +247,33 @@ namespace Hymson.MES.Services.Dtos.Plan
     }
 
     /// <summary>
+    /// Dto（生产计划产品）
+    /// </summary>
+    public record PlanWorkPlanProductDetailDto : PlanWorkPlanProductDto
+    {
+        /// <summary>
+        /// 计划开始时间
+        /// </summary>
+        public new string PlanStartTime { get; set; }
+
+        /// <summary>
+        /// 计划结束时间
+        /// </summary>
+        public new string PlanEndTime { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public new string Type { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public new string Status { get; set; }
+
+    }
+
+    /// <summary>
     /// Dto（生产计划物料）
     /// </summary>
     public record PlanWorkPlanMaterialDto : BaseEntityDto
@@ -301,6 +328,50 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工单明细
         /// </summary>
         public IEnumerable<PlanWorkPlanDetailSaveDto>? Details { get; set; }
+
+    }
+
+    /// <summary>
+    /// 保存对象（生产计划）
+    /// </summary>
+    public record PlanWorkPlanSplitRequestDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 生产计划产品Id
+        /// </summary>
+        public long WorkPlanProductId { get; set; }
+
+        /// <summary>
+        /// 要生产的工单数量
+        /// </summary>
+        public int Qty { get; set; }
+
+    }
+
+    /// <summary>
+    /// 响应对象（生产计划）
+    /// </summary>
+    public record PlanWorkPlanSplitResponseDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string WorkOrderCode { get; set; }
+
+        /// <summary>
+        /// 子工单数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 计划开始时间
+        /// </summary>
+        public DateTime PlanStartDate { get; set; }
+
+        /// <summary>
+        /// 计划结束时间
+        /// </summary>
+        public DateTime PlanEndDate { get; set; }
 
     }
 
