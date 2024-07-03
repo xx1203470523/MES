@@ -250,17 +250,17 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             var sfcs = manuSfcSummaryEntities.Select(a => a.SFC).ToArray();
             var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new() { CirculationBarCodes = sfcs, SiteId = _currentEquipment.SiteId });
 
+            var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
+            if (includeNoQuality?.Any() == true)
+            {
+                //允许进站不合格产品
+                throw new CustomerValidationException(nameof(ErrorCode.MES19137))
+                    .WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
+            }
+
             //尾工序校验是否存在漏绑定
             if (isLast && sfcProduceList?.Any() == true)
             {
-                var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
-                if (includeNoQuality.Any())
-                {
-                    //允许进站不合格产品
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19137))
-                        .WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
-                }
-
                 if (!(manuSfcCirculationEntities?.Any() == true))
                 {
                     //尾工序校验是否存在漏绑
