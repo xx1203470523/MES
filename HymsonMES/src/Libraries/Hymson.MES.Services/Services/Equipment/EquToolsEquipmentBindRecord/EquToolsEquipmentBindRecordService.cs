@@ -405,6 +405,10 @@ namespace Hymson.MES.Services.Services.Equipment
             var bindRecordDto = bindRecordEntity.ToModel<EquToolsEquipmentBindRecordDto>();
             //查询工具信息
             var toolsEntity = await _toolsRepository.GetByIdAsync(bindRecordEntity.ToolId);
+            if (toolsEntity == null)
+            {
+                toolsEntity = new EquToolsEntity();
+            }
 
             //查询设备信息
             var equEquipmentEntity = await _equEquipmentRepository.GetByIdAsync(bindRecordEntity.EquipmentId);
@@ -414,7 +418,9 @@ namespace Hymson.MES.Services.Services.Equipment
             bindRecordDto.EquipmentCode = equEquipmentEntity?.EquipmentCode ?? "";
             bindRecordDto.EquipmentName = equEquipmentEntity?.EquipmentName ?? "";
             bindRecordDto.RatedLife = toolsEntity?.RatedLife ?? 0;
-            bindRecordDto.RemainingUsedLife = toolsEntity?.CurrentUsedLife ?? 0;
+
+            var userLife = toolsEntity?.CurrentUsedLife ?? 0;
+            bindRecordDto.RemainingUsedLife = bindRecordDto.RatedLife - userLife;
             return bindRecordDto;
         }
 
