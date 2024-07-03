@@ -15,8 +15,10 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.EquRepairOrder;
+using Hymson.MES.Core.Domain.EquRepairOrderAttachment;
 using Hymson.MES.Core.Domain.EquRepairOrderFault;
 using Hymson.MES.Core.Domain.EquRepairResult;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
@@ -27,10 +29,13 @@ using Hymson.MES.Data.Repositories.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.EquRepairOrder;
+using Hymson.MES.Data.Repositories.EquRepairOrderAttachment;
 using Hymson.MES.Data.Repositories.EquRepairOrderFault;
 using Hymson.MES.Data.Repositories.EquRepairResult;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Services.Dtos.Equipment.EquMaintenance;
 using Hymson.MES.Services.Dtos.EquRepairOrder;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -59,10 +64,12 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
 
         private readonly IManuGenerateBarcodeService _manuGenerateBarcodeService;
         private readonly IEquFaultPhenomenonRepository _equFaultPhenomenonRepository;
+        private readonly IEquRepairOrderAttachmentRepository _equRepairOrderAttachmentRepository;
+        private readonly IInteAttachmentRepository _inteAttachmentRepository;
         private readonly AbstractValidator<EquRepairOrderCreateDto> _validationCreateRules;
         private readonly AbstractValidator<EquRepairOrderModifyDto> _validationModifyRules;
 
-        public EquRepairOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IEquRepairOrderRepository equRepairOrderRepository, AbstractValidator<EquRepairOrderCreateDto> validationCreateRules, AbstractValidator<EquRepairOrderModifyDto> validationModifyRules, IEquEquipmentRepository equEquipmentRepository, IEquEquipmentRecordRepository equipmentRecordRepository, IEquRepairOrderFaultRepository equRepairOrderFaultRepository, IEquRepairResultRepository equRepairResultRepository, IInteCodeRulesRepository inteCodeRulesRepository, IManuGenerateBarcodeService manuGenerateBarcodeService, IEquFaultPhenomenonRepository equFaultPhenomenonRepository)
+        public EquRepairOrderService(ICurrentUser currentUser, ICurrentSite currentSite, IEquRepairOrderRepository equRepairOrderRepository, AbstractValidator<EquRepairOrderCreateDto> validationCreateRules, AbstractValidator<EquRepairOrderModifyDto> validationModifyRules, IEquEquipmentRepository equEquipmentRepository, IEquEquipmentRecordRepository equipmentRecordRepository, IEquRepairOrderFaultRepository equRepairOrderFaultRepository, IEquRepairResultRepository equRepairResultRepository, IInteCodeRulesRepository inteCodeRulesRepository, IManuGenerateBarcodeService manuGenerateBarcodeService, IEquFaultPhenomenonRepository equFaultPhenomenonRepository, IEquRepairOrderAttachmentRepository equRepairOrderAttachmentRepository, IInteAttachmentRepository inteAttachmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -76,6 +83,8 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
             _equFaultPhenomenonRepository = equFaultPhenomenonRepository;
+            _equRepairOrderAttachmentRepository = equRepairOrderAttachmentRepository;
+            _inteAttachmentRepository = inteAttachmentRepository;
         }
         #region
         /// <summary>
@@ -99,6 +108,7 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
             EquRepairOrderEntity equRepairOrderEntity = new()
             {
                 //TODO 这里编号要改的
+
                 RepairOrder = await GenerateOrderCodeAsync(siteId, _currentUser.UserName), // 维修信息
                 EquipmentId = equEquipment.Id, // 替换为实际的设备ID
                 EquipmentRecordId = 0,// equRecord.Id, // 替换为实际的设备记录ID
@@ -107,7 +117,7 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
                 Status = EquRepairOrderStatusEnum.PendingRepair, // 设置状态，比如待维修
                 Remark = equReportRepairDto.Remark ?? "", // 备注信息
 
-                Id = IdGenProvider.Instance.CreateId(),
+                Id = equReportRepairDto.Id > 0 ? equReportRepairDto.Id : IdGenProvider.Instance.CreateId(),
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName,
                 CreatedOn = HymsonClock.Now(),
@@ -400,6 +410,147 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
             }
             return equReportRepairFaultDtoList;
         }
+
+
+
+
+
+        /// <summary>
+        /// 保存检验单附件
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task<int> SaveAttachmentAsync(EquRepairOrderSaveAttachmentDto requestDto)
+        {
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            //单据 
+            //var entity = await _equRepairOrderRepository.GetByIdAsync(requestDto.OrderId)
+            //    ?? throw new CustomerValidationException(nameof(ErrorCode.MES17961));
+
+            if (!requestDto.Attachments.Any()) return 0;
+
+
+            List<InteAttachmentEntity> inteAttachmentEntities = new();
+            List<EquRepairOrderAttachmentEntity> orderAttachmentEntities = new();
+            foreach (var attachment in requestDto.Attachments)
+            {
+                var attachmentId = IdGenProvider.Instance.CreateId();
+                inteAttachmentEntities.Add(new InteAttachmentEntity
+                {
+                    Id = attachmentId,
+                    Name = attachment.Name,
+                    Path = attachment.Path,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn,
+                    SiteId = _currentSite.SiteId ?? 0,
+                });
+
+                orderAttachmentEntities.Add(new EquRepairOrderAttachmentEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    AttachmentType = requestDto.Type,
+                    RepairOrderId = requestDto.OrderId,
+                    AttachmentId = attachmentId,
+                    Remark = "",
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                });
+            }
+
+            var rows = 0;
+            try
+            {
+                using var trans = TransactionHelper.GetTransactionScope();
+                rows += await _inteAttachmentRepository.InsertRangeAsync(inteAttachmentEntities);
+                rows += await _equRepairOrderAttachmentRepository.InsertsAsync(orderAttachmentEntities);
+                trans.Complete();
+            }
+            catch (Exception ex) { }
+            return rows;
+        }
+
+        /// <summary>
+        /// 删除检验单附件
+        /// </summary>
+        /// <param name="orderAttachmentId"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteAttachmentByIdAsync(long orderAttachmentId)
+        {
+            var attachmentEntity = await _equRepairOrderAttachmentRepository.GetByIdAsync(orderAttachmentId);
+            if (attachmentEntity == null) return default;
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _inteAttachmentRepository.DeleteAsync(attachmentEntity.AttachmentId);
+            rows += await _equRepairOrderAttachmentRepository.DeleteAsync(attachmentEntity.Id);
+            trans.Complete();
+            return rows;
+        }
+
+
+        /// <summary>
+        /// 查询单据附件
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteAttachmentBaseDto>> QueryOrderAttachmentListByIdAsync(EquRepairOrderAttachmentDto dto)
+        {
+            var orderAttachments = await _equRepairOrderAttachmentRepository.GetByOrderIdAsync(new EquRepairOrderAttachmentQuery
+            {
+                OrderId = dto.OrderId,
+                AttachmentType = dto.Type
+            });
+            if (orderAttachments == null) return Array.Empty<InteAttachmentBaseDto>();
+
+            var attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(orderAttachments.Select(s => s.AttachmentId));
+            if (attachmentEntities == null) return Array.Empty<InteAttachmentBaseDto>();
+
+            return PrepareAttachmentBaseDtos(orderAttachments, attachmentEntities);
+        }
+        /// <summary>
+        /// 转换成附近DTO
+        /// </summary>
+        /// <param name="linkAttachments"></param>
+        /// <param name="attachmentEntities"></param>
+        /// <returns></returns>
+        private static IEnumerable<InteAttachmentBaseDto> PrepareAttachmentBaseDtos(IEnumerable<dynamic> linkAttachments, IEnumerable<InteAttachmentEntity> attachmentEntities)
+        {
+            List<InteAttachmentBaseDto> dtos = new();
+            foreach (var item in linkAttachments)
+            {
+                var dto = new InteAttachmentBaseDto
+                {
+                    Id = item.Id,
+                    AttachmentId = item.AttachmentId
+                };
+
+                var attachmentEntity = attachmentEntities.FirstOrDefault(f => f.Id == item.AttachmentId);
+                if (attachmentEntity == null)
+                {
+                    dto.Name = "附件不存在";
+                    dto.Path = "";
+                    dto.Url = "";
+                    dtos.Add(dto);
+                    continue;
+                }
+
+                dto.Id = item.Id;
+                dto.Name = attachmentEntity.Name;
+                dto.Path = attachmentEntity.Path;
+                dto.Url = attachmentEntity.Path;
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
         #endregion
 
         #region 帮助
@@ -534,7 +685,7 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
                 {
                     var codes = string.Join(",", equRepairOrderStatuss.Select(it => it.RepairOrder));
                     throw new CustomerValidationException(nameof(ErrorCode.MES17959)).WithData("Code", codes);
-                } 
+                }
                 var equRepairOrderOn = equRepairOrders.Where(it => it.CreatedOn != it.UpdatedOn);
                 if (equRepairOrderOn != null && equRepairOrderOn.Any())
                 {
