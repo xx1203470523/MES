@@ -316,7 +316,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 toolsEntity.UpdatedBy = updatedBy;
                 toolsEntity.UpdatedOn = updatedOn;
                 toolsEntity.CumulativeUsedLife = toolsEntity.CumulativeUsedLife + saveDto.CurrentUsedLife;
-                toolsEntity.CurrentUsedLife = toolsEntity.CurrentUsedLife + saveDto.CurrentUsedLife;
+                toolsEntity.CurrentUsedLife = currentUsedLife + saveDto.CurrentUsedLife;
 
                 toolsRecordEntity = new EquToolsRecordEntity()
                 {
