@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Core.Domain.Plan
 {
@@ -19,6 +20,16 @@ namespace Hymson.MES.Core.Domain.Plan
         /// 计划单号
         /// </summary>
         public string WorkPlanCode { get; set; }
+
+        /// <summary>
+        /// 类型(工厂/车间/产线) 
+        /// </summary>
+        public WorkCenterTypeEnum WorkCenterType { get; set; }
+
+        /// <summary>
+        /// 工作中心编码
+        /// </summary>
+        public string WorkCenterCode { get; set; }
 
         /// <summary>
         /// 需求单号

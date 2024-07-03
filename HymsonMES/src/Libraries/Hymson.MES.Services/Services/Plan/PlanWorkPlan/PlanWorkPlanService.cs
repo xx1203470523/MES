@@ -6,8 +6,11 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -47,6 +50,11 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
+        /// 仓储接口（工作中心）
+        /// </summary>
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        /// <summary>
         /// 仓储接口（BOM）
         /// </summary>
         private readonly IProcBomRepository _procBomRepository;
@@ -65,6 +73,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="planWorkPlanProductRepository"></param>
         /// <param name="planWorkPlanMaterialRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procMaterialRepository"></param>
         public PlanWorkPlanService(ICurrentUser currentUser, ICurrentSite currentSite,
@@ -72,6 +81,7 @@ namespace Hymson.MES.Services.Services.Plan
             IPlanWorkPlanProductRepository planWorkPlanProductRepository,
             IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository,
             IProcBomRepository procBomRepository,
             IProcMaterialRepository procMaterialRepository)
         {
@@ -81,6 +91,7 @@ namespace Hymson.MES.Services.Services.Plan
             _planWorkPlanProductRepository = planWorkPlanProductRepository;
             _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
             _procBomRepository = procBomRepository;
             _procMaterialRepository = procMaterialRepository;
         }
@@ -103,24 +114,41 @@ namespace Hymson.MES.Services.Services.Plan
             var planEntity = await _planWorkPlanRepository.GetByIdAsync(planProductEntity.WorkPlanId);
             if (planEntity == null) return list;
 
-            // 根据传入的数量生成拆分预览
+            // 计算每个分段的的数量
+            var remainingQty = planProductEntity.Qty;
+            var partitionQty = Math.Floor(planProductEntity.Qty / dto.Count);
 
-            // 根据Qty生成子工单
-            dto.Qty = dto.Qty < 1 ? 1 : dto.Qty;
+            // 计算每个分段的的天数
+            var remainingDay = (planEntity.PlanEndTime - planEntity.PlanStartTime).TotalDays;
+            var partitionDay = Math.Floor(remainingDay / dto.Count);
 
-
-
-            for (int i = 1; i <= dto.Qty; i++)
+            for (int i = 1; i <= dto.Count; i++)
             {
-                var responseDto = new PlanWorkPlanSplitResponseDto
+                var splitDto = new PlanWorkPlanSplitResponseDto
                 {
-                    WorkOrderCode = $"{planEntity}-{i}",
-                    Qty = planProductEntity.Qty / dto.Qty,
-                    PlanStartDate = planEntity.PlanStartTime,
-                    PlanEndDate = planEntity.PlanEndTime
+                    WorkOrderCode = $"{planEntity.WorkPlanCode}-{i}"
                 };
 
-                list.Add(responseDto);
+                // 如果不是最后一条
+                if (i != dto.Count)
+                {
+                    splitDto.Qty = partitionQty;
+                    splitDto.PlanStartDate = planEntity.PlanStartTime.AddDays((i - 1) * partitionDay);
+                    splitDto.PlanEndDate = planEntity.PlanStartTime.AddDays(i * partitionDay);
+                }
+                // 如果是最后一条
+                else
+                {
+                    splitDto.Qty = remainingQty;
+                    splitDto.PlanStartDate = planEntity.PlanStartTime.AddDays((i - 1) * partitionDay);
+                    splitDto.PlanEndDate = planEntity.PlanEndTime;
+                }
+
+                // 添加到待返回
+                list.Add(splitDto);
+
+                // 扣减剩余数量
+                remainingQty -= partitionQty;
             }
 
             return list;
@@ -193,12 +221,19 @@ namespace Hymson.MES.Services.Services.Plan
             workPlanEntity.UpdatedBy = currentBo.User;
             workPlanEntity.UpdatedOn = currentBo.Time;
 
+            // 读取工作中心
+            var workCenterEntity = await _inteWorkCenterRepository.GetEntityAsync(new InteWorkCenterOneQuery
+            {
+                SiteId = workPlanEntity.SiteId,
+                Code = workPlanEntity.WorkCenterCode
+            });
+
             List<PlanWorkOrderEntity> workOrderEntites = new();
             workOrderEntites.AddRange(dto.Details.Select(s => new PlanWorkOrderEntity
             {
                 OrderCode = s.WorkOrderCode,
-                WorkCenterType = s.WorkCenterType,
-                WorkCenterId = s.WorkCenterId,
+                WorkCenterType = WorkCenterTypeEnum.Line,
+                WorkCenterId = workCenterEntity?.Id,
                 PlanStartTime = s.PlanStartTime,
                 PlanEndTime = s.PlanEndTime,
                 Qty = s.Qty,
@@ -331,8 +366,20 @@ namespace Hymson.MES.Services.Services.Plan
                 dto.WorkPlanCode = planEntity.WorkPlanCode;
                 dto.Type = planEntity.Type.GetDescription();
                 dto.Status = planEntity.Status.GetDescription();
-                dto.PlanStartTime = planEntity.PlanStartTime.ToString("yyyy-MM-dd HH:mm:ss");
-                dto.PlanEndTime = planEntity.PlanEndTime.ToString("yyyy-MM-dd HH:mm:ss");
+                dto.PlanStartTime = planEntity.PlanStartTime.ToString("yyyy-MM-dd");
+                dto.PlanEndTime = planEntity.PlanEndTime.ToString("yyyy-MM-dd");
+
+                // 读取工作中心
+                var workCenterEntity = await _inteWorkCenterRepository.GetEntityAsync(new InteWorkCenterOneQuery
+                {
+                    SiteId = planProductEntity.SiteId,
+                    Code = planEntity.WorkCenterCode
+                });
+                if (workCenterEntity != null)
+                {
+                    dto.WorkCenterCode = workCenterEntity.Code;
+                    dto.WorkCenterName = workCenterEntity.Name;
+                }
             }
 
             // 填充产品

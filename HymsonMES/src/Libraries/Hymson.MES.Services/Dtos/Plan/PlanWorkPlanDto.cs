@@ -151,6 +151,16 @@ namespace Hymson.MES.Services.Dtos.Plan
         public long ProductId { get; set; }
 
         /// <summary>
+        /// 工作中心编码
+        /// </summary>
+        public string WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 工作中心名称
+        /// </summary>
+        public string WorkCenterName { get; set; }
+
+        /// <summary>
         /// 产品编码
         /// </summary>
         public string ProductCode { get; set; }
@@ -312,6 +322,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+
     }
 
     /// <summary>
@@ -344,7 +355,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 要生产的工单数量
         /// </summary>
-        public int Qty { get; set; }
+        public int Count { get; set; }
 
     }
 
@@ -400,6 +411,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public DateTime? PlanEndTime { get; set; }
 
+        /*
         /// <summary>
         /// 工作中心类型;和工作中心保持一致
         /// </summary>
@@ -409,6 +421,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工作中心（车间或者线体）
         /// </summary>
         public long? WorkCenterId { get; set; }
+        */
 
     }
 

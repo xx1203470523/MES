@@ -145,8 +145,8 @@ namespace Hymson.MES.Services.Services.QualEnvOrder
 
             if (!string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterCode) || !string.IsNullOrWhiteSpace(qualEnvOrderPagedQueryDto.WorkCenterName))
             {
-                var inteWorkCenterQuery = new InteWorkCenterFirstQuery { SiteId = _currentSite.SiteId ?? 0, Code = qualEnvOrderPagedQueryDto.WorkCenterCode, Name = qualEnvOrderPagedQueryDto.WorkCenterName };
-                var inteWorkCenter = await _inteWorkCenterRepository.GetEntitieAsync(inteWorkCenterQuery);
+                var inteWorkCenterQuery = new InteWorkCenterOneQuery { SiteId = _currentSite.SiteId ?? 0, Code = qualEnvOrderPagedQueryDto.WorkCenterCode, Name = qualEnvOrderPagedQueryDto.WorkCenterName };
+                var inteWorkCenter = await _inteWorkCenterRepository.GetEntityAsync(inteWorkCenterQuery);
                 if (inteWorkCenter == null)
                 {
                     return new PagedInfo<QualEnvOrderDto>(qualEnvOrderDtos, qualEnvOrderPagedQueryDto.PageIndex, qualEnvOrderPagedQueryDto.PageSize, 0);

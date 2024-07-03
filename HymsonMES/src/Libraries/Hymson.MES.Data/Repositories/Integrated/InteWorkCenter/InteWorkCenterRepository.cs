@@ -470,26 +470,19 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// </summary>
         /// <param name="workCenterQuery"></param>
         /// <returns></returns>
-        public async Task<InteWorkCenterEntity> GetEntitieAsync(InteWorkCenterFirstQuery workCenterQuery)
+        public async Task<InteWorkCenterEntity> GetEntityAsync(InteWorkCenterOneQuery workCenterQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
 
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
-            if (!string.IsNullOrWhiteSpace(workCenterQuery.Code))
-            {
-                sqlBuilder.Where(" Code = @Code ");
-            }
-            if (!string.IsNullOrWhiteSpace(workCenterQuery.Name))
-            {
-                sqlBuilder.Where(" Name = @Name ");
-            }
+            if (!string.IsNullOrWhiteSpace(workCenterQuery.Code)) sqlBuilder.Where(" Code = @Code ");
+            if (!string.IsNullOrWhiteSpace(workCenterQuery.Name)) sqlBuilder.Where(" Name = @Name ");
 
             using var conn = GetMESDbConnection();
-            var inteWorkCenters = await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
-            return inteWorkCenters;
+            return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(template.RawSql, workCenterQuery);
         }
 
         /// <summary>
