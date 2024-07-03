@@ -47,6 +47,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.BackgroundServic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.BackgroundServices.Stator", "src\Libraries\Hymson.MES.BackgroundServices.Stator\Hymson.MES.BackgroundServices.Stator.csproj", "{1055CEF8-B77F-4BEE-B06B-812EB62D78F8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.BackgroundTasks.NIO", "src\Presentation\Hymson.MES.BackgroundTasks.NIO\Hymson.MES.BackgroundTasks.NIO.csproj", "{1AF8DD70-81BC-443A-AACA-AECC5A36F2C8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.BackgroundServices.NIO", "src\Libraries\Hymson.MES.BackgroundServices.NIO\Hymson.MES.BackgroundServices.NIO.csproj", "{91D52979-0FC5-4781-8DDB-065C1B012321}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -162,6 +166,18 @@ Global
 		{1055CEF8-B77F-4BEE-B06B-812EB62D78F8}.DM|Any CPU.Build.0 = DM|Any CPU
 		{1055CEF8-B77F-4BEE-B06B-812EB62D78F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1055CEF8-B77F-4BEE-B06B-812EB62D78F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AF8DD70-81BC-443A-AACA-AECC5A36F2C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AF8DD70-81BC-443A-AACA-AECC5A36F2C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AF8DD70-81BC-443A-AACA-AECC5A36F2C8}.DM|Any CPU.ActiveCfg = DM|Any CPU
+		{1AF8DD70-81BC-443A-AACA-AECC5A36F2C8}.DM|Any CPU.Build.0 = DM|Any CPU
+		{1AF8DD70-81BC-443A-AACA-AECC5A36F2C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AF8DD70-81BC-443A-AACA-AECC5A36F2C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91D52979-0FC5-4781-8DDB-065C1B012321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91D52979-0FC5-4781-8DDB-065C1B012321}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91D52979-0FC5-4781-8DDB-065C1B012321}.DM|Any CPU.ActiveCfg = DM|Any CPU
+		{91D52979-0FC5-4781-8DDB-065C1B012321}.DM|Any CPU.Build.0 = DM|Any CPU
+		{91D52979-0FC5-4781-8DDB-065C1B012321}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91D52979-0FC5-4781-8DDB-065C1B012321}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -187,6 +203,8 @@ Global
 		{C4988C5A-8257-4F73-AE13-C06ACEB75887} = {3B0CC3D3-DA17-41DC-AC2C-FE4347693571}
 		{194E8BB4-C366-4A67-9528-8F4311B0B24C} = {161AAA01-664F-42BF-9AD3-1F159465B00A}
 		{1055CEF8-B77F-4BEE-B06B-812EB62D78F8} = {161AAA01-664F-42BF-9AD3-1F159465B00A}
+		{1AF8DD70-81BC-443A-AACA-AECC5A36F2C8} = {3B0CC3D3-DA17-41DC-AC2C-FE4347693571}
+		{91D52979-0FC5-4781-8DDB-065C1B012321} = {161AAA01-664F-42BF-9AD3-1F159465B00A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FA9F6A13-66F6-4986-8CB3-CF8FA4CF99CD}
