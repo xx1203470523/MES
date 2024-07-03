@@ -1097,6 +1097,8 @@
         public const string MES19155 = "条码{SFC}和条码{SFCs}已存在绑定关系，不可重复绑！";
         public const string MES19156 = "该条码{BindSFC}已存在绑定关系，请先解绑！";
         public const string MES19157 = "未查到条码{SFC}批次信息,无法正常校验电芯批次,请检查该条码是否导入";
+
+        public const string MES19158 = "未查到条码{SFCS}绑定记录，请检查条码绑定记录！";
         #endregion
 
         #region 系统对接 MES19201
