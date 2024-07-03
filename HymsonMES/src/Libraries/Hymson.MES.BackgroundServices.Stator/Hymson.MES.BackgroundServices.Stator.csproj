@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;DM</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591;8618</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;1591;8618</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DM|AnyCPU'">
+    <NoWarn>1701;1702;1591;8618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.4.0" />
+    <PackageReference Include="Quartz.Serialization.Json" Version="3.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Equipment\" />
+    <Folder Include="EventHandling\" />
+    <Folder Include="Tasks\" />
+  </ItemGroup>
+
+</Project>
