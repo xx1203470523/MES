@@ -2226,6 +2226,7 @@
         public const string MES17958 = "请选择故障原因";
         public const string MES17959 = "{Code}非待维修状态不允许删除";
         public const string MES17960 = "{Code}已维修过的单据不允许删除";
+        public const string MES17961 = "附件上传失败，未获取到维修单，请刷新后重试";
 
 
 
