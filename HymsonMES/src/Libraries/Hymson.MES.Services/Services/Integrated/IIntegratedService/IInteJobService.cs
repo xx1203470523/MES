@@ -45,5 +45,12 @@ namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
         /// <param name="param"></param>
         /// <returns></returns>
         Task ModifyInteJobAsync(InteJobModifyDto param);
+
+        /// <summary>
+        /// 根据ID查询
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteJobConfigDto>> GetConfigByJobIdAsync(long jobId);
     }
 }
