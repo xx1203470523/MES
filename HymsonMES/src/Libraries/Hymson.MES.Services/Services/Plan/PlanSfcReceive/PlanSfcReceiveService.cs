@@ -475,18 +475,18 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
-            var manuSfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                SFCs = param.SFCs,
-                Type = SfcTypeEnum.Produce
-            });
-
+            
             var sfcMaterialEntityDic = new Dictionary<string, (decimal, ProcMaterialEntity)>();
 
             decimal qty = 0;
             if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
+                var manuSfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFCs = param.SFCs,
+                    Type = SfcTypeEnum.Produce
+                });
                 //校验条码是否存在
                 if (manuSfcEntities == null || !manuSfcEntities.Any())
                 {
@@ -547,6 +547,11 @@ namespace Hymson.MES.Services.Services.Plan
                     }
                 }
                 //校验条码是否存在
+                var manuSfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFCs = param.SFCs
+                });
                 if (manuSfcEntities != null && manuSfcEntities.Any())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16122)).WithData("sfc", string.Join(',', manuSfcEntities.Select(x => x.SFC)));
