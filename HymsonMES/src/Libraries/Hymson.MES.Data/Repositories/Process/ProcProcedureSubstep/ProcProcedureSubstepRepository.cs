@@ -134,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("Id DESC");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
@@ -153,6 +153,11 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where(" Name like @Name");
+            }
+
+            if (pagedQuery.Type.HasValue)
+            {
+                sqlBuilder.Where(" Type=@Type");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.CreatedBy))

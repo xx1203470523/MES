@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
@@ -66,13 +67,13 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <summary>
         /// 删除（子步骤）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteAsync([FromBody] long[] ids)
+        public async Task DeleteAsync(DeleteDto deleteDto)
         {
-            await _procProcedureSubstepService.DeletesAsync(ids);
+            await _procProcedureSubstepService.DeletesAsync(deleteDto.Ids);
         }
 
         /// <summary>

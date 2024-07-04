@@ -346,7 +346,7 @@ namespace Hymson.MES.Services.Services.Process
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 // 保存
-                rows += await _procProcedureSubstepRepository.InsertAsync(substepEntity);
+                rows += await _procProcedureSubstepRepository.UpdateAsync(substepEntity);
 
                 //删除之前的数据
                 await _jobBusinessRelationRepository.DeleteByBusinessIdAsync(param.Id);
@@ -376,6 +376,11 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            if (ids.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10102));
+            }
+
             //查询是否被工序关联，关联了就不能删除
             return await _procProcedureSubstepRepository.DeletesAsync(new DeleteCommand
             {
