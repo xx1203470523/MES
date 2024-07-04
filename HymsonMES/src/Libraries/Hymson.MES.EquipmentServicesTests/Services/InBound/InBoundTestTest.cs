@@ -74,8 +74,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             //string equipmentCode = "YTLPACK01AE004";
 
             //端板刻码
-            //string resourceCode = "YTLPACK01ER014";
-            //string equipmentCode = "YTLPACK01AE014";
+            string resourceCode = "YTLPACK01ER014";
+            string equipmentCode = "YTLPACK01AE014";
 
             ////CCS安装
             //string resourceCode = "YTLPACK01ER016";
@@ -93,9 +93,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             //string resourceCode = "YTLPACK01ER026";
             //string equipmentCode = "YTLPACK01VIR01";
 
-            //气密性
-            string resourceCode = "YTLPACK01ER021";
-            string equipmentCode = "YTLPACK01AE021";
+            ////气密性
+            //string resourceCode = "YTLPACK01ER021";
+            //string equipmentCode = "YTLPACK01AE021";
 
             ////涂胶
             //string resourceCode = "YTLPACK01ER022";
@@ -106,7 +106,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
             //string prefix = "YTM20240620003";
 
             //BMU进站测试
-            string prefix = "BMU20240620004";
+            string prefix = "TESTM001";
 
             await SetEquInfoAsync(equipmentCode);
             await _inBoundService.InBoundAsync(new InBoundDto

@@ -65,12 +65,12 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
         [TestMethod()]
         public async Task SfcCirculationBindAsyncTest()
         {
-            //string equipmentCode = "YTLPACK01AE014";
-            string equipmentCode = "YTLPACK01AE023";
+            string equipmentCode = "YTLPACK01AE014";
+            //string equipmentCode = "YTLPACK01AE023";
             await SetEquInfoAsync(equipmentCode);
             SfcCirculationBindDto sfcCirculationCCS = new SfcCirculationBindDto()
             {
-                SFC = "YTP20240620003",
+                SFC = "TESTM001",
                 ModelCode = "12S",  //ModelCode
                 //IsVirtualSFC=false,
                 BindSFCs = new CirculationBindDto[] {
@@ -81,22 +81,22 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
                     //},
 
                     new CirculationBindDto{
-                        SFC="BMU20240620004",
+                        SFC="TESTSFC01",
                         Location="0",
                         //Name="CCS01"
                     },
 
-                    new CirculationBindDto{
-                        SFC="YTM20240620003",
-                        Location="1",
-                        //Name="CCS01"
-                    }
+                    //new CirculationBindDto{
+                    //    SFC="YTM20240620003",
+                    //    Location="1",
+                    //    //Name="CCS01"
+                    //}
                 },
-                //EquipmentCode = "YTLPACK01AE014",
-                //ResourceCode = "YTLPACK01ER014",
+                EquipmentCode = "YTLPACK01AE014",
+                ResourceCode = "YTLPACK01ER014",
 
-                EquipmentCode = "YTLPACK01AE023",
-                ResourceCode = "YTLPACK01ER023",
+                //EquipmentCode = "YTLPACK01AE023",
+                //ResourceCode = "YTLPACK01ER023",
                 LocalTime = DateTime.Now
             };
             await _sfcCirculationService.SfcCirculationBindAsync(sfcCirculationCCS);

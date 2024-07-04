@@ -243,31 +243,51 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
 
-            //尾工序进站不允许Pack段出现不合格记录（出现后需要复测）
-            var LastProcedureEntity = await GetLastProcedureAsync(planWorkOrderEntity.ProcessRouteId);
-            var isLast = !sfcProduceList.Any(a => a.ProcedureId != LastProcedureEntity.ProcedureId);
 
-            var sfcs = manuSfcSummaryEntities.Select(a => a.SFC).ToArray();
+            //#region 先不发布
+
+            ////尾工序进站不允许Pack段出现不合格记录（出现后需要复测）
+            //var LastProcedureEntity = await GetLastProcedureAsync(planWorkOrderEntity.ProcessRouteId);
+            //var isLast = !sfcProduceList.Any(a => a.ProcedureId != LastProcedureEntity.ProcedureId);
+
+            var sfcs = inBoundMoreDto.SFCs.ToArray();
             var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new() { CirculationBarCodes = sfcs, SiteId = _currentEquipment.SiteId });
 
-            var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
-            if (includeNoQuality?.Any() == true)
-            {
-                //允许进站不合格产品
-                throw new CustomerValidationException(nameof(ErrorCode.MES19137))
-                    .WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
-            }
 
-            //尾工序校验是否存在漏绑定
-            if (isLast && sfcProduceList?.Any() == true)
+            var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
+            //if (includeNoQuality?.Any() == true)
+            //{
+            //    //允许进站不合格产品
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19137))
+            //        .WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
+            //}
+            //刻码后一道工序（挤压-刻码-CCS安装）
+            //虚拟组件安装后一道工序（人工组件安装(2)-线束固定与连接排固定）
+            //客户要去需要在绑定工序后校验数量是否满足
+            if ((new string[] { "OP14", "OP26" }).Contains(procedureEntity.Code))
             {
                 if (!(manuSfcCirculationEntities?.Any() == true))
                 {
-                    //尾工序校验是否存在漏绑
                     throw new CustomerValidationException(nameof(ErrorCode.MES19158))
                         .WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
                 }
+                else
+                {
+                    var result = false;
+
+                    if (procedureEntity.Code == "OP14" && manuSfcCirculationEntities?.Count() < 12) result = true;
+                    if (procedureEntity.Code == "OP26" && manuSfcCirculationEntities?.Count() < 4) result = true;
+
+                    if (result)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19159))
+                            .WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)))
+                            .WithData("Count", includeNoQuality.Count());
+                    }
+                }
             }
+
+            //#endregion
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
@@ -304,7 +324,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                             //校验工单和条码是否同批次
                             if (!currenWorkBatch.Equals(sfcBatch.BatchNo))
                             {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES19149)).WithData("SFC", sfc).WithData("sfcBatchNo", sfcBatch.BatchNo).WithData("workBatchNo", currenWorkBatch);
+                                //throw new CustomerValidationException(nameof(ErrorCode.MES19149)).WithData("SFC", sfc).WithData("sfcBatchNo", sfcBatch.BatchNo).WithData("workBatchNo", currenWorkBatch);
                             }
                         }
                         else
