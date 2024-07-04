@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
-    <ProjectReference Include="..\Hymson.MES.Repository\Hymson.MES.Repository.csproj" />
+    <ProjectReference Include="..\Hymson.MES.Repository\Hymson.MES.BackgroundServices.CoreServices.csproj" />
   </ItemGroup>
 
 </Project>

@@ -55,7 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mavel", "Mavel", "{7B363C14
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mavel", "Mavel", "{94AE91C8-7347-49AA-8A6C-186BD69273E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.Repository", "src\Libraries\Hymson.MES.Repository\Hymson.MES.Repository.csproj", "{108BDE9F-8931-49D6-9491-0471B1E7A11D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hymson.MES.BackgroundServices.CoreServices", "src\Libraries\Hymson.MES.Repository\Hymson.MES.BackgroundServices.CoreServices.csproj", "{108BDE9F-8931-49D6-9491-0471B1E7A11D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

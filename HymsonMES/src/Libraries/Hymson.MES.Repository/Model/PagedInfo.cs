@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Hymson.MES.Repository.Model
+namespace Hymson.MES.BackgroundServices.CoreServices.Model
 {
     /// <summary>
     /// 分页参数
@@ -28,7 +28,7 @@ namespace Hymson.MES.Repository.Model
             {
                 if (TotalNum > 0)
                 {
-                    return TotalNum % this.PageSize == 0 ? TotalNum / this.PageSize : TotalNum / this.PageSize + 1;
+                    return TotalNum % PageSize == 0 ? TotalNum / PageSize : TotalNum / PageSize + 1;
                 }
                 else
                 {

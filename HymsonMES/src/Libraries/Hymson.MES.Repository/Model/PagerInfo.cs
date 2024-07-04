@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.Repository.Model
+﻿namespace Hymson.MES.BackgroundServices.CoreServices.Model
 {
     /// <summary>
     /// 

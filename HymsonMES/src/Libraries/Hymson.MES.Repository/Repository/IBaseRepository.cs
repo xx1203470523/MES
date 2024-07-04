@@ -1,9 +1,8 @@
-﻿using Hymson.MES.Repository.Model;
-using SqlSugar;
+﻿using Hymson.MES.BackgroundServices.CoreServices.Model;
 using System.Data;
 using System.Linq.Expressions;
 
-namespace Hymson.MES.Repository
+namespace Hymson.MES.BackgroundServices.CoreServices.Repository
 {
     public interface IBaseRepository<T> : ISimpleClient<T> where T : class, new()
     {
@@ -32,6 +31,7 @@ namespace Hymson.MES.Repository
         int Update(Expression<Func<T, bool>> where, Expression<Func<T, T>> columns);
 
         #endregion update
+
         DbResult<bool> UseTran(Action action);
 
         DbResult<bool> UseTran(ISqlSugarClient client, Action action);

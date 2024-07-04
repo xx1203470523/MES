@@ -1,13 +1,12 @@
-using Hymson.MES.Repository.Model;
+using Hymson.MES.BackgroundServices.CoreServices.Model;
 using Hymson.Utils;
 using Mapster;
-using SqlSugar;
 using SqlSugar.IOC;
 using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Hymson.MES.Repository
+namespace Hymson.MES.BackgroundServices.CoreServices.Repository
 {
     /// <summary>
     /// 数据仓库类
@@ -15,7 +14,15 @@ namespace Hymson.MES.Repository
     /// <typeparam name="T"></typeparam>
     public class BaseRepository<T> : SimpleClient<T> where T : class, new()
     {
-        public ITenant itenant = null;//多租户事务
+        /// <summary>
+        /// 多租户事务
+        /// </summary>
+        public ITenant itenant = null;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
         public BaseRepository(ISqlSugarClient context = null) : base(context)
         {
             //通过特性拿到ConfigId
@@ -33,7 +40,6 @@ namespace Hymson.MES.Repository
         }
 
         #region add
-
         /// <summary>
         /// 插入实体
         /// </summary>
