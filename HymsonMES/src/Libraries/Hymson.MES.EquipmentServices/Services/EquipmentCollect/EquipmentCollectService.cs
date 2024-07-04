@@ -833,8 +833,8 @@ public class EquipmentCollectService : IEquipmentCollectService
         var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new()
         {
             SFCS = new string[] { queryDto.SFC },
-            QualityStatus = 0,
-            ProcedureIds = new long[] { procedureEntity.Id }
+            ProcedureIds = new long[] { procedureEntity.Id },
+            SiteId = 123456
         });
 
         var manuSfcSummaryEntity = manuSfcSummaryEntities.OrderByDescending(a => a.CreatedOn).FirstOrDefault();
@@ -844,8 +844,8 @@ public class EquipmentCollectService : IEquipmentCollectService
             SFC = queryDto.SFC,
             ProcedureCode = procedureEntity.Code ?? "",
             ProcedureName = procedureEntity.Name ?? "",
-            FirstQualityStatus = manuSfcSummaryEntity?.FirstQualityStatus ?? 1,
-            QualityStatus = manuSfcSummaryEntity?.QualityStatus ?? 1
+            FirstQualityStatus = manuSfcSummaryEntity?.FirstQualityStatus ?? 0,
+            QualityStatus = manuSfcSummaryEntity?.QualityStatus ?? 0
         };
 
         return result;

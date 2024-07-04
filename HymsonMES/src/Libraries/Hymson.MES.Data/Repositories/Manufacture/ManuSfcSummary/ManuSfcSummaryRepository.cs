@@ -154,8 +154,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where($"CreatedOn < '{manuSfcSummaryQuery.EndTime.GetValueOrDefault().ToString("yyyy-MM-dd HH:mm:ss")}'");
             }
+
+            sqlBuilder.AddParameters(manuSfcSummaryQuery); 
             using var conn = GetMESDbConnection();
-            var manuSfcSummaryEntities = await conn.QueryAsync<ManuSfcSummaryEntity>(template.RawSql, manuSfcSummaryQuery);
+            var manuSfcSummaryEntities = await conn.QueryAsync<ManuSfcSummaryEntity>(template.RawSql, template.Parameters);
             return manuSfcSummaryEntities;
         }
 

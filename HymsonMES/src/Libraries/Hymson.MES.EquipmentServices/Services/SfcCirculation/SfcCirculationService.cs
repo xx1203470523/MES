@@ -22,7 +22,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using System.Linq;
 
 namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 {
