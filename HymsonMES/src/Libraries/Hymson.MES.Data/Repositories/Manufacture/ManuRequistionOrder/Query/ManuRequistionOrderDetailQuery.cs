@@ -13,5 +13,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
     /// </summary>
     public class ManuRequistionOrderDetailQuery
     {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public long[] RequistionOrderIds { get; set; }
     }
 }

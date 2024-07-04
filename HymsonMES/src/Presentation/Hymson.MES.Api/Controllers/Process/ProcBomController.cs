@@ -66,6 +66,17 @@ namespace Hymson.MES.Api.Controllers.Process
         {
             return await _procBomService.GetProcBomMaterialAsync(bomId);
         }
+        /// <summary>
+        /// 获取领料BOM明细
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// 
+        /// <returns></returns>
+        [HttpGet("material/picklist")]
+        public async Task<List<ProcBomDetailView>> GetPickBomMaterialAsync(long orderId)
+        {
+            return await _procBomService.GetPickBomMaterialAsync(orderId);
+        }
 
         /// <summary>
         /// 添加（BOM表）

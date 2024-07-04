@@ -136,7 +136,7 @@ namespace Hymson.MES.Services.Services.Plan
                 InputQty = 0,
                 UnqualifiedQuantity = 0,
                 FinishProductQuantity = 0,
-                PassDownQuantity = 0
+                PassDownQuantity = 0,
             };
 
             // 检查工艺路线

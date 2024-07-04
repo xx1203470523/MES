@@ -111,6 +111,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuRequistionOrderDetailEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SitId=@SiteId");
+            sqlBuilder.Select("*");
+            if (manuRequistionOrderDetailQuery.RequistionOrderIds!=null&&manuRequistionOrderDetailQuery.RequistionOrderIds.Any())
+            {
+                sqlBuilder.Where("RequistionOrderId IN @RequistionOrderIds");
+            }
+            sqlBuilder.AddParameters(manuRequistionOrderDetailQuery);
             using var conn = GetMESDbConnection();
             var manuRequistionOrderDetailEntities = await conn.QueryAsync<ManuRequistionOrderDetailEntity>(template.RawSql, manuRequistionOrderDetailQuery);
             return manuRequistionOrderDetailEntities;

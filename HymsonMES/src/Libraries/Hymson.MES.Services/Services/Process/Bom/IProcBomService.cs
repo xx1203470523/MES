@@ -59,6 +59,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="bomId"></param>
         /// <returns></returns>
         Task<List<ProcBomDetailView>> GetProcBomMaterialAsync(long bomId);
+        Task<List<ProcBomDetailView>> GetPickBomMaterialAsync(long orderId);
 
         /// <summary>
         /// 状态变更

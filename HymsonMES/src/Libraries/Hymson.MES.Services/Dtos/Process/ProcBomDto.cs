@@ -273,5 +273,14 @@ namespace Hymson.MES.Services.Dtos.Process
 
         public string FileName { get; set; }
     }
+    /// <summary>
+    /// 领料BOMQuery
+    /// </summary>
+    public class PickBomQueryDto
+    {
+        public long BomId { get; set; }
+
+        public long WorkId { get; set; }
+    }
 
 }

@@ -56,7 +56,11 @@ namespace Hymson.MES.Core.Domain.Plan
         /// 工单Id
         /// </summary>
         public long WorkOrderId { get; set; }
+        /// <summary>
+        /// 工单计划Id
+        /// </summary>
+        public long? WorkPlanId { get; set; }
 
-       
+
     }
 }
