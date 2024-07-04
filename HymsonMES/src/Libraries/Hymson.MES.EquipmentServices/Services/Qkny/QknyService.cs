@@ -394,6 +394,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             query.Qty = dto.Qty;
             query.ProcedureId = equResModel.ProcedureId;
             query.UserName = equResModel.EquipmentCode;
+            query.EquipmentId = equResModel.EquipmentId;
             //2.2 进站数据
             SFCInStationBo inBo = new SFCInStationBo();
             inBo.SiteId = equResModel.SiteId;

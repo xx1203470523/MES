@@ -470,6 +470,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.GlueHomogenate
             query.Qty = 1;
             query.ProcedureId = equResModel.ProcedureId;
             query.UserName = equResModel.EquipmentCode;
+            query.EquipmentId = equResModel.EquipmentId;
             //查询当前设备的上料;数量超过批次大小，会生成多个条码
             //EntityByResourceIdQuery loadQuery = new EntityByResourceIdQuery();
             //loadQuery.SiteId = equResModel.SiteId;

@@ -116,6 +116,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            if (query.BusinessId.HasValue)
+            {
+                sqlBuilder.Where("BusinessId = @BusinessId");
+            }
+            if (query.BusinessType.HasValue)
+            {
+                sqlBuilder.Where("BusinessType = @BusinessType");
+            }
+            if (!string.IsNullOrWhiteSpace(query.CustomFieldName))
+            {
+                sqlBuilder.Where("CustomFieldName = @CustomFieldName");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteCustomFieldBusinessEffectuateEntity>(template.RawSql, query);
         }

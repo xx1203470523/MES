@@ -27,6 +27,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         /// 资源Id
         /// </summary>
         public long ResourceId { set; get; }
+
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long? EquipmentId { set; get; }
     }
 
     /// <summary>

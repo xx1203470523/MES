@@ -124,6 +124,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 工单id 为生成极片状态创建而设置
         /// </summary>
         public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long? EquipmentId { get; set; }
     }
 
     /// <summary>

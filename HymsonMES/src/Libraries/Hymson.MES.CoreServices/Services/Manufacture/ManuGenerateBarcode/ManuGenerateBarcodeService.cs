@@ -11,6 +11,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -57,6 +58,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// </summary>
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
+        private readonly IInteCustomFieldBusinessEffectuateRepository _inteCustomFieldBusinessEffectuateRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -70,7 +73,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             ITracingSourceCoreService tracingSourceCoreService,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuSfcRepository manuSfcRepository,
-            IManuSfcInfoRepository manuSfcInfoRepository)
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            IInteCustomFieldBusinessEffectuateRepository inteCustomFieldBusinessEffectuateRepository)
         {
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
@@ -83,6 +87,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
+            _inteCustomFieldBusinessEffectuateRepository = inteCustomFieldBusinessEffectuateRepository;
         }
 
         /// <summary>
@@ -275,6 +280,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                         case GenerateBarcodeWildcard.ElectrodeState:
                             rules.Add(new List<string> { await GenerateElectrodeStateAsync(bo) });
                             break;
+                        case GenerateBarcodeWildcard.EquipmentMappingCode:
+                            rules.Add(new List<string> { await GenerateEquipmentMappingCode(bo) });
+                            break;
                         default:
                             throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);
                     }
@@ -297,7 +305,32 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
 
             return list;
         }
+
         #region 内部方法
+
+        /// <summary>
+        /// 生成设备编码映射码
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        private async Task<string> GenerateEquipmentMappingCode(BarCodeSerialNumberBo bo)
+        {
+            if (bo.IsTest) return "0";
+            if (bo.EquipmentId == null) return string.Empty;
+            //
+            var entities = await _inteCustomFieldBusinessEffectuateRepository.GetEntitiesAsync(new InteCustomFieldBusinessEffectuateQuery
+            {
+                BusinessId = bo.EquipmentId.GetValueOrDefault(),
+                BusinessType = InteCustomFieldBusinessTypeEnum.Device,
+                CustomFieldName = "EquMappingCode"
+            });
+            if (entities == null || !entities.Any() || string.IsNullOrWhiteSpace(entities.First().SetValue))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16220));
+            }
+
+            return entities.First().SetValue ?? "";
+        }
 
         /// <summary>
         /// 生成正极片生产信息

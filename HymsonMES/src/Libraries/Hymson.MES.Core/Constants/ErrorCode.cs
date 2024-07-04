@@ -1165,6 +1165,7 @@
         public const string MES16217 = "条码【{Barcode}】对应正极片生产信息不存在或未正确配置相关信息，请检查数据";
         public const string MES16218 = "工单【{WorkOrderId}】不存在";
         public const string MES16219 = "条码【{Barcode}】对应正极浆料生产信息不存在或未正确配置相关信息，请检查数据";
+        public const string MES16220 = "设备对应映射码未设置，请至【设备注册=>自定义】维护相应数据";
         #endregion
 
         #region 生产通用 MES16300

@@ -126,5 +126,11 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// </summary>
         [GenerateBarcodeWildcardDescriptionAttribute("工单类型映射通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
         public const string ElectrodeState = "%ELECTRODESTATE%";
+
+        /// <summary>
+        /// 设备编码通配符
+        /// </summary>
+        [GenerateBarcodeWildcardDescriptionAttribute("设备编码通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        public const string EquipmentMappingCode = "%EQUIPMENTMAPPINGCODE%";
     }
 }

@@ -258,13 +258,14 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 Count = discuss,
                 Base = inteCodeRulesEntity.Base,
                 Increment = inteCodeRulesEntity.Increment,
-                IgnoreChar = inteCodeRulesEntity.IgnoreChar,
+                IgnoreChar = inteCodeRulesEntity.IgnoreChar ?? "",
                 OrderLength = inteCodeRulesEntity.OrderLength,
                 ResetType = inteCodeRulesEntity.ResetType,
                 StartNumber = inteCodeRulesEntity.StartNumber,
                 CodeMode = inteCodeRulesEntity.CodeMode,
                 SiteId = param.SiteId,
-                InteWorkCenterId = inteWorkCenterEntity.Id
+                InteWorkCenterId = inteWorkCenterEntity.Id,
+                EquipmentId = param.EquipmentId
             });
 
             List<CreateBarcodeByWorkOrderOutputBo> result = new();
