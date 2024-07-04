@@ -73,9 +73,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 
         /// <returns></returns>
         [HttpGet("material/picklist")]
-        public async Task<List<ProcBomDetailView>> GetPickBomMaterialAsync(long bomId,long workId)
+        public async Task<List<ProcBomDetailView>> GetPickBomMaterialAsync(long orderId)
         {
-            return await _procBomService.GetProcBomMaterialAsync(bomId);
+            return await _procBomService.GetPickBomMaterialAsync(orderId);
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
@@ -56,6 +57,9 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IMinioService _minioService;
 
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+        private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
+        private readonly IManuRequistionOrderDetailRepository _manuRequistionOrderDetailRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
         /// 构造函数
@@ -82,6 +86,9 @@ namespace Hymson.MES.Services.Services.Process
             IMinioService minioService,
         IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository
             , ILocalizationService localizationService,
+        IManuRequistionOrderDetailRepository manuRequistionOrderDetailRepository,
+        IManuRequistionOrderRepository manuRequistionOrderRepository,
+        IPlanWorkOrderRepository planWorkOrderRepository,
         IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
         {
             _currentSite = currentSite;
@@ -97,6 +104,9 @@ namespace Hymson.MES.Services.Services.Process
             _minioService = minioService;
 
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
+            _manuRequistionOrderDetailRepository = manuRequistionOrderDetailRepository;
+            _manuRequistionOrderRepository = manuRequistionOrderRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
@@ -632,6 +642,55 @@ namespace Hymson.MES.Services.Services.Process
             if (replaceBomDetails.Any())
             {
                 procBomDetailViews.AddRange(replaceBomDetails);
+            }
+
+            return procBomDetailViews;
+        }
+        public async Task<List<ProcBomDetailView>> GetPickBomMaterialAsync(long orderId)
+        {
+            var procBomDetailViews = new List<ProcBomDetailView>();
+            //查找领料明细
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderId);
+            var mainBomDetails = await _procBomDetailRepository.GetListMainAsync(planWorkOrderEntity.ProductBOMId);
+            var replaceBomDetails = await _procBomDetailRepository.GetListReplaceAsync(planWorkOrderEntity.ProductBOMId);
+
+            if (mainBomDetails.Any())
+            {
+                mainBomDetails = mainBomDetails.OrderBy(x => x.Seq).ToList();
+
+                procBomDetailViews.AddRange(mainBomDetails);
+            }
+            if (replaceBomDetails.Any())
+            {
+                procBomDetailViews.AddRange(replaceBomDetails);
+            }
+            
+            //查找领料单集合
+            var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.OrderCode, planWorkOrderEntity.SiteId);
+            
+            if (requistionOrderEntities.Any())
+            {
+                var requistionOrderDetailEntities = await _manuRequistionOrderDetailRepository.GetManuRequistionOrderDetailEntitiesAsync(new ManuRequistionOrderDetailQuery
+                {
+                    SiteId = planWorkOrderEntity.SiteId,
+                    RequistionOrderIds = requistionOrderEntities.Select(r => r.Id).ToArray(),
+                });
+                var requistionMaterialGroup = requistionOrderDetailEntities.GroupBy(r => r.MaterialCode);
+                foreach (var item in procBomDetailViews)
+                {
+                    //已领料
+                    var receivedMaterialList = requistionMaterialGroup.FirstOrDefault(g => g.Key == item.MaterialCode)?.ToList();
+                    if (receivedMaterialList != null && receivedMaterialList.Any())
+                    {
+                        item.Usages = item.Usages * planWorkOrderEntity.Qty * (1 + item.Loss ?? 0) - receivedMaterialList.Sum(r => r.Qty) * item.Usages * (1 + item.Loss ?? 0);
+                    }
+
+                }
+            }
+            //汇总出领料明细集合
+            foreach (var item in procBomDetailViews)
+            {
+                item.Usages = item.Usages * planWorkOrderEntity.Qty * (1 + item.Loss ?? 0);
             }
 
             return procBomDetailViews;
