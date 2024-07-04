@@ -23,6 +23,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Jobs\Equipment\**" />
+	  <EmbeddedResource Remove="Jobs\Equipment\**" />
+	  <None Remove="Jobs\Equipment\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="appsettings.Development.json" />
 		<None Remove="appsettings.json" />
 		<None Remove="appsettings.Production.json" />
@@ -73,15 +79,15 @@
 		<PackageReference Include="Quartz.Serialization.Json" Version="3.4.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\Libraries\Hymson.MES.BackgroundServices\Hymson.MES.BackgroundServices.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Jobs\Equipment\" />
-	</ItemGroup>
-	<ItemGroup>
 	  <EmbeddedResource Update="Properties\Resources.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Jobs\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Libraries\Hymson.MES.BackgroundServices.Rotor\Hymson.MES.BackgroundServices.Rotor.csproj" />
 	</ItemGroup>
 </Project>

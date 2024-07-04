@@ -7,7 +7,7 @@ namespace Hymson.MES.BackgroundServices.CoreServices
     /// 
     /// </summary>
     [AppService(ServiceType = typeof(IOP010Service), ServiceLifetime = LifeTime.Transient)]
-    public class OP010Service : BaseService<OP10Entity>, IOP010Service, IDynamicApi
+    public class OP010Service : BaseService<OP010Entity>, IOP010Service, IDynamicApi
     {
         /// <summary>
         /// 
@@ -22,7 +22,7 @@ namespace Hymson.MES.BackgroundServices.CoreServices
         /// <returns></returns>
         public string SayHello(string name)
         {
-            var result = DbScoped.SugarScope.Queryable<OP10Entity>().First();
+            var result = DbScoped.SugarScope.Queryable<OP010Entity>().First();
             Console.WriteLine(JsonConvert.SerializeObject(result));
 
             return "Hello:" + name;

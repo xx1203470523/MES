@@ -5,7 +5,7 @@ namespace Hymson.MES.BackgroundServices.CoreServices
     /// <summary>
     /// Hello接口
     /// </summary>
-    public interface IOP010Service : IBaseService<OP10Entity>
+    public interface IOP010Service : IBaseService<OP010Entity>
     {
         /// <summary>
         /// 

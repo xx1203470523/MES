@@ -1,11 +1,7 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.BackgroundTasks.Rotor.Extensions;
 using Hymson.MES.BackgroundTasks.Rotor.HostedServices;
-using Hymson.MES.BackgroundTasks.Rotor.Jobs;
-using Hymson.MES.BackgroundTasks.Rotor.Jobs.Manufacture;
-using Hymson.MES.BackgroundTasks.Rotor.Jobs.Quality;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Print.Options;
 using Microsoft.Extensions.Configuration;
@@ -52,24 +48,6 @@ Host.CreateDefaultBuilder(args)
        {
            // Use a Scoped container to create jobs. I'll touch on this later
            q.UseMicrosoftDependencyInjectionJobFactory();
-
-           #region jobs
-           q.AddJobAndTrigger<MessagePushJob>(hostContext.Configuration);
-           q.AddJobAndTrigger<PrintExecuteJob>(hostContext.Configuration);
-           q.AddJobAndTrigger<SqlExecuteJob>(hostContext.Configuration);
-           #endregion
-
-           #region 生产
-           q.AddJobAndTrigger<Productionstatistic>(hostContext.Configuration);
-           q.AddJobAndTrigger<TracingSourceSFCJob>(hostContext.Configuration);
-           q.AddJobAndTrigger<WorkOrderStatisticJob>(hostContext.Configuration);
-           #endregion
-
-           #region 品质
-
-           q.AddJobAndTrigger<EnvOrderCreateJob>(hostContext.Configuration);
-
-           #endregion
 
            q.UsePersistentStore((persistentStoreOptions) =>
            {

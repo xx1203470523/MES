@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Hymson.MES.BackgroundServices.NIO.DependencyInjection
+namespace Hymson.MES.BackgroundServices.DependencyInjection
 {
     /// <summary>
     /// 依赖注入项配置
