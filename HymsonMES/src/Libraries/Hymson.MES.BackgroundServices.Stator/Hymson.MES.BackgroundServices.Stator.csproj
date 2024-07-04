@@ -26,12 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Equipment\" />
-    <Folder Include="EventHandling\" />
-    <Folder Include="Tasks\" />
+    <ProjectReference Include="..\Hymson.MES.Repository\Hymson.MES.Repository.csproj" />
   </ItemGroup>
 
 </Project>
