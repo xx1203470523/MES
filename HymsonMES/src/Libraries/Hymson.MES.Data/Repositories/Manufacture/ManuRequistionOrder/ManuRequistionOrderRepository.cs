@@ -13,6 +13,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
 {
@@ -69,6 +70,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByIdsSql, new { Ids = ids});
+        }
+        public async Task<IEnumerable<ManuRequistionOrderEntity>> GetByOrderCodeAsync(string orderCode,long siteId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByOrderCodeSql, new { WorkOrderCode = orderCode, SiteId= siteId });
         }
 
         /// <summary>
@@ -208,6 +214,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
                             FROM `manu_requistion_order`  WHERE Id IN @Ids ";
 
         const string GetByCodeSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND ReqOrderCode = @ReqOrderCode and SiteId=@SiteId ";
+        const string GetByOrderCodeSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND WorkOrderCode = @WorkOrderCode and SiteId=@SiteId ";
         #endregion
     }
 }
