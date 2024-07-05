@@ -1,9 +1,12 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Process
@@ -79,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +104,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcedureSubstepEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcProcedureSubstepEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcProcedureSubstepEntity>(GetByIdsSql, new { Ids = ids });
@@ -140,6 +143,35 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
+            {
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where(" Code like @Code");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
+            {
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where(" Name like @Name");
+            }
+
+            if (pagedQuery.Type.HasValue)
+            {
+                sqlBuilder.Where(" Type=@Type");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.CreatedBy))
+            {
+                pagedQuery.CreatedBy = $"%{pagedQuery.CreatedBy}%";
+                sqlBuilder.Where(" CreatedBy like @CreatedBy");
+            }
+
+            if (pagedQuery.CreatedOnRange != null && pagedQuery.CreatedOnRange.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.CreatedOnRange[0], CreatedOnEnd = pagedQuery.CreatedOnRange[1] });
+                sqlBuilder.Where("CreatedOn >= @CreatedOnStart AND CreatedOn < @CreatedOnEnd");
+            }
+
             using var conn = GetMESDbConnection();
             var entitiesTask = conn.QueryAsync<ProcProcedureSubstepEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
@@ -148,6 +180,16 @@ namespace Hymson.MES.Data.Repositories.Process
             return new PagedInfo<ProcProcedureSubstepEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据编码获取数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<ProcProcedureSubstepEntity> GetByCodeAsync(EntityByCodeQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcProcedureSubstepEntity>(GetByCodeSql, param);
+        }
     }
 
 
@@ -171,6 +213,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string GetByIdSql = @"SELECT * FROM proc_procedure_substep WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM proc_procedure_substep WHERE Id IN @Ids ";
+        const string GetByCodeSql = "SELECT * FROM `proc_procedure_substep` WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
 
     }
 }

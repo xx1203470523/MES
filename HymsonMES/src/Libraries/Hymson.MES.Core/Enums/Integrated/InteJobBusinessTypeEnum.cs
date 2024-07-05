@@ -23,6 +23,11 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// 3不合格代码
         /// </summary>
         [Description("不合格代码")]
-        Unqualified = 3
+        Unqualified = 3,
+        /// <summary>
+        /// 4子步骤
+        /// </summary>
+        [Description("子步骤")]
+        Substep = 4
     }
 }

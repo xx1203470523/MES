@@ -132,7 +132,7 @@ namespace Hymson.MES.Services.Services.Integrated
             });
             if (entity != null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19427));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19441));
             }
             //if (saveDto.Type == FieldDefinitionTypeEnum.Number || saveDto.Type == FieldDefinitionTypeEnum.Text)
             //{
