@@ -963,6 +963,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcedureTimeControlCreateDto, ProcProcedureTimeControlEntity>();
             CreateMap<ProcProcedureTimeControlModifyDto, ProcProcedureTimeControlEntity>();
             CreateMap<ProcProcedureTimeControlEntity, ProcProcedureTimeControlDetailDto>();
+
+            #region ProcProcedureSubstep
+            CreateMap<ProcProcedureSubstepSaveDto, ProcProcedureSubstepEntity>();
+            CreateMap<ProcProcedureSubstepEntity, ProcProcedureSubstepDto>();
+            CreateMap<ProcProcedureSubstepPagedQueryDto, ProcProcedureSubstepPagedQuery>();
+            #endregion
         }
 
         /// <summary>

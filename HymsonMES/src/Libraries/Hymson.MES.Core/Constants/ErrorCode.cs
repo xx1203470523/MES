@@ -132,6 +132,7 @@
         public const string MES10387 = "作业参数不能为空！";
         public const string MES10388 = "资源不存在！";
         public const string MES10389 = $"关联资质中，重复配置资质认证!";
+        public const string MES10357 = $"关联子步骤中，重复配置子步骤!";
         #endregion
 
         #region 标签模板 10340
@@ -2105,7 +2106,7 @@
         #endregion 
 
 
-        #region OQC检验项目 19500
+        #region OQC检验项目 17800
 
         public const string MES17800 = "出货单暂无数据!";
         public const string MES17801 = "出货单详情暂无数据!";
@@ -2253,6 +2254,12 @@
         public const string MES17704 = "设备{code}位置{position}已安装工具，请卸载后再进行操作!";
         public const string MES17705 = "工具无剩余寿命，不可使用!";
         public const string MES17706 = "工具本次使用寿命需大于0";
+        #endregion
+
+        #region 子步骤管理 17750
+        public const string MES17751 = "子步骤{code}已经存在";
+        public const string MES17752 = "子步骤不存在！";
+        public const string MES17753 = "子步骤已被分配给工序，不允许删除！";
         #endregion
     }
 }

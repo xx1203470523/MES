@@ -337,6 +337,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 资质认证信息
         /// </summary>
         public List<ProcQualificationAuthenticationCreateDto> AuthSetList { get; set; }
+
+        /// <summary>
+        /// 子步骤信息
+        /// </summary>
+        public List<ProcResourceConfigSubstepCreateDto> SubstepList { get; set; }
     }
 
     /// <summary>
@@ -369,6 +374,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 资质认证信息
         /// </summary>
         public List<ProcQualificationAuthenticationCreateDto> AuthSetList { get; set; }
+
+        /// <summary>
+        /// 子步骤信息
+        /// </summary>
+        public List<ProcResourceConfigSubstepCreateDto> SubstepList { get; set; }
     }
 
     /// <summary>
@@ -522,6 +532,33 @@ namespace Hymson.MES.Services.Dtos.Process
 
         /// <summary>
         /// 工序BOM名称
+        /// </summary>
+        public string Name { get; set; }
+    }
+
+    public record ProcResourceConfigSubstepCreateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 子步骤ID
+        /// </summary>
+        public long ProcedureSubstepId { get; set; }
+    }
+
+
+    public record ProcResourceConfigSubstepDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 子步骤ID
+        /// </summary>
+        public long ProcedureSubstepId { get; set; }
+
+        /// <summary>
+        /// 子步骤编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 子步骤名称
         /// </summary>
         public string Name { get; set; }
     }
