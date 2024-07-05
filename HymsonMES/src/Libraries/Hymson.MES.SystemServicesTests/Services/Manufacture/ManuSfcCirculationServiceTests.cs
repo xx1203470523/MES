@@ -45,7 +45,7 @@ namespace Hymson.MES.SystemServices.Services.Manufacture.Tests
         [TestMethod()]
         public async Task GetRelationShipByPackAsyncTest()
         {
-            var manuSfcCirculation = await _manuSfcCirculationService.GetRelationShipByPackAsync("YTLSM202309130001A");
+            var manuSfcCirculation = await _manuSfcCirculationService.GetRelationShipByPackAsync("123");
             Assert.IsTrue(manuSfcCirculation != null);
         }
         /// <summary>

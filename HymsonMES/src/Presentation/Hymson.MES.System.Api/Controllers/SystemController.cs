@@ -71,6 +71,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="manuSfcCirculationQueryDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [AllowAnonymous]
         [Route("relationship")]
         public async Task<ManuSfcCirculationDto?> GetRelationShipByPackAsync(ManuSfcCirculationQueryDto manuSfcCirculationQueryDto)
         {

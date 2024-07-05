@@ -127,7 +127,28 @@ namespace Hymson.MES.SystemServices.Services.Manufacture
             if (string.IsNullOrEmpty(sfc)) { throw new CustomerValidationException(nameof(ErrorCode.MES19203)); }
             //追溯条码信息
             var manuSfcCirculationViews = await GetProductTraceListAsync(sfc);
-            if (!manuSfcCirculationViews.Any()) { return null; }
+            if (!manuSfcCirculationViews.Any())
+            {
+                if (sfc.IndexOf("ES") != -1)
+                {
+                    return new()
+                    {
+                        DeviceCode = "",
+                        CodeId = sfc,
+                        Level = 3
+                    };
+                }
+
+                if (sfc.IndexOf("YT") != -1)
+                {
+                    return new()
+                    {
+                        DeviceCode = "",
+                        CodeId = sfc,
+                        Level = 2
+                    };
+                }
+            }
             //递归处理层级数据
             int level = 1;
             //第一层Pack信息/第二层模组信息
@@ -190,7 +211,8 @@ namespace Hymson.MES.SystemServices.Services.Manufacture
 
             foreach (var item in sfcCirculationEntities)
             {
-                result.Add(new() {
+                result.Add(new()
+                {
                     Id = item.Id,
                     BindSFC = item.SFC,
                     SFC = item.CirculationBarCode,
@@ -205,7 +227,7 @@ namespace Hymson.MES.SystemServices.Services.Manufacture
                 {
                     Id = item.Id,
                     BindSFC = item.CirculationBarCode,
-                    SFC = item.SFC ,
+                    SFC = item.SFC,
                     UpdatedBy = item.UpdatedBy,
                     UpdatedOn = item.UpdatedOn,
                 });
