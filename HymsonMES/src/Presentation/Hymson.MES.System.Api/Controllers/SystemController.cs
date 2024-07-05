@@ -10,6 +10,7 @@ using Hymson.MES.SystemServices.Services.Api;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
 using Hymson.MES.SystemServices.Services.ProductTrace;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.System.Api.Controllers
