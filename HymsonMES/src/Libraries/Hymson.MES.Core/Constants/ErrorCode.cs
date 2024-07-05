@@ -132,6 +132,7 @@
         public const string MES10387 = "作业参数不能为空！";
         public const string MES10388 = "资源不存在！";
         public const string MES10389 = $"关联资质中，重复配置资质认证!";
+        public const string MES10357 = $"关联子步骤中，重复配置子步骤!";
         #endregion
 
         #region 标签模板 10340
@@ -2257,6 +2258,7 @@
         #region 子步骤管理 17750
         public const string MES17751 = "子步骤{code}已经存在";
         public const string MES17752 = "子步骤不存在！";
+        public const string MES17753 = "子步骤已被分配给工序，不允许删除！";
         #endregion
     }
 }

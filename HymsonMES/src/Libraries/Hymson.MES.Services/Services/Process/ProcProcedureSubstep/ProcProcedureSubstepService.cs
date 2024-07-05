@@ -56,6 +56,8 @@ namespace Hymson.MES.Services.Services.Process
         /// 配置作业表仓储
         /// </summary>
         private readonly IInteJobBusinessRelationRepository _jobBusinessRelationRepository;
+
+        private readonly IProcProcedureSubstepRelationRepository _configSubstepRepository;
         /// <summary>
         /// 作业表仓储
         /// </summary>
@@ -74,6 +76,7 @@ namespace Hymson.MES.Services.Services.Process
             IProcProcedureSubstepRepository procProcedureSubstepRepository,
             IInteJobBusinessRelationRepository jobBusinessRelationRepository,
             IInteJobRepository inteJobRepository,
+            IProcProcedureSubstepRelationRepository configSubstepRepository,
             ILocalizationService localizationService)
         {
             _currentUser = currentUser;
@@ -82,6 +85,7 @@ namespace Hymson.MES.Services.Services.Process
             _procProcedureSubstepRepository = procProcedureSubstepRepository;
             _jobBusinessRelationRepository = jobBusinessRelationRepository;
             _inteJobRepository = inteJobRepository;
+            _configSubstepRepository = configSubstepRepository;
             _localizationService = localizationService;
         }
 
@@ -382,6 +386,15 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             //查询是否被工序关联，关联了就不能删除
+            var substepRelationEntities =await _configSubstepRepository.GetEntitiesAsync(new ProcProcedureSubstepRelationQuery
+            {
+                ProcedureSubstepIds = ids
+            });
+            if (substepRelationEntities != null && substepRelationEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17753));
+            }
+
             return await _procProcedureSubstepRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,

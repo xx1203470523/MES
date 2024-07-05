@@ -117,6 +117,18 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
+        /// 获取子步骤设置
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Route("substep/{id}")]
+        [HttpGet]
+        public async Task<IEnumerable<ProcResourceConfigSubstepDto>> GetProcedureSubStepListAsync(long id)
+        {
+            return await _procProcedureService.GetProcedureSubStepListAsync(id);
+        }
+
+        /// <summary>
         /// 添加（工序表）
         /// </summary>
         /// <param name="parm"></param>
