@@ -37,6 +37,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="id"></param>
         /// <returns></returns>
         Task<PlanWorkPlanProductEntity> GetByIdAsync(long id);
+        /// <summary>
+        /// 根据产品Id,计划Id获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<PlanWorkPlanProductEntity> GetByPlanIdAndProductIdAsync(long id,long productId);
 
         /// <summary>
         /// 根据IDs批量获取数据

@@ -86,6 +86,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IManuReturnOrderDetailRepository _manuReturnOrderDetailRepository;
         private readonly IXnebulaWMSApiClient _wmsRequest;
         private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
+        private readonly IPlanWorkPlanProductRepository _planWorkPlanProductRepository;
         private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
 
         /// <summary>
@@ -128,6 +129,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IManuReturnOrderRepository manuReturnOrderRepository,
             IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
             IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkPlanProductRepository planWorkPlanProductRepository,
             IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _currentUser = currentUser;
@@ -157,6 +159,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _manuReturnOrderRepository  = manuReturnOrderRepository;
             _planWorkPlanRepository = planWorkPlanRepository;
             _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
+            _planWorkPlanProductRepository = planWorkPlanProductRepository;
         }
 
 
@@ -1323,6 +1326,104 @@ namespace Hymson.MES.Services.Services.Warehouse
             else
             {
                 return false;
+            }
+        }
+
+        public async Task PickMaterialsRequestAsync(PickMaterialsRequestV2 request)
+        {
+            //派工单校验
+
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(request.OrderId);
+            if (planWorkOrderEntity != null)
+            {
+                if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Finish)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16048)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+                }
+            }
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+            }
+            //查询生产计划
+            var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+            //查询生产计划产品
+            var planWorkPlanProductEntity = await _planWorkPlanProductRepository.GetByPlanIdAndProductIdAsync(planWorkPlanEntity.Id,planWorkOrderEntity.ProductId)
+              ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+            //创建领料申请单
+            ManuRequistionOrderEntity manuRequistionOrderEntity = new ManuRequistionOrderEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                Status = WhWarehouseRequistionStatusEnum.Approvaling,
+                Type = ManuRequistionTypeEnum.WorkOrderPicking,
+                WorkOrderCode = planWorkOrderEntity.OrderCode,
+                WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
+                WorkPlanId = planWorkPlanEntity.Id
+            };
+
+
+            //获取派工单指定BOM记录
+
+            //var bomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrderEntity.ProductBOMId);
+
+            var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                PlanId = planWorkPlanEntity.Id,
+                PlanProductId = planWorkOrderEntity.ProductId,
+            });
+
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkPlanMaterialEntities.Select(b => b.MaterialId).Distinct().ToArray());
+            var productionPickMaterialDtos = new List<HttpClients.Requests.ProductionPickMaterialDto>();
+            var validationFailures = new List<ValidationFailure>();
+            foreach (var item in request.Items)
+            {
+                var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
+                if (materialEntity == null)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", item.MaterialId } };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialId);
+                    }
+                    validationFailure.FormattedMessagePlaceholderValues.Add("MaterialId", item.MaterialId);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES10243);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(p=>p.MaterialId== item.MaterialId);
+                HttpClients.Requests.ProductionPickMaterialDto productionPickMaterialDto = new HttpClients.Requests.ProductionPickMaterialDto
+                {
+                    MaterialCode = materialEntity.MaterialCode,
+                    Quantity = item.Usages.ToString(),
+                    UnitCode = materialEntity.Unit,
+                    ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                    ProductionOrderComponentID = planWorkPlanMaterialEntity.Id,
+                    ProductionOrderDetailID = planWorkPlanProductEntity.Id
+
+                };
+                productionPickMaterialDtos.Add(productionPickMaterialDto);
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException("", validationFailures);
+            }
+            //下达WMS领料申请
+            var response = await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.MaterialPickingRequestDto
+            {
+                SyncCode = $"{planWorkOrderEntity.OrderCode}_{manuRequistionOrderEntity.Id}",
+                SendOn = HymsonClock.Now().ToString(),
+                details = productionPickMaterialDtos
+            });
+            if (response)
+            {
+                await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
             }
         }
     }
