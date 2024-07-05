@@ -180,6 +180,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
+        /// 条码档位
+        /// </summary>
+        private readonly IManuSfcGradeRepository _manuSfcGradeRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -204,7 +209,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IEquEquipmentService equEquipmentService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto,
             IManuProductParameterService manuProductParameterService,
-            IProcMaterialRepository procMaterialRepository)
+            IProcMaterialRepository procMaterialRepository,
+            IManuSfcGradeRepository manuSfcGradeRepository)
         {
             _equEquipmentRepository = equEquipmentRepository;
             _planWorkOrderService = planWorkOrderService;
@@ -230,6 +236,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
             _manuProductParameterService = manuProductParameterService;
+            _manuSfcGradeRepository = manuSfcGradeRepository;
         }
 
 
@@ -1014,12 +1021,30 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
                 UpdatedBy = dto.EquipmentCode,
                 UpdatedOn = HymsonClock.Now()
             }).ToList();
+            //2.4 电芯档位
+            var sfcGradeDtos = new List<ManuSfcGradeEntity>();
+            if (!string.IsNullOrWhiteSpace(dto.Grade))
+            {
+                sfcGradeDtos = dto.ContainerSfcList.Select(x => new ManuSfcGradeEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = equResModel.SiteId,
+                    SFC = x.Sfc,
+                    Grade = dto.Grade,
+                    CreatedBy = dto.EquipmentCode,
+                    UpdatedBy = dto.EquipmentCode
+                }).ToList();
+            }
 
             //3. 数据操作
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             await _inteVehicleService.VehicleBindOperationAsync(vehicleBindDto);
             await _manuPassStationService.OutStationRangeByVehicleAsync(outStationBo, RequestSourceEnum.EquipmentApi);
             await _equProductParamRecordService.AddMultAsync(paramRecordSaveDtos);
+            if (sfcGradeDtos.Count > 0)
+            {
+                await _manuSfcGradeRepository.InsertsAsync(sfcGradeDtos);
+            }
             trans.Complete();
         }
 

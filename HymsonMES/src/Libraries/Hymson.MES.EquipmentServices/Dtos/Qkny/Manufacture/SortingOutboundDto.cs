@@ -16,6 +16,11 @@
         public int Passed {  get; set; }
 
         /// <summary>
+        /// 档位
+        /// </summary>
+        public string Grade { get; set; } = "";
+
+        /// <summary>
         /// 托盘电芯码列表
         /// </summary>
         public List<ContainerSfcDto> ContainerSfcList { get; set; } = new List<ContainerSfcDto>();
