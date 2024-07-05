@@ -126,6 +126,11 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.QueryAsync<PlanWorkPlanProductEntity>(template.RawSql, query);
         }
 
+        public async Task<PlanWorkPlanProductEntity> GetByPlanIdAndProductIdAsync(long id, long productId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkPlanProductEntity>(GetByIdSql, new { Id = id });
+        }
     }
 
 

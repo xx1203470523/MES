@@ -107,6 +107,28 @@ namespace Hymson.MES.HttpClients.Requests
         [JsonPropertyName("quantity")]
         public string Quantity { get; set; }
 
+
+        /// <summary>
+        /// 生产订单号
+        /// </summary>
+        /// 
+        [JsonPropertyName("productionOrder")]
+        public string? ProductionOrder { get; set; }
+
+        /// <summary>
+        /// 生产订单子表ID
+        /// </summary>
+        /// 
+        [JsonPropertyName("productionOrderDetailID")]
+        public long? ProductionOrderDetailID { get; set; }
+
+        /// <summary>
+        /// 生产订单子件ID
+        /// </summary>
+        /// 
+        [JsonPropertyName("productionOrderComponentID")]
+        public long? ProductionOrderComponentID { get; set; }
+
     }
    
 }
