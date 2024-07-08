@@ -7,8 +7,12 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.EquRepairOrderFault;
+using Hymson.MES.Services.Dtos.Equipment.EquMaintenance;
 using Hymson.MES.Services.Dtos.EquRepairOrder;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.EquRepairOrder;
+using Hymson.Snowflake;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -162,6 +166,51 @@ namespace Hymson.MES.Api.Controllers.EquRepairOrder
         public async Task ConfirmAsync([FromBody] ConfirmDto parm)
         {
             await _equRepairOrderService.ConfirmAsync(parm);
+        }
+
+        /// <summary>
+        /// 获取Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getNewId")]
+        public long GetNewId()
+        {
+            return IdGenProvider.Instance.CreateId();
+        }
+
+        /// <summary>
+        /// 上传单据附件
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("attachment/save")]
+        [LogDescription("上传单据附件", BusinessType.EXPORT)]
+        public async Task SaveAttachmentAsync([FromBody] EquRepairOrderSaveAttachmentDto dto)
+        {
+            await _equRepairOrderService.SaveAttachmentAsync(dto);
+        }
+
+        /// <summary>
+        /// 删除单据附件
+        /// </summary>
+        /// <param name="orderAnnexId"></param>
+        /// <returns></returns>
+        [HttpDelete("attachment/delete/{orderAnnexId}")]
+        [LogDescription("删除单据附件", BusinessType.OTHER)]
+        public async Task DeleteAttachmentByIdAsync(long orderAnnexId)
+        {
+            await _equRepairOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
+        }
+
+        /// <summary>
+        /// 查询单据附件
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet("attachment/attachmentList")]
+        public async Task<IEnumerable<InteAttachmentBaseDto>> QueryAttachmentListByIdAsync([FromQuery] EquRepairOrderAttachmentDto dto)
+        {
+            return await _equRepairOrderService.QueryOrderAttachmentListByIdAsync(dto);
         }
 
         #endregion

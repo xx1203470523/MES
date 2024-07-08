@@ -276,6 +276,18 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             result.EquipmentCode = equipmenEntity?.EquipmentCode ?? string.Empty;
             result.Location = equipmenEntity?.Location ?? string.Empty;
             result.ExecutorIds = _currentUser.UserName;
+
+            var deferOperation = await _equMaintenanceTaskOperationRepository.GetEntitiesAsync(new EquMaintenanceTaskOperationQuery { MaintenanceTaskIds = new List<long> { id }, OperationType = EquMaintenanceOperationTypeEnum.Defer });
+            result.IsDeferText = TrueOrFalseEnum.No.GetDescription();
+            if (deferOperation != null)
+            {
+                if (deferOperation.Any())
+                {
+                    result.IsDeferText = TrueOrFalseEnum.Yes.GetDescription();
+                }
+            }
+
+
             if (result.PlanType?.GetDescription() != "0")
             {
                 result.PlanTypeText = result.PlanType?.GetDescription() ?? string.Empty;

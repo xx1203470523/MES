@@ -1,4 +1,3 @@
-using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
@@ -8,7 +7,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
@@ -31,13 +29,6 @@ using Hymson.Snowflake;
 using Hymson.SqlActuator.Services;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
-using Minio.DataModel;
-using OfficeOpenXml.ConditionalFormatting;
-using Org.BouncyCastle.Crypto;
-using System;
-using System.Security.AccessControl;
-using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.Procedure
@@ -119,6 +110,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         private readonly IInteQualificationAuthenticationRepository _inteQualificationAuthenticationRepository;
 
         private readonly IProcProcedureQualificationAuthenticationRelationRepository _authenticationRelationRepository;
+        private readonly IProcProcedureSubstepRelationRepository _configSubstepRepository;
+        private readonly IProcProcedureSubstepRepository _procedureSubstepRepository;
 
         /// <summary>
         /// 构造函数
@@ -139,7 +132,9 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
             AbstractValidator<ProcProcedureModifyDto> validationModifyRules, ILocalizationService localizationService, ISqlExecuteTaskService sqlExecuteTaskService, IManuProductParameterRepository manuProductParameterRepository,
             IInteQualificationAuthenticationRepository inteQualificationAuthenticationRepository,
-            IProcProcedureQualificationAuthenticationRelationRepository authenticationRelationRepository)
+            IProcProcedureQualificationAuthenticationRelationRepository authenticationRelationRepository,
+            IProcProcedureSubstepRelationRepository configSubstepRepository,
+            IProcProcedureSubstepRepository procedureSubstepRepository)
         {
             _manuProductParameterRepository = manuProductParameterRepository;
             _currentUser = currentUser;
@@ -161,6 +156,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _authenticationRelationRepository = authenticationRelationRepository;
             _inteQualificationAuthenticationRepository = inteQualificationAuthenticationRepository;
+            _configSubstepRepository = configSubstepRepository;
+            _procedureSubstepRepository=procedureSubstepRepository;
         }
 
         /// <summary>
@@ -488,6 +485,44 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             return authenticationDtos;
         }
 
+        /// <summary>
+        /// 获取子步骤设置
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceConfigSubstepDto>> GetProcedureSubStepListAsync(long procedureId)
+        {
+            var query = new ProcProcedureSubstepRelationQuery()
+            {
+                ProcedureId = procedureId
+            };
+            var relationEntities = await _configSubstepRepository.GetEntitiesAsync(query);
+
+            //实体到DTO转换 装载数据
+            List<ProcResourceConfigSubstepDto> authenticationDtos = new List<ProcResourceConfigSubstepDto>();
+            if (relationEntities != null && relationEntities.Any())
+            {
+                IEnumerable<ProcProcedureSubstepEntity> substepEntities = new List<ProcProcedureSubstepEntity>();
+                var substepIds = relationEntities.Select(a => a.ProcedureSubstepId).ToArray();
+                if (substepIds.Any())
+                {
+                    substepEntities = await _procedureSubstepRepository.GetByIdsAsync(substepIds);
+                }
+
+                foreach (var entity in relationEntities)
+                {
+                    var substepEntity = substepEntities.FirstOrDefault(x => x.Id == entity.ProcedureSubstepId);
+                    authenticationDtos.Add(new ProcResourceConfigSubstepDto()
+                    {
+                        ProcedureSubstepId = entity.ProcedureSubstepId,
+                        Code = substepEntity?.Code ?? "",
+                        Name = substepEntity?.Name ?? ""
+                    });
+                }
+            }
+
+            return authenticationDtos;
+        }
 
         /// <summary>
         /// 创建
@@ -554,6 +589,12 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             if (procProcedureCreateDto.AuthSetList != null && procProcedureCreateDto.AuthSetList.Count > 0 && procProcedureCreateDto.AuthSetList.GroupBy(x => x.AuthenticationId).Any(g => g.Count() >= 2))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10389));
+            }
+
+            //判断子步骤是否重复配置  数据库中 已经存储的情况
+            if (procProcedureCreateDto.SubstepList != null && procProcedureCreateDto.SubstepList.Count > 0 && procProcedureCreateDto.SubstepList.GroupBy(x => x.ProcedureSubstepId).Any(g => g.Count() >= 2))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10357));
             }
             #endregion
 
@@ -729,6 +770,22 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     });
                 }
             }
+
+            //子步骤设置数据
+            var configSubstepEntities = new List<ProcProcedureSubstepRelationEntity>();
+            if (procProcedureCreateDto.SubstepList != null && procProcedureCreateDto.SubstepList.Count > 0)
+            {
+                foreach (var item in procProcedureCreateDto.SubstepList)
+                {
+                    configSubstepEntities.Add(new ProcProcedureSubstepRelationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ProcedureId = procProcedureEntity.Id,
+                        ProcedureSubstepId = item.ProcedureSubstepId
+                    });
+                }
+            }
+
             if (validationFailures.Any())
             {
                 throw new ValidationException(_localizationService.GetResource(nameof(ErrorCode.MES10107)), validationFailures);
@@ -783,6 +840,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     await _authenticationRelationRepository.InsertRangeAsync(authenticationRelationEntities);
                 }
 
+                if (configSubstepEntities.Any())
+                {
+                    await _configSubstepRepository.InsertRangeAsync(configSubstepEntities);
+                }
+
                 await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER_PARAMETER, createProductParameterProcedureCodeTableSql, userName);
                 //提交
                 ts.Complete();
@@ -832,6 +894,12 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             if (procProcedureModifyDto.AuthSetList != null && procProcedureModifyDto.AuthSetList.Count > 0 && procProcedureModifyDto.AuthSetList.GroupBy(x => x.AuthenticationId).Any(g => g.Count() >= 2))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10389));
+            }
+
+            //判断子步骤是否重复配置  数据库中 已经存储的情况
+            if (procProcedureModifyDto.SubstepList != null && procProcedureModifyDto.SubstepList.Count > 0 && procProcedureModifyDto.SubstepList.GroupBy(x => x.ProcedureSubstepId).Any(g => g.Count() >= 2))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10357));
             }
             #endregion
 
@@ -1048,6 +1116,21 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
             }
 
+            //子步骤设置数据
+            var configSubstepEntities = new List<ProcProcedureSubstepRelationEntity>();
+            if (procProcedureModifyDto.SubstepList != null && procProcedureModifyDto.SubstepList.Count > 0)
+            {
+                foreach (var item in procProcedureModifyDto.SubstepList)
+                {
+                    configSubstepEntities.Add(new ProcProcedureSubstepRelationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ProcedureId = procProcedureEntity.Id,
+                        ProcedureSubstepId = item.ProcedureSubstepId
+                    });
+                }
+            }
+
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //入库
@@ -1082,6 +1165,12 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 {
                     await _procProcedureRejudgeRepository.InsertRangeAsync(procProcedureRejudgeList);
                 }
+
+                await _configSubstepRepository.DeleteByProcedureIdsAsync(new[] { procProcedureEntity.Id });
+                if (configSubstepEntities.Any())
+                {
+                    await _configSubstepRepository.InsertRangeAsync(configSubstepEntities);
+                }
                 //提交
                 ts.Complete();
             }
@@ -1114,6 +1203,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     DeleteOn = HymsonClock.Now(),
                     UserId = _currentUser.UserName
                 });
+                rows += await _configSubstepRepository.DeleteByProcedureIdsAsync(idsAr);
                 rows += await _procProcedureRejudgeRepository.DeleteByParentIdAsync(idsAr);
                 rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsAr);
                 ts.Complete();

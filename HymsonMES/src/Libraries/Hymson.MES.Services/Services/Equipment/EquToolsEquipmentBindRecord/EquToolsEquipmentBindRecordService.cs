@@ -191,7 +191,7 @@ namespace Hymson.MES.Services.Services.Equipment
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 ToolId = toolsEntity.Id,
-                ToolsRecordId = 0,
+                ToolsRecordId = toolsRecordEntity.Id,
                 EquipmentId = equEquipmentEntity.Id,
                 EquipmentRecordId = equRecordEntity.Id,
                 Position = saveDto.Position,
@@ -241,7 +241,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 Supplier = equEquipmentEntity.Supplier,
                 Power = equEquipmentEntity.Power,
                 EnergyLevel = equEquipmentEntity.EnergyLevel,
-                OperationType = EquEquipmentRecordOperationTypeEnum.SparePartsBinding,
+                OperationType = operationType,
                 Ip = equEquipmentEntity.Ip,
                 TakeTime = equEquipmentEntity.TakeTime,
                 Remark = equEquipmentEntity.Remark,
@@ -316,7 +316,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 toolsEntity.UpdatedBy = updatedBy;
                 toolsEntity.UpdatedOn = updatedOn;
                 toolsEntity.CumulativeUsedLife = toolsEntity.CumulativeUsedLife + saveDto.CurrentUsedLife;
-                toolsEntity.CurrentUsedLife = toolsEntity.CurrentUsedLife + saveDto.CurrentUsedLife;
+                toolsEntity.CurrentUsedLife = currentUsedLife + saveDto.CurrentUsedLife;
 
                 toolsRecordEntity = new EquToolsRecordEntity()
                 {
@@ -328,7 +328,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     RatedLife = toolsEntity.RatedLife,
                     RatedLifeUnit = toolsEntity.RatedLifeUnit,
                     CumulativeUsedLife = toolsEntity.CumulativeUsedLife,
-                    CurrentUsedLife = toolsEntity.CumulativeUsedLife,
+                    CurrentUsedLife = toolsEntity.CurrentUsedLife,
                     LastVerificationTime = toolsEntity.LastVerificationTime,
                     IsCalibrated = toolsEntity.IsCalibrated,
                     CalibrationCycle = toolsEntity.CalibrationCycle,
@@ -337,7 +337,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     Remark = toolsEntity.Remark,
                     EquipmentId = equEquipmentEntity.Id,
                     OperationType = ToolRecordOperationTypeEnum.UnBind,
-                    OperationRemark = "",
+                    OperationRemark = saveDto.Remark??"",
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
                     UpdatedBy = updatedBy,
@@ -403,8 +403,12 @@ namespace Hymson.MES.Services.Services.Equipment
             if (bindRecordEntity == null) return null;
 
             var bindRecordDto = bindRecordEntity.ToModel<EquToolsEquipmentBindRecordDto>();
-            //查询备件信息
+            //查询工具信息
             var toolsEntity = await _toolsRepository.GetByIdAsync(bindRecordEntity.ToolId);
+            if (toolsEntity == null)
+            {
+                toolsEntity = new EquToolsEntity();
+            }
 
             //查询设备信息
             var equEquipmentEntity = await _equEquipmentRepository.GetByIdAsync(bindRecordEntity.EquipmentId);
@@ -414,7 +418,9 @@ namespace Hymson.MES.Services.Services.Equipment
             bindRecordDto.EquipmentCode = equEquipmentEntity?.EquipmentCode ?? "";
             bindRecordDto.EquipmentName = equEquipmentEntity?.EquipmentName ?? "";
             bindRecordDto.RatedLife = toolsEntity?.RatedLife ?? 0;
-            bindRecordDto.RemainingUsedLife = toolsEntity?.CurrentUsedLife ?? 0;
+
+            var userLife = toolsEntity?.CurrentUsedLife ?? 0;
+            bindRecordDto.RemainingUsedLife = bindRecordDto.RatedLife - userLife;
             return bindRecordDto;
         }
 

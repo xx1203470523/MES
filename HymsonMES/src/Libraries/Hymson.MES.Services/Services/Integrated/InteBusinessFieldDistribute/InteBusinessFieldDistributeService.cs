@@ -128,12 +128,13 @@ namespace Hymson.MES.Services.Services.Integrated
             // 验证是否编码唯一
             var inteBusinessFieldEntity = await _inteBusinessFieldDistributeRepository.GetByCodeAsync(new InteBusinessFieldDistributeQuery
             {
+                Type = entity.Type,
                 Code = entity.Code.Trim(),
                 SiteId = _currentSite.SiteId ?? 0
             });
             if (inteBusinessFieldEntity != null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19427));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19427)).WithData("type", entity.Type.GetDescription()).WithData("code", entity.Code);
             }
 
             #region 处理 载具类型验证数据
@@ -195,6 +196,11 @@ namespace Hymson.MES.Services.Services.Integrated
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
+            if (saveDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            var inteBusinessFieldDistribute = await _inteBusinessFieldDistributeRepository.GetByIdAsync(saveDto.Id);
+            if (inteBusinessFieldDistribute == null) throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
@@ -203,6 +209,20 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
+            // 验证是否编码唯一
+            if (inteBusinessFieldDistribute.Type != entity.Type || inteBusinessFieldDistribute.Code != entity.Code)
+            {
+                var inteBusinessFieldEntity = await _inteBusinessFieldDistributeRepository.GetByCodeAsync(new InteBusinessFieldDistributeQuery
+                {
+                    Type = entity.Type,
+                    Code = entity.Code.Trim(),
+                    SiteId = _currentSite.SiteId ?? 0
+                });
+                if (inteBusinessFieldEntity != null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19427)).WithData("type", entity.Type.GetDescription()).WithData("code", entity.Code);
+                }
+            }
             #region 处理 载具类型验证数据
             List<InteBusinessFieldDistributeDetailsEntity> detailEntities = new();
             if (saveDto.InteBusinessFieldDistributeDetailList != null && saveDto.InteBusinessFieldDistributeDetailList.Any())

@@ -25,6 +25,8 @@
   </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Crc32.NET" Version="1.2.0" />
+		<PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.152" />
+
 		<PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.175" />
 		<PackageReference Include="Hymson.Snowflake" Version="2.1.175" />
 		<PackageReference Include="Hymson.Web.Framework" Version="2.1.175" />

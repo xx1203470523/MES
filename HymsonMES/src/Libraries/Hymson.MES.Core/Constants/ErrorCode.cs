@@ -132,6 +132,7 @@
         public const string MES10387 = "作业参数不能为空！";
         public const string MES10388 = "资源不存在！";
         public const string MES10389 = $"关联资质中，重复配置资质认证!";
+        public const string MES10357 = $"关联子步骤中，重复配置子步骤!";
         #endregion
 
         #region 标签模板 10340
@@ -2031,7 +2032,7 @@
         public const string MES19424 = "一个列表只能有一个缺省标签！";
         public const string MES19425 = "数据字段已被分配,不能删除！";
         public const string MES19426 = "数据字段存在非法字符，只能输入数字,大写字母,下划线！";
-        public const string MES19427 = "数据字段已存在！";
+        public const string MES19427 = "类别【{type}】和分配类型【{code}】已存在,不允许重复创建！";
         public const string MES19428 = "数据字段不能为空！";
         public const string MES19429 = "序号必须为正整数";
         public const string MES19430 = "一个列表序号不能重复！";
@@ -2039,6 +2040,7 @@
         public const string MES19432 = "数据字段：{code}不符合掩码规则，请检查配置";
         public const string MES19433 = "数据字段已被分配，不允许删除!";
         public const string MES19434 = "列表字段存在非法字符，只能输入数字,大写字母,下划线";
+        public const string MES19441 = "数据字段已存在,不允许重复创建！";
         #endregion
 
         #region 数据字段定义 19600
@@ -2119,7 +2121,7 @@
         #endregion 
 
 
-        #region OQC检验项目 19500
+        #region OQC检验项目 17800
 
         public const string MES17800 = "出货单暂无数据!";
         public const string MES17801 = "出货单详情暂无数据!";
@@ -2241,6 +2243,7 @@
         public const string MES17958 = "请选择故障原因";
         public const string MES17959 = "{Code}非待维修状态不允许删除";
         public const string MES17960 = "{Code}已维修过的单据不允许删除";
+        public const string MES17961 = "附件上传失败，未获取到维修单，请刷新后重试";
 
 
 
@@ -2266,6 +2269,12 @@
         public const string MES17704 = "设备{code}位置{position}已安装工具，请卸载后再进行操作!";
         public const string MES17705 = "工具无剩余寿命，不可使用!";
         public const string MES17706 = "工具本次使用寿命需大于0";
+        #endregion
+
+        #region 子步骤管理 17750
+        public const string MES17751 = "子步骤{code}已经存在";
+        public const string MES17752 = "子步骤不存在！";
+        public const string MES17753 = "子步骤已被分配给工序，不允许删除！";
         #endregion
     }
 }

@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.EquRepairOrderFault;
 using Hymson.MES.Services.Dtos.EquRepairOrder;
+using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Services.EquRepairOrder
 {
@@ -97,6 +98,27 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
         /// <param name="id"></param>
         /// <returns></returns>
         Task<IEnumerable<EquReportRepairFaultDto>> QueryEquRepairOrderFaultByOrderIdAsync(long id);
+
+        /// <summary>
+        /// 保存检验单附件
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> SaveAttachmentAsync(EquRepairOrderSaveAttachmentDto requestDto);
+
+        /// <summary>
+        /// 删除检验单附件
+        /// </summary>
+        /// <param name="orderAttachmentId"></param>
+        /// <returns></returns>
+        Task<int> DeleteAttachmentByIdAsync(long orderAttachmentId);
+
+        /// <summary>
+        /// 查询单据附件
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteAttachmentBaseDto>> QueryOrderAttachmentListByIdAsync(EquRepairOrderAttachmentDto dto);
 
     }
 }

@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
@@ -14,12 +15,15 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
+using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.DependencyInjection;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -36,6 +40,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 工序配置作业表仓储
         /// </summary>
         private readonly IInteJobBusinessRelationRepository _jobBusinessRelationRepository;
+        private readonly IInteJobConfigRepository _inteJobConfigRepository;
         /// <summary>
         /// 注入反射获取依赖对象
         /// </summary>
@@ -52,6 +57,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="inteJobRepository"></param>
         /// <param name="jobBusinessRelationRepository"></param>
+        /// <param name="inteJobConfigRepository"></param>
         /// <param name="executeJobService"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
@@ -60,11 +66,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="serviceProvider"></param>
         public InteJobService(IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository jobBusinessRelationRepository,
+            IInteJobConfigRepository inteJobConfigRepository,
             IExecuteJobService<JobBaseBo> executeJobService,
             AbstractValidator<InteJobCreateDto> validationCreateRules, AbstractValidator<InteJobModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite, IServiceProvider serviceProvider)
         {
             _inteJobRepository = inteJobRepository;
             _jobBusinessRelationRepository = jobBusinessRelationRepository;
+            _inteJobConfigRepository = inteJobConfigRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _currentUser = currentUser;
@@ -126,6 +134,7 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12001)).WithData("code", param.Code);
             }
+
             var userId = _currentUser.UserName;
             //DTO转换实体
             inteJobEntity = param.ToEntity<InteJobEntity>();
@@ -134,7 +143,33 @@ namespace Hymson.MES.Services.Services.Integrated
             inteJobEntity.UpdatedBy = userId;
             inteJobEntity.SiteId = _currentSite.SiteId ?? 0;
 
-            await _inteJobRepository.InsertAsync(inteJobEntity);
+            //作业规则数据
+            var jobConfigEntities = new List<InteJobConfigEntity>();
+            if (param.ConfigList != null && param.ConfigList.Count > 0)
+            {
+                foreach (var item in param.ConfigList)
+                {
+                    jobConfigEntities.Add(new InteJobConfigEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentSite.SiteId ??0,
+                        JobId = inteJobEntity.Id,
+                        SetValue = item.SetValue,
+                        RuleName = item.RuleName
+                    });
+                }
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
+            {
+                await _inteJobRepository.InsertAsync(inteJobEntity);
+                if (jobConfigEntities.Any())
+                {
+                    await _inteJobConfigRepository.InsertRangeAsync(jobConfigEntities);
+                }
+                //提交
+                ts.Complete();
+            }
             return inteJobEntity.Id;
         }
 
@@ -186,7 +221,61 @@ namespace Hymson.MES.Services.Services.Integrated
             inteJobEntity.UpdatedBy = userId;
             inteJobEntity.UpdatedOn = HymsonClock.Now();
 
-            await _inteJobRepository.UpdateAsync(inteJobEntity);
+            //作业规则数据
+            var jobConfigEntities = new List<InteJobConfigEntity>();
+            if (param.ConfigList != null && param.ConfigList.Count > 0)
+            {
+                foreach (var item in param.ConfigList)
+                {
+                    jobConfigEntities.Add(new InteJobConfigEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentSite.SiteId ?? 0,
+                        JobId = inteJobEntity.Id,
+                        SetValue = item.SetValue,
+                        RuleName = item.RuleName
+                    });
+                }
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
+            {
+                await _inteJobRepository.UpdateAsync(inteJobEntity);
+
+                //先删除再加
+                await _inteJobConfigRepository.DeleteByJobIdAsync(inteJobEntity.Id);
+                if (jobConfigEntities.Any())
+                {
+                    await _inteJobConfigRepository.InsertRangeAsync(jobConfigEntities);
+                }
+                //提交
+                ts.Complete();
+            }
+        }
+
+        /// <summary>
+        /// 根据ID查询
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteJobConfigDto>> GetConfigByJobIdAsync(long jobId)
+        {
+            var jobConfigEntities = await _inteJobConfigRepository.GetEntitiesAsync(new InteJobConfigQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                JobId = jobId
+            });
+
+            var jobConfigDtos=new  List<InteJobConfigDto>();
+            foreach (var item in jobConfigEntities)
+            {
+                jobConfigDtos.Add(new InteJobConfigDto
+                {
+                    SetValue = item.SetValue,
+                    RuleName = item.RuleName
+                });
+            }
+            return jobConfigDtos;
         }
 
         /// <summary>
