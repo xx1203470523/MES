@@ -1,5 +1,10 @@
 ﻿global using System.Collections.Generic;
 global using System;
-global using SqlSugar;
 global using Newtonsoft.Json;
 global using System.Linq;
+global using Hymson.MES.Data.Options;
+global using Hymson.MES.Data.Repositories;
+global using Microsoft.Extensions.Options;
+global using Hymson.MES.BackgroundServices.Stator.Model;
+global using Hymson.MES.BackgroundServices.Stator.Services;
+global using Hymson.MES.BackgroundServices.Stator.Repositories;

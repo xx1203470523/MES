@@ -1,5 +1,4 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -20,7 +19,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         public static IServiceCollection AddBackgroundServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddCoreService(configuration);
-            AddConfig(services, configuration);
 
             AddEventBusServices(services);
 
@@ -29,18 +27,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             return services;
         }
 
-        /// <summary>
-        /// 添加配置
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
-        private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
-        {
-            // 数据库连接
-            services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
-            return services;
-        }
 
         /// <summary>
         /// 订阅

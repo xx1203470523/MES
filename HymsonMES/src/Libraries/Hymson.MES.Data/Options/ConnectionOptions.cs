@@ -3,7 +3,7 @@
     /// <summary>
     /// 数据库连接字符串
     /// </summary>
-    public class ConnectionOptions
+    public partial class ConnectionOptions
     {
         /// <summary>
         /// MES连接字符串
@@ -19,5 +19,6 @@
         /// Doris参数数据库连接
         /// </summary>
         public string DorisParamterConnectionString { get; set; } = "";
+
     }
 }

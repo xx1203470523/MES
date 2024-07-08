@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class OP010Entity
+    public class OP010 : BaseOPEntity
     {
         // TODO: Add properties
 
