@@ -65,7 +65,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         /// </summary>
         public void ParamToNgList()
         {
-            NgList = ParamList.Where(m => m.Result != 1).Select(m => m.ParamName).ToList();
+            NgList = ParamList.Where(m => m.Result == false).Select(m => m.ParamName).ToList();
         }
     }
 
@@ -103,7 +103,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         /// <summary>
         /// 物料数量
         /// </summary>
-        public string MatNum { get; set; }
+        public int? MatNum { get; set; }
     }
 
     /// <summary>
@@ -147,7 +147,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         /// 结果
         /// 1-OK 其他-NG
         /// </summary>
-        public int Result { get; set; }
+        public bool Result { get; set; }
     }
 
 }

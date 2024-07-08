@@ -29,6 +29,17 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         public string WorkPosNo { get; set; }
 
         /// <summary>
+        /// MES工序编码
+        /// </summary>
+        public string ProcedureCode 
+        {
+            get
+            {
+                return WorkPosNo.Split('.')[0];
+            }
+        }
+
+        /// <summary>
         /// 描述 : 结果
         /// OK 或者 NG
         /// </summary>
