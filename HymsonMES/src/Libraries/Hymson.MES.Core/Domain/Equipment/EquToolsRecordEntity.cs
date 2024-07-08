@@ -35,7 +35,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 类型id equ_tools_type的id
         /// </summary>
-        public string ToolsId { get; set; }
+        public long ToolsId { get; set; }
 
         /// <summary>
         /// 额定寿命单位
