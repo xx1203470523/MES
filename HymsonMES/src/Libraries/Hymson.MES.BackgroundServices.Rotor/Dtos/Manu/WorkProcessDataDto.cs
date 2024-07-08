@@ -9,7 +9,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
     /// <summary>
     /// 参数数据
     /// </summary>
-    public class WorkProcessData
+    public class WorkProcessDataDto
     {
         /// <summary>
         /// ID 主键

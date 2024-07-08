@@ -1,4 +1,6 @@
 ﻿using Google.Protobuf.WellKnownTypes;
+using Hymson.MES.BackgroundServices.CoreServices.Model.Rotor;
+using Hymson.MES.BackgroundServices.CoreServices.Repository.Rotor;
 using Hymson.MES.BackgroundServices.Rotor.Dtos.Manu;
 using MySqlX.XDevAPI.Common;
 using SqlSugar;
@@ -15,6 +17,34 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
     /// </summary>
     public class ManuInOutBoundService : IManuInOutBoundService
     {
+        /// <summary>
+        /// 上料信息
+        /// </summary>
+        private readonly IWorkItemInfoRepository _workItemInfoRepository;
+
+        /// <summary>
+        /// 参数信息
+        /// </summary>
+        private readonly IWorkProcessDataRepository _workProcessDataRepository;
+
+        /// <summary>
+        /// 过站数据
+        /// </summary>
+        private readonly IWorkProcessRepository _workProcessRepository;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public ManuInOutBoundService(
+            IWorkItemInfoRepository workItemInfoRepository,
+            IWorkProcessDataRepository workProcessDataRepository,
+            IWorkProcessRepository workProcessRepository)
+        {
+            _workItemInfoRepository = workItemInfoRepository;
+            _workProcessDataRepository = workProcessDataRepository;
+            _workProcessRepository = workProcessRepository;
+        }
+
         /// <summary>
         /// 进站状态
         /// </summary>
@@ -48,6 +78,18 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <returns></returns>
         public async Task InOutBoundAsync(DateTime start, DateTime end)
         {
+            //TODO
+            //1. 中间工序不管进出站，但是参数需要记录保存，上料信息需要记录
+            //2. 进站工序的上料，统一算到出站工序里面
+            //3. 710工序当作芯轴上料工序，铁芯码和轴码绑定
+            //4. 中间工序NG后，后面不会在有进出站记录
+            //5. 进站不会NG，出站才有NG
+
+            //获取MES需要处理管控的工位数据
+            List<WorkPosDto> workPosList = GetPosNoList();
+            List<WorkPosDto> mesWorkPosList = workPosList.Where(m => m.WorkPosType != 0).ToList();
+            List<string> workPosCodeList = mesWorkPosList.Select(m => m.WorkPosNo).ToList();
+
             #region 获取线体LMS数据
 
             //表名后缀
@@ -56,9 +98,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             List<WorkProcessDto> inOutList = await GetInOutBoundListAsync(start, end, suffixTableName);
             List<string> sfcIdList = inOutList.Select(m => m.ID).ToList();
             //2. 查询参数信息
-            List<WorkProcessData> paramList = await GetParamList(suffixTableName, sfcIdList);
+            List<WorkProcessDataDto> paramList = await GetParamList(suffixTableName, sfcIdList);
             //3. 查询上料信息
-            List<WorkItemInfo> upMatList = await GetUpMatList(suffixTableName, sfcIdList);
+            List<WorkItemInfoDto> upMatList = await GetUpMatList(suffixTableName, sfcIdList);
 
             #endregion
 
@@ -68,14 +110,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             List<MesOutDto> outList = new List<MesOutDto>();
 
             #region 线体LMS数据转成MES数据
-            //获取MES需要处理管控的工位数据
-            List<WorkPosDto> workPosList = GetPosNoList();
-            List<WorkPosDto> mesWorkPosList = workPosList.Where(m => m.WorkPosType != 0).ToList();
-            List<string> workPosCodeList = mesWorkPosList.Select(m => m.WorkPosNo).ToList();
             //过滤MES不需要的数据
-            List<WorkProcessDto> mesList = inOutList.Where(m => workPosCodeList.Contains(m.WorkPosNo) == true).ToList();
+            //List<WorkProcessDto> mesList = inOutList.Where(m => workPosCodeList.Contains(m.WorkPosNo) == true).ToList();
             //依次处理每个条码的数据
-            foreach(var item in  mesList)
+            foreach(var item in inOutList)
             {
                 //获取工位类型
                 WorkPosDto? curWorkPos = mesWorkPosList.Where(m => item.WorkPosNo == m.WorkPosNo).FirstOrDefault();
@@ -83,12 +121,65 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     continue;
                 }
+
                 //基础数据
                 MesDto mesDto = new MesDto();
                 mesDto.Sfc = item.ProductNo;
                 mesDto.ProcedureCode = item.ProcedureCode;
                 mesDto.IsPassed = item.Result == Result_OK ? true : false;
                 mesDto.Date = item.CreateTime;
+
+                //处理上料信息
+                List<WorkItemInfoDto> curUpMatList = upMatList.Where(m => m.ProcessUID == item.ID).ToList();
+                List<SfcUpMatDto> sfcUpList = new List<SfcUpMatDto>();
+                if (curUpMatList != null && curUpMatList.Count > 0)
+                {
+                    foreach (var upItem in curUpMatList)
+                    {
+                        sfcUpList.Add(new SfcUpMatDto()
+                        {
+                            MatName = upItem.MatName,
+                            MatValue = upItem.MatValue,
+                            MatBatchCode = upItem.MatBatchCode,
+                            BarCode = string.IsNullOrEmpty(upItem.MatValue) ? upItem.MatBatchCode : upItem.MatValue,
+                            MatType = string.IsNullOrEmpty(upItem.MatValue) ? MatType_One : MatType_Batch,
+                            MatNum = upItem.MatNum
+                        });
+                    }
+                }
+                //处理参数信息
+                List<WorkProcessDataDto> curParamList = paramList.Where(m => m.ProcessUID == item.ID).ToList();
+                List<SfcParamDto> sfcParamList = new List<SfcParamDto>();
+                if (curParamList != null && curParamList.Count > 0)
+                {
+                    foreach (var paramItem in curParamList)
+                    {
+                        SfcParamDto curParamDto = new SfcParamDto();
+                        curParamDto.ParamName = paramItem.Name;
+                        curParamDto.Unit = paramItem.Unit;
+                        curParamDto.Value = Convert.ToDecimal(paramItem.Value);
+                        curParamDto.StrValue = paramItem.StrValue;
+                        curParamDto.Result = paramItem.Result == 1 ? true : false;
+                        curParamDto.ValueType = string.IsNullOrEmpty(paramItem.StrValue) ? 1 : 2;
+                        curParamDto.ParamValue = string.IsNullOrEmpty(paramItem.StrValue) ? curParamDto.Value.ToString() : paramItem.StrValue;
+                        sfcParamList.Add(curParamDto);
+                    }
+                }
+
+                //如果是中间工位，且不是NG，则不处理（中间工位不做进出站）
+                if (curWorkPos.WorkPosType == 0 && mesDto.IsPassed == true)
+                {
+                    //基础数据
+                    MesOutDto outDto = new MesOutDto();
+                    outDto = (MesOutDto)mesDto;
+                    outDto.IsOut = false;
+                    outDto.ParamList = sfcParamList;
+                    outDto.UpMatList = sfcUpList;
+                    outList.Add(outDto);
+
+                    continue;
+                }
+
                 //进站
                 if ((curWorkPos.WorkPosType & 1) == 1 && item.ProductStatus == ProductStatus_In)
                 {
@@ -97,52 +188,28 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     indto = (MesInDto)mesDto;
                     inList.Add(indto);
                 }
-                //出站
-                if ((curWorkPos.WorkPosType & 2) == 2 && item.ProductStatus == ProductStatus_Out)
+                //NG出站（中间工位可能会NG,NG在后续不会在有记录，当成出站处理）
+                if (mesDto.IsPassed == false)
+                {
+                    //处理NG信息
+                    MesOutDto outDto = new MesOutDto();
+                    outDto = (MesOutDto)mesDto;
+                    outDto.IsOut = true;
+                    outDto.ParamList = sfcParamList;
+                    outDto.UpMatList = sfcUpList;
+                    outDto.ParamToNgList();
+                    outList.Add(outDto);
+                }
+                //正常出站
+                if ((curWorkPos.WorkPosType & 2) == 2 && item.ProductStatus == ProductStatus_Out && mesDto.IsPassed == true)
                 {
                     //基础数据
                     MesOutDto outDto = new MesOutDto();
                     outDto = (MesOutDto)mesDto;
-                    //处理上料信息
-                    List<WorkItemInfo> curUpMatList = upMatList.Where(m => m.ProcessUID == item.ID).ToList();
-                    if(curUpMatList != null && curUpMatList.Count > 0)
-                    {
-                        List<SfcUpMatDto> sfcUpList = new List<SfcUpMatDto>();
-                        foreach(var upItem in  curUpMatList)
-                        {
-                            sfcUpList.Add(new SfcUpMatDto()
-                            {
-                                MatName = upItem.MatName,
-                                MatValue = upItem.MatValue,
-                                MatBatchCode = upItem.MatBatchCode,
-                                BarCode = string.IsNullOrEmpty(upItem.MatValue) ? upItem.MatBatchCode : upItem.MatValue,
-                                MatType = string.IsNullOrEmpty(upItem.MatValue) ? MatType_One : MatType_Batch,
-                                MatNum = upItem.MatNum
-                            });
-                        }
-                        outDto.UpMatList = sfcUpList;
-                    }
-                    //处理参数信息
-                    List<WorkProcessData> curParamList = paramList.Where(m => m.ProcessUID == item.ID).ToList();
-                    if(curParamList != null && curParamList.Count > 0)
-                    {
-                        List<SfcParamDto> sfcParamList = new List<SfcParamDto>();
-                        foreach(var paramItem in curParamList)
-                        {
-                            SfcParamDto curParamDto = new SfcParamDto();
-                            curParamDto.ParamName = paramItem.Name;
-                            curParamDto.Unit = paramItem.Unit;
-                            curParamDto.Value = Convert.ToDecimal(paramItem.Value);
-                            curParamDto.StrValue = paramItem.StrValue;
-                            curParamDto.Result = paramItem.Result == 1 ? true : false;
-                            curParamDto.ValueType = string.IsNullOrEmpty(paramItem.StrValue) ? 1 : 2;
-                            curParamDto.ParamValue = string.IsNullOrEmpty(paramItem.StrValue) ? curParamDto.Value.ToString() : paramItem.StrValue;
-                            sfcParamList.Add(curParamDto);
-                        }
-                        outDto.ParamList = sfcParamList;
-                    }
-                    //处理NG信息
-                    outDto.ParamToNgList();
+                    outDto.IsOut = true;
+                    outDto.ParamList = sfcParamList;
+                    outDto.UpMatList = sfcUpList;
+                    outList.Add(outDto);
                 }
             }
 
@@ -173,6 +240,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 ORDER BY StartTime ASC;
             ";
 
+            List<WorkProcessEntity> dbList = await _workProcessRepository.GetList(sql);
+
+            resultList = dbList.Cast<WorkProcessDto>().ToList();
+
             return resultList;
         }
 
@@ -182,28 +253,36 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="suffixTableName"></param>
         /// <param name="sfcIdList"></param>
         /// <returns></returns>
-        private async Task<List<WorkProcessData>> GetParamList(string suffixTableName, List<string> sfcIdList)
+        private async Task<List<WorkProcessDataDto>> GetParamList(string suffixTableName, List<string> sfcIdList)
         {
-            List<WorkProcessData> resultLit = new List<WorkProcessData>();
+            List<WorkProcessDataDto> resultLit = new List<WorkProcessDataDto>();
 
             if (sfcIdList == null ||  sfcIdList.Count == 0)
             {
                 return resultLit;
             }
 
+            List<WorkProcessDataEntity> allDbList = new List<WorkProcessDataEntity>();
+
             int batchDataNum = 999;
             int batchNum = sfcIdList.Count / batchDataNum + 1;
             for(int i = 0; i < batchNum; ++i)
             {
-                string idListStr = string.Join(",", sfcIdList.Select(uuid => $"'{uuid}'"));
+                List<string> curSfcIdList = sfcIdList.Skip(i * batchDataNum).Take(batchNum).ToList();
+                string idListStr = string.Join(",", curSfcIdList.Select(uuid => $"'{uuid}'"));
 
                 string sql = $@"
-                    SELECT t2.* -- t2.ProcessUID, t2.WorkPosNo ,t2.Name ,t2.Unit ,t2.Value ,t2.StrValue ,t2.[MinValue] ,t2.[MaxValue],t2.[Result] 
+                    SELECT t2.*
                     FROM Work_Process_{suffixTableName} t1
                     inner join Work_ProcessData_{suffixTableName} t2 on t1.ID  = t2.ProcessUID 
                     WHERE T2.ProcessUID IN ( {idListStr} )
                 ";
+
+                List<WorkProcessDataEntity> dbList = await _workProcessDataRepository.GetList(sql);
+                allDbList.AddRange(dbList);
             }
+
+            resultLit = allDbList.Cast<WorkProcessDataDto>().ToList();
 
             return resultLit;
         }
@@ -214,34 +293,42 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="suffixTableName"></param>
         /// <param name="sfcIdList"></param>
         /// <returns></returns>
-        private async Task<List<WorkItemInfo>> GetUpMatList(string suffixTableName, List<string> sfcIdList)
+        private async Task<List<WorkItemInfoDto>> GetUpMatList(string suffixTableName, List<string> sfcIdList)
         {
-            List<WorkItemInfo> resultLit = new List<WorkItemInfo>();
+            List<WorkItemInfoDto> resultLit = new List<WorkItemInfoDto>();
 
             if (sfcIdList == null || sfcIdList.Count == 0)
             {
                 return resultLit;
             }
 
+            List<WorkItemInfoEntity> allDbList = new List<WorkItemInfoEntity>();
+
             int batchDataNum = 999;
             int batchNum = sfcIdList.Count / batchDataNum + 1;
             for (int i = 0; i < batchNum; ++i)
             {
+                List<string> curSfcIdList = sfcIdList.Skip(i * batchDataNum).Take(batchNum).ToList();
                 string idListStr = string.Join(",", sfcIdList.Select(uuid => $"'{uuid}'"));
 
-                string sql2 = $@"
-                    SELECT t1.* -- t1.WorkPosNo ,t1.MatName ,t1.MatValue ,t1.MatBatchCode ,t1.MatNum ,t1.MatStatus ,t1.MatSerialID
+                string sql = $@"
+                    SELECT t1.*
                     FROM Work_ItemInfo t1
                     inner join Work_Process_{suffixTableName} t2 on t1.ProcessUID = t2.ID  and t2.IsDeleted  = 0
                     WHERE T1.ProcessUID IN ( {idListStr} )
                 ";
+
+                var dbList = await _workItemInfoRepository.GetList(sql);
+                allDbList.AddRange(dbList);
             }
+
+            resultLit = allDbList.Cast<WorkItemInfoDto>().ToList();
 
             return resultLit;
         }
 
         /// <summary>
-        /// 获取首位工位列表
+        /// 获取工位列表
         /// </summary>
         /// <returns></returns>
         private List<WorkPosDto> GetPosNoList()

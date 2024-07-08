@@ -9,7 +9,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
     /// <summary>
     /// 上料信息
     /// </summary>
-    public class WorkItemInfo
+    public class WorkItemInfoDto
     {
         /// <summary>
         /// UID

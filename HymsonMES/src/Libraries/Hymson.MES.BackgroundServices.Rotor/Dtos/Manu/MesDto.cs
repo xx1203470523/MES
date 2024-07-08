@@ -46,6 +46,12 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
     public class MesOutDto : MesDto
     {
         /// <summary>
+        /// 是否出站
+        /// false-不出站，则只处理参数和上料信息
+        /// </summary>
+        public bool IsOut { get; set; } = true;
+
+        /// <summary>
         /// 上料条码列表
         /// </summary>
         public List<SfcUpMatDto> UpMatList {  get; set; } = new List<SfcUpMatDto>();
