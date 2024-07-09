@@ -114,7 +114,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteContainerEntity>> GetByIdsAsync(IEnumerable<long> ids);
+        Task<IEnumerable<InteContainerInfoEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 通过关联ID获取数据
