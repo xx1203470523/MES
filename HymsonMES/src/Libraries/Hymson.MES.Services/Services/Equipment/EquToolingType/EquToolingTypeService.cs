@@ -11,16 +11,10 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
-using Hymson.MES.Data.Repositories.Plan.Query;
-using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.MES.Services.Dtos.Plan;
-using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Org.BouncyCastle.Crypto;
-using System.Diagnostics.Tracing;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -33,52 +27,46 @@ namespace Hymson.MES.Services.Services.Equipment
         /// 当前用户
         /// </summary>
         private readonly ICurrentUser _currentUser;
+
         /// <summary>
         /// 当前站点
         /// </summary>
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 参数验证器
-        /// </summary>
-        private readonly AbstractValidator<EquSparePartsGroupSaveDto> _validationSaveRules;
-
-        /// <summary>
         /// 仓储接口（备件类型）
         /// </summary>
-        private readonly IEquSparePartsRepository _equSparePartsRepository;
         private readonly IEquToolingTypeGroupRepository _equToolingTypeGroupRepository;
-        private readonly IEquSparePartsGroupEquipmentGroupRelationRepository _equSparePartsGroupEquipmentGroupRelationRepository;
-        //工具类型与设备组
+
+        /// <summary>
+        /// 工具类型与设备组
+        /// </summary>
         private readonly IEquToolingTypeEquipmentGroupRelationRepository _equToolingTypeEquipmentGroupRelationRepository;
-        //工具类型与物料
+
+        /// <summary>
+        /// 工具类型与物料
+        /// </summary>
         private readonly IEquToolingTypeMaterialRelationRepository _equToolingTypeMateriaRelationRepository;
 
         /// <summary>
-        /// 构造函数
+        /// 
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="validationSaveRules"></param>
         /// <param name="equToolingTypeGroupRepository"></param>
-        /// <param name="equSparePartsGroupEquipmentGroupRelationRepository"></param>
-        /// <param name="equSparePartsRepository"></param>
         /// <param name="equToolingTypeEquipmentGroupRelationRepository"></param>
         /// <param name="equToolingTypeMateriaRelationRepository"></param>
-        public EquToolingTypeService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSparePartsGroupSaveDto> validationSaveRules,
+        public EquToolingTypeService(ICurrentUser currentUser, ICurrentSite currentSite,
             IEquToolingTypeGroupRepository equToolingTypeGroupRepository,
-            IEquSparePartsGroupEquipmentGroupRelationRepository equSparePartsGroupEquipmentGroupRelationRepository, IEquSparePartsRepository equSparePartsRepository, IEquToolingTypeEquipmentGroupRelationRepository equToolingTypeEquipmentGroupRelationRepository, IEquToolingTypeMaterialRelationRepository equToolingTypeMateriaRelationRepository)
+            IEquToolingTypeEquipmentGroupRelationRepository equToolingTypeEquipmentGroupRelationRepository,
+            IEquToolingTypeMaterialRelationRepository equToolingTypeMateriaRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _validationSaveRules = validationSaveRules;
             _equToolingTypeGroupRepository = equToolingTypeGroupRepository;
-            _equSparePartsGroupEquipmentGroupRelationRepository = equSparePartsGroupEquipmentGroupRelationRepository;
-            _equSparePartsRepository = equSparePartsRepository;
             _equToolingTypeEquipmentGroupRelationRepository = equToolingTypeEquipmentGroupRelationRepository;
             _equToolingTypeMateriaRelationRepository = equToolingTypeMateriaRelationRepository;
         }
-
 
         /// <summary>
         /// 创建
@@ -193,7 +181,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     {
                         ToolTypeId = item.ToolTypeId,
                         EquipmentGroupId = item.EquipmentGroupId,
-                        
+
                     });
                 }
             }

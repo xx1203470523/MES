@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="procLoadPointEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ProcLoadPointEntity> procLoadPointEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<EquToolsEntity> entities);
 
         /// <summary>
         /// 根据Code查询对象
@@ -50,7 +50,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="procLoadPointEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<ProcLoadPointEntity> procLoadPointEntitys);
+        Task<int> UpdateRangeAsync(IEnumerable<EquToolsEntity> entities);
 
         /// <summary>
         /// 删除
@@ -78,21 +78,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquToolingManageView>> GetByIdsAsync(long[] ids);
-
-        /// <summary>
-        /// 根据IDs批量获取数据
-        /// </summary>
-        /// <param name="resourceId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProcLoadPointEntity>> GetByResourceIdAsync(long resourceId);
-
-        /// <summary>
-        /// 获取List
-        /// </summary>
-        /// <param name="procLoadPointQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProcConversionFactorEntity>> GetProcConversionFactorEntitiesAsync(IEquToolingManagePagedQuery procConversionFactorQuery);
+        Task<IEnumerable<EquToolingManageView>> GetByIdsAsync(IEnumerable<long>  ids);
 
         /// <summary>
         /// 分页查询
@@ -100,5 +86,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="procLoadPointPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<EquToolingManageView>> GetPagedInfoAsync(IEquToolingManagePagedQuery procLoadPointPagedQuery);
+
+        /// <summary>
+        /// 工具查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquToolingTypeEntity>> GetEntitiesAsync(EquToolingManageQuery query);
     }
 }
