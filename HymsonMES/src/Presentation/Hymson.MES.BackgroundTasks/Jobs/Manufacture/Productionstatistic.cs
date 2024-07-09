@@ -1,4 +1,5 @@
-﻿using Hymson.MES.BackgroundServices.Tasks.Manufacture.Productionstatistic;
+﻿using Hymson.Logging.Services;
+using Hymson.MES.BackgroundServices.Tasks.Manufacture.Productionstatistic;
 using Quartz;
 
 namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
@@ -7,14 +8,19 @@ namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
     public class Productionstatistic : IJob
     {
         private readonly IProductionstatisticService _productionstatisticService;
+        private readonly IAlarmLogService _alarmLogService;
+
+
 
         /// <summary>
         /// 生产统计
         /// </summary>
-        /// <param name="manuSfcSummaryService"></param>
-        public Productionstatistic(IProductionstatisticService productionstatisticService)
+        /// <param name="productionstatisticService"></param>
+        /// <param name="alarmLogService"></param>
+        public Productionstatistic(IProductionstatisticService productionstatisticService, IAlarmLogService alarmLogService)
         {
             _productionstatisticService = productionstatisticService;
+            _alarmLogService = alarmLogService;
         }
         public async Task Execute(IJobExecutionContext context)
         {
@@ -25,8 +31,7 @@ namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
             }
             catch (Exception ex)
             {
-
-                Console.WriteLine(ex);
+                _alarmLogService.WriteAlarmLogEntry(new Logging.AlarmLogEntry(ex.Message, ex.StackTrace ?? ""));
             }
         }
     }
