@@ -20,19 +20,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Equipment\**" />
+    <Compile Remove="EventHandling\**" />
+    <Compile Remove="Tasks\**" />
+    <EmbeddedResource Remove="Equipment\**" />
+    <EmbeddedResource Remove="EventHandling\**" />
+    <EmbeddedResource Remove="Tasks\**" />
+    <None Remove="Equipment\**" />
+    <None Remove="EventHandling\**" />
+    <None Remove="Tasks\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.4.0" />
     <PackageReference Include="Quartz.Serialization.Json" Version="3.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
-    <ProjectReference Include="..\Hymson.MES.Repository\Hymson.MES.BackgroundServices.CoreServices.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Equipment\" />
-    <Folder Include="EventHandling\" />
-    <Folder Include="Tasks\" />
+    <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
   </ItemGroup>
 
 </Project>

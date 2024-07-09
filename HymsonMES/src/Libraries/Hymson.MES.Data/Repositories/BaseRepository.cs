@@ -15,8 +15,11 @@ namespace Hymson.MES.Data.Repositories
     /// <summary>
     /// 
     /// </summary>
-    public abstract class BaseRepository
+    public abstract partial class BaseRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ConnectionOptions _connectionOptions;
 
         /// <summary>
@@ -72,63 +75,4 @@ namespace Hymson.MES.Data.Repositories
 
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public abstract class BaseRepositorySingleton<T> : IDisposable where T : BaseRepositorySingleton<T>, new()
-    {
-#if DM
-        private readonly Lazy<DmConnection> _connection;
-#else
-        private readonly Lazy<MySqlConnection> _connection;
-#endif
-
-        private readonly IOptions<ConnectionOptions> _connectionOptions;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="connectionOptions"></param>
-        public BaseRepositorySingleton(IOptions<ConnectionOptions> connectionOptions)
-        {
-            _connectionOptions = connectionOptions;
-#if DM
-            _connection = new Lazy<DmConnection>(() => new DmConnection(_connectionOptions.Value.MESConnectionString));
-#else
-            _connection = new Lazy<MySqlConnection>(() => new MySqlConnection(_connectionOptions.Value.MESConnectionString));
-#endif
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        protected async Task<IDbConnection> GetDbConnectionAsync()
-        {
-            await OpenAsync();
-            return _connection.Value;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        private async Task OpenAsync()
-        {
-            if (_connection.Value.State == ConnectionState.Closed)
-            {
-                await _connection.Value.OpenAsync();
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-    }
 }
