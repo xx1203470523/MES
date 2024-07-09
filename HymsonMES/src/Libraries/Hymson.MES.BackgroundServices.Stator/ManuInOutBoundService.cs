@@ -1,8 +1,9 @@
 ﻿using Google.Protobuf.WellKnownTypes;
+using Hymson.MES.BackgroundServices.CoreServices.Model.Rotor;
+using Hymson.MES.BackgroundServices.CoreServices.Repository.Rotor;
 using Hymson.MES.BackgroundServices.Rotor.Dtos.Manu;
-using Hymson.MES.BackgroundServices.Rotor.Entity;
-using Hymson.MES.BackgroundServices.Rotor.Repositories;
 using MySqlX.XDevAPI.Common;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;

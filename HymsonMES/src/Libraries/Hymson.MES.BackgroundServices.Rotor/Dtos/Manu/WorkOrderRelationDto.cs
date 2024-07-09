@@ -1,4 +1,4 @@
-﻿using Hymson.MES.BackgroundServices.CoreServices.Model.Rotor;
+﻿using Hymson.MES.BackgroundServices.Rotor.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
