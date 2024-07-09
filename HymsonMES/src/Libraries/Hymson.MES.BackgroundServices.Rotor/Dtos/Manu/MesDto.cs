@@ -43,6 +43,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         public string Sfc { get; set; }
 
         /// <summary>
+        /// 工单
+        /// </summary>
+        public string OrderCode { get; set; }
+
+        /// <summary>
         /// 工序编码
         /// </summary>
         public string ProcedureCode { get; set; }

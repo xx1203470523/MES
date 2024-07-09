@@ -2,6 +2,9 @@
 using Hymson.MES.BackgroundServices.Rotor.Dtos.Manu;
 using Hymson.MES.BackgroundServices.Rotor.Entity;
 using Hymson.MES.BackgroundServices.Rotor.Repositories;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.Snowflake;
 using MySqlX.XDevAPI.Common;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
@@ -38,18 +41,39 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly IWorkOrderRelationRepository _workOrderRelationRepository;
 
         /// <summary>
+        /// 工单产品关联
+        /// </summary>
+        private readonly IWorkOrderListRepository _workOrderListRepository;
+
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
+        /// 流转表
+        /// </summary>
+        private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ManuInOutBoundService(
             IWorkItemInfoRepository workItemInfoRepository,
             IWorkProcessDataRepository workProcessDataRepository,
             IWorkProcessRepository workProcessRepository,
-            IWorkOrderRelationRepository workOrderRelationRepository)
+            IWorkOrderRelationRepository workOrderRelationRepository,
+            IWorkOrderListRepository workOrderListRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
+            IManuSfcCirculationRepository manuSfcCirculationRepository)
         {
             _workItemInfoRepository = workItemInfoRepository;
             _workProcessDataRepository = workProcessDataRepository;
             _workProcessRepository = workProcessRepository;
             _workOrderRelationRepository = workOrderRelationRepository;
+            _workOrderListRepository = workOrderListRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
+            _manuSfcCirculationRepository = manuSfcCirculationRepository;
         }
 
         /// <summary>
@@ -78,6 +102,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly int MatType_Batch = 2;
 
         /// <summary>
+        /// 转子站点ID
+        /// </summary>
+        private readonly long Rotor_SiteId = 1994;
+
+        /// <summary>
         /// 进出站
         /// </summary>
         /// <param name="start"></param>
@@ -104,15 +133,20 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //1. 根据开始时间，结束时间，读取线体MES过站数据
             List<WorkProcessDto> inOutList = await GetInOutBoundListAsync(start, end, suffixTableName);
             List<string> sfcIdList = inOutList.Select(m => m.ID).ToList();
+            List<string> sfcList = inOutList.Select(m => m.ProductNo).Distinct().ToList();
             //2. 查询参数信息
-            List<WorkProcessDataDto> paramList = await GetParamList(suffixTableName, sfcIdList);
+            List<WorkProcessDataDto> paramList = await GetParamListAsync(suffixTableName, sfcIdList);
             //3. 查询上料信息
-            List<WorkItemInfoDto> upMatList = await GetUpMatList(suffixTableName, sfcIdList);
-
+            List<WorkItemInfoDto> upMatList = await GetUpMatListAsync(suffixTableName, sfcIdList);
+            //4. 查询铁芯码和轴码对应关系
+            List<WorkOrderRelationDto> bindList = await GetBindListAsync(sfcList);
+            //List<string> orderCodeList = bindList.Select(m => m.WorkNo).Distinct().ToList();
+            //5. 查询产品和工单的对应关系
+            List<WorkOrderListDto> productOrderList = await GetProductOrder(sfcList);
             #endregion
 
-            //MES出战数据
-            List<MesOutDto> outList = new List<MesOutDto>();
+            //MES过站数据
+            List<MesOutDto> mesList = new List<MesOutDto>();
 
             #region 线体LMS数据转成MES数据
             //过滤MES不需要的数据
@@ -133,6 +167,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 mesDto.ProcedureCode = item.ProcedureCode;
                 mesDto.IsPassed = item.Result == Result_OK ? true : false;
                 mesDto.Date = item.CreateTime;
+                WorkOrderListDto? curProductOrder = productOrderList.Where(m => m.ProductNo == item.ProductNo).FirstOrDefault();
+                if(curProductOrder != null)
+                {
+                    mesDto.OrderCode = curProductOrder.WorkNo;
+                }
 
                 //处理上料信息
                 List<WorkItemInfoDto> curUpMatList = upMatList.Where(m => m.ProcessUID == item.ID).ToList();
@@ -174,6 +213,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
                 mesDto.ParamList = sfcParamList;
                 mesDto.UpMatList = sfcUpList;
+                mesDto.NgList = new List<string>();
                 mesDto.Type = 0;
 
                 //如果是中间工位，且不是NG，则只处理参数
@@ -196,23 +236,77 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 //正常出站
                 if ((curWorkPos.WorkPosType & 2) == 2 && item.ProductStatus == ProductStatus_Out && mesDto.IsPassed == true)
                 {
+                    //OP710工序在出站的时候把铁芯码和轴码绑定，把铁芯码当成轴码上料记录来处理
                     if(mesDto.ProcedureCode == "OP710")
                     {
-
+                        List<WorkOrderRelationDto> op710List = bindList.Where(m => m.ProductNo == item.ProductNo).ToList();
+                        if(op710List != null && op710List.Count > 0)
+                        {
+                            mesDto.UpMatList.AddRange(op710List.Select(m => new SfcUpMatDto()
+                            {
+                                BarCode = m.ProductNo,
+                                MatType = 1,
+                                MatNum = 1
+                            }));
+                        }
                     }
-
-                    //基础数据
                     mesDto.Type = 2;
                 }
 
-                outList.Add(mesDto);
+                mesList.Add(mesDto);
+            }
+
+            #endregion
+
+            List<ManuSfcCirculationEntity> circulaList = new List<ManuSfcCirculationEntity>();
+            List<ManuSfcStepEntity> stepList = new List<ManuSfcStepEntity>();
+            #region 整理成MES表结构数据
+
+            //MES过站数据转成MES表数据结构
+            //IManuSfcCirculationRepository ManuSfcCirculationEntity
+            //IManuSfcStepRepository    ManuSfcStepEntity
+            //参数
+            //NG信息
+
+            foreach (var mesItem in mesList)
+            {
+                //如果是过程数据，没有上料信息和参数信息，则直接忽略
+                if (mesItem.Type == 0 && mesItem.UpMatList.Count == 0 && mesItem.ParamList.Count == 0)
+                {
+                    continue;
+                }
+                //写入到步骤表
+                if(mesItem.Type == 1 || mesItem.Type == 2)
+                {
+                    ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode);
+                    stepList.Add(step);
+                }
+                //写入到流转表ManuSfcCirculationEntity
+                if (mesItem.UpMatList.Count > 0)
+                {
+                    List<ManuSfcCirculationEntity> curCirculaList = GetCirculaList(mesItem.Sfc, mesItem.UpMatList, mesItem.ProcedureCode);
+                    circulaList.AddRange(curCirculaList);
+                }
+                //写入到参数表
+                if(mesItem.ParamList.Count > 0)
+                {
+
+                }
+                //写入到NG表
+                if(mesItem.NgList.Count > 0)
+                {
+
+                }
             }
 
             #endregion
 
             //MES数据入库
-            var mesOutList = outList;
+            await _manuSfcCirculationRepository.InsertRangeAsync(circulaList);
+            await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
         }
+
+        #region LMS-SQLSERVER数据库查询
 
         /// <summary>
         /// 获取线体MES过站数据
@@ -254,7 +348,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="suffixTableName"></param>
         /// <param name="sfcIdList"></param>
         /// <returns></returns>
-        private async Task<List<WorkProcessDataDto>> GetParamList(string suffixTableName, List<string> sfcIdList)
+        private async Task<List<WorkProcessDataDto>> GetParamListAsync(string suffixTableName, List<string> sfcIdList)
         {
             List<WorkProcessDataDto> resultLit = new List<WorkProcessDataDto>();
 
@@ -294,7 +388,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="suffixTableName"></param>
         /// <param name="sfcIdList"></param>
         /// <returns></returns>
-        private async Task<List<WorkItemInfoDto>> GetUpMatList(string suffixTableName, List<string> sfcIdList)
+        private async Task<List<WorkItemInfoDto>> GetUpMatListAsync(string suffixTableName, List<string> sfcIdList)
         {
             List<WorkItemInfoDto> resultLit = new List<WorkItemInfoDto>();
 
@@ -333,7 +427,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// </summary>
         /// <param name="sfcList"></param>
         /// <returns></returns>
-        private async Task<List<WorkOrderRelationDto>> GetBindList(List<string> sfcList)
+        private async Task<List<WorkOrderRelationDto>> GetBindListAsync(List<string> sfcList)
         {
             List<WorkOrderRelationDto> resultLit = new List<WorkOrderRelationDto>();
 
@@ -342,7 +436,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 return resultLit;
             }
 
-            List<WorkOrderRelationEntity> allDbList = new List<WorkOrderRelationEntity>();
+            List<WorkOrderRelationDto> allDbList = new List<WorkOrderRelationDto>();
 
             int batchDataNum = 999;
             int batchNum = sfcList.Count / batchDataNum + 1;
@@ -358,15 +452,107 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     AND ProductNo IN ( {sfcListStr} )
                 ";
 
-                List<WorkOrderRelationEntity> dbList = await _workOrderRelationRepository.GetList(sql);
+                List<WorkOrderRelationDto> dbList = await _workOrderRelationRepository.GetList(sql);
                 allDbList.AddRange(dbList);
             }
 
-            resultLit = allDbList.OfType<WorkOrderRelationDto>().ToList();
+            //resultLit = allDbList.OfType<WorkOrderRelationDto>().ToList();
 
-            return resultLit;
-
+            return allDbList;
         }
+
+        /// <summary>
+        /// 获取产品工单对应关系
+        /// </summary>
+        /// <param name="sfcList"></param>
+        /// <returns></returns>
+        private async Task<List<WorkOrderListDto>> GetProductOrder(List<string> sfcList)
+        {
+            List<WorkOrderListDto> resultLit = new List<WorkOrderListDto>();
+
+            if (sfcList == null || sfcList.Count == 0)
+            {
+                return resultLit;
+            }
+
+            List<WorkOrderListDto> allDbList = new List<WorkOrderListDto>();
+
+            int batchDataNum = 999;
+            int batchNum = sfcList.Count / batchDataNum + 1;
+            for (int i = 0; i < batchNum; ++i)
+            {
+                List<string> curSfcList = sfcList.Skip(i * batchDataNum).Take(batchDataNum).ToList();
+                string sfcListStr = string.Join(",", curSfcList.Select(sfc => $"'{sfc}'"));
+
+                string sql = $@"
+                    SELECT  WorkNo,ProductNo 
+                    FROM Work_OrderList t1
+                    WHERE T1.IsDeleted  = 0
+                    AND ProductNo IN ( {sfcListStr} )
+                ";
+
+                List<WorkOrderListDto> dbList = await _workOrderListRepository.GetList(sql);
+                allDbList.AddRange(dbList);
+            }
+
+            return allDbList;
+        }
+
+        #endregion
+
+        #region MES数据写入
+
+        /// <summary>
+        /// 获取步骤表
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="type">1-进站 2-出站</param>
+        /// <param name="produceCode"></param>
+        /// <returns></returns>
+        private ManuSfcStepEntity GetStepEntity(string sfc, int type, string produceCode)
+        {
+            ManuSfcStepEntity step = new ManuSfcStepEntity();
+            step.Id = IdGenProvider.Instance.CreateId();
+            step.SiteId = Rotor_SiteId;
+            step.SFC = sfc;
+            step.Qty = 1;
+            step.Remark = produceCode; //备注字段存放工序，用于NIO直接取
+            step.Operatetype = Core.Enums.Manufacture.ManuSfcStepTypeEnum.Receive;
+            step.CurrentStatus = type == 1 ? Core.Enums.SfcStatusEnum.Activity : Core.Enums.SfcStatusEnum.lineUp;
+            step.AfterOperationStatus = type == 1 ? Core.Enums.SfcStatusEnum.lineUp : Core.Enums.SfcStatusEnum.Activity;
+            step.UpdatedBy = "";
+
+            return step;
+        }
+
+        /// <summary>
+        /// 获取流转记录
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="upList"></param>
+        /// <returns></returns>
+        private List<ManuSfcCirculationEntity> GetCirculaList(string sfc, List<SfcUpMatDto> upList,
+            string produceCode)
+        {
+            List<ManuSfcCirculationEntity> list = new List<ManuSfcCirculationEntity>();
+
+            foreach(var item in upList)
+            {
+                ManuSfcCirculationEntity model = new ManuSfcCirculationEntity();
+                model.Id = IdGenProvider.Instance.CreateId();
+                model.SiteId = Rotor_SiteId;
+                model.SFC = sfc;
+                model.CirculationBarCode = item.BarCode;
+                model.CirculationQty = item.MatNum;
+                model.Location = produceCode;
+                model.UpdatedBy = "";
+                list.Add(model);
+            }
+
+            return list;
+        }
+
+        #endregion
 
         /// <summary>
         /// 获取工位列表

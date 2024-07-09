@@ -8,10 +8,9 @@ using System.Threading.Tasks;
 namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
 {
     /// <summary>
-    /// 参数数据
+    /// 工单和产品关联
     /// </summary>
-    public class WorkProcessDataDto : WorkProcessDataEntity
+    public class WorkOrderListDto : WorkOrderListEntity
     {
-
     }
 }

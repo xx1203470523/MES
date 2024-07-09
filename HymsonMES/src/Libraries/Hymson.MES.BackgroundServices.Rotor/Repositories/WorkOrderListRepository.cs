@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Hymson.MES.BackgroundServices.Rotor.Dtos.Manu;
-using Hymson.MES.BackgroundServices.Rotor.Entity;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories;
 using Microsoft.Extensions.Options;
@@ -13,28 +12,27 @@ using System.Threading.Tasks;
 namespace Hymson.MES.BackgroundServices.Rotor.Repositories
 {
     /// <summary>
-    /// 铁芯码和轴码绑定仓储
+    /// 获取列表仓储
     /// </summary>
-    public class WorkOrderRelationRepository : BaseRepository, IWorkOrderRelationRepository
+    public class WorkOrderListRepository : BaseRepository, IWorkOrderListRepository
     {
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public WorkOrderRelationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        public WorkOrderListRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-
         }
 
         /// <summary>
-        /// 获取绑定关系数据
+        /// 获取列表
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public async Task<List<WorkOrderRelationDto>> GetList(string sql)
+        public async Task<List<WorkOrderListDto>> GetList(string sql)
         {
             using var conn = GetRotorDbConnection();
-            var dbList = await conn.QueryAsync<WorkOrderRelationDto>(sql);
+            var dbList = await conn.QueryAsync<WorkOrderListDto>(sql);
 
             return dbList.ToList();
         }
