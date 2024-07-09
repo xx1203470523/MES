@@ -1,7 +1,7 @@
 ﻿using Hymson.EventBus.Abstractions;
 using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
+namespace Hymson.MES.CoreServices.Events.IntegrationEvents.Messages
 {
     /// <summary>
     /// 消息接收成功事件

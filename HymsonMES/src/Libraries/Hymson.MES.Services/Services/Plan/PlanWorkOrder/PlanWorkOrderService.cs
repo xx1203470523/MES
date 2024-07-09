@@ -13,13 +13,14 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Transactions;
 
-namespace Hymson.MES.Services.Services.Plan
+namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
 {
     /// <summary>
     /// 工单信息表 服务
