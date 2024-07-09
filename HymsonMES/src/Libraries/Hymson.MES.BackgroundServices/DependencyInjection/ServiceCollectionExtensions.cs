@@ -11,7 +11,6 @@ using Hymson.MES.CoreServices.Events.Equipment;
 using Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents;
 using Hymson.MES.CoreServices.Events.Quality;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
-using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

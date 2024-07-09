@@ -1,11 +1,10 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Hymson.MES.BackgroundServices.DependencyInjection
+namespace Hymson.MES.CoreServices.DependencyInjection
 {
     /// <summary>
     /// 依赖注入项配置
