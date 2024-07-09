@@ -50,6 +50,8 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly IEquToolsRepository _toolsRepository;
         private readonly IEquEquipmentRecordRepository _equipmentRecordRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
+        //工具类型与设备组
+        private readonly IEquToolingTypeEquipmentGroupRelationRepository _equToolingTypeEquipment;
         /// <summary>
         /// 多语言服务
         /// </summary>
@@ -64,6 +66,7 @@ namespace Hymson.MES.Services.Services.Equipment
             IEquToolsRepository toolsRepository,
             IEquEquipmentRecordRepository equipmentRecordRepository,
             IEquEquipmentRepository equEquipmentRepository,
+            IEquToolingTypeEquipmentGroupRelationRepository equToolingTypeEquipment,
             ILocalizationService localizationService)
         {
             _currentUser = currentUser;
@@ -73,6 +76,7 @@ namespace Hymson.MES.Services.Services.Equipment
             _toolsRepository = toolsRepository;
             _equipmentRecordRepository = equipmentRecordRepository;
             _equEquipmentRepository = equEquipmentRepository;
+            _equToolingTypeEquipment = equToolingTypeEquipment;
             _localizationService = localizationService;
         }
 
@@ -133,8 +137,24 @@ namespace Hymson.MES.Services.Services.Equipment
                 throw new CustomerValidationException(nameof(ErrorCode.MES17703)).WithData("code", toolsEntity.Code).WithData("position", position);
             }
 
+            //如果勾选了所有设备组可使用则不用验证
             //校验工具所属工具类型是否允许在设备使用（工具类型在所有设备组均可使用或工具类型分配的设备组包含该设备所属的设备组），若不允许，则报错：工具XXX不允许在设备XXX使用；
+            var toolTypeId = toolsEntity.ToolsId;
+            var groupRelationViews = await _equToolingTypeEquipment.GetSparePartsEquipmentGroupRelationAsync(toolTypeId);
+            if (groupRelationViews == null || !groupRelationViews.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17707)).WithData("toolCode", toolsEntity.Code).WithData("equipmentCode", equEquipmentEntity.EquipmentCode);
+            }
 
+            if (groupRelationViews!= null && groupRelationViews.Any())
+            {
+                var groupIds = groupRelationViews.Select(x => x.EquipmentGroupId).ToArray();
+                if (groupIds.Any()&&!groupIds.Contains(equEquipmentEntity.EquipmentGroupId))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17707)).WithData("toolCode", toolsEntity.Code).WithData("equipmentCode", equEquipmentEntity.EquipmentCode);
+                }
+            }
+            //如果勾选了所有物料可使用则不用验证
             //校验工具所属工具类型是否允许对设备生产的产品使用（工具类型对所有产品均可使用或工具类型分配的产品料号包含该设备所在线体当前已激活工单的产品料号），若不允许，则报错：工具XXX不允许对产品XXX使用；
 
             //验证某个位置是否已经安装了其他工具
@@ -337,7 +357,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     Remark = toolsEntity.Remark,
                     EquipmentId = equEquipmentEntity.Id,
                     OperationType = ToolRecordOperationTypeEnum.UnBind,
-                    OperationRemark = saveDto.Remark??"",
+                    OperationRemark = saveDto.Remark ?? "",
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
                     UpdatedBy = updatedBy,
