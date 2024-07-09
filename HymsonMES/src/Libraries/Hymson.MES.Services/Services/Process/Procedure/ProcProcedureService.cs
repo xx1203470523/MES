@@ -436,7 +436,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         /// <param name="procProcedureCreateDto"></param>
         /// <returns></returns>
-        public async Task AddProcProcedureAsync(AddProcProcedureDto procProcedureCreateDto)
+        public async Task<long> AddProcProcedureAsync(AddProcProcedureDto procProcedureCreateDto)
         {
             #region 验证
             if (procProcedureCreateDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
@@ -621,6 +621,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER_PARAMETER, createProductParameterProcedureCodeTableSql, userName);
             // 提交
             ts.Complete();
+
+            return procProcedureEntity.Id;
         }
 
         /// <summary>

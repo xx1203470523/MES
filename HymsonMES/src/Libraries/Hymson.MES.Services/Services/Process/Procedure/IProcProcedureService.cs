@@ -57,7 +57,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         /// <param name="procProcedureCreateDto"></param>
         /// <returns></returns>
-        Task AddProcProcedureAsync(AddProcProcedureDto procProcedureCreateDto);
+        Task<long> AddProcProcedureAsync(AddProcProcedureDto procProcedureCreateDto);
 
         /// <summary>
         /// 修改

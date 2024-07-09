@@ -51,7 +51,7 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// 事件类型
         /// </summary>
         [Description("事件类型")]
-        EventType =9,
+        EventType = 9,
         /// <summary>
         /// 事件维护
         /// </summary>
@@ -153,6 +153,11 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// </summary>
         [Description("设备组")]
         DeviceGroup = 30,
+        /// <summary>
+        /// 工序
+        /// </summary>
+        [Description("工序")]
+        Procedure = 31,
     }
 
 }

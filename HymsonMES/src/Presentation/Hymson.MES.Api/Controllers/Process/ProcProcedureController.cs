@@ -112,9 +112,9 @@ namespace Hymson.MES.Api.Controllers
         [HttpPost]
         [LogDescription("工序维护", BusinessType.INSERT)]
         [PermissionDescription("proc:procedure:insert")]
-        public async Task AddProcProcedureAsync([FromBody] AddProcProcedureDto parm)
+        public async Task<long> AddProcProcedureAsync([FromBody] AddProcProcedureDto parm)
         {
-            await _procProcedureService.AddProcProcedureAsync(parm);
+            return await _procProcedureService.AddProcProcedureAsync(parm);
         }
 
         /// <summary>
