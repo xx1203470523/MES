@@ -33,16 +33,23 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly IWorkProcessRepository _workProcessRepository;
 
         /// <summary>
+        /// 绑定关系
+        /// </summary>
+        private readonly IWorkOrderRelationRepository _workOrderRelationRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ManuInOutBoundService(
             IWorkItemInfoRepository workItemInfoRepository,
             IWorkProcessDataRepository workProcessDataRepository,
-            IWorkProcessRepository workProcessRepository)
+            IWorkProcessRepository workProcessRepository,
+            IWorkOrderRelationRepository workOrderRelationRepository)
         {
             _workItemInfoRepository = workItemInfoRepository;
             _workProcessDataRepository = workProcessDataRepository;
             _workProcessRepository = workProcessRepository;
+            _workOrderRelationRepository = workOrderRelationRepository;
         }
 
         /// <summary>
@@ -203,6 +210,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 //正常出站
                 if ((curWorkPos.WorkPosType & 2) == 2 && item.ProductStatus == ProductStatus_Out && mesDto.IsPassed == true)
                 {
+                    if(mesDto.ProcedureCode == "OP710")
+                    {
+
+                    }
+
                     //基础数据
                     MesOutDto outDto = new MesOutDto();
                     outDto = (MesOutDto)mesDto;
@@ -325,6 +337,46 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             resultLit = allDbList.Cast<WorkItemInfoDto>().ToList();
 
             return resultLit;
+        }
+
+        /// <summary>
+        /// 获取铁芯码和轴码绑定关系
+        /// </summary>
+        /// <param name="sfcList"></param>
+        /// <returns></returns>
+        private async Task<List<WorkOrderRelationDto>> GetBindList(List<string> sfcList)
+        {
+            List<WorkOrderRelationDto> resultLit = new List<WorkOrderRelationDto>();
+
+            if (sfcList == null || sfcList.Count == 0)
+            {
+                return resultLit;
+            }
+
+            List<WorkOrderRelationEntity> allDbList = new List<WorkOrderRelationEntity>();
+
+            int batchDataNum = 999;
+            int batchNum = sfcList.Count / batchDataNum + 1;
+            for (int i = 0; i < batchNum; ++i)
+            {
+                List<string> curSfcList = sfcList.Skip(i * batchDataNum).Take(batchNum).ToList();
+                string sfcListStr = string.Join(",", curSfcList.Select(sfc => $"'{sfc}'"));
+
+                string sql = $@"
+                    SELECT * 
+                    FROM Work_OrderRelation t1
+                    WHERE T1.IsDeleted  = 0
+                    AND ProductNo IN ( {sfcListStr} )
+                ";
+
+                List<WorkOrderRelationEntity> dbList = await _workOrderRelationRepository.GetList(sql);
+                allDbList.AddRange(dbList);
+            }
+
+            resultLit = allDbList.Cast<WorkOrderRelationDto>().ToList();
+
+            return resultLit;
+
         }
 
         /// <summary>
