@@ -1,4 +1,6 @@
-﻿using RestSharp;
+﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
+using Hymson.MES.BackgroundServices.NIO.Dtos.Master;
+using RestSharp;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -15,11 +17,17 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <summary>
         /// 主数据（产品）
         /// </summary>
-        /// <param name="jsonBody"></param>
+        /// <param name="dtos"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> ProductAsync(object jsonBody)
+        public static async Task<RestResponse> ProductAsync(IEnumerable<ProductDto> dtos)
         {
-            return await ExecuteAsync("/v1/trans/masterdata/product", jsonBody, Method.Post);
+            var bodyDto = new ClientRequestDto<ProductDto>
+            {
+                SchemaCode = "",
+                List = dtos
+            };
+
+            return await ExecuteAsync("/v1/trans/masterdata/product", bodyDto);
         }
 
         /// <summary>
@@ -29,7 +37,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> StationAsync(object jsonBody)
         {
-            return await ExecuteAsync("/v1/trans/masterdata/station", jsonBody, Method.Post);
+            return await ExecuteAsync("/v1/trans/masterdata/station", jsonBody);
         }
 
         /// <summary>
@@ -39,7 +47,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> FieldAsync(object jsonBody)
         {
-            return await ExecuteAsync("/v1/trans/masterdata/field", jsonBody, Method.Post);
+            return await ExecuteAsync("/v1/trans/masterdata/field", jsonBody);
         }
 
         /// <summary>
@@ -49,7 +57,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> PassrateTargetAsync(object jsonBody)
         {
-            return await ExecuteAsync("/v1/trans/masterdata/passrate_target", jsonBody, Method.Post);
+            return await ExecuteAsync("/v1/trans/masterdata/passrate_target", jsonBody);
         }
 
         /// <summary>
@@ -59,7 +67,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> EnvFieldAsync(object jsonBody)
         {
-            return await ExecuteAsync("/v1/trans/masterdata/envfield", jsonBody, Method.Post);
+            return await ExecuteAsync("/v1/trans/masterdata/envfield", jsonBody);
         }
 
         /// <summary>
@@ -69,7 +77,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> PersonCertAsync(object jsonBody)
         {
-            return await ExecuteAsync("/v1/trans/masterdata/personcert", jsonBody, Method.Post);
+            return await ExecuteAsync("/v1/trans/masterdata/personcert", jsonBody);
         }
 
         /// <summary>
@@ -79,7 +87,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> TeamSchedulingAsync(object jsonBody)
         {
-            return await ExecuteAsync("/v1/trans/masterdata/teamscheduling", jsonBody, Method.Post);
+            return await ExecuteAsync("/v1/trans/masterdata/teamscheduling", jsonBody);
         }
 
     }

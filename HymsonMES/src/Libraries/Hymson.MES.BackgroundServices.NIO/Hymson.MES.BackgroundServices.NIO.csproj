@@ -44,6 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Dtos\File\" />
     <Folder Include="Repositories\" />
   </ItemGroup>
 

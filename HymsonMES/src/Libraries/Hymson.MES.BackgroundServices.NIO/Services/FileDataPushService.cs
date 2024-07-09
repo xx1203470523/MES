@@ -19,7 +19,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> DisposableUploadUrlAsync(object jsonBody)
         {
-            return await ExecuteAsync("/v1/trans/file/disposable_upload_url", jsonBody, Method.Post);
+            return await ExecuteAsync("/v1/trans/file/disposable_upload_url", jsonBody);
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> AuthorizeUrlAsync(object jsonBody)
         {
-            return await ExecuteAsync("/v1/trans/file/authorize_url", jsonBody, Method.Post);
+            return await ExecuteAsync("/v1/trans/file/authorize_url", jsonBody);
         }
 
     }

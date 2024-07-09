@@ -26,7 +26,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// 公用方法
         /// </summary>
         /// <param name="resource"></param>
-        /// <param name="body"></param>
+        /// <param name="jsonBody"></param>
         /// <param name="method"></param>
         /// <returns></returns>
         public static async Task<RestResponse> ExecuteAsync(string resource, object jsonBody, Method method = Method.Post)
