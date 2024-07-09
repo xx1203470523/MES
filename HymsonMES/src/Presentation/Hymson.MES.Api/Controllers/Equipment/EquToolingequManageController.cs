@@ -61,6 +61,7 @@ namespace Hymson.MES.Api.Controllers
         [HttpPost]
         [Route("create")]
         [LogDescription("工具管理", BusinessType.INSERT)]
+        [PermissionDescription("equ:toolingManage:create")]
         public async Task<long> AddEquToolingManageAsync([FromBody] AddEquToolingManageDto parm)
         {
             return await _equToolingManageService.AddEquToolingManageAsync(parm);
@@ -74,9 +75,24 @@ namespace Hymson.MES.Api.Controllers
         [HttpDelete]
         [Route("delete")]
         [LogDescription("工具管理", BusinessType.DELETE)]
+        [PermissionDescription("equ:toolingManage:delete")]
         public async Task DeleteEquToolingManageAsync([FromBody] long[] ids)
         {
             await _equToolingManageService.DeleteEquToolingManageAsync(ids);
+        }
+
+        /// <summary>
+        /// 校准
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("{id}/calibration")]
+        [LogDescription("工具校准", BusinessType.UPDATE)]
+        [PermissionDescription("equ:toolingManage:calibration")]
+        public async Task CalibrationAsync(long id)
+        { 
+            await _equToolingManageService.CalibrationAsync(id);
         }
 
         /// <summary>
@@ -87,9 +103,36 @@ namespace Hymson.MES.Api.Controllers
         [HttpPut]
         [Route("update")]
         [LogDescription("工具管理", BusinessType.UPDATE)]
+        [PermissionDescription("equ:toolingManage:update")]
         public async Task ModifyEquToolingManageAsync([FromBody] EquToolingManageModifyDto parm)
         {
             await _equToolingManageService.ModifyEquToolingManageAsync(parm);
+        }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [PermissionDescription("equ:toolingManage:download")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new();
+            var worksheetName = await _equToolingManageService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{worksheetName}导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost("import")]
+        [PermissionDescription("equ:toolingManage:import")]
+        public async Task ImportAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _equToolingManageService.ImportAsync(formFile);
         }
     }
 }

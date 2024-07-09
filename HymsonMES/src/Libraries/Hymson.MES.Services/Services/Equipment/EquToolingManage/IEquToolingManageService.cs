@@ -3,6 +3,7 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
 {
@@ -37,7 +38,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeleteEquToolingManageAsync(long[] ids);
+        Task<int> DeleteEquToolingManageAsync(IEnumerable<long>  ids);
 
         /// <summary>
         /// 修改
@@ -45,5 +46,27 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// <param name="equToolingManageModifyDto"></param>
         /// <returns></returns>
         Task ModifyEquToolingManageAsync(EquToolingManageModifyDto equToolingManageModifyDto);
+
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+       Task<string> DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        Task ImportAsync(IFormFile formFile);
+
+        /// <summary>
+        /// 校准
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task CalibrationAsync(long id);
     }
 }

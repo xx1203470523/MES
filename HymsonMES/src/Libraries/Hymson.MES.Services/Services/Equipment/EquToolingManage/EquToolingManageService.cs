@@ -1,32 +1,27 @@
-using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
-using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
-using Hymson.SqlActuator.Services;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Security.Policy;
+using Microsoft.AspNetCore.Http;
+using Minio.DataModel;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
@@ -40,66 +35,71 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// 当前登录用户对象
         /// </summary>
         private readonly ICurrentUser _currentUser;
+
         /// <summary>
         /// 当前站点
         /// </summary>
         private readonly ICurrentSite _currentSite;
-        /// <summary>
-        /// 工序表 仓储
-        /// </summary>
-        private readonly IProcProcedureRepository _procProcedureRepository;
+
         /// <summary>
         /// 工具管理表 仓储
         /// </summary>
         private readonly IEquToolingManageRepository _equToolingManageRepository;
-        /// <summary>
-        /// 工序配置作业表仓储
-        /// </summary>
-        private readonly IInteJobBusinessRelationRepository _jobBusinessRelationRepository;
-        /// <summary>
-        /// 物料维护 仓储
-        /// </summary>
-        private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
-        /// 多语言服务
+        /// 工具类型
+        /// </summary>
+        private readonly IEquToolingTypeGroupRepository _equToolingTypeGroupRepository;
+
+        /// <summary>
+        /// 
         /// </summary>
         private readonly ILocalizationService _localizationService;
-        /// <summary>
-        /// sql执行器
-        /// </summary>
-        private readonly ISqlExecuteTaskService _sqlExecuteTaskService;
-
 
         /// <summary>
-        /// 仓储接口（工序复投设置）
+        /// 导出
         /// </summary>
-        private readonly IProcProcedureRejudgeRepository _procProcedureRejudgeRepository;
-
+        private readonly IExcelService _excelService;
 
         /// <summary>
-        /// 构造函数
+        /// 创建验证器
         /// </summary>
-        public EquToolingManageService(
-            ICurrentUser currentUser, ICurrentSite currentSite,
-            IProcProcedureRepository procProcedureRepository,
-            IEquToolingManageRepository equToolingManageRepository,
-            IInteJobBusinessRelationRepository jobBusinessRelationRepository,
-            IProcMaterialRepository procMaterialRepository,
-            IProcProcedureRejudgeRepository procProcedureRejudgeRepository,
-            ILocalizationService localizationService, ISqlExecuteTaskService sqlExecuteTaskService)
+        private readonly AbstractValidator<AddEquToolingManageDto> _verifyValidationRules;
+
+        /// <summary>
+        /// 更新验证器
+        /// </summary>
+        private readonly AbstractValidator<EquToolingManageModifyDto> _verifyValidationeModifyRules;
+
+        /// <summary>
+        /// 导入验证器
+        /// </summary>
+        private readonly AbstractValidator<EquToolingManageExcelDto> _verifyValidationeExcelRules;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="equToolingManageRepository"></param>
+        /// <param name="equToolingTypeGroupRepository"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="excelService"></param>
+        /// <param name="verifyValidationRules"></param>
+        /// <param name="verifyValidationeModifyRules"></param>
+        /// <param name="verifyValidationeExcelRules"></param>
+        public EquToolingManageService(ICurrentUser currentUser, ICurrentSite currentSite, IEquToolingManageRepository equToolingManageRepository, IEquToolingTypeGroupRepository equToolingTypeGroupRepository, ILocalizationService localizationService, IExcelService excelService, AbstractValidator<AddEquToolingManageDto> verifyValidationRules, AbstractValidator<EquToolingManageModifyDto> verifyValidationeModifyRules, AbstractValidator<EquToolingManageExcelDto> verifyValidationeExcelRules)
         {
-            _equToolingManageRepository = equToolingManageRepository;
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _procProcedureRepository = procProcedureRepository;
-            _jobBusinessRelationRepository = jobBusinessRelationRepository;
-            _procMaterialRepository = procMaterialRepository;
+            _equToolingManageRepository = equToolingManageRepository;
+            _equToolingTypeGroupRepository = equToolingTypeGroupRepository;
             _localizationService = localizationService;
-            _sqlExecuteTaskService = sqlExecuteTaskService;
-            _procProcedureRejudgeRepository = procProcedureRejudgeRepository;
+            _excelService = excelService;
+            _verifyValidationRules = verifyValidationRules;
+            _verifyValidationeModifyRules = verifyValidationeModifyRules;
+            _verifyValidationeExcelRules = verifyValidationeExcelRules;
         }
-
 
         /// <summary>
         /// 根据查询条件获取分页数据
@@ -115,7 +115,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
             List<EquToolingManageViewDto> procProcedureDtos = PreparEquToolingManageDtos(pagedInfo);
             return new PagedInfo<EquToolingManageViewDto>(procProcedureDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
-      
 
         /// <summary>
         /// 分页实体转换
@@ -150,38 +149,55 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
             EquToolingManageViewDto equToolingManageViewDto = new EquToolingManageViewDto
             {
                 Id = equToolingManageEntity.Id,
-                Status= equToolingManageEntity.Status,
-                Code= equToolingManageEntity.Code,
+                Status = equToolingManageEntity.Status,
+                Code = equToolingManageEntity.Code,
                 Name = equToolingManageEntity.Name,
-                ToolsId= equToolingManageEntity.ToolsId,
+                ToolsId = equToolingManageEntity.ToolsId,
                 CalibrationCycle = equToolingManageEntity.CalibrationCycle,
                 IsCalibrated = equToolingManageEntity.IsCalibrated,
                 RatedLife = equToolingManageEntity.RatedLife,
-                RatedLifeUnit=equToolingManageEntity.RatedLifeUnit,
+                RatedLifeUnit = equToolingManageEntity.RatedLifeUnit,
                 ToolsTypeCode = equToolingManageEntity.ToolsTypeCode,
                 CumulativeUsedLife = equToolingManageEntity.CumulativeUsedLife,
+                LastVerificationTime = equToolingManageEntity.LastVerificationTime,
+                CalibrationCycleUnit = equToolingManageEntity.CalibrationCycleUnit,
                 ToolsTypeName = equToolingManageEntity.ToolsTypeName,
-                ResidualLife= equToolingManageEntity.RatedLife - equToolingManageEntity.CumulativeUsedLife
+                ResidualLife = equToolingManageEntity.RatedLife - equToolingManageEntity.CumulativeUsedLife
             };
-         
+            if (equToolingManageViewDto.IsCalibrated == YesOrNoEnum.Yes)
+            {
+                switch (equToolingManageViewDto.CalibrationCycleUnit)
+                {
+                    case ToolingTypeEnum.Day:
+                        equToolingManageViewDto.NextVerificationTime = equToolingManageViewDto.LastVerificationTime?.AddDays(Convert.ToDouble(equToolingManageViewDto.CalibrationCycle ?? 0));
+                        break;
+                    case ToolingTypeEnum.Week:
+                        equToolingManageViewDto.NextVerificationTime = equToolingManageViewDto.LastVerificationTime?.AddDays(Convert.ToDouble(equToolingManageViewDto.CalibrationCycle ?? 0) * 7);
+                        break;
+                    case ToolingTypeEnum.Month:
+                        equToolingManageViewDto.NextVerificationTime = equToolingManageViewDto.LastVerificationTime?.AddMonths(Convert.ToInt32(equToolingManageViewDto.CalibrationCycle ?? 0));
+                        break;
+                }
+            }
             return equToolingManageViewDto;
         }
 
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="AddEquToolingManageDto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<long> AddEquToolingManageAsync(AddEquToolingManageDto AddEquToolingManageDto)
+        public async Task<long> AddEquToolingManageAsync(AddEquToolingManageDto param)
         {
             //校验
-            if (AddEquToolingManageDto == null)
+            if (param == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
+            await _verifyValidationRules.ValidateAndThrowAsync(param);
             //对象映射
-            var equToolsEntity = AddEquToolingManageDto.ToEntity<EquToolsEntity>();
+            var equToolsEntity = param.ToEntity<EquToolsEntity>();
             equToolsEntity.Id = IdGenProvider.Instance.CreateId();
             equToolsEntity.CreatedBy = _currentUser.UserName;
             equToolsEntity.UpdatedBy = _currentUser.UserName;
@@ -204,22 +220,20 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
             response = await _equToolingManageRepository.InsertAsync(equToolsEntity);
             if (response == 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10704));
+                throw new CustomerValidationException(nameof(ErrorCode.MES13502));
             }
             trans.Complete();
             return equToolsEntity.Id;
         }
-        
-
 
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="idsAr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteEquToolingManageAsync(long[] idsAr)
+        public async Task<int> DeleteEquToolingManageAsync(IEnumerable<long> idsAr)
         {
-            if (idsAr.Length < 1)
+            if (idsAr == null || !idsAr.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
@@ -244,38 +258,20 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
             return rows;
         }
 
-
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="equToolingManageModifyDto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task ModifyEquToolingManageAsync(EquToolingManageModifyDto equToolingManageModifyDto)
+        public async Task ModifyEquToolingManageAsync(EquToolingManageModifyDto param)
         {
-            if (equToolingManageModifyDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));          
-
+            if (param == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            await _verifyValidationeModifyRules.ValidateAndThrowAsync(param);
             // DTO转换实体
-            var equToolsEntity = equToolingManageModifyDto.ToEntity<EquToolsEntity>();
+            var equToolsEntity = param.ToEntity<EquToolsEntity>();
             equToolsEntity.UpdatedBy = _currentUser.UserName;
             equToolsEntity.UpdatedOn = HymsonClock.Now();
             equToolsEntity.SiteId = _currentSite.SiteId ?? 0;
-            //procConversionFactorEntity.MaterialId = procLoadPointModifyDto.LinkMaterials[0].MaterialId;
-            #region 数据库验证
-            //var isExists = (await _equToolingManageRepository.GetProcConversionFactorEntitiesAsync(new ProcConversionFactorQuery()
-            //{
-            //    SiteId = procConversionFactorEntity.SiteId,
-            //    ProcedureId = procConversionFactorEntity.ProcedureId,
-            //    MaterialId = procConversionFactorEntity.MaterialId
-            //})).Any();
-            //if (isExists)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10477)).WithData("ProcedureId", procConversionFactorEntity.ProcedureId);
-            //}
-            #endregion
-            
-
-
-            
 
             using TransactionScope ts = TransactionHelper.GetTransactionScope();
             int rows = 0;
@@ -284,13 +280,159 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
 
             if (rows == 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10704));
+                throw new CustomerValidationException(nameof(ErrorCode.MES13502));
             }
 
             ts.Complete();
         }
 
+        /// <summary>
+        /// 校准
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task CalibrationAsync(long id)
+        {
+            var equToolsEntity = await _equToolingManageRepository.GetByIdAsync(id);
+            equToolsEntity.UpdatedBy = _currentUser.UserName;
+            equToolsEntity.UpdatedOn = HymsonClock.Now();
+            equToolsEntity.SiteId = _currentSite.SiteId ?? 0;
+            equToolsEntity.LastVerificationTime = HymsonClock.Now();
+            using TransactionScope ts = TransactionHelper.GetTransactionScope();
+            int rows = 0;
+            // 入库
+            rows = await _equToolingManageRepository.UpdateAsync(equToolsEntity);
 
+            if (rows == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13502));
+            }
+
+            ts.Complete();
+        }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task<string> DownloadImportTemplateAsync(Stream stream)
+        {
+            var worksheetName = "工具管理";
+            await _excelService.ExportAsync(Array.Empty<EquToolingManageExcelDto>(), stream, worksheetName);
+            var re = new EquToolingManageExcelDto();
+            return worksheetName;
+        }
+
+        /// <summary>
+        /// 导入
+        /// </summary>
+        /// <returns></returns>
+        public async Task ImportAsync(IFormFile formFile)
+        {
+            using MemoryStream memoryStream = new();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            var dtos = _excelService.Import<EquToolingManageExcelDto>(memoryStream);
+            if (dtos == null || !dtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10133));
+
+            // 分组标准
+            var time = HymsonClock.Now();
+            var equToolingTypeGroupEntities = await _equToolingTypeGroupRepository.GetEntitiesAsync(new EquToolingTypeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = dtos.Select(x => x.ToolTypeCode)
+            });
+
+            var quToolingManageEntities = await _equToolingManageRepository.GetEntitiesAsync(new EquToolingManageQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = dtos.Select(x => x.Code)
+            });
+
+            List<EquToolsEntity> entities = new();
+            var validationFailures = new List<ValidationFailure>();
+            var index = 0;
+            foreach (var item in dtos)
+            {
+                index++;
+                var validationResult = await _verifyValidationeExcelRules.ValidateAsync(item);
+                if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
+                {
+                    foreach (var validationFailure in validationResult.Errors)
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                        validationFailures.Add(validationFailure);
+                    }
+                }
+                var quToolingManageEntity = quToolingManageEntities.FirstOrDefault(x => x.Code == item.Code);
+                if (quToolingManageEntity != null)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", index}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES13504);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("ToolCode", item.Code);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+
+                var equToolingTypeGroupEntity = equToolingTypeGroupEntities.FirstOrDefault(x => x.Code == item.ToolTypeCode);
+                if (equToolingTypeGroupEntity == null)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", index}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES13503);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("ToolTypeCode", item.ToolTypeCode);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+
+                entities.Add(new EquToolsEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Code = item.ToolTypeCode,
+                    Name = item.Name,
+                    ToolsId = equToolingTypeGroupEntity.Id,
+                    RatedLife = item.RatedLife,
+                    LastVerificationTime = item.LastVerificationTime,
+                    IsCalibrated = item.IsCalibrated,
+                    CalibrationCycle = item.CalibrationCycle,
+                    Status = item.Status,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = time,
+                    UpdatedOn = time
+                });
+            }
+
+            if (validationFailures != null && validationFailures.Any())
+            {
+                throw new FluentValidation.ValidationException(_localizationService.GetResource("ExcelRowError"), validationFailures);
+            }
+
+            using TransactionScope ts = TransactionHelper.GetTransactionScope();
+
+            await _equToolingManageRepository.InsertRangeAsync(entities);
+
+            ts.Complete();
+        }
     }
-
 }

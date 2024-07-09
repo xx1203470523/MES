@@ -153,6 +153,10 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// </summary>
         [Description("设备组")]
         DeviceGroup = 30,
+        /// <summary>
+        /// 工具维护
+        /// </summary>
+        [Description("工具")]
+        ToolingManage = 31
     }
-
 }

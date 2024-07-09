@@ -17,18 +17,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public long? SiteId { get; set; }
+        public long SiteId { get; set; }
 
         /// <summary>
-        /// 描述 :工序ID
+        ///工具编码
         /// 空值 : false  
         /// </summary>
-        public long ProcedureId { get; set; }
-
-        /// <summary>
-        /// 描述 :物料ID
-        /// 空值 : false  
-        /// </summary>
-        public long MaterialId { get; set; }
+        public IEnumerable<string>?  Codes { get; set; }
     }
 }
