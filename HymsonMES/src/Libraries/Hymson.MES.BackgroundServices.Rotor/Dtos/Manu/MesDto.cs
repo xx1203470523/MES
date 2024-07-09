@@ -33,23 +33,34 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
     }
 
     /// <summary>
-    /// 进站条码
+    /// MES过站数据
     /// </summary>
-    public class MesInDto : MesDto
-    {
-        
-    }
-
-    /// <summary>
-    /// 构造好的MES出站数据
-    /// </summary>
-    public class MesOutDto : MesDto
+    public class MesOutDto
     {
         /// <summary>
-        /// 是否出站
-        /// false-不出站，则只处理参数和上料信息
+        /// 条码
         /// </summary>
-        public bool IsOut { get; set; } = true;
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 时间
+        /// </summary>
+        public DateTime Date { get; set; }
+
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public bool IsPassed { get; set; }
+
+        /// <summary>
+        /// 0-中间参数 1-进站 2-出站
+        /// </summary>
+        public int Type { get; set; }
 
         /// <summary>
         /// 上料条码列表

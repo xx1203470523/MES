@@ -1,4 +1,5 @@
-﻿using Hymson.MES.BackgroundServices.Rotor.Entity;
+﻿using Hymson.MES.BackgroundServices.Rotor.Dtos.Manu;
+using Hymson.MES.BackgroundServices.Rotor.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,6 @@ namespace Hymson.MES.BackgroundServices.Rotor.Repositories
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        Task<List<WorkItemInfoEntity>> GetList(string sql);
+        Task<List<WorkItemInfoDto>> GetList(string sql);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Hymson.MES.BackgroundServices.Rotor.Dtos.Manu;
 using Hymson.MES.BackgroundServices.Rotor.Entity;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories;
@@ -31,10 +32,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Repositories
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
-        public async Task<List<WorkItemInfoEntity>> GetList(string sql)
+        public async Task<List<WorkItemInfoDto>> GetList(string sql)
         {
             using var conn = GetRotorDbConnection();
-            var dbList = await conn.QueryAsync<WorkItemInfoEntity>(sql);
+            var dbList = await conn.QueryAsync<WorkItemInfoDto>(sql);
 
             return dbList.ToList();
         }

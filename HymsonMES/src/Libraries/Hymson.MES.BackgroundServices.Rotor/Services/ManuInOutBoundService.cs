@@ -3,6 +3,7 @@ using Hymson.MES.BackgroundServices.Rotor.Dtos.Manu;
 using Hymson.MES.BackgroundServices.Rotor.Entity;
 using Hymson.MES.BackgroundServices.Rotor.Repositories;
 using MySqlX.XDevAPI.Common;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,8 +94,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             //获取MES需要处理管控的工位数据
             List<WorkPosDto> workPosList = GetPosNoList();
-            List<WorkPosDto> mesWorkPosList = workPosList.Where(m => m.WorkPosType != 0).ToList();
-            List<string> workPosCodeList = mesWorkPosList.Select(m => m.WorkPosNo).ToList();
+            //List<WorkPosDto> mesWorkPosList = workPosList.Where(m => m.WorkPosType != 0).ToList();
+            List<string> workPosCodeList = workPosList.Select(m => m.WorkPosNo).ToList();
 
             #region 获取线体LMS数据
 
@@ -110,8 +111,6 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             #endregion
 
-            //MES进站数据
-            List<MesInDto> inList = new List<MesInDto>();
             //MES出战数据
             List<MesOutDto> outList = new List<MesOutDto>();
 
@@ -122,14 +121,14 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             foreach(var item in inOutList)
             {
                 //获取工位类型
-                WorkPosDto? curWorkPos = mesWorkPosList.Where(m => item.WorkPosNo == m.WorkPosNo).FirstOrDefault();
+                WorkPosDto? curWorkPos = workPosList.Where(m => item.WorkPosNo == m.WorkPosNo).FirstOrDefault();
                 if(curWorkPos == null)
                 {
                     continue;
                 }
 
                 //基础数据
-                MesDto mesDto = new MesDto();
+                MesOutDto mesDto = new MesOutDto();
                 mesDto.Sfc = item.ProductNo;
                 mesDto.ProcedureCode = item.ProcedureCode;
                 mesDto.IsPassed = item.Result == Result_OK ? true : false;
@@ -153,6 +152,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         });
                     }
                 }
+                
                 //处理参数信息
                 List<WorkProcessDataDto> curParamList = paramList.Where(m => m.ProcessUID == item.ID).ToList();
                 List<SfcParamDto> sfcParamList = new List<SfcParamDto>();
@@ -172,39 +172,26 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     }
                 }
 
-                //如果是中间工位，且不是NG，则不处理（中间工位不做进出站）
+                mesDto.ParamList = sfcParamList;
+                mesDto.UpMatList = sfcUpList;
+                mesDto.Type = 0;
+
+                //如果是中间工位，且不是NG，则只处理参数
                 if (curWorkPos.WorkPosType == 0 && mesDto.IsPassed == true)
                 {
-                    //基础数据
-                    MesOutDto outDto = new MesOutDto();
-                    outDto = (MesOutDto)mesDto;
-                    outDto.IsOut = false;
-                    outDto.ParamList = sfcParamList;
-                    outDto.UpMatList = sfcUpList;
-                    outList.Add(outDto);
-
-                    continue;
+                    mesDto.Type = 0;
                 }
 
                 //进站
                 if ((curWorkPos.WorkPosType & 1) == 1 && item.ProductStatus == ProductStatus_In)
                 {
-                    //基础数据
-                    MesInDto indto = new MesInDto();
-                    indto = (MesInDto)mesDto;
-                    inList.Add(indto);
+                    mesDto.Type = 1;
                 }
                 //NG出站（中间工位可能会NG,NG在后续不会在有记录，当成出站处理）
                 if (mesDto.IsPassed == false)
                 {
-                    //处理NG信息
-                    MesOutDto outDto = new MesOutDto();
-                    outDto = (MesOutDto)mesDto;
-                    outDto.IsOut = true;
-                    outDto.ParamList = sfcParamList;
-                    outDto.UpMatList = sfcUpList;
-                    outDto.ParamToNgList();
-                    outList.Add(outDto);
+                    mesDto.Type = 2;
+                    mesDto.ParamToNgList();
                 }
                 //正常出站
                 if ((curWorkPos.WorkPosType & 2) == 2 && item.ProductStatus == ProductStatus_Out && mesDto.IsPassed == true)
@@ -215,19 +202,16 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     }
 
                     //基础数据
-                    MesOutDto outDto = new MesOutDto();
-                    outDto = (MesOutDto)mesDto;
-                    outDto.IsOut = true;
-                    outDto.ParamList = sfcParamList;
-                    outDto.UpMatList = sfcUpList;
-                    outList.Add(outDto);
+                    mesDto.Type = 2;
                 }
+
+                outList.Add(mesDto);
             }
 
             #endregion
 
             //MES数据入库
-
+            var mesOutList = outList;
         }
 
         /// <summary>
@@ -251,11 +235,17 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 ORDER BY StartTime ASC;
             ";
 
-            List<WorkProcessEntity> dbList = await _workProcessRepository.GetList(sql);
+            List<WorkProcessDto> dbList = await _workProcessRepository.GetList(sql);
+            if(dbList == null || dbList.Count == 0)
+            {
+                return resultList;
+            }
 
-            resultList = dbList.Cast<WorkProcessDto>().ToList();
+            //resultList = dbList.Cast<WorkProcessDto>().ToList();
+            //resultList = dbList.OfType<WorkProcessDto>().ToList();
+            //resultList = dbList.Select(m => m as WorkProcessDto).ToList();
 
-            return resultList;
+            return dbList;
         }
 
         /// <summary>
@@ -273,13 +263,13 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 return resultLit;
             }
 
-            List<WorkProcessDataEntity> allDbList = new List<WorkProcessDataEntity>();
+            List<WorkProcessDataDto> allDbList = new List<WorkProcessDataDto>();
 
             int batchDataNum = 999;
             int batchNum = sfcIdList.Count / batchDataNum + 1;
             for(int i = 0; i < batchNum; ++i)
             {
-                List<string> curSfcIdList = sfcIdList.Skip(i * batchDataNum).Take(batchNum).ToList();
+                List<string> curSfcIdList = sfcIdList.Skip(i * batchDataNum).Take(batchDataNum).ToList();
                 string idListStr = string.Join(",", curSfcIdList.Select(uuid => $"'{uuid}'"));
 
                 string sql = $@"
@@ -289,13 +279,13 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     WHERE T2.ProcessUID IN ( {idListStr} )
                 ";
 
-                List<WorkProcessDataEntity> dbList = await _workProcessDataRepository.GetList(sql);
+                List<WorkProcessDataDto> dbList = await _workProcessDataRepository.GetList(sql);
                 allDbList.AddRange(dbList);
             }
 
-            resultLit = allDbList.Cast<WorkProcessDataDto>().ToList();
+            //resultLit = allDbList.OfType<WorkProcessDataDto>().ToList();
 
-            return resultLit;
+            return allDbList;
         }
 
         /// <summary>
@@ -313,13 +303,13 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 return resultLit;
             }
 
-            List<WorkItemInfoEntity> allDbList = new List<WorkItemInfoEntity>();
+            List<WorkItemInfoDto> allDbList = new List<WorkItemInfoDto>();
 
             int batchDataNum = 999;
             int batchNum = sfcIdList.Count / batchDataNum + 1;
             for (int i = 0; i < batchNum; ++i)
             {
-                List<string> curSfcIdList = sfcIdList.Skip(i * batchDataNum).Take(batchNum).ToList();
+                List<string> curSfcIdList = sfcIdList.Skip(i * batchDataNum).Take(batchDataNum).ToList();
                 string idListStr = string.Join(",", sfcIdList.Select(uuid => $"'{uuid}'"));
 
                 string sql = $@"
@@ -358,7 +348,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             int batchNum = sfcList.Count / batchDataNum + 1;
             for (int i = 0; i < batchNum; ++i)
             {
-                List<string> curSfcList = sfcList.Skip(i * batchDataNum).Take(batchNum).ToList();
+                List<string> curSfcList = sfcList.Skip(i * batchDataNum).Take(batchDataNum).ToList();
                 string sfcListStr = string.Join(",", curSfcList.Select(sfc => $"'{sfc}'"));
 
                 string sql = $@"
@@ -372,7 +362,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 allDbList.AddRange(dbList);
             }
 
-            resultLit = allDbList.Cast<WorkOrderRelationDto>().ToList();
+            resultLit = allDbList.OfType<WorkOrderRelationDto>().ToList();
 
             return resultLit;
 
@@ -397,28 +387,28 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 new WorkPosDto { WorkPosNo = "OP20.1.3.2", WorkPosName = "3号插大磁钢工位", SortIndex = 25 , WorkPosType = 0},
                 new WorkPosDto { WorkPosNo = "OP20.1.4.1", WorkPosName = "磁钢检测工位", SortIndex = 26 , WorkPosType = 0},
                 new WorkPosDto { WorkPosNo = "OP20.1.5.1", WorkPosName = "碟片下料工位", SortIndex = 27 , WorkPosType = 2},
-                new WorkPosDto { WorkPosNo = "OP30.1.1.1", WorkPosName = "堆叠工位", SortIndex = 30 , WorkPosType = 4},
-                new WorkPosDto { WorkPosNo = "OP40.1.1.1", WorkPosName = "1号加热工位", SortIndex = 40 , WorkPosType = 4},
-                new WorkPosDto { WorkPosNo = "OP40.1.2.1", WorkPosName = "2号加热工位", SortIndex = 41 , WorkPosType = 4},
+                new WorkPosDto { WorkPosNo = "OP30.1.1.1", WorkPosName = "堆叠工位", SortIndex = 30 , WorkPosType = 3},
+                new WorkPosDto { WorkPosNo = "OP40.1.1.1", WorkPosName = "1号加热工位", SortIndex = 40 , WorkPosType = 3},
+                new WorkPosDto { WorkPosNo = "OP40.1.2.1", WorkPosName = "2号加热工位", SortIndex = 41 , WorkPosType = 3},
                 new WorkPosDto { WorkPosNo = "OP40.1.3.1", WorkPosName = "3号加热工位", SortIndex = 42 ,WorkPosType=4},
-                new WorkPosDto { WorkPosNo = "OP50.1.1.1", WorkPosName = "1号注塑工位", SortIndex = 50 ,WorkPosType = 4},
-                new WorkPosDto { WorkPosNo = "OP50.1.2.1", WorkPosName = "2号注塑工位", SortIndex = 51 , WorkPosType = 4},
-                new WorkPosDto { WorkPosNo = "OP55.1.1.1", WorkPosName = "注塑凸点检测工位", SortIndex = 55 , WorkPosType = 4},
+                new WorkPosDto { WorkPosNo = "OP50.1.1.1", WorkPosName = "1号注塑工位", SortIndex = 50 ,WorkPosType = 3},
+                new WorkPosDto { WorkPosNo = "OP50.1.2.1", WorkPosName = "2号注塑工位", SortIndex = 51 , WorkPosType = 3},
+                new WorkPosDto { WorkPosNo = "OP55.1.1.1", WorkPosName = "注塑凸点检测工位", SortIndex = 55 , WorkPosType = 3},
                 new WorkPosDto { WorkPosNo = "OP55.1.1.6", WorkPosName = "人工返工工位", SortIndex = 56 , WorkPosType = 0},
                 new WorkPosDto { WorkPosNo = "OP710.1.1.1", WorkPosName = "轴上料工位", SortIndex = 70 , WorkPosType = 1},
                 new WorkPosDto { WorkPosNo = "OP710.1.3.1", WorkPosName = "上平衡盘压装工位", SortIndex = 71 , WorkPosType = 0},
                 new WorkPosDto { WorkPosNo = "OP710.1.4.1", WorkPosName = "下平衡盘压装工位", SortIndex = 72 , WorkPosType = 0},
                 new WorkPosDto { WorkPosNo = "OP710.1.4.2", WorkPosName = "热套环压装", SortIndex = 73 , WorkPosType = 2},
-                new WorkPosDto { WorkPosNo = "OP720.1.2.1", WorkPosName = "轴环压装工位", SortIndex = 76 , WorkPosType = 4},
-                new WorkPosDto { WorkPosNo = "OP80.1.1.1", WorkPosName = "冷却工位", SortIndex = 80 ,WorkPosType = 4},
+                new WorkPosDto { WorkPosNo = "OP720.1.2.1", WorkPosName = "轴环压装工位", SortIndex = 76 , WorkPosType = 3},
+                new WorkPosDto { WorkPosNo = "OP80.1.1.1", WorkPosName = "冷却工位", SortIndex = 80 ,WorkPosType = 3},
                 new WorkPosDto { WorkPosNo = "OP90.1.2.1", WorkPosName = "充磁工位", SortIndex = 90 ,WorkPosType = 1},
                 new WorkPosDto { WorkPosNo = "OP90.1.4.1", WorkPosName = "表磁工位", SortIndex = 91 ,WorkPosType = 2},
-                new WorkPosDto { WorkPosNo = "OP100.1.1.1", WorkPosName = "动平衡工位", SortIndex = 100 ,WorkPosType = 4},
-                new WorkPosDto { WorkPosNo = "OP110.1.1.1", WorkPosName = "清洁工位", SortIndex = 110 , WorkPosType = 4},
-                new WorkPosDto { WorkPosNo = "OP120.1.1.1", WorkPosName = "全尺寸工位", SortIndex = 120 , WorkPosType = 4},
-                new WorkPosDto { WorkPosNo = "OP130.1.1.1", WorkPosName = "激光刻印工位", SortIndex = 130 , WorkPosType = 4},
-                new WorkPosDto { WorkPosNo = "OP140.1.1.1", WorkPosName = "涂油工位", SortIndex = 140 , WorkPosType = 4},
-                new WorkPosDto { WorkPosNo = "OP150.1.1.1", WorkPosName = "成品下料工位", SortIndex = 150 , WorkPosType = 4}
+                new WorkPosDto { WorkPosNo = "OP100.1.1.1", WorkPosName = "动平衡工位", SortIndex = 100 ,WorkPosType = 3},
+                new WorkPosDto { WorkPosNo = "OP110.1.1.1", WorkPosName = "清洁工位", SortIndex = 110 , WorkPosType = 3},
+                new WorkPosDto { WorkPosNo = "OP120.1.1.1", WorkPosName = "全尺寸工位", SortIndex = 120 , WorkPosType = 3},
+                new WorkPosDto { WorkPosNo = "OP130.1.1.1", WorkPosName = "激光刻印工位", SortIndex = 130 , WorkPosType = 3},
+                new WorkPosDto { WorkPosNo = "OP140.1.1.1", WorkPosName = "涂油工位", SortIndex = 140 , WorkPosType = 3},
+                new WorkPosDto { WorkPosNo = "OP150.1.1.1", WorkPosName = "成品下料工位", SortIndex = 150 , WorkPosType = 3}
             };
 
             return workPosList;
