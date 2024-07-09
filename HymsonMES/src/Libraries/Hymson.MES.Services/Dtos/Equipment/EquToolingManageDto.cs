@@ -128,6 +128,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 校准周期
         /// </summary>
         public decimal? CalibrationCycle { get; set; }
+
+        /// <summary>
+        /// 校准周期单位
+        /// </summary>
+        public ToolingTypeEnum? CalibrationCycleUnit { get; set; }
+
+        /// <summary>
+        /// 最后校验时间
+        /// </summary>
+        public DateTime? LastVerificationTime { get; set; }
+
         /// <summary>
         /// 创建人
         /// </summary>
@@ -160,6 +171,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 剩余寿命
         /// </summary>
         public decimal? ResidualLife { get; set; }
+
+        /// <summary>
+        /// 下次校验时间
+        /// </summary>
+        public DateTime? NextVerificationTime { get; set; }
     }
 
     /// <summary>
@@ -171,17 +187,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 工具类型ID
         /// 空值 : false  
         /// </summary>
-        public string? ToolsId { get; set; }
-        /// <summary>
-        /// 工具类型编码
-        /// 空值 : false  
-        /// </summary>
-        public string? ToolsTypeCode { get; set; }
-        /// <summary>
-        /// 工具类型名称
-        /// 空值 : false  
-        /// </summary>
-        public string? ToolsTypeName { get; set; }
+        public long ToolsId { get; set; }
         /// <summary>
         /// 工具编码
         /// 空值 : false  
@@ -215,7 +221,13 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 校准周期单位
         /// </summary>
-        public ToolingTypeEnum CalibrationCycleUnit { get; set; }
+        public ToolingTypeEnum? CalibrationCycleUnit { get; set; }
+
+        /// <summary>
+        /// 最后校验时间
+        /// </summary>
+        public DateTime? LastVerificationTime { get; set; }
+
         /// <summary>
         /// 备注
         /// </summary>
@@ -232,16 +244,13 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 空值 : false  
         /// </summary>
         public long Id { get; set; }
-        /// <summary>
-        /// 工具编码
-        /// 空值 : false  
-        /// </summary>
-        public string Code { get; set; }
+
         /// <summary>
         /// 工具名称
         /// 空值 : false  
         /// </summary>
         public string Name { get; set; }
+
         /// <summary>
         /// 工具类型ID
         /// 空值 : false  
@@ -251,25 +260,30 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 状态
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
+
         /// <summary>
         /// 额定使用寿命
         /// </summary>
         public decimal? RatedLife { get; set; }
+
         /// <summary>
         /// 额定使用寿命单位
         /// </summary>
         public ToolingTypeEnum RatedLifeUnit { get; set; }
+
         /// <summary>
         /// 是否效准
         /// </summary>
         public YesOrNoEnum? IsCalibrated { get; set; }
+
         /// <summary>
         /// 校准周期
         /// </summary>
         public decimal? CalibrationCycle { get; set; }
+
         /// <summary>
         /// 校准周期单位
         /// </summary>
-        public ToolingTypeEnum CalibrationCycleUnit { get; set; }
+        public ToolingTypeEnum? CalibrationCycleUnit { get; set; }
     }
 }
