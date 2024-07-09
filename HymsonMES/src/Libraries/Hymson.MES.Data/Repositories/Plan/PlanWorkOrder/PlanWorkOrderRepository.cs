@@ -603,7 +603,7 @@ namespace Hymson.MES.Data.Repositories.Plan
 #else
         const string UpdatePassDownQuantitySql = "UPDATE plan_work_order_record SET PassDownQuantity = IFNULL(PassDownQuantity, 0) + @PassDownQuantity, UpdatedBy = @UserName, UpdatedOn = @UpdateDate WHERE WorkOrderId = @WorkOrderId AND IFNULL(PassDownQuantity, 0) <= @PlanQuantity - @PassDownQuantity AND IsDeleted = 0; ";
         const string UpdateFinishProductQuantitySql = "UPDATE plan_work_order_record SET " +
-            "FinishProductQuantity = (CASE WHEN FinishProductQuantity IS NULL THEN 0 ELSE FinishProductQuantity END) + @Qty, " +
+            "FinishProductQuantity = @Qty, " +
             "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
         const string UpdateInputQtySql = "UPDATE plan_work_order_record SET " +
             "InputQty = (CASE WHEN InputQty IS NULL THEN 0 ELSE InputQty END) + @Qty, " +
