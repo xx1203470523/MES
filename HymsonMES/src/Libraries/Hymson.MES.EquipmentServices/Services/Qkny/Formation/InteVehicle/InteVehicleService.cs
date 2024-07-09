@@ -1,28 +1,20 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.CoreServices.Dtos.Qkny;
-using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.Snowflake;
-using Hymson.Utils.Tools;
-using Hymson.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
-using Hymson.MES.Data.Repositories.Integrated.InteVehicleFreight.Command;
-using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.CoreServices.Dtos.Qkny;
 using Hymson.MES.CoreServices.Services.Common;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.InteVehicleFreight.Command;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Quality;
+using Hymson.Snowflake;
+using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Microsoft.IdentityModel.Tokens;
-using Google.Protobuf.WellKnownTypes;
-using System.Collections;
+using System.Transactions;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
 {
@@ -116,7 +108,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
         public async Task<InteVehicleEntity> GetByCodeAsync(InteVehicleCodeQuery query)
         {
             var dbModel = await _inteVehicleRepository.GetByCodeAsync(query);
-            if(dbModel == null)
+            if (dbModel == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45110));
             }
@@ -295,7 +287,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             if (sfcProductList == null || sfcProductList.Count == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45112))
-                    .WithData("SfcListStr", string.Join(",",sfcList));
+                    .WithData("SfcListStr", string.Join(",", sfcList));
             }
             //数量校验
             var dbSfcList = sfcProductList.Select(m => m.SFC).ToList();
@@ -343,7 +335,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             //数据库操作
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             delNum = await _inteVehiceFreightStackRepository.DeleteByVehiceBarCode(updateList);
-            if(delNum != updateList.Count)
+            if (delNum != updateList.Count)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45120));
             }
@@ -360,29 +352,29 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
         /// <returns></returns>
         public async Task ContainerNgReportAsync(InteVehicleNgSfcDto param)
         {
-            List<string> ngCodeList = param.NgSfcList.Select(m => m.NgCode).Distinct().ToList();
-            QualUnqualifiedCodeByCodesQuery ngCodeQuery = new QualUnqualifiedCodeByCodesQuery();
-            ngCodeQuery.SiteId = param.SiteId;
-            ngCodeQuery.Codes = ngCodeList;
-            var ngEntityList = await _masterDataService.GetUnqualifiedEntitiesByCodesAsync(ngCodeQuery);
-            if (ngEntityList.IsNullOrEmpty() == true)
+            //不合格代码校验（不合格代码可以为空）
+            List<string> ngCodeList = param.NgSfcList.Select(x => x.NgCode).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().ToList();
+            var ngEntityList = await _masterDataService.GetUnqualifiedEntitiesByCodesAsync(new QualUnqualifiedCodeByCodesQuery
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45121))
-                    .WithData("ngCode", string.Join(",", ngCodeList));
-            }
-            if (ngEntityList.Count() != ngCodeList.Count())
+                SiteId = param.SiteId,
+                Codes = ngCodeList
+            });
+            if (ngCodeList.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45121));
+                if (ngEntityList.IsNullOrEmpty())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45121)).WithData("ngCode", string.Join(",", ngCodeList));
+                }
+                var noExistNgCodes = ngCodeList.Except(ngEntityList.Select(x => x.UnqualifiedCode));
+                if (noExistNgCodes.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES45121)).WithData("ngCode", string.Join(",", noExistNgCodes));
+                }
             }
-
             //查询条码信息表数据
-            List<string> ngSfcList = param.NgSfcList.Select(m => m.Sfc).ToList();
+            List<string> ngSfcList = param.NgSfcList.Select(m => m.Sfc).Distinct().ToList();
             List<ManuSfcInfoSfcView> sfcInfoList = (await _manuSfcInfoRepository.GetUsedBySFCsAsync(ngSfcList)).ToList();
-            if (sfcInfoList.IsNullOrEmpty() == true)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45122));
-            }
-            if(sfcInfoList.Count != ngSfcList.Count())
+            if (sfcInfoList.IsNullOrEmpty() || sfcInfoList.Count != ngSfcList.Count)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45122));
             }
@@ -407,37 +399,34 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
                 badModel.FoundBadOperationId = item.OperationId;
                 badModel.FoundBadResourceId = item.ResourceId;
                 badModel.OutflowOperationId = param.OperationId;
-                badModel.UnqualifiedId = ngEntityList.Where(m => m.UnqualifiedCode == item.NgCode).FirstOrDefault()!.Id;
+                badModel.UnqualifiedId = ngEntityList.Where(m => m.UnqualifiedCode == item.NgCode).FirstOrDefault()?.Id ?? 0;
                 badModel.Status = Core.Enums.Manufacture.ProductBadRecordStatusEnum.Open;
                 badModel.Source = Core.Enums.Manufacture.ProductBadRecordSourceEnum.EquipmentReBad;
                 badModel.Qty = 1;
                 badList.Add(badModel);
 
                 var sfcNgCodeList = param.NgSfcList.Where(m => m.Sfc == item.Sfc).ToList();
-                if(sfcNgCodeList.IsNullOrEmpty() == false)
+                foreach (var sfcCode in sfcNgCodeList)
                 {
-                    foreach(var sfcCode in sfcNgCodeList)
-                    {
-                        ManuProductNgRecordEntity ngRecord = new ManuProductNgRecordEntity();
-                        ngRecord.Id = IdGenProvider.Instance.CreateId();
-                        ngRecord.SiteId = param.SiteId;
-                        ngRecord.BadRecordId = badModel.Id;
-                        ngRecord.UnqualifiedId = ngEntityList.Where(m => m.UnqualifiedCode == sfcCode.NgCode).FirstOrDefault()!.Id;
-                        ngRecord.NGCode = sfcCode.NgCode;
-                        ngRecord.Remark = "托盘NG电芯上报";
-                        ngRecord.CreatedOn = curDate;
-                        ngRecord.CreatedBy = param.UserName;
-                        ngRecord.UpdatedOn = curDate;
-                        ngRecord.UpdatedBy = param.UserName;
-                        ngList.Add(ngRecord);
-                    }
+                    ManuProductNgRecordEntity ngRecord = new ManuProductNgRecordEntity();
+                    ngRecord.Id = IdGenProvider.Instance.CreateId();
+                    ngRecord.SiteId = param.SiteId;
+                    ngRecord.BadRecordId = badModel.Id;
+                    ngRecord.UnqualifiedId = ngEntityList.Where(m => m.UnqualifiedCode == sfcCode.NgCode).FirstOrDefault()?.Id ?? 0;
+                    ngRecord.NGCode = sfcCode.NgCode;
+                    ngRecord.Remark = "托盘NG电芯上报";
+                    ngRecord.CreatedOn = curDate;
+                    ngRecord.CreatedBy = param.UserName;
+                    ngRecord.UpdatedOn = curDate;
+                    ngRecord.UpdatedBy = param.UserName;
+                    ngList.Add(ngRecord);
                 }
             }
 
             //托盘和电芯解绑
             InteVehicleUnBindDto unBind = new InteVehicleUnBindDto();
             unBind.ContainerCode = param.ContainerCode;
-            unBind.SfcList = param.NgSfcList.Select(m => m.Sfc).ToList();
+            unBind.SfcList = param.NgSfcList.Select(m => m.Sfc).Distinct().ToList();
             unBind.SiteId = param.SiteId;
             unBind.UserName = param.UserName;
             //电芯设备上报NG出站

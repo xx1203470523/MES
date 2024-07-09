@@ -377,13 +377,18 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.Formation
                     throw new CustomerValidationException(nameof(ErrorCode.MES45001));
                 }
 
-                InteVehicleSfcDetailDto ngModel = new InteVehicleSfcDetailDto();
-                ngModel.NgCode = item.NgCode;
-                ngModel.Sfc = item.Sfc;
-                ngModel.OperationId = sfcEquResModel.ProcedureId;
-                ngModel.ResourceId = sfcEquResModel.ResId;
-                ngModel.EquipmentId = sfcEquResModel.EquipmentId;
-                ngDto.NgSfcList.Add(ngModel);
+                var ngCodes = item.NgCode?.Trim().Split(',') ?? new[] { "" };
+
+                foreach (var code in ngCodes)
+                {
+                    InteVehicleSfcDetailDto ngModel = new InteVehicleSfcDetailDto();
+                    ngModel.NgCode = code;
+                    ngModel.Sfc = item.Sfc;
+                    ngModel.OperationId = sfcEquResModel.ProcedureId;
+                    ngModel.ResourceId = sfcEquResModel.ResId;
+                    ngModel.EquipmentId = sfcEquResModel.EquipmentId;
+                    ngDto.NgSfcList.Add(ngModel);
+                }
             }
             ngDto.SiteId = equResModel.SiteId;
             ngDto.UserName = equResModel.EquipmentName;
