@@ -206,6 +206,11 @@ namespace Hymson.MES.BackgroundServices.CoreServices.Repository
             return Context.Ado.SqlQuery<T>(sql, obj);
         }
 
+        public async Task<List<T>> SqlQueryToListAsync(string sql, object obj = null)
+        {
+            return await Context.Ado.SqlQueryAsync<T>(sql, obj);
+        }
+
         /// <summary>
         /// 根据主值查询单条数据
         /// </summary>
