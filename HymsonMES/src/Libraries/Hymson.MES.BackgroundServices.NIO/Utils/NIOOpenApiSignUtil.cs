@@ -37,7 +37,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Utils
             string resource,
             Dictionary<string, object>? queryString,
             Dictionary<string, object>? formData,
-            string jsonBody)
+            string? jsonBody)
         {
             // 获取原始字符串
             string originStr = BuildOriginStr(appKey, timestamp, nonce, method, resource, queryString, formData, jsonBody);
@@ -66,7 +66,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Utils
             string resource,
             Dictionary<string, object>? queryString,
             Dictionary<string, object>? formData,
-            string jsonBody)
+            string? jsonBody)
         {
             StringBuilder sb = new();
             sb.Append(METHOD).Append("=").Append(method.ToUpper());

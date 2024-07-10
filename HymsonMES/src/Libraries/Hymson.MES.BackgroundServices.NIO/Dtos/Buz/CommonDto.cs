@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.BackgroundServices.NIO.Dtos.Process
+﻿namespace Hymson.MES.BackgroundServices.NIO.Dtos.Buz
 {
     /// <summary>
     /// 通用业务
