@@ -3,7 +3,7 @@
     /// <summary>
     /// 服务接口
     /// </summary>
-    public interface IOP010CartService
+    public interface IOP010_CartService
     {
         /// <summary>
         /// 执行统计

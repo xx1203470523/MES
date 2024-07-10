@@ -1,7 +1,4 @@
-﻿using Hymson.MES.BackgroundServices.Stator.Model;
-using Hymson.MES.BackgroundServices.Stator.Repositories;
-using Hymson.MES.BackgroundServices.Stator.Services;
-using Hymson.MES.Data.Repositories.Common.Query;
+﻿using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 
@@ -10,7 +7,7 @@ namespace Hymson.MES.BackgroundServices.Stator
     /// <summary>
     /// 服务
     /// </summary>
-    public class OP010CartService : IOP010CartService
+    public class OP010_CartService : IOP010_CartService
     {
         /// <summary>
         /// 服务接口（水位）
@@ -20,15 +17,15 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// <summary>
         /// 仓储接口（工序）
         /// </summary>
-        private readonly IOPRepository<OP010Cart> _opRepository;
+        private readonly IOPRepository<OP010_Cart> _opRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="waterMarkService"></param>
         /// <param name="opRepository"></param>
-        public OP010CartService(IWaterMarkService waterMarkService,
-            IOPRepository<OP010Cart> opRepository)
+        public OP010_CartService(IWaterMarkService waterMarkService,
+            IOPRepository<OP010_Cart> opRepository)
         {
             _waterMarkService = waterMarkService;
             _opRepository = opRepository;
@@ -41,7 +38,7 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// <returns></returns>
         public async Task ExecuteAsync(int limitCount = 1000)
         {
-            var businessKey = $"Stator-{typeof(OP010Cart).Name}";
+            var businessKey = $"Stator-{typeof(OP010_Cart).Name}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(businessKey);
 
             // 获取步骤表数据

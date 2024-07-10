@@ -25,20 +25,20 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <summary>
         /// 公用方法
         /// </summary>
-        /// <param name="resource"></param>
+        /// <param name="path"></param>
         /// <param name="jsonBody"></param>
         /// <param name="method"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> ExecuteAsync(string resource, object jsonBody, Method method = Method.Post)
+        public static async Task<RestResponse> ExecuteAsync(string path, object jsonBody, Method method = Method.Post)
         {
             var TIMESTAMP = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
             var NONCE = Guid.NewGuid().ToString().Replace("-", "");
             var METHOD = method.ToString().ToUpper();
             var BODY = jsonBody.ToSerialize();
-            var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, resource, null, null, BODY);
+            var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, BODY);
 
             var client = new RestClient(HOST);
-            var request = new RestRequest(resource, method);
+            var request = new RestRequest(path, method);
             request.AddHeader("appKey", APP_KEY);
             request.AddHeader("timestamp", TIMESTAMP);
             request.AddHeader("nonce", NONCE);
@@ -47,7 +47,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             request.AddHeader("Accept-Encoding", "gzip, deflate, br");
             request.AddHeader("Content-Type", "application/json");
             request.AddHeader("Connection", "keep-alive");
-            request.AddHeader("User-Agent", "Xnebula/1.1.0");
+            request.AddHeader("User-Agent", "Pob/1.1.0");
             request.AddParameter("application/json", BODY, ParameterType.RequestBody);
             return await client.ExecuteAsync(request);
         }

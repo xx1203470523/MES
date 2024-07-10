@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class OP010Cart : BaseOPEntity
+    public class OP010_Cart : BaseOPEntity
     {
         /// <summary>
         /// 
