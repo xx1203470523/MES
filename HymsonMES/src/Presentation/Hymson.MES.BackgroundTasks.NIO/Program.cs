@@ -37,9 +37,9 @@ Host.CreateDefaultBuilder(args)
        services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
-       services.AddPrintBackgroundService(hostContext.Configuration);
+       //services.AddPrintBackgroundService(hostContext.Configuration);
        services.AddClearCacheService(hostContext.Configuration);
-       services.AddPrintService(hostContext.Configuration);
+       //services.AddPrintService(hostContext.Configuration);
        
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
        var programName = hostContext.Configuration.GetSection("Quartz").GetValue<string>("ProgramName");

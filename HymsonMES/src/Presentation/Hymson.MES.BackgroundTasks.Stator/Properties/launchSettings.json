@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Hymson.MES.BackgroundTasks": {
+    "Hymson.MES.BackgroundTasks.Rotor": {
       "commandName": "Project",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Staging"

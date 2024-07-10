@@ -1,11 +1,7 @@
 ﻿using Hymson.ClearCache;
-using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Enums;
-using Hymson.MES.Data.Options;
-using Hymson.SqlActuator.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.BackgroundTasks.Rotor.HostedServices
 {
@@ -17,28 +13,18 @@ namespace Hymson.MES.BackgroundTasks.Rotor.HostedServices
         /// <summary>
         /// 
         /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
-        private readonly IDeliveryService _deliveryService;
-        private readonly IOptions<ManuSfcStepTableOptions> _options;
-        private readonly IClearCacheService _clearCacheService;
         private readonly ILogger<SubHostedService> _logger;
-
+        private readonly IClearCacheService _clearCacheService;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="eventBus"></param>
         /// <param name="clearCacheService"></param>
-        public SubHostedService(IEventBus<EventBusInstance1> eventBus,
-            IDeliveryService deliveryService,
-            IOptions<ManuSfcStepTableOptions> options,
-            IClearCacheService clearCacheService, ILogger<SubHostedService> logger)
+        public SubHostedService(ILogger<SubHostedService> logger, IClearCacheService clearCacheService)
         {
-            _eventBus = eventBus;
-            _deliveryService = deliveryService;
-            _options = options;
-            _clearCacheService = clearCacheService;
             _logger = logger;
+            _clearCacheService = clearCacheService;
         }
 
         /// <summary>
