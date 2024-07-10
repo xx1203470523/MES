@@ -4,6 +4,7 @@ using Hymson.MES.BackgroundServices.Rotor.Dtos.Manu;
 using Hymson.MES.BackgroundServices.Rotor.Entity;
 using Hymson.MES.BackgroundServices.Rotor.Repositories;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
@@ -12,6 +13,8 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.Snowflake;
+using Hymson.Utils.Tools;
+using Hymson.WaterMark;
 using MySqlX.XDevAPI.Common;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
@@ -74,6 +77,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly ISysConfigRepository _sysConfigRepository;
 
         /// <summary>
+        /// 服务接口（水位）
+        /// </summary>
+        public readonly IWaterMarkService _waterMarkService;
+
+        /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteID = 0;
@@ -90,7 +98,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
-            ISysConfigRepository sysConfigRepository)
+            ISysConfigRepository sysConfigRepository,
+            IWaterMarkService waterMarkService)
         {
             _workItemInfoRepository = workItemInfoRepository;
             _workProcessDataRepository = workProcessDataRepository;
@@ -101,6 +110,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _sysConfigRepository = sysConfigRepository;
+            _waterMarkService = waterMarkService;
         }
 
         /// <summary>
@@ -134,10 +144,23 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// 进出站
         /// </summary>
         /// <param name="start"></param>
-        /// <param name="end"></param>
+        /// <param name="rows"></param>
         /// <returns></returns>
-        public async Task InOutBoundAsync(DateTime start, DateTime end)
+        public async Task InOutBoundAsync(DateTime start, int rows = 200)
         {
+            string busKey = "MavelRatorTotal";
+            long waterMarkId = await _waterMarkService.GetWaterMarkAsync(busKey);
+            DateTime startWaterMarkTime = DateTime.Now;
+            if(waterMarkId != 0)
+            {
+                startWaterMarkTime = DateTimeOffset.FromUnixTimeMilliseconds(waterMarkId).DateTime;
+            }
+            else
+            {
+                startWaterMarkTime = DateTime.Parse("2024-04-01 01:01:01");
+            }
+            start = startWaterMarkTime;
+
             //TODO
             //1. 中间工序不管进出站，但是参数需要记录保存，上料信息需要记录
             //2. 进站工序的上料，直接查出来
@@ -162,7 +185,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //表名后缀
             string suffixTableName = GetFirstDayOfQuarter(start);
             //1. 根据开始时间，结束时间，读取线体MES过站数据
-            List<WorkProcessDto> inOutList = await GetInOutBoundListAsync(start, end, suffixTableName);
+            List<WorkProcessDto> inOutList = await GetInOutBoundListAsync(start, rows, suffixTableName);
             List<string> sfcIdList = inOutList.Select(m => m.ID).ToList();
             List<string> sfcList = inOutList.Select(m => m.ProductNo).Distinct().ToList();
             //2. 查询参数信息
@@ -342,8 +365,16 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             #endregion
 
             //MES数据入库
+            using var trans = TransactionHelper.GetTransactionScope();
+
             await _manuSfcCirculationRepository.InsertRangeAsync(circulaList);
             await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
+            DateTime maxCreateTime = inOutList.Max(x => x.CreateTime);
+            string maxCreateTimeStr = maxCreateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            long timestamp = (DateTimeOffset.Parse(maxCreateTimeStr)).ToUnixTimeMilliseconds();
+            rows += await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
+
+            trans.Complete();
         }
 
         #endregion
@@ -354,21 +385,20 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// 获取线体MES过站数据
         /// </summary>
         /// <param name="start"></param>
-        /// <param name="end"></param>
+        /// <param name="rows"></param>
         /// <param name="suffixTableName"></param>
         /// <returns></returns>
-        private async Task<List<WorkProcessDto>> GetInOutBoundListAsync(DateTime start, DateTime end,
+        private async Task<List<WorkProcessDto>> GetInOutBoundListAsync(DateTime start, int rows,
             string suffixTableName)
         {
             List<WorkProcessDto> resultList = new List<WorkProcessDto>();
 
             string sql = $@"
-                SELECT * 
+                SELECT TOP {rows} * 
                 FROM Work_Process_{suffixTableName} wp 
                 WHERE IsDeleted = 0
-                AND CreateTime >= '{start.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
-                AND CreateTime < '{end.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
-                ORDER BY StartTime ASC;
+                AND CreateTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.000")}'
+                ORDER BY CreateTime ASC;
             ";
 
             List<WorkProcessDto> dbList = await _workProcessRepository.GetList(sql);
