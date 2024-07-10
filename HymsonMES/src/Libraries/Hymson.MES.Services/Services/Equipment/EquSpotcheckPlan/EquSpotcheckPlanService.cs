@@ -15,6 +15,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Common;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.CoreServices.Events.Equipment;
 using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
@@ -529,7 +530,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                         UnitId = thisEquSpotcheckItem.UnitId,
                         OperationContent = thisEquSpotcheckItem.OperationContent ?? "",
                         Components = thisEquSpotcheckItem.Components ?? "",
-                        Remark = thisEquSpotcheckItem.Remark ?? "",
+                        //Remark = thisEquSpotcheckItem.Remark ?? "",
                         ReferenceValue = thisEquSpotcheckTemplateItemRelation?.Center,
                         UpperLimit = thisEquSpotcheckTemplateItemRelation?.UpperLimit,
                         LowerLimit = thisEquSpotcheckTemplateItemRelation?.LowerLimit,
@@ -548,7 +549,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                         SpotCheckTaskId = equSpotcheckTask.Id,
                         SpotCheckItemSnapshotId = equSpotcheckTask.Id,
                         InspectionValue = "",
-                        IsQualified = TrueOrFalseEnum.No,
+                        IsQualified = TrueFalseEmptyEnum.No,
                         Remark = equSpotcheckTaskSnapshotItem.Remark,
 
                         Id = IdGenProvider.Instance.CreateId(),
