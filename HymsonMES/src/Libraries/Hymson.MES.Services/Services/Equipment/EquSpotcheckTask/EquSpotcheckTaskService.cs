@@ -26,6 +26,7 @@ using Hymson.MES.Services.Services.EquEquipmentRecord;
 using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.EquEquipmentRecord;
+using Hymson.MES.Core.Enums.Common;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -230,7 +231,8 @@ namespace Hymson.MES.Services.Services.Equipment
             var entitys = await _equSpotcheckTaskRepository.GetByIdsAsync(ids);
             if (entitys != null)
             {
-                if (!entitys.Any(x => x.Status == EquSpotcheckTaskStautusEnum.WaitInspect))
+                var isDeleteEntitys = entitys.Where(x => x.Status != EquSpotcheckTaskStautusEnum.WaitInspect);
+                if (isDeleteEntitys.Any())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15904));
                 }
@@ -454,37 +456,6 @@ namespace Hymson.MES.Services.Services.Equipment
 
             List<TaskItemUnionSnapshotView> outViews = new();
 
-            //var result = from a in taskitem
-            //             join b in taskitemSnap on a.SpotCheckItemSnapshotId equals b.Id
-            //             select new TaskItemUnionSnapshotView
-            //             {
-            //                 Id = a.Id,
-            //                 SpotCheckTaskId = a.SpotCheckTaskId,
-            //                 SpotCheckItemSnapshotId = b.Id,
-
-            //                 // 映射其他属性
-            //                 InspectionValue = a.InspectionValue,
-            //                 IsQualified = a.IsQualified,
-            //                 Remark = a.Remark,
-            //                 SiteId = a.SiteId,
-
-            //                 //snapshot
-            //                 Code = b.Code,
-            //                 Name = b.Name,
-            //                 Status = b.Status,
-            //                 DataType = b.DataType,
-            //                 CheckType = b.CheckType,
-            //                 CheckMethod = b.CheckMethod,
-            //                 UnitId = b.UnitId,
-            //                 Unit = "",
-            //                 OperationContent = b.OperationContent,
-            //                 Components = b.Components,
-            //                 LowerLimit = b.LowerLimit,
-            //                 ReferenceValue = b.ReferenceValue,
-            //                 UpperLimit = b.UpperLimit
-
-            //             };
-
             try
             {
                 foreach (var item in taskitem)
@@ -674,6 +645,14 @@ namespace Hymson.MES.Services.Services.Equipment
                     Ids = beforeAttachments.Select(s => s.AttachmentId)
                 });
             }
+
+            //修改检验状态
+            rows += await OperationOrderAsync(new EquSpotcheckTaskOrderOperationStatusDto
+            {
+                OrderId = requestDto.SpotCheckTaskId,
+                OperationType = EquSpotcheckOperationTypeEnum.Start
+            });
+
             //更新task操作时间
             rows += await _equSpotcheckTaskRepository.UpdateAsync(taskEntity);
             if (snapshotPlanEntitys != null)
@@ -758,7 +737,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var operationType = EquSpotcheckOperationTypeEnum.Complete;
 
             //有任一不合格，完成
-            if (sampleDetailEntities.Any(X => X.IsQualified == TrueOrFalseEnum.No))
+            if (sampleDetailEntities.Any(X => X.IsQualified == TrueFalseEmptyEnum.No))
             {
                 entity.Status = EquSpotcheckTaskStautusEnum.Completed;
                 entity.IsQualified = TrueOrFalseEnum.No;

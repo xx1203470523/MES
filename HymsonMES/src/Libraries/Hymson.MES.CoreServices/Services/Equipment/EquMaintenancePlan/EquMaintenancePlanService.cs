@@ -265,7 +265,7 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                         UnitId = thisEquMaintenanceItem.UnitId,
                         OperationContent = thisEquMaintenanceItem.OperationContent ?? "",
                         Components = thisEquMaintenanceItem.Components ?? "",
-                        Remark = thisEquMaintenanceItem.Remark ?? "",
+                        //Remark = thisEquMaintenanceItem.Remark ?? "",
                         ReferenceValue = thisEquMaintenanceTemplateItemRelation?.Center,
                         UpperLimit = thisEquMaintenanceTemplateItemRelation?.UpperLimit,
                         LowerLimit = thisEquMaintenanceTemplateItemRelation?.LowerLimit,
