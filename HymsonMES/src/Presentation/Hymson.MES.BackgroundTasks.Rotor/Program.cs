@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.BackgroundTasks.Rotor.Extensions;
 using Hymson.MES.BackgroundTasks.Rotor.HostedServices;
+using Hymson.MES.BackgroundTasks.Rotor.Jobs;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Print.Options;
 using Microsoft.Extensions.Configuration;
@@ -48,6 +50,8 @@ Host.CreateDefaultBuilder(args)
        {
            // Use a Scoped container to create jobs. I'll touch on this later
            q.UseMicrosoftDependencyInjectionJobFactory();
+
+           q.AddJobAndTrigger<ManuDataJob>(hostContext.Configuration);
 
            q.UsePersistentStore((persistentStoreOptions) =>
            {

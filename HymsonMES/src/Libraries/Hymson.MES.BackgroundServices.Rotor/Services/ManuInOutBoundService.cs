@@ -13,12 +13,14 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 using MySqlX.XDevAPI.Common;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -146,20 +148,22 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="start"></param>
         /// <param name="rows"></param>
         /// <returns></returns>
-        public async Task InOutBoundAsync(DateTime start, int rows = 200)
+        public async Task InOutBoundAsync(int rows = 200)
         {
+            DateTime now = HymsonClock.Now();
+
             string busKey = "MavelRatorTotal";
             long waterMarkId = await _waterMarkService.GetWaterMarkAsync(busKey);
             DateTime startWaterMarkTime = DateTime.Now;
             if(waterMarkId != 0)
             {
-                startWaterMarkTime = DateTimeOffset.FromUnixTimeMilliseconds(waterMarkId).DateTime;
+                startWaterMarkTime = UnixTimestampMillisToDateTime(waterMarkId);
             }
             else
             {
                 startWaterMarkTime = DateTime.Parse("2024-04-01 01:01:01");
             }
-            start = startWaterMarkTime;
+            DateTime start = startWaterMarkTime;
 
             //TODO
             //1. 中间工序不管进出站，但是参数需要记录保存，上料信息需要记录
@@ -186,6 +190,20 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             string suffixTableName = GetFirstDayOfQuarter(start);
             //1. 根据开始时间，结束时间，读取线体MES过站数据
             List<WorkProcessDto> inOutList = await GetInOutBoundListAsync(start, rows, suffixTableName);
+            if(inOutList == null || inOutList.Count == 0)
+            {
+                //如果数据为空，且当前水位的季度和当前时间的季度不一样，则把水位转为下个季度的初始时间
+                string curDateStr = GetFirstDayOfQuarter(now);
+                if(suffixTableName != curDateStr)
+                {
+                    //LMS数据一个季度一张表，季度不匹配，则水位往后推一个季度
+                    DateTime curQuarter = DateTime.ParseExact(suffixTableName, "yyyyMMdd", CultureInfo.InvariantCulture).AddMonths(3);
+                    long nowTimestamp = GetTimestampInMilliseconds(curQuarter);
+                    await _waterMarkService.RecordWaterMarkAsync(busKey, nowTimestamp);
+                }
+
+                return;
+            }
             List<string> sfcIdList = inOutList.Select(m => m.ID).ToList();
             List<string> sfcList = inOutList.Select(m => m.ProductNo).Distinct().ToList();
             //2. 查询参数信息
@@ -209,11 +227,14 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             List<MesOutDto> mesList = new List<MesOutDto>();
 
             #region 线体LMS数据转成MES数据
-            //过滤MES不需要的数据
-            //List<WorkProcessDto> mesList = inOutList.Where(m => workPosCodeList.Contains(m.WorkPosNo) == true).ToList();
-            //依次处理每个条码的数据
+
             foreach(var item in inOutList)
             {
+                //处理条码为空的异常数据
+                if(string.IsNullOrEmpty(item.ProductNo) == true)
+                {
+                    continue;
+                }
                 //获取工位类型
                 WorkPosDto? curWorkPos = workPosList.Where(m => item.WorkPosNo == m.WorkPosNo).FirstOrDefault();
                 if(curWorkPos == null)
@@ -364,15 +385,16 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             #endregion
 
+            //水位数据更新
+            DateTime? maxStartTime = inOutList.Max(x => x.StartTime);
+            long timestamp = GetTimestampInMilliseconds(maxStartTime);
+
             //MES数据入库
             using var trans = TransactionHelper.GetTransactionScope();
 
             await _manuSfcCirculationRepository.InsertRangeAsync(circulaList);
             await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
-            DateTime maxCreateTime = inOutList.Max(x => x.CreateTime);
-            string maxCreateTimeStr = maxCreateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            long timestamp = (DateTimeOffset.Parse(maxCreateTimeStr)).ToUnixTimeMilliseconds();
-            rows += await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
+            await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
 
             trans.Complete();
         }
@@ -397,8 +419,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 SELECT TOP {rows} * 
                 FROM Work_Process_{suffixTableName} wp 
                 WHERE IsDeleted = 0
-                AND CreateTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.000")}'
-                ORDER BY CreateTime ASC;
+                AND StartTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
+                ORDER BY StartTime ASC;
             ";
 
             List<WorkProcessDto> dbList = await _workProcessRepository.GetList(sql);
@@ -406,10 +428,6 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             {
                 return resultList;
             }
-
-            //resultList = dbList.Cast<WorkProcessDto>().ToList();
-            //resultList = dbList.OfType<WorkProcessDto>().ToList();
-            //resultList = dbList.Select(m => m as WorkProcessDto).ToList();
 
             return dbList;
         }
@@ -448,8 +466,6 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 List<WorkProcessDataDto> dbList = await _workProcessDataRepository.GetList(sql);
                 allDbList.AddRange(dbList);
             }
-
-            //resultLit = allDbList.OfType<WorkProcessDataDto>().ToList();
 
             return allDbList;
         }
@@ -527,8 +543,6 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 List<WorkOrderRelationDto> dbList = await _workOrderRelationRepository.GetList(sql);
                 allDbList.AddRange(dbList);
             }
-
-            //resultLit = allDbList.OfType<WorkOrderRelationDto>().ToList();
 
             return allDbList;
         }
@@ -736,5 +750,41 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             return datetime.ToString("yyyyMMdd");
         }
+
+        /// <summary>
+        /// 转为毫秒时间戳
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        private long GetTimestampInMilliseconds(DateTime ?dateTime)
+        {
+            if(dateTime == null)
+            {
+                return 0;
+            }
+
+            // 首先将本地时间转换为UTC时间  
+            DateTime utcDateTime = ((DateTime)dateTime).ToUniversalTime();
+            // 然后计算UTC时间与Unix纪元（1970年1月1日UTC）之间的差值  
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan timeSpan = utcDateTime - epoch;
+            return (long)timeSpan.TotalMilliseconds;
+        }
+
+        /// <summary>
+        /// 将Unix时间戳（毫秒）转换为DateTime  
+        /// </summary>
+        /// <param name="timestamp"></param>
+        /// <returns></returns>
+        private DateTime UnixTimestampMillisToDateTime(long timestamp)
+        {
+            // 将Unix时间戳转换为UTC DateTime  
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            DateTime utcDateTime = epoch.AddMilliseconds(timestamp);
+            // 然后将UTC DateTime转换为本地时间  
+            DateTime localDateTime = utcDateTime.ToLocalTime();
+            return localDateTime;
+        }
+
     }
 }
