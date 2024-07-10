@@ -29,7 +29,6 @@ namespace Hymson.MES.Api.Controllers.Report
             _logger = logger;
         }
 
-
         /// <summary>
         /// 分页查询列表（不良报告）
         /// </summary>
@@ -77,6 +76,5 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _badRecordReportService.GetLogPageDetailListAsync(request);
         }
-
     }
 }
