@@ -1,13 +1,16 @@
 {
   "profiles": {
-    "Hymson.MES.BackgroundTasks": {
+    "BackgroundTasks.Stator【Development】": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "BackgroundTasks.Stator【Staging】": {
       "commandName": "Project",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Staging"
       }
-    },
-    "Docker": {
-      "commandName": "Docker"
     }
   }
 }

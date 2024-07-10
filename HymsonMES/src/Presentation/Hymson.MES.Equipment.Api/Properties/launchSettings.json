@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Hymson.MES.Equipment.Api【开发环境】": {
+    "Hymson.MES.Equipment.Api【Development】": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -10,7 +10,7 @@
       "dotnetRunMessages": true,
       "applicationUrl": "http://*:5022"
     },
-    "Hymson.MES.Equipment.Api【测试环境】": {
+    "Hymson.MES.Equipment.Api【Staging】": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

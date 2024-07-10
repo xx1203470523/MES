@@ -85,7 +85,7 @@
 	  </EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Jobs\" />
+	  <Folder Include="Jobs\Buz\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Libraries\Hymson.MES.BackgroundServices.NIO\Hymson.MES.BackgroundServices.NIO.csproj" />

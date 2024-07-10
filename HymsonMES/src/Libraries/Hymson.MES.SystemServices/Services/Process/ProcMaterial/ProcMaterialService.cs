@@ -57,7 +57,7 @@ namespace Hymson.MES.SystemServices.Services.Process
         {
             if (requestDtos == null || !requestDtos.Any()) return 0;
 
-            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) return 0;
 
             var resposeBo = await ConvertMaterialListAsync(configEntities.FirstOrDefault(), requestDtos);

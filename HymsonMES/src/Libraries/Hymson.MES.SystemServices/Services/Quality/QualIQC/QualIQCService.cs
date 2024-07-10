@@ -80,7 +80,7 @@ namespace Hymson.MES.SystemServices.Services.Quality
             if (dto == null || dto.Details == null) return 0;
             if (!dto.Details.Any()) return 0;
 
-            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) return 0;
 
             var configEntity = configEntities.FirstOrDefault();
