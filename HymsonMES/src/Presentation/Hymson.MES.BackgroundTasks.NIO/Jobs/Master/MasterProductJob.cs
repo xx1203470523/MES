@@ -18,8 +18,7 @@ namespace Hymson.MES.BackgroundTasks.NIO
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="tracingSourceSFCService"></param>
-        public MasterProductJob(ILogger<MasterProductJob> logger,
-            IMasterDataPushService masterDataPushService)
+        public MasterProductJob(ILogger<MasterProductJob> logger, IMasterDataPushService masterDataPushService)
         {
             _logger = logger;
             _masterDataPushService = masterDataPushService;

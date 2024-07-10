@@ -1,8 +1,11 @@
-﻿using Hymson.Infrastructure.Mapper;
+﻿using AutoMapper;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Mapper;
 using Hymson.MES.BackgroundTasks;
 using Hymson.MES.BackgroundTasks.HostedServices;
 using Hymson.MES.BackgroundTasks.Jobs;
+using Hymson.MES.BackgroundTasks.Jobs.Manufacture;
+using Hymson.MES.BackgroundTasks.Jobs.Quality;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Print.Options;
 using Microsoft.Extensions.Configuration;
@@ -10,10 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using Quartz;
-using System.Reflection;
-using AutoMapper;
-using Hymson.MES.BackgroundTasks.Jobs.Manufacture;
-using Hymson.MES.BackgroundTasks.Jobs.Quality;
 
 try
 {
@@ -71,6 +70,7 @@ Host.CreateDefaultBuilder(args)
 
            #endregion
 
+           /*
            q.UsePersistentStore((persistentStoreOptions) =>
            {
                persistentStoreOptions.UseProperties = true;
@@ -82,6 +82,7 @@ Host.CreateDefaultBuilder(args)
                persistentStoreOptions.SetProperty("quartz.scheduler.instanceId", assemblyName + hostContext.HostingEnvironment.EnvironmentName + programName);
                persistentStoreOptions.UseMySql(mySqlConnection);
            });
+           */
        });
 
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
