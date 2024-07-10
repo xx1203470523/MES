@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Mavel;
+using Hymson.MES.Core.Enums.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
 
 namespace Hymson.MES.BackgroundServices.NIO
@@ -14,7 +16,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(NioPushSwitchEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -28,7 +30,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(NioPushSwitchEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -42,7 +44,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -51,12 +53,19 @@ namespace Hymson.MES.BackgroundServices.NIO
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 根据场景获取数据
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <returns></returns>
+        Task<NioPushSwitchEntity> GetBySceneAsync(BuzSceneEnum scene);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<NioPushSwitchEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -70,7 +79,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<NioPushSwitchEntity>> GetEntitiesAsync(NioPushSwitchQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

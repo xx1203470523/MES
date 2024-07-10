@@ -1,5 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums.Plan;
+using Hymson.MES.Core.Enums.Mavel;
 
 namespace Hymson.MES.BackgroundServices.NIO
 {
@@ -14,7 +14,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <summary>
         /// 业务场景;这里不允许0的数据存在；
         /// </summary>
-        public int BuzScene { get; set; }
+        public BuzSceneEnum BuzScene { get; set; }
 
         /// <summary>
         /// 业务类型;1：转子线；2：定子线；

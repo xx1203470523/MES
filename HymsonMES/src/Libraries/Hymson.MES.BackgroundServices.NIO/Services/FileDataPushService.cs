@@ -1,4 +1,4 @@
-﻿using RestSharp;
+﻿using Hymson.MES.Core.Enums.Mavel;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -8,28 +8,45 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
     public class FileDataPushService : BasePushService
     {
         /// <summary>
+        /// 仓储接口（蔚来推送开关）
+        /// </summary>
+        private readonly INioPushSwitchRepository _nioPushSwitchRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
-        public FileDataPushService() { }
+        /// <param name="nioPushSwitchRepository"></param>
+        public FileDataPushService(INioPushSwitchRepository nioPushSwitchRepository)
+        {
+            _nioPushSwitchRepository = nioPushSwitchRepository;
+        }
 
         /// <summary>
         /// 主数据（获取预授权上传URL）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> DisposableUploadUrlAsync(object jsonBody)
+        public async Task DisposableUploadUrlAsync()
         {
-            return await ExecuteAsync("/v1/trans/file/disposable_upload_url", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.File_DisposableUpload);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+
+            await ExecuteAsync(switchEntity.Path, "TODO");
         }
 
         /// <summary>
         /// 主数据（获取附件浏览URL）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> AuthorizeUrlAsync(object jsonBody)
+        public async Task AuthorizeUrlAsync()
         {
-            return await ExecuteAsync("/v1/trans/file/authorize_url", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.File_AuthorizeUrl);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+
+            await ExecuteAsync(switchEntity.Path, "TODO");
         }
 
     }

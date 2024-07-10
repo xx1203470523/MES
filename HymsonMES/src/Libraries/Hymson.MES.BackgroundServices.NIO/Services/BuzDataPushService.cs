@@ -1,4 +1,6 @@
-﻿using RestSharp;
+﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
+using Hymson.MES.BackgroundServices.NIO.Dtos.Process;
+using Hymson.MES.Core.Enums.Mavel;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -8,108 +10,167 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
     public class BuzDataPushService : BasePushService
     {
         /// <summary>
+        /// 仓储接口（蔚来推送开关）
+        /// </summary>
+        private readonly INioPushSwitchRepository _nioPushSwitchRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
-        public BuzDataPushService() { }
+        /// <param name="nioPushSwitchRepository"></param>
+        public BuzDataPushService(INioPushSwitchRepository nioPushSwitchRepository)
+        {
+            _nioPushSwitchRepository = nioPushSwitchRepository;
+        }
 
         /// <summary>
         /// 业务数据（控制项）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> CollectionAsync(object jsonBody)
+        public async Task CollectionAsync()
         {
-            return await ExecuteAsync("/v1/trans/processdata/collection", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Collection);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<CollectionDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<CollectionDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 业务数据（生产业务）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> ProductionAsync(object jsonBody)
+        public async Task ProductionAsync()
         {
-            return await ExecuteAsync("/v1/trans/processdata/production", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Production);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<ProductionDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<ProductionDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 业务数据（材料清单）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> MaterialAsync(object jsonBody)
+        public async Task MaterialAsync()
         {
-            return await ExecuteAsync("/v1/trans/processdata/material", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Material);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<MaterialDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<MaterialDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 业务数据（产品一次合格率）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> PassrateProductAsync(object jsonBody)
+        public async Task PassrateProductAsync()
         {
-            return await ExecuteAsync("/v1/trans/processdata/passrate_product", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_PassrateProduct);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<PassrateProductDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<PassrateProductDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 业务数据（工位一次合格率）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> PassrateStationAsync(object jsonBody)
+        public async Task PassrateStationAsync()
         {
-            return await ExecuteAsync("/v1/trans/processdata/passrate_station", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_PassrateStation);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<PassrateStationDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<PassrateStationDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 业务数据（环境业务）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> DataEnvAsync(object jsonBody)
+        public async Task DataEnvAsync()
         {
-            return await ExecuteAsync("/v1/trans/processdata/dataenv", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_DataEnv);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<DataEnvDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<DataEnvDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 业务数据（缺陷业务）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> IssueAsync(object jsonBody)
+        public async Task IssueAsync()
         {
-            return await ExecuteAsync("/v1/trans/processdata/issue", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Issue);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<IssueDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<IssueDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 业务数据（工单业务）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> WorkOrderAsync(object jsonBody)
+        public async Task WorkOrderAsync()
         {
-            return await ExecuteAsync("/v1/trans/processdata/workorder", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_WorkOrder);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<WorkOrderDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<WorkOrderDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 业务数据（通用业务）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> CommonAsync(object jsonBody)
+        public async Task CommonAsync()
         {
-            return await ExecuteAsync("/v1/trans/processdata/common", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Common);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<CommonDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<CommonDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 业务数据（附件）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> AttachmentAsync(object jsonBody)
+        public async Task AttachmentAsync()
         {
-            return await ExecuteAsync("/v1/trans/processdata/attachment", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Attachment);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<AttachmentDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<AttachmentDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
     }

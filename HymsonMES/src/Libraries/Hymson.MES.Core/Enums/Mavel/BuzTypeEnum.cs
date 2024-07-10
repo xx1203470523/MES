@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Hymson.MES.Core.Enums.Plan
+namespace Hymson.MES.Core.Enums.Mavel
 {
     /// <summary>
     /// 业务类型

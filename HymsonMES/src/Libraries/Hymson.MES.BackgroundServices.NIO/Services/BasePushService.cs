@@ -52,5 +52,34 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             return await client.ExecuteAsync(request);
         }
 
+        /// <summary>
+        /// 公用方法
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public static async Task<RestResponse> ExecuteAsync<T>(NioPushSwitchEntity config, T data)
+        {
+            var TIMESTAMP = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+            var NONCE = Guid.NewGuid().ToString().Replace("-", "");
+            var METHOD = config.Method.ToString().ToUpper();
+            var BODY = data?.ToSerialize();
+            var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, config.Path, null, null, BODY);
+
+            var client = new RestClient(HOST);
+            var request = new RestRequest(config.Path, config.Method);
+            request.AddHeader("appKey", APP_KEY);
+            request.AddHeader("timestamp", TIMESTAMP);
+            request.AddHeader("nonce", NONCE);
+            request.AddHeader("sign", SIGN);
+            request.AddHeader("Accept", "*/*");
+            request.AddHeader("Accept-Encoding", "gzip, deflate, br");
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("Connection", "keep-alive");
+            request.AddHeader("User-Agent", "Pob/1.1.0");
+            request.AddParameter("application/json", BODY, ParameterType.RequestBody);
+            return await client.ExecuteAsync(request);
+        }
+
     }
 }

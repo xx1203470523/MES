@@ -1,12 +1,18 @@
 ﻿using System.ComponentModel;
 
-namespace Hymson.MES.Core.Enums.Plan
+namespace Hymson.MES.Core.Enums.Mavel
 {
     /// <summary>
     /// 业务场景
     /// </summary>
     public enum BuzSceneEnum
     {
+        /// <summary>
+        /// 总开关
+        /// </summary>
+        [Description("总开关")]
+        All = 0,
+
         /// <summary>
         /// 主数据（产品）
         /// </summary>
@@ -48,7 +54,7 @@ namespace Hymson.MES.Core.Enums.Plan
         /// 业务数据（控制项）
         /// </summary> 
         [Description("业务数据（控制项）")]
-        Buz_Station = 201,
+        Buz_Collection = 201,
         /// <summary>
         /// 业务数据（生产业务）
         /// </summary> 
@@ -93,7 +99,19 @@ namespace Hymson.MES.Core.Enums.Plan
         /// 业务数据（附件）
         /// </summary> 
         [Description("业务数据（附件）")]
-        Buz_Attachment = 210
+        Buz_Attachment = 210,
+
+
+        /// <summary>
+        /// 文件（获取预授权上传URL）
+        /// </summary> 
+        [Description("文件（获取预授权上传URL）")]
+        File_DisposableUpload = 301,
+        /// <summary>
+        /// 文件（获取附件浏览URL）
+        /// </summary> 
+        [Description("文件（获取附件浏览URL）")]
+        File_AuthorizeUrl = 302
 
     }
 }

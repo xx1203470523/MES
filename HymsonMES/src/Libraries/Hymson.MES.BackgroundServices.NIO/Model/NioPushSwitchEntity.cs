@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Mavel;
 
 namespace Hymson.MES.BackgroundServices.NIO
 {
@@ -22,9 +23,14 @@ namespace Hymson.MES.BackgroundServices.NIO
         public string Path { get; set; }
 
         /// <summary>
+        /// 请求路径
+        /// </summary>
+        public RestSharp.Method Method { get; set; }
+
+        /// <summary>
         /// 业务场景;0：表示总开关；
         /// </summary>
-        public int BuzScene { get; set; }
+        public BuzSceneEnum BuzScene { get; set; }
 
         /// <summary>
         /// 是否启用推送;0：不推送；1：推送；

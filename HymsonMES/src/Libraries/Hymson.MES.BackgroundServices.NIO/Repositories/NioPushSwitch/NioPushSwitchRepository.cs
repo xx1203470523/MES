@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -78,10 +79,21 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetStatorDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
+        }
+
+        /// <summary>
+        /// 根据场景获取数据
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <returns></returns>
+        public async Task<NioPushSwitchEntity> GetBySceneAsync(BuzSceneEnum scene)
+        {
+            using var conn = GetStatorDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<NioPushSwitchEntity>(GetBySceneSql, new { BuzScene = scene });
         }
 
         /// <summary>
@@ -100,7 +112,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<NioPushSwitchEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<NioPushSwitchEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetStatorDbConnection();
             return await conn.QueryAsync<NioPushSwitchEntity>(GetByIdsSql, new { Ids = ids });
@@ -170,6 +182,7 @@ namespace Hymson.MES.BackgroundServices.NIO
 
         const string GetByIdSql = @"SELECT * FROM nio_push_switch WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM nio_push_switch WHERE Id IN @Ids ";
+        const string GetBySceneSql = @"SELECT * FROM nio_push_switch WHERE BuzScene = @BuzScene";
 
     }
 }

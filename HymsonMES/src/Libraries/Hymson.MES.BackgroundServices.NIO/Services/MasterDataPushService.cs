@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
 using Hymson.MES.BackgroundServices.NIO.Dtos.Master;
-using RestSharp;
+using Hymson.MES.Core.Enums.Mavel;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -26,79 +26,106 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <summary>
         /// 主数据（产品）
         /// </summary>
-        /// <param name="dtos"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> ProductAsync(IEnumerable<ProductDto> dtos)
+        public async Task ProductAsync()
         {
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Master_Product);
+            if (switchEntity == null) return;
 
+            // TODO: 替换为实际数据
+            var dtos = new List<ProductDto> { };
 
-            var bodyDto = new ClientRequestDto<ProductDto>
-            {
-                SchemaCode = "",
-                List = dtos
-            };
-
-            return await ExecuteAsync("/v1/trans/masterdata/product", bodyDto);
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<ProductDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 主数据（工站）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> StationAsync(object jsonBody)
+        public async Task StationAsync()
         {
-            return await ExecuteAsync("/v1/trans/masterdata/station", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Master_Station);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<StationDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<StationDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 主数据（控制项）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> FieldAsync(object jsonBody)
+        public async Task FieldAsync()
         {
-            return await ExecuteAsync("/v1/trans/masterdata/field", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Master_Field);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<FieldDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<FieldDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 主数据（一次合格率目标）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> PassrateTargetAsync(object jsonBody)
+        public async Task PassrateTargetAsync()
         {
-            return await ExecuteAsync("/v1/trans/masterdata/passrate_target", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Master_PassrateTarget);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<PassrateTargetDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<PassrateTargetDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 主数据（环境监测）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> EnvFieldAsync(object jsonBody)
+        public async Task EnvFieldAsync()
         {
-            return await ExecuteAsync("/v1/trans/masterdata/envfield", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Master_EnvField);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<EnvFieldDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<EnvFieldDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 主数据（人员资质）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> PersonCertAsync(object jsonBody)
+        public async Task PersonCertAsync()
         {
-            return await ExecuteAsync("/v1/trans/masterdata/personcert", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Master_PersonCert);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<PersonCertDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<PersonCertDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
         /// <summary>
         /// 主数据（排班）
         /// </summary>
-        /// <param name="jsonBody"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> TeamSchedulingAsync(object jsonBody)
+        public async Task TeamSchedulingAsync()
         {
-            return await ExecuteAsync("/v1/trans/masterdata/teamscheduling", jsonBody);
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Master_TeamScheduling);
+            if (switchEntity == null) return;
+
+            // TODO: 替换为实际数据
+            var dtos = new List<TeamSchedulingDto> { };
+
+            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<TeamSchedulingDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
         }
 
     }
