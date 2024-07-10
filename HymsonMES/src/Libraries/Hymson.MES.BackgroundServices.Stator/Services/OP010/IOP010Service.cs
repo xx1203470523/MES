@@ -1,7 +1,7 @@
 ﻿namespace Hymson.MES.BackgroundServices.Stator.Services
 {
     /// <summary>
-    /// Hello接口
+    /// 服务接口
     /// </summary>
     public interface IOP010Service
     {

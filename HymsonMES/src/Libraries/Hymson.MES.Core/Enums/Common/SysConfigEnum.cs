@@ -18,9 +18,9 @@ namespace Hymson.MES.Core.Enums
         [Description("AQLPlan")]
         AQLPlan = 2,
         /// <summary>
-        /// ERP请求站点（默认值）
+        /// 请求站点（默认值）
         /// </summary>
-        [Description("ERPSite")]
-        ERPSite = 3
+        [Description("MainSite")]
+        MainSite = 3
     }
 }

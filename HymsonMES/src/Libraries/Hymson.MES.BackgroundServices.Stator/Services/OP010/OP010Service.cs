@@ -1,13 +1,11 @@
-﻿using Hymson.MES.BackgroundServices.Stator.Model;
-using Hymson.MES.Core.Constants.Manufacture;
-using Hymson.MES.Data.Repositories.Common.Query;
+﻿using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
     /// <summary>
-    /// 
+    /// 服务
     /// </summary>
     public class OP010Service : IOP010Service
     {

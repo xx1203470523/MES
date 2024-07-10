@@ -97,7 +97,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
         {
             if (requestDtos == null || !requestDtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
-            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 
             // 当前对象
@@ -150,7 +150,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
         {
             if (WorkPlanCodes == null || !WorkPlanCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
-            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 
             var configEntity = configEntities.FirstOrDefault()

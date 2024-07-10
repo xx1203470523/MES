@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.BackgroundServices.DependencyInjection;
 using Hymson.MES.BackgroundTasks.NIO.HostedServices;
+using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.Print.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
