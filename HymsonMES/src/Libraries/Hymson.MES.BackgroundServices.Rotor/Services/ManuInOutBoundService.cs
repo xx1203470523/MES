@@ -81,7 +81,17 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <summary>
         /// 服务接口（水位）
         /// </summary>
-        public readonly IWaterMarkService _waterMarkService;
+        private readonly IWaterMarkService _waterMarkService;
+
+        /// <summary>
+        /// 条码表
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
+        /// 条码信息表
+        /// </summary>
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
         /// 站点ID
@@ -101,7 +111,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             ISysConfigRepository sysConfigRepository,
-            IWaterMarkService waterMarkService)
+            IWaterMarkService waterMarkService,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository)
         {
             _workItemInfoRepository = workItemInfoRepository;
             _workProcessDataRepository = workProcessDataRepository;
@@ -113,6 +125,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             _planWorkOrderRepository = planWorkOrderRepository;
             _sysConfigRepository = sysConfigRepository;
             _waterMarkService = waterMarkService;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
         }
 
         /// <summary>
@@ -341,6 +355,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             List<ManuSfcCirculationEntity> circulaList = new List<ManuSfcCirculationEntity>();
             List<ManuSfcStepEntity> stepList = new List<ManuSfcStepEntity>();
+            List<ManuSfcDto> sfcUpdateList = new List<ManuSfcDto>();
 
             #region 整理成MES表结构数据
 
@@ -363,6 +378,18 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode, mesOrder);
                     stepList.Add(step);
+                    if(mesItem.Type == 2)
+                    {
+                        sfcUpdateList.Add(new ManuSfcDto()
+                        {
+                            WorkOrder = mesOrder,
+                            SiteId = SiteID,
+                            Status = SfcStatusEnum.lineUp,
+                            Sfc = mesItem.Sfc,
+                            UpdatedOn = now,
+                            UserId = "LMS-JOB"
+                        });
+                    }
                 }
                 //写入到流转表ManuSfcCirculationEntity
                 if (mesItem.UpMatList.Count > 0)
@@ -395,6 +422,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             await _manuSfcCirculationRepository.InsertRangeAsync(circulaList);
             await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
             await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
+            //await _manuSfcRepository.InsertOrUpdateAsync(sfcUpdateList);
+            await InsertOrUpdateAsync(sfcUpdateList);
 
             trans.Complete();
         }
@@ -684,6 +713,76 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
 
             return dbList!.ToList();
+        }
+
+        /// <summary>
+        /// 插入或者更新条码表
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        private async Task<int> InsertOrUpdateAsync(List<ManuSfcDto> commands)
+        {
+            List<string> sfcList = commands.Select(m => m.Sfc).Distinct().ToList();
+            List<string> existSfcList = new List<string>();
+            List<ManuSfcEntity> addSfcList = new List<ManuSfcEntity>();
+            List<ManuSfcInfoEntity> addSfcInfoList = new List<ManuSfcInfoEntity>();
+
+            ManuSfcStatusQuery sfcQuery = new ManuSfcStatusQuery();
+            sfcQuery.SiteId = (long)commands[0].SiteId!;
+            sfcQuery.Sfcs = sfcList;
+            var dbList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(sfcQuery);
+            //if (dbList == null || dbList.Count() == 0)
+            //{
+            //    return 0;
+            //}
+            List<string> dbSfcList = dbList.Select(m => m.SFC).ToList();
+
+            List<ManuSfcUpdateStatusCommand> updateSfcList = new List<ManuSfcUpdateStatusCommand>();
+            foreach (var item in commands)
+            {
+                if (existSfcList.Contains(item.Sfc) == true)
+                {
+                    continue;
+                }
+                existSfcList.Add(item.Sfc);
+                if (dbSfcList.Contains(item.Sfc) == true) //更新
+                {
+                    updateSfcList.Add(item);
+                }
+                else //插入
+                {
+                    var sfcEntity = new ManuSfcEntity()
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SFC = item.Sfc,
+                        Qty = 1,
+                        SiteId = (long)item.SiteId!,
+                        ScrapQty = 0,
+                        Status = (SfcStatusEnum)item.Status,
+                        CreatedBy = item.UserId,
+                        UpdatedBy = item.UserId
+                    };
+                    addSfcList.Add(sfcEntity);
+                    addSfcInfoList.Add(new ManuSfcInfoEntity()
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SfcId = sfcEntity.Id,
+                        ProcessRouteId = item.WorkOrder?.ProcessRouteId,
+                        ProductBOMId = item.WorkOrder?.ProductBOMId,
+                        ProductId = item.WorkOrder == null ? 0 : item.WorkOrder.ProductId,
+                        WorkOrderId = item.WorkOrder?.Id,
+                        SiteId = (long)item.SiteId,
+                        CreatedBy = item.UserId,
+                        UpdatedBy = item.UserId
+                    });
+                }
+            }
+
+            await _manuSfcRepository.InsertRangeAsync(addSfcList);
+            await _manuSfcRepository.ManuSfcUpdateStatusBySfcsAsync(updateSfcList);
+            await _manuSfcInfoRepository.InsertsAsync(addSfcInfoList);
+
+            return sfcList.Count;
         }
 
         #endregion
