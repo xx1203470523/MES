@@ -25,6 +25,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             AddEventBusServices(services);
 
             AddServices(services);
+            AddRepository(services);
 
             return services;
         }
@@ -37,8 +38,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            // 数据库连接
-            services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
             return services;
         }
 
@@ -63,6 +62,22 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             {
                 services.TryAddSingleton(keyValuePair.Value, keyValuePair.Key);
             }
+        }
+
+        /// <summary>
+        /// 添加仓储依赖
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        private static IServiceCollection AddRepository(this IServiceCollection services)
+        {
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var keyValuePairs = typeFinder.GetInterfaceImplPairs("Repository");
+            foreach (var keyValuePair in keyValuePairs)
+            {
+                services.TryAddSingleton(keyValuePair.Value, keyValuePair.Key);
+            }
+            return services;
         }
 
     }

@@ -1,5 +1,4 @@
-﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
-using Hymson.MES.BackgroundServices.NIO.Dtos.Process;
+﻿using Hymson.MES.BackgroundServices.NIO.Dtos.Buz;
 using Hymson.MES.Core.Enums.Mavel;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
@@ -7,7 +6,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
     /// <summary>
     /// 推送服务（业务数据）
     /// </summary>
-    public class BuzDataPushService : BasePushService
+    public class BuzDataPushService : BasePushService, IBuzDataPushService
     {
         /// <summary>
         /// 仓储接口（蔚来推送开关）
@@ -18,7 +17,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// 构造函数
         /// </summary>
         /// <param name="nioPushSwitchRepository"></param>
-        public BuzDataPushService(INioPushSwitchRepository nioPushSwitchRepository)
+        public BuzDataPushService(INioPushSwitchRepository nioPushSwitchRepository) : base(nioPushSwitchRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
         }
@@ -29,13 +28,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task CollectionAsync()
         {
-            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Collection);
+            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.Buz_Collection);
             if (switchEntity == null) return;
 
             // TODO: 替换为实际数据
             var dtos = new List<CollectionDto> { };
-
-            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<CollectionDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
+            await switchEntity.ExecuteAsync(dtos);
         }
 
         /// <summary>
@@ -44,13 +42,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task ProductionAsync()
         {
-            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Production);
+            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.Buz_Production);
             if (switchEntity == null) return;
 
             // TODO: 替换为实际数据
             var dtos = new List<ProductionDto> { };
-
-            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<ProductionDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
+            await switchEntity.ExecuteAsync(dtos);
         }
 
         /// <summary>
@@ -59,13 +56,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task MaterialAsync()
         {
-            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Material);
+            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.Buz_Material);
             if (switchEntity == null) return;
 
             // TODO: 替换为实际数据
             var dtos = new List<MaterialDto> { };
-
-            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<MaterialDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
+            await switchEntity.ExecuteAsync(dtos);
         }
 
         /// <summary>
@@ -74,13 +70,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task PassrateProductAsync()
         {
-            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_PassrateProduct);
+            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.Buz_PassrateProduct);
             if (switchEntity == null) return;
 
             // TODO: 替换为实际数据
             var dtos = new List<PassrateProductDto> { };
-
-            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<PassrateProductDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
+            await switchEntity.ExecuteAsync(dtos);
         }
 
         /// <summary>
@@ -89,13 +84,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task PassrateStationAsync()
         {
-            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_PassrateStation);
+            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.Buz_PassrateStation);
             if (switchEntity == null) return;
 
             // TODO: 替换为实际数据
             var dtos = new List<PassrateStationDto> { };
-
-            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<PassrateStationDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
+            await switchEntity.ExecuteAsync(dtos);
         }
 
         /// <summary>
@@ -104,13 +98,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task DataEnvAsync()
         {
-            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_DataEnv);
+            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.Buz_DataEnv);
             if (switchEntity == null) return;
 
             // TODO: 替换为实际数据
             var dtos = new List<DataEnvDto> { };
-
-            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<DataEnvDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
+            await switchEntity.ExecuteAsync(dtos);
         }
 
         /// <summary>
@@ -119,13 +112,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task IssueAsync()
         {
-            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Issue);
+            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.Buz_Issue);
             if (switchEntity == null) return;
 
             // TODO: 替换为实际数据
             var dtos = new List<IssueDto> { };
-
-            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<IssueDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
+            await switchEntity.ExecuteAsync(dtos);
         }
 
         /// <summary>
@@ -134,13 +126,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task WorkOrderAsync()
         {
-            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_WorkOrder);
+            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.Buz_WorkOrder);
             if (switchEntity == null) return;
 
             // TODO: 替换为实际数据
             var dtos = new List<WorkOrderDto> { };
-
-            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<WorkOrderDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
+            await switchEntity.ExecuteAsync(dtos);
         }
 
         /// <summary>
@@ -149,13 +140,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task CommonAsync()
         {
-            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Common);
+            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.Buz_Common);
             if (switchEntity == null) return;
 
             // TODO: 替换为实际数据
             var dtos = new List<CommonDto> { };
-
-            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<CommonDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
+            await switchEntity.ExecuteAsync(dtos);
         }
 
         /// <summary>
@@ -164,13 +154,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task AttachmentAsync()
         {
-            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.Buz_Attachment);
+            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.Buz_Attachment);
             if (switchEntity == null) return;
 
             // TODO: 替换为实际数据
             var dtos = new List<AttachmentDto> { };
-
-            await ExecuteAsync(switchEntity.Path, new ClientRequestDto<AttachmentDto> { SchemaCode = switchEntity.SchemaCode, List = dtos });
+            await switchEntity.ExecuteAsync(dtos);
         }
 
     }

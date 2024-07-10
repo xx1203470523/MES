@@ -1,6 +1,6 @@
-﻿using Hymson.MES.BackgroundServices.NIO.Utils;
-using Hymson.Utils;
-using RestSharp;
+﻿using Hymson.MES.BackgroundServices.NIO.Dtos.Master;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Mavel;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -10,75 +10,35 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
     public class BasePushService
     {
         /// <summary>
-        /// 
+        /// 仓储接口（蔚来推送开关）
         /// </summary>
-        public const string HOST = "https://openapi-nexus-stg.nio.com";
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string APP_KEY = "APP17459815";
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string APP_SECRET = "mcqh6XEHPoyvDAbSlXKYR9CCfQfLC4Hj6GAWafgbOmh6ONCkSSDBquhEGXtHKaFS7dOhvdKVPiDTU2zedifWQZ4j5Tuk0d5z4voKsYoUucvOehPC6wHUGWUNP2RvYJPh";
+        private readonly INioPushSwitchRepository _nioPushSwitchRepository;
 
         /// <summary>
-        /// 公用方法
+        /// 构造函数
         /// </summary>
-        /// <param name="path"></param>
-        /// <param name="jsonBody"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static async Task<RestResponse> ExecuteAsync(string path, object jsonBody, Method method = Method.Post)
+        /// <param name="nioPushSwitchRepository"></param>
+        public BasePushService(INioPushSwitchRepository nioPushSwitchRepository)
         {
-            var TIMESTAMP = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
-            var NONCE = Guid.NewGuid().ToString().Replace("-", "");
-            var METHOD = method.ToString().ToUpper();
-            var BODY = jsonBody.ToSerialize();
-            var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, BODY);
-
-            var client = new RestClient(HOST);
-            var request = new RestRequest(path, method);
-            request.AddHeader("appKey", APP_KEY);
-            request.AddHeader("timestamp", TIMESTAMP);
-            request.AddHeader("nonce", NONCE);
-            request.AddHeader("sign", SIGN);
-            request.AddHeader("Accept", "*/*");
-            request.AddHeader("Accept-Encoding", "gzip, deflate, br");
-            request.AddHeader("Content-Type", "application/json");
-            request.AddHeader("Connection", "keep-alive");
-            request.AddHeader("User-Agent", "Pob/1.1.0");
-            request.AddParameter("application/json", BODY, ParameterType.RequestBody);
-            return await client.ExecuteAsync(request);
+            _nioPushSwitchRepository = nioPushSwitchRepository;
         }
 
         /// <summary>
-        /// 公用方法
+        /// 是否允许推送
         /// </summary>
-        /// <param name="config"></param>
-        /// <param name="method"></param>
+        /// <param name="buzSceneEnum"></param>
         /// <returns></returns>
-        public static async Task<RestResponse> ExecuteAsync<T>(NioPushSwitchEntity config, T data)
+        public async Task<NioPushSwitchEntity?> GetSwitchEntityAsync(BuzSceneEnum buzSceneEnum)
         {
-            var TIMESTAMP = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
-            var NONCE = Guid.NewGuid().ToString().Replace("-", "");
-            var METHOD = config.Method.ToString().ToUpper();
-            var BODY = data?.ToSerialize();
-            var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, config.Path, null, null, BODY);
+            // 总开关是否开启
+            var masterSwitchEntity = await _nioPushSwitchRepository.GetBySceneAsync(BuzSceneEnum.All);
+            if (masterSwitchEntity == null || masterSwitchEntity.IsEnabled == TrueOrFalseEnum.No) return default;
 
-            var client = new RestClient(HOST);
-            var request = new RestRequest(config.Path, config.Method);
-            request.AddHeader("appKey", APP_KEY);
-            request.AddHeader("timestamp", TIMESTAMP);
-            request.AddHeader("nonce", NONCE);
-            request.AddHeader("sign", SIGN);
-            request.AddHeader("Accept", "*/*");
-            request.AddHeader("Accept-Encoding", "gzip, deflate, br");
-            request.AddHeader("Content-Type", "application/json");
-            request.AddHeader("Connection", "keep-alive");
-            request.AddHeader("User-Agent", "Pob/1.1.0");
-            request.AddParameter("application/json", BODY, ParameterType.RequestBody);
-            return await client.ExecuteAsync(request);
+            // 子开关是否开启
+            var switchEntity = await _nioPushSwitchRepository.GetBySceneAsync(buzSceneEnum);
+            if (switchEntity == null || switchEntity.IsEnabled == TrueOrFalseEnum.No) return default;
+
+            return switchEntity;
         }
 
     }
