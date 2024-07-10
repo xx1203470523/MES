@@ -52,6 +52,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntities);
 
         /// <summary>
+        /// 批量新增-不分表
+        /// </summary>
+        /// <param name="manuSfcStepEntities"></param>
+        /// <returns></returns>
+        Task<int> InsertRangeMavleAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntities);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuSfcStepEntity"></param>

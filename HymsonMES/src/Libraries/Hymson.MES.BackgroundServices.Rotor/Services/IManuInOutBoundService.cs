@@ -14,9 +14,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <summary>
         /// 进出站
         /// </summary>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
+        /// <param name="rows"></param>
         /// <returns></returns>
-        Task InOutBoundAsync(DateTime start, DateTime end);
+        Task InOutBoundAsync(int rows);
     }
 }
