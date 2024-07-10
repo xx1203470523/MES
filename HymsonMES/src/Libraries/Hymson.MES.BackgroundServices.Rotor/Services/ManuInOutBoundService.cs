@@ -151,7 +151,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //List<WorkPosDto> mesWorkPosList = workPosList.Where(m => m.WorkPosType != 0).ToList();
             List<string> workPosCodeList = workPosList.Select(m => m.WorkPosNo).ToList();
 
-            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ERPSite });
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10139));
@@ -632,7 +632,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             PlanWorkOrderNewQuery query = new PlanWorkOrderNewQuery();
             query.Codes = orderCodeList;
-            query.SiteId = 30654441397841920; //SiteID;
+            query.SiteId = SiteID;
             var dbList = await _planWorkOrderRepository.GetEntitiesAsync(query);
             if(dbList == null)
             {
