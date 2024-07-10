@@ -1,7 +1,5 @@
 ﻿using Hymson.MES.BackgroundServices.NIO.Utils;
-using Hymson.Utils;
 using RestSharp;
-using System.IO;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -11,10 +9,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
     public static class NIOPushClient
     {
         /// <summary>
-        /// 
+        /// 主机
         /// </summary>
         public const string HOST = "https://openapi-nexus-stg.nio.com";
-        public const string SUFFIX = "/qm/ppqm-trans-api";
+        public const string HOSTSUFFIX = "/qm/ppqm-trans-api";
 
         //public const string HOST = "openapi-nexus.nio.com/qm/ppqm-trans-api";
         //public const string HOST = "https://openapi-nexus-stg.nio.com";
@@ -37,13 +35,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> ExecuteAsync(string path, object jsonBody, Method method = Method.Post)
         {
-            path = $"{SUFFIX}{path}";
-
             var TIMESTAMP = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
             var NONCE = $"{Guid.NewGuid()}".Replace("-", "");
             var METHOD = $"{method}".ToUpper();
 
-            var BODY = jsonBody.ToSerialize();
+            var BODY = jsonBody.ToSerializeLower();
             var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, BODY);
 
             var client = new RestClient(HOST);
@@ -72,7 +68,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         public static async Task<RestResponse> ExecuteAsync<T>(this NioPushSwitchEntity config, IEnumerable<T> data)
         {
             if (config == null || data == null || !data.Any()) return new RestResponse { IsSuccessStatusCode = false };
-            var path = $"{SUFFIX}{config.Path}";
+            var path = $"{HOSTSUFFIX}{config.Path}";
 
             var TIMESTAMP = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
             var NONCE = $"{Guid.NewGuid()}".Replace("-", "");
@@ -81,10 +77,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             // 组装数据
             var dataObj = new
             {
-                schemaCode = config.SchemaCode,
-                list = data
+                config.SchemaCode,
+                List = data
             };
-            var BODY = dataObj.ToSerialize() ?? "";
+            var BODY = dataObj.ToSerializeLower() ?? "";
             var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, BODY);
 
             var client = new RestClient(HOST);
