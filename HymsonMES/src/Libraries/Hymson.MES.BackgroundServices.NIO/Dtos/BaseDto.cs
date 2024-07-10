@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.BackgroundServices.NIO.Dtos
+﻿using Newtonsoft.Json;
+
+namespace Hymson.MES.BackgroundServices.NIO.Dtos
 {
     /// <summary>
     /// 基类
@@ -8,11 +10,13 @@
         /// <summary>
         /// 是否已投产, true/false
         /// </summary>
+        [JsonProperty("debug")]
         public bool Debug { get; set; }
 
         /// <summary>
         /// 工单更改的时间, Unix 时间戳, 以秒为单位
         /// </summary>
+        [JsonProperty("updateTime")]
         public string UpdateTime { get; set; }
 
     }

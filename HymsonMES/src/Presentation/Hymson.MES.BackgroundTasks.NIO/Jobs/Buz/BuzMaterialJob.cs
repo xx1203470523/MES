@@ -5,23 +5,23 @@ using Quartz;
 namespace Hymson.MES.BackgroundTasks.NIO
 {
     /// <summary>
-    /// 主数据（产品）
+    /// 业务数据（材料清单）
     /// </summary>
     [DisallowConcurrentExecution]
-    internal class MasterProductJob : IJob
+    internal class BuzMaterialJob : IJob
     {
-        private readonly ILogger<MasterProductJob> _logger;
-        private readonly IMasterDataPushService _masterDataPushService;
+        private readonly ILogger<BuzMaterialJob> _logger;
+        private readonly IBuzDataPushService _buzDataPushService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="masterDataPushService"></param>
-        public MasterProductJob(ILogger<MasterProductJob> logger, IMasterDataPushService masterDataPushService)
+        /// <param name="buzDataPushService"></param>
+        public BuzMaterialJob(ILogger<BuzMaterialJob> logger, IBuzDataPushService buzDataPushService)
         {
             _logger = logger;
-            _masterDataPushService = masterDataPushService;
+            _buzDataPushService = buzDataPushService;
         }
 
         /// <summary>
@@ -33,11 +33,11 @@ namespace Hymson.MES.BackgroundTasks.NIO
         {
             try
             {
-                await _masterDataPushService.ProductAsync();
+                await _buzDataPushService.MaterialAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "推送 -> 主数据（产品）:");
+                _logger.LogError(ex, "推送 -> 业务数据（材料清单）:");
             }
         }
 

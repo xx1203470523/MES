@@ -5,12 +5,12 @@ using Quartz;
 namespace Hymson.MES.BackgroundTasks.NIO
 {
     /// <summary>
-    /// 主数据（产品）
+    /// 主数据（环境监测）
     /// </summary>
     [DisallowConcurrentExecution]
-    internal class MasterProductJob : IJob
+    internal class MasterEnvFieldJob : IJob
     {
-        private readonly ILogger<MasterProductJob> _logger;
+        private readonly ILogger<MasterEnvFieldJob> _logger;
         private readonly IMasterDataPushService _masterDataPushService;
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace Hymson.MES.BackgroundTasks.NIO
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="masterDataPushService"></param>
-        public MasterProductJob(ILogger<MasterProductJob> logger, IMasterDataPushService masterDataPushService)
+        public MasterEnvFieldJob(ILogger<MasterEnvFieldJob> logger, IMasterDataPushService masterDataPushService)
         {
             _logger = logger;
             _masterDataPushService = masterDataPushService;
@@ -33,11 +33,11 @@ namespace Hymson.MES.BackgroundTasks.NIO
         {
             try
             {
-                await _masterDataPushService.ProductAsync();
+                await _masterDataPushService.EnvFieldAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "推送 -> 主数据（产品）:");
+                _logger.LogError(ex, "推送 -> 主数据（环境监测）:");
             }
         }
 

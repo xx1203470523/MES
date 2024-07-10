@@ -33,6 +33,21 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<ProductDto> { };
+            dtos.Add(new ProductDto
+            {
+                VendorProductCode = "合作伙伴总成产品代码",
+                VendorProductName = "合作伙伴产品名称",
+                NioProductCode = "NIO 产品物料号",
+                NioProductName = "NIO 产品名称",
+                NioHardwareRevision = "A.01.01.01",
+                NioSoftwareRevision = "B.01.01.01",
+                NioModel = "NIO 车型",
+                NioProjectName = "seth",
+                Launched = true,
+                Debug = true,
+                UpdateTime = "1662528391"
+            });
+
             await switchEntity.ExecuteAsync(dtos);
         }
 

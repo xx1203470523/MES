@@ -111,7 +111,14 @@ namespace Hymson.MES.Core.Enums.Mavel
         /// 文件（获取附件浏览URL）
         /// </summary> 
         [Description("文件（获取附件浏览URL）")]
-        File_AuthorizeUrl = 302
+        File_AuthorizeUrl = 302,
+
+
+        /// <summary>
+        /// Mock（Hello）
+        /// </summary>
+        [Description("Mock（Hello）")]
+        Mock_Hello = 900
 
     }
 }

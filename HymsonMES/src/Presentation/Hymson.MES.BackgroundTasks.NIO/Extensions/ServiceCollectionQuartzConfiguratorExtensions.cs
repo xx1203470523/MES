@@ -10,16 +10,14 @@ namespace Hymson.MES.BackgroundTasks.NIO.Extensions
     public static class ServiceCollectionQuartzConfiguratorExtensions
     {
         /// <summary>
-        /// 
+        /// 注册
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="quartz"></param>
         /// <param name="config"></param>
         /// <exception cref="Exception"></exception>
-        public static void AddJobAndTrigger<T>(this IServiceCollectionQuartzConfigurator quartz, IConfiguration config)
-        where T : IJob
+        public static void AddJobAndTrigger<T>(this IServiceCollectionQuartzConfigurator quartz, IConfiguration config) where T : IJob
         {
-
             // Use the name of the IJob as the appsettings.json key
             string jobName = typeof(T).Name;
             string assemblyName = Assembly.GetExecutingAssembly().GetName().Name ?? "Hymson.MES.BackgroundTasks.NIO";

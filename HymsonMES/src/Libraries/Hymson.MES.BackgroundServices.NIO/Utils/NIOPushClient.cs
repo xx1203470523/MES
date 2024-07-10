@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.BackgroundServices.NIO.Utils;
 using Hymson.Utils;
 using RestSharp;
+using System.IO;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -13,6 +14,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// 
         /// </summary>
         public const string HOST = "https://openapi-nexus-stg.nio.com";
+        public const string SUFFIX = "/qm/ppqm-trans-api";
+
+        //public const string HOST = "openapi-nexus.nio.com/qm/ppqm-trans-api";
+        //public const string HOST = "https://openapi-nexus-stg.nio.com";
+
         /// <summary>
         /// 
         /// </summary>
@@ -31,9 +37,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> ExecuteAsync(string path, object jsonBody, Method method = Method.Post)
         {
-            var TIMESTAMP = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
-            var NONCE = Guid.NewGuid().ToString().Replace("-", "");
-            var METHOD = method.ToString().ToUpper();
+            path = $"{SUFFIX}{path}";
+
+            var TIMESTAMP = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
+            var NONCE = $"{Guid.NewGuid()}".Replace("-", "");
+            var METHOD = $"{method}".ToUpper();
+
             var BODY = jsonBody.ToSerialize();
             var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, BODY);
 
@@ -49,25 +58,37 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             request.AddHeader("Connection", "keep-alive");
             request.AddHeader("User-Agent", "Pob_chen/1.1.0");
             request.AddParameter("application/json", BODY, ParameterType.RequestBody);
-            return await client.ExecuteAsync(request);
+            var response = await client.ExecuteAsync(request);
+            return response;
         }
 
         /// <summary>
         /// 公用方法
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
         /// <param name="data"></param>
         /// <returns></returns>
         public static async Task<RestResponse> ExecuteAsync<T>(this NioPushSwitchEntity config, IEnumerable<T> data)
         {
-            var TIMESTAMP = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
-            var NONCE = Guid.NewGuid().ToString().Replace("-", "");
-            var METHOD = config.Method.ToString().ToUpper();
-            var BODY = data?.ToSerialize() ?? "";
-            var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, config.Path, null, null, BODY);
+            if (config == null || data == null || !data.Any()) return new RestResponse { IsSuccessStatusCode = false };
+            var path = $"{SUFFIX}{config.Path}";
+
+            var TIMESTAMP = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
+            var NONCE = $"{Guid.NewGuid()}".Replace("-", "");
+            var METHOD = $"{config.Method}".ToUpper();
+
+            // 组装数据
+            var dataObj = new
+            {
+                schemaCode = config.SchemaCode,
+                list = data
+            };
+            var BODY = dataObj.ToSerialize() ?? "";
+            var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, BODY);
 
             var client = new RestClient(HOST);
-            var request = new RestRequest(config.Path, config.Method);
+            var request = new RestRequest(path, config.Method);
             request.AddHeader("appKey", APP_KEY);
             request.AddHeader("timestamp", TIMESTAMP);
             request.AddHeader("nonce", NONCE);
@@ -78,7 +99,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             request.AddHeader("Connection", "keep-alive");
             request.AddHeader("User-Agent", "Pob_chen/1.1.0");
             request.AddParameter("application/json", BODY, ParameterType.RequestBody);
-            return await client.ExecuteAsync(request);
+            var response = await client.ExecuteAsync(request);
+            return response;
         }
 
     }

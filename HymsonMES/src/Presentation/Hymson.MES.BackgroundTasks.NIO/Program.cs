@@ -50,7 +50,28 @@ Host.CreateDefaultBuilder(args)
            q.UseMicrosoftDependencyInjectionJobFactory();
 
            #region jobs
+           /*
+           q.AddJobAndTrigger<BuzAttachmentJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<BuzCollectionJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<BuzCommonJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<BuzDataEnvJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<BuzIssueJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<BuzMaterialJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<BuzPassrateProductJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<BuzPassrateStationJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<BuzProductionJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<BuzWorkOrderJob>(hostContext.Configuration);
+           */
+
+           //q.AddJobAndTrigger<MasterEnvFieldJob>(hostContext.Configuration);
+           //q.AddJobAndTrigger<MasterFieldJob>(hostContext.Configuration);
+           //q.AddJobAndTrigger<MasterPassrateTargetJob>(hostContext.Configuration);
+           //q.AddJobAndTrigger<MasterPersonCertJob>(hostContext.Configuration);
            q.AddJobAndTrigger<MasterProductJob>(hostContext.Configuration);
+           //q.AddJobAndTrigger<MasterStationJob>(hostContext.Configuration);
+           //q.AddJobAndTrigger<MasterTeamSchedulingJob>(hostContext.Configuration);
+
+           //q.AddJobAndTrigger<MockHelloJob>(hostContext.Configuration);
            #endregion
 
            /*

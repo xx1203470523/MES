@@ -25,7 +25,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <returns></returns>
         public async Task<int> InsertAsync(NioPushEntity entity)
         {
-            using var conn = GetStatorDbConnection();
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
         }
 
@@ -36,7 +36,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<NioPushEntity> entities)
         {
-            using var conn = GetStatorDbConnection();
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
         }
 
@@ -47,7 +47,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <returns></returns>
         public async Task<int> UpdateAsync(NioPushEntity entity)
         {
-            using var conn = GetStatorDbConnection();
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
@@ -58,7 +58,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <returns></returns>
         public async Task<int> UpdateRangeAsync(IEnumerable<NioPushEntity> entities)
         {
-            using var conn = GetStatorDbConnection();
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, entities);
         }
 
@@ -69,7 +69,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = GetStatorDbConnection();
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -80,7 +80,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand command) 
         {
-            using var conn = GetStatorDbConnection();
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
         }
 
@@ -91,7 +91,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <returns></returns>
         public async Task<NioPushEntity> GetByIdAsync(long id)
         {
-            using var conn = GetStatorDbConnection();
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<NioPushEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -102,7 +102,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <returns></returns>
         public async Task<IEnumerable<NioPushEntity>> GetByIdsAsync(long[] ids) 
         {
-            using var conn = GetStatorDbConnection();
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<NioPushEntity>(GetByIdsSql, new { Ids = ids });
         }
 
@@ -115,7 +115,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            using var conn = GetStatorDbConnection();
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<NioPushEntity>(template.RawSql, query);
         }
 
@@ -139,7 +139,7 @@ namespace Hymson.MES.BackgroundServices.NIO
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
-            using var conn = GetStatorDbConnection();
+            using var conn = GetMESDbConnection();
             var entitiesTask = conn.QueryAsync<NioPushEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;

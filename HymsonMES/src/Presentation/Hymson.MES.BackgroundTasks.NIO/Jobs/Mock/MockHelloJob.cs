@@ -5,23 +5,23 @@ using Quartz;
 namespace Hymson.MES.BackgroundTasks.NIO
 {
     /// <summary>
-    /// 主数据（产品）
+    /// Mock（Hello）
     /// </summary>
     [DisallowConcurrentExecution]
-    internal class MasterProductJob : IJob
+    internal class MockHelloJob : IJob
     {
-        private readonly ILogger<MasterProductJob> _logger;
-        private readonly IMasterDataPushService _masterDataPushService;
+        private readonly ILogger<MockHelloJob> _logger;
+        private readonly IMockDataPushService _mockDataPushService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="masterDataPushService"></param>
-        public MasterProductJob(ILogger<MasterProductJob> logger, IMasterDataPushService masterDataPushService)
+        /// <param name="mockDataPushService"></param>
+        public MockHelloJob(ILogger<MockHelloJob> logger, IMockDataPushService mockDataPushService)
         {
             _logger = logger;
-            _masterDataPushService = masterDataPushService;
+            _mockDataPushService = mockDataPushService;
         }
 
         /// <summary>
@@ -33,11 +33,11 @@ namespace Hymson.MES.BackgroundTasks.NIO
         {
             try
             {
-                await _masterDataPushService.ProductAsync();
+                await _mockDataPushService.HelloAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "推送 -> 主数据（产品）:");
+                _logger.LogError(ex, "推送 -> Mock（Hello）:");
             }
         }
 
