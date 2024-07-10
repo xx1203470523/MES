@@ -1,5 +1,4 @@
-﻿using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.SystemServices.Dtos;
+﻿using Hymson.MES.SystemServices.Dtos;
 using Hymson.MES.SystemServices.Services.Plan;
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;

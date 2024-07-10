@@ -1,5 +1,4 @@
-﻿using Hymson.MES.BackgroundServices.Stator.Repositories;
-using Hymson.MES.Data.Repositories.Common.Query;
+﻿using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 

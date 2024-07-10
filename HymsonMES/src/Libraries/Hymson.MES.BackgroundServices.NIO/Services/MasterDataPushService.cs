@@ -10,9 +10,18 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
     public class MasterDataPushService : BasePushService
     {
         /// <summary>
+        /// 仓储接口（蔚来推送开关）
+        /// </summary>
+        private readonly INioPushSwitchRepository _nioPushSwitchRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
-        public MasterDataPushService() { }
+        /// <param name="nioPushSwitchRepository"></param>
+        public MasterDataPushService(INioPushSwitchRepository nioPushSwitchRepository)
+        {
+            _nioPushSwitchRepository = nioPushSwitchRepository;
+        }
 
         /// <summary>
         /// 主数据（产品）
@@ -21,6 +30,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public static async Task<RestResponse> ProductAsync(IEnumerable<ProductDto> dtos)
         {
+
+
             var bodyDto = new ClientRequestDto<ProductDto>
             {
                 SchemaCode = "",
