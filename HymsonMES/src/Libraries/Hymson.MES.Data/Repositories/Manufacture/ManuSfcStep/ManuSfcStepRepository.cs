@@ -135,6 +135,26 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 批量新增-不分表
+        /// </summary>
+        /// <param name="manuSfcStepEntities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertRangeMavleAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntities)
+        {
+            if (manuSfcStepEntities == null || !manuSfcStepEntities.Any()) return 0;
+
+            //var keyValuePairs = TableGrouping(manuSfcStepEntities);
+            using var conn = GetMESDbConnection();
+            ////插入分表数据
+            //foreach (var item in keyValuePairs)
+            //{
+            //    await conn.ExecuteAsync(string.Format(InsertSql, item.Key), item.Value);
+            //}
+            //插入主表数据
+            return await conn.ExecuteAsync(string.Format(InsertSql, TEMPLATETABLENAME), manuSfcStepEntities);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuSfcStepEntity"></param>

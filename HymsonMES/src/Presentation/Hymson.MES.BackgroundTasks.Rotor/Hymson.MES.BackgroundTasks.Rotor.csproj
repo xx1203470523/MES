@@ -23,12 +23,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Jobs\Equipment\**" />
-	  <EmbeddedResource Remove="Jobs\Equipment\**" />
-	  <None Remove="Jobs\Equipment\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Remove="appsettings.Development.json" />
 		<None Remove="appsettings.json" />
 		<None Remove="appsettings.Production.json" />
@@ -83,9 +77,6 @@
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Jobs\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Libraries\Hymson.MES.BackgroundServices.Rotor\Hymson.MES.BackgroundServices.Rotor.csproj" />

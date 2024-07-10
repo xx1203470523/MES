@@ -1,6 +1,8 @@
 using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.BackgroundServices.Rotor.Repositories;
+using Hymson.MES.BackgroundServices.Rotor.Services;
 using Hymson.Web.Framework.Filters;
 using Hymson.WebApi.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -52,6 +54,12 @@ namespace Hymson.MES.Equipment.Api
             builder.Services.AddSequenceService(builder.Configuration);
             builder.Services.AddLocalization();
             builder.Services.AddPrintService(builder.Configuration);
+            builder.Services.AddTransient<IManuInOutBoundService, ManuInOutBoundService>();
+            builder.Services.AddTransient<IWorkItemInfoRepository, WorkItemInfoRepository>();
+            builder.Services.AddTransient<IWorkOrderRelationRepository, WorkOrderRelationRepository>();
+            builder.Services.AddTransient<IWorkProcessDataRepository, WorkProcessDataRepository>();
+            builder.Services.AddTransient<IWorkProcessRepository, WorkProcessRepository>();
+            builder.Services.AddTransient<IWorkOrderListRepository, WorkOrderListRepository>();
 
             // 注入nlog日志服务
             builder.AddNLogWeb(builder.Configuration);

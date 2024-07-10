@@ -65,6 +65,8 @@ namespace Hymson.MES.BackgroundServices.CoreServices.Repository
 
         List<T> SqlQueryToList(string sql, object obj = null);
 
+        Task<List<T>> SqlQueryToListAsync(string sql, object obj = null);
+
         T GetId(object pkValue);
 
         #endregion query

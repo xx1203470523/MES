@@ -1,4 +1,5 @@
-﻿using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
+﻿using Hymson.MES.BackgroundServices.Rotor.Services;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos;
 
@@ -11,6 +12,7 @@ using Hymson.MES.EquipmentServices.Services.Qkny.Common;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Equipment.Api.Controllers
@@ -40,6 +42,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly ISfcBindingService _sfcBindingService;
         private readonly IEquCommonService _equCommonService;
 
+        /// <summary>
+        /// 马威转子
+        /// </summary>
+        private readonly IManuInOutBoundService _mavel;
 
         /// <summary>
         /// 构造函数
@@ -51,15 +57,32 @@ namespace Hymson.MES.Equipment.Api.Controllers
             IManufactureService manufactureService,
             IEquCommonService equCommonService,
             IEquipmentCollectService equipmentCollectService,
-            ISfcBindingService sfcBindingService)
+            ISfcBindingService sfcBindingService,
+            IManuInOutBoundService manuInOutBoundService)
         {
             _logger = logger;
             _manufactureService = manufactureService;
             _sfcBindingService = sfcBindingService;
             _equipmentService = equipmentCollectService;
             _equCommonService = equCommonService;
+            _mavel = manuInOutBoundService;
         }
 
+        /// <summary>
+        /// 马威测试
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("mavel")]
+        [AllowAnonymous]
+        public async Task EquipmentHeartbeatAsync()
+        {
+            DateTime beginDate = DateTime.Parse("2024-05-17 11:49:09.340");
+            //DateTime endDate = DateTime.Parse("2024-05-22 13:08:20.273");
+
+
+            await _mavel.InOutBoundAsync(100);
+        }
 
         /// <summary>
         /// 设备心跳
