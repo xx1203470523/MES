@@ -336,7 +336,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetByIdSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND Id IN @ids ";
-        const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId = @SfcId  ";
+        const string GetBySFCSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId = @SfcId  AND  IsUsed=1 ";
         const string GetBySFCNoCheckUsedSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId = @SfcId ";
         const string GetBySFCIdsSql = @"SELECT * FROM manu_sfc_info WHERE IsDeleted = 0 AND SfcId IN @sfcIds  AND  IsUsed=1";
 

@@ -379,7 +379,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 return emptyResult;
             }
-            var sfcinfo = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity?.Id ?? 0);
+            var sfcinfo = await _manuSfcInfoRepository.GetBySFCNoCheckUsedAsync(manuSfcEntity?.Id ?? 0);
             if (sfcinfo == null)
             {
                 return emptyResult;
