@@ -130,12 +130,12 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         }
 
         /// <summary>
-        /// 进站状态
+        /// 进站状态-S
         /// </summary>
         private readonly string ProductStatus_In = "S";
 
         /// <summary>
-        /// 出站状态
+        /// 出站状态-Z
         /// </summary>
         private readonly string ProductStatus_Out = "Z";
 
@@ -186,6 +186,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //4. 中间工序NG后，后面不会在有进出站记录
             //5. 进站不会NG，出站才有NG
             //6. 进站没有参数上传，没有关联数据
+            //7. 进出站是同一条记录
+            //8. 只处理有出站时间，且出站（状态=Z）的数据
+            //9. 只处理出站，进站忽略
 
             //获取MES需要处理管控的工位数据
             List<WorkPosDto> workPosList = GetPosNoList();
@@ -318,7 +321,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 }
 
                 //进站
-                if ((curWorkPos.WorkPosType & 1) == 1 && item.ProductStatus == ProductStatus_In)
+                if ((curWorkPos.WorkPosType & 1) == 1)
                 {
                     mesDto.Type = 1;
                 }
@@ -355,7 +358,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             List<ManuSfcCirculationEntity> circulaList = new List<ManuSfcCirculationEntity>();
             List<ManuSfcStepEntity> stepList = new List<ManuSfcStepEntity>();
-            List<ManuSfcDto> sfcUpdateList = new List<ManuSfcDto>();
+            List<ManuSfcDto> sfcUpdateList = new List<ManuSfcDto>(); //条码表，条码信息表
 
             #region 整理成MES表结构数据
 
@@ -374,22 +377,19 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 }
                 var mesOrder = mesOrderList.Where(m => m.OrderCode == mesItem.OrderCode).FirstOrDefault();
                 //写入到步骤表
-                if(mesItem.Type == 1 || mesItem.Type == 2)
+                if(mesItem.Type == 2)
                 {
                     ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode, mesOrder);
                     stepList.Add(step);
-                    if(mesItem.Type == 2)
+                    sfcUpdateList.Add(new ManuSfcDto()
                     {
-                        sfcUpdateList.Add(new ManuSfcDto()
-                        {
-                            WorkOrder = mesOrder,
-                            SiteId = SiteID,
-                            Status = SfcStatusEnum.lineUp,
-                            Sfc = mesItem.Sfc,
-                            UpdatedOn = now,
-                            UserId = "LMS-JOB"
-                        });
-                    }
+                        WorkOrder = mesOrder,
+                        SiteId = SiteID,
+                        Status = SfcStatusEnum.lineUp,
+                        Sfc = mesItem.Sfc,
+                        UpdatedOn = now,
+                        UserId = "LMS-JOB"
+                    });
                 }
                 //写入到流转表ManuSfcCirculationEntity
                 if (mesItem.UpMatList.Count > 0)
@@ -413,8 +413,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             #endregion
 
             //水位数据更新
-            DateTime? maxStartTime = inOutList.Max(x => x.StartTime);
-            long timestamp = GetTimestampInMilliseconds(maxStartTime);
+            DateTime? maxEndTime = inOutList.Max(x => x.EndTime);
+            long timestamp = GetTimestampInMilliseconds(maxEndTime);
 
             //MES数据入库
             using var trans = TransactionHelper.GetTransactionScope();
@@ -448,8 +448,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 SELECT TOP {rows} * 
                 FROM Work_Process_{suffixTableName} wp 
                 WHERE IsDeleted = 0
-                AND StartTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
-                ORDER BY StartTime ASC;
+                AND EndTime IS NOT NULL
+                AND EndTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
+                AND ProductStatus = '{ProductStatus_Out}'
+                ORDER BY EndTime ASC;
             ";
 
             List<WorkProcessDto> dbList = await _workProcessRepository.GetList(sql);
