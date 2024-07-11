@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests;
+using Hymson.MES.HttpClients.Requests.Rotor;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -25,17 +26,7 @@ namespace Hymson.MES.HttpClients.RotorHandle
             _options = options.Value;
         }
 
-        public Task<bool> MaterialSync(IEnumerable<ProcMaterialEntity> materialEntities)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<bool> ProcedureLineSync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetails)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> ProcedureSync(IEnumerable<ProcProcedureEntity> procedureEntities)
         {
             throw new NotImplementedException();
         }
@@ -53,6 +44,7 @@ namespace Hymson.MES.HttpClients.RotorHandle
 
             return httpResponse.IsSuccessStatusCode;
         }
+
         /// <summary>
         /// 工单取消激活
         /// </summary>
@@ -66,6 +58,7 @@ namespace Hymson.MES.HttpClients.RotorHandle
 
             return httpResponse.IsSuccessStatusCode;
         }
+
         /// <summary>
         /// 工单同步
         /// </summary>
@@ -78,6 +71,52 @@ namespace Hymson.MES.HttpClients.RotorHandle
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             return httpResponse.IsSuccessStatusCode;
+        }
+
+        /// <summary>
+        /// 物料同步
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public async Task<int> MaterialSync(IEnumerable<ProcMaterialEntity> list)
+        {
+            List<RotorMaterialSync> rotorList = Change(list);
+
+            foreach (var rotor in rotorList)
+            {
+                var httpResponse = await _httpClient.PostAsJsonAsync(_options.MaterialSyncRoute, rotor);
+                await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+            }
+
+            return 0;
+
+            List<RotorMaterialSync> Change(IEnumerable<ProcMaterialEntity> list)
+            {
+                return list.Select(m => new RotorMaterialSync()
+                {
+                    MaterialCode = m.MaterialCode,
+                    MaterialName = m.MaterialName,
+                    MatSpecification = m.Specifications ?? "",
+                    MaterialType = m.BuyType == null ? "1" : ((int)m.BuyType!).ToString(),
+                    MaterialVersion = m.Version ?? "",
+                    MaterialUnit = m.Unit ?? "",
+                    BarcodeType = "",
+                    BatchCodeRegular = "",
+                    EffectiveDays = m.ValidTime,
+                    WarnAmount = null,
+                    Enable = true
+                }).ToList();
+            }
+        }
+
+        /// <summary>
+        /// 工序同步
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public async Task<int> ProcedureSync(IEnumerable<ProcProcedureEntity> list)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -19,30 +19,35 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// <param name="rotorWorkOrder"></param>
         /// <returns></returns>
         Task<bool> WorkOrderSync(RotorWorkOrderSync rotorWorkOrder);
+
         /// <summary>
         /// 工单激活
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
         Task<bool> WorkOrderStart(string workOrderCode);
+
         /// <summary>
         /// 工单取消激活
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
         Task<bool> WorkOrderStop(string workOrderCode);
+
         /// <summary>
         /// 物料同步
         /// </summary>
-        /// <param name="materialEntities"></param>
+        /// <param name="list"></param>
         /// <returns></returns>
-        Task<bool> MaterialSync(IEnumerable<ProcMaterialEntity> materialEntities);
+        Task<int> MaterialSync(IEnumerable<ProcMaterialEntity> list);
+
         /// <summary>
         /// 工序同步
         /// </summary>
-        /// <param name="procedureEntities"></param>
+        /// <param name="list"></param>
         /// <returns></returns>
-        Task<bool> ProcedureSync(IEnumerable<ProcProcedureEntity> procedureEntities);
+        Task<int> ProcedureSync(IEnumerable<ProcProcedureEntity> list);
+
         /// <summary>
         /// 工艺路线同步
         /// </summary>
