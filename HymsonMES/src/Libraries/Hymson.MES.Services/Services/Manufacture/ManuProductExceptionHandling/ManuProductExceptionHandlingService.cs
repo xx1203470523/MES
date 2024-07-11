@@ -1591,7 +1591,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
 
                 // 查询条码信息
-                var sfcInfoEntity = sfcInfoEntities.FirstOrDefault(f => f.SfcId == sfcEntity.Id)
+                var sfcInfoEntity = sfcInfoEntities.OrderByDescending(x => x.Id).FirstOrDefault(f => f.SfcId == sfcEntity.Id)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES15446)).WithData("barCode", sfcEntity.SFC);
 
                 // 填充工单
