@@ -81,7 +81,17 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <summary>
         /// 服务接口（水位）
         /// </summary>
-        public readonly IWaterMarkService _waterMarkService;
+        private readonly IWaterMarkService _waterMarkService;
+
+        /// <summary>
+        /// 条码表
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
+        /// 条码信息表
+        /// </summary>
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
         /// 站点ID
@@ -101,7 +111,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             ISysConfigRepository sysConfigRepository,
-            IWaterMarkService waterMarkService)
+            IWaterMarkService waterMarkService,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository)
         {
             _workItemInfoRepository = workItemInfoRepository;
             _workProcessDataRepository = workProcessDataRepository;
@@ -113,15 +125,17 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             _planWorkOrderRepository = planWorkOrderRepository;
             _sysConfigRepository = sysConfigRepository;
             _waterMarkService = waterMarkService;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
         }
 
         /// <summary>
-        /// 进站状态
+        /// 进站状态-S
         /// </summary>
         private readonly string ProductStatus_In = "S";
 
         /// <summary>
-        /// 出站状态
+        /// 出站状态-Z
         /// </summary>
         private readonly string ProductStatus_Out = "Z";
 
@@ -172,6 +186,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //4. 中间工序NG后，后面不会在有进出站记录
             //5. 进站不会NG，出站才有NG
             //6. 进站没有参数上传，没有关联数据
+            //7. 进出站是同一条记录
+            //8. 只处理有出站时间，且出站（状态=Z）的数据
+            //9. 只处理出站，进站忽略
 
             //获取MES需要处理管控的工位数据
             List<WorkPosDto> workPosList = GetPosNoList();
@@ -304,7 +321,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 }
 
                 //进站
-                if ((curWorkPos.WorkPosType & 1) == 1 && item.ProductStatus == ProductStatus_In)
+                if ((curWorkPos.WorkPosType & 1) == 1)
                 {
                     mesDto.Type = 1;
                 }
@@ -341,6 +358,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             List<ManuSfcCirculationEntity> circulaList = new List<ManuSfcCirculationEntity>();
             List<ManuSfcStepEntity> stepList = new List<ManuSfcStepEntity>();
+            List<ManuSfcDto> sfcUpdateList = new List<ManuSfcDto>(); //条码表，条码信息表
 
             #region 整理成MES表结构数据
 
@@ -359,10 +377,19 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 }
                 var mesOrder = mesOrderList.Where(m => m.OrderCode == mesItem.OrderCode).FirstOrDefault();
                 //写入到步骤表
-                if(mesItem.Type == 1 || mesItem.Type == 2)
+                if(mesItem.Type == 2)
                 {
                     ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode, mesOrder);
                     stepList.Add(step);
+                    sfcUpdateList.Add(new ManuSfcDto()
+                    {
+                        WorkOrder = mesOrder,
+                        SiteId = SiteID,
+                        Status = SfcStatusEnum.lineUp,
+                        Sfc = mesItem.Sfc,
+                        UpdatedOn = now,
+                        UserId = "LMS-JOB"
+                    });
                 }
                 //写入到流转表ManuSfcCirculationEntity
                 if (mesItem.UpMatList.Count > 0)
@@ -386,8 +413,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             #endregion
 
             //水位数据更新
-            DateTime? maxStartTime = inOutList.Max(x => x.StartTime);
-            long timestamp = GetTimestampInMilliseconds(maxStartTime);
+            DateTime? maxEndTime = inOutList.Max(x => x.EndTime);
+            long timestamp = GetTimestampInMilliseconds(maxEndTime);
 
             //MES数据入库
             using var trans = TransactionHelper.GetTransactionScope();
@@ -395,6 +422,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             await _manuSfcCirculationRepository.InsertRangeAsync(circulaList);
             await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
             await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
+            //await _manuSfcRepository.InsertOrUpdateAsync(sfcUpdateList);
+            await InsertOrUpdateAsync(sfcUpdateList);
 
             trans.Complete();
         }
@@ -419,8 +448,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 SELECT TOP {rows} * 
                 FROM Work_Process_{suffixTableName} wp 
                 WHERE IsDeleted = 0
-                AND StartTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
-                ORDER BY StartTime ASC;
+                AND EndTime IS NOT NULL
+                AND EndTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
+                AND ProductStatus = '{ProductStatus_Out}'
+                ORDER BY EndTime ASC;
             ";
 
             List<WorkProcessDto> dbList = await _workProcessRepository.GetList(sql);
@@ -684,6 +715,76 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
 
             return dbList!.ToList();
+        }
+
+        /// <summary>
+        /// 插入或者更新条码表
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        private async Task<int> InsertOrUpdateAsync(List<ManuSfcDto> commands)
+        {
+            List<string> sfcList = commands.Select(m => m.Sfc).Distinct().ToList();
+            List<string> existSfcList = new List<string>();
+            List<ManuSfcEntity> addSfcList = new List<ManuSfcEntity>();
+            List<ManuSfcInfoEntity> addSfcInfoList = new List<ManuSfcInfoEntity>();
+
+            ManuSfcStatusQuery sfcQuery = new ManuSfcStatusQuery();
+            sfcQuery.SiteId = (long)commands[0].SiteId!;
+            sfcQuery.Sfcs = sfcList;
+            var dbList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(sfcQuery);
+            //if (dbList == null || dbList.Count() == 0)
+            //{
+            //    return 0;
+            //}
+            List<string> dbSfcList = dbList.Select(m => m.SFC).ToList();
+
+            List<ManuSfcUpdateStatusCommand> updateSfcList = new List<ManuSfcUpdateStatusCommand>();
+            foreach (var item in commands)
+            {
+                if (existSfcList.Contains(item.Sfc) == true)
+                {
+                    continue;
+                }
+                existSfcList.Add(item.Sfc);
+                if (dbSfcList.Contains(item.Sfc) == true) //更新
+                {
+                    updateSfcList.Add(item);
+                }
+                else //插入
+                {
+                    var sfcEntity = new ManuSfcEntity()
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SFC = item.Sfc,
+                        Qty = 1,
+                        SiteId = (long)item.SiteId!,
+                        ScrapQty = 0,
+                        Status = (SfcStatusEnum)item.Status,
+                        CreatedBy = item.UserId,
+                        UpdatedBy = item.UserId
+                    };
+                    addSfcList.Add(sfcEntity);
+                    addSfcInfoList.Add(new ManuSfcInfoEntity()
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SfcId = sfcEntity.Id,
+                        ProcessRouteId = item.WorkOrder?.ProcessRouteId,
+                        ProductBOMId = item.WorkOrder?.ProductBOMId,
+                        ProductId = item.WorkOrder == null ? 0 : item.WorkOrder.ProductId,
+                        WorkOrderId = item.WorkOrder?.Id,
+                        SiteId = (long)item.SiteId,
+                        CreatedBy = item.UserId,
+                        UpdatedBy = item.UserId
+                    });
+                }
+            }
+
+            await _manuSfcRepository.InsertRangeAsync(addSfcList);
+            await _manuSfcRepository.ManuSfcUpdateStatusBySfcsAsync(updateSfcList);
+            await _manuSfcInfoRepository.InsertsAsync(addSfcInfoList);
+
+            return sfcList.Count;
         }
 
         #endregion

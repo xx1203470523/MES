@@ -11,6 +11,9 @@ namespace Hymson.MES.HttpClients.Options
     /// </summary>
     public class RotorOption
     {
+        /// <summary>
+        /// 基础地址
+        /// </summary>
         public string BaseAddressUri { get; set; } = "";
         /// <summary>
         /// 请求token
@@ -24,6 +27,9 @@ namespace Hymson.MES.HttpClients.Options
         /// 设置工单状态，R 进行中，T 暂停
         /// </summary>
         public string SetWorkOrderStatusRoute { get; set; }= "api/Order/SetWorkNoStatus";
-       // public string StopOrderRoute { get; set; } = "api/Order/Stop?id=";
+        /// <summary>
+        /// 物料同步
+        /// </summary>
+        public string MaterialSyncRoute { get; set; } = "/api/Material/Create";
     }
 }
