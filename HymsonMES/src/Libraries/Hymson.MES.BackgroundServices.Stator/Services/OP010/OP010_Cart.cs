@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.BackgroundServices.Stator.Model
+﻿namespace Hymson.MES.BackgroundServices.Stator
 {
     /// <summary>
     /// 

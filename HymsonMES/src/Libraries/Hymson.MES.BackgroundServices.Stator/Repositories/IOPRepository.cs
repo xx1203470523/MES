@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Data.Repositories.Common.Query;
 
-namespace Hymson.MES.BackgroundServices.Stator.Repositories
+namespace Hymson.MES.BackgroundServices.Stator
 {
     /// <summary>
     /// 仓储接口

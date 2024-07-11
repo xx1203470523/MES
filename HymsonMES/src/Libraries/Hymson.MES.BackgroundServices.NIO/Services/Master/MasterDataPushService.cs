@@ -45,7 +45,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 NioProjectName = "seth",
                 Launched = true,
                 Debug = true,
-                UpdateTime = "1662528391"
+                UpdateTime = 1662528391
             });
 
             await switchEntity.ExecuteAsync(dtos);

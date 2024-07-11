@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.BackgroundTasks.Stator;
 using Hymson.MES.BackgroundTasks.Stator.Extensions;
 using Hymson.MES.BackgroundTasks.Stator.HostedServices;
-using Hymson.MES.BackgroundTasks.Stator.Jobs;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,7 +50,7 @@ Host.CreateDefaultBuilder(args)
            q.UseMicrosoftDependencyInjectionJobFactory();
 
            #region jobs
-           q.AddJobAndTrigger<SqlExecuteJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<OP010Job>(hostContext.Configuration);
            #endregion
 
            /*

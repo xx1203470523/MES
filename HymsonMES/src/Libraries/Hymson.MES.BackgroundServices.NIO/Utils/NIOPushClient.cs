@@ -1,4 +1,5 @@
-﻿using Hymson.MES.BackgroundServices.NIO.Utils;
+﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
+using Hymson.MES.BackgroundServices.NIO.Utils;
 using RestSharp;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
@@ -75,9 +76,9 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var METHOD = $"{config.Method}".ToUpper();
 
             // 组装数据
-            var dataObj = new
+            var dataObj = new ClientRequestDto<T>
             {
-                config.SchemaCode,
+                SchemaCode = config.SchemaCode,
                 List = data
             };
             var BODY = dataObj.ToSerializeLower() ?? "";
@@ -95,6 +96,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             request.AddHeader("Connection", "keep-alive");
             request.AddHeader("User-Agent", "Pob_chen/1.1.0");
             request.AddParameter("application/json", BODY, ParameterType.RequestBody);
+            request.Timeout = TimeSpan.FromSeconds(15);
             var response = await client.ExecuteAsync(request);
             return response;
         }

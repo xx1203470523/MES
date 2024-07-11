@@ -11,9 +11,9 @@
         public bool Debug { get; set; }
 
         /// <summary>
-        /// 工单更改的时间, Unix 时间戳, 以秒为单位
+        /// 更改的时间, Unix 时间戳, 以秒为单位
         /// </summary>
-        public string UpdateTime { get; set; }
+        public long UpdateTime { get; set; }
 
     }
 

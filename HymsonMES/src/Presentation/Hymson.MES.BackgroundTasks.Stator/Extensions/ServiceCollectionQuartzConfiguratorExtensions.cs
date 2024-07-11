@@ -22,7 +22,7 @@ namespace Hymson.MES.BackgroundTasks.Stator.Extensions
 
             // Use the name of the IJob as the appsettings.json key
             string jobName = typeof(T).Name;
-            string assemblyName = Assembly.GetExecutingAssembly().GetName().Name ?? "Hymson.MES.BackgroundTasks.NIO";
+            string assemblyName = Assembly.GetExecutingAssembly().GetName().Name ?? "Hymson.MES.BackgroundTasks.Stator";
             // Try and load the schedule from configuration
             var configKey = $"Quartz:{jobName}";
             var cronSchedule = config[configKey];

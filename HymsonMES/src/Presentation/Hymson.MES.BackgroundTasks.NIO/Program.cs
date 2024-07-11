@@ -67,11 +67,11 @@ Host.CreateDefaultBuilder(args)
            //q.AddJobAndTrigger<MasterFieldJob>(hostContext.Configuration);
            //q.AddJobAndTrigger<MasterPassrateTargetJob>(hostContext.Configuration);
            //q.AddJobAndTrigger<MasterPersonCertJob>(hostContext.Configuration);
-           q.AddJobAndTrigger<MasterProductJob>(hostContext.Configuration);
+           //q.AddJobAndTrigger<MasterProductJob>(hostContext.Configuration);
            //q.AddJobAndTrigger<MasterStationJob>(hostContext.Configuration);
            //q.AddJobAndTrigger<MasterTeamSchedulingJob>(hostContext.Configuration);
 
-           //q.AddJobAndTrigger<MockHelloJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<MockHelloJob>(hostContext.Configuration);
            #endregion
 
            /*
