@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 
@@ -93,6 +94,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="businessId"></param>
         /// <returns></returns>
         Task<IEnumerable<InteCustomFieldBusinessEffectuateEntity>> GetBusinessEffectuatesByBusinessIdAsync(long businessId);
+
+        /// <summary>
+        /// 获取自定义字段值
+        /// </summary>
+        /// <param name="businessId"></param>
+        /// <param name="businessType"></param>
+        /// <param name="customFieldName"></param>
+        /// <returns></returns>
+        Task<string?> GetCustomeFieldValue(long businessId, InteCustomFieldBusinessTypeEnum businessType, string customFieldName);
 
         /// <summary>
         /// 根据业务ID硬删除

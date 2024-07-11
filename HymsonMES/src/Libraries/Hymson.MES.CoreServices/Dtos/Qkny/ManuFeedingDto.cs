@@ -206,6 +206,11 @@ namespace Hymson.MES.CoreServices.Dtos.Qkny
         /// </summary>
         public IEnumerable<long>? MaterialIds { get; set; }
 
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
     }
 
     /// <summary>

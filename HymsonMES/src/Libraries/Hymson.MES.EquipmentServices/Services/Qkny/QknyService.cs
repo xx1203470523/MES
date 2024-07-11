@@ -342,7 +342,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             //TODO 和上料保持一致，使用BOM上料
 
             //1. 获取设备基础信息
-            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResLineAsync(dto);
+            EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
             //2. 构造数据
             ManuFeedingMaterialSaveDto saveDto = new ManuFeedingMaterialSaveDto();
@@ -350,6 +350,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             saveDto.Source = ManuSFCFeedingSourceEnum.BOM;
             saveDto.SiteId = equResModel.SiteId;
             saveDto.ResourceId = equResModel.ResId;
+            saveDto.ProcedureId = equResModel.ProcedureId;
             //3. 上料
             var feedResult = await _manuFeedingService.CreateAsync(saveDto);
         }

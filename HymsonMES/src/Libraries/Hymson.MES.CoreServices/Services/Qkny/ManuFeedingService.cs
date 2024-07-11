@@ -32,6 +32,9 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using Hymson.MessagePush.Helper;
 using Microsoft.Extensions.Logging;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.Query;
+using Hymson.MES.Core.Constants.Common;
 
 namespace Hymson.MES.CoreServices.Services.Qkny
 {
@@ -136,6 +139,11 @@ namespace Hymson.MES.CoreServices.Services.Qkny
         private readonly IProcLoadPointLinkResourceRepository _procLoadPointLinkResourceRepository;
 
         /// <summary>
+        /// 自定义字段
+        /// </summary>
+        private readonly IInteCustomFieldBusinessEffectuateRepository _inteCustomFieldBusinessEffectuateRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public ManuFeedingService(
@@ -157,7 +165,8 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
             ISysConfigRepository sysConfigRepository,
-            IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository)
+            IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository,
+            IInteCustomFieldBusinessEffectuateRepository inteCustomFieldBusinessEffectuateRepository)
         {
             _logger = logger;
             _equEquipmentRepository = equEquipmentRepository;
@@ -178,6 +187,7 @@ namespace Hymson.MES.CoreServices.Services.Qkny
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _sysConfigRepository = sysConfigRepository;
             _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
+            _inteCustomFieldBusinessEffectuateRepository = inteCustomFieldBusinessEffectuateRepository;
         }
 
         /// <summary>
@@ -294,6 +304,29 @@ namespace Hymson.MES.CoreServices.Services.Qkny
                     throw new CustomerValidationException(nameof(ErrorCode.MES15507)).WithData("BarCode", entity.BarCode);
                 }
             }
+
+            #region 校验已上料(自制件)条码个数
+
+            if (saveDto.ProcedureId.HasValue)
+            {
+                //查询工序自定义配置
+                var customFieldValue = await _inteCustomFieldBusinessEffectuateRepository.GetCustomeFieldValue(saveDto.ProcedureId.Value, Core.Enums.Integrated.InteCustomFieldBusinessTypeEnum.Procedure, CustomFieldName.PolarReelLoadLimit);
+                var limitCount = string.IsNullOrWhiteSpace(customFieldValue) ? 0 : customFieldValue.ParseToInt();
+                if (limitCount != 0)
+                {
+                    //查询已上料条码个数
+                    var feedingList = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync(new GetByResourceIdAndMaterialIdsQuery
+                    {
+                        ResourceId = saveDto.ResourceId
+                    });
+                    if (feedingList != null && feedingList.Count(x => x.MaterialType != Core.Enums.Warehouse.MaterialInventoryMaterialTypeEnum.PurchaseParts) >= limitCount)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15510));
+                    }
+                }
+            }
+
+            #endregion
 
             #region 上料点上料条码下发到设备
             //上料点才需要下发给设备

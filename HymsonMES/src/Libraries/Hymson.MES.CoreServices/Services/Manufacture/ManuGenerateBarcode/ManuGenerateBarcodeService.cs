@@ -2,6 +2,7 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Common;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
@@ -322,7 +323,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             {
                 BusinessId = bo.EquipmentId.GetValueOrDefault(),
                 BusinessType = InteCustomFieldBusinessTypeEnum.Device,
-                CustomFieldName = "EquMappingCode"
+                CustomFieldName = CustomFieldName.EquMappingCode
             });
             if (entities == null || !entities.Any() || string.IsNullOrWhiteSpace(entities.First().SetValue))
             {

@@ -1,6 +1,8 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Constants.Common;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
@@ -185,6 +187,16 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 获取自定义字段值
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string?> GetCustomeFieldValue(long businessId, InteCustomFieldBusinessTypeEnum businessType, string customFieldName)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteScalarAsync<string>(GetCustomeFieldValueSql, new { BusinessId = businessId, BusinessType = businessType, CustomFieldName = customFieldName });
+        }
+
+        /// <summary>
         /// 批量删除（真删除）
         /// </summary>
         /// <param name="ids"></param>
@@ -226,5 +238,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string DeleteTrueByBusinessIdsSql = @"DELETE FROM inte_custom_field_business_effectuate WHERE BusinessId in @BusinessIds ";
 
         const string GetBusinessEffectuatesByBusinessIdSql = @"SELECT * FROM inte_custom_field_business_effectuate WHERE BusinessId=@BusinessId ";
+
+        const string GetCustomeFieldValueSql= @"SELECT SetValue FROM inte_custom_field_business_effectuate WHERE BusinessId = @BusinessId AND BusinessType = @BusinessType AND CustomFieldName = @CustomFieldName LIMIT 1;";
     }
 }
