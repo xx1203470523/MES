@@ -20,6 +20,7 @@ using MySqlX.XDevAPI.Common;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -379,7 +380,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 //写入到步骤表
                 if(mesItem.Type == 2)
                 {
-                    ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode, mesOrder);
+                    ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode, mesItem.IsPassed, mesOrder);
                     stepList.Add(step);
                     sfcUpdateList.Add(new ManuSfcDto()
                     {
@@ -628,13 +629,14 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="mesOrder"></param>
         /// <returns></returns>
         private ManuSfcStepEntity GetStepEntity(string sfc, int type, string produceCode,
-            PlanWorkOrderEntity ?mesOrder)
+            bool isPassed, PlanWorkOrderEntity ?mesOrder)
         {
             ManuSfcStepEntity step = new ManuSfcStepEntity();
             step.Id = IdGenProvider.Instance.CreateId();
             step.SiteId = SiteID;
             step.SFC = sfc;
             step.Qty = 1;
+            step.ScrapQty = isPassed == true ? 0 : 1; //有报废数量代表不合格
             step.Remark = produceCode; //备注字段存放工序，用于NIO直接取
             step.Operatetype = Core.Enums.Manufacture.ManuSfcStepTypeEnum.Receive;
             step.CurrentStatus = type == 1 ? Core.Enums.SfcStatusEnum.Activity : Core.Enums.SfcStatusEnum.lineUp;
@@ -668,6 +670,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             foreach(var item in upList)
             {
+                if(sfc == item.BarCode)
+                {
+                    continue;
+                }
                 ManuSfcCirculationEntity model = new ManuSfcCirculationEntity();
                 model.Id = IdGenProvider.Instance.CreateId();
                 model.SiteId = SiteID;
@@ -774,6 +780,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         ProductId = item.WorkOrder == null ? 0 : item.WorkOrder.ProductId,
                         WorkOrderId = item.WorkOrder?.Id,
                         SiteId = (long)item.SiteId,
+                        IsUsed = true,
                         CreatedBy = item.UserId,
                         UpdatedBy = item.UserId
                     });
