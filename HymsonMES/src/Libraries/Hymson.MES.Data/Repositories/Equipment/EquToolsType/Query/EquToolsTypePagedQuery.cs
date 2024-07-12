@@ -29,6 +29,11 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         public DateTime[]? UpdatedOn { get; set; }
 
         /// <summary>
+        ///创建时间  时间范围  数组
+        /// </summary>
+        public DateTime[]? CreatedOn { get; set; }
+
+        /// <summary>
         /// 状态;0 禁用 1、启用
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }

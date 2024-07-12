@@ -150,6 +150,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
             {
                 sqlBuilder.Where("Status = @Status");
             }
+            if (pagedQuery.CreatedOn != null && pagedQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = pagedQuery.CreatedOn[0], CreatedOnEnd = pagedQuery.CreatedOn[1] });
+                sqlBuilder.Where("CreatedOn >=@CreatedOnStart AND CreatedOn <@CreatedOnEnd");
+            }
             if (pagedQuery.UpdatedOn != null && pagedQuery.UpdatedOn.Length >= 2)
             {
                 sqlBuilder.AddParameters(new { StartTime = pagedQuery.UpdatedOn[0], EndTime = pagedQuery.UpdatedOn[1] });
