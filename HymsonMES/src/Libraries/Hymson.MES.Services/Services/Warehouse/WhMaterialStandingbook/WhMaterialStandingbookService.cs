@@ -9,15 +9,16 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using System.Transactions;
+using System.Runtime.Versioning;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -34,13 +35,24 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// 物料台账 仓储
         /// </summary>
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
-
+        private readonly IManuFeedingRecordRepository _manuFeedingRecordRepository;
         private readonly AbstractValidator<WhMaterialStandingbookCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialStandingbookModifyDto> _validationModifyRules;
 
         private readonly IWhSupplierRepository _whSupplierRepository;
 
-        public WhMaterialStandingbookService(ICurrentUser currentUser, ICurrentSite currentSite, IWhMaterialStandingbookRepository whMaterialStandingbookRepository, AbstractValidator<WhMaterialStandingbookCreateDto> validationCreateRules, AbstractValidator<WhMaterialStandingbookModifyDto> validationModifyRules, IWhSupplierRepository whSupplierRepository)
+        private readonly IProcResourceRepository _procResourceRepository;
+
+        private readonly IProcLoadPointRepository _procLoadPointRepository;
+
+        public WhMaterialStandingbookService(ICurrentUser currentUser, ICurrentSite currentSite,
+                  IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+                  AbstractValidator<WhMaterialStandingbookCreateDto> validationCreateRules,
+                  AbstractValidator<WhMaterialStandingbookModifyDto> validationModifyRules,
+                  IWhSupplierRepository whSupplierRepository,
+                  IManuFeedingRecordRepository manuFeedingRecordRepository,
+                  IProcResourceRepository procResourceRepository,
+                  IProcLoadPointRepository procLoadPointRepository)
         {
             _currentUser = currentUser;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
@@ -48,6 +60,9 @@ namespace Hymson.MES.Services.Services.Warehouse
             _validationModifyRules = validationModifyRules;
             _currentSite = currentSite;
             _whSupplierRepository = whSupplierRepository;
+            _manuFeedingRecordRepository = manuFeedingRecordRepository;
+            _procResourceRepository = procResourceRepository;
+            _procLoadPointRepository = procLoadPointRepository;
         }
 
         /// <summary>
@@ -171,6 +186,48 @@ namespace Hymson.MES.Services.Services.Warehouse
                 return whMaterialStandingbookEntity.ToModel<WhMaterialStandingbookDto>();
             }
             return new WhMaterialStandingbookDto();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<WhMaterialStandingBookRelationDto> GetWhMaterialStandingBookRelationByIdAsync(long id)
+        {
+
+            return new WhMaterialStandingBookRelationDto();
+        }
+
+        /// <summary>
+        /// 上料信息表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<WhMaterialStandingBookFeedingDto> GetWhMaterialStandingBookFeedingByIdAsync(long id)
+        {
+            var manuFeedingRecordEntity = await _manuFeedingRecordRepository.GetEntity(
+                new ManuFeedingRecordQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    MaterialStandingbookId = id
+                }
+            );
+            var procResourceEntity = await _procResourceRepository.GetByIdAsync(manuFeedingRecordEntity.Id);
+            var whMaterialStandingBookFeeding = new WhMaterialStandingBookFeedingDto()
+            {
+                ResourceCode = procResourceEntity.ResCode,
+                ResourceName = procResourceEntity.ResName,
+                Qty = manuFeedingRecordEntity.Qty ?? 0
+            };
+            if (manuFeedingRecordEntity.FeedingPointId.HasValue)
+            {
+                var procLoadPointEntity = await _procLoadPointRepository.GetByIdAsync(manuFeedingRecordEntity.Id);
+                whMaterialStandingBookFeeding.LoadingPointCode = procLoadPointEntity.LoadPoint;
+                whMaterialStandingBookFeeding.LoadingPointName = procLoadPointEntity.LoadPointName;
+            }
+
+            return whMaterialStandingBookFeeding;
         }
     }
 }

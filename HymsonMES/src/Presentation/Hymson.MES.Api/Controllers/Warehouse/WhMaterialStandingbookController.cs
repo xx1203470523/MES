@@ -94,6 +94,5 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             await _whMaterialStandingbookService.DeletesWhMaterialStandingbookAsync(ids);
         }
-
     }
 }

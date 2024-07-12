@@ -1,4 +1,5 @@
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
 {
@@ -21,5 +22,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <returns></returns>
         Task<int> InsertsAsync(IEnumerable<ManuFeedingRecordEntity> entities);
 
+        /// <summary>
+        /// 获取单条数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuFeedingRecordEntity> GetEntity(ManuFeedingRecordQuery query);
     }
 }
