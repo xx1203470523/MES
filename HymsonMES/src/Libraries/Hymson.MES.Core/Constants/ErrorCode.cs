@@ -858,6 +858,7 @@
         public const string MES13513 = "需要校准时校准周期不可为空";
         public const string MES13514 = "需要校准时校准周期单位不可为空";
         public const string MES13515 = "需要校准时最后校验时间不可为空";
+        public const string MES13516= "工具类型已被工具引用,不能删除!";
         #endregion
 
         #region 环境检验 13600

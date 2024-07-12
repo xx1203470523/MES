@@ -143,6 +143,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
             {
                 sqlBuilder.Where("Code IN @Codes");
             }
+            if (query.ToolTypeIds != null && query.ToolTypeIds.Any())
+            {
+                sqlBuilder.Where("ToolsId IN @ToolTypeIds");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquToolingTypeEntity>(template.RawSql, query);
         }
