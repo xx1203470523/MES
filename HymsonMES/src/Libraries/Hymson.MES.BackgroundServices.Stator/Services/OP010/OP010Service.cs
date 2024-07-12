@@ -41,7 +41,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var businessKey = $"Stator-{typeof(OP010).Name}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(businessKey);
 
-            // 获取步骤表数据
+            // 获取数据
             var opList = await _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
             {
                 StartWaterMarkId = waterMarkId,
@@ -50,6 +50,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             if (opList == null || !opList.Any()) return;
 
             // TODO: 业务逻辑
+
 
 
             using var trans = TransactionHelper.GetTransactionScope();

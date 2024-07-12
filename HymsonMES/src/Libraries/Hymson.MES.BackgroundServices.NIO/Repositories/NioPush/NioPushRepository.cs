@@ -78,7 +78,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -100,7 +100,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<NioPushEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<NioPushEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<NioPushEntity>(GetByIdsSql, new { Ids = ids });
@@ -159,11 +159,11 @@ namespace Hymson.MES.BackgroundServices.NIO
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM nio_push /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM nio_push /**where**/  ";
 
-        const string InsertSql = "INSERT INTO nio_push(  `Id`, `SchemaCode`, `BuzScene`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SchemaCode, @BuzScene, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO nio_push(  `Id`, `SchemaCode`, `BuzScene`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SchemaCode, @BuzScene, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO nio_push(  `Id`, `SchemaCode`, `BuzScene`, `Status`, Content, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SchemaCode, @BuzScene, @Status, @Content, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO nio_push(  `Id`, `SchemaCode`, `BuzScene`, `Status`, Content, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SchemaCode, @BuzScene, @Status, @Content, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE nio_push SET   SchemaCode = @SchemaCode, BuzScene = @BuzScene, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE nio_push SET   SchemaCode = @SchemaCode, BuzScene = @BuzScene, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE nio_push SET   SchemaCode = @SchemaCode, BuzScene = @BuzScene, Status = @Status, Content = @Content, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE nio_push SET   SchemaCode = @SchemaCode, BuzScene = @BuzScene, Status = @Status, Content = @Content, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE nio_push SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE nio_push SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

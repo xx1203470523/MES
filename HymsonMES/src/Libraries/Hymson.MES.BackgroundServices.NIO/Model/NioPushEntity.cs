@@ -27,5 +27,10 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// </summary>
         public PushStatusEnum Status { get; set; }
 
+        /// <summary>
+        /// 内容
+        /// </summary>
+        public string Content { get; set; }
+
     }
 }

@@ -14,12 +14,19 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly INioPushSwitchRepository _nioPushSwitchRepository;
 
         /// <summary>
+        /// 仓储接口（蔚来推送）
+        /// </summary>
+        private readonly INioPushRepository _nioPushRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="nioPushSwitchRepository"></param>
-        public MockDataPushService(INioPushSwitchRepository nioPushSwitchRepository) : base(nioPushSwitchRepository)
+        public MockDataPushService(INioPushSwitchRepository nioPushSwitchRepository, INioPushRepository nioPushRepository)
+            : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
+            _nioPushRepository = nioPushRepository;
         }
 
         /// <summary>

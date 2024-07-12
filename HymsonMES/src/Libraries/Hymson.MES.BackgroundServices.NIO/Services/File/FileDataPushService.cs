@@ -13,12 +13,19 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly INioPushSwitchRepository _nioPushSwitchRepository;
 
         /// <summary>
+        /// 仓储接口（蔚来推送）
+        /// </summary>
+        private readonly INioPushRepository _nioPushRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="nioPushSwitchRepository"></param>
-        public FileDataPushService(INioPushSwitchRepository nioPushSwitchRepository) : base(nioPushSwitchRepository)
+        public FileDataPushService(INioPushSwitchRepository nioPushSwitchRepository, INioPushRepository nioPushRepository)
+            : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
+            _nioPushRepository = nioPushRepository;
         }
 
         /// <summary>
@@ -27,12 +34,13 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task DisposableUploadUrlAsync()
         {
-            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.File_DisposableUpload);
-            if (switchEntity == null) return;
+            var buzScene = BuzSceneEnum.File_DisposableUpload;
+            var config = await GetSwitchEntityAsync(buzScene);
+            if (config == null) return;
 
             // TODO: 替换为实际数据
 
-            await switchEntity.ExecuteAsync("TODO");
+            await config.ExecuteAsync("TODO");
         }
 
         /// <summary>
@@ -41,12 +49,13 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task AuthorizeUrlAsync()
         {
-            var switchEntity = await GetSwitchEntityAsync(BuzSceneEnum.File_AuthorizeUrl);
-            if (switchEntity == null) return;
+            var buzScene = BuzSceneEnum.File_AuthorizeUrl;
+            var config = await GetSwitchEntityAsync(buzScene);
+            if (config == null) return;
 
             // TODO: 替换为实际数据
 
-            await switchEntity.ExecuteAsync("TODO");
+            await config.ExecuteAsync("TODO");
         }
 
     }
