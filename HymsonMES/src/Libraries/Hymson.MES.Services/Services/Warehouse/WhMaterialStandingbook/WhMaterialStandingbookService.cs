@@ -11,8 +11,10 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Warehouse;
@@ -45,6 +47,8 @@ namespace Hymson.MES.Services.Services.Warehouse
 
         private readonly IProcLoadPointRepository _procLoadPointRepository;
 
+        private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
+
         public WhMaterialStandingbookService(ICurrentUser currentUser, ICurrentSite currentSite,
                   IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
                   AbstractValidator<WhMaterialStandingbookCreateDto> validationCreateRules,
@@ -52,7 +56,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                   IWhSupplierRepository whSupplierRepository,
                   IManuFeedingRecordRepository manuFeedingRecordRepository,
                   IProcResourceRepository procResourceRepository,
-                  IProcLoadPointRepository procLoadPointRepository)
+                  IProcLoadPointRepository procLoadPointRepository,
+                  IManuBarCodeRelationRepository manuBarCodeRelationRepository)
         {
             _currentUser = currentUser;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
@@ -63,6 +68,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _manuFeedingRecordRepository = manuFeedingRecordRepository;
             _procResourceRepository = procResourceRepository;
             _procLoadPointRepository = procLoadPointRepository;
+            _manuBarCodeRelationRepository=manuBarCodeRelationRepository;
         }
 
         /// <summary>
@@ -189,12 +195,19 @@ namespace Hymson.MES.Services.Services.Warehouse
         }
 
         /// <summary>
-        /// 
+        /// 获取绑定信息
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public async Task<WhMaterialStandingBookRelationDto> GetWhMaterialStandingBookRelationByIdAsync(long id)
         {
+            //if()
+            //var manuBarCodeRelationEnties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
+            //{
+            //    InputSfcStepId = beforeStepEntity.Id,
+            //    SiteId = _currentSite.SiteId ?? 0,
+            //});
+
 
             return new WhMaterialStandingBookRelationDto();
         }

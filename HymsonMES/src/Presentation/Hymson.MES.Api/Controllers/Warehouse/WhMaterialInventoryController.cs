@@ -188,7 +188,6 @@ namespace Hymson.MES.Api.Controllers.Warehouse
             await _whMaterialInventoryService.UpdateOutsideWhMaterialInventoryAsync(modifyDto);
         }
 
-        
         /// <summary>
         /// 物料条码拆分
         /// </summary>
@@ -200,7 +199,6 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         public async Task<string> BarcodeSplitAdjustAsync(MaterialBarCodeSplitAdjustDto adjustDto)
         {
             return await _whMaterialInventoryService.BarcodeSplitAdjustAsync(adjustDto);
-
         }
 
         /// <summary>

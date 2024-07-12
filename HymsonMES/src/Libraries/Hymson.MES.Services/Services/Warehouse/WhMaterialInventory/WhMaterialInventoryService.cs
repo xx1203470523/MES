@@ -632,12 +632,9 @@ namespace Hymson.MES.Services.Services.Warehouse
                 manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(manuSfcEntity.Id);
             }
 
-
             if (manuSfcInfoEntity != null && manuSfcInfoEntity.Id != 0)
             {
                 planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
-
-
 
                 //更新MANUSFC条码表-父条码
                 updateStatusAndQtyByIdCommand = new UpdateStatusAndQtyByIdCommand
@@ -690,9 +687,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                 UpdatedBy = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
             };
-
-
-
 
             var subWhMEntirty = oldWhMEntirty.ToCopy();
 
@@ -750,8 +744,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                     RelationType = ManuBarCodeRelationTypeEnum.SFC_Combined,
                     BusinessContent = new
                     {
-                        InputMaterialStandingBookd = standingbook?.Id,
-                        OutputMaterialStandingBook = standingbook?.Id
+                        InputMaterialStandingBookId = standingbook?.Id,
+                        OutputMaterialStandingBookId = standingbook?.Id
                     }.ToSerialize(),
                     IsDisassemble = TrueOrFalseEnum.No,
                     DisassembledBy = _currentUser.UserName,
@@ -883,7 +877,6 @@ namespace Hymson.MES.Services.Services.Warehouse
             //指定父条码
             if (IsMergeSFC)
             {
-
                 var newEntity = oldWhMEntirty.Where(w => w.MaterialBarCode == adjustDto.MergeSFC).FirstOrDefault();
 
                 foreach (var entity in oldWhMEntirty)
@@ -950,7 +943,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                 }
             }
 
-
             //更新MANUSFC
             var updateSFCOtherCommand = new UpdateStatusAndQtyBySfcsCommand()
             {
@@ -987,7 +979,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                     };
                 }
 
-
                 inputBarcodeSingle = standbookList.Where(w => w.QuantityResidue != 0).FirstOrDefault();
 
             }
@@ -1002,8 +993,6 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             //物料台账
             var whMaterialStandingbookEntities = new List<WhMaterialStandingbookEntity>();
-
-
 
             foreach (var entity in standbookList)
             {
@@ -1070,11 +1059,11 @@ namespace Hymson.MES.Services.Services.Warehouse
                     OutputBarCodeMaterialId = inputBarcodeSingle.MaterialId,
                     OutputBarCodeWorkOrderId = inputBarcodeSingle.WorkOrderId,
                     OutputBarCodeMode = ManuBarCodeOutputModeEnum.Normal,
-                    RelationType = ManuBarCodeRelationTypeEnum.SFC_Combined,
+                    RelationType = ManuBarCodeRelationTypeEnum.Batch_Combined,
                     BusinessContent = new
                     {
-                        InputMaterialStandingBookd = standingbook?.Id,
-                        OutputMaterialStandingBook = standingbook?.Id
+                        InputMaterialStandingBookId = standingbook?.Id,
+                        OutputMaterialStandingBookId = standingbook?.Id
                     }.ToSerialize(),                   
                     IsDisassemble = TrueOrFalseEnum.No,
                     DisassembledBy = _currentUser.UserName,
@@ -1134,7 +1123,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                 {
 
                 }
-
             }
 
             return returnSFC;
