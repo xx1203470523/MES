@@ -95,6 +95,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
+        /// 生产参数
+        /// </summary>
+        private readonly Data.Repositories.Parameter.IManuProductParameterRepository _manuProductParameterRepository;
+
+        /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteID = 0;
@@ -114,7 +119,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             ISysConfigRepository sysConfigRepository,
             IWaterMarkService waterMarkService,
             IManuSfcRepository manuSfcRepository,
-            IManuSfcInfoRepository manuSfcInfoRepository)
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            Data.Repositories.Parameter.IManuProductParameterRepository manuProductParameterRepository)
         {
             _workItemInfoRepository = workItemInfoRepository;
             _workProcessDataRepository = workProcessDataRepository;
@@ -128,6 +134,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             _waterMarkService = waterMarkService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuProductParameterRepository = manuProductParameterRepository;
         }
 
         /// <summary>
@@ -260,10 +267,20 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     continue;
                 }
 
+                string procedureCode = item.ProcedureCode;
+                if(item.ProcedureCode == "OP710")
+                {
+                    procedureCode = "OP060";
+                }
+                if(item.ProcedureCode == "OP720")
+                {
+                    procedureCode = "OP070";
+                }
+
                 //基础数据
                 MesOutDto mesDto = new MesOutDto();
                 mesDto.Sfc = item.ProductNo;
-                mesDto.ProcedureCode = item.ProcedureCode;
+                mesDto.ProcedureCode = procedureCode;
                 mesDto.IsPassed = item.Result == Result_OK ? true : false;
                 mesDto.Date = item.CreateTime;
                 WorkOrderListDto? curProductOrder = productOrderList.Where(m => m.ProductNo == item.ProductNo).FirstOrDefault();
@@ -360,6 +377,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             List<ManuSfcCirculationEntity> circulaList = new List<ManuSfcCirculationEntity>();
             List<ManuSfcStepEntity> stepList = new List<ManuSfcStepEntity>();
             List<ManuSfcDto> sfcUpdateList = new List<ManuSfcDto>(); //条码表，条码信息表
+            List<Core.Domain.Parameter.ManuProductParameterEntity> manuParamList = new List<Core.Domain.Parameter.ManuProductParameterEntity>();
 
             #region 整理成MES表结构数据
 
@@ -376,11 +394,13 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     continue;
                 }
+                long stepId = 0;
                 var mesOrder = mesOrderList.Where(m => m.OrderCode == mesItem.OrderCode).FirstOrDefault();
                 //写入到步骤表
                 if(mesItem.Type == 2)
                 {
                     ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode, mesItem.IsPassed, mesOrder);
+                    stepId = step.Id;
                     stepList.Add(step);
                     sfcUpdateList.Add(new ManuSfcDto()
                     {
@@ -402,7 +422,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 //写入到参数表
                 if(mesItem.ParamList.Count > 0)
                 {
-
+                    List<Core.Domain.Parameter.ManuProductParameterEntity> addParamList = 
+                        GetParamList(mesItem.ParamList, mesItem.ProcedureCode, stepId, mesItem.Sfc);
+                    manuParamList.AddRange(addParamList);
                 }
                 //写入到NG表
                 if(mesItem.NgList.Count > 0)
@@ -423,10 +445,12 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             await _manuSfcCirculationRepository.InsertRangeAsync(circulaList);
             await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
             await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
-            //await _manuSfcRepository.InsertOrUpdateAsync(sfcUpdateList);
             await InsertOrUpdateAsync(sfcUpdateList);
 
+            //await _manuProductParameterRepository.InsertRangeAsync(manuParamList);
             trans.Complete();
+
+
         }
 
         #endregion
@@ -696,6 +720,41 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// 获取参数列表
+        /// </summary>
+        /// <param name="parammList"></param>
+        /// <returns></returns>
+        private List<Core.Domain.Parameter.ManuProductParameterEntity> GetParamList(List<SfcParamDto> parammList,
+            string produceCode, long stepId, string sfc)
+        {
+            List<Core.Domain.Parameter.ManuProductParameterEntity> resultList = new List<Core.Domain.Parameter.ManuProductParameterEntity>();
+            
+            if(parammList == null || parammList.Count == 0)
+            {
+                return resultList;
+            }
+
+            foreach(var item in parammList)
+            {
+                Core.Domain.Parameter.ManuProductParameterEntity model = new Core.Domain.Parameter.ManuProductParameterEntity();
+                model.Id = IdGenProvider.Instance.CreateId();
+                model.SiteId = SiteID;
+                model.ProcedureId = long.Parse(produceCode.Substring(2));
+                model.SfcstepId = stepId;
+                model.SFC = sfc;
+                model.ParameterId = 1;
+                model.ParameterValue = item.ParamValue;
+                model.CreatedOn = HymsonClock.Now();
+                model.CreatedBy = "LMS-JOB";
+                model.UpdatedBy = model.CreatedBy;
+
+                resultList.Add(model);
+            }
+
+            return resultList;
         }
 
         /// <summary>
