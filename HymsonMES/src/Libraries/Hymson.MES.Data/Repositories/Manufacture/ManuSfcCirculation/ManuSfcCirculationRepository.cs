@@ -396,7 +396,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT * FROM `manu_sfc_circulation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc_circulation`  WHERE Id IN @ids ";
         const string GetListByStartWaterMarkIdSql = @"SELECT * FROM `manu_sfc_circulation` WHERE Id > @StartWaterMarkId ORDER BY Id ASC LIMIT @Rows";
-        const string GetListByStartWaterMarkTimeSql = @"SELECT * FROM `manu_sfc_circulation` WHERE UpdatedOn > @StartWaterMarkTime ORDER BY UpdatedOn ASC LIMIT @Rows";
+        const string GetListByStartWaterMarkTimeSql = @"SELECT * FROM `manu_sfc_circulation` WHERE UpdatedOn > @StartWaterMarkTime and SiteId  = 47024007283048448 ORDER BY UpdatedOn ASC LIMIT @Rows";
 
         const string DisassemblyUpdateSql = "UPDATE manu_sfc_circulation SET " +
             "CirculationType = @CirculationType, IsDisassemble = @IsDisassemble," +

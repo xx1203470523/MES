@@ -19,7 +19,13 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         {
             get
             {
-                return WorkPosNo.Split('.')[0];
+                var code = WorkPosNo.Split('.')[0];
+                if(code.Length == 4)
+                {
+                    code = code.Substring(0,2) + "0" + code.Substring(2);
+                }
+
+                return code;
             }
         }
     }
