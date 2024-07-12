@@ -83,7 +83,20 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [LogDescription("电芯批次导入", BusinessType.IMPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
         public async Task<int> ImportDataAsync([FromForm] UploadSFCBoxDto uploadStockDetailDto)
         {
-            return await _inteSFCBoxService.ImportDataAsync(uploadStockDetailDto);
+            return await _inteSFCBoxService.ImportDataNoRepeatAsync(uploadStockDetailDto);
+        }
+
+
+        /// <summary>
+        /// 电芯批次导入
+        /// </summary>
+        /// <param name="uploadStockDetailDto"></param>
+        /// <returns></returns>
+        [HttpPost("importData2")]
+        [LogDescription("电芯批次导入（过滤重复的）", BusinessType.IMPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<int> ImportDatNoRepeataAsync([FromForm] UploadSFCBoxDto uploadStockDetailDto)
+        {
+            return await _inteSFCBoxService.ImportDataNoRepeatAsync(uploadStockDetailDto);
         }
 
 

@@ -256,6 +256,165 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
         }
 
         /// <summary>
+        /// 重复导入数据（过滤已经导入过的）
+        /// </summary>
+        /// <param name="uploadStockDetailDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        /// <exception cref="ValidationException"></exception>
+        public async Task<int> ImportDataNoRepeatAsync(UploadSFCBoxDto uploadStockDetailDto)
+        {
+            IFormFile formFile = uploadStockDetailDto.File;
+
+            string namestr = uploadStockDetailDto.File.FileName;
+            int filenameindex = namestr.IndexOf('.');
+            var batchNo = string.Empty;
+            if (filenameindex >= 0)
+            {
+                batchNo = namestr.Substring(0, filenameindex).Trim();
+            }
+            if (string.IsNullOrEmpty(batchNo))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16353));
+            }
+
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            IEnumerable<InteSFCBoxImportDto> stockTakeDetailExcelImportDtos;
+            try
+            {
+                stockTakeDetailExcelImportDtos = _excelService.Import<InteSFCBoxImportDto>(memoryStream);
+            }
+            catch (Exception)
+            {
+                //数据导入模板不正确或数据填写异常
+                throw new CustomerValidationException(nameof(ErrorCode.MES16352));
+            }
+
+            //验证导入数据
+            var validationFailures = new List<ValidationFailure>();
+
+            //foreach (var (item, i) in stockTakeDetailExcelImportDtos.Select((item, i) => (item, i)))
+            //{
+            //    var validationResult = await _inteSFCBoxImportValidator.ValidateAsync(item);
+            //    if (!validationResult.IsValid)
+            //    {
+            //        if (validationResult.Errors != null && validationResult.Errors.Any())
+            //        {
+            //            foreach (var validationFailure in validationResult.Errors)
+            //            {
+            //                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+            //                validationFailures.Add(validationFailure);
+            //            }
+            //            break;
+            //        }
+            //    }
+            //    //string[] boxCodes = { item.BoxCode };
+            //    //var boxCodesAny = await _inteSFCBoxRepository.GetByBoxCodesAsync(boxCodes);
+            //    //if (boxCodesAny.Any())
+            //    //{
+            //    //    var validatetion = new ValidationFailure();
+            //    //    validatetion.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+            //    //    validatetion.ErrorMessage = $"{item.BoxCode}已存在";
+            //    //    validationFailures.Add(validatetion);
+            //    //}
+            //}
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+
+            //校验电芯唯一
+            string[] sfcs = stockTakeDetailExcelImportDtos.Select(s => s.SFC).ToArray();
+
+            if (sfcs.Any())
+            {
+                var sfcsQuery = new InteSFCBoxEntityQuery
+                {
+                    SFCs = sfcs
+                };
+
+                var sfcAny = await _inteSFCBoxRepository.GetManuSFCBoxAsync(sfcsQuery);
+
+                //过滤已经存在的，继续导入
+                stockTakeDetailExcelImportDtos = stockTakeDetailExcelImportDtos.Where(a=>!sfcAny.Any(b=>b.SFC.Equals(a.SFC)));
+
+                //if (sfcAny.Any())
+                //{
+                //    var sfchas = sfcAny.Select(s => s.SFC).ToArray();
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES16354)).WithData("SFC", string.Join(",", sfchas));
+                //}
+            }
+
+            //校验箱码只能存在一个批次中
+            string[] boxcodes = stockTakeDetailExcelImportDtos.Select(s => s.BoxCode).Distinct().ToArray();
+
+            //if (boxcodes.Any())
+            //{
+            //    var sfcsQuery = new InteSFCBoxEntityQuery
+            //    {
+            //        BoxCodes = boxcodes,
+            //        NotInBatch = batchNo
+            //    };
+
+            //    var boxAny = await _inteSFCBoxRepository.GetManuSFCBoxAsync(sfcsQuery);
+
+            //    if (boxAny.Any())
+            //    {
+            //        var boxhas = boxAny.Select(s => s.BoxCode).Distinct().ToArray();
+            //        throw new CustomerValidationException(nameof(ErrorCode.MES16355)).WithData("BoxCode", string.Join(",", boxhas));
+            //    }
+            //}
+
+
+            //组装数据
+            var insert = new List<InteSFCBoxEntity>();
+
+
+            foreach (var item in stockTakeDetailExcelImportDtos)
+            {
+                //var Entity = item.ToEntity<InteSFCBoxEntity>();
+                insert.Add(new InteSFCBoxEntity
+                {
+                    BatchNo = batchNo,
+                    SFC = item.SFC,
+                    Grade = item.Grade,
+                    Status = SFCBoxEnum.Start,
+                    BoxCode = item.BoxCode,
+                    OCVB = item.OCVB,
+                    OcvbDate = DateTime.Parse(item.OCVBDate),
+
+                    Weight = item.Weight,
+                    DC = item.DC,
+                    DcDate = DateTime.Parse(item.DCDate),
+                    IMPB = item.IMPB,
+                    SelfDischargeRate = item.SelfDischargeRate,
+
+                    Width = item.Width,
+                    HeightF = item.HeightF,
+                    HeightZ = item.HeightZ,
+
+                    ShoulderHeightZ = item.ShoulderHeightZ,
+                    ShoulderHeightF = item.ShoulderHeightF,
+                    Thickness = item.Thickness,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    Localtime = HymsonClock.Now(),
+                    SiteId = _currentSite?.SiteId ?? 123456,
+                    IsDeleted = 0
+
+                });
+            }
+
+            return await _inteSFCBoxRepository.InsertsAsync(insert);
+
+        }
+
+        /// <summary>
         /// 导入模板下载
         /// </summary>
         /// <param name="stream"></param>

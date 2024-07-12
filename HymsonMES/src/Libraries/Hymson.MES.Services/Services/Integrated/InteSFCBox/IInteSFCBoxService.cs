@@ -19,6 +19,13 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
         Task<int> ImportDataAsync(UploadSFCBoxDto uploadStockDetailDto);
 
         /// <summary>
+        /// 电信批次导入（自动过滤重复的）
+        /// </summary>
+        /// <param name="uploadStockDetailDto"></param>
+        /// <returns></returns>
+        Task<int> ImportDataNoRepeatAsync(UploadSFCBoxDto uploadStockDetailDto);
+
+        /// <summary>
         /// 导入模板下载
         /// </summary>
         /// <param name="stream"></param>
