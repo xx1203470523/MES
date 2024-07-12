@@ -21,6 +21,16 @@ namespace Hymson.MES.Core.Enums
         /// 请求站点（默认值）
         /// </summary>
         [Description("MainSite")]
-        MainSite = 3
+        MainSite = 3,
+        /// <summary>
+        /// 转子配置
+        /// </summary>
+        [Description("Rotor")]
+        Rotor = 4,
+        /// <summary>
+        /// 定子配置
+        /// </summary>
+        [Description("Stator")]
+        Stator = 5,
     }
 }

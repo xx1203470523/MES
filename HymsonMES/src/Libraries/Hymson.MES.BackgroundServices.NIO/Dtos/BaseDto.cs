@@ -8,7 +8,7 @@
         /// <summary>
         /// 是否已投产, true/false
         /// </summary>
-        public bool Debug { get; set; }
+        public bool Debug { get; set; } = true;
 
         /// <summary>
         /// 更改的时间, Unix 时间戳, 以秒为单位
