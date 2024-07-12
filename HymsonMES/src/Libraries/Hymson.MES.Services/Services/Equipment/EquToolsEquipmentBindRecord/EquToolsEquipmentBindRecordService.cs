@@ -48,10 +48,11 @@ namespace Hymson.MES.Services.Services.Equipment
 
         private readonly IEquToolsRecordRepository _toolsRecordRepository;
         private readonly IEquToolsRepository _toolsRepository;
+        private readonly IEquToolsTypeRepository _equToolsTypeRepository;
         private readonly IEquEquipmentRecordRepository _equipmentRecordRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
         //工具类型与设备组
-        private readonly IEquToolingTypeEquipmentGroupRelationRepository _equToolingTypeEquipment;
+        private readonly IEquToolsTypeEquipmentGroupRelationRepository _equToolingTypeEquipment;
         /// <summary>
         /// 多语言服务
         /// </summary>
@@ -63,10 +64,11 @@ namespace Hymson.MES.Services.Services.Equipment
         public EquToolsEquipmentBindRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
             IEquToolsEquipmentBindRecordRepository equToolsEquipmentBindRecordRepository,
             IEquToolsRecordRepository toolsRecordRepository,
+            IEquToolsTypeRepository equToolsTypeRepository,
             IEquToolsRepository toolsRepository,
             IEquEquipmentRecordRepository equipmentRecordRepository,
             IEquEquipmentRepository equEquipmentRepository,
-            IEquToolingTypeEquipmentGroupRelationRepository equToolingTypeEquipment,
+            IEquToolsTypeEquipmentGroupRelationRepository equToolingTypeEquipment,
             ILocalizationService localizationService)
         {
             _currentUser = currentUser;
@@ -74,6 +76,7 @@ namespace Hymson.MES.Services.Services.Equipment
             _equToolsEquipmentBindRecordRepository = equToolsEquipmentBindRecordRepository;
             _toolsRecordRepository = toolsRecordRepository;
             _toolsRepository = toolsRepository;
+            _equToolsTypeRepository = equToolsTypeRepository;
             _equipmentRecordRepository = equipmentRecordRepository;
             _equEquipmentRepository = equEquipmentRepository;
             _equToolingTypeEquipment = equToolingTypeEquipment;
@@ -140,22 +143,33 @@ namespace Hymson.MES.Services.Services.Equipment
             //如果勾选了所有设备组可使用则不用验证
             //校验工具所属工具类型是否允许在设备使用（工具类型在所有设备组均可使用或工具类型分配的设备组包含该设备所属的设备组），若不允许，则报错：工具XXX不允许在设备XXX使用；
             var toolTypeId = toolsEntity.ToolsId;
-            var groupRelationViews = await _equToolingTypeEquipment.GetSparePartsEquipmentGroupRelationAsync(toolTypeId);
-            if (groupRelationViews == null || !groupRelationViews.Any())
+            var equToolsTypeEntity = await _equToolsTypeRepository.GetByIdAsync(toolTypeId);
+            if (equToolsTypeEntity?.IsAllMaterialUsed != true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17707)).WithData("toolCode", toolsEntity.Code).WithData("equipmentCode", equEquipmentEntity.EquipmentCode);
-            }
-
-            if (groupRelationViews!= null && groupRelationViews.Any())
-            {
-                var groupIds = groupRelationViews.Select(x => x.EquipmentGroupId).ToArray();
-                if (groupIds.Any()&&!groupIds.Contains(equEquipmentEntity.EquipmentGroupId))
+                var groupRelationViews = await _equToolingTypeEquipment.GetEntitiesAsync(new EquToolsTypeEquipmentGroupRelationQuery
+                {
+                    ToolTypeId = toolTypeId
+                });
+                if (groupRelationViews == null || !groupRelationViews.Any())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES17707)).WithData("toolCode", toolsEntity.Code).WithData("equipmentCode", equEquipmentEntity.EquipmentCode);
                 }
+
+                if (groupRelationViews != null && groupRelationViews.Any())
+                {
+                    var groupIds = groupRelationViews.Select(x => x.EquipmentGroupId).ToArray();
+                    if (groupIds.Any() && !groupIds.Contains(equEquipmentEntity.EquipmentGroupId))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17707)).WithData("toolCode", toolsEntity.Code).WithData("equipmentCode", equEquipmentEntity.EquipmentCode);
+                    }
+                }
             }
+
             //如果勾选了所有物料可使用则不用验证
             //校验工具所属工具类型是否允许对设备生产的产品使用（工具类型对所有产品均可使用或工具类型分配的产品料号包含该设备所在线体当前已激活工单的产品料号），若不允许，则报错：工具XXX不允许对产品XXX使用；
+            if (equToolsTypeEntity?.IsAllMaterialUsed != true)
+            {
+            }
 
             //验证某个位置是否已经安装了其他工具
             var toolsEquipmentBindRecordEntity = await _equToolsEquipmentBindRecordRepository.GetIsPostionBindAsync(new EquToolsEquipmentBindRecordQuery
