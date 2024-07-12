@@ -187,10 +187,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteContainerEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        public async Task<IEnumerable<InteContainerInfoEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteContainerEntity>(GetByIdsSql, new { Ids = ids });
+            return await conn.QueryAsync<InteContainerInfoEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -307,8 +307,8 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
                                `Height`,`Length`,`Width`, `MaxFillWeight`, `Weight`
                                FROM `inte_container_specification`  WHERE ContainerId = @Id and IsDeleted=@IsDeleted ";
         const string GetByIdsSql = @"SELECT 
-                               `Id`, `DefinitionMethod`, `MaterialId`, `MaterialGroupId`, Level, `Status`, `Maximum`, `Minimum`, `Height`, `Length`, `Width`, `MaxFillWeight`, `Weight`, Remark, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `inte_container`  WHERE Id IN @Ids ";
+                            *
+                            FROM `inte_container_info`  WHERE Id IN @Ids ";
 
         const string GetByMaterialIdSql = @"SELECT * FROM inte_container WHERE IsDeleted = 0 AND DefinitionMethod = @DefinitionMethod AND MaterialId = @MaterialId   AND Level = @Level ";
 

@@ -97,7 +97,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [HttpDelete]
         [LogDescription("É¾³ýÈÝÆ÷", BusinessType.DELETE)]
         [PermissionDescription("inte:container:delete")]
-        public async Task DeletesAsync(long[] ids)
+        public async Task DeletesAsync(IEnumerable<long> ids)
         {
             await _inteContainerService.DeletesAsync(ids);
         }

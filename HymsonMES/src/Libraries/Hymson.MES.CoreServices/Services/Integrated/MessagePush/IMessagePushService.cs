@@ -1,5 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
+using Hymson.MES.CoreServices.Events.IntegrationEvents.Messages;
 
 namespace Hymson.MES.CoreServices.Services.Integrated
 {

@@ -211,7 +211,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetEquSparePartsGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `equ_tooling_type_manage` /**where**/  ";
-
+            
         const string InsertSql = "INSERT INTO `equ_tooling_type_manage`(  `Id`, `Code`, `Name`, `Status`, `Calibration`, `LifeSpan`, `Cycle`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Status, @Calibration, @LifeSpan, @Cycle,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `equ_tooling_type_manage`(  `Id`, `Code`, `Name`, `Status`, `Calibration`, `LifeSpan`, `Cycle`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Status, @Calibration, @LifeSpan, @Cycle,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 

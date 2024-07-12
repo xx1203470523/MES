@@ -1,6 +1,6 @@
 ﻿using Hymson.EventBus.Abstractions;
 
-namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
+namespace Hymson.MES.CoreServices.Events.IntegrationEvents.Messages
 {
     /// <summary>
     /// 消息触发成功事件

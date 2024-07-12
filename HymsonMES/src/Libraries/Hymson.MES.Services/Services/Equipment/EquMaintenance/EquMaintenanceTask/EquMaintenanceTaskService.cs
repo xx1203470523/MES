@@ -243,7 +243,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquMaintenance.EquMaintenanceTa
             var entitys = await _equMaintenanceTaskRepository.GetByIdsAsync(ids);
             if (entitys != null)
             {
-                if (!entitys.Any(x => x.Status == EquMaintenanceTaskStautusEnum.WaitInspect))
+                var isDeleteEntitys = entitys.Where(x => x.Status != EquMaintenanceTaskStautusEnum.WaitInspect);
+                if (isDeleteEntitys.Any())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15904));
                 }

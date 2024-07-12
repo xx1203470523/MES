@@ -385,7 +385,7 @@ public partial class InteContainerService : IInteContainerService
     /// </summary>
     /// <param name="idsArr"></param>
     /// <returns></returns>
-    public async Task<int> DeletesAsync(long[] idsArr)
+    public async Task<int> DeletesAsync(IEnumerable<long>  idsArr)
     {
         var list = await _inteContainerRepository.GetByIdsAsync(idsArr);
         if (list != null && list.Any(x => x.Status != SysDataStatusEnum.Build))
