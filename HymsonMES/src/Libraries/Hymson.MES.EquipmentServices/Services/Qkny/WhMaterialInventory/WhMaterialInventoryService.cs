@@ -109,26 +109,27 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
             var equResModel = await _equEquipmentService.GetEquResAsync(dto);
 
             //原材料条码解析（物料代码(6)，供应商代码(5)，生产批号/日期(8)，班次P01(3)，最小包装数量,最小包装流水号(P001B001)）
-            var barcodeSupplierDic = new Dictionary<string, string>();
+            //原材料条码解析（物料代码（久期8位数字码）,物料名称（6位BOM物料代码）,物料批次（8位入库日期+3位流水码）,供应商批次,生产日期,总托数,本托数量,本托编号,最小包装数量,最小包装流水号） 2024-07-11
+            //var barcodeSupplierDic = new Dictionary<string, string>();
             foreach (var item in dto.BarCodeList)
             {
                 if (item == null) continue;
                 if (!item.IsRawMaterial) continue;
 
                 var arr = item.BarCode.Trim().Split(',');
-                if (arr.Length != 6)
+                if (arr.Length < 6)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES45231)).WithData("BarCode", item.BarCode);
                 }
 
-                if (!decimal.TryParse(arr[4], out decimal qty) || qty <= 0)
+                if (!decimal.TryParse(arr[5], out decimal qty) || qty <= 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES45232)).WithData("BarCode", item.BarCode);
                 }
 
-                item.MaterialCode = arr[0];
+                item.MaterialCode = arr[1];
                 item.Qty = qty;
-                barcodeSupplierDic.Add(item.BarCode, arr[1]);
+                //barcodeSupplierDic.Add(item.BarCode, arr[1]);
             }
 
             //查询物料信息
@@ -144,11 +145,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
                 throw new CustomerValidationException(nameof(ErrorCode.MES45233)).WithData("MaterialCode", string.Join(',', noExistMaterialCodes));
             }
             //查询供应商信息
-            var supplierCodes = await _whSupplierRepository.GetByCodesAsync(new WhSuppliersByCodeQuery
-            {
-                SiteId = equResModel.SiteId,
-                Codes = barcodeSupplierDic.Values.Distinct()
-            });
+            //var supplierCodes = await _whSupplierRepository.GetByCodesAsync(new WhSuppliersByCodeQuery
+            //{
+            //    SiteId = equResModel.SiteId,
+            //    Codes = barcodeSupplierDic.Values.Distinct()
+            //});
 
             await _whMaterialInventoryCoreService.MaterialInventoryAsync(new CoreServices.Bos.Manufacture.MaterialInventoryBo
             {
@@ -161,7 +162,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.WhMaterialInventory
                     MaterialId = materialEntities.First(z => z.MaterialCode == x.MaterialCode).Id,
                     MaterialBarCode = x.BarCode,
                     QuantityResidue = x.Qty,
-                    SupplierId = supplierCodes.FirstOrDefault(s => s.Code == barcodeSupplierDic[x.BarCode])?.Id ?? 0,
+                    SupplierId = 0, //supplierCodes.FirstOrDefault(s => s.Code == barcodeSupplierDic[x.BarCode])?.Id ?? 0,
                     Type = Core.Enums.WhMaterialInventoryTypeEnum.MaterialReceiving
                 })
             });
