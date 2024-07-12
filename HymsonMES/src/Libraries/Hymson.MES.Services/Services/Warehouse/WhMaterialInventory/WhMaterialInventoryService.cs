@@ -716,7 +716,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialBarCode = i == 1 ? oldWhMEntirty.MaterialBarCode : newSplitSFC,
                     Quantity = i == 1 ? remainsQty : adjustDto.Qty,
                     Unit = procMaterialEntitity?.Unit ?? "",
-                    Type = WhMaterialInventoryTypeEnum.MaterialBarCodeSplit,
+                    Type = i == 1 ? WhMaterialInventoryTypeEnum.MaterialBarCodeSplit : WhMaterialInventoryTypeEnum.SplitAdd,
                     Source = MaterialInventorySourceEnum.Disassembly,
                     SiteId = _currentSite.SiteId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
@@ -751,7 +751,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 OutputBarCodeMaterialId = oldWhMEntirty.MaterialId,
                 OutputBarCodeWorkOrderId = oldWhMEntirty.WorkOrderId,
                 OutputBarCodeMode = ManuBarCodeOutputModeEnum.Normal,
-                RelationType = ManuBarCodeRelationTypeEnum.SplitAdd,
+                RelationType = ManuBarCodeRelationTypeEnum.SFC_Split,
                 BusinessContent = new
                 {
                     InputMaterialStandingBookd = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == oldWhMEntirty.MaterialBarCode).FirstOrDefault()?.Id,
@@ -1043,7 +1043,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialBarCode = entity.MaterialBarCode,
                     Quantity = quantityResidue,
 
-                    Type = WhMaterialInventoryTypeEnum.MaterialBarCodeMerge,
+                    Type = IsMergeSFC == true ? WhMaterialInventoryTypeEnum.CombinedAdd : WhMaterialInventoryTypeEnum.MaterialBarCodeMerge,
                     Source = MaterialInventorySourceEnum.Merge,
                     SiteId = _currentSite.SiteId ?? 0,
                     Batch = entity.Batch ?? string.Empty,
@@ -1076,7 +1076,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     OutputBarCodeMaterialId = inputBarcodeSingle.MaterialId,
                     OutputBarCodeWorkOrderId = inputBarcodeSingle.WorkOrderId,
                     OutputBarCodeMode = ManuBarCodeOutputModeEnum.Normal,
-                    RelationType = IsMergeSFC == true ? ManuBarCodeRelationTypeEnum.CombinedAdd : ManuBarCodeRelationTypeEnum.SFC_Combined,
+                    RelationType = ManuBarCodeRelationTypeEnum.SFC_Combined,
                     BusinessContent = new
                     {
                         InputMaterialStandingBookd = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == inputBarcodeSingle.MaterialBarCode).FirstOrDefault()?.Id,

@@ -42,17 +42,5 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("批次拆分")]
         Batch_Split = 7,
-
-        /// <summary>
-        /// 拆分新增
-        /// </summary>
-        [Description("拆分新增")]
-        SplitAdd = 8,
-
-        /// <summary>
-        /// 合并新增
-        /// </summary>
-        [Description("合并新增")]
-        CombinedAdd = 9,
     }
 }

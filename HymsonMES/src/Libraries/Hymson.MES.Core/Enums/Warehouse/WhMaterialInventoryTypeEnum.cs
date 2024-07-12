@@ -97,6 +97,18 @@ namespace Hymson.MES.Core.Enums
         /// 不良处置
         /// </summary>
         [Description("不良处置")]
-        BadDisposal = 18
+        BadDisposal = 18,
+
+        /// <summary>
+        /// 物料拆分新增
+        /// </summary>
+        [Description("物料拆分新增")]
+        SplitAdd = 19,
+
+        /// <summary>
+        /// 物料合并新增
+        /// </summary>
+        [Description("物料合并新增")]
+        CombinedAdd = 20,
     }
 }
