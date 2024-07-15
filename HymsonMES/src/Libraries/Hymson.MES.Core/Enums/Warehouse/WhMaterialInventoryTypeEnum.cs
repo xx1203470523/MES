@@ -28,80 +28,86 @@ namespace Hymson.MES.Core.Enums
         /// <summary>
         /// 生产完成
         /// </summary>
+        [Description("生产完成")]
+        ManuComplete = 4,
 
 
         /// <summary>
         /// 库存维护   (仅仅做记录使用)
         /// </summary>
         [Description("库存维护")]
-
+        InventoryModify = 6,
 
         /// <summary>
         /// 物料拆分
         /// </summary>
         [Description("物料拆分")]
-        MaterialBarCodeSplit = 12,
+        MaterialBarCodeSplit = 7,
 
         /// <summary>
         /// 物料合并
         /// </summary>
         [Description("物料合并")]
-        MaterialBarCodeMerge = 13,
+        MaterialBarCodeMerge = 8,
 
         /// <summary>
         /// 物料锁定
         /// </summary>
         [Description("物料锁定")]
+        MaterialBarCodeLock = 9,
 
         /// <summary>
         /// 物料解锁
         /// </summary>
         [Description("物料解锁")]
-        MaterialBarCodeUnLock = 16 ,
+        MaterialBarCodeUnLock = 10,
 
         /// <summary>
         /// 物料不良录入
         /// </summary>
         [Description("物料不良录入")]
-        BadEntry = 17,
+        BadEntry = 11,
 
         /// <summary>
         /// 不良处置
         /// </summary>
         [Description("不良处置")]
-        BadDisposal = 18,
+        BadDisposal = 12,
 
         /// <summary>
         /// 物料拆分新增
         /// </summary>
         [Description("物料拆分新增")]
-        SplitAdd = 19,
+        SplitAdd = 13,
 
         /// <summary>
         /// 物料合并新增
         /// </summary>
         [Description("物料合并新增")]
-        CombinedAdd = 20,
+        CombinedAdd = 14,
 
- // <summary>
+        // <summary>
         /// 物料报废
         /// </summary>
         [Description("物料报废")]
-        MaterialScrapping = 21,
+        MaterialScrapping = 15,
 
         /// <summary>
         /// 取消报废
         /// </summary>
         [Description("取消报废")]
-        CancelScrapping = 22,
+        CancelScrapping = 16,
 
         /// <summary>
         /// 离脱
         /// </summary>
         [Description("离脱")]
-        Detachment = 23,
+        Detachment = 17,
+
         /// <summary>
         /// 物料卸载
-        /// </summary>        [Description("物料卸载")]
-        MaterialUnloading = 24    }
+        /// </summary>       
+        [Description("物料卸载")]
+        MaterialUnloading = 18
+    }
 }
