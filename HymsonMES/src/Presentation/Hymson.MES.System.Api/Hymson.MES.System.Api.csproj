@@ -20,10 +20,8 @@
     <PackageReference Include="Hymson.NLog.Web" Version="2.1.167" />
     <PackageReference Include="Hymson.Print" Version="2.1.167" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-	  
+	  <PackageReference Include="Hymson.EventBus.RabbitMQ" Version="2.1.175" />
 	  <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
-	
-	  <PackageReference Include="Hymson.EventBus.RabbitMQ" Version="2.1.167" />
   </ItemGroup>
 
   <ItemGroup>

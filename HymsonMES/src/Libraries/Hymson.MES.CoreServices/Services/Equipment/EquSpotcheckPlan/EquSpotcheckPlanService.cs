@@ -5,6 +5,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Common;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Events.Equipment;
@@ -124,7 +125,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                     throw new CustomerValidationException(nameof(ErrorCode.MES12325));
                 }
 
-                if (!equSpotcheckPlanEntity.FirstExecuteTime.HasValue || !equSpotcheckPlanEntity.Type.HasValue || !equSpotcheckPlanEntity.Cycle.HasValue)
+                if (!equSpotcheckPlanEntity.FirstExecuteTime.HasValue || !equSpotcheckPlanEntity.CycleType.HasValue || !equSpotcheckPlanEntity.Cycle.HasValue)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12304));
                 }
@@ -284,7 +285,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
                         SpotCheckTaskId = equSpotcheckTask.Id,
                         SpotCheckItemSnapshotId = equSpotcheckTaskSnapshotItem.Id,
                         InspectionValue = "",
-                        IsQualified = TrueOrFalseEnum.No,
+                        IsQualified = TrueFalseEmptyEnum.No,
                         Remark = equSpotcheckTaskSnapshotItem.Remark,
 
                         Id = IdGenProvider.Instance.CreateId(),

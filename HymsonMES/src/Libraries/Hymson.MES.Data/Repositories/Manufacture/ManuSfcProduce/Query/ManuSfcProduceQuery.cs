@@ -24,6 +24,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 工序
         /// </summary>
         public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long? ProductId { get; set; }
+
+        /// <summary>
+        /// 工作中心Id
+        /// </summary>
+        public long? WorkCenterId { get; set; }
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public string? OrderCode { get; set; }
     }
 
     /// <summary>

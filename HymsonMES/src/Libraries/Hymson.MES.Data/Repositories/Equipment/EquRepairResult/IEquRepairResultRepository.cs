@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
         /// <param name="equRepairResultEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(EquRepairResultEntity equRepairResultEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
         /// <param name="equRepairResultEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquRepairResultEntity equRepairResultEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +66,14 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquRepairResultEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 根据RepairOrderId获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<EquRepairResultEntity> GetByRepairOrderIdAsync(long repairOrderId);
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -80,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairResult
         /// <param name="equRepairResultQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<EquRepairResultEntity>> GetEquRepairResultEntitiesAsync(EquRepairResultQuery equRepairResultQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

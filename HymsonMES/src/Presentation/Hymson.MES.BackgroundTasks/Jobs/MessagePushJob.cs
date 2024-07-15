@@ -1,5 +1,5 @@
-﻿using Hymson.MessagePush.Services;
-using Microsoft.Extensions.Logging;
+﻿using Hymson.Logging.Services;
+using Hymson.MessagePush.Services;
 using Quartz;
 
 namespace Hymson.MES.BackgroundTasks.Jobs
@@ -14,17 +14,17 @@ namespace Hymson.MES.BackgroundTasks.Jobs
         /// 
         /// </summary>
         private readonly IMessageService _messageService;
-        private readonly ILogger<MessagePushJob> _logger;
+        private readonly IAlarmLogService _alarmLogService;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="messageService"></param>
         /// <param name="logger"></param>
-        public MessagePushJob(IMessageService messageService, ILogger<MessagePushJob> logger)
+        public MessagePushJob(IMessageService messageService, IAlarmLogService alarmLogService)
         {
             this._messageService = messageService;
-            _logger = logger;
+            _alarmLogService = alarmLogService;
         }
 
         /// <summary>
@@ -41,8 +41,7 @@ namespace Hymson.MES.BackgroundTasks.Jobs
             }
             catch (Exception ex)
             {
-
-                _logger.LogError(ex, "定时执行发送消息出错:");
+                _alarmLogService.WriteAlarmLogEntry(new Logging.AlarmLogEntry("定时执行发送消息出错:" + ex.Message, ex.StackTrace ?? ""));
             }
         }
 

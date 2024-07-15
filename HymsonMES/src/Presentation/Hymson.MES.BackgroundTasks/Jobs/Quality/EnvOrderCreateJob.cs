@@ -1,5 +1,5 @@
-﻿using Hymson.MES.BackgroundServices.Tasks.Quality.EnvOrderCreate;
-using Microsoft.Extensions.Logging;
+﻿using Hymson.Logging.Services;
+using Hymson.MES.BackgroundServices.Tasks.Quality.EnvOrderCreate;
 using Quartz;
 
 namespace Hymson.MES.BackgroundTasks.Jobs.Quality
@@ -10,17 +10,20 @@ namespace Hymson.MES.BackgroundTasks.Jobs.Quality
     [DisallowConcurrentExecution]
     internal class EnvOrderCreateJob : IJob
     {
-        private readonly ILogger<EnvOrderCreateJob> _logger;
+
+        private readonly IAlarmLogService _alarmLogService;
         private readonly IEnvOrderAutoCreateService _envOrderAutoCreateService;
+
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="alarmLogService"></param>
         /// <param name="envOrderAutoCreateService"></param>
-        public EnvOrderCreateJob(ILogger<EnvOrderCreateJob> logger, IEnvOrderAutoCreateService envOrderAutoCreateService)
+        public EnvOrderCreateJob(IAlarmLogService alarmLogService, IEnvOrderAutoCreateService envOrderAutoCreateService)
         {
-            _logger = logger;
+
+            _alarmLogService = alarmLogService;
             _envOrderAutoCreateService = envOrderAutoCreateService;
         }
 
@@ -37,7 +40,7 @@ namespace Hymson.MES.BackgroundTasks.Jobs.Quality
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "环境检验单自动生成出错:");
+                _alarmLogService.WriteAlarmLogEntry(new Logging.AlarmLogEntry("环境检验单自动生成出错:" + ex.Message, ex.StackTrace ?? ""));
             }
         }
     }

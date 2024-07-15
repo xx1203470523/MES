@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquSparepartRecord;
 
 namespace Hymson.MES.Data.Repositories.EquEquipmentRecord
 {
@@ -86,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.EquEquipmentRecord
         /// </summary>
         /// <param name="equEquipmentRecordPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentRecordEntity>> GetPagedInfoAsync(EquEquipmentRecordPagedQuery equEquipmentRecordPagedQuery);
+        Task<PagedInfo<EquEquipmentRecordPagedView>> GetPagedInfoAsync(EquEquipmentRecordPagedQuery equEquipmentRecordPagedQuery);
         #endregion
     }
 }

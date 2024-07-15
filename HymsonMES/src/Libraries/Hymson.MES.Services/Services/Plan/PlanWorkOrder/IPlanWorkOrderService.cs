@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
 
-namespace Hymson.MES.Services.Services.Plan
+namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
 {
     /// <summary>
     /// 工单信息表 service接口

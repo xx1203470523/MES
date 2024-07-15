@@ -65,6 +65,11 @@ namespace Hymson.MES.Services.Dtos.Process
     public record ProcProductParameterGroupDetailDto : BaseEntityDto
     {
         /// <summary>
+        /// 产品检验参数id
+        /// </summary>
+        public long ParameterGroupId { get; set; }
+
+        /// <summary>
         /// 参数id（产品参数）
         /// </summary>
         public long ParameterId { get; set; }

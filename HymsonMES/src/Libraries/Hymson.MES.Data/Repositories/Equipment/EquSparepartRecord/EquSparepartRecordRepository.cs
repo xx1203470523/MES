@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.EquSparepartRecord;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquRepairOrder;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -19,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
     /// <summary>
     /// 设备备件记录表仓储
     /// </summary>
-    public partial class EquSparepartRecordRepository :BaseRepository, IEquSparepartRecordRepository
+    public partial class EquSparepartRecordRepository : BaseRepository, IEquSparepartRecordRepository
     {
 
-        public EquSparepartRecordRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public EquSparepartRecordRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
         public async Task<EquSparepartRecordEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<EquSparepartRecordEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<EquSparepartRecordEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +66,10 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquSparepartRecordEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquSparepartRecordEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquSparepartRecordEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<EquSparepartRecordEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -76,30 +77,74 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
         /// </summary>
         /// <param name="equSparepartRecordPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquSparepartRecordEntity>> GetPagedInfoAsync(EquSparepartRecordPagedQuery equSparepartRecordPagedQuery)
+        public async Task<PagedInfo<EquSparepartRecordPagedView>> GetPagedInfoAsync(EquSparepartRecordPagedQuery equSparepartRecordPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
+            sqlBuilder.Where("esr.IsDeleted=0");
+            sqlBuilder.Where("esr.SiteId=@SiteId");
+            sqlBuilder.Select("DISTINCT esr.Code,esr.Name,est.Code AS SparePartTypeCode,est.Name AS SparePartTypeName,esr.Qty,esr.OperationQty,esr.EquipmentId,ee.EquipmentCode,ee.EquipmentName,esr.Position,esr.OperationType,esr.CreatedOn,esr.CreatedBy,iwc.Code AS WorkCenterCode,esr.WorkCenterCode AS RecordWorkCenterCode,esr.Recipients ");
+            sqlBuilder.OrderBy("esr.CreatedOn DESC");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            sqlBuilder.LeftJoin(" equ_equipment ee ON ee.Id=esr.EquipmentId");
+            sqlBuilder.LeftJoin(" equ_sparepart_type est ON est.Id=esr.SparePartTypeId");
+            sqlBuilder.LeftJoin(" proc_resource_equipment_bind preb ON preb.EquipmentId=esr.EquipmentId");
+            sqlBuilder.LeftJoin(" inte_work_center_resource_relation iwcrr ON iwcrr.ResourceId=preb.ResourceId");
+            sqlBuilder.LeftJoin(" inte_work_center iwc ON iwc.Id=iwcrr.WorkCenterId");
+
+            if (!string.IsNullOrWhiteSpace(equSparepartRecordPagedQuery.Code))
+            {
+                equSparepartRecordPagedQuery.Code = $"%{equSparepartRecordPagedQuery.Code}%";
+                sqlBuilder.Where("esr.Code LIKE @Code");
+            }
+
+            if (!string.IsNullOrWhiteSpace(equSparepartRecordPagedQuery.Name))
+            {
+                equSparepartRecordPagedQuery.Name = $"%{equSparepartRecordPagedQuery.Name}%";
+                sqlBuilder.Where("esr.Name LIKE @Name");
+            }
+
+            if (!string.IsNullOrWhiteSpace(equSparepartRecordPagedQuery.EquipmentCode))
+            {
+                equSparepartRecordPagedQuery.EquipmentCode = $"%{equSparepartRecordPagedQuery.EquipmentCode}%";
+                sqlBuilder.Where("ee.EquipmentCode LIKE @EquipmentCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(equSparepartRecordPagedQuery.EquipmentName))
+            {
+                equSparepartRecordPagedQuery.EquipmentName = $"%{equSparepartRecordPagedQuery.EquipmentName}%";
+                sqlBuilder.Where("ee.EquipmentName LIKE @EquipmentName");
+            }
+
+            if (!string.IsNullOrWhiteSpace(equSparepartRecordPagedQuery.SparePartTypeCode))
+            {
+                equSparepartRecordPagedQuery.SparePartTypeCode = $"%{equSparepartRecordPagedQuery.SparePartTypeCode}%";
+                sqlBuilder.Where("est.Code LIKE @SparePartTypeCode");
+            }
+
+            if (equSparepartRecordPagedQuery.OperationType.HasValue)
+            {
+                sqlBuilder.Where("esr.OperationType=@OperationType");
+            }
+
+            if (equSparepartRecordPagedQuery.CreatedOn != null && equSparepartRecordPagedQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { StartTime = equSparepartRecordPagedQuery.CreatedOn[0], EndTime = equSparepartRecordPagedQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where("esr.CreatedOn >= @StartTime AND esr.CreatedOn <= @EndTime");
+            }
+
             var offSet = (equSparepartRecordPagedQuery.PageIndex - 1) * equSparepartRecordPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = equSparepartRecordPagedQuery.PageSize });
             sqlBuilder.AddParameters(equSparepartRecordPagedQuery);
 
             using var conn = GetMESDbConnection();
-            var equSparepartRecordEntitiesTask = conn.QueryAsync<EquSparepartRecordEntity>(templateData.RawSql, templateData.Parameters);
+            var equSparepartRecordEntitiesTask = conn.QueryAsync<EquSparepartRecordPagedView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var equSparepartRecordEntities = await equSparepartRecordEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<EquSparepartRecordEntity>(equSparepartRecordEntities, equSparepartRecordPagedQuery.PageIndex, equSparepartRecordPagedQuery.PageSize, totalCount);
+            return new PagedInfo<EquSparepartRecordPagedView>(equSparepartRecordEntities, equSparepartRecordPagedQuery.PageIndex, equSparepartRecordPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -166,8 +211,8 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
     public partial class EquSparepartRecordRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_sparepart_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_sparepart_record` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_sparepart_record` esr /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/  LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_sparepart_record` esr /**innerjoin**/ /**leftjoin**/ /**where**/ ";
         const string GetEquSparepartRecordEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `equ_sparepart_record` /**where**/  ";

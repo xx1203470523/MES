@@ -12,6 +12,8 @@ using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -40,19 +42,60 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteBusinessFieldDistributeRepository _inteBusinessFieldDistributeRepository;
 
         /// <summary>
+        /// 仓储接口（字段定义）
+        /// </summary>
+        private readonly IInteBusinessFieldRepository _inteBusinessFieldRepository;
+
+
+        private readonly IInteBusinessFieldDistributeDetailsRepository _inteBusinessFieldDistributeDetailsRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="inteBusinessFieldDistributeRepository"></param>
-        public InteBusinessFieldDistributeService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteBusinessFieldDistributeSaveDto> validationSaveRules, 
-            IInteBusinessFieldDistributeRepository inteBusinessFieldDistributeRepository)
+        /// <param name="inteBusinessFieldDistributeDetailsRepository"></param>
+        /// <param name="inteBusinessFieldRepository"></param>
+        public InteBusinessFieldDistributeService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteBusinessFieldDistributeSaveDto> validationSaveRules,
+            IInteBusinessFieldDistributeRepository inteBusinessFieldDistributeRepository,
+            IInteBusinessFieldDistributeDetailsRepository inteBusinessFieldDistributeDetailsRepository, IInteBusinessFieldRepository inteBusinessFieldRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _inteBusinessFieldDistributeRepository = inteBusinessFieldDistributeRepository;
+            _inteBusinessFieldDistributeDetailsRepository = inteBusinessFieldDistributeDetailsRepository;
+            _inteBusinessFieldRepository = inteBusinessFieldRepository;
+        }
+
+        /// <summary>
+        /// 根据ID查询
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<BusinessFieldViewDto>> getBusinessFieldDistributeDetailsByIdAsync(long id)
+        {
+            var inteBusinessFieldLists = new List<BusinessFieldViewDto>();
+            var inteBusinessFieldEntity = await _inteBusinessFieldDistributeDetailsRepository.GetByIdAsync(id);
+            //if (inteBusinessFieldEntity == null) return null;
+            if (inteBusinessFieldEntity.Any())
+            {
+                inteBusinessFieldEntity = inteBusinessFieldEntity.OrderBy(x => x.Seq).ToList();
+                foreach (var item in inteBusinessFieldEntity)
+                {
+                    var inteVehicleTypeVerifyDto = item.ToModel<BusinessFieldViewDto>();
+                    if (inteVehicleTypeVerifyDto.BusinessFieldId > 0)
+                    {
+                        var inteBusinessField = await _inteBusinessFieldRepository.GetByIdAsync(inteVehicleTypeVerifyDto.BusinessFieldId);
+                        inteVehicleTypeVerifyDto.Code = inteBusinessField.Code;
+                        inteVehicleTypeVerifyDto.Name = inteBusinessField.Name;
+                    }
+                    inteBusinessFieldLists.Add(inteVehicleTypeVerifyDto);
+                }
+            }
+            return inteBusinessFieldLists;
         }
 
 
@@ -61,7 +104,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(InteBusinessFieldDistributeSaveDto saveDto)
+        public async Task<long> CreateAsync(InteBusinessFieldDistributeSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -82,8 +125,65 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
-            // 保存
-            return await _inteBusinessFieldDistributeRepository.InsertAsync(entity);
+            // 验证是否编码唯一
+            var inteBusinessFieldEntity = await _inteBusinessFieldDistributeRepository.GetByCodeAsync(new InteBusinessFieldDistributeQuery
+            {
+                Type = entity.Type,
+                Code = entity.Code.Trim(),
+                SiteId = _currentSite.SiteId ?? 0
+            });
+            if (inteBusinessFieldEntity != null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19427)).WithData("type", entity.Type.GetDescription()).WithData("code", entity.Code);
+            }
+
+            #region 处理 载具类型验证数据
+            List<InteBusinessFieldDistributeDetailsEntity> detailEntities = new();
+            if (saveDto.InteBusinessFieldDistributeDetailList != null && saveDto.InteBusinessFieldDistributeDetailList.Any())
+            {
+                foreach (var item in saveDto.InteBusinessFieldDistributeDetailList)
+                {
+                    //验证数据
+                    var pattern = @"^[1-9]\d*$";
+                    if (!Regex.IsMatch($"{item.Seq}", pattern)) throw new CustomerValidationException(nameof(ErrorCode.MES19438));
+                    var isSeqCount = saveDto.InteBusinessFieldDistributeDetailList.GroupBy(p => p.Seq)
+                                         .Any(g => g.Count() > 1);
+                    if (isSeqCount)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19439));
+                    }
+
+                    var isBusinessFieldIds = saveDto.InteBusinessFieldDistributeDetailList.GroupBy(p => p.BusinessFieldId)
+                                         .Any(g => g.Count() > 1);
+                    if (isBusinessFieldIds)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19440));
+                    }
+                    detailEntities.Add(new InteBusinessFieldDistributeDetailsEntity()
+                    {
+                        BusinessFieldId = item.BusinessFieldId,
+                        Seq = item.Seq,
+                        BusinessFieldFistributeid = entity.Id,
+                        Id = IdGenProvider.Instance.CreateId(),
+                        IsRequired = item.IsRequired,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0,
+                    });
+                }
+            }
+            #endregion
+
+            using var ts = TransactionHelper.GetTransactionScope();
+            await _inteBusinessFieldDistributeRepository.InsertAsync(entity);
+            if (detailEntities.Any())
+            {
+                await _inteBusinessFieldDistributeDetailsRepository.InsertRangeAsync(detailEntities);
+            }
+            ts.Complete();
+            return entity.Id;
         }
 
         /// <summary>
@@ -96,7 +196,12 @@ namespace Hymson.MES.Services.Services.Integrated
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
+            if (saveDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            var inteBusinessFieldDistribute = await _inteBusinessFieldDistributeRepository.GetByIdAsync(saveDto.Id);
+            if (inteBusinessFieldDistribute == null) throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
@@ -104,7 +209,66 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
-            return await _inteBusinessFieldDistributeRepository.UpdateAsync(entity);
+            // 验证是否编码唯一
+            if (inteBusinessFieldDistribute.Type != entity.Type || inteBusinessFieldDistribute.Code != entity.Code)
+            {
+                var inteBusinessFieldEntity = await _inteBusinessFieldDistributeRepository.GetByCodeAsync(new InteBusinessFieldDistributeQuery
+                {
+                    Type = entity.Type,
+                    Code = entity.Code.Trim(),
+                    SiteId = _currentSite.SiteId ?? 0
+                });
+                if (inteBusinessFieldEntity != null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19427)).WithData("type", entity.Type.GetDescription()).WithData("code", entity.Code);
+                }
+            }
+            #region 处理 载具类型验证数据
+            List<InteBusinessFieldDistributeDetailsEntity> detailEntities = new();
+            if (saveDto.InteBusinessFieldDistributeDetailList != null && saveDto.InteBusinessFieldDistributeDetailList.Any())
+            {
+                foreach (var item in saveDto.InteBusinessFieldDistributeDetailList)
+                {
+                    //验证数据
+                    var pattern = @"^[1-9]\d*$";
+                    if (!Regex.IsMatch($"{item.Seq}", pattern)) throw new CustomerValidationException(nameof(ErrorCode.MES19438));
+                    var isSeqCount = saveDto.InteBusinessFieldDistributeDetailList.GroupBy(p => p.Seq)
+                                         .Any(g => g.Count() > 1);
+                    if (isSeqCount)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19439));
+                    }
+
+                    var isBusinessFieldIds = saveDto.InteBusinessFieldDistributeDetailList.GroupBy(p => p.BusinessFieldId)
+                                         .Any(g => g.Count() > 1);
+                    if (isBusinessFieldIds)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19440));
+                    }
+                    detailEntities.Add(new InteBusinessFieldDistributeDetailsEntity()
+                    {
+                        BusinessFieldId = item.BusinessFieldId,
+                        Seq = item.Seq,
+                        BusinessFieldFistributeid = entity.Id,
+                        Id = IdGenProvider.Instance.CreateId(),
+                        IsRequired = item.IsRequired,
+                        UpdatedBy = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0,
+                    });
+                }
+            }
+            #endregion
+            var rows = 0;
+            using var ts = TransactionHelper.GetTransactionScope();
+            rows += await _inteBusinessFieldDistributeRepository.UpdateAsync(entity);
+            await _inteBusinessFieldDistributeDetailsRepository.DeleteAsync(entity.Id);
+            if (detailEntities.Any())
+            {
+                rows += await _inteBusinessFieldDistributeDetailsRepository.InsertRangeAsync(detailEntities);
+            }
+            ts.Complete();
+            return rows;
         }
 
         /// <summary>
@@ -124,12 +288,18 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
-            return await _inteBusinessFieldDistributeRepository.DeletesAsync(new DeleteCommand
+            var rows = 0;
+            using var ts = TransactionHelper.GetTransactionScope();
+            rows += await _inteBusinessFieldDistributeDetailsRepository.DeletesAsync(new DeleteCommand { Ids = ids });
+
+            rows += await _inteBusinessFieldDistributeRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
                 DeleteOn = HymsonClock.Now(),
                 UserId = _currentUser.UserName
             });
+            ts.Complete();
+            return rows;
         }
 
         /// <summary>
@@ -141,7 +311,6 @@ namespace Hymson.MES.Services.Services.Integrated
         {
            var inteBusinessFieldDistributeEntity = await _inteBusinessFieldDistributeRepository.GetByIdAsync(id);
            if (inteBusinessFieldDistributeEntity == null) return null;
-           
            return inteBusinessFieldDistributeEntity.ToModel<InteBusinessFieldDistributeDto>();
         }
 

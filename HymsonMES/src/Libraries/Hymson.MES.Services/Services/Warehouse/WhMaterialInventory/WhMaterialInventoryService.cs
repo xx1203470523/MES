@@ -81,6 +81,11 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// 条码关系
         /// </summary>
         private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
+        private readonly IManuSfcProduceRepository _sfcProduceRepository;
+        /// <summary>
+        /// 条码步骤表仓储 仓储
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
         private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
         private readonly IManuReturnOrderDetailRepository _manuReturnOrderDetailRepository;
@@ -121,6 +126,9 @@ namespace Hymson.MES.Services.Services.Warehouse
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
             IManuGenerateBarcodeService manuGenerateBarcodeService,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IManuBarCodeRelationRepository manuBarCodeRelationRepository,
+            IManuSfcProduceRepository sfcProduceRepository,
+            IManuSfcStepRepository manuSfcStepRepository)
             IManuRequistionOrderRepository manuRequistionOrderRepository,
             IXnebulaWMSApiClient wMSRequest,
             IProcBomRepository procBomRepository,
@@ -150,6 +158,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
+            _sfcProduceRepository = sfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
             _validationPickMaterialsRequest = validationPickMaterialsRequest;
             _manuRequistionOrderRepository = manuRequistionOrderRepository;
             _wmsRequest = wMSRequest;
@@ -405,7 +415,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         {
             var whMaterialInventoryPagedQuery = whMaterialInventoryPagedQueryDto.ToQuery<WhMaterialInventoryPagedQuery>();
             whMaterialInventoryPagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            whMaterialInventoryPagedQuery.Sources = new MaterialInventorySourceEnum[] { MaterialInventorySourceEnum.ManualEntry, MaterialInventorySourceEnum.WMS, MaterialInventorySourceEnum.LoadingPoint };//只查询外部的
+            //whMaterialInventoryPagedQuery.Sources = new MaterialInventorySourceEnum[] { MaterialInventorySourceEnum.ManualEntry, MaterialInventorySourceEnum.WMS, MaterialInventorySourceEnum.LoadingPoint };//只查询外部的
             var pagedInfo = await _whMaterialInventoryRepository.GetPagedInfoAsync(whMaterialInventoryPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -496,10 +506,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES15124));
             }
 
-            if (!new MaterialInventorySourceEnum[] { MaterialInventorySourceEnum.ManualEntry, MaterialInventorySourceEnum.WMS, MaterialInventorySourceEnum.LoadingPoint }.Contains(oldWhMIEntirty.Source))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15123));
-            }
+            //if (!new MaterialInventorySourceEnum[] { MaterialInventorySourceEnum.ManualEntry, MaterialInventorySourceEnum.WMS, MaterialInventorySourceEnum.LoadingPoint }.Contains(oldWhMIEntirty.Source))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES15123));
+            //}
 
             if (modifyDto.QuantityResidue < 0 || modifyDto.QuantityResidue > oldWhMIEntirty.ReceivedQty)
             {
@@ -521,7 +531,38 @@ namespace Hymson.MES.Services.Services.Warehouse
             whMaterialInventoryEntity.Batch = modifyDto.Batch;
             whMaterialInventoryEntity.SupplierId = modifyDto.SupplierId;
 
-
+            //判断要修改的条码在不在在制品表，如果在记录步骤信息
+            var sfcProduceEntity = await _sfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfc = oldWhMIEntirty.MaterialBarCode
+            });
+            var manuSfcStepEntity = new ManuSfcStepEntity();
+            if (sfcProduceEntity != null)
+            {
+                //步骤表-不良录入
+                manuSfcStepEntity = new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SFC = sfcProduceEntity.SFC,
+                    ProductId = sfcProduceEntity.ProductId,
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
+                    WorkCenterId = sfcProduceEntity.WorkCenterId,
+                    ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProcessRouteId = sfcProduceEntity.ProcessRouteId,
+                    Qty = whMaterialInventoryEntity.QuantityResidue,
+                    EquipmentId = sfcProduceEntity.EquipmentId,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.InventoryModify,
+                    CurrentStatus = sfcProduceEntity.Status,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    CreatedOn = HymsonClock.Now(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+                };
+            }
             #region  处理得到记录
             //查询到物料信息
             var materialInfo = await _procMaterialRepository.GetByIdAsync(modifyDto.MaterialId);
@@ -550,6 +591,11 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                //插入步骤表
+                if (sfcProduceEntity != null)
+                {
+                    await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
+                }
                 await _whMaterialInventoryRepository.UpdateOutsideWhMaterilInventoryAsync(whMaterialInventoryEntity);
 
                 await _whMaterialStandingbookRepository.InsertAsync(whMaterialStandingbookEntity);
@@ -791,7 +837,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 }
 
                 oldWhMEntirty = oldWhMEntirty.Where(x => x.Status == WhMaterialInventoryStatusEnum.ToBeUsed);
-            }           
+            }
 
             if (oldWhMEntirty.Count() == 0)
             {
@@ -829,7 +875,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             //指定父条码
             if (IsMergeSFC)
             {
-               
+
                 var newEntity = oldWhMEntirty.Where(w => w.MaterialBarCode == adjustDto.MergeSFC).FirstOrDefault();
 
                 foreach (var entity in oldWhMEntirty)

@@ -126,7 +126,7 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                     throw new CustomerValidationException(nameof(ErrorCode.MES12325));
                 }
 
-                if (!equMaintenancePlanEntity.FirstExecuteTime.HasValue || !equMaintenancePlanEntity.Type.HasValue || !equMaintenancePlanEntity.Cycle.HasValue)
+                if (!equMaintenancePlanEntity.FirstExecuteTime.HasValue || !equMaintenancePlanEntity.CycleType.HasValue || !equMaintenancePlanEntity.Cycle.HasValue)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12304));
                 }
@@ -265,7 +265,7 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                         UnitId = thisEquMaintenanceItem.UnitId,
                         OperationContent = thisEquMaintenanceItem.OperationContent ?? "",
                         Components = thisEquMaintenanceItem.Components ?? "",
-                        Remark = thisEquMaintenanceItem.Remark ?? "",
+                        //Remark = thisEquMaintenanceItem.Remark ?? "",
                         ReferenceValue = thisEquMaintenanceTemplateItemRelation?.Center,
                         UpperLimit = thisEquMaintenanceTemplateItemRelation?.UpperLimit,
                         LowerLimit = thisEquMaintenanceTemplateItemRelation?.LowerLimit,

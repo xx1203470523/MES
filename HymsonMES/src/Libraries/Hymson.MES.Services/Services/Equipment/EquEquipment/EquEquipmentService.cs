@@ -7,9 +7,12 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.EquEquipmentRecord;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
@@ -22,7 +25,9 @@ using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelation;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplateItemRelation;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.EquEquipmentRecord;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Services.EquEquipmentRecord;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -83,6 +88,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
         private readonly IEquSpotcheckTemplateRepository _equSpotcheckTemplateRepository;
         private readonly IEquSpotcheckTemplateEquipmentGroupRelationRepository _equSpotcheckTemplateEquipmentGroupRelationRepository;
+
+        /// <summary>
+        /// 设备记录
+        /// </summary>
+        private readonly IEquEquipmentRecordService _equEquipmentRecordService;
+
+        /// <summary>
+        /// 设备记录(仓储)
+        /// </summary>
+        private readonly IEquEquipmentRecordRepository _equEquipmentRecordRepository;
         /// <summary>
         /// 验证器
         /// </summary>
@@ -107,7 +122,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             IEquEquipmentRepository equEquipmentRepository,
             IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
             IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository,
-            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, AbstractValidator<EquEquipmentVerifyCreateDto> verifyValidationRules, IProcResourceRepository procResourceRepository, IEquMaintenanceTemplateRepository equMaintenanceTemplateRepository, IEquMaintenanceTemplateEquipmentGroupRelationRepository equMaintenanceTemplateEquipmentGroupRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository)
+            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, AbstractValidator<EquEquipmentVerifyCreateDto> verifyValidationRules, IProcResourceRepository procResourceRepository, IEquMaintenanceTemplateRepository equMaintenanceTemplateRepository, IEquMaintenanceTemplateEquipmentGroupRelationRepository equMaintenanceTemplateEquipmentGroupRelationRepository, IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository, IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository, IEquEquipmentRecordService equEquipmentRecordService, IEquEquipmentRecordRepository equEquipmentRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -124,6 +139,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             _equMaintenanceTemplateEquipmentGroupRelationRepository = equMaintenanceTemplateEquipmentGroupRelationRepository;
             _equSpotcheckTemplateRepository = equSpotcheckTemplateRepository;
             _equSpotcheckTemplateEquipmentGroupRelationRepository = equSpotcheckTemplateEquipmentGroupRelationRepository;
+            _equEquipmentRecordService = equEquipmentRecordService;
+            _equEquipmentRecordRepository = equEquipmentRecordRepository;
         }
 
 
@@ -217,6 +234,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("Code", entity.EquipmentCode);
             #endregion
 
+            #region 添加记录
+            var equEquipmentRecordEntity = await _equEquipmentRecordService.GetAddEquRecordByEquEquipmentAsync(new GetAddEquRecordByEquEquipmentDto { EquEquipmentEntity = entity, operationType = EquEquipmentRecordOperationTypeEnum.Registration });
+            #endregion
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
@@ -224,6 +244,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 rows += await _equEquipmentLinkApiRepository.InsertRangeAsync(linkApiList);
                 rows += await _equEquipmentLinkHardwareRepository.InsertRangeAsync(linkHardwareList);
                 rows += await _equEquipmentVerifyRepository.InsertsAsync(verifyList);
+                if (equEquipmentRecordEntity != null)
+                {
+                    rows += await _equEquipmentRecordRepository.InsertAsync(equEquipmentRecordEntity);
+                }
                 trans.Complete();
             }
             return entity.Id;

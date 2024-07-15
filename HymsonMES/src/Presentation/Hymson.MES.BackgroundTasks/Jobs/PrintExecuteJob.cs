@@ -1,5 +1,5 @@
-﻿using Hymson.Print.Abstractions;
-using Microsoft.Extensions.Logging;
+﻿using Hymson.Logging.Services;
+using Hymson.Print.Abstractions;
 using Quartz;
 
 namespace Hymson.MES.BackgroundTasks.Jobs
@@ -8,12 +8,12 @@ namespace Hymson.MES.BackgroundTasks.Jobs
     internal class PrintExecuteJob : IJob
     {
         private readonly IPrintBackgroundService _printBackgroundService;
-        private readonly ILogger<PrintExecuteJob> _logger;
+        private readonly IAlarmLogService _alarmLogService;
 
-        public PrintExecuteJob(IPrintBackgroundService printBackgroundService,ILogger<PrintExecuteJob> logger)
+        public PrintExecuteJob(IPrintBackgroundService printBackgroundService, IAlarmLogService alarmLogService)
         {
             _printBackgroundService = printBackgroundService;
-            _logger = logger;
+            _alarmLogService = alarmLogService;
         }
         public async Task Execute(IJobExecutionContext context)
         {
@@ -23,7 +23,7 @@ namespace Hymson.MES.BackgroundTasks.Jobs
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "后台执行打印出错:");
+                _alarmLogService.WriteAlarmLogEntry(new Logging.AlarmLogEntry("后台执行打印出错:" + ex.Message, ex.StackTrace ?? ""));
             }
         }
     }

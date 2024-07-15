@@ -6,7 +6,9 @@
  *build datetime: 2024-06-12 10:56:10
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.EquRepairOrderFault;
 using Hymson.MES.Services.Dtos.EquRepairOrder;
+using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Services.EquRepairOrder
 {
@@ -15,6 +17,31 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
     /// </summary>
     public interface IEquRepairOrderService
     {
+        #region
+        /// <summary>
+        /// 报修
+        /// </summary>
+        /// <param name="equReportRepairDto"></param>
+        /// <returns></returns>
+        Task ReportRepairAsync(EquReportRepairDto equReportRepairDto);
+
+        /// <summary>
+        /// 维修
+        /// </summary>
+        /// <param name="equMaintenanceDto"></param>
+        /// <returns></returns> 
+        Task MaintenanceAsync(EquMaintenanceDto equMaintenanceDto);
+
+        /// <summary>
+        /// 确认
+        /// </summary>
+        /// <param name="confirmDto"></param>
+        /// <returns></returns> 
+        Task ConfirmAsync(ConfirmDto confirmDto);
+
+        #endregion
+
+
         /// <summary>
         /// 获取分页List
         /// </summary>
@@ -48,13 +75,50 @@ namespace Hymson.MES.Services.Services.EquRepairOrder
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesEquRepairOrderAsync(long[] ids);
+        Task<int> DeletesEquRepairOrderAsync(EquRepairOrderDeletesDto ids);
 
         /// <summary>
-        /// 根据ID查询
+        /// 根据OrderId查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquRepairOrderDto> QueryEquRepairOrderByIdAsync(long id);
+        Task<EquRepairOrderFromDto> QueryEquRepairOrderByIdAsync(long id);
+
+        /// <summary>
+        /// 根据OrderId查询FROM数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<EquRepairOrderFromDetailDto> QueryEquRepairOrderDetailByIdAsync(long id);
+
+
+        /// <summary>
+        /// 根据OrderId查询故障详细
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquReportRepairFaultDto>> QueryEquRepairOrderFaultByOrderIdAsync(long id);
+
+        /// <summary>
+        /// 保存检验单附件
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> SaveAttachmentAsync(EquRepairOrderSaveAttachmentDto requestDto);
+
+        /// <summary>
+        /// 删除检验单附件
+        /// </summary>
+        /// <param name="orderAttachmentId"></param>
+        /// <returns></returns>
+        Task<int> DeleteAttachmentByIdAsync(long orderAttachmentId);
+
+        /// <summary>
+        /// 查询单据附件
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteAttachmentBaseDto>> QueryOrderAttachmentListByIdAsync(EquRepairOrderAttachmentDto dto);
+
     }
 }

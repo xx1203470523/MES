@@ -329,7 +329,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
-
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
             // 工单信息
@@ -337,6 +336,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
             {
                 WorkOrderId = saveDto.WorkOrderid,
                 IsVerifyActivation = false
+            });
+            //查询Bom中得物料信息
+            var procBomDetails = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrderEntity.ProductBOMId);
+            //查询已收货数量
+            var jointProductAndByproductsReceiveRecords = await _manuJointProductAndByproductsReceiveRecordRepository.GetEntitiesAsync(new ManuJointProductAndByproductsReceiveRecordQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkOrderid = saveDto.WorkOrderid,
+                procMaterialIds= procBomDetails.Where(x => x.BomProductType == ManuProductTypeEnum.JointProducts).Select(x => x.MaterialId).ToArray()
             });
             // 查询已下发数量
             var workOrderRecordEntity = await _planWorkOrderRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id);
@@ -364,16 +372,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
             }
+            if (saveDto.ProductType == "joinProduct")
+            {
+                //已收货数量
+                var receivedQuantity = jointProductAndByproductsReceiveRecords.Sum(x => x.Qty);
+                if (saveDto.Qty + receivedQuantity > workOrderRecordEntity.PassDownQuantity)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES14603));
+                }
+            }
             // 判断数量限制
             List<string> list = new List<string>();
             switch (procMaterialEntity.QuantityLimit)
             {
                 case MaterialQuantityLimitEnum.AnyNumber:
-                    if (saveDto.Qty > workOrderRecordEntity.PassDownQuantity)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES14603));
-                    }
-
+                   
                     if (saveDto.Qty < qty)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES11719));

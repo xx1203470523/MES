@@ -25,7 +25,7 @@ namespace Hymson.MES.Core.Domain.EquRepairOrderFault
        /// <summary>
         /// 维修单idequ_repair_orderid
         /// </summary>
-        public string RepairOrderId { get; set; }
+        public long RepairOrderId { get; set; }
 
        /// <summary>
         /// 故障id equ_fault_phenomenon id

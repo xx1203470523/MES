@@ -16,8 +16,8 @@ namespace Hymson.MES.Core.Enums
         /// <summary>
         /// 小时
         /// </summary>
-        [Description("小时")]
-        Hour = 2,
+        //[Description("小时")]
+        //Hour = 2,
         /// <summary>
         /// 日
         /// </summary>

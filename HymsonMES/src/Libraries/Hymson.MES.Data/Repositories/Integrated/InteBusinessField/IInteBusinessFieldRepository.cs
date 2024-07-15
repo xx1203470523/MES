@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.InteBusinessField.View;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -78,7 +79,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteBusinessFieldEntity>> GetPagedListAsync(InteBusinessFieldPagedQuery pagedQuery);
+        Task<PagedInfo<InteBusinessFieldView>> GetPagedListAsync(InteBusinessFieldPagedQuery pagedQuery);
+
+        Task<InteBusinessFieldEntity> GetByCodeAsync(InteBusinessFieldQuery query);
 
     }
 }

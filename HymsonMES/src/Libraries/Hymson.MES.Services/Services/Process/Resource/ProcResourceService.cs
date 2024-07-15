@@ -21,6 +21,7 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Common;
@@ -115,6 +116,12 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
+        /// 仓储接口（资质认证）
+        /// </summary>
+        private readonly IInteQualificationAuthenticationRepository _inteQualificationAuthenticationRepository;
+        private readonly IProcResourceQualificationAuthenticationRelationRepository _authenticationRelationRepository;
+
+        /// <summary>
         /// 
         /// </summary>
         private readonly ILocalizationService _localizationService;
@@ -139,6 +146,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procMaterialRepository"></param>
         /// <param name="procProductSetRepository"></param>
         /// <param name="equEquipmentRepository"></param>
+        /// <param name="authenticationRelationRepository"></param>
+        /// <param name="inteQualificationAuthenticationRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         /// <param name="localizationService"></param>
@@ -155,6 +164,8 @@ namespace Hymson.MES.Services.Services.Process
                   IProcMaterialRepository procMaterialRepository,
                   IProcProductSetRepository procProductSetRepository,
                   IEquEquipmentRepository equEquipmentRepository,
+                  IInteQualificationAuthenticationRepository inteQualificationAuthenticationRepository,
+                  IProcResourceQualificationAuthenticationRelationRepository authenticationRelationRepository,
                   AbstractValidator<ProcResourceCreateDto> validationCreateRules,
                   AbstractValidator<ProcResourceModifyDto> validationModifyRules, ILocalizationService localizationService)
         {
@@ -172,6 +183,8 @@ namespace Hymson.MES.Services.Services.Process
             _procMaterialRepository = procMaterialRepository;
             _procProductSetRepository = procProductSetRepository;
             _equEquipmentRepository = equEquipmentRepository;
+            _inteQualificationAuthenticationRepository=inteQualificationAuthenticationRepository;
+            _authenticationRelationRepository = authenticationRelationRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
@@ -470,6 +483,46 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
+        /// 获取资质认证设置
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcQualificationAuthenticationDto>> GetResourceAuthSetListAsync(long resourceId)
+        {
+            var query = new ProcResourceQualificationAuthenticationRelationQuery()
+            {
+                ResourceId = resourceId
+            };
+            var relationEntities = await _authenticationRelationRepository.GetEntitiesAsync(query);
+
+            //实体到DTO转换 装载数据
+            List<ProcQualificationAuthenticationDto> authenticationDtos = new List<ProcQualificationAuthenticationDto>();
+            if (relationEntities != null && relationEntities.Any())
+            {
+                IEnumerable<InteQualificationAuthenticationEntity> authenticationEntities = new List<InteQualificationAuthenticationEntity>();
+                var authIds = relationEntities.Select(a => a.QualificationAuthenticationId).ToArray();
+                if (authIds.Any())
+                {
+                    authenticationEntities = await _inteQualificationAuthenticationRepository.GetByIdsAsync(authIds);
+                }
+
+                foreach (var entity in relationEntities)
+                {
+                    var authenticationEntity = authenticationEntities.FirstOrDefault(x => x.Id == entity.QualificationAuthenticationId);
+                    authenticationDtos.Add(new ProcQualificationAuthenticationDto()
+                    {
+                        AuthenticationId = entity.QualificationAuthenticationId,
+                        IsEnable = entity.IsEnable,
+                        Code = authenticationEntity?.Code ?? "",
+                        Name = authenticationEntity?.Name ?? ""
+                    });
+                }
+            }
+
+            return authenticationDtos;
+        }
+
+        /// <summary>
         /// 添加资源维护表所有页签的数据
         /// </summary>
         /// <param name="param"></param>
@@ -483,7 +536,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             param.ResCode = param.ResCode.ToTrimSpace().ToUpperInvariant();
             param.ResName = param.ResName.Trim();
-            param.Remark = param?.Remark??"".Trim();
+            param.Remark = param?.Remark ?? "".Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
@@ -529,6 +582,12 @@ namespace Hymson.MES.Services.Services.Process
                     throw new CustomerValidationException(nameof(ErrorCode.MES10307));
                 }
             }
+
+            //判断资质是否重复配置  数据库中 已经存储的情况
+            if (param.AuthSetList != null && param.AuthSetList.Count > 0 && param.AuthSetList.GroupBy(x => x.AuthenticationId).Any(g => g.Count() >= 2))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10389));
+            }
             #endregion
 
             var siteId = _currentSite.SiteId ?? 0;
@@ -558,7 +617,7 @@ namespace Hymson.MES.Services.Services.Process
             if (param.PrintList != null && param.PrintList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in param.PrintList.Select(x=>x.PrintId))
+                foreach (var item in param.PrintList.Select(x => x.PrintId))
                 {
                     i++;
                     if (item <= 0)
@@ -791,6 +850,22 @@ namespace Hymson.MES.Services.Services.Process
                     productSetList.Add(relationEntity);
                 }
             }
+
+            //资质认证设置数据
+            var authenticationRelationEntities = new List<ProcResourceQualificationAuthenticationRelationEntity>();
+            if (param.AuthSetList != null && param.AuthSetList.Count > 0)
+            {
+                foreach (var item in param.AuthSetList)
+                {
+                    authenticationRelationEntities.Add(new ProcResourceQualificationAuthenticationRelationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ResourceId = entity.Id,
+                        IsEnable = item.IsEnable,
+                        QualificationAuthenticationId = item.AuthenticationId
+                    });
+                }
+            }
             if (validationFailures.Any())
             {
                 throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
@@ -822,6 +897,11 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     await _procProductSetRepository.InsertsAsync(productSetList);
                 }
+                if (authenticationRelationEntities.Any())
+                {
+                    await _authenticationRelationRepository.InsertRangeAsync(authenticationRelationEntities);
+                }
+
                 ts.Complete();
             }
             return entity.Id;
@@ -871,7 +951,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     if (x.PrintId == 0)
                     {
-                        x.PrintId = x.Id==null?0: x.Id.ParseToLong();
+                        x.PrintId = x.Id == null ? 0 : x.Id.ParseToLong();
                     }
                 });
                 //判断打印机是否重复配置  数据库中 已经存储的情况
@@ -899,6 +979,12 @@ namespace Hymson.MES.Services.Services.Process
                     throw new CustomerValidationException(nameof(ErrorCode.MES10307));
                 }
             }
+
+            //判断资质是否重复配置  数据库中 已经存储的情况
+            if (param.AuthSetList != null && param.AuthSetList.Count > 0 && param.AuthSetList.GroupBy(x => x.AuthenticationId).Any(g => g.Count() >= 2))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10389));
+            }
             #endregion
 
             //DTO转换实体
@@ -919,7 +1005,7 @@ namespace Hymson.MES.Services.Services.Process
             if (param.PrintList != null && param.PrintList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in param.PrintList.Select(x=>x.PrintId))
+                foreach (var item in param.PrintList.Select(x => x.PrintId))
                 {
                     i++;
                     if (item <= 0)
@@ -1154,10 +1240,27 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
+            //资质认证设置数据
+            var authenticationRelationEntities = new List<ProcResourceQualificationAuthenticationRelationEntity>();
+            if (param.AuthSetList != null && param.AuthSetList.Count > 0)
+            {
+                foreach (var item in param.AuthSetList)
+                {
+                    authenticationRelationEntities.Add(new ProcResourceQualificationAuthenticationRelationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ResourceId = entity.Id,
+                        IsEnable = item.IsEnable,
+                        QualificationAuthenticationId = item.AuthenticationId
+                    });
+                }
+            }
+
             if (validationFailures.Any())
             {
                 throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
             }
+
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //入库
@@ -1202,6 +1305,12 @@ namespace Hymson.MES.Services.Services.Process
                     await _procProductSetRepository.InsertsAsync(productSetList);
                 }
 
+                //资质设置
+                await _authenticationRelationRepository.DeleteByResourceIdAsync(param.Id);
+                if (authenticationRelationEntities.Any())
+                {
+                    await _authenticationRelationRepository.InsertRangeAsync(authenticationRelationEntities);
+                }
                 ts.Complete();
             }
         }
@@ -1257,7 +1366,7 @@ namespace Hymson.MES.Services.Services.Process
             var resourceEquipmentBindEntities = await _resourceEquipmentBindRepository.GetByResourceIdAsync(new ProcResourceEquipmentBindQuery { ResourceId = resourceId });
 
             List<SelectOptionDto> selectOptionDtos = new();
-            foreach (var item in resourceEquipmentBindEntities.Select(x=>x.EquipmentId))
+            foreach (var item in resourceEquipmentBindEntities.Select(x => x.EquipmentId))
             {
                 var equipmentEntity = await _equEquipmentRepository.GetByIdAsync(item);
                 if (equipmentEntity == null) continue;

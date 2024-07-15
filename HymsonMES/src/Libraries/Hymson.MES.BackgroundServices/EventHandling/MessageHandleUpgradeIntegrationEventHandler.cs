@@ -1,5 +1,5 @@
 ﻿using Hymson.EventBus.Abstractions;
-using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
+using Hymson.MES.CoreServices.Events.IntegrationEvents.Messages;
 using Hymson.MES.CoreServices.Services.Integrated;
 
 namespace Hymson.MES.BackgroundServices.EventHandling

@@ -2,7 +2,7 @@
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Integrated;
-using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
+using Hymson.MES.CoreServices.Events.IntegrationEvents.Messages;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;

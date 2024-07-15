@@ -22,6 +22,11 @@ using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.CoreServices.Bos.Equment;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Services.EquEquipmentRecord;
+using Hymson.MES.Core.Domain.EquEquipmentRecord;
+using Hymson.MES.Services.Dtos.EquEquipmentRecord;
+using Hymson.MES.Data.Repositories.EquEquipmentRecord;
+using Hymson.MES.Core.Enums.Common;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -97,6 +102,16 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         private readonly IEquSpotcheckTaskSnapshotPlanRepository _equSpotcheckTaskSnapshotPlanRepository;
 
+        /// <summary>
+        /// 设备记录
+        /// </summary>
+        private readonly IEquEquipmentRecordService _equEquipmentRecordService;
+
+        /// <summary>
+        /// 设备记录(仓储)
+        /// </summary>
+        private readonly IEquEquipmentRecordRepository _equEquipmentRecordRepository;
+
 
 
         /// <summary>
@@ -124,7 +139,7 @@ namespace Hymson.MES.Services.Services.Equipment
             IEquSpotcheckTaskOperationRepository equSpotcheckTaskOperationRepository,
             IEquSpotcheckTaskProcessedRepository equSpotcheckTaskProcessedRepository,
             IEquSpotcheckTaskAttachmentRepository equSpotcheckTaskAttachmentRepository,
-            IEquSpotcheckTaskSnapshotPlanRepository equSpotcheckTaskSnapshotPlanRepository)
+            IEquSpotcheckTaskSnapshotPlanRepository equSpotcheckTaskSnapshotPlanRepository, IEquEquipmentRecordService equEquipmentRecordService, IEquEquipmentRecordRepository equEquipmentRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -140,6 +155,8 @@ namespace Hymson.MES.Services.Services.Equipment
             _equSpotcheckTaskProcessedRepository = equSpotcheckTaskProcessedRepository;
             _equSpotcheckTaskAttachmentRepository = equSpotcheckTaskAttachmentRepository;
             _equSpotcheckTaskSnapshotPlanRepository = equSpotcheckTaskSnapshotPlanRepository;
+            _equEquipmentRecordService = equEquipmentRecordService;
+            _equEquipmentRecordRepository = equEquipmentRecordRepository;
         }
 
 
@@ -214,7 +231,8 @@ namespace Hymson.MES.Services.Services.Equipment
             var entitys = await _equSpotcheckTaskRepository.GetByIdsAsync(ids);
             if (entitys != null)
             {
-                if (!entitys.Any(x => x.Status == EquSpotcheckTaskStautusEnum.WaitInspect))
+                var isDeleteEntitys = entitys.Where(x => x.Status != EquSpotcheckTaskStautusEnum.WaitInspect);
+                if (isDeleteEntitys.Any())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15904));
                 }
@@ -367,11 +385,16 @@ namespace Hymson.MES.Services.Services.Equipment
                 default: return default;
             }
 
+            EquEquipmentRecordEntity? equEquipmentRecordEntity = null;
+
             // 更改状态
             switch (requestDto.OperationType)
             {
                 case EquSpotcheckOperationTypeEnum.Start:
                     entity.Status = EquSpotcheckTaskStautusEnum.Inspecting;
+                    var equSpotcheckTaskSnapshotPlan = await _equSpotcheckTaskSnapshotPlanRepository.GetByTaskIdAsync(entity.Id);
+                    equEquipmentRecordEntity = await _equEquipmentRecordService.GetAddEquRecordByEquEquipmentAsync(new GetAddEquRecordByEquEquipmentDto { EquipmentId = equSpotcheckTaskSnapshotPlan.EquipmentId, operationType = EquEquipmentRecordOperationTypeEnum.Inspection });
+
                     break;
                 case EquSpotcheckOperationTypeEnum.Complete:
                     entity.Status = entity.IsQualified == TrueOrFalseEnum.Yes ? EquSpotcheckTaskStautusEnum.Closed : EquSpotcheckTaskStautusEnum.Completed;
@@ -387,6 +410,10 @@ namespace Hymson.MES.Services.Services.Equipment
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await CommonOperationAsync(entity, EquSpotcheckOperationTypeEnum.Start);
+            if (equEquipmentRecordEntity != null)
+            {
+                await _equEquipmentRecordRepository.InsertAsync(equEquipmentRecordEntity);
+            }
             trans.Complete();
             return rows;
         }
@@ -428,37 +455,6 @@ namespace Hymson.MES.Services.Services.Equipment
 
 
             List<TaskItemUnionSnapshotView> outViews = new();
-
-            //var result = from a in taskitem
-            //             join b in taskitemSnap on a.SpotCheckItemSnapshotId equals b.Id
-            //             select new TaskItemUnionSnapshotView
-            //             {
-            //                 Id = a.Id,
-            //                 SpotCheckTaskId = a.SpotCheckTaskId,
-            //                 SpotCheckItemSnapshotId = b.Id,
-
-            //                 // 映射其他属性
-            //                 InspectionValue = a.InspectionValue,
-            //                 IsQualified = a.IsQualified,
-            //                 Remark = a.Remark,
-            //                 SiteId = a.SiteId,
-
-            //                 //snapshot
-            //                 Code = b.Code,
-            //                 Name = b.Name,
-            //                 Status = b.Status,
-            //                 DataType = b.DataType,
-            //                 CheckType = b.CheckType,
-            //                 CheckMethod = b.CheckMethod,
-            //                 UnitId = b.UnitId,
-            //                 Unit = "",
-            //                 OperationContent = b.OperationContent,
-            //                 Components = b.Components,
-            //                 LowerLimit = b.LowerLimit,
-            //                 ReferenceValue = b.ReferenceValue,
-            //                 UpperLimit = b.UpperLimit
-
-            //             };
 
             try
             {
@@ -649,6 +645,14 @@ namespace Hymson.MES.Services.Services.Equipment
                     Ids = beforeAttachments.Select(s => s.AttachmentId)
                 });
             }
+
+            //修改检验状态
+            rows += await OperationOrderAsync(new EquSpotcheckTaskOrderOperationStatusDto
+            {
+                OrderId = requestDto.SpotCheckTaskId,
+                OperationType = EquSpotcheckOperationTypeEnum.Start
+            });
+
             //更新task操作时间
             rows += await _equSpotcheckTaskRepository.UpdateAsync(taskEntity);
             if (snapshotPlanEntitys != null)
@@ -733,7 +737,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var operationType = EquSpotcheckOperationTypeEnum.Complete;
 
             //有任一不合格，完成
-            if (sampleDetailEntities.Any(X => X.IsQualified == TrueOrFalseEnum.No))
+            if (sampleDetailEntities.Any(X => X.IsQualified == TrueFalseEmptyEnum.No))
             {
                 entity.Status = EquSpotcheckTaskStautusEnum.Completed;
                 entity.IsQualified = TrueOrFalseEnum.No;

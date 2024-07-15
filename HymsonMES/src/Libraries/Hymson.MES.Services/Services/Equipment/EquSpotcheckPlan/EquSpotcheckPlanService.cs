@@ -15,6 +15,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Common;
 using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.CoreServices.Events.Equipment;
 using Hymson.MES.CoreServices.Services.EquSpotcheckPlan;
@@ -148,7 +149,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
             }
-            if (!equSpotcheckPlanCreateDto.CompletionHour.HasValue && !equSpotcheckPlanCreateDto.CompletionHour.HasValue)
+            if (!equSpotcheckPlanCreateDto.CompletionHour.HasValue && !equSpotcheckPlanCreateDto.CompletionMinute.HasValue)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12323));
             }
@@ -314,8 +315,8 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             if (equSpotcheckPlanModifyDto.FirstExecuteTime < equSpotcheckPlanModifyDto.BeginTime || equSpotcheckPlanModifyDto.FirstExecuteTime > equSpotcheckPlanModifyDto.EndTime)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12320));
-            }
-            if (!equSpotcheckPlanModifyDto.CompletionHour.HasValue && !equSpotcheckPlanModifyDto.CompletionHour.HasValue)
+            } 
+            if (!equSpotcheckPlanModifyDto.CompletionHour.HasValue && !equSpotcheckPlanModifyDto.CompletionMinute.HasValue)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12323));
             }
@@ -529,7 +530,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                         UnitId = thisEquSpotcheckItem.UnitId,
                         OperationContent = thisEquSpotcheckItem.OperationContent ?? "",
                         Components = thisEquSpotcheckItem.Components ?? "",
-                        Remark = thisEquSpotcheckItem.Remark ?? "",
+                        //Remark = thisEquSpotcheckItem.Remark ?? "",
                         ReferenceValue = thisEquSpotcheckTemplateItemRelation?.Center,
                         UpperLimit = thisEquSpotcheckTemplateItemRelation?.UpperLimit,
                         LowerLimit = thisEquSpotcheckTemplateItemRelation?.LowerLimit,
@@ -548,7 +549,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
                         SpotCheckTaskId = equSpotcheckTask.Id,
                         SpotCheckItemSnapshotId = equSpotcheckTask.Id,
                         InspectionValue = "",
-                        IsQualified = TrueOrFalseEnum.No,
+                        IsQualified = TrueFalseEmptyEnum.No,
                         Remark = equSpotcheckTaskSnapshotItem.Remark,
 
                         Id = IdGenProvider.Instance.CreateId(),
@@ -627,7 +628,7 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
         /// <exception cref="ValidationException"></exception>
         private static string? GetExecuteCycle(EquSpotcheckPlanEntity plan)
         {
-            if (!plan.FirstExecuteTime.HasValue || !plan.Type.HasValue || !plan.Cycle.HasValue)
+            if (!plan.FirstExecuteTime.HasValue || !plan.CycleType.HasValue || !plan.Cycle.HasValue)
             {
                 return null;
             }
@@ -636,14 +637,19 @@ namespace Hymson.MES.Services.Services.EquSpotcheckPlan
             var hour = plan.FirstExecuteTime.GetValueOrDefault().Hour.ToString();
             var day = "*";
             var tail = "* ?";
-            if (plan.Type == EquipmentSpotcheckTypeEnum.Hour)
+
+            switch (plan.CycleType)
             {
-                hour = $"0/{plan.Cycle}";
-            }
-            else
-            {
-                day = $"*/{day}";
-            }
+                case EquipmentCycleTypeEnum.Hour:
+                    hour = $"0/{plan.Cycle}";
+                    break;
+                case EquipmentCycleTypeEnum.Day:
+                    day = $"*/{plan.Cycle}";
+                    break;
+                default:
+                    break;
+            }   
+
             var expression = $"{second} {minute} {hour} {day} {tail}";
             return expression;
         }

@@ -29,12 +29,12 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 类型 1、文本2、文本区域，日期，数字，复选框
         /// </summary>
-        public FieldDefinitionTypeEnum Type { get; set; }
+        public FieldDefinitionTypeEnum Type { get; set; } = FieldDefinitionTypeEnum.Text;
 
         /// <summary>
         /// 值来源 物料条码，供应商，客户，产品序列码，
         /// </summary>
-        public FieldDefinitionSourceEnum Source { get; set; }
+        public FieldDefinitionSourceEnum? Source { get; set; }
 
         /// <summary>
         /// 掩码组id proc_maskcode id

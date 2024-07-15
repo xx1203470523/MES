@@ -13,7 +13,9 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.EquSparepartRecord;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.EquEquipmentRecord;
 using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.EquSparepartRecord;
 using Hymson.Snowflake;
@@ -46,14 +48,15 @@ namespace Hymson.MES.Services.Services.EquSparepartRecord
         /// </summary>
         /// <param name="equSparepartRecordPagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquSparepartRecordDto>> GetPagedListAsync(EquSparepartRecordPagedQueryDto equSparepartRecordPagedQueryDto)
+        public async Task<PagedInfo<EquSparepartRecordPagedViewDto>> GetPagedListAsync(EquSparepartRecordPagedQueryDto equSparepartRecordPagedQueryDto)
         {
             var equSparepartRecordPagedQuery = equSparepartRecordPagedQueryDto.ToQuery<EquSparepartRecordPagedQuery>();
+            equSparepartRecordPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equSparepartRecordRepository.GetPagedInfoAsync(equSparepartRecordPagedQuery);
 
             //实体到DTO转换 装载数据
-            List<EquSparepartRecordDto> equSparepartRecordDtos = PrepareEquSparepartRecordDtos(pagedInfo);
-            return new PagedInfo<EquSparepartRecordDto>(equSparepartRecordDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            List<EquSparepartRecordPagedViewDto> equSparepartRecordDtos = PrepareEquSparepartRecordDtos(pagedInfo);
+            return new PagedInfo<EquSparepartRecordPagedViewDto>(equSparepartRecordDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -61,12 +64,17 @@ namespace Hymson.MES.Services.Services.EquSparepartRecord
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<EquSparepartRecordDto> PrepareEquSparepartRecordDtos(PagedInfo<EquSparepartRecordEntity>   pagedInfo)
+        private static List<EquSparepartRecordPagedViewDto> PrepareEquSparepartRecordDtos(PagedInfo<EquSparepartRecordPagedView> pagedInfo)
         {
-            var equSparepartRecordDtos = new List<EquSparepartRecordDto>();
+            var equSparepartRecordDtos = new List<EquSparepartRecordPagedViewDto>();
+
             foreach (var equSparepartRecordEntity in pagedInfo.Data)
             {
-                var equSparepartRecordDto = equSparepartRecordEntity.ToModel<EquSparepartRecordDto>();
+                var equSparepartRecordDto = equSparepartRecordEntity.ToModel<EquSparepartRecordPagedViewDto>();
+                if (equSparepartRecordDto.OperationType == EquOperationTypeEnum.Outbound)
+                {
+                    equSparepartRecordDto.WorkCenterCode = equSparepartRecordDto.RecordWorkCenterCode;
+                }
                 equSparepartRecordDtos.Add(equSparepartRecordDto);
             }
 
@@ -78,13 +86,13 @@ namespace Hymson.MES.Services.Services.EquSparepartRecord
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquSparepartRecordDto> QueryEquSparepartRecordByIdAsync(long id) 
+        public async Task<EquSparepartRecordDto> QueryEquSparepartRecordByIdAsync(long id)
         {
-           var equSparepartRecordEntity = await _equSparepartRecordRepository.GetByIdAsync(id);
-           if (equSparepartRecordEntity != null) 
-           {
-               return equSparepartRecordEntity.ToModel<EquSparepartRecordDto>();
-           }
+            var equSparepartRecordEntity = await _equSparepartRecordRepository.GetByIdAsync(id);
+            if (equSparepartRecordEntity != null)
+            {
+                return equSparepartRecordEntity.ToModel<EquSparepartRecordDto>();
+            }
             return null;
         }
     }

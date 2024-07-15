@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.EquSparepartRecord
 {
@@ -188,11 +189,130 @@ namespace Hymson.MES.Services.Dtos.EquSparepartRecord
        
     }
 
+    /// <summary>
+    /// 备件记录
+    /// </summary>
+    public record EquSparepartRecordPagedViewDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 备件编号 
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 备件名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 备件类型
+        /// </summary>
+        public string SparePartTypeCode { get; set; }
+
+        /// <summary>
+        /// 备件类型名称
+        /// </summary>
+        public string SparePartTypeName { get; set; }
+
+        /// <summary>
+        /// 操作数量
+        /// </summary>
+        public int Qty { get; set; }
+
+        /// <summary>
+        /// 操作数量
+        /// </summary>
+        public int OperationQty { get; set; }
+
+        /// <summary>
+        /// 工作中心
+        /// </summary>
+        public string WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 工作中心
+        /// </summary>
+        public string RecordWorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 设备编号
+        /// </summary>
+        public string EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string EquipmentName { get; set; }
+
+        /// <summary>
+        /// 位置
+        /// </summary>
+        public string Position { get; set; }
+
+        /// <summary>
+        /// 操作类型 1、注册 2、入库 3、出库4、绑定5、解绑
+        /// </summary> 
+        public EquOperationTypeEnum? OperationType { get; set; }
+
+        /// <summary>
+        /// 领用人
+        /// </summary>
+        public string Recipients { get; set; } 
+
+        /// <summary>
+        /// 操作时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// 操作人
+        /// </summary>
+        public string CreatedBy { get; set; }
+    }
 
     /// <summary>
     /// 设备备件记录表分页Dto
     /// </summary>
     public class EquSparepartRecordPagedQueryDto : PagerInfo
     {
+        /// <summary>
+        /// 备件编号 
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 备件名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// 操作类型 1、注册 2、入库 3、出库4、绑定5、解绑
+        /// </summary> 
+        public EquOperationTypeEnum? OperationType { get; set; }
+
+        /// <summary>
+        /// 备件类型
+        /// </summary>
+        public string? SparePartTypeCode { get; set; }
+
+        /// <summary>
+        /// 设备编号
+        /// </summary>
+        public string? EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string? EquipmentName { get; set; }
+
+        /// <summary>
+        /// 操作时间
+        /// </summary>
+        public DateTime[]? CreatedOn { get; set; }
     }
 }

@@ -71,6 +71,12 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// </summary>
         [Description("车间库存")]
         WorkshopInventory = 11,
-        
+
+        /// <summary>
+        /// 设备维修
+        /// </summary>
+        [Description("设备维修")]
+        EquRepairOrder = 12,
+
     }
 }
