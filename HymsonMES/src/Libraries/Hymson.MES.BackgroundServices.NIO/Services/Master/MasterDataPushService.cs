@@ -138,7 +138,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10140));
             }
-           
+
             //主数据查询
             MavelProducreQuery query = new MavelProducreQuery() { SiteId = siteId };
             var producreList = await _procProcedureMavelRepository.GetList(query);
@@ -148,7 +148,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
             //组装数据
             List<StationDto> dtos = new List<StationDto>();
-            foreach (var item in  producreList)
+            foreach (var item in producreList)
             {
                 StationDto model = new StationDto();
                 if (item.Code.Length == 5) //转子
@@ -179,7 +179,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.UpdateTime = GetTimestamp(item.CreatedOn, item.UpdatedOn);
                 dtos.Add(model);
             }
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
