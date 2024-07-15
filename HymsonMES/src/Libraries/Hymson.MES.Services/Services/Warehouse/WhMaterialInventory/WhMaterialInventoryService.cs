@@ -703,10 +703,11 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             //物料台账+2
             var whMaterialStandingbookEntities = new List<WhMaterialStandingbookEntity>();
+            //流转关系表
+            var manuBarCodeRelationEntitys = new List<ManuBarCodeRelationEntity>();
+
             for (int i = 1; i <= 2; i++)
             {
-                //var orgisfc = i == 1 ? oldWhMEntirty.MaterialBarCode : newSplitSFC;
-                //var newsfc = i == 1 ? newSplitSFC : oldWhMEntirty.MaterialBarCode;
                 var standingbook = new WhMaterialStandingbookEntity
                 {
                     MaterialCode = procMaterialEntitity?.MaterialCode ?? "",
@@ -715,7 +716,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialBarCode = i == 1 ? oldWhMEntirty.MaterialBarCode : newSplitSFC,
                     Quantity = i == 1 ? remainsQty : adjustDto.Qty,
                     Unit = procMaterialEntitity?.Unit ?? "",
-                    Type = WhMaterialInventoryTypeEnum.MaterialBarCodeSplit,
+                    Type = i == 1 ? WhMaterialInventoryTypeEnum.MaterialBarCodeSplit : WhMaterialInventoryTypeEnum.SplitAdd,
                     Source = MaterialInventorySourceEnum.Disassembly,
                     SiteId = _currentSite.SiteId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
@@ -729,7 +730,45 @@ namespace Hymson.MES.Services.Services.Warehouse
                 };
 
                 whMaterialStandingbookEntities.Add(standingbook);
+
+
             }
+
+
+            var manuBarCodeRelationEntity = new ManuBarCodeRelationEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = oldWhMEntirty!.SiteId,
+                ProcedureId = null,
+                ResourceId = null,
+                EquipmentId = null,
+                InputBarCode = oldWhMEntirty.MaterialBarCode,
+                InputBarCodeLocation = string.Empty,
+                InputBarCodeMaterialId = oldWhMEntirty.MaterialId,
+                InputBarCodeWorkOrderId = oldWhMEntirty.WorkOrderId,
+                InputQty = remainsQty,
+                OutputBarCode = newSplitSFC,
+                OutputBarCodeMaterialId = oldWhMEntirty.MaterialId,
+                OutputBarCodeWorkOrderId = oldWhMEntirty.WorkOrderId,
+                OutputBarCodeMode = ManuBarCodeOutputModeEnum.Normal,
+                RelationType = ManuBarCodeRelationTypeEnum.SFC_Split,
+                BusinessContent = new
+                {
+                    InputMaterialStandingBookd = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == oldWhMEntirty.MaterialBarCode).FirstOrDefault()?.Id,
+                    OutputMaterialStandingBook = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == newSplitSFC).FirstOrDefault()?.Id
+                }.ToSerialize(),
+                IsDisassemble = TrueOrFalseEnum.No,
+                DisassembledBy = _currentUser.UserName,
+                DisassembledOn = HymsonClock.Now(),
+                SubstituteId = 0,
+                Remark = "物料条码拆分",
+                CreatedOn = HymsonClock.Now(),
+                CreatedBy = _currentUser.UserName,
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+                IsDeleted = 0
+            };
+            manuBarCodeRelationEntitys.Add(manuBarCodeRelationEntity);
 
             //MANU BARCODE RELATION INSERT
 
@@ -771,7 +810,12 @@ namespace Hymson.MES.Services.Services.Warehouse
                 {
                     await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
                 }
-
+                //流程
+                if (manuBarCodeRelationEntitys != null)
+                {
+                    //插入manu_barcode_relation
+                    await _manuBarCodeRelationRepository.InsertRangeAsync(manuBarCodeRelationEntitys);
+                }
                 ts.Complete();
             }
             return newSplitSFC;
@@ -990,6 +1034,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
                 var standingbook = new WhMaterialStandingbookEntity
                 {
+                    Id = IdGenProvider.Instance.CreateId(),
                     MaterialCode = procMaterialEntitity?.MaterialCode ?? "",
                     MaterialName = procMaterialEntitity?.MaterialName ?? "",
                     MaterialVersion = procMaterialEntitity?.Version ?? "",
@@ -998,10 +1043,9 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialBarCode = entity.MaterialBarCode,
                     Quantity = quantityResidue,
 
-                    Type = WhMaterialInventoryTypeEnum.MaterialBarCodeMerge,
+                    Type = IsMergeSFC == true ? WhMaterialInventoryTypeEnum.CombinedAdd : WhMaterialInventoryTypeEnum.MaterialBarCodeMerge,
                     Source = MaterialInventorySourceEnum.Merge,
                     SiteId = _currentSite.SiteId ?? 0,
-                    Id = IdGenProvider.Instance.CreateId(),
                     Batch = entity.Batch ?? string.Empty,
                     SupplierId = entity.SupplierId,
                     CreatedBy = _currentUser.UserName,
@@ -1012,7 +1056,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                 };
 
                 whMaterialStandingbookEntities.Add(standingbook);
+            }
 
+            foreach (var entity in standbookList)
+            {
                 var manuBarCodeRelationEntity = new ManuBarCodeRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -1030,7 +1077,11 @@ namespace Hymson.MES.Services.Services.Warehouse
                     OutputBarCodeWorkOrderId = inputBarcodeSingle.WorkOrderId,
                     OutputBarCodeMode = ManuBarCodeOutputModeEnum.Normal,
                     RelationType = ManuBarCodeRelationTypeEnum.SFC_Combined,
-                    BusinessContent = "{}",
+                    BusinessContent = new
+                    {
+                        InputMaterialStandingBookd = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == inputBarcodeSingle.MaterialBarCode).FirstOrDefault()?.Id,
+                        OutputMaterialStandingBook = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == entity.MaterialBarCode).FirstOrDefault()?.Id,
+                    }.ToSerialize(),
                     IsDisassemble = TrueOrFalseEnum.No,
                     DisassembledBy = _currentUser.UserName,
                     DisassembledOn = HymsonClock.Now(),
@@ -1047,48 +1098,42 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                try
+
+                //更新其它SFC MANUSFC
+                if (updateSFCOtherCommand != null)
                 {
-                    //更新其它SFC MANUSFC
-                    if (updateSFCOtherCommand != null)
-                    {
-                        await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(updateSFCOtherCommand);
-                    }
-
-                    //更新指定SFC
-                    if (updateSFCSpecifyCommand.SFCs != null)
-                    {
-                        await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(updateSFCSpecifyCommand);
-                    }
-
-                    //INVENTORY UPDATE
-                    if (updateInventoryCommands != null)
-                    {
-                        await _whMaterialInventoryRepository.UpdateQuantityResidueRangeAsync(updateInventoryCommands);
-                    }
-
-                    //INVENTORY INSERT
-                    if (newSFCEntity != null && newSFCEntity.Id != 0)
-                    {
-                        await _whMaterialInventoryRepository.InsertAsync(newSFCEntity);
-                    }
-                    //台账
-                    if (whMaterialStandingbookEntities.Any())
-                    {
-                        await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
-                    }
-                    //流程
-                    if (manuBarCodeRelationEntitys != null)
-                    {
-                        //插入manu_barcode_relation
-                        await _manuBarCodeRelationRepository.InsertRangeAsync(manuBarCodeRelationEntitys);
-                    }
-                    ts.Complete();
+                    await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(updateSFCOtherCommand);
                 }
-                catch (Exception ex)
+
+                //更新指定SFC
+                if (updateSFCSpecifyCommand.SFCs != null)
                 {
-
+                    await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(updateSFCSpecifyCommand);
                 }
+
+                //INVENTORY UPDATE
+                if (updateInventoryCommands != null)
+                {
+                    await _whMaterialInventoryRepository.UpdateQuantityResidueRangeAsync(updateInventoryCommands);
+                }
+
+                //INVENTORY INSERT
+                if (newSFCEntity != null && newSFCEntity.Id != 0)
+                {
+                    await _whMaterialInventoryRepository.InsertAsync(newSFCEntity);
+                }
+                //台账
+                if (whMaterialStandingbookEntities.Any())
+                {
+                    await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
+                }
+                //流程
+                if (manuBarCodeRelationEntitys != null)
+                {
+                    //插入manu_barcode_relation
+                    await _manuBarCodeRelationRepository.InsertRangeAsync(manuBarCodeRelationEntitys);
+                }
+                ts.Complete();
 
             }
 
