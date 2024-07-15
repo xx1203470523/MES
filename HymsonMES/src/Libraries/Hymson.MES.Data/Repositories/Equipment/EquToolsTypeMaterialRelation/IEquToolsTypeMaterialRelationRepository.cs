@@ -1,43 +1,42 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment
 {
     /// <summary>
-    /// 仓储接口（工具类型管理）
+    /// 仓储接口（工具类型和物料关系表）
     /// </summary>
-    public interface IEquToolsTypeRepository
+    public interface IEquToolsTypeMaterialRelationRepository
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(EquToolsTypeEntity entity);
+        Task<int> InsertAsync(EquToolsTypeMaterialRelationEntity entity);
 
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<EquToolsTypeEntity> entities);
+        Task<int> InsertRangeAsync(IEnumerable<EquToolsTypeMaterialRelationEntity> entities);
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquToolsTypeEntity entity);
+        Task<int> UpdateAsync(EquToolsTypeMaterialRelationEntity entity);
 
         /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<EquToolsTypeEntity> entities);
+        Task<int> UpdateRangeAsync(IEnumerable<EquToolsTypeMaterialRelationEntity> entities);
 
         /// <summary>
         /// 软删除  
@@ -54,39 +53,46 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByToolTypeIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByToolTypeIdAsync(long id);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquToolsTypeEntity> GetByIdAsync(long id);
+        Task<EquToolsTypeMaterialRelationEntity> GetByIdAsync(long id);
 
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquToolsTypeEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<EquToolsTypeMaterialRelationEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquToolsTypeEntity>> GetEntitiesAsync(EquToolsTypeQuery query);
+        Task<IEnumerable<EquToolsTypeMaterialRelationEntity>> GetEntitiesAsync(EquToolsTypeMaterialRelationQuery query);
 
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquToolsTypeEntity>> GetPagedListAsync(EquToolsTypePagedQuery pagedQuery);
-
-        /// <summary>
-        /// 根据Code查询对象
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        Task<EquToolsTypeEntity> GetByCodeAsync(EntityByCodeQuery query);
+        Task<PagedInfo<EquToolsTypeMaterialRelationEntity>> GetPagedListAsync(EquToolsTypeMaterialRelationPagedQuery pagedQuery);
 
     }
 }
