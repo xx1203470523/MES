@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Equipment;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -122,5 +123,28 @@ namespace Hymson.MES.Api.Controllers.Equipment
             return await _equToolsTypeService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 获取设备组
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("equGrouplist")]
+        public async Task<IEnumerable<EquEquipmentGroupListDto>> GetEquipmentsAsync([FromQuery] EquToolsTypeQueryDto queryDto)
+        {
+            return await _equToolsTypeService.GetEquipmentsAsync(queryDto.Id);
+        }
+
+        /// <summary>
+        /// 获取物料列表
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("materialslist")]
+        public async Task<IEnumerable<ProcMaterialDto>> GetMaterialsAsync([FromQuery] EquToolsTypeQueryDto queryDto)
+        {
+            return await _equToolsTypeService.GetMaterialsAsync(queryDto.Id);
+        }
     }
 }

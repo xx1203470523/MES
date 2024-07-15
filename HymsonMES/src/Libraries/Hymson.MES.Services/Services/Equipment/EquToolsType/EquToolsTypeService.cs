@@ -11,8 +11,11 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -45,6 +48,11 @@ namespace Hymson.MES.Services.Services.Equipment
 
         private readonly IEquToolsTypeEquipmentGroupRelationRepository _groupRelationRepository;
         private readonly IEquToolsTypeMaterialRelationRepository _materialRelationRepository;
+        /// <summary>
+        /// 仓储（设备组）
+        /// </summary>
+        private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
         /// 参数验证器
@@ -59,6 +67,8 @@ namespace Hymson.MES.Services.Services.Equipment
             IEquToolingManageRepository equToolingManageRepository,
             IEquToolsTypeEquipmentGroupRelationRepository groupRelationRepository,
             IEquToolsTypeMaterialRelationRepository materialRelationRepository,
+            IEquEquipmentGroupRepository equEquipmentGroupRepository,
+            IProcMaterialRepository procMaterialRepository,
             AbstractValidator<EquToolsTypeSaveDto> validationSaveRules)
         {
             _currentUser = currentUser;
@@ -67,6 +77,8 @@ namespace Hymson.MES.Services.Services.Equipment
             _equToolingManageRepository = equToolingManageRepository;
             _groupRelationRepository = groupRelationRepository;
             _materialRelationRepository = materialRelationRepository;
+            _equEquipmentGroupRepository = equEquipmentGroupRepository;
+            _procMaterialRepository = procMaterialRepository;
             _validationSaveRules = validationSaveRules;
         }
 
@@ -326,14 +338,14 @@ namespace Hymson.MES.Services.Services.Equipment
         }
 
         /// <summary>
-        /// 获取设备组
+        /// 获取关联设备组
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public async Task<EquToolsTypeCofigEquipmentGroupDto> GetEquipmentRelationAsync(long id)
         {
-            var toolsTypeEntity=await _equToolsTypeRepository.GetByIdAsync(id);
-            var equToolsTypeCofig = new EquToolsTypeCofigEquipmentGroupDto { IsAllEquipmentUsed = toolsTypeEntity?.IsAllEquipmentUsed??false};
+            var toolsTypeEntity = await _equToolsTypeRepository.GetByIdAsync(id);
+            var equToolsTypeCofig = new EquToolsTypeCofigEquipmentGroupDto { IsAllEquipmentUsed = toolsTypeEntity?.IsAllEquipmentUsed ?? false };
             //查数据
             var equToolsTypes = await _groupRelationRepository.GetEntitiesAsync(new EquToolsTypeEquipmentGroupRelationQuery
             {
@@ -405,6 +417,61 @@ namespace Hymson.MES.Services.Services.Equipment
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquToolsTypeDto>());
             return new PagedInfo<EquToolsTypeDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 获取设备组
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquEquipmentGroupListDto>> GetEquipmentsAsync(long id)
+        {
+            var siteId = _currentSite.SiteId ?? 0;
+            //查数据
+            var equToolsTypes = await _groupRelationRepository.GetEntitiesAsync(new EquToolsTypeEquipmentGroupRelationQuery());
+            var groupEntities = await _equEquipmentGroupRepository.GetEntitiesAsync(new Data.Repositories.Equipment.EquEquipmentGroup.Query.EquEquipmentGroupQuery
+            {
+                SiteId = siteId
+            });
+            if (id == 0)
+            {
+                var groupIds = equToolsTypes.Select(x => x.EquipmentGroupId).Distinct().ToArray();
+                groupEntities = groupEntities.Where(x => !groupIds.Contains(x.Id));
+            }
+            else
+            {
+                var groupIds = equToolsTypes.Where(x => x.ToolTypeId != id).Select(x => x.EquipmentGroupId).Distinct().ToArray();
+                groupEntities = groupEntities.Where(x => !groupIds.Contains(x.Id));
+            }
+
+            var groupListDtos = groupEntities.Select(s => s.ToModel<EquEquipmentGroupListDto>());
+            return groupListDtos;
+        }
+
+        /// <summary>
+        /// 获取物料列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialDto>> GetMaterialsAsync(long id)
+        {
+            var siteId = _currentSite.SiteId ?? 0;
+            //查数据
+            var equToolsTypes = await _materialRelationRepository.GetEntitiesAsync(new EquToolsTypeMaterialRelationQuery());
+            var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery{SiteId = siteId});
+            if (id == 0)
+            {
+                var materialIds = equToolsTypes.Select(x => x.MaterialId).Distinct().ToArray();
+                materialEntities = materialEntities.Where(x => !materialIds.Contains(x.Id));
+            }
+            else
+            {
+                var materialIds = equToolsTypes.Where(x => x.ToolTypeId != id).Select(x => x.MaterialId).Distinct().ToArray();
+                materialEntities = materialEntities.Where(x => !materialIds.Contains(x.Id));
+            }
+
+            var materialDtos = materialEntities.Select(s => s.ToModel<ProcMaterialDto>());
+            return materialDtos;
         }
 
     }
