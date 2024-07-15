@@ -127,6 +127,9 @@ namespace Hymson.MES.BackgroundServices.NIO
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<NioPushSwitchEntity>(template.RawSql, query);
         }

@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Data.Repositories.Common.Query;
+using System.Data;
 
 namespace Hymson.MES.BackgroundServices.Stator
 {
@@ -13,6 +14,13 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<TEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query);
+
+        /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<DataTable> GetDataTableByStartWaterMarkIdAsync(EntityByWaterMarkQuery query);
 
     }
 }

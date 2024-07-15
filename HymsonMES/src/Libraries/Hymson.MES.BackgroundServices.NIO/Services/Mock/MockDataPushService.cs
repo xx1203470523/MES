@@ -1,4 +1,6 @@
-﻿using Hymson.MES.Core.Enums.Mavel;
+﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
+using Hymson.MES.Core.Enums.Mavel;
+using Hymson.Utils;
 using RestSharp;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
@@ -41,10 +43,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             // 组装数据
             var dataObj = new
             {
-                hello = "world"
+                Hello = "world"
             };
 
-            await NIOPushClient.ExecuteAsync(switchEntity.Path, dataObj, Method.Post);
+            var response = await NIOPushClient.ExecuteAsync(switchEntity.Path, dataObj, Method.Post);
+            var result = response.Content?.ToDeserializeLower<NIOResponseDto>();
         }
 
     }

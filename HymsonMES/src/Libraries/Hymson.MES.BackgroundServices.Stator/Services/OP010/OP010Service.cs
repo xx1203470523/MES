@@ -36,10 +36,16 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// </summary>
         /// <param name="limitCount"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(int limitCount = 1000)
+        public async Task ExecuteAsync(int limitCount)
         {
             var businessKey = $"Stator-{typeof(OP010).Name}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(businessKey);
+
+            var dt = await _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            {
+                StartWaterMarkId = waterMarkId,
+                Rows = limitCount
+            });
 
             // 获取数据
             var opList = await _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery

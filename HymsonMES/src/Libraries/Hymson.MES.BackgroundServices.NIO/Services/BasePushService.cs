@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Enums;
+﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.Enums.Plan;
 using Hymson.Snowflake;
@@ -51,28 +52,31 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         }
 
         /// <summary>
-        /// 记录推送明细
+        /// 添加到推送队列
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
         /// <param name="buzSceneEnum"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public async Task ExecutePushAsync<T>(NioPushSwitchEntity config, BuzSceneEnum buzSceneEnum, IEnumerable<T> data)
+        public async Task AddToPushQueueAsync<T>(NioPushSwitchEntity config, BuzSceneEnum buzSceneEnum, IEnumerable<T> data)
         {
-            // 推送
-            var restResponse = await config.ExecuteAsync(data);
-
-            var user = "NIO";
+            var user = "AddToPushQueue";
             var time = HymsonClock.Now();
 
-            // 保存推送
+            // 保存
             await _nioPushRepository.InsertAsync(new NioPushEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SchemaCode = config.SchemaCode,
                 BuzScene = buzSceneEnum,
-                Status = restResponse.StatusCode == System.Net.HttpStatusCode.OK ? PushStatusEnum.Success : PushStatusEnum.Failure,
+                Status = PushStatusEnum.Wait,
+                Content = new NIORequestDto<T>
+                {
+                    SchemaCode = config.SchemaCode,
+                    List = data
+                }.ToSerializeLower(),
+                Remark = buzSceneEnum.GetDescription(),
                 CreatedBy = user,
                 CreatedOn = time,
                 UpdatedBy = user,

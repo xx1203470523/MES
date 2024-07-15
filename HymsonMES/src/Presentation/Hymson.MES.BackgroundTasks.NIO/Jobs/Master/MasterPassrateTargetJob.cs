@@ -37,7 +37,7 @@ namespace Hymson.MES.BackgroundTasks.NIO
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "推送 -> 主数据（一次合格率目标）:");
+                _logger.LogError(ex, "扫描推送数据 -> 主数据（一次合格率目标）:");
             }
         }
 

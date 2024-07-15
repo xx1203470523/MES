@@ -37,7 +37,7 @@ namespace Hymson.MES.BackgroundTasks.NIO
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "推送 -> 业务数据（材料清单）:");
+                _logger.LogError(ex, "扫描推送数据 -> 业务数据（材料清单）:");
             }
         }
 

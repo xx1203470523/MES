@@ -65,12 +65,12 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 删除（iqc检验单）
+        /// 删除（IQC检验单）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete("delete")]
-        [LogDescription("除（iqc检验单", BusinessType.DELETE)]
+        [LogDescription("删除IQC检验单", BusinessType.DELETE)]
         public async Task DeleteOrdersAsync([FromBody] long[] ids)
         {
             await _qualIqcOrderService.DeleteOrdersAsync(ids);
@@ -86,7 +86,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [LogDescription("生成IQC检验单", BusinessType.INSERT)]
         public async Task<long> GeneratedOrderAsync([FromBody] GenerateInspectionDto requestDto)
         {
-            // TODO 生成IQC检验单
+            // 生成IQC检验单
             return await _qualIqcOrderService.GeneratedOrderAsync(requestDto);
         }
 

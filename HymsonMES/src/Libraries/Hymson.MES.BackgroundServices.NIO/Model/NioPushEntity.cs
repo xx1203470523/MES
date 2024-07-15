@@ -32,5 +32,15 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// </summary>
         public string Content { get; set; }
 
+        /// <summary>
+        /// 返回结果
+        /// </summary>
+        public string? Result { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
     }
 }

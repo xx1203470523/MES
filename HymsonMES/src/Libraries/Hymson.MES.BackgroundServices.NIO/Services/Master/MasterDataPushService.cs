@@ -56,7 +56,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 UpdateTime = 1662528391
             });
 
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<StationDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<FieldDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<PassrateTargetDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<EnvFieldDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<PersonCertDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<TeamSchedulingDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
     }

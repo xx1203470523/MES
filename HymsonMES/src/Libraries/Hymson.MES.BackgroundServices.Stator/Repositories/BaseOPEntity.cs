@@ -6,6 +6,11 @@
     public class BaseOPEntity
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public BaseOPEntity() { }
+
+        /// <summary>
         /// 序号
         /// </summary>
         public int index { get; set; }

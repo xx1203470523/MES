@@ -1,5 +1,7 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.BackgroundServices.NIO
 {
@@ -49,6 +51,13 @@ namespace Hymson.MES.BackgroundServices.NIO
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeletesAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<NioPushEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query);
 
         /// <summary>
         /// 根据ID获取数据

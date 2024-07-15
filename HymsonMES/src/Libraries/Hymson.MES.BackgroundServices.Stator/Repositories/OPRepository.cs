@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Hymson.MES.Data.Repositories.Common.Query;
+using System.Data;
 
 namespace Hymson.MES.BackgroundServices.Stator
 {
@@ -11,7 +12,7 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// <summary>
         /// 水位查询SQL
         /// </summary>
-        const string QuerySql = @"SELECT * FROM {0} WHERE Id > @StartWaterMarkId ORDER BY Id ASC LIMIT @Rows";
+        const string QuerySql = @"SELECT * FROM {0} WHERE `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
 
         /// <summary>
         /// 构造函数
@@ -22,12 +23,76 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// <summary>
         /// 根据水位批量获取数据
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         public async Task<IEnumerable<TEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query)
         {
             using var conn = GetStatorDbConnection();
             return await conn.QueryAsync<TEntity>(string.Format(QuerySql, typeof(TEntity).Name), query);
+        }
+
+        /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<DataTable> GetDataTableByStartWaterMarkIdAsync(EntityByWaterMarkQuery query)
+        {
+            using var conn = GetStatorDbConnection();
+            using var reader = await conn.ExecuteReaderAsync(string.Format(QuerySql, typeof(TEntity).Name), query);
+
+            var dt = new DataTable { };
+            dt.Load(reader);
+
+            return dt;
+        }
+
+        /// <summary>
+        /// 将DataTable转为List
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> ConvertDataTableToList<T>(DataTable dt)
+        {
+            var properties = typeof(T).GetProperties();
+            return dt.AsEnumerable()
+                     .Select(row => (T)properties.Aggregate(Activator.CreateInstance<T>(),
+                             (current, prop) =>
+                             {
+                                 prop.SetValue(current, row[prop.Name]);
+                                 return current;
+                             }));
+
+            /*
+            List<T> data = new();
+            foreach (DataRow row in dt.Rows)
+            {
+                T item = new();
+                foreach (PropertyInfo prop in item.GetType().GetProperties())
+                {
+                    if (dt.Columns.Contains(prop.Name))
+                    {
+                        prop.SetValue(item, row[prop.Name], null);
+                    }
+                }
+                data.Add(item);
+            }
+            return data;
+            */
+
+            /*
+            return dt.AsEnumerable()
+             .Select(row => Activator.CreateInstance<T>()
+             .GetType()
+             .GetProperties()
+             .Aggregate((T)new object(), (current, prop) =>
+             {
+                 prop.SetValue(current, row[prop.Name]);
+                 return current;
+             }))
+             .Cast<T>();
+            */
         }
 
     }

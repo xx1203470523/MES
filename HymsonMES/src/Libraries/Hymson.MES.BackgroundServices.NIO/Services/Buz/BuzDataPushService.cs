@@ -41,7 +41,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<CollectionDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<ProductionDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<MaterialDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<PassrateProductDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<PassrateStationDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<DataEnvDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<IssueDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<WorkOrderDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             // TODO: 替换为实际数据
             var dtos = new List<AttachmentDto> { };
-            await ExecutePushAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
     }

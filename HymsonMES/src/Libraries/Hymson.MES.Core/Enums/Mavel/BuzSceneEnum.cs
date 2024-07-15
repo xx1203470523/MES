@@ -115,6 +115,23 @@ namespace Hymson.MES.Core.Enums.Mavel
 
 
         /// <summary>
+        /// ERP（合作伙伴精益与生产能力）
+        /// </summary> 
+        [Description("ERP（合作伙伴精益与生产能力）")]
+        ERP_ProductionCapacity = 401,
+        /// <summary>
+        /// ERP（关键下级件信息）
+        /// </summary> 
+        [Description("ERP（关键下级件信息）")]
+        ERP_KeySubordinate = 402,
+        /// <summary>
+        /// ERP（实际交付情况）
+        /// </summary> 
+        [Description("ERP（实际交付情况）")]
+        ERP_ActualDelivery = 403,
+
+
+        /// <summary>
         /// Mock（Hello）
         /// </summary>
         [Description("Mock（Hello）")]

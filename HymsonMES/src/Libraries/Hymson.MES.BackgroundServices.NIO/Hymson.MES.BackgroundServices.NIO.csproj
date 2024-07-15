@@ -45,6 +45,7 @@
 
   <ItemGroup>
     <Folder Include="Dtos\File\" />
+    <Folder Include="Services\ERP\" />
   </ItemGroup>
 
 </Project>

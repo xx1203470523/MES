@@ -3,7 +3,7 @@
     /// <summary>
     /// 水位查询实体
     /// </summary>
-    public class EntityByWaterMarkQuery
+    public partial class EntityByWaterMarkQuery
     {
         /// <summary>
         /// 水位id

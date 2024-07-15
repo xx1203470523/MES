@@ -37,7 +37,7 @@ namespace Hymson.MES.BackgroundTasks.NIO
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "推送 -> 主数据（人员资质）:");
+                _logger.LogError(ex, "扫描推送数据 -> 主数据（人员资质）:");
             }
         }
 

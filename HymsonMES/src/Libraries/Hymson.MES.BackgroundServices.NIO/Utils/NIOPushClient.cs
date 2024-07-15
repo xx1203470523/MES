@@ -76,7 +76,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var METHOD = $"{config.Method}".ToUpper();
 
             // 组装数据
-            var dataObj = new ClientRequestDto<T>
+            var dataObj = new NIORequestDto<T>
             {
                 SchemaCode = config.SchemaCode,
                 List = data
@@ -96,6 +96,40 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             request.AddHeader("Connection", "keep-alive");
             request.AddHeader("User-Agent", "Pob_chen/1.1.0");
             request.AddParameter("application/json", BODY, ParameterType.RequestBody);
+            request.Timeout = TimeSpan.FromSeconds(15);
+            var response = await client.ExecuteAsync(request);
+            return response;
+        }
+
+        /// <summary>
+        /// 公用方法
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        public static async Task<RestResponse> ExecuteAsync(this NioPushSwitchEntity config, string body)
+        {
+            if (config == null || string.IsNullOrWhiteSpace(body)) return new RestResponse { IsSuccessStatusCode = false };
+            var path = $"{HOSTSUFFIX}{config.Path}";
+
+            var TIMESTAMP = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
+            var NONCE = $"{Guid.NewGuid()}".Replace("-", "");
+            var METHOD = $"{config.Method}".ToUpper();
+
+            var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, body);
+
+            var client = new RestClient(HOST);
+            var request = new RestRequest(path, config.Method);
+            request.AddHeader("appKey", APP_KEY);
+            request.AddHeader("timestamp", TIMESTAMP);
+            request.AddHeader("nonce", NONCE);
+            request.AddHeader("sign", SIGN);
+            request.AddHeader("Accept", "*/*");
+            request.AddHeader("Accept-Encoding", "gzip, deflate, br");
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("Connection", "keep-alive");
+            request.AddHeader("User-Agent", "Pob_chen/1.1.0");
+            request.AddParameter("application/json", body, ParameterType.RequestBody);
             request.Timeout = TimeSpan.FromSeconds(15);
             var response = await client.ExecuteAsync(request);
             return response;

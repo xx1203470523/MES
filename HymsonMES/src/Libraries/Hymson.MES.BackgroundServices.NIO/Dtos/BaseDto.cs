@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.BackgroundServices.NIO.Dtos
+﻿using Newtonsoft.Json;
+
+namespace Hymson.MES.BackgroundServices.NIO.Dtos
 {
     /// <summary>
     /// 基类
@@ -20,7 +22,7 @@
     /// <summary>
     /// 基类（请求）
     /// </summary>
-    public class ClientRequestDto<T>
+    public class NIORequestDto<T>
     {
         /// <summary>
         /// 业务场景编码
@@ -36,8 +38,36 @@
     /// <summary>
     /// 基类（响应）
     /// </summary>
-    public class ClientResponseDto
+    public class NIOResponseDto
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public NIOResponseBaseDto NexusOpenapi { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public object Data { get; set; }
+    }
+
+    /// <summary>
+    /// 基类（响应）
+    /// </summary>
+    public class NIOResponseBaseDto
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ReqId { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Code { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Message { get; set; }
 
     }
 

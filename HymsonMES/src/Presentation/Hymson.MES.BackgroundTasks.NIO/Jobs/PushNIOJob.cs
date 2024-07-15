@@ -5,23 +5,23 @@ using Quartz;
 namespace Hymson.MES.BackgroundTasks.NIO
 {
     /// <summary>
-    /// 主数据（环境监测）
+    /// 推送蔚来作业
     /// </summary>
     [DisallowConcurrentExecution]
-    internal class MasterEnvFieldJob : IJob
+    internal class PushNIOJob : IJob
     {
-        private readonly ILogger<MasterEnvFieldJob> _logger;
-        private readonly IMasterDataPushService _masterDataPushService;
+        private readonly ILogger<PushNIOJob> _logger;
+        private readonly IPushNIOService _pushNIOService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="masterDataPushService"></param>
-        public MasterEnvFieldJob(ILogger<MasterEnvFieldJob> logger, IMasterDataPushService masterDataPushService)
+        /// <param name="pushNIOService"></param>
+        public PushNIOJob(ILogger<PushNIOJob> logger, IPushNIOService pushNIOService)
         {
             _logger = logger;
-            _masterDataPushService = masterDataPushService;
+            _pushNIOService = pushNIOService;
         }
 
         /// <summary>
@@ -33,11 +33,11 @@ namespace Hymson.MES.BackgroundTasks.NIO
         {
             try
             {
-                await _masterDataPushService.EnvFieldAsync();
+                await _pushNIOService.ExecutePushAsync(1000);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "扫描推送数据 -> 主数据（环境监测）:");
+                _logger.LogError(ex, "推送 -> NIO:");
             }
         }
 
