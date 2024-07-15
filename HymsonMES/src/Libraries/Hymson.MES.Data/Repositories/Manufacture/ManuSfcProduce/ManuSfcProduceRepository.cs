@@ -1055,7 +1055,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuSfcProduceRepository
     {
         const string GetProducePagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_produce /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset, @Rows ";
-        const string GetProducePagedInfoCountSqlTemplate = @"SELECT COUNT(1) FROM manu_sfc_produce /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetProducePagedInfoCountSqlTemplate = @"SELECT COUNT(1) FROM manu_sfc_produce /**innerjoin**/ /**leftjoin**/ /**where**/";
 
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_produce`  msp /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_produce`  msp  /**innerjoin**/ /**leftjoin**/  /**where**/ ";

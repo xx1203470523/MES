@@ -136,5 +136,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<PagedInfo<ManuSfcSummaryEntity>> GetPagedListAsync(ManuSfcSummaryPagedQuery pagedQuery);
 
+
+        /// <summary>
+        /// 通过条码获取所有汇总明细
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcSummaryEntity>> GetSummaryEntitiesBySfcAsync(long siteId, string sfc);
+
     }
 }
