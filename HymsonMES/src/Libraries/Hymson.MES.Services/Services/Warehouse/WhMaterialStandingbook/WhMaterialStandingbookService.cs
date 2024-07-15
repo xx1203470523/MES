@@ -250,7 +250,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialStandingbookId = id
                 }
             );
-            var procResourceEntity = await _procResourceRepository.GetByIdAsync(manuFeedingRecordEntity.Id);
+            var procResourceEntity = await _procResourceRepository.GetByIdAsync(manuFeedingRecordEntity.ResourceId);
             var whMaterialStandingBookFeeding = new WhMaterialStandingBookFeedingDto()
             {
                 ResourceCode = procResourceEntity.ResCode,
@@ -259,7 +259,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
             if (manuFeedingRecordEntity.FeedingPointId.HasValue)
             {
-                var procLoadPointEntity = await _procLoadPointRepository.GetByIdAsync(manuFeedingRecordEntity.Id);
+                var procLoadPointEntity = await _procLoadPointRepository.GetByIdAsync(manuFeedingRecordEntity.FeedingPointId??0);
                 whMaterialStandingBookFeeding.LoadingPointCode = procLoadPointEntity.LoadPoint;
                 whMaterialStandingBookFeeding.LoadingPointName = procLoadPointEntity.LoadPointName;
             }

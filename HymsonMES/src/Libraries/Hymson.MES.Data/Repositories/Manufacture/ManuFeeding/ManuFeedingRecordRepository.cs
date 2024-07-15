@@ -66,6 +66,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     public partial class ManuFeedingRecordRepository
     {
         const string InsertSql = "INSERT INTO `manu_feeding_record`(`Id`, `ResourceId`, `FeedingPointId`, `ProductId`, `BarCode`, MaterialId, `Qty`, `DirectionType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, MaterialType, WorkOrderId, LoadSource, MaterialStandingbookId) VALUES (@Id, @ResourceId, @FeedingPointId, @ProductId, @BarCode, @MaterialId, @Qty, @DirectionType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @MaterialType, @WorkOrderId, @LoadSource,@MaterialStandingbookId)  ";
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_container_pack_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT 1 ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_feeding_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT 1 ";
     }
 }

@@ -674,7 +674,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     Batch = inventory.Batch,
                     Quantity = entity.Qty,
                     Unit = material.Unit ?? "",
-                    Type = WhMaterialInventoryTypeEnum.MaterialReturn,
+                    Type = WhMaterialInventoryTypeEnum.MaterialUnloading,
                     Source = inventory.Source,
                     CreatedBy = entity.UpdatedBy,
                     CreatedOn = now,
