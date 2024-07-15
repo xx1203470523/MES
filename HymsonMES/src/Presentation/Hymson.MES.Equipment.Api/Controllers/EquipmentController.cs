@@ -71,7 +71,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 马威测试
         /// </summary>
-        /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("mavel")]
         [AllowAnonymous]
@@ -94,7 +93,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task EquipmentHeartbeatAsync(EquipmentHeartbeatDto request)
         {
             _logger.LogDebug(request.ToSerialize());
-            
+
 
             await _equipmentService.EquipmentHeartbeatAsync(request);
         }
@@ -106,10 +105,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("State")]
-        public async Task EquipmentStateAsync(EquipmentServices.Dtos.EquipmentCollect.EquipmentStateDto request)
+        public async Task EquipmentStateAsync(EquipmentStateDto request)
         {
             _logger.LogDebug(request.ToSerialize());
-         
+
 
             await _equipmentService.EquipmentStateAsync(request);
         }
@@ -124,7 +123,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task EquipmentAlarmAsync(EquipmentAlarmDto request)
         {
             _logger.LogDebug(request.ToSerialize());
-           // await Task.CompletedTask;
+            // await Task.CompletedTask;
 
             await _equipmentService.EquipmentAlarmAsync(request);
         }
@@ -267,6 +266,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             return await _manufactureService.MergeAsync(request);
         }
+
         /// <summary>
         /// CCD文件上传完成006
         /// </summary>

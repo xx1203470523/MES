@@ -126,9 +126,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
             IManuGenerateBarcodeService manuGenerateBarcodeService,
             IPlanWorkOrderRepository planWorkOrderRepository,
-            IManuBarCodeRelationRepository manuBarCodeRelationRepository,
             IManuSfcProduceRepository sfcProduceRepository,
-            IManuSfcStepRepository manuSfcStepRepository)
+            IManuSfcStepRepository manuSfcStepRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
             IXnebulaWMSApiClient wMSRequest,
             IProcBomRepository procBomRepository,
@@ -1254,7 +1253,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialId);
                     }
                     validationFailure.FormattedMessagePlaceholderValues.Add("MaterialId", item.MaterialId);
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES10243);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES10250);
                     validationFailures.Add(validationFailure);
                     continue;
                 }
@@ -1439,7 +1438,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialId);
                     }
                     validationFailure.FormattedMessagePlaceholderValues.Add("MaterialId", item.MaterialId);
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES10243);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES10250);
                     validationFailures.Add(validationFailure);
                     continue;
                 }

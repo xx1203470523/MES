@@ -214,7 +214,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
             if (productEntities == null || productEntities.Any())
             {
                 // 这里应该提示产品不存在
-                throw new CustomerValidationException(nameof(ErrorCode.MES10244)).WithData("Code", string.Join(',', productCodes));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10251)).WithData("Code", string.Join(',', productCodes));
             }
 
             // 判断BOM编码是否存在

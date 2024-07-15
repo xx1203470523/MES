@@ -69,7 +69,8 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <summary>
         /// 仓储（标准参数）
         /// </summary>
-        private readonly Data.Repositories.Manufacture.IManuProductParameterRepository _manuProductParameterRepository;
+        //private readonly IManuProductParameterRepository _manuProductParameterRepository;
+        
         /// <summary>
         /// 工作中心
         /// </summary>
@@ -92,7 +93,6 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <param name="equProductParameterRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="procParameterRepository"></param>
-        /// <param name="manuProductParameterRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         public EquipmentCollectService(ICurrentEquipment currentEquipment,
@@ -103,7 +103,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcParameterRepository procParameterRepository,
-            Data.Repositories.Manufacture.IManuProductParameterRepository manuProductParameterRepository,
+            //IManuProductParameterRepository manuProductParameterRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IPlanWorkOrderRepository planWorkOrderRepository)
         {
@@ -114,7 +114,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             _equProductParameterRepository = equProductParameterRepository;
             _procResourceRepository = procResourceRepository;
             _procParameterRepository = procParameterRepository;
-            _manuProductParameterRepository = manuProductParameterRepository;
+            //_manuProductParameterRepository = manuProductParameterRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procProcedureRepository = procProcedureRepository;
@@ -329,6 +329,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             var paramCodes = request.ParamList.Select(s => s.ParamCode.ToUpper());
             var (parameterEntities, resourceEntity, procParameters) = await GetEntitiesWithCheckAsync(paramCodes, request.ResourceCode);
 
+            /*
             // 校验数据库是否存在该设备的值
             var isExists = await _manuProductParameterRepository.IsExistsAsync(new EquipmentIdQuery
             {
@@ -338,6 +339,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 SFC = ManuProductParameter.DefaultSFC
             });
             if (isExists == true) throw new CustomerValidationException(nameof(ErrorCode.MES19113));
+            */
 
             var entities = request.ParamList.Select(s => new ManuProductParameterEntity
             {
@@ -371,7 +373,8 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             {
                 await _procParameterRepository.InsertsAsync(procParameters);
             }
-            await _manuProductParameterRepository.InsertsAsync(entities);
+
+            //await _manuProductParameterRepository.InsertsAsync(entities);
 
             trans.Complete();
 
@@ -459,7 +462,8 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             {
                 await _procParameterRepository.InsertsAsync(procParameters);
             }
-            await _manuProductParameterRepository.InsertsAsync(entities);
+            
+            //await _manuProductParameterRepository.InsertsAsync(entities);
 
             trans.Complete();
             

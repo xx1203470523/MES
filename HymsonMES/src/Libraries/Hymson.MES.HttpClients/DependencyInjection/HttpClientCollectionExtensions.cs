@@ -44,6 +44,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(nameof(RotorOption.SYSTOKEN), rotorOptions.SYSTOKEN);
             });
 
+            var printOptions = new PrintOptions();
+            configuration.GetSection("PrintOptions").Bind(printOptions);
+            services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
+            });
+
             return services;
         }
 

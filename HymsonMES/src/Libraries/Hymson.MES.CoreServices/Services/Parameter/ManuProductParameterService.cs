@@ -146,8 +146,8 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                 list.AddRange(bo.SFCs.Select(SFC => new Core.Domain.Parameter.ManuProductParameterEntity
                 {
                     ProcedureId = bo.ProcedureId,
-                    ResourceId=bo.ResourceId,
-                    ParameterGroupId = parameter.ParameterGroupId,
+                    //ResourceId=bo.ResourceId,
+                    //ParameterGroupId = parameter.ParameterGroupId,
                     SFC = SFC,
                     SfcstepId = manuSfcStepEntities.FirstOrDefault(x => x.SFC == SFC)?.Id,
                     ParameterId = parameterEntity.Id,

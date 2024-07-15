@@ -35,7 +35,7 @@ namespace Hymson.MES.Core.Domain.Parameter
         /// <summary>
         /// 参数值
         /// </summary>
-        public string ParameterValue { get; set; }    
+        public string ParameterValue { get; set; } = "";
 
         /// <summary>
         /// 采集时间
@@ -45,6 +45,16 @@ namespace Hymson.MES.Core.Domain.Parameter
         /// <summary>
         ///步骤表id
         /// </summary>
-        public long?  SfcstepId { get; set; }
+        public long? SfcstepId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long ResourceId { get; set; } = 0;
+
+        /// <summary>
+        /// 产品参数组id
+        /// </summary>
+        public long ParameterGroupId { get; set; } = 0;
     }
 }

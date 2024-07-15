@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.Data.Repositories.Manufacture
+﻿namespace Hymson.MES.Data.Repositories.Parameter
 {
     /// <summary>
     /// 

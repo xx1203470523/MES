@@ -9,6 +9,20 @@ namespace Hymson.MES.Data.Repositories.Parameter
     public interface IManuProductParameterRepository
     {
         /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertsAsync(IEnumerable<ManuProductParameterEntity> entities);
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<bool> IsExistsAsync(EquipmentIdQuery query);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="list"></param>
