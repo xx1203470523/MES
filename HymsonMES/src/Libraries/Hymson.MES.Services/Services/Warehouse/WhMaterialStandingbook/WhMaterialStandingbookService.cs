@@ -10,7 +10,9 @@ using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
@@ -68,7 +70,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _manuFeedingRecordRepository = manuFeedingRecordRepository;
             _procResourceRepository = procResourceRepository;
             _procLoadPointRepository = procLoadPointRepository;
-            _manuBarCodeRelationRepository=manuBarCodeRelationRepository;
+            _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
         }
 
         /// <summary>
@@ -199,17 +201,39 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<WhMaterialStandingBookRelationDto> GetWhMaterialStandingBookRelationByIdAsync(long id)
+        public async Task<IEnumerable<WhMaterialStandingBookRelationDto> > GetWhMaterialStandingBookRelationByIdAsync(long id)
         {
-            //if()
-            //var manuBarCodeRelationEnties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
-            //{
-            //    InputSfcStepId = beforeStepEntity.Id,
-            //    SiteId = _currentSite.SiteId ?? 0,
-            //});
+            var whMaterialStandingbookEntity = await _whMaterialStandingbookRepository.GetByIdAsync(id);
+            var whMaterialStandingBookRelationEntities = new List<WhMaterialStandingBookRelationDto> ();
+            IEnumerable<ManuBarCodeRelationEntity> manubarcoderelationenties = new List<ManuBarCodeRelationEntity>() { };
+            switch (whMaterialStandingbookEntity.Type)
+            {
+                case WhMaterialInventoryTypeEnum.MaterialBarCodeSplit:
+                    manubarcoderelationenties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
+                    {
+                        InputMaterialStandingBookId = id,
+                        SiteId = _currentSite.SiteId ?? 0,
+                    });
+                    break;
+                case WhMaterialInventoryTypeEnum.MaterialBarCodeMerge:
+                    manubarcoderelationenties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
+                    {
+                        OutputMaterialStandingBookId = id,
+                        SiteId = _currentSite.SiteId ?? 0,
+                    });
+                    break;
+            }
 
-
-            return new WhMaterialStandingBookRelationDto();
+            foreach (var item in manubarcoderelationenties)
+            {
+                whMaterialStandingBookRelationEntities.Add(new WhMaterialStandingBookRelationDto()
+                {
+                    ParentBarcode = item.InputBarCode,
+                    ChildrenParentBarcode = item.OutputBarCode,
+                    Qty = item.InputQty
+                });
+            }
+            return whMaterialStandingBookRelationEntities;
         }
 
         /// <summary>
