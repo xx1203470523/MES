@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -38,7 +39,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 是否校准 1、是 2、否
         /// </summary>
-        public bool? IsCalibrated { get; set; }
+        public YesOrNoEnum? IsCalibrated { get; set; }
 
         /// <summary>
         /// 校准周期
@@ -48,7 +49,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 校准周期单位
         /// </summary>
-        public string CalibrationCycleUnit { get; set; }
+        public ToolingTypeEnum? CalibrationCycleUnit { get; set; }
 
         /// <summary>
         /// 是否所有设备都可用 1、是 2、否
@@ -58,12 +59,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 是否物料都可用 1、是 2、否
         /// </summary>
-        public string IsAllMaterialUsed { get; set; }
+        public bool IsAllMaterialUsed { get; set; }
 
         /// <summary>
         /// 状态 1、启用  2、禁用
         /// </summary>
-        public bool Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
         /// <summary>
         /// 备注

@@ -26,81 +26,82 @@ namespace Hymson.MES.Core.Enums
         MaterialLoading = 3,
 
         /// <summary>
-        /// 物料卸载
+        /// 生产完成
         /// </summary>
-        [Description("物料卸载")]
-        MaterialUnloading = 4,
+
 
         /// <summary>
         /// 库存维护   (仅仅做记录使用)
         /// </summary>
         [Description("库存维护")]
-        InventoryModify = 5,
+
 
         /// <summary>
         /// 物料拆分
         /// </summary>
         [Description("物料拆分")]
-        MaterialBarCodeSplit = 6,
+        MaterialBarCodeSplit = 12,
 
         /// <summary>
         /// 物料合并
         /// </summary>
         [Description("物料合并")]
-        MaterialBarCodeMerge = 7,
+        MaterialBarCodeMerge = 13,
 
         /// <summary>
         /// 物料锁定
         /// </summary>
         [Description("物料锁定")]
-        MaterialBarCodeLock = 8,
 
         /// <summary>
         /// 物料解锁
         /// </summary>
         [Description("物料解锁")]
-        MaterialBarCodeUnLock = 9,
+        MaterialBarCodeUnLock = 16 ,
 
         /// <summary>
         /// 物料不良录入
         /// </summary>
         [Description("物料不良录入")]
-        BadEntry = 10,
+        BadEntry = 17,
 
         /// <summary>
         /// 不良处置
         /// </summary>
         [Description("不良处置")]
-        BadDisposal = 11,
+        BadDisposal = 18,
 
         /// <summary>
-        /// 生产完成
+        /// 物料拆分新增
         /// </summary>
-        [Description("生产完成")]
-        ManuComplete = 12,
+        [Description("物料拆分新增")]
+        SplitAdd = 19,
 
         /// <summary>
-        /// 步骤控制
+        /// 物料合并新增
         /// </summary>
-        [Description("步骤控制")]
-        StepControl = 13,
+        [Description("物料合并新增")]
+        CombinedAdd = 20,
 
-        // <summary>
+ // <summary>
         /// 物料报废
         /// </summary>
         [Description("物料报废")]
-        MaterialScrapping = 14,
+        MaterialScrapping = 21,
 
         /// <summary>
         /// 取消报废
         /// </summary>
         [Description("取消报废")]
-        CancelScrapping = 15,
+        CancelScrapping = 22,
 
         /// <summary>
         /// 离脱
         /// </summary>
         [Description("离脱")]
-        Detachment = 16
-    }
+        Detachment = 23,
+        /// <summary>
+        /// 物料卸载
+        /// </summary>        [Description("物料卸载")]
+        MaterialUnloading = 24    }
 }
