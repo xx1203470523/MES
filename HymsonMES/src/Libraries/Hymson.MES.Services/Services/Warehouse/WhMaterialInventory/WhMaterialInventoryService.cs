@@ -746,7 +746,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 InputBarCodeLocation = string.Empty,
                 InputBarCodeMaterialId = oldWhMEntirty.MaterialId,
                 InputBarCodeWorkOrderId = oldWhMEntirty.WorkOrderId,
-                InputQty = remainsQty,
+                InputQty = adjustDto.Qty,
                 OutputBarCode = newSplitSFC,
                 OutputBarCodeMaterialId = oldWhMEntirty.MaterialId,
                 OutputBarCodeWorkOrderId = oldWhMEntirty.WorkOrderId,
@@ -1071,7 +1071,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     InputBarCodeLocation = string.Empty,
                     InputBarCodeMaterialId = inputBarcodeSingle.MaterialId,
                     InputBarCodeWorkOrderId = inputBarcodeSingle.WorkOrderId,
-                    InputQty = inputBarcodeSingle.QuantityResidue,
+                    InputQty = entity.QuantityResidue,
                     OutputBarCode = entity.MaterialBarCode,
                     OutputBarCodeMaterialId = inputBarcodeSingle.MaterialId,
                     OutputBarCodeWorkOrderId = inputBarcodeSingle.WorkOrderId,
@@ -1079,8 +1079,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                     RelationType = ManuBarCodeRelationTypeEnum.SFC_Combined,
                     BusinessContent = new
                     {
-                        InputMaterialStandingBookd = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == inputBarcodeSingle.MaterialBarCode).FirstOrDefault()?.Id,
-                        OutputMaterialStandingBook = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == entity.MaterialBarCode).FirstOrDefault()?.Id,
+                        InputMaterialStandingBookd = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == entity.MaterialBarCode).FirstOrDefault()?.Id,
+                        OutputMaterialStandingBook = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == inputBarcodeSingle.MaterialBarCode).FirstOrDefault()?.Id,
                     }.ToSerialize(),
                     IsDisassemble = TrueOrFalseEnum.No,
                     DisassembledBy = _currentUser.UserName,
