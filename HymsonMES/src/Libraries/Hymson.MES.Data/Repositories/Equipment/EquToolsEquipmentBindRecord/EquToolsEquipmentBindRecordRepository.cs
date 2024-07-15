@@ -154,7 +154,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             sqlBuilder.LeftJoin(" equ_equipment ee on ee.Id=ese.EquipmentId");
             sqlBuilder.LeftJoin(" equ_tools es on es.Id=ese.ToolId");
-            sqlBuilder.LeftJoin(" equ_tooling_type_manage est on est.Id=es.ToolsId");
+            sqlBuilder.LeftJoin(" equ_tools_type est on est.Id=es.ToolsId");
 
             sqlBuilder.OrderBy("ese.UpdatedOn DESC");
             sqlBuilder.Where("ese.IsDeleted = 0");

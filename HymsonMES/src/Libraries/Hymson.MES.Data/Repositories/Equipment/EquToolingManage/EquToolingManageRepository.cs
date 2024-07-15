@@ -143,6 +143,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
             {
                 sqlBuilder.Where("Code IN @Codes");
             }
+            if (query.ToolTypeIds != null && query.ToolTypeIds.Any())
+            {
+                sqlBuilder.Where("ToolsId IN @ToolTypeIds");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquToolingTypeEntity>(template.RawSql, query);
         }
@@ -209,8 +213,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
     public partial class EquToolingManageRepository
     {
 
-        const string GetPagedInfoDataSqlTemplate = @"select A.LastVerificationTime, A.Code,A.Name,A.Status,A.RatedLife,A.RatedLifeUnit,A.IsCalibrated,A.CalibrationCycle,A.CurrentUsedLife, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, A.Id, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName,B.Id AS ToolsId  from equ_tools A JOIN equ_tooling_type_manage B ON A.ToolsId = B.Id  /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "select COUNT(*) from equ_tools A  JOIN equ_tooling_type_manage B ON A.ToolsId = B.Id /**join**/ /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"select A.LastVerificationTime, A.Code,A.Name,A.Status,A.RatedLife,A.RatedLifeUnit,A.IsCalibrated,A.CalibrationCycle,A.CurrentUsedLife, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, A.Id, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName,B.Id AS ToolsId  from equ_tools A JOIN equ_tools_type B ON A.ToolsId = B.Id  /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoCountSqlTemplate = "select COUNT(*) from equ_tools A  JOIN equ_tools_type B ON A.ToolsId = B.Id /**join**/ /**where**/ ";
 
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
@@ -225,7 +229,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string DeleteSql = "UPDATE `proc_product_process_conversion_factor` SET IsDeleted = Id WHERE Id = @Id ";
 
         const string DeletesSql = "UPDATE `equ_tools` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
-        const string GetByIdSql = @"SELECT A.Id, A.Code,A.Name,A.RatedLife,A.RatedLifeUnit,A.CumulativeUsedLife,A.CurrentUsedLife,A.LastVerificationTime,A.IsCalibrated, A.CalibrationCycle,A.CalibrationCycleUnit, A.Status, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName,B.Id AS ToolsId  from equ_tools A JOIN equ_tooling_type_manage B ON A.ToolsId = B.Id  WHERE A.Id = @Id ";
+        const string GetByIdSql = @"SELECT A.Id, A.Code,A.Name,A.RatedLife,A.RatedLifeUnit,A.CumulativeUsedLife,A.CurrentUsedLife,A.LastVerificationTime,A.IsCalibrated, A.CalibrationCycle,A.CalibrationCycleUnit, A.Status, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName,B.Id AS ToolsId  from equ_tools A JOIN equ_tools_type B ON A.ToolsId = B.Id  WHERE A.Id = @Id ";
         const string GetByIdsSql = @"SELECT  `Id`, `SiteId`, `Code`, `Name`, `ToolsId`, `RatedLife`, `RatedLifeUnit`, `CumulativeUsedLife`, `CurrentUsedLife`, `LastVerificationTime`, `IsCalibrated`, `CalibrationCycle`, `CalibrationCycleUnit`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `equ_tools`  WHERE Id IN @ids ";
 
