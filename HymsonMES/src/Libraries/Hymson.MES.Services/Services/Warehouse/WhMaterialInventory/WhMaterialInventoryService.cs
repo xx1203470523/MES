@@ -1144,16 +1144,6 @@ namespace Hymson.MES.Services.Services.Warehouse
         }
 
         /// <summary>
-        /// 拆分合并条码的验证
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <returns></returns>
-        public async Task<bool> MergeAdjustVerifySfcAsync(string[] sfcs)
-        {
-            return true;
-        }
-
-        /// <summary>
         /// 获取条码
         /// </summary>
         /// <param name="type"></param>

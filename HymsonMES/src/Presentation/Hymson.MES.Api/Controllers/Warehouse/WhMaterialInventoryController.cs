@@ -213,16 +213,5 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.BarcodeMergeAdjustAsync(adjustDto);
         }
-
-        /// <summary>
-        /// 验证条码 拆分合并
-        /// </summary>
-        /// <param name="sfcs"></param>
-        [HttpPost("mergeAdjustVerifySfcs")]
-        [LogDescription("验证条码", BusinessType.INSERT)]
-        public async Task<bool> MergeAdjustVerifySfcsAsync(string[] sfcs)
-        {
-            return await _whMaterialInventoryService.MergeAdjustVerifySfcAsync(sfcs);
-        }
     }
 }
