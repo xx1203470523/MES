@@ -1060,6 +1060,8 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             foreach (var entity in standbookList)
             {
+                if (entity.MaterialBarCode == inputBarcodeSingle?.MaterialBarCode) continue;
+       
                 var manuBarCodeRelationEntity = new ManuBarCodeRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -1080,9 +1082,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                     RelationType = ManuBarCodeRelationTypeEnum.SFC_Combined,
                     BusinessContent = new
                     {
-            
-                        InputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == inputBarcodeSingle.MaterialBarCode).FirstOrDefault()?.Id,
-                        OutputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == entity.MaterialBarCode).FirstOrDefault()?.Id,
+                        InputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == entity.MaterialBarCode).FirstOrDefault()?.Id,
+                        OutputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == inputBarcodeSingle.MaterialBarCode).FirstOrDefault()?.Id,
                     }.ToSerialize(),
                     IsDisassemble = TrueOrFalseEnum.No,
                     DisassembledBy = _currentUser.UserName,
