@@ -846,7 +846,7 @@
         public const string MES13501 = "工具维护失败";
         public const string MES13502 = "新增工具失败";
         public const string MES13503 = "工具类型{ToolTypeCode}不存在";
-        public const string MES13504 = "工具{ToolCode}已经存在";
+        public const string MES13504 = "工具编码{ToolCode}已经存在";
         public const string MES13505 = "编码不可为空";
         public const string MES13506 = "编码长度为50.";
         public const string MES13507 = "名称不可为空";
@@ -859,6 +859,8 @@
         public const string MES13514 = "需要校准时校准周期单位不可为空";
         public const string MES13515 = "需要校准时最后校验时间不可为空";
         public const string MES13516= "工具类型已被工具引用,不能删除!";
+        public const string MES13517 = "工具{ToolCode}重复";
+        public const string MES13518 = "需要校准时校准周期为正整数";
         #endregion
 
         #region 环境检验 13600
