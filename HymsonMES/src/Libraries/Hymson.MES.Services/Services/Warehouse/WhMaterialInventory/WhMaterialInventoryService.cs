@@ -746,7 +746,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 InputBarCodeLocation = string.Empty,
                 InputBarCodeMaterialId = oldWhMEntirty.MaterialId,
                 InputBarCodeWorkOrderId = oldWhMEntirty.WorkOrderId,
-                InputQty = remainsQty,
+                InputQty = adjustDto.Qty,
                 OutputBarCode = newSplitSFC,
                 OutputBarCodeMaterialId = oldWhMEntirty.MaterialId,
                 OutputBarCodeWorkOrderId = oldWhMEntirty.WorkOrderId,
@@ -754,8 +754,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 RelationType = ManuBarCodeRelationTypeEnum.SFC_Split,
                 BusinessContent = new
                 {
-                    InputMaterialStandingBookd = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == oldWhMEntirty.MaterialBarCode).FirstOrDefault()?.Id,
-                    OutputMaterialStandingBook = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == newSplitSFC).FirstOrDefault()?.Id
+                    InputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == oldWhMEntirty.MaterialBarCode).FirstOrDefault()?.Id,
+                    OutputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == newSplitSFC).FirstOrDefault()?.Id
                 }.ToSerialize(),
                 IsDisassemble = TrueOrFalseEnum.No,
                 DisassembledBy = _currentUser.UserName,
@@ -1060,6 +1060,8 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             foreach (var entity in standbookList)
             {
+                if (entity.MaterialBarCode == inputBarcodeSingle?.MaterialBarCode) continue;
+       
                 var manuBarCodeRelationEntity = new ManuBarCodeRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -1071,7 +1073,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                     InputBarCodeLocation = string.Empty,
                     InputBarCodeMaterialId = inputBarcodeSingle.MaterialId,
                     InputBarCodeWorkOrderId = inputBarcodeSingle.WorkOrderId,
-                    InputQty = inputBarcodeSingle.QuantityResidue,
+
+                    InputQty = entity.QuantityResidue,
                     OutputBarCode = entity.MaterialBarCode,
                     OutputBarCodeMaterialId = inputBarcodeSingle.MaterialId,
                     OutputBarCodeWorkOrderId = inputBarcodeSingle.WorkOrderId,
@@ -1079,8 +1082,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                     RelationType = ManuBarCodeRelationTypeEnum.SFC_Combined,
                     BusinessContent = new
                     {
-                        InputMaterialStandingBookd = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == inputBarcodeSingle.MaterialBarCode).FirstOrDefault()?.Id,
-                        OutputMaterialStandingBook = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == entity.MaterialBarCode).FirstOrDefault()?.Id,
+                        InputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == entity.MaterialBarCode).FirstOrDefault()?.Id,
+                        OutputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == inputBarcodeSingle.MaterialBarCode).FirstOrDefault()?.Id,
                     }.ToSerialize(),
                     IsDisassemble = TrueOrFalseEnum.No,
                     DisassembledBy = _currentUser.UserName,

@@ -61,5 +61,19 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="id"></param>
         /// <returns></returns>
         Task<WhMaterialStandingbookDto> QueryWhMaterialStandingbookByIdAsync(long id);
+
+        /// <summary>
+        /// 条码关系
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WhMaterialStandingBookRelationDto>> GetWhMaterialStandingBookRelationByIdAsync(long id);
+
+        /// <summary>
+        /// 上料信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<WhMaterialStandingBookFeedingDto> GetWhMaterialStandingBookFeedingByIdAsync(long id);
     }
 }

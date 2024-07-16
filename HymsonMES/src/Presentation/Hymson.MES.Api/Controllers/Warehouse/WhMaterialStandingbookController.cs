@@ -95,5 +95,27 @@ namespace Hymson.MES.Api.Controllers.Warehouse
             await _whMaterialStandingbookService.DeletesWhMaterialStandingbookAsync(ids);
         }
 
+        /// <summary>
+        /// 查询详情（关系）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/relation")]
+        public async Task<IEnumerable<WhMaterialStandingBookRelationDto>> GetWhMaterialStandingBookRelationByIdAsync(long id)
+        {
+            return await _whMaterialStandingbookService.GetWhMaterialStandingBookRelationByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（上料）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/feeding")]
+        public async Task<WhMaterialStandingBookFeedingDto> GetWhMaterialStandingBookFeedingByIdAsync(long id)
+        {
+            return await _whMaterialStandingbookService.GetWhMaterialStandingBookFeedingByIdAsync(id);
+        }
+
     }
 }
