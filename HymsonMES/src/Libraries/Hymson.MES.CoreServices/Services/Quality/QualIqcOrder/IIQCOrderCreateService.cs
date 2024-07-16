@@ -13,5 +13,13 @@ namespace Hymson.MES.CoreServices.Services.Quality
         /// <param name="bo"></param>
         /// <returns></returns>
         Task<int> CreateAsync(IQCOrderCreateBo bo);
+
+        /// <summary>
+        /// 检验单号生成
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<string> GenerateIQCOrderCodeAsync(IQCOrderCreateBo bo);
+
     }
 }

@@ -1306,6 +1306,15 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualMaterialUnqualifiedDataPagedQueryDto, QualMaterialUnqualifiedDataPagedQuery>();
             #endregion
 
+
+
+            #region IQC_Lite
+            CreateMap<QualIqcOrderPagedQueryLiteDto, QualIqcOrderLitePagedQuery>();
+            CreateMap<QualIqcOrderLiteEntity, QualIqcOrderLiteDto>();
+            CreateMap<QualIqcOrderLiteEntity, QualIqcOrderLiteBaseDto>();
+            CreateMap<QualIqcOrderLiteDetailEntity, QualIqcOrderLiteDetailDto>();
+            #endregion
+
         }
 
         /// <summary>

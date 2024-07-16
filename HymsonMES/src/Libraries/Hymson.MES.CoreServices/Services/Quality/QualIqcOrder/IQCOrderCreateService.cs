@@ -410,7 +410,7 @@ namespace Hymson.MES.CoreServices.Services.Quality
         /// <param name="bo"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        private async Task<string> GenerateIQCOrderCodeAsync(IQCOrderCreateBo bo)
+        public async Task<string> GenerateIQCOrderCodeAsync(IQCOrderCreateBo bo)
         {
             var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
             {
