@@ -173,7 +173,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcSummaryEntity>(GetMaxTimeBySFCsSql, query);
         }
-
+        public async Task<IEnumerable<ManuSfcSummaryEntity>> GetSummaryEntitiesBySfcAsync(long siteId,string sfc)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcSummaryEntity>(GetSummaryEntitiesBySfcSql, new { SiteId=siteId, Sfc=sfc });
+        }
         /// <summary>
         /// 获取条码最后数据
         /// </summary>
@@ -308,7 +312,7 @@ SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId
 			SELECT ProductId, SFC, MAX(UpdatedOn) AS MaxUpdatedOn FROM manu_sfc_summary GROUP BY SFC,ProductId
 	        ) T2 ON T1.SFC = T2.SFC AND T1.ProductId = T2.ProductId AND T1.UpdatedOn = T2.MaxUpdatedOn WHERE T1.SFC IN @Sfcs  AND T1.IsDeleted=0   ";
 
-
+        const string GetSummaryEntitiesBySfcSql = "SELECT * FROM manu_sfc_summary WHERE SFC=@Sfc AND SiteId=@SiteId";
 
     }
 }
