@@ -144,6 +144,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("BusinessContent->>'$.OutputSFCStepId'=@OutputSfcStepId");
             }
+
+            if (query.OutputMaterialStandingBookId.HasValue)
+            {
+                sqlBuilder.Where("BusinessContent->>'$.OutputMaterialStandingBookId'=@OutputMaterialStandingBookId");
+            }
+
+            if (query.InputMaterialStandingBookId.HasValue)
+            {
+                sqlBuilder.Where("BusinessContent->>'$.InputMaterialStandingBookId'=@InputMaterialStandingBookId");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuBarCodeRelationEntity>(template.RawSql, query);
         }
@@ -175,8 +185,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var totalCount = await totalCountTask;
             return new PagedInfo<ManuBarCodeRelationEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
-
 
         /// <summary>
         /// 根据SFC获取数据

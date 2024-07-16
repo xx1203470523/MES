@@ -1,5 +1,5 @@
-﻿using Hymson.MES.BackgroundServices.Tasks.Manufacture.WorkOrderStatistic;
-using Microsoft.Extensions.Logging;
+﻿using Hymson.Logging.Services;
+using Hymson.MES.BackgroundServices.Tasks.Manufacture.WorkOrderStatistic;
 using Quartz;
 
 namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
@@ -10,18 +10,19 @@ namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
     [DisallowConcurrentExecution]
     internal class WorkOrderStatisticJob : IJob
     {
-        private readonly ILogger<WorkOrderStatisticJob> _logger;
+        private readonly IAlarmLogService _alarmLogService;
         private readonly IWorkOrderStatisticService _workOrderStatisticService;
+
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="alarmLogService"></param>
         /// <param name="workOrderStatisticService"></param>
-        public WorkOrderStatisticJob(ILogger<WorkOrderStatisticJob> logger,
+        public WorkOrderStatisticJob(IAlarmLogService alarmLogService,
             IWorkOrderStatisticService workOrderStatisticService)
         {
-            _logger = logger;
+            _alarmLogService = alarmLogService;
             _workOrderStatisticService = workOrderStatisticService;
         }
 
@@ -38,7 +39,7 @@ namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "工单统计出错:");
+                _alarmLogService.WriteAlarmLogEntry(new Logging.AlarmLogEntry("工单统计出错:" + ex.Message, ex.StackTrace ?? ""));
             }
         }
 

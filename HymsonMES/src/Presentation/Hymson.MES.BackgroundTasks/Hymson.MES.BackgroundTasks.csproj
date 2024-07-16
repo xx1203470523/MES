@@ -61,7 +61,7 @@
 		<PackageReference Include="Hymson.Print.Background" Version="2.1.175" />
 
 		<PackageReference Include="Hymson.SqlActuator" Version="2.1.175" />
-
+		<PackageReference Include="Hymson.Logging" Version="2.1.175" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
 
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />

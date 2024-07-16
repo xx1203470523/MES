@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Plan;
@@ -357,6 +358,27 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <param name="parameterBySfcQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery);
+
+
+        #region 获取基础数据带缓存
+        //Task<ProcMaterialEntity> GetProcMaterialEntityAsync(long id);
+
+        //Task<PlanWorkOrderEntity> GetPlanWorkOrderEntityAsync(long id);
+
+        //Task<InteWorkCenterEntity> GetInteWorkCenterEntityAsync(long id);
+
+        //Task<ProcProcessRouteEntity> GetProcProcessRouteEntityAsync(long id);
+
+        //Task<ProcBomEntity> GetProcBomEntityAsync(long id);
+
+        //Task<ProcResourceEntity> GetProcResourceEntityAsync(long id);   
+
+        //Task<EquEquipmentEntity> GetEquEquipmentEntityAsync(long id);   
+
+        //Task<ProcProcedureEntity> GetProcProcedureEntityAsync(long id); 
+
+
+        #endregion
 
     }
 }

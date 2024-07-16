@@ -73,4 +73,10 @@
     <Folder Include="Services\Process\LabelTemplate\Utility\Execute\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Dtos\Report\ProcedureSourceDto.cs">
+      <Generator></Generator>
+    </Compile>
+  </ItemGroup>
+
 </Project>

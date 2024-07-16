@@ -47,6 +47,48 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _tracingSFCService.DestinationAsync(sfc);
         }
+        /// <summary>
+        /// 追溯条码工序相关信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet("ProcedureSources/{sfc}")]
+        public async Task<IEnumerable<ProcedureSourceDto>> GetProcedureSourcesAsync(string sfc)
+        {
+            return await _tracingSFCService.GetProcedureSourcesAsync(sfc);
+        }
+        /// <summary>
+        /// 查询此条码所有的作业日志
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet("StepSources/{sfc}")]
+        public async Task<IEnumerable<StepSourceDto>> GetStepSourcesAsync(string sfc)
+        {
+            return await _tracingSFCService.GetStepSourcesAsync(sfc);
+        }
+
+        /// <summary>
+        /// 查询此条码 产品参数 追溯
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet("ProductParameterSources/{sfc}")]
+        public async Task<IEnumerable<ProductParameterSourceDto>> GetProductParameterSourcesAsync(string sfc)
+        {
+            return await _tracingSFCService.GetProductParameterSourcesAsync(sfc);
+        }
+        /// <summary>
+        /// 查询此条码原材料追溯信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet("MaterialSources/{sfc}")]
+        public async Task<IEnumerable<MaterialSourceDto>> GetMaterialSourcesAsync(string sfc)
+        {
+            return await _tracingSFCService.GetMaterialSourcesAsync(sfc);
+        }
+
 
     }
 }

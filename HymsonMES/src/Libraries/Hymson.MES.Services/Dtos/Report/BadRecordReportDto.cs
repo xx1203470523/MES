@@ -34,6 +34,8 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public string? ProcedureCode { get; set; }
 
+
+
         /// <summary>
         /// 计划开始时间  数组 ：时间范围 
         /// </summary>
@@ -55,6 +57,11 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         //public decimal Num { get; set; }
         public int Num { get; set; }
+
+        /// <summary>
+        /// 百分比
+        /// </summary>
+        public decimal Percentage { get; set; }
 
         /// <summary>
         /// 描述 :不合格代码 
