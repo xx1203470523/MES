@@ -2273,6 +2273,8 @@
         public const string MES17705 = "工具无剩余寿命，不可使用!";
         public const string MES17706 = "工具本次使用寿命需大于0";
         public const string MES17707= "工具{toolCode}不允许在设备{equipmentCode}使用!";
+        public const string MES17708 = "工具{toolCode}不允许对产品使用!";
+        public const string MES17709= "工具{toolCode}不允许对产品{productCode}使用!";
         #endregion
 
         #region 子步骤管理 17750

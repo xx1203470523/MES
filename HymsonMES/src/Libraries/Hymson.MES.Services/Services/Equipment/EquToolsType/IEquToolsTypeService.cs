@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -64,5 +65,18 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         Task<PagedInfo<EquToolsTypeDto>> GetPagedListAsync(EquToolsTypePagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 获取设备组
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentGroupListDto>> GetEquipmentsAsync(long id);
+
+        /// <summary>
+        /// 获取物料列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaterialDto>> GetMaterialsAsync(long id);
     }
 }

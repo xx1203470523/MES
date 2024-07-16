@@ -169,6 +169,11 @@ namespace Hymson.MES.Services.Services.Equipment
             //校验工具所属工具类型是否允许对设备生产的产品使用（工具类型对所有产品均可使用或工具类型分配的产品料号包含该设备所在线体当前已激活工单的产品料号），若不允许，则报错：工具XXX不允许对产品XXX使用；
             if (equToolsTypeEntity?.IsAllMaterialUsed != true)
             {
+                //设备未设置
+                //if(!equEquipmentEntity.WorkCenterLineId.HasValue|| equEquipmentEntity.WorkCenterLineId.Value == 0)
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES17708)).WithData("toolCode", toolsEntity.Code);
+                //}
             }
 
             //验证某个位置是否已经安装了其他工具

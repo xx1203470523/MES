@@ -243,4 +243,14 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long? MaterialId { get; set; }
     }
 
+    /// <summary>
+    /// 工具类型查询Dto
+    /// </summary>
+    public class EquToolsTypeQueryDto
+    {
+        /// <summary>
+        /// 工具类型Id
+        /// </summary>
+        public long Id { get; set; }=0L;
+    }
 }
