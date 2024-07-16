@@ -1060,7 +1060,13 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             foreach (var entity in standbookList)
             {
-                if (entity.MaterialBarCode == inputBarcodeSingle?.MaterialBarCode) continue;
+                if (IsMergeSFC)
+                {
+                    if (entity.MaterialBarCode == adjustDto.MergeSFC)
+                    {
+                        continue;
+                    }                     
+                }               
        
                 var manuBarCodeRelationEntity = new ManuBarCodeRelationEntity
                 {
@@ -1141,16 +1147,6 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
 
             return returnSFC;
-        }
-
-        /// <summary>
-        /// 拆分合并条码的验证
-        /// </summary>
-        /// <param name="sfcs"></param>
-        /// <returns></returns>
-        public async Task<bool> MergeAdjustVerifySfcAsync(string[] sfcs)
-        {
-            return true;
         }
 
         /// <summary>
