@@ -717,13 +717,14 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             if (defaultNextProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
             result = await _procProcedureRepository.GetByIdAsync(defaultNextProcedure.ProcedureId);
 
-            //是否报工（该工序设备是否上传），如果该工序不上传则继续获取下一个工序
-            //不上报工序：OP12挤压，OP23模组入箱，OP24模组人工固定，OP32模组固定2，组件安装OP25
-            //BMU是从气密检测进站，涂胶出站，
-            if (defaultNextProcedure.IsWorkReport == 0)
-                return await GetNextProcedureAsync(workOrderId, processRouteId, defaultNextProcedure.ProcedureId);
-            else
-                return result;
+            ////是否报工（该工序设备是否上传），如果该工序不上传则继续获取下一个工序
+            ////不上报工序：OP12挤压，OP23模组入箱，OP24模组人工固定，OP32模组固定2，组件安装OP25
+            ////BMU是从气密检测进站，涂胶出站，
+            ////客户调整工艺路线，去掉不上报工序
+            //if (defaultNextProcedure.IsWorkReport == 0)
+            //    return await GetNextProcedureAsync(workOrderId, processRouteId, defaultNextProcedure.ProcedureId);
+            //else
+            return result;
         }
 
         /// <summary>
