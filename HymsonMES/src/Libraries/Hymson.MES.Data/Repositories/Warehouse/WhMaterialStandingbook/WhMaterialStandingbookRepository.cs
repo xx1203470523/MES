@@ -83,25 +83,30 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.OrderBy(" CreatedOn DESC");
             sqlBuilder.Where("SiteId=@SiteId");
 
-            if (whMaterialStandingbookPagedQuery.Batch > 0)
+            if (!string.IsNullOrEmpty(whMaterialStandingbookPagedQuery.Batch))
             {
-                whMaterialStandingbookPagedQuery.Batch = whMaterialStandingbookPagedQuery.Batch;
-                sqlBuilder.Where("Batch = @Batch");
+                whMaterialStandingbookPagedQuery.Batch = $"%{whMaterialStandingbookPagedQuery.Batch}%";
+                sqlBuilder.Where("Batch LIKE @Batch");
             }
+            if (whMaterialStandingbookPagedQuery.Type.HasValue)
+            {
+                sqlBuilder.Where("Type = @Type");
+            }
+
             if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.MaterialBarCode))
             {
                 whMaterialStandingbookPagedQuery.MaterialBarCode = $"%{whMaterialStandingbookPagedQuery.MaterialBarCode}%";
-                sqlBuilder.Where("MaterialBarCode like @MaterialBarCode");
+                sqlBuilder.Where("MaterialBarCode LIKE @MaterialBarCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.MaterialCode))
             {
                 whMaterialStandingbookPagedQuery.MaterialCode = $"%{whMaterialStandingbookPagedQuery.MaterialCode}%";
-                sqlBuilder.Where("MaterialCode like @MaterialCode");
+                sqlBuilder.Where("MaterialCode LIKE @MaterialCode");
             }
             if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.MaterialVersion))
             {
                 whMaterialStandingbookPagedQuery.MaterialVersion = $"%{whMaterialStandingbookPagedQuery.MaterialVersion}%";
-                sqlBuilder.Where("MaterialVersion like @MaterialVersion");
+                sqlBuilder.Where("MaterialVersion LIKE @MaterialVersion");
             }
 
             var offSet = (whMaterialStandingbookPagedQuery.PageIndex - 1) * whMaterialStandingbookPagedQuery.PageSize;

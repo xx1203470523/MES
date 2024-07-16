@@ -33,6 +33,7 @@ namespace Hymson.MES.Services.Validators.EquSpotcheckTemplate
                 else
                     return true;
             }).WithErrorCode(ErrorCode.MES13514);
+            RuleFor(x => x.CalibrationCycle).PrecisionScale(8, 0, false).WithErrorCode(ErrorCode.MES13513);
             RuleFor(x => x).Must((x) => {
                 if (x.IsCalibrated == YesOrNoEnum.Yes)
                     return x.LastVerificationTime.HasValue;
@@ -59,6 +60,7 @@ namespace Hymson.MES.Services.Validators.EquSpotcheckTemplate
                 else
                     return true;
             }).WithErrorCode(ErrorCode.MES13513);
+            RuleFor(x => x.CalibrationCycle).PrecisionScale(8, 0, false).WithErrorCode(ErrorCode.MES13513);
             RuleFor(x => x).Must((x) => {
                 if (x.IsCalibrated == YesOrNoEnum.Yes)
                     return x.CalibrationCycleUnit.HasValue;
@@ -89,6 +91,8 @@ namespace Hymson.MES.Services.Validators.EquSpotcheckTemplate
                 else
                     return true;
             }).WithErrorCode(ErrorCode.MES13513);
+
+            RuleFor(x => x.CalibrationCycle).PrecisionScale(8, 0, false).WithErrorCode(ErrorCode.MES13518);
             RuleFor(x => x).Must((x) => {
                 if (x.IsCalibrated == YesOrNoEnum.Yes)
                     return x.CalibrationCycleUnit.HasValue;
