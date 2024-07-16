@@ -67,5 +67,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 物料加载来源
         /// </summary>
         public ManuSFCFeedingSourceEnum? LoadSource { get; set; }
+
+       /// <summary>
+       /// 
+       /// </summary>
+        public long MaterialStandingbookId { get; set; }
     }
 }
