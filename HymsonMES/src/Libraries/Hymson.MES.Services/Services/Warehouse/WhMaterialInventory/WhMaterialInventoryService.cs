@@ -1060,7 +1060,13 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             foreach (var entity in standbookList)
             {
-                if (entity.MaterialBarCode == inputBarcodeSingle?.MaterialBarCode) continue;
+                if (IsMergeSFC)
+                {
+                    if (entity.MaterialBarCode == adjustDto.MergeSFC)
+                    {
+                        continue;
+                    }                     
+                }               
        
                 var manuBarCodeRelationEntity = new ManuBarCodeRelationEntity
                 {
