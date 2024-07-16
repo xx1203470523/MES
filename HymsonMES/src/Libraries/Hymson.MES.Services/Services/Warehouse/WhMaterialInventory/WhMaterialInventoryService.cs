@@ -1079,7 +1079,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                     InputBarCodeLocation = string.Empty,
                     InputBarCodeMaterialId = inputBarcodeSingle.MaterialId,
                     InputBarCodeWorkOrderId = inputBarcodeSingle.WorkOrderId,
-
                     InputQty = entity.QuantityResidue,
                     OutputBarCode = entity.MaterialBarCode,
                     OutputBarCodeMaterialId = inputBarcodeSingle.MaterialId,
