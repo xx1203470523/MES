@@ -118,6 +118,7 @@ using Hymson.MES.Services.Dtos.EquSparepartInventory;
 using Hymson.MES.Data.Repositories.Equipment.View;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteBusinessField.View;
+using System.Reflection;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -1578,6 +1579,12 @@ namespace Hymson.MES.Services.Mapper
             #region MarkingInterceptReport
             CreateMap<MarkingInterceptReportPagedQueryDto, MarkingReportReportPagedQuery>();
             CreateMap<MarkingRecordQueryReportView, MarkingRecordReportDto>();
+            #endregion
+
+            #region 追溯
+            CreateMap<ManuSfcSummaryEntity, ProcedureSourceDto>();
+            CreateMap<ManuBarCodeRelationEntity, MaterialSourceDto>();
+            CreateMap<ManuSfcStepEntity, StepSourceDto>();
             #endregion
         }
 
