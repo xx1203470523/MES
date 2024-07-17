@@ -45,7 +45,7 @@
         public const string MES10136 = "操作数据丢失";
         public const string MES10137 = "只允许删除【待检验】状态的数据！";
         public const string MES10138 = "必须要选择一项查询类型！";
-        public const string MES10139 = "配置信息读取失败！";
+        public const string MES10139 = "{name}配置信息读取失败！";
         public const string MES10140 = "定子/转子工厂车间产线信息读取异常！";
 
         #region 物料 10200

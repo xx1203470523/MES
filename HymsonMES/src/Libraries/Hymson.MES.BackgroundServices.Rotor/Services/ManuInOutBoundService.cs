@@ -434,7 +434,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 //写入到步骤表
                 if (mesItem.Type == 2)
                 {
-                    ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode, mesItem.IsPassed, mesOrder);
+                    ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode,
+                        mesItem.IsPassed, mesOrder, procedureId);
                     stepId = step.Id;
                     stepList.Add(step);
                     sfcUpdateList.Add(new ManuSfcDto()
@@ -451,7 +452,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 if (mesItem.UpMatList.Count > 0)
                 {
                     List<ManuSfcCirculationEntity> curCirculaList = GetCirculaList(mesItem.Sfc, mesItem.UpMatList,
-                        mesItem.ProcedureCode, mesOrder, mesMaterialList);
+                        mesItem.ProcedureCode, mesOrder, mesMaterialList, procedureId);
                     circulaList.AddRange(curCirculaList);
                 }
                 //写入到参数表
@@ -688,7 +689,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="mesOrder"></param>
         /// <returns></returns>
         private ManuSfcStepEntity GetStepEntity(string sfc, int type, string produceCode,
-            bool isPassed, PlanWorkOrderEntity ?mesOrder)
+            bool isPassed, PlanWorkOrderEntity ?mesOrder, long procedureId)
         {
             ManuSfcStepEntity step = new ManuSfcStepEntity();
             step.Id = IdGenProvider.Instance.CreateId();
@@ -701,8 +702,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             step.CurrentStatus = type == 1 ? Core.Enums.SfcStatusEnum.Activity : Core.Enums.SfcStatusEnum.lineUp;
             step.AfterOperationStatus = type == 1 ? Core.Enums.SfcStatusEnum.lineUp : Core.Enums.SfcStatusEnum.Activity;
             step.UpdatedBy = "";
+            step.ProcedureId = procedureId;
 
-            if(mesOrder != null)
+            if (mesOrder != null)
             {
                 step.ProductBOMId = mesOrder.ProductBOMId;
                 step.ProcessRouteId = mesOrder.ProcessRouteId;
@@ -724,7 +726,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="matList"></param>
         /// <returns></returns>
         private List<ManuSfcCirculationEntity> GetCirculaList(string sfc, List<SfcUpMatDto> upList,
-            string produceCode, PlanWorkOrderEntity ?mesOrder, List<ProcMaterialEntity> matList)
+            string produceCode, PlanWorkOrderEntity ?mesOrder, List<ProcMaterialEntity> matList,
+            long procedureId)
         {
             List<ManuSfcCirculationEntity> list = new List<ManuSfcCirculationEntity>();
 
@@ -743,6 +746,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 model.Location = produceCode;
                 model.UpdatedBy = "";
                 model.CirculationType = Core.Enums.Manufacture.SfcCirculationTypeEnum.Consume;
+                model.ProcedureId = procedureId;
 
                 ProcMaterialEntity? materialEntity = matList.Where(m => m.MaterialCode == item.MatCode).FirstOrDefault();
                 if(materialEntity != null)
