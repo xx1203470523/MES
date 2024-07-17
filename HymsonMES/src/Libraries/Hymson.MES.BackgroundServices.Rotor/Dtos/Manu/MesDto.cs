@@ -126,6 +126,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         /// 物料数量
         /// </summary>
         public int? MatNum { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MatCode { get; set; }
     }
 
     /// <summary>

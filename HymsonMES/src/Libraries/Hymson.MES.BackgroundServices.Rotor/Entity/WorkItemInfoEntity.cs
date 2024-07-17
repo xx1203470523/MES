@@ -44,9 +44,19 @@ namespace Hymson.MES.BackgroundServices.Rotor.Entity
         public string MatValue { get; set; }
 
         /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MatCode { get; set; }
+
+        /// <summary>
         /// 批次号
         /// </summary>
         public string MatBatchCode { get; set; }
+
+        /// <summary>
+        /// 批次号对应物料编码
+        /// </summary>
+        public string LotCode { get; set; }
 
         /// <summary>
         /// 数量
