@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Process;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -78,5 +79,18 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcMaterialDto>> GetMaterialsAsync(long id);
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task<string> DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 导入
+        /// </summary>
+        /// <returns></returns>
+        Task ImportAsync(IFormFile formFile);
     }
 }
