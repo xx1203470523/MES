@@ -24,6 +24,11 @@ namespace Hymson.MES.Data.Repositories.Plan
     public class InteCodeRulesPageView : InteCodeRulesEntity
     {
         /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long MaterialId {  get; set; }
+
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; }

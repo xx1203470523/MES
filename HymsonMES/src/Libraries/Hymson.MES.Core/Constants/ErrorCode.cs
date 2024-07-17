@@ -607,6 +607,7 @@
         public const string MES12449 = "包装序列码必须填写有效的容器编码";
         public const string MES12450 = "容器{code}编码规则已存在，请删除原规则再进行新增!";
         public const string MES12451 = "编码类型{type}已经存在记录";
+        public const string MES12452 = "物料【{MaterialCode}】对应编码规则已存在！";
         #endregion
 
         #region 容器维护 12500

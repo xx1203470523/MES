@@ -65,7 +65,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [PermissionDescription("inte:codeRules:insert")]
         public async Task AddInteCodeRulesAsync([FromBody] InteCodeRulesCreateDto parm)
         {
-             await _inteCodeRulesService.CreateInteCodeRulesAsync(parm);
+            await _inteCodeRulesService.CreateInteCodeRulesAsync(parm);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [PermissionDescription("inte:codeRules:update")]
         public async Task UpdateInteCodeRulesAsync([FromBody] InteCodeRulesModifyDto parm)
         {
-             await _inteCodeRulesService.ModifyInteCodeRulesAsync(parm);
+            await _inteCodeRulesService.ModifyInteCodeRulesAsync(parm);
         }
 
         /// <summary>

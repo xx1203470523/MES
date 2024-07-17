@@ -67,7 +67,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<InteCodeRulesEntity> GetInteCodeRulesByProductIdAsync(InteCodeRulesByProductQuery param)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteCodeRulesEntity>(GetInteCodeRulesByProductIdSql, param);
+            var entity = await conn.QueryFirstOrDefaultAsync<InteCodeRulesEntity>(GetInteCodeRulesByProductIdSql, param);
+            if (entity != null)
+            {
+                entity.ProductId = param.ProductId;
+            }
+            return entity;
         }
 
         /// <summary>
@@ -236,20 +241,23 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class InteCodeRulesRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT
-	cr.*,
-	m.MaterialCode,
-	m.MaterialName,
-	m.Version AS MaterialVersion,
-	c.CODE AS ContainerCode,
-	c.NAME AS ContainerName 
-FROM
-	`inte_code_rules` cr
-	LEFT JOIN proc_material m ON cr.ProductId = m.Id
-	LEFT JOIN inte_container_info c ON cr.ContainerInfoId = c.Id
+	                                    cr.*,
+                                        crm.MaterialId,
+	                                    m.MaterialCode,
+	                                    m.MaterialName,
+	                                    m.Version AS MaterialVersion,
+	                                    c.CODE AS ContainerCode,
+	                                    c.NAME AS ContainerName 
+                                    FROM
+	                                    `inte_code_rules` cr
+                                        LEFT JOIN inte_code_rules_material crm ON crm.CodeRulesId = cr.Id AND crm.IsDeleted = 0
+	                                    LEFT JOIN proc_material m ON crm.MaterialId = m.Id
+	                                    LEFT JOIN inte_container_info c ON cr.ContainerInfoId = c.Id
                                     /**where**/ Order by cr.CreatedOn desc LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                                             FROM `inte_code_rules` cr
-                                            LEFT JOIN proc_material m on cr.ProductId=m.Id
+                                            LEFT JOIN inte_code_rules_material crm ON crm.CodeRulesId = cr.Id AND crm.IsDeleted = 0
+                                            LEFT JOIN proc_material m ON crm.MaterialId = m.Id
                                             LEFT JOIN inte_container_info c ON cr.ContainerInfoId = c.Id
                                             /**where**/ ";
         const string GetInteCodeRulesEntitiesSqlTemplate = @"SELECT 
@@ -263,7 +271,7 @@ FROM
         const string DeleteSql = "UPDATE `inte_code_rules` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_code_rules` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
         const string GetByIdSql = @"SELECT * FROM `inte_code_rules`  WHERE Id = @Id ";
-        const string GetInteCodeRulesByProductIdSql = @"SELECT * FROM `inte_code_rules`  WHERE ProductId = @ProductId AND CodeType=@CodeType AND IsDeleted=0 ";
+        const string GetInteCodeRulesByProductIdSql = @"SELECT icr.* FROM `inte_code_rules` icr LEFT JOIN inte_code_rules_material icrm ON icrm.CodeRulesId = icr.Id AND icrm.IsDeleted = 0 WHERE icrm.MaterialId = @ProductId AND icr.CodeType=@CodeType AND icr.IsDeleted=0 ";
         const string GetByIdsSql = @"SELECT * FROM `inte_code_rules`  WHERE Id IN @ids ";
     }
 }

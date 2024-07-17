@@ -124,7 +124,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 产品id
         /// </summary>
-        public long? ProductId { get; set; }
+        public List<long>? ProductIds { get; set; }
 
         /// <summary>
         /// 容器id
@@ -216,7 +216,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 产品id
         /// </summary>
-        public long ProductId { get; set; }
+        public List<long>? ProductIds { get; set; }
 
         /// <summary>
         /// 编码类型;1：过程控制序列码；2：包装序列码；
@@ -314,6 +314,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
 
     public record class InteCodeRulesPageViewDto : BaseEntityDto
     {
+        /// <summary>
+        /// 前端渲染唯一key（查询出的数据编码规则Id不是唯一的）
+        /// </summary>
+        public long RowKey {  get; set; }
+
         /// <summary>
         /// 主键
         /// </summary>
@@ -507,6 +512,21 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 物料版本
         /// </summary>
         public string MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 编码规则物料Ids
+        /// </summary>
+        public IEnumerable<long> ProductIds { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public IEnumerable<string> MaterialCodes { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCodesJoinStr {  get; set; }
 
 
         /// <summary>

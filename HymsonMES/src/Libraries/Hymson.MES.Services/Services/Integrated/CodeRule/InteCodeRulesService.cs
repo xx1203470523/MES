@@ -43,6 +43,7 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
         private readonly IInteContainerInfoRepository _inteContainerInfoRepository;
+        private readonly IInteCodeRulesMaterialRepository _inteCodeRulesMaterialRepository;
 
         private readonly AbstractValidator<InteCodeRulesCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteCodeRulesModifyDto> _validationModifyRules;
@@ -58,7 +59,8 @@ namespace Hymson.MES.Services.Services.Integrated
             IInteContainerInfoRepository inteContainerInfoRepository,
             AbstractValidator<InteCodeRulesCreateDto> validationCreateRules,
             AbstractValidator<InteCodeRulesModifyDto> validationModifyRules,
-            AbstractValidator<InteCodeRulesMakeCreateDto> validationMakeCreateRules)
+            AbstractValidator<InteCodeRulesMakeCreateDto> validationMakeCreateRules,
+            IInteCodeRulesMaterialRepository inteCodeRulesMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -69,6 +71,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _validationMakeCreateRules = validationMakeCreateRules;
+            _inteCodeRulesMaterialRepository = inteCodeRulesMaterialRepository;
         }
 
         /// <summary>
@@ -88,7 +91,7 @@ namespace Hymson.MES.Services.Services.Integrated
             //校验OQC与IQC只能创建一个
             if (inteCodeRulesCreateDto.CodeType != null)
             {
-                if(inteCodeRulesCreateDto.CodeType== CodeRuleCodeTypeEnum.OQC|| inteCodeRulesCreateDto.CodeType== CodeRuleCodeTypeEnum.IQC || inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.FQC)
+                if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.OQC || inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.IQC || inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.FQC)
                 {
                     var Entities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId = _currentSite.SiteId ?? 0, CodeType = inteCodeRulesCreateDto.CodeType });
                     if (Entities.Any())
@@ -163,29 +166,22 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             //判断是否已经存在该物料数据
-            var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId = _currentSite.SiteId ?? 0, ProductId = inteCodeRulesCreateDto.ProductId.GetValueOrDefault() });
-            if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any())
+            if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode && inteCodeRulesCreateDto.ProductIds != null)
             {
-                IEnumerable<InteCodeRulesEntity> repeats = Enumerable.Empty<InteCodeRulesEntity>();
-                //判断 编码类型和包装类型是否重复，重复则报错   2023/04/25 加的需求
-                if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                var codeRulesMaterialEntities = await _inteCodeRulesMaterialRepository.GetEntitiesAsync(new InteCodeRulesMaterialQuery
                 {
-                    repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode).ToList();
-                }
-                else
+                    SiteId = _currentSite.SiteId ?? 0,
+                    MaterialIds = inteCodeRulesCreateDto.ProductIds
+                });
+                if (codeRulesMaterialEntities != null && codeRulesMaterialEntities.Any())
                 {
-                    //repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.PackagingSeqCode && x.PackType == inteCodeRulesCreateDto.PackType).ToList();
-                }
-
-                if (repeats != null && repeats.Any())
-                {
-                    if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                    var codeRulesEntities = await _inteCodeRulesRepository.GetByIdsAsync(codeRulesMaterialEntities.Select(x => x.CodeRulesId).Distinct().ToArray());
+                    if (codeRulesEntities != null && codeRulesEntities.Any(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode))
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId.GetValueOrDefault());
-                    }
-                    else
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesCreateDto.ProductId.GetValueOrDefault());
+                        var codeRulesIds = codeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode).Select(x => x.Id);
+                        var materialIds = codeRulesMaterialEntities.Where(x => codeRulesIds.Contains(x.CodeRulesId)).Select(x => x.MaterialId);
+                        var materialCodes = (await _procMaterialRepository.GetByIdsAsync(materialIds)).Select(x => x.MaterialCode);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12452)).WithData("MaterialCode", string.Join(',', materialCodes));
                     }
                 }
             }
@@ -207,6 +203,20 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
             }
 
+            var codeRulesMaterials = new List<InteCodeRulesMaterialEntity>();
+            if (inteCodeRulesCreateDto.ProductIds != null && inteCodeRulesCreateDto.ProductIds.Any())
+            {
+                codeRulesMaterials = inteCodeRulesCreateDto.ProductIds.Select(item => new InteCodeRulesMaterialEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    CodeRulesId = inteCodeRulesEntity.Id,
+                    MaterialId = item,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                }).ToList();
+            }
+            
             try
             {
                 using TransactionScope ts = TransactionHelper.GetTransactionScope();
@@ -231,6 +241,10 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12402));
                     }
+                }
+                if (codeRulesMaterials.Any())
+                {
+                    await _inteCodeRulesMaterialRepository.InsertRangeAsync(codeRulesMaterials);
                 }
 
                 ts.Complete();
@@ -295,6 +309,11 @@ namespace Hymson.MES.Services.Services.Integrated
             foreach (var inteCodeRulesEntity in pagedInfo.Data)
             {
                 var inteCodeRulesDto = inteCodeRulesEntity.ToModel<InteCodeRulesPageViewDto>();
+                inteCodeRulesDto.RowKey = inteCodeRulesEntity.Id;
+                if (inteCodeRulesEntity.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                {
+                    inteCodeRulesDto.RowKey = inteCodeRulesEntity.MaterialId;
+                }
                 inteCodeRulesDtos.Add(inteCodeRulesDto);
             }
 
@@ -370,26 +389,23 @@ namespace Hymson.MES.Services.Services.Integrated
 
 
             //判断是否已经存在该物料数据
-            var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId = _currentSite.SiteId ?? 0, ProductId = inteCodeRulesModifyDto.ProductId });
-            if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any())
+            if (inteCodeRulesModifyDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode && inteCodeRulesModifyDto.ProductIds != null)
             {
-                IEnumerable<InteCodeRulesEntity> repeats = Enumerable.Empty<InteCodeRulesEntity>();
-                //判断 编码类型和包装类型是否重复，重复则报错   2023/04/25 加的需求
-                if (inteCodeRulesModifyDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                var codeRulesMaterialEntities = await _inteCodeRulesMaterialRepository.GetEntitiesAsync(new InteCodeRulesMaterialQuery
                 {
-                    repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode).ToList();
-                }
-                else
+                    SiteId = _currentSite.SiteId ?? 0,
+                    MaterialIds = inteCodeRulesModifyDto.ProductIds
+                });
+                if (codeRulesMaterialEntities != null && codeRulesMaterialEntities.Any(x => x.CodeRulesId != inteCodeRulesModifyDto.Id))
                 {
-                    //repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.PackagingSeqCode && x.PackType == inteCodeRulesModifyDto.PackType).ToList();
-                }
-
-                if (repeats != null && repeats.Any() && !(repeats.Count() == 1 && repeats.First().Id == inteCodeRulesModifyDto.Id)) //去掉当前修改的数据的
-                {
-                    if (inteCodeRulesModifyDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
-                        throw new CustomerValidationException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesModifyDto.ProductId);
-                    else
-                        throw new CustomerValidationException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesModifyDto.ProductId);
+                    var codeRulesEntities = await _inteCodeRulesRepository.GetByIdsAsync(codeRulesMaterialEntities.Where(x => x.CodeRulesId != inteCodeRulesModifyDto.Id).Select(x => x.CodeRulesId).Distinct().ToArray());
+                    if (codeRulesEntities != null && codeRulesEntities.Any(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode))
+                    {
+                        var codeRulesIds = codeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode).Select(x => x.Id);
+                        var existMaterialIds = codeRulesMaterialEntities.Where(x => codeRulesIds.Contains(x.CodeRulesId)).Select(x => x.MaterialId);
+                        var materialCodes = (await _procMaterialRepository.GetByIdsAsync(existMaterialIds)).Select(x => x.MaterialCode);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12452)).WithData("MaterialCode", string.Join(',', materialCodes));
+                    }
                 }
             }
 
@@ -411,6 +427,20 @@ namespace Hymson.MES.Services.Services.Integrated
 
                     inteCodeRulesMakeEntitys.Add(inteCodeRulesMakeEntity);
                 }
+            }
+
+            var codeRulesMaterials = new List<InteCodeRulesMaterialEntity>();
+            if (inteCodeRulesModifyDto.ProductIds != null && inteCodeRulesModifyDto.ProductIds.Any())
+            {
+                codeRulesMaterials = inteCodeRulesModifyDto.ProductIds.Select(item => new InteCodeRulesMaterialEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    CodeRulesId = inteCodeRulesEntity.Id,
+                    MaterialId = item,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                }).ToList();
             }
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -435,6 +465,12 @@ namespace Hymson.MES.Services.Services.Integrated
                     }
                 }
 
+                await _inteCodeRulesMaterialRepository.DeleteByCodeRulesIdAsync(inteCodeRulesEntity.Id);
+                if (codeRulesMaterials.Any())
+                {
+                    await _inteCodeRulesMaterialRepository.InsertRangeAsync(codeRulesMaterials);
+                }
+
                 ts.Complete();
             }
 
@@ -454,13 +490,28 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 var inteCodeRulesDetailViewDto = inteCodeRulesEntity.ToModel<InteCodeRulesDetailViewDto>();
 
-                //查询关联数据
-                var material = await _procMaterialRepository.GetByIdAsync(inteCodeRulesEntity.ProductId.GetValueOrDefault(), _currentSite.SiteId ?? 0);
-                if (material != null)
+                ////查询关联数据
+                //var material = await _procMaterialRepository.GetByIdAsync(inteCodeRulesEntity.ProductId.GetValueOrDefault());
+                //if (material != null)
+                //{
+                //    inteCodeRulesDetailViewDto.MaterialCode = material.MaterialCode ;
+                //    inteCodeRulesDetailViewDto.MaterialName = material.MaterialName;
+                //    inteCodeRulesDetailViewDto.MaterialVersion = material.Version ?? "";
+                //}
+
+                //查询编码规则对应物料
+                var codeRulesMaterialEntities = await _inteCodeRulesMaterialRepository.GetEntitiesAsync(new InteCodeRulesMaterialQuery
                 {
-                    inteCodeRulesDetailViewDto.MaterialCode = material.MaterialCode;
-                    inteCodeRulesDetailViewDto.MaterialName = material.MaterialName;
-                    inteCodeRulesDetailViewDto.MaterialVersion = material.Version ?? "";
+                    SiteId = inteCodeRulesEntity.SiteId,
+                    CodeRulesId = id,
+                    Sorting = "Id"
+                });
+                if (codeRulesMaterialEntities != null && codeRulesMaterialEntities.Any())
+                {
+                    inteCodeRulesDetailViewDto.ProductIds = codeRulesMaterialEntities.Select(x => x.MaterialId);
+                    var materialEntities = await _procMaterialRepository.GetByIdsAsync(inteCodeRulesDetailViewDto.ProductIds);
+                    inteCodeRulesDetailViewDto.MaterialCodes = materialEntities.Select(x => x.MaterialCode);
+                    inteCodeRulesDetailViewDto.MaterialCodesJoinStr = string.Join(',', materialEntities.Select(x => x.MaterialCode));
                 }
 
                 //查询关联的编码规则组成
