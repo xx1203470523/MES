@@ -1011,6 +1011,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             foreach (var entity in standbookList)
             {
                 decimal quantityResidue = 0;
+                var type = WhMaterialInventoryTypeEnum.MaterialBarCodeMerge;
                 //指定条码
                 //处理备注内容及数量
                 if (IsMergeSFC)
@@ -1027,10 +1028,13 @@ namespace Hymson.MES.Services.Services.Warehouse
                     {
                         //新条码时处理
                         quantityResidue = entity.QuantityResidue;
+                        type = WhMaterialInventoryTypeEnum.CombinedAdd;
                     }
                     beforeBarcode = beforeBarcode.Where(x => x != inputBarcodeSingle?.MaterialBarCode);
                     afterBarcode = inputBarcodeSingle?.MaterialBarCode ?? string.Empty;
                 }
+
+                
 
                 var standingbook = new WhMaterialStandingbookEntity
                 {
@@ -1043,7 +1047,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialBarCode = entity.MaterialBarCode,
                     Quantity = quantityResidue,
 
-                    Type = IsMergeSFC == true ? WhMaterialInventoryTypeEnum.CombinedAdd : WhMaterialInventoryTypeEnum.MaterialBarCodeMerge,
+                    Type = type,
                     Source = MaterialInventorySourceEnum.Merge,
                     SiteId = _currentSite.SiteId ?? 0,
                     Batch = entity.Batch ?? string.Empty,
@@ -1060,13 +1064,10 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             foreach (var entity in standbookList)
             {
-                if (IsMergeSFC)
-                {
-                    if (entity.MaterialBarCode == adjustDto.MergeSFC)
-                    {
-                        continue;
-                    }                     
-                }               
+                //if (entity.MaterialBarCode != inputBarcodeSingle?.MaterialBarCode)
+                //{
+                //    continue;
+                //}            
        
                 var manuBarCodeRelationEntity = new ManuBarCodeRelationEntity
                 {
@@ -1075,14 +1076,12 @@ namespace Hymson.MES.Services.Services.Warehouse
                     ProcedureId = null,
                     ResourceId = null,
                     EquipmentId = null,
-                    InputBarCode = inputBarcodeSingle.MaterialBarCode,
+                    InputBarCode = entity.MaterialBarCode,
                     InputBarCodeLocation = string.Empty,
-                    InputBarCodeMaterialId = inputBarcodeSingle.MaterialId,
-                    InputBarCodeWorkOrderId = inputBarcodeSingle.WorkOrderId,
-          
-
+                    InputBarCodeMaterialId = entity.MaterialId,
+                    InputBarCodeWorkOrderId = entity.WorkOrderId,
                     InputQty = entity.QuantityResidue,
-                    OutputBarCode = entity.MaterialBarCode,
+                    OutputBarCode = inputBarcodeSingle.MaterialBarCode,
                     OutputBarCodeMaterialId = inputBarcodeSingle.MaterialId,
                     OutputBarCodeWorkOrderId = inputBarcodeSingle.WorkOrderId,
                     OutputBarCodeMode = ManuBarCodeOutputModeEnum.Normal,
