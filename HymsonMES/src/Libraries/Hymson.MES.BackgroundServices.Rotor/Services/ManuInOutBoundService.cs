@@ -7,11 +7,13 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -58,6 +60,16 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// 工单产品关联
         /// </summary>
         private readonly IWorkOrderListRepository _workOrderListRepository;
+
+        /// <summary>
+        /// 工序
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
+        /// 物料
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
         /// 仓储接口（条码步骤）
@@ -113,6 +125,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             IWorkProcessRepository workProcessRepository,
             IWorkOrderRelationRepository workOrderRelationRepository,
             IWorkOrderListRepository workOrderListRepository,
+            IProcProcedureRepository procProcedureRepository,
+            IProcMaterialRepository procMaterialRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
@@ -127,6 +141,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             _workProcessRepository = workProcessRepository;
             _workOrderRelationRepository = workOrderRelationRepository;
             _workOrderListRepository = workOrderListRepository;
+            _procProcedureRepository = procProcedureRepository;
+            _procMaterialRepository = procMaterialRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -246,6 +262,14 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             #region 获取MES数据
             //MES工单数据
             List<PlanWorkOrderEntity> mesOrderList = await GetMesOrderAsync(lmsOrderList);
+            //MES工序信息
+            ProcProcedureQuery procedureQuery = new ProcProcedureQuery();
+            procedureQuery.SiteId = SiteID;
+            List<ProcProcedureEntity> mesProcedureList = await GetMesProcedureAsync(procedureQuery);
+            //MES物料信息
+            ProcMaterialQuery materialQuery = new ProcMaterialQuery();
+            materialQuery.SiteId = SiteID;
+            List<ProcMaterialEntity> mesMaterialList = await GetMesMaterialAsync(materialQuery);
             #endregion
 
             //MES过站数据
@@ -302,6 +326,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                             MatValue = upItem.MatValue,
                             MatBatchCode = upItem.MatBatchCode,
                             BarCode = string.IsNullOrEmpty(upItem.MatValue) ? upItem.MatBatchCode : upItem.MatValue,
+                            MatCode = string.IsNullOrEmpty(upItem.MatValue) ? upItem.LotCode : upItem.MatCode,
                             MatType = string.IsNullOrEmpty(upItem.MatValue) ? MatType_One : MatType_Batch,
                             MatNum = upItem.MatNum
                         });
@@ -395,11 +420,22 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     continue;
                 }
                 long stepId = 0;
+
+                //工单
                 var mesOrder = mesOrderList.Where(m => m.OrderCode == mesItem.OrderCode).FirstOrDefault();
-                //写入到步骤表
-                if(mesItem.Type == 2)
+                //工序
+                long procedureId = 0;
+                ProcProcedureEntity ?mesProcedure = mesProcedureList.Where(m => m.Code == mesItem.ProcedureCode).FirstOrDefault();
+                if(mesProcedure != null)
                 {
-                    ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode, mesItem.IsPassed, mesOrder);
+                    procedureId = mesProcedure.Id;
+                }
+
+                //写入到步骤表
+                if (mesItem.Type == 2)
+                {
+                    ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode,
+                        mesItem.IsPassed, mesOrder, procedureId);
                     stepId = step.Id;
                     stepList.Add(step);
                     sfcUpdateList.Add(new ManuSfcDto()
@@ -416,14 +452,14 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 if (mesItem.UpMatList.Count > 0)
                 {
                     List<ManuSfcCirculationEntity> curCirculaList = GetCirculaList(mesItem.Sfc, mesItem.UpMatList,
-                        mesItem.ProcedureCode, mesOrder);
+                        mesItem.ProcedureCode, mesOrder, mesMaterialList, procedureId);
                     circulaList.AddRange(curCirculaList);
                 }
                 //写入到参数表
                 if(mesItem.ParamList.Count > 0)
                 {
-                    List<Core.Domain.Parameter.ManuProductParameterEntity> addParamList = 
-                        GetParamList(mesItem.ParamList, mesItem.ProcedureCode, stepId, mesItem.Sfc);
+                    List<Core.Domain.Parameter.ManuProductParameterEntity> addParamList =
+                        GetParamList(mesItem.ParamList, mesItem.ProcedureCode, stepId, mesItem.Sfc, procedureId);
                     manuParamList.AddRange(addParamList);
                 }
                 //写入到NG表
@@ -653,7 +689,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="mesOrder"></param>
         /// <returns></returns>
         private ManuSfcStepEntity GetStepEntity(string sfc, int type, string produceCode,
-            bool isPassed, PlanWorkOrderEntity ?mesOrder)
+            bool isPassed, PlanWorkOrderEntity ?mesOrder, long procedureId)
         {
             ManuSfcStepEntity step = new ManuSfcStepEntity();
             step.Id = IdGenProvider.Instance.CreateId();
@@ -666,8 +702,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             step.CurrentStatus = type == 1 ? Core.Enums.SfcStatusEnum.Activity : Core.Enums.SfcStatusEnum.lineUp;
             step.AfterOperationStatus = type == 1 ? Core.Enums.SfcStatusEnum.lineUp : Core.Enums.SfcStatusEnum.Activity;
             step.UpdatedBy = "";
+            step.ProcedureId = procedureId;
 
-            if(mesOrder != null)
+            if (mesOrder != null)
             {
                 step.ProductBOMId = mesOrder.ProductBOMId;
                 step.ProcessRouteId = mesOrder.ProcessRouteId;
@@ -686,9 +723,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="upList"></param>
         /// <param name="produceCode"></param>
         /// <param name="mesOrder"></param>
+        /// <param name="matList"></param>
         /// <returns></returns>
         private List<ManuSfcCirculationEntity> GetCirculaList(string sfc, List<SfcUpMatDto> upList,
-            string produceCode, PlanWorkOrderEntity ?mesOrder)
+            string produceCode, PlanWorkOrderEntity ?mesOrder, List<ProcMaterialEntity> matList,
+            long procedureId)
         {
             List<ManuSfcCirculationEntity> list = new List<ManuSfcCirculationEntity>();
 
@@ -706,14 +745,21 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 model.CirculationQty = item.MatNum;
                 model.Location = produceCode;
                 model.UpdatedBy = "";
+                model.CirculationType = Core.Enums.Manufacture.SfcCirculationTypeEnum.Consume;
+                model.ProcedureId = procedureId;
+
+                ProcMaterialEntity? materialEntity = matList.Where(m => m.MaterialCode == item.MatCode).FirstOrDefault();
+                if(materialEntity != null)
+                {
+                    model.CirculationProductId = materialEntity.Id;
+                    model.CirculationMainProductId = materialEntity.Id;
+                }
 
                 if (mesOrder != null)
                 {
-                    model.ProductId = mesOrder.ProductId;
+                    model.ProductId = mesOrder.Id;
                     model.WorkOrderId = mesOrder.Id;
                     model.CirculationWorkOrderId = mesOrder.Id;
-                    model.CirculationMainProductId = mesOrder.ProductId;
-                    model.CirculationProductId = mesOrder.ProductId;
                 }
 
                 list.Add(model);
@@ -726,9 +772,13 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// 获取参数列表
         /// </summary>
         /// <param name="parammList"></param>
+        /// <param name="produceCode"></param>
+        /// <param name="stepId"></param>
+        /// <param name="sfc"></param>
+        /// <param name="procedureId"></param>
         /// <returns></returns>
         private List<Core.Domain.Parameter.ManuProductParameterEntity> GetParamList(List<SfcParamDto> parammList,
-            string produceCode, long stepId, string sfc)
+            string produceCode, long stepId, string sfc, long procedureId)
         {
             List<Core.Domain.Parameter.ManuProductParameterEntity> resultList = new List<Core.Domain.Parameter.ManuProductParameterEntity>();
             
@@ -742,7 +792,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 Core.Domain.Parameter.ManuProductParameterEntity model = new Core.Domain.Parameter.ManuProductParameterEntity();
                 model.Id = IdGenProvider.Instance.CreateId();
                 model.SiteId = SiteID;
-                model.ProcedureId = long.Parse(produceCode.Substring(2));
+                model.ProcedureId = procedureId;
                 model.SfcstepId = stepId;
                 model.SFC = sfc;
                 model.ParameterId = 1;
@@ -780,6 +830,30 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
 
             return dbList!.ToList();
+        }
+
+        /// <summary>
+        /// 获取工序
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private async Task<List<ProcProcedureEntity>> GetMesProcedureAsync(ProcProcedureQuery query)
+        {
+            var dbList = await _procProcedureRepository.GetEntitiesAsync(query);
+
+            return dbList.ToList();
+        }
+
+        /// <summary>
+        /// 获取物料
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private async Task<List<ProcMaterialEntity>> GetMesMaterialAsync(ProcMaterialQuery query)
+        {
+            var dbList = await _procMaterialRepository.GetEntitiesAsync(query);
+
+            return dbList.ToList();
         }
 
         /// <summary>

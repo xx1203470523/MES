@@ -39,6 +39,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Entity
         public string Name { get; set; }
 
         /// <summary>
+        /// 参数编码
+        /// </summary>
+        public string NameCode { get; set; }
+
+        /// <summary>
         /// 单位
         /// </summary>
         public string Unit { get; set; }
