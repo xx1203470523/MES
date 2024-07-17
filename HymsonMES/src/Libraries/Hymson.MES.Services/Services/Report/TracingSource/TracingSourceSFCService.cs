@@ -9,6 +9,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.MES.Services.Extension;
 using Minio.DataModel;
 using OfficeOpenXml.Utils;
 
@@ -33,6 +34,7 @@ namespace Hymson.MES.Services.Services
         private readonly IManuProductParameterRepository _manuProductParameterRepository;
         private readonly IMasterDataService _masterDataService;
         private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
+        private readonly IManuEquipmentParameterRepository _manuEquipmentParameterRepository;
 
         /// <summary>
         /// 构造函数
@@ -44,13 +46,15 @@ namespace Hymson.MES.Services.Services
         /// <param name="manuProductParameterRepository"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuBarCodeRelationRepository"></param>
+        /// <param name="manuEquipmentParameterRepository"></param>
         public TracingSourceSFCService(ICurrentSite currentSite,
             ITracingSourceCoreService tracingSourceCoreService,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuProductParameterRepository manuProductParameterRepository,
             IMasterDataService masterDataService,
-            IManuBarCodeRelationRepository manuBarCodeRelationRepository)
+            IManuBarCodeRelationRepository manuBarCodeRelationRepository,
+            IManuEquipmentParameterRepository manuEquipmentParameterRepository)
         {
             _currentSite = currentSite;
             _tracingSourceCoreService = tracingSourceCoreService;
@@ -59,6 +63,7 @@ namespace Hymson.MES.Services.Services
             _manuProductParameterRepository = manuProductParameterRepository;
             _masterDataService = masterDataService;
             _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
+            _manuEquipmentParameterRepository = manuEquipmentParameterRepository;
         }
 
 
@@ -116,6 +121,7 @@ namespace Hymson.MES.Services.Services
                 await PrepareStepSourceAsync(manuSfcStepEntity, stepSourceDto);
                 stepSourceDtos.Add(stepSourceDto);
             }
+
             return stepSourceDtos;
         }
         
@@ -170,7 +176,33 @@ namespace Hymson.MES.Services.Services
             }
             return materialSourceDtos;
         }
+        public async Task<IEnumerable<EquipmentParameterSourceDto>> GetEquipmentParameterSourcesAsync(string sfc)
+        {
+            var equipmentParameterSourceDtos = new List<EquipmentParameterSourceDto>();
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetSummaryEntitiesBySfcAsync(_currentSite.SiteId ?? 0, sfc);
+            if (manuSfcSummaryEntities == null || !manuSfcSummaryEntities.Any()) return equipmentParameterSourceDtos;
 
+            //获取此条码所有进出站最小进站时间 最大出站时间
+            var minInDateTime = manuSfcSummaryEntities.Min(x => x.StartOn);
+            var maxOutDateTime = manuSfcSummaryEntities.Max(x => x.EndOn);
+
+            //获取此条码所经过的工序
+           var procedureIds = manuSfcSummaryEntities.Select(x=>x.ProcedureId);
+
+            var pagedInfo = await _manuEquipmentParameterRepository.GetParametesByEqumentIdEntitiesAsync(new Data.Repositories.Parameter.Query.ManuEquipmentParameterPagedQuery
+            {
+                EquipmentId = 1
+            });
+            
+
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any()) return equipmentParameterSourceDtos;
+            foreach (var equipmentParameterEntity in pagedInfo.Data)
+            {
+                var equipmentParameterSourceDto = equipmentParameterEntity.ToModel<EquipmentParameterSourceDto>();
+                equipmentParameterSourceDtos.Add(equipmentParameterSourceDto);
+            }
+            return equipmentParameterSourceDtos;
+        }
 
         #region  private
 
@@ -193,6 +225,11 @@ namespace Hymson.MES.Services.Services
         /// <returns></returns>
         private async Task PrepareStepSourceAsync(ManuSfcStepEntity manuSfcStepEntity, StepSourceDto stepSourceDto)
         {
+            var  manuSfcStepTypeJobOrAssemblyNameDtos = EnumHelper.GetManuSfcStepTypeobOrAssemblys();
+            var  manuSfcStepTypeJobOrAssemblyNameDto = manuSfcStepTypeJobOrAssemblyNameDtos.FirstOrDefault(x => x.Key == manuSfcStepEntity.Operatetype);
+            if (manuSfcStepTypeJobOrAssemblyNameDto != null)
+            { stepSourceDto.JobOrAssemblyName = manuSfcStepTypeJobOrAssemblyNameDto.JobOrAssemblyName; }
+
             var procMaterialEntity = await _masterDataService.GetProcMaterialEntityAsync(manuSfcStepEntity.SiteId, manuSfcStepEntity.ProductId);
             stepSourceDto.MaterialCode = procMaterialEntity==null?"": procMaterialEntity.MaterialCode;
             stepSourceDto.MaterialName = procMaterialEntity==null?"": procMaterialEntity.MaterialName;
@@ -218,6 +255,8 @@ namespace Hymson.MES.Services.Services
                 stepSourceDto.ResourceName = procResourceEntity == null ? "" : procResourceEntity.ResName;
             }
         }
+
+        
         #endregion
     }
 

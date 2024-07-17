@@ -52,5 +52,12 @@ namespace Hymson.MES.Services.Services
         /// <returns></returns>
         Task<IEnumerable<MaterialSourceDto>> GetMaterialSourcesAsync(string sfc);
 
+        /// <summary>
+        /// 查询此条码生产开始 结束中间设备参数
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquipmentParameterSourceDto>> GetEquipmentParameterSourcesAsync(string sfc);
+
     }
 }

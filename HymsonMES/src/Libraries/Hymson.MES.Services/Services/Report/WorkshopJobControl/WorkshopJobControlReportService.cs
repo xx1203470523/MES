@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.MES.Services.Extension;
 using Minio.DataModel;
 using System.Reflection;
 
@@ -456,7 +457,7 @@ namespace Hymson.MES.Services.Services.Report
             await StepAssignment(stepDetailDto.AfterStepDDto);
             stepDetailDto.AfterStepDDto.CreatedBy = beforeStepEntity.CreatedBy;
             stepDetailDto.AfterStepDDto.CreatedOn = beforeStepEntity.CreatedOn;
-           var manuSfcStepTypeobOrAssemblys = GetManuSfcStepTypeobOrAssemblys();
+           var manuSfcStepTypeobOrAssemblys = EnumHelper.GetManuSfcStepTypeobOrAssemblys();
             var manuSfcStepTypeobOrAssembly = manuSfcStepTypeobOrAssemblys.FirstOrDefault(x => x.Key == beforeStepEntity.Operatetype);
             if (manuSfcStepTypeobOrAssembly != null)
             {
@@ -690,40 +691,6 @@ namespace Hymson.MES.Services.Services.Report
             stepDto.OrderCode = planWorkOrderEntity?.OrderCode ?? "";
         }
 
-        /// <summary>
-        /// 使用切面来获取
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<GetManuSfcStepTypeJobOrAssemblyNameDto> GetManuSfcStepTypeobOrAssemblys()
-        {
-            var list = new List<GetManuSfcStepTypeJobOrAssemblyNameDto>();
-
-            // 获取枚举类型
-            Type enumType = typeof(ManuSfcStepTypeEnum);
-
-            // 遍历枚举值
-            foreach (var enumValue in Enum.GetValues(enumType))
-            {
-                if (enumValue == null) continue;
-                // 获取枚举字段
-                var field = enumType.GetField(enumValue.ToString());
-
-                if (field == null) continue;
-
-                // 获取枚举值上的 ManuSfcStepOperationTypeAttrribute 特性
-                var manuSfcStepOperationTypeAttribute = field.GetCustomAttribute<ManuSfcStepOperationTypeAttrribute>(false);
-                if (manuSfcStepOperationTypeAttribute != null)
-                {
-                    list.Add(new GetManuSfcStepTypeJobOrAssemblyNameDto
-                    {
-                        Key = (ManuSfcStepTypeEnum)enumValue,
-                        JobOrAssemblyCode = manuSfcStepOperationTypeAttribute.JobOrAssemblyCode,
-                        JobOrAssemblyName = manuSfcStepOperationTypeAttribute.JobOrAssemblyName
-                    });
-                }
-            }
-
-            return list;
-        }
+        
     }
 }

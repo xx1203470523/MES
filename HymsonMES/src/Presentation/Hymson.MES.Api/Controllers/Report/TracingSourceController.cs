@@ -90,5 +90,15 @@ namespace Hymson.MES.Api.Controllers.Report
         }
 
 
+        /// <summary>
+        /// 查询此条码生产过程中设备参数追溯信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet("EquipmentParameterSources/{sfc}")]
+        public async Task<IEnumerable<EquipmentParameterSourceDto>> GetEquipmentParameterSourcesAsync(string sfc)
+        {
+            return await _tracingSFCService.GetEquipmentParameterSourcesAsync(sfc);
+        }
     }
 }
