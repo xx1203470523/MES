@@ -86,5 +86,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procParameterPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcParameterEntity>> GetPagedListAsync(ProcParameterPagedQuery procParameterPagedQuery);
+
+        
+
+        /// <summary>
+        /// 获取此站点所有参数信息 用于缓存整个站点的参数数据 为单个查询 范围查询加速
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcParameterEntity>> GetBySiteIdAsync(long siteId);
     }
 }

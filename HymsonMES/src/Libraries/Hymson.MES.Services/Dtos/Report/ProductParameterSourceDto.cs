@@ -8,25 +8,21 @@ namespace Hymson.MES.Services.Dtos.Report
     public  record ProductParameterSourceDto:BaseEntityDto
     {
         /// <summary>
-        /// 站点Id
+        /// 工序名称
         /// </summary>
-        public long SiteId { get; set; }
-
+        public string ProcedureName { get; set; }
         /// <summary>
-        /// 产品条码
+        /// 工序编码
         /// </summary>
-        public string SFC { get; set; }
-
+        public string ProcedureCode { get; set; }
         /// <summary>
-        /// 工序Id
+        /// 参数名称
         /// </summary>
-        public long ProcedureId { get; set; }
-
+        public string ParameterName { get; set; }
         /// <summary>
-        /// 参数Id
+        /// 参数编码
         /// </summary>
-        public long ParameterId { get; set; }
-
+        public string ParameterCode { get; set; }
         /// <summary>
         /// 参数值
         /// </summary>
@@ -36,20 +32,5 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 采集时间
         /// </summary>
         public DateTime CollectionTime { get; set; }
-
-        /// <summary>
-        ///步骤表id
-        /// </summary>
-        public long? SfcstepId { get; set; }
-
-        /// <summary>
-        /// 资源Id
-        /// </summary>
-        public long ResourceId { get; set; } = 0;
-
-        /// <summary>
-        /// 产品参数组id
-        /// </summary>
-        public long ParameterGroupId { get; set; } = 0;
     }
 }
