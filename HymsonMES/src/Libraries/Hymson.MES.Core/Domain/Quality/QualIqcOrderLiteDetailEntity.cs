@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
@@ -38,11 +38,6 @@ namespace Hymson.MES.Core.Domain.Quality
         public long MaterialReceiptDetailId { get; set; }
 
         /// <summary>
-        /// 状态;1、待检验2、检验中3、已检验4、已关闭
-        /// </summary>
-        public InspectionStatusEnum Status { get; set; }
-
-        /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
         public TrueOrFalseEnum? IsQualified { get; set; }
@@ -50,7 +45,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 不合格处理方式;1-让步；2-挑选；3-返工；4-报废；
         /// </summary>
-        public bool? HandMethod { get; set; }
+        public HandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 处理人

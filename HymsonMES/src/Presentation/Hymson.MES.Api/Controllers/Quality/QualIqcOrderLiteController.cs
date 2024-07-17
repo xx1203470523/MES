@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost("generated")]
         [LogDescription("生成IQC检验单", BusinessType.INSERT)]
-        public async Task<long> GeneratedOrderAsync([FromBody] GenerateInspectionLiteDto requestDto)
+        public async Task<long> GeneratedOrderAsync([FromBody] GenerateOrderLiteDto requestDto)
         {
             // 生成IQC检验单
             return await _qualIqcOrderLiteService.GeneratedOrderAsync(requestDto);
@@ -63,6 +63,19 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task<long> OperationOrderAsync([FromBody] QualOrderLiteOperationStatusDto requestDto)
         {
             return await _qualIqcOrderLiteService.OperationOrderAsync(requestDto);
+        }
+
+
+        /// <summary>
+        /// 保存样品数据
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("save")]
+        [LogDescription("保存样品数据", BusinessType.OTHER)]
+        public async Task<long> SaveOrderAsync([FromBody] QualIqcOrderLiteSaveDto requestDto)
+        {
+            return await _qualIqcOrderLiteService.SaveOrderAsync(requestDto);
         }
 
 
@@ -131,7 +144,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet("pagelist")]
-        public async Task<PagedInfo<QualIqcOrderLiteDto>> QueryPagedListAsync([FromQuery] QualIqcOrderPagedQueryLiteDto pagedQueryDto)
+        public async Task<PagedInfo<QualIqcOrderLiteDto>> QueryPagedListAsync([FromQuery] QualIqcOrderLitePagedQueryDto pagedQueryDto)
         {
             return await _qualIqcOrderLiteService.GetPagedListAsync(pagedQueryDto);
         }

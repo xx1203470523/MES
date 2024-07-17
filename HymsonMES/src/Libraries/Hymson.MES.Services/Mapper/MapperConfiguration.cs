@@ -1309,7 +1309,7 @@ namespace Hymson.MES.Services.Mapper
 
 
             #region IQC_Lite
-            CreateMap<QualIqcOrderPagedQueryLiteDto, QualIqcOrderLitePagedQuery>();
+            CreateMap<QualIqcOrderLitePagedQueryDto, QualIqcOrderLitePagedQuery>();
             CreateMap<QualIqcOrderLiteEntity, QualIqcOrderLiteDto>();
             CreateMap<QualIqcOrderLiteEntity, QualIqcOrderLiteBaseDto>();
             CreateMap<QualIqcOrderLiteDetailEntity, QualIqcOrderLiteDetailDto>();
