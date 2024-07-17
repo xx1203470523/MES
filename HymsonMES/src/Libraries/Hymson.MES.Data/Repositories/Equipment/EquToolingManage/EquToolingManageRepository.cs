@@ -213,7 +213,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     public partial class EquToolingManageRepository
     {
 
-        const string GetPagedInfoDataSqlTemplate = @"select A.LastVerificationTime, A.Code,A.Name,A.Status,A.RatedLife,A.RatedLifeUnit,A.IsCalibrated,A.CalibrationCycle,A.CurrentUsedLife, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, A.Id, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName,B.Id AS ToolsId  from equ_tools A JOIN equ_tools_type B ON A.ToolsId = B.Id  /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoDataSqlTemplate = @"select A.LastVerificationTime, A.Code,A.Name,A.Status,A.RatedLife,A.RatedLifeUnit,A.IsCalibrated,A.CalibrationCycle ,A.CalibrationCycleUnit,A.CurrentUsedLife, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, A.Id, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName,B.Id AS ToolsId  from equ_tools A JOIN equ_tools_type B ON A.ToolsId = B.Id  /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "select COUNT(*) from equ_tools A  JOIN equ_tools_type B ON A.ToolsId = B.Id /**join**/ /**where**/ ";
 
         const string GetEntitiesSqlTemplate = @"SELECT 

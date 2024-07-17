@@ -19,9 +19,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
-using Minio.DataModel;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
@@ -49,7 +46,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// <summary>
         /// 工具类型
         /// </summary>
-        private readonly IEquToolingTypeGroupRepository _equToolingTypeGroupRepository;
+        private readonly IEquToolsTypeRepository _equToolsTypeRepository;
 
         /// <summary>
         /// 
@@ -82,18 +79,18 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="equToolingManageRepository"></param>
-        /// <param name="equToolingTypeGroupRepository"></param>
+        /// <param name="equToolsTypeRepository"></param>
         /// <param name="localizationService"></param>
         /// <param name="excelService"></param>
         /// <param name="verifyValidationRules"></param>
         /// <param name="verifyValidationeModifyRules"></param>
         /// <param name="verifyValidationeExcelRules"></param>
-        public EquToolingManageService(ICurrentUser currentUser, ICurrentSite currentSite, IEquToolingManageRepository equToolingManageRepository, IEquToolingTypeGroupRepository equToolingTypeGroupRepository, ILocalizationService localizationService, IExcelService excelService, AbstractValidator<AddEquToolingManageDto> verifyValidationRules, AbstractValidator<EquToolingManageModifyDto> verifyValidationeModifyRules, AbstractValidator<EquToolingManageExcelDto> verifyValidationeExcelRules)
+        public EquToolingManageService(ICurrentUser currentUser, ICurrentSite currentSite, IEquToolingManageRepository equToolingManageRepository, IEquToolsTypeRepository equToolsTypeRepository, ILocalizationService localizationService, IExcelService excelService, AbstractValidator<AddEquToolingManageDto> verifyValidationRules, AbstractValidator<EquToolingManageModifyDto> verifyValidationeModifyRules, AbstractValidator<EquToolingManageExcelDto> verifyValidationeExcelRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _equToolingManageRepository = equToolingManageRepository;
-            _equToolingTypeGroupRepository = equToolingTypeGroupRepository;
+            _equToolsTypeRepository = equToolsTypeRepository;
             _localizationService = localizationService;
             _excelService = excelService;
             _verifyValidationRules = verifyValidationRules;
@@ -123,13 +120,28 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         /// <returns></returns>
         private static List<EquToolingManageViewDto> PreparEquToolingManageDtos(PagedInfo<EquToolingManageView> pagedInfo)
         {
-            var procProcedureDtos = new List<EquToolingManageViewDto>();
+            var equToolingManageViewDtos = new List<EquToolingManageViewDto>();
             foreach (var procProcedureEntity in pagedInfo.Data)
             {
-                var procProcedureDto = procProcedureEntity.ToModel<EquToolingManageViewDto>();
-                procProcedureDtos.Add(procProcedureDto);
+                var equToolingManageViewDto = procProcedureEntity.ToModel<EquToolingManageViewDto>();
+                if (equToolingManageViewDto.IsCalibrated == YesOrNoEnum.Yes)
+                {
+                    switch (equToolingManageViewDto.CalibrationCycleUnit)
+                    {
+                        case ToolingTypeEnum.Day:
+                            equToolingManageViewDto.NextVerificationTime = equToolingManageViewDto.LastVerificationTime?.AddDays(Convert.ToDouble(equToolingManageViewDto.CalibrationCycle ?? 0));
+                            break;
+                        case ToolingTypeEnum.Week:
+                            equToolingManageViewDto.NextVerificationTime = equToolingManageViewDto.LastVerificationTime?.AddDays(Convert.ToDouble(equToolingManageViewDto.CalibrationCycle ?? 0) * 7);
+                            break;
+                        case ToolingTypeEnum.Month:
+                            equToolingManageViewDto.NextVerificationTime = equToolingManageViewDto.LastVerificationTime?.AddMonths(Convert.ToInt32(equToolingManageViewDto.CalibrationCycle ?? 0));
+                            break;
+                    }
+                }
+                equToolingManageViewDtos.Add(equToolingManageViewDto);
             }
-            return procProcedureDtos;
+            return equToolingManageViewDtos;
         }
 
         /// <summary>
@@ -337,7 +349,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
 
             // 分组标准
             var time = HymsonClock.Now();
-            var equToolingTypeGroupEntities = await _equToolingTypeGroupRepository.GetEntitiesAsync(new EquToolingTypeQuery
+            var equToolingTypeGroupEntities = await _equToolsTypeRepository.GetEntitiesAsync(new EquToolsTypeQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 Codes = dtos.Select(x => x.ToolTypeCode)
@@ -364,6 +376,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
                         validationFailures.Add(validationFailure);
                     }
                 }
+
                 var quToolingManageEntity = quToolingManageEntities.FirstOrDefault(x => x.Code == item.Code);
                 if (quToolingManageEntity != null)
                 {
@@ -383,6 +396,27 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
                     validationFailures.Add(validationFailure);
                     continue;
                 }
+
+                if (dtos.Where(x => x.Code == item.Code).Count()>1)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", index}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES13517);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("ToolCode", item.Code);
+                    validationFailures.Add(validationFailure);
+                    continue;
+
+                }
+                
 
                 var equToolingTypeGroupEntity = equToolingTypeGroupEntities.FirstOrDefault(x => x.Code == item.ToolTypeCode);
                 if (equToolingTypeGroupEntity == null)
@@ -408,7 +442,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentSite.SiteId ?? 0,
-                    Code = item.ToolTypeCode,
+                    Code = item.Code,
                     Name = item.Name,
                     ToolsId = equToolingTypeGroupEntity.Id,
                     RatedLife = item.RatedLife,

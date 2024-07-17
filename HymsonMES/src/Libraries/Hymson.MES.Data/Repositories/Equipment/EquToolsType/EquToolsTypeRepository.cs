@@ -120,11 +120,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-            if (query.Codes != null && query.Codes.Any())
+            if (query.Codes!=null&& query.Codes.Any())
             {
                 sqlBuilder.Where("Code IN @Codes");
             }
-
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquToolsTypeEntity>(template.RawSql, query);
         }

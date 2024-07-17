@@ -213,7 +213,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_operation_permissions /**where**/  ";
 
         const string InsertSql = "INSERT INTO equ_operation_permissions(`Id`,`EquipmentId`,`Status`,`Type`,`ExecutorIds`,`LeaderIds`,`Remark`,`CreatedOn`,`CreatedBy`,`UpdatedBy`,`UpdatedOn`,`SiteId`,`IsDeleted`) VALUES (@Id,@EquipmentId,@Status,@Type,@ExecutorIds,@LeaderIds,@Remark,@CreatedOn,@CreatedBy,@UpdatedBy,@UpdatedOn,@SiteId,@IsDeleted) ";
-        const string UpdatesSql = "UPDATE equ_operation_permissions SET ExecutorIds=@ExecutorIds,LeaderIds=@LeaderIds,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id=@Id ";
+        const string UpdatesSql = "UPDATE equ_operation_permissions SET Status=@Status, ExecutorIds=@ExecutorIds,LeaderIds=@LeaderIds,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id=@Id ";
 
         const string DeleteSql = "UPDATE equ_operation_permissions SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE equ_operation_permissions SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

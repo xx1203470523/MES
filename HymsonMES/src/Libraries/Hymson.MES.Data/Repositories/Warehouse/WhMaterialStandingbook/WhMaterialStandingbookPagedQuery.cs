@@ -6,6 +6,7 @@
  *build datetime: 2023-03-13 10:03:29
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 物料编码
@@ -44,5 +45,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// 站点id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public WhMaterialInventoryTypeEnum? Type { get; set; }
     }
 }
