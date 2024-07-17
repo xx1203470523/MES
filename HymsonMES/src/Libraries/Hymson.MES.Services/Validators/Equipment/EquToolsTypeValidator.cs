@@ -19,7 +19,6 @@ namespace Hymson.MES.Services.Validators.Equipment
             RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(ErrorCode.MES10115);
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCode.MES13507);
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(ErrorCode.MES10117);
-            //RuleFor(x => x.Status).NotEmpty().WithErrorCode(ErrorCode.MES13509);
             RuleFor(x => x.Status).Must(x => Enum.IsDefined(typeof(DisableOrEnableEnum), x)).WithErrorCode(nameof(ErrorCode.MES13012));
             // RuleFor(x => x.RatedLife).NotEmpty().WithErrorCode(ErrorCode.MES13511);
             //RuleFor(x => x.IsCalibrated).IsInEnum().WithErrorCode(ErrorCode.MES13512);
@@ -44,6 +43,24 @@ namespace Hymson.MES.Services.Validators.Equipment
             //    else
             //        return true;
             //}).WithErrorCode(ErrorCode.MES13515);
+        }
+
+        /// <summary>
+        ///  工具更新验证
+        /// </summary>
+        internal class EquToolsTypeExcelValidator : AbstractValidator<EquToolingTypeExcelDto>
+        {
+            public EquToolsTypeExcelValidator()
+            {
+                RuleFor(x => x.Code).NotEmpty().WithErrorCode(ErrorCode.MES13505);
+                RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(ErrorCode.MES10115);
+                RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCode.MES13507);
+                RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(ErrorCode.MES10117);
+                RuleFor(x => x.Status).NotEmpty().WithErrorCode(ErrorCode.MES13509);
+                RuleFor(x => x.RatedLife).NotEmpty().WithErrorCode(ErrorCode.MES13511);
+             
+                RuleFor(x => x.IsCalibrated).IsInEnum().WithErrorCode(ErrorCode.MES13517);
+            }
         }
     }
 
