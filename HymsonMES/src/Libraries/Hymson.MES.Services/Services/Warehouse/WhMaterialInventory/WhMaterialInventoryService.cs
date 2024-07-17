@@ -400,8 +400,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             var entity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = barCode });
             if (entity == null) throw new CustomerValidationException(nameof(ErrorCode.MES15124));
 
-            if (new MaterialInventorySourceEnum[] { MaterialInventorySourceEnum.ManualEntry, MaterialInventorySourceEnum.WMS, MaterialInventorySourceEnum.LoadingPoint }.Contains(entity.Source))
-            {
+            //if (new MaterialInventorySourceEnum[] { MaterialInventorySourceEnum.ManualEntry, MaterialInventorySourceEnum.WMS, MaterialInventorySourceEnum.LoadingPoint }.Contains(entity.Source))
+            //{
                 var detailDto = entity.ToModel<WhMaterialInventoryDetailDto>();
 
                 //查询关联信息
@@ -417,11 +417,11 @@ namespace Hymson.MES.Services.Services.Warehouse
 
 
                 return detailDto;
-            }
-            else
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15120));
-            }
+            //}
+            //else
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES15120));
+            //}
         }
 
         /// <summary>

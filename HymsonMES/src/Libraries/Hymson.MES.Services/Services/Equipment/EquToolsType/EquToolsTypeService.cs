@@ -1,17 +1,21 @@
-using Elastic.Clients.Elasticsearch;
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Equipment;
@@ -19,6 +23,8 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Http;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -54,10 +60,14 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly IEquEquipmentGroupRepository _equEquipmentGroupRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
 
+        private readonly IExcelService _excelService;
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 参数验证器
         /// </summary>
         private readonly AbstractValidator<EquToolsTypeSaveDto> _validationSaveRules;
+        private readonly AbstractValidator<EquToolingTypeExcelDto> _validationExcelRules;
 
         /// <summary>
         /// 构造函数
@@ -69,7 +79,10 @@ namespace Hymson.MES.Services.Services.Equipment
             IEquToolsTypeMaterialRelationRepository materialRelationRepository,
             IEquEquipmentGroupRepository equEquipmentGroupRepository,
             IProcMaterialRepository procMaterialRepository,
-            AbstractValidator<EquToolsTypeSaveDto> validationSaveRules)
+            IExcelService excelService,
+            ILocalizationService localizationService,
+            AbstractValidator<EquToolsTypeSaveDto> validationSaveRules,
+            AbstractValidator<EquToolingTypeExcelDto> validationExcelRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -79,7 +92,10 @@ namespace Hymson.MES.Services.Services.Equipment
             _materialRelationRepository = materialRelationRepository;
             _equEquipmentGroupRepository = equEquipmentGroupRepository;
             _procMaterialRepository = procMaterialRepository;
+            _excelService = excelService;
+            _localizationService = localizationService;
             _validationSaveRules = validationSaveRules;
+            _validationExcelRules = validationExcelRules;
         }
 
         /// <summary>
@@ -458,7 +474,7 @@ namespace Hymson.MES.Services.Services.Equipment
             var siteId = _currentSite.SiteId ?? 0;
             //查数据
             var equToolsTypes = await _materialRelationRepository.GetEntitiesAsync(new EquToolsTypeMaterialRelationQuery());
-            var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery{SiteId = siteId});
+            var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery { SiteId = siteId });
             if (id == 0)
             {
                 var materialIds = equToolsTypes.Select(x => x.MaterialId).Distinct().ToArray();
@@ -474,5 +490,230 @@ namespace Hymson.MES.Services.Services.Equipment
             return materialDtos;
         }
 
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task<string> DownloadImportTemplateAsync(Stream stream)
+        {
+            var worksheetName = "工具类型管理";
+            await _excelService.ExportAsync(Array.Empty<EquToolingTypeExcelDto>(), stream, worksheetName);
+            return worksheetName;
+        }
+
+        /// <summary>
+        /// 导入
+        /// </summary>
+        /// <returns></returns>
+        public async Task ImportAsync(IFormFile formFile)
+        {
+            using MemoryStream memoryStream = new();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            var dtos = _excelService.Import<EquToolingTypeExcelDto>(memoryStream);
+            if (dtos == null || !dtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10133));
+
+            var siteId = _currentSite.SiteId ?? 0;
+            var time = HymsonClock.Now();
+            var toolsTypeEntities = await _equToolsTypeRepository.GetEntitiesAsync(new EquToolsTypeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = dtos.Select(x => x.Code)
+            });
+
+            var equipmentGroupEntities = await GetEqumentGroupListAsync(dtos);
+            var procMaterialEntities = await GetMaterialListAsync(dtos);
+
+            List<EquToolsTypeEntity> entities = new();
+            //关联的设备组
+            List<EquToolsTypeEquipmentGroupRelationEntity> equToolsTypeEquipments = new();
+            //工具类型关联物料
+            List<EquToolsTypeMaterialRelationEntity> equToolsTypeMaterials = new();
+            var validationFailures = new List<ValidationFailure>();
+            var index = 0;
+            foreach (var item in dtos)
+            {
+                index++;
+                var validationResult = await _validationExcelRules.ValidateAsync(item);
+                if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
+                {
+                    foreach (var validationFailure in validationResult.Errors)
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                        validationFailures.Add(validationFailure);
+                    }
+                }
+                var toolsTypeEntity = toolsTypeEntities.FirstOrDefault(x => x.Code == item.Code);
+                if (toolsTypeEntity != null)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", index}
+                        };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                    }
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES13518);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("toolTypeCode", item.Code);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+
+                var typeId = IdGenProvider.Instance.CreateId();
+                if (!string.IsNullOrWhiteSpace(item.EqumentGroupCodes))
+                {
+                    var equGroupCodes = item.EqumentGroupCodes.Split(',');
+                    var groupEntities = equipmentGroupEntities.Where(x => equGroupCodes.Contains(x.EquipmentGroupCode));
+                    if(groupEntities.Count()< equGroupCodes.Length)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", index}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES13519);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+                    if (groupEntities != null && groupEntities.Any())
+                    {
+                        foreach (var groupEntity in groupEntities)
+                        {
+                            var equipmentGroupEntity = new EquToolsTypeEquipmentGroupRelationEntity
+                            {
+                                Id = IdGenProvider.Instance.CreateId(),
+                                ToolTypeId = typeId,
+                                EquipmentGroupId = groupEntity.Id
+                            };
+                            equToolsTypeEquipments.Add(equipmentGroupEntity);
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(item.MaterialCodes))
+                {
+                    var materialCodes = item.MaterialCodes.Split(',');
+                    var materialEntities = procMaterialEntities.Where(x => materialCodes.Contains(x.MaterialCode));
+                    if (materialEntities.Count() < materialCodes.Length)
+                    {
+                        var validationFailure = new ValidationFailure();
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", index}
+                        };
+                        }
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES13520);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
+
+                    if (materialEntities != null && materialEntities.Any())
+                    {
+                        foreach (var materialCode in materialCodes)
+                        {
+                            var materialEntity = materialEntities.FirstOrDefault(x => x.MaterialCode == materialCode);
+                            if(materialEntity != null)
+                            {
+                                var materialIdEntity = new EquToolsTypeMaterialRelationEntity
+                                {
+                                    Id = IdGenProvider.Instance.CreateId(),
+                                    ToolTypeId = typeId,
+                                    MaterialId = materialEntity.Id
+                                };
+                                equToolsTypeMaterials.Add(materialIdEntity);
+                            }             
+                        }
+                    }
+                }
+
+                entities.Add(new EquToolsTypeEntity
+                {
+                    Id = typeId,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Code = item.Code,
+                    Name = item.Name,
+                    Status = item.Status,
+                    RatedLife = item.RatedLife,
+                    IsCalibrated = item.IsCalibrated,
+                    Remark = "",
+                    CalibrationCycle = item.CalibrationCycle,
+                    CalibrationCycleUnit = item.CalibrationCycleUnit,
+                    IsAllEquipmentUsed = item.IsAllEquipmentUsed == TrueOrFalseEnum.No ? false : true,
+                    IsAllMaterialUsed = item.IsAllMaterialUsed == TrueOrFalseEnum.No ? false : true,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = time,
+                    UpdatedOn = time
+                });
+            }
+
+            if (validationFailures != null && validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("ExcelRowError"), validationFailures);
+            }
+
+            using TransactionScope ts = TransactionHelper.GetTransactionScope();
+
+            await _equToolsTypeRepository.InsertRangeAsync(entities);
+            if (equToolsTypeEquipments.Any())
+            {
+                await _groupRelationRepository.InsertRangeAsync(equToolsTypeEquipments);
+            }
+            if (equToolsTypeMaterials.Any())
+            {
+                await _materialRelationRepository.InsertRangeAsync(equToolsTypeMaterials);
+            }
+
+            ts.Complete();
+        }
+
+        private async Task<IEnumerable<EquEquipmentGroupEntity>> GetEqumentGroupListAsync(IEnumerable<EquToolingTypeExcelDto> dtos)
+        {
+            var list = dtos.Where(x => !string.IsNullOrWhiteSpace(x.EqumentGroupCodes)).ToArray();
+            var groupCodes = new List<string>();
+            foreach (var entity in list)
+            {
+                var codes = entity.EqumentGroupCodes.Split(',').ToArray();
+                groupCodes.AddRange(codes);
+            }
+            var groupEntities = await _equEquipmentGroupRepository.GetEntitiesAsync(new EquEquipmentGroupQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                EquipmentGroupCodes = groupCodes.ToArray()
+            });
+            return groupEntities;
+        }
+
+        private async Task<IEnumerable<ProcMaterialEntity>> GetMaterialListAsync(IEnumerable<EquToolingTypeExcelDto> dtos)
+        {
+            var list = dtos.Where(x => !string.IsNullOrWhiteSpace(x.MaterialCodes)).ToArray();
+            var materialCodes = new List<string>();
+            foreach (var entity in list)
+            {
+                var codes = entity.MaterialCodes.Split(',').ToArray();
+                materialCodes.AddRange(codes);
+            }
+            var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                MaterialCodes = materialCodes.ToArray()
+            });
+            return procMaterialEntities.OrderByDescending(x=>x.Id);
+        }
     }
 }
