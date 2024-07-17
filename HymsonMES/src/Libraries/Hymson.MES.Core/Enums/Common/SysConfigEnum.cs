@@ -22,15 +22,30 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("MainSite")]
         MainSite = 3,
+        ///// <summary>
+        ///// 转子配置
+        ///// </summary>
+        //[Description("Rotor")]
+        //Rotor = 4,
+        ///// <summary>
+        ///// 定子配置
+        ///// </summary>
+        //[Description("Stator")]
+        //Stator = 5,
         /// <summary>
-        /// 转子配置
+        /// NIO物料数据
         /// </summary>
-        [Description("Rotor")]
-        Rotor = 4,
+        [Description("NioMaterial")]
+        NioMaterial = 6,
         /// <summary>
-        /// 定子配置
+        /// NIO一次良率
         /// </summary>
-        [Description("Stator")]
-        Stator = 5,
+        [Description("NioOneYield")]
+        NioOneYield = 7,
+        /// <summary>
+        /// NIO转子线主配置
+        /// </summary>
+        [Description("NioBaseConfig")]
+        NioBaseConfig = 8,
     }
 }
