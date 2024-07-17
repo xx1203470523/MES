@@ -146,5 +146,32 @@ namespace Hymson.MES.Api.Controllers.Equipment
         {
             return await _equToolsTypeService.GetMaterialsAsync(queryDto.Id);
         }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        //[PermissionDescription("equ:toolsType:download")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new();
+            var worksheetName = await _equToolsTypeService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{worksheetName}导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导入
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost("import")]
+        //[PermissionDescription("equ:toolingManage:import")]
+        [LogDescription("导入模板下载", BusinessType.IMPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task ImportAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _equToolsTypeService.ImportAsync(formFile);
+        }
     }
 }
