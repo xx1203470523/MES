@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquToolingManage.Command;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="equToolsEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquToolsEntity equToolsEntity);
+
+        /// <summary>
+        ///校准
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> CalibrationAsync(CalibratioCommandCommand command);
 
         /// <summary>
         /// 批量更新 

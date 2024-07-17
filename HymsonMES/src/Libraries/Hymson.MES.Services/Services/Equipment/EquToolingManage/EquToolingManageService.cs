@@ -174,7 +174,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
                 LastVerificationTime = equToolingManageEntity.LastVerificationTime,
                 CalibrationCycleUnit = equToolingManageEntity.CalibrationCycleUnit,
                 ToolsTypeName = equToolingManageEntity.ToolsTypeName,
-                ResidualLife = equToolingManageEntity.RatedLife - equToolingManageEntity.CumulativeUsedLife
+                ResidualLife = equToolingManageEntity.RatedLife - (equToolingManageEntity.CumulativeUsedLife??0)
             };
             if (equToolingManageViewDto.IsCalibrated == YesOrNoEnum.Yes)
             {
@@ -306,14 +306,23 @@ namespace Hymson.MES.Services.Services.Equipment.EquToolingManage
         public async Task CalibrationAsync(long id)
         {
             var equToolsEntity = await _equToolingManageRepository.GetByIdAsync(id);
-            equToolsEntity.UpdatedBy = _currentUser.UserName;
-            equToolsEntity.UpdatedOn = HymsonClock.Now();
-            equToolsEntity.SiteId = _currentSite.SiteId ?? 0;
-            equToolsEntity.LastVerificationTime = HymsonClock.Now();
-            using TransactionScope ts = TransactionHelper.GetTransactionScope();
+
+            if (equToolsEntity.IsCalibrated== YesOrNoEnum.No)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13523)).WithData("toolTypeCode", equToolsEntity.Code);
+            }
+
             int rows = 0;
+            using TransactionScope ts = TransactionHelper.GetTransactionScope();
             // 入库
-            rows = await _equToolingManageRepository.UpdateAsync(equToolsEntity);
+            rows = await _equToolingManageRepository.CalibrationAsync(new Data.Repositories.Equipment.EquToolingManage.Command.CalibratioCommandCommand
+
+            {
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+                Id = id,
+                LastVerificationTime = HymsonClock.Now()
+            });
 
             if (rows == 0)
             {

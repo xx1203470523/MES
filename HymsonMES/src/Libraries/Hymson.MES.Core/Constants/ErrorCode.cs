@@ -865,6 +865,7 @@
         public const string MES13520 = "工具类型关联的物料不存在";
         public const string MES13521 = "需要校准不可为空";
         public const string MES13522 = "工具类型{toolTypeCode}已经存在";
+        public const string MES13523 = "工具类型{toolTypeCode}无需校准";
         #endregion
 
         #region 环境检验 13600
@@ -888,6 +889,11 @@
         public const string MES13617 = "检验单号生成失败：环境检验类型编码规则未维护！";
         public const string MES13618 = "检验单号生成失败：编码规则错误，不允许同时存在多条环境检验类型编码规则！";
 
+        #endregion
+
+        #region 备件维护 13700
+        public const string MES13701 = "工具维护失败";
+        public const string MES13702 = "工具类型{codes}已经存在";
         #endregion
 
         #region  14000段项目使用 平台请勿使用
