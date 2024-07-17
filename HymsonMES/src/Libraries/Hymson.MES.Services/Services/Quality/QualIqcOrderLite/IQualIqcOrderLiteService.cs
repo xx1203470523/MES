@@ -14,7 +14,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<long> GeneratedOrderAsync(GenerateInspectionLiteDto requestDto);
+        Task<long> GeneratedOrderAsync(GenerateOrderLiteDto requestDto);
 
         /// <summary>
         /// 更改检验单状态（点击执行检验）
@@ -22,6 +22,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="requestDto"></param>
         /// <returns></returns>
         Task<int> OperationOrderAsync(QualOrderLiteOperationStatusDto requestDto);
+
+        /// <summary>
+        /// 保存样品数据
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        Task<int> SaveOrderAsync(QualIqcOrderLiteSaveDto requestDto);
 
 
         /// <summary>
@@ -65,7 +72,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualIqcOrderLiteDto>> GetPagedListAsync(QualIqcOrderPagedQueryLiteDto pagedQueryDto);
+        Task<PagedInfo<QualIqcOrderLiteDto>> GetPagedListAsync(QualIqcOrderLitePagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 根据ID查询附件
