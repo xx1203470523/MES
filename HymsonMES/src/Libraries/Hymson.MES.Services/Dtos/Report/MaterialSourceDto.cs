@@ -1,6 +1,4 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Process;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -10,157 +8,43 @@ namespace Hymson.MES.Services.Dtos.Report
     public  record MaterialSourceDto:BaseEntityDto
     {
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
+        /// 产品序列码
         /// </summary>
-        public long SiteId { get; set; }
+        public string Sfc { get; set; }
 
         /// <summary>
-        /// 描述 :所属物料组ID 
-        /// 空值 : false  
+        /// 批次条码
         /// </summary>
-        public long GroupId { get; set; }
+        public string CirculationBarCode { get; set; }
 
         /// <summary>
-        /// 描述 :物料编码 
-        /// 空值 : false  
+        /// 扣料数量
         /// </summary>
-        public string MaterialCode { get; set; }
+        public decimal CirculationQty { get; set; }
 
         /// <summary>
-        /// 描述 :物料名称 
-        /// 空值 : false  
+        /// 工单
         /// </summary>
-        public string MaterialName { get; set; }
+        public string WorkOrder { get; set; }
 
         /// <summary>
-        /// 描述 :状态 
-        /// 空值 : true  
+        /// 物料编码/产品
         /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        public string MaterialRemark { get; set; }
 
         /// <summary>
-        /// 描述 :来源 
-        /// 空值 : true  
+        /// 需求用量
         /// </summary>
-        public MaterialOriginEnum? Origin { get; set; }
+        public decimal BomUsages { get; set; }
 
         /// <summary>
-        /// 描述 :版本 
-        /// 空值 : true  
+        /// 扣料工序
         /// </summary>
-        public string? Version { get; set; }
+        public string ProcedureName { get; set; }
 
         /// <summary>
-        /// 描述 :是否默认版本 
-        /// 空值 : true  
+        /// 扣料工序编码
         /// </summary>
-        public bool IsDefaultVersion { get; set; }
-
-        /// <summary>
-        /// 描述 :物料描述 
-        /// 空值 : true  
-        /// </summary>
-        public string? Remark { get; set; } = "";
-
-        /// <summary>
-        /// 描述 :采购类型 
-        /// 空值 : true  
-        /// </summary>
-        public MaterialBuyTypeEnum? BuyType { get; set; }
-
-        /// <summary>
-        /// 描述 :工艺路线ID 
-        /// 空值 : true  
-        /// </summary>
-        public long? ProcessRouteId { get; set; }
-
-        /// <summary>
-        /// 描述 :BomID 
-        /// 空值 : true  
-        /// </summary>
-        public long? BomId { get; set; }
-
-        /// <summary>
-        /// 描述 :批次大小 
-        /// 空值 : true  
-        /// </summary>
-        public string? Batch { get; set; }
-
-        /// <summary>
-        /// 有效时间
-        /// </summary>
-        public int? ValidTime { get; set; }
-
-        /// <summary>
-        /// 描述 :数量限制
-        /// </summary>
-        public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
-
-        /// <summary>
-        /// 标包数量
-        /// </summary>
-        public int? PackageNum { get; set; }
-
-        /// <summary>
-        /// 描述 :计量单位(字典定义) 
-        /// 空值 : true  
-        /// </summary>
-        public string? Unit { get; set; }
-
-        /// <summary>
-        /// 描述 :数据收集方式
-        /// 空值 : true  
-        /// </summary>
-        public MaterialSerialNumberEnum? SerialNumber { get; set; }
-
-        /// <summary>
-        /// 描述 :验证掩码组 
-        /// 空值 : true  
-        /// </summary>
-        public string? ValidationMaskGroup { get; set; }
-
-        /// <summary>
-        /// 验证规则id
-        /// </summary>
-        public long? MaskCodeId { get; set; }
-
-        /// <summary>
-        /// 描述 :基于时间(字典定义) 
-        /// 空值 : true  
-        /// </summary>
-        public MaterialBaseTimeEnum? BaseTime { get; set; }
-
-        /// <summary>
-        /// 描述 :消耗公差 
-        /// 空值 : true  
-        /// </summary>
-        public int? ConsumptionTolerance { get; set; }
-
-        /// <summary>
-        /// 消耗系数
-        /// </summary>
-        public decimal? ConsumeRatio { get; set; }
-
-        /// <summary>
-        /// 保质期（天）
-        /// </summary>
-        public int? ShelfLife { get; set; }
-
-        /// <summary>
-        /// 规格型号
-        /// </summary>
-        public string? Specifications { get; set; }
-
-
-        /// <summary>
-        /// 产品型号 条码规则 生成条码使用
-        /// </summary>
-        public string? ProductModel { get; set; }
-
-        /// <summary>
-        /// 原材料类型
-        /// </summary>
-        public MaterialTypeEnum? MaterialType { get; set; }
+        public string ProcedureCode { get; set; }
     }
 }

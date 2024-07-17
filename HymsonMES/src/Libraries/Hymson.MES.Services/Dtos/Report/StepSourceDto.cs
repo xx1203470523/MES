@@ -98,5 +98,15 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 作业时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        ///设备名称 
+        /// </summary>
+        public string EquipmentName { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
     }
 }
