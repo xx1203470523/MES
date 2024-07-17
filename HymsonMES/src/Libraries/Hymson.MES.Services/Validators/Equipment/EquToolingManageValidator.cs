@@ -19,7 +19,7 @@ namespace Hymson.MES.Services.Validators.EquSpotcheckTemplate
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(ErrorCode.MES13508);
             RuleFor(x => x.Status).NotEmpty().WithErrorCode(ErrorCode.MES13509);
             RuleFor(x => x.ToolsId).NotEmpty().WithErrorCode(ErrorCode.MES13510);
-            RuleFor(x => x.RatedLife).NotEmpty().WithErrorCode(ErrorCode.MES13511);
+            //RuleFor(x => x.RatedLife).NotEmpty().WithErrorCode(ErrorCode.MES13511);
             RuleFor(x => x.IsCalibrated).IsInEnum().WithErrorCode(ErrorCode.MES13512);
             RuleFor(x => x).Must((x)=>{
                 if (x.IsCalibrated == YesOrNoEnum.Yes)
@@ -52,7 +52,7 @@ namespace Hymson.MES.Services.Validators.EquSpotcheckTemplate
         {
             RuleFor(x => x.Status).NotEmpty().WithErrorCode(ErrorCode.MES13509);
             RuleFor(x => x.ToolsId).NotEmpty().WithErrorCode(ErrorCode.MES13510);
-            RuleFor(x => x.RatedLife).NotEmpty().WithErrorCode(ErrorCode.MES13511);
+            //RuleFor(x => x.RatedLife).NotEmpty().WithErrorCode(ErrorCode.MES13511);
             RuleFor(x => x.IsCalibrated).IsInEnum().WithErrorCode(ErrorCode.MES13512);
             RuleFor(x => x).Must((x) => {
                 if (x.IsCalibrated == YesOrNoEnum.Yes)
@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Validators.EquSpotcheckTemplate
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(ErrorCode.MES13508);
             RuleFor(x => x.Status).NotEmpty().WithErrorCode(ErrorCode.MES13509);
             RuleFor(x => x.ToolTypeCode).NotEmpty().WithErrorCode(ErrorCode.MES13510);
-            RuleFor(x => x.RatedLife).NotEmpty().WithErrorCode(ErrorCode.MES13511);
+            //RuleFor(x => x.RatedLife).NotEmpty().WithErrorCode(ErrorCode.MES13511);
             RuleFor(x => x.IsCalibrated).IsInEnum().WithErrorCode(ErrorCode.MES13512);
             RuleFor(x => x).Must((x) => {
                 if (x.IsCalibrated == YesOrNoEnum.Yes)
