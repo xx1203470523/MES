@@ -3,6 +3,8 @@ using Hymson.MES.BackgroundServices.NIO.Dtos;
 using Hymson.MES.BackgroundServices.NIO.Dtos.Master;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Material;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Material.View;
+using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Param;
+using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Param.View;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Proceduce;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Proceduce.View;
 using Hymson.MES.Core.Constants;
@@ -52,7 +54,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <summary>
         /// 参数
         /// </summary>
-        private readonly IProcParameterRepository _procParameterRepository;
+        private readonly IProcProductParameterGroupMavelRepository _procProductParameterGroupMavelRepository;
 
         /// <summary>
         /// 构造函数
@@ -62,7 +64,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             ISysConfigRepository sysConfigRepository,
             IProcMaterialMavelRepository procMaterialMavelRepository,
             IProcProcedureMavelRepository procProcedureMavelRepository,
-            IProcParameterRepository procParameterRepository)
+            IProcProductParameterGroupMavelRepository procProductParameterGroupMavelRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -70,7 +72,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _sysConfigRepository = sysConfigRepository;
             _procMaterialMavelRepository = procMaterialMavelRepository;
             _procProcedureMavelRepository = procProcedureMavelRepository;
-            _procParameterRepository = procParameterRepository;
+            _procProductParameterGroupMavelRepository = procProductParameterGroupMavelRepository;
         }
 
         /// <summary>
@@ -257,47 +259,82 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
             long siteId = long.Parse(configEntities.ElementAt(0).Value);
             //参数查询
-            ProcParameterQuery query = new ProcParameterQuery();
+            MavelParamQuery query = new MavelParamQuery();
             query.SiteId = siteId;
-            var paramList = await _procParameterRepository.GetProcParameterEntitiesAsync(query);
+            var paramList = await _procProductParameterGroupMavelRepository.GetParamListAsync(query);
             if(paramList == null || paramList.Any() == false)
             {
                 return;
             }
-            //获取车间线体配置
-            //var lineConfig = await GetLineConfig();
-            //List<string> rotorConfigList = lineConfig.Item1;
-            //List<string> statorConfigList = lineConfig.Item2;
+            //基础数据配置
+            SysConfigQuery configQuery = new SysConfigQuery();
+            configQuery.Type = SysConfigEnum.NioBaseConfig;
+            configQuery.Codes = new List<string>() { "NioRotorConfig", "NioStatorConfig" };
+            var baseConfigList = await _sysConfigRepository.GetEntitiesAsync(configQuery);
+            if (baseConfigList == null || !baseConfigList.Any() || baseConfigList.Count() != 2)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", "NioRotorConfig&NioStatorConfig");
+            }
 
             //组装数据
-            //var dtos = new List<FieldDto> { };
-            //foreach (var param in paramList)
-            //{
-            //    char firstChar = param.ParameterCode[0];
-            //    if(firstChar != 'R' && firstChar != 'S')
-            //    {
-            //        continue;
-            //    }
+            var dtos = new List<FieldDto> { };
+            foreach (var param in paramList)
+            {
+                char firstChar = param.ParameterCode[0];
+                if (firstChar != 'R' && firstChar != 'S')
+                {
+                    continue;
+                }
 
-            //    FieldDto model = new FieldDto();
-            //    if (firstChar == 'R') //转子
-            //    {
-            //        model.PlantId = rotorConfigList[0];
-            //        model.WorkshopId = rotorConfigList[2];
-            //        model.ProductionLineId = rotorConfigList[4];
-            //    }
-            //    else //定子
-            //    {
-            //        model.PlantId = statorConfigList[0];
-            //        model.WorkshopId = statorConfigList[2];
-            //        model.ProductionLineId = statorConfigList[4];
-            //    }
+                NIOConfigBaseDto curConfig = new NIOConfigBaseDto();
+                FieldDto model = new FieldDto();
+                if (firstChar == 'R') //转子
+                {
+                    var baseConfigModel = baseConfigList.Where(m => m.Code == "NioRotorConfig").FirstOrDefault();
+                    if (baseConfigModel == null)
+                    {
+                        continue;
+                    }
+                    curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(baseConfigModel.Value);
+                }
+                else //定子
+                {
+                    var baseConfigModel = baseConfigList.Where(m => m.Code == "NioStatorConfig").FirstOrDefault();
+                    if (baseConfigModel == null)
+                    {
+                        continue;
+                    }
+                    curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(baseConfigModel.Value);
+                }
+                model.PlantId = curConfig.PlantId;
+                model.WorkshopId = curConfig.WorkshopId;
+                model.ProductionLineId = curConfig.ProductionLineId;
+                model.VendorProductNum = curConfig.VendorProductCode;
+                model.StationId = param.ProcedureCode;
+                model.VendorFieldCode = param.ParameterCode;
+                model.VendorFieldName = param.ParameterName;
+                model.VendorFieldDesc = param.ParameterName;
+                model.FieldObject = "定子&转子";
+                model.FieldType = "无";
+                if(param.DataType == 2)
+                {
+                    model.ValueType = "decimal";
+                }
+                else
+                {
+                    model.ValueType = "string";
+                }
+                model.LifecycleCode = "process";
+                model.DetectionMethod = "设备检测";
+                model.DeviceId = "123";
+                model.LimitUpdateTime = GetTimestamp(param.CreatedOn, param.UpdatedOn);
+                model.UpdateTime = GetTimestamp(HymsonClock.Now(),HymsonClock.Now());
 
-            //    dtos.Add(model);
-            //}
+                dtos.Add(model);
+            }
 
             // TODO: 替换为实际数据
-            var dtos = new List<FieldDto> { };
+            //var dtos = new List<FieldDto> { };
             await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
