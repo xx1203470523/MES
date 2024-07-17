@@ -108,5 +108,10 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 设备编码
         /// </summary>
         public string EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 生产不良记录是否存在
+        /// </summary>
+        public bool ManuProductBadRecordIsExist { get; set; }
     }
 }

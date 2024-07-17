@@ -35,6 +35,7 @@ namespace Hymson.MES.Services.Services
         private readonly IMasterDataService _masterDataService;
         private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
         private readonly IManuEquipmentParameterRepository _manuEquipmentParameterRepository;
+        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
         /// <summary>
         /// 构造函数
@@ -47,6 +48,7 @@ namespace Hymson.MES.Services.Services
         /// <param name="masterDataService"></param>
         /// <param name="manuBarCodeRelationRepository"></param>
         /// <param name="manuEquipmentParameterRepository"></param>
+        /// <param name="manuProductBadRecordRepository"></param>
         public TracingSourceSFCService(ICurrentSite currentSite,
             ITracingSourceCoreService tracingSourceCoreService,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
@@ -54,7 +56,8 @@ namespace Hymson.MES.Services.Services
             IManuProductParameterRepository manuProductParameterRepository,
             IMasterDataService masterDataService,
             IManuBarCodeRelationRepository manuBarCodeRelationRepository,
-            IManuEquipmentParameterRepository manuEquipmentParameterRepository)
+            IManuEquipmentParameterRepository manuEquipmentParameterRepository,
+            IManuProductBadRecordRepository manuProductBadRecordRepository)
         {
             _currentSite = currentSite;
             _tracingSourceCoreService = tracingSourceCoreService;
@@ -64,6 +67,7 @@ namespace Hymson.MES.Services.Services
             _masterDataService = masterDataService;
             _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
             _manuEquipmentParameterRepository = manuEquipmentParameterRepository;
+            _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
 
@@ -115,9 +119,12 @@ namespace Hymson.MES.Services.Services
             var manuSfcStepEntities = await _manuSfcStepRepository.GetStepsBySFCAsync(new EntityBySFCQuery { SFC = sfc, SiteId = _currentSite.SiteId ?? 0 });
             var stepSourceDtos = new List<StepSourceDto>();
             if (manuSfcStepEntities == null || !manuSfcStepEntities.Any()) return stepSourceDtos;
+            var stepIds = manuSfcStepEntities.Select(x => x.Id);
+           var  manuProductBadRecordEntities=await  _manuProductBadRecordRepository.GetBySfcStepIdsAsync(stepIds);
             foreach (var manuSfcStepEntity in manuSfcStepEntities)
             {
                 var stepSourceDto = manuSfcStepEntity.ToModel<StepSourceDto>();
+                stepSourceDto.ManuProductBadRecordIsExist = manuProductBadRecordEntities.Any(x => x.SfcStepId == manuSfcStepEntity.Id);
                 await PrepareStepSourceAsync(manuSfcStepEntity, stepSourceDto);
                 stepSourceDtos.Add(stepSourceDto);
             }
