@@ -6,6 +6,8 @@
  *build datetime: 2024-06-12 10:29:55
  */
 
+using Hymson.MES.Core.Enums;
+
 namespace Hymson.MES.Data.Repositories.EquSparepartRecord
 {
     /// <summary>
@@ -13,5 +15,9 @@ namespace Hymson.MES.Data.Repositories.EquSparepartRecord
     /// </summary>
     public class EquSparepartRecordQuery
     {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

@@ -1,15 +1,21 @@
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
+using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Linq;
 
 namespace Hymson.MES.Services.Services.Equipment.EquSparePart
 {
@@ -33,6 +39,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// </summary>
         private readonly IEquSparePartRepository _equSparePartRepository;
 
+        /// <summary>
+        /// 仓储接口（工具绑定设备操作记录表）
+        /// </summary>
+        private readonly IEquSparepartEquipmentBindRecordRepository _equSparepartEquipmentBindRecordRepository;
+
 
         /// <summary>
         /// 构造函数
@@ -41,11 +52,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// <param name="currentUser"></param>
         /// <param name="equSparePartRepository"></param>
         public EquSparePartService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IEquSparePartRepository equSparePartRepository)
+            IEquSparePartRepository equSparePartRepository, IEquSparepartEquipmentBindRecordRepository equSparepartEquipmentBindRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _equSparePartRepository = equSparePartRepository;
+            _equSparepartEquipmentBindRecordRepository = equSparepartEquipmentBindRecordRepository;
         }
 
         /// <summary>
@@ -78,8 +90,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         public async Task<int> ModifyAsync(EquSparePartSaveDto modifyDto)
         {
             // 验证DTO
-
-
             // DTO转换实体
             var entity = modifyDto.ToEntity<EquSparePartEntity>();
             entity.UpdatedBy = _currentUser.UserName;
@@ -102,8 +112,18 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(IEnumerable<long> idsArr)
         {
+            var entities = await _equSparepartEquipmentBindRecordRepository.GetEntitiesAsync(new Data.Repositories.Equipment.Query.EquSparepartEquipmentBindRecordQuery
+            {
+                SparepartIds = idsArr,
+                OperationType = BindOperationTypeEnum.Install
+            } );
+            if (entities != null && entities.Any())
+            {
+                var  equSparePartEntities =await _equSparePartRepository.GetByIdsAsync(entities.Select(x => x.SparepartId));
+                throw new CustomerValidationException(nameof(ErrorCode.MES13523)).WithData("codes", string.Join(",", equSparePartEntities.Select(x => x.SparePartCode).ToArray()));
+            }
             return await _equSparePartRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = idsArr,
