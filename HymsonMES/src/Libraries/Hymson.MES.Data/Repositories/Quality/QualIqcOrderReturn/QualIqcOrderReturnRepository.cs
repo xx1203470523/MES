@@ -11,20 +11,20 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// <summary>
     /// 仓储（iqc检验单）
     /// </summary>
-    public partial class QualIqcOrderLiteRepository : BaseRepository, IQualIqcOrderLiteRepository
+    public partial class QualIqcOrderReturnRepository : BaseRepository, IQualIqcOrderReturnRepository
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public QualIqcOrderLiteRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public QualIqcOrderReturnRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(QualIqcOrderLiteEntity entity)
+        public async Task<int> InsertAsync(QualIqcOrderReturnEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
@@ -35,7 +35,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<QualIqcOrderLiteEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<QualIqcOrderReturnEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(QualIqcOrderLiteEntity entity)
+        public async Task<int> UpdateAsync(QualIqcOrderReturnEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(IEnumerable<QualIqcOrderLiteEntity> entities)
+        public async Task<int> UpdateRangeAsync(IEnumerable<QualIqcOrderReturnEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, entities);
@@ -90,10 +90,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualIqcOrderLiteEntity> GetByIdAsync(long id)
+        public async Task<QualIqcOrderReturnEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<QualIqcOrderLiteEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryFirstOrDefaultAsync<QualIqcOrderReturnEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -101,10 +101,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderLiteEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<QualIqcOrderReturnEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualIqcOrderLiteEntity>(GetByIdsSql, new { Ids = ids });
+            return await conn.QueryAsync<QualIqcOrderReturnEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<QualIqcOrderLiteEntity> GetEntityAsync(QualIqcOrderLiteQuery query)
+        public async Task<QualIqcOrderReturnEntity> GetEntityAsync(QualIqcOrderReturnQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitySqlTemplate);
@@ -134,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             //排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<QualIqcOrderLiteEntity>(template.RawSql, query);
+            return await conn.QueryFirstOrDefaultAsync<QualIqcOrderReturnEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderLiteEntity>> GetEntitiesAsync(QualIqcOrderLiteQuery query)
+        public async Task<IEnumerable<QualIqcOrderReturnEntity>> GetEntitiesAsync(QualIqcOrderReturnQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
@@ -180,7 +180,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             // 排序
             if (!string.IsNullOrWhiteSpace(query.Sorting)) sqlBuilder.OrderBy(query.Sorting);
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualIqcOrderLiteEntity>(template.RawSql, query);
+            return await conn.QueryAsync<QualIqcOrderReturnEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualIqcOrderLiteEntity>> GetPagedListAsync(QualIqcOrderLitePagedQuery pagedQuery)
+        public async Task<PagedInfo<QualIqcOrderReturnEntity>> GetPagedListAsync(QualIqcOrderReturnPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -210,11 +210,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<QualIqcOrderLiteEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<QualIqcOrderReturnEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<QualIqcOrderLiteEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<QualIqcOrderReturnEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -223,24 +223,24 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// <summary>
     /// 
     /// </summary>
-    public partial class QualIqcOrderLiteRepository
+    public partial class QualIqcOrderReturnRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_lite /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order_lite /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_lite /**where**/ /**orderby**/ LIMIT @MaxRows ";
-        const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_lite /**where**/ /**orderby**/ LIMIT 1 ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order_return /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return /**where**/ /**orderby**/ LIMIT @MaxRows ";
+        const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return /**where**/ /**orderby**/ LIMIT 1 ";
 
-        const string InsertSql = "INSERT INTO qual_iqc_order_lite(`Id`, `SiteId`, `InspectionOrder`, `MaterialReceiptId`, `SupplierId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialReceiptId, @SupplierId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_iqc_order_lite(`Id`, `SiteId`, `InspectionOrder`, `MaterialReceiptId`, `SupplierId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialReceiptId, @SupplierId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_iqc_order_return(`Id`, `SiteId`, `InspectionOrder`, `MaterialReceiptId`, `SupplierId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialReceiptId, @SupplierId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_iqc_order_return(`Id`, `SiteId`, `InspectionOrder`, `MaterialReceiptId`, `SupplierId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialReceiptId, @SupplierId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_iqc_order_lite SET Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_iqc_order_lite SET Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_iqc_order_return SET Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_iqc_order_return SET Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE qual_iqc_order_lite SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE qual_iqc_order_lite SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteSql = "UPDATE qual_iqc_order_return SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE qual_iqc_order_return SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM qual_iqc_order_lite WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM qual_iqc_order_lite WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM qual_iqc_order_return WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM qual_iqc_order_return WHERE Id IN @Ids ";
 
     }
 }

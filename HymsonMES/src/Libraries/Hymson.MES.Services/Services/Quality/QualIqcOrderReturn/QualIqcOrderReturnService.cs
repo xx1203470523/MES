@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Services.Quality
     /// <summary>
     /// 服务（iqc检验单） 
     /// </summary>
-    public class QualIqcOrderLiteService : IQualIqcOrderLiteService
+    public class QualIqcOrderReturnService : IQualIqcOrderReturnService
     {
         /// <summary>
         /// 当前用户
@@ -45,12 +45,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 仓储接口（iqc检验单）
         /// </summary>
-        private readonly IQualIqcOrderLiteRepository _qualIqcOrderLiteRepository;
+        private readonly IQualIqcOrderReturnRepository _qualIqcOrderReturnRepository;
 
         /// <summary>
         /// 仓储接口（iqc检验单明细）
         /// </summary>
-        private readonly IQualIqcOrderLiteDetailRepository _qualIqcOrderLiteDetailRepository;
+        private readonly IQualIqcOrderReturnDetailRepository _qualIqcOrderReturnDetailRepository;
 
         /// <summary>
         /// 仓储接口（iqc检验单操作）
@@ -97,8 +97,8 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="qualIqcOrderLiteRepository"></param>
-        /// <param name="qualIqcOrderLiteDetailRepository"></param>
+        /// <param name="qualIqcOrderReturnRepository"></param>
+        /// <param name="qualIqcOrderReturnDetailRepository"></param>
         /// <param name="qualIqcOrderOperateRepository"></param>
         /// <param name="qualIqcOrderAnnexRepository"></param>
         /// <param name="whMaterialReceiptRepository"></param>
@@ -107,9 +107,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="whSupplierRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="iqcOrderCreateService"></param>
-        public QualIqcOrderLiteService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IQualIqcOrderLiteRepository qualIqcOrderLiteRepository,
-            IQualIqcOrderLiteDetailRepository qualIqcOrderLiteDetailRepository,
+        public QualIqcOrderReturnService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IQualIqcOrderReturnRepository qualIqcOrderReturnRepository,
+            IQualIqcOrderReturnDetailRepository qualIqcOrderReturnDetailRepository,
             IQualIqcOrderOperateRepository qualIqcOrderOperateRepository,
             IQualIqcOrderAnnexRepository qualIqcOrderAnnexRepository,
             IWhMaterialReceiptRepository whMaterialReceiptRepository,
@@ -121,8 +121,8 @@ namespace Hymson.MES.Services.Services.Quality
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _qualIqcOrderLiteRepository = qualIqcOrderLiteRepository;
-            _qualIqcOrderLiteDetailRepository = qualIqcOrderLiteDetailRepository;
+            _qualIqcOrderReturnRepository = qualIqcOrderReturnRepository;
+            _qualIqcOrderReturnDetailRepository = qualIqcOrderReturnDetailRepository;
             _qualIqcOrderOperateRepository = qualIqcOrderOperateRepository;
             _qualIqcOrderAnnexRepository = qualIqcOrderAnnexRepository;
             _whMaterialReceiptRepository = whMaterialReceiptRepository;
@@ -139,8 +139,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
-        public async Task<long> GeneratedOrderAsync(GenerateOrderLiteDto requestDto)
+        public async Task<long> GeneratedOrderAsync(GenerateOrderReturnDto requestDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -150,7 +149,7 @@ namespace Hymson.MES.Services.Services.Quality
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES11901));
 
             // 校验是否已生成过检验单
-            var orderEntities = await _qualIqcOrderLiteRepository.GetEntitiesAsync(new QualIqcOrderLiteQuery
+            var orderEntities = await _qualIqcOrderReturnRepository.GetEntitiesAsync(new QualIqcOrderReturnQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 MaterialReceiptId = receiptEntity.Id
@@ -182,7 +181,7 @@ namespace Hymson.MES.Services.Services.Quality
             });
 
             // 检验单
-            var orderEntity = new QualIqcOrderLiteEntity
+            var orderEntity = new QualIqcOrderReturnEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = receiptEntity.SiteId,
@@ -196,7 +195,7 @@ namespace Hymson.MES.Services.Services.Quality
             };
 
             // 检验单明细
-            var orderDetailEntities = receiptDetailEntities.Select(s => new QualIqcOrderLiteDetailEntity
+            var orderDetailEntities = receiptDetailEntities.Select(s => new QualIqcOrderReturnDetailEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = receiptEntity.SiteId,
@@ -211,8 +210,8 @@ namespace Hymson.MES.Services.Services.Quality
             // 保存
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
-            rows += await _qualIqcOrderLiteRepository.InsertAsync(orderEntity);
-            rows += await _qualIqcOrderLiteDetailRepository.InsertRangeAsync(orderDetailEntities);
+            rows += await _qualIqcOrderReturnRepository.InsertAsync(orderEntity);
+            rows += await _qualIqcOrderReturnDetailRepository.InsertRangeAsync(orderDetailEntities);
             trans.Complete();
             return rows;
         }
@@ -222,13 +221,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<int> OperationOrderAsync(QualOrderLiteOperationStatusDto requestDto)
+        public async Task<int> OperationOrderAsync(QualOrderReturnOperationStatusDto requestDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // IQC检验单
-            var entity = await _qualIqcOrderLiteRepository.GetByIdAsync(requestDto.IQCOrderId)
+            var entity = await _qualIqcOrderReturnRepository.GetByIdAsync(requestDto.IQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 检查当前操作类型是否已经执行过
@@ -275,17 +274,17 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<int> SaveOrderAsync(QualIqcOrderLiteSaveDto requestDto)
+        public async Task<int> SaveOrderAsync(QualIqcOrderReturnSaveDto requestDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // IQC检验单
-            var orderEntity = await _qualIqcOrderLiteRepository.GetByIdAsync(requestDto.IQCOrderId)
+            var orderEntity = await _qualIqcOrderReturnRepository.GetByIdAsync(requestDto.IQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 检验单明细
-            var detailEntities = await _qualIqcOrderLiteDetailRepository.GetEntitiesAsync(new QualIqcOrderLiteDetailQuery
+            var detailEntities = await _qualIqcOrderReturnDetailRepository.GetEntitiesAsync(new QualIqcOrderReturnDetailQuery
             {
                 SiteId = orderEntity.SiteId,
                 IQCOrderId = orderEntity.Id
@@ -303,7 +302,7 @@ namespace Hymson.MES.Services.Services.Quality
             if (!isEqual) throw new CustomerValidationException(nameof(ErrorCode.MES11995));
 
             // 遍历样本参数
-            List<QualIqcOrderLiteDetailEntity> updateDetailEntities = new();
+            List<QualIqcOrderReturnDetailEntity> updateDetailEntities = new();
             foreach (var detailEntity in detailEntities)
             {
                 var dto = requestDto.Details.FirstOrDefault(f => f.Id == detailEntity.Id);
@@ -328,8 +327,8 @@ namespace Hymson.MES.Services.Services.Quality
             // 保存
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
-            rows += await _qualIqcOrderLiteRepository.UpdateAsync(orderEntity);
-            rows += await _qualIqcOrderLiteDetailRepository.UpdateRangeAsync(updateDetailEntities);
+            rows += await _qualIqcOrderReturnRepository.UpdateAsync(orderEntity);
+            rows += await _qualIqcOrderReturnDetailRepository.UpdateRangeAsync(updateDetailEntities);
             trans.Complete();
             return rows;
         }
@@ -347,7 +346,7 @@ namespace Hymson.MES.Services.Services.Quality
             var time = HymsonClock.Now();
 
             // IQC检验单
-            var entity = await _qualIqcOrderLiteRepository.GetByIdAsync(requestDto.IQCOrderId)
+            var entity = await _qualIqcOrderReturnRepository.GetByIdAsync(requestDto.IQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             if (!requestDto.Attachments.Any()) return 0;
@@ -417,13 +416,13 @@ namespace Hymson.MES.Services.Services.Quality
         {
             if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
-            var entities = await _qualIqcOrderLiteRepository.GetByIdsAsync(ids);
+            var entities = await _qualIqcOrderReturnRepository.GetByIdsAsync(ids);
             if (entities != null && entities.Any(a => a.Status != InspectionStatusEnum.WaitInspect))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10137));
             }
 
-            return await _qualIqcOrderLiteRepository.DeletesAsync(new DeleteCommand
+            return await _qualIqcOrderReturnRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
                 DeleteOn = HymsonClock.Now(),
@@ -437,13 +436,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualIqcOrderLiteBaseDto?> QueryByIdAsync(long id)
+        public async Task<QualIqcOrderReturnBaseDto?> QueryByIdAsync(long id)
         {
-            var entity = await _qualIqcOrderLiteRepository.GetByIdAsync(id);
+            var entity = await _qualIqcOrderReturnRepository.GetByIdAsync(id);
             if (entity == null) return null;
 
             // 实体到DTO转换
-            var dto = entity.ToModel<QualIqcOrderLiteBaseDto>();
+            var dto = entity.ToModel<QualIqcOrderReturnBaseDto>();
             dto.StatusText = dto.Status.GetDescription();
             dto.InspectionTime = entity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -473,16 +472,16 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderLiteDetailDto>?> QueryOrderDetailAsync(long id)
+        public async Task<IEnumerable<QualIqcOrderReturnDetailDto>?> QueryOrderDetailAsync(long id)
         {
-            List<QualIqcOrderLiteDetailDto> dtos = new();
+            List<QualIqcOrderReturnDetailDto> dtos = new();
 
             // 检验单
-            var orderEntity = await _qualIqcOrderLiteRepository.GetByIdAsync(id);
+            var orderEntity = await _qualIqcOrderReturnRepository.GetByIdAsync(id);
             if (orderEntity == null) return dtos;
 
             // 检验单明细
-            var detailEntities = await _qualIqcOrderLiteDetailRepository.GetEntitiesAsync(new QualIqcOrderLiteDetailQuery
+            var detailEntities = await _qualIqcOrderReturnDetailRepository.GetEntitiesAsync(new QualIqcOrderReturnDetailQuery
             {
                 SiteId = orderEntity.SiteId,
                 IQCOrderId = orderEntity.Id
@@ -503,7 +502,7 @@ namespace Hymson.MES.Services.Services.Quality
             // 遍历
             foreach (var entity in detailEntities)
             {
-                var dto = entity.ToModel<QualIqcOrderLiteDetailDto>();
+                var dto = entity.ToModel<QualIqcOrderReturnDetailDto>();
 
                 // 收货单明细
                 var materialReceiptDetailEntity = receiptDetailEntities.FirstOrDefault(f => f.Id == entity.MaterialReceiptDetailId);
@@ -561,9 +560,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualIqcOrderLiteDto>> GetPagedListAsync(QualIqcOrderLitePagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<QualIqcOrderReturnDto>> GetPagedListAsync(QualIqcOrderReturnPagedQueryDto pagedQueryDto)
         {
-            var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderLitePagedQuery>();
+            var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderReturnPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
             // 转换产品编码/版本变为产品ID
@@ -611,11 +610,11 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 查询数据
-            var pagedInfo = await _qualIqcOrderLiteRepository.GetPagedListAsync(pagedQuery);
+            var pagedInfo = await _qualIqcOrderReturnRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = await PrepareOrderDtosAsync(pagedInfo.Data);
-            return new PagedInfo<QualIqcOrderLiteDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<QualIqcOrderReturnDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -643,7 +642,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="operationType"></param>
         /// <param name="handleBo"></param>
         /// <returns></returns>
-        private async Task<int> CommonOperationAsync(QualIqcOrderLiteEntity entity, OrderOperateTypeEnum operationType, QCHandleBo? handleBo = null)
+        private async Task<int> CommonOperationAsync(QualIqcOrderReturnEntity entity, OrderOperateTypeEnum operationType, QCHandleBo? handleBo = null)
         {
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -654,7 +653,7 @@ namespace Hymson.MES.Services.Services.Quality
             entity.UpdatedOn = updatedOn;
 
             var rows = 0;
-            rows += await _qualIqcOrderLiteRepository.UpdateAsync(entity);
+            rows += await _qualIqcOrderReturnRepository.UpdateAsync(entity);
             rows += await _qualIqcOrderOperateRepository.InsertAsync(new QualIqcOrderOperateEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
@@ -677,9 +676,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<QualIqcOrderLiteDto>> PrepareOrderDtosAsync(IEnumerable<QualIqcOrderLiteEntity> entities)
+        private async Task<IEnumerable<QualIqcOrderReturnDto>> PrepareOrderDtosAsync(IEnumerable<QualIqcOrderReturnEntity> entities)
         {
-            List<QualIqcOrderLiteDto> dtos = new();
+            List<QualIqcOrderReturnDto> dtos = new();
 
             // 读取收货单
             var receiptEntities = await _whMaterialReceiptRepository.GetByIdsAsync(entities.Select(x => x.MaterialReceiptId));
@@ -698,7 +697,7 @@ namespace Hymson.MES.Services.Services.Quality
 
             foreach (var entity in entities)
             {
-                var dto = entity.ToModel<QualIqcOrderLiteDto>();
+                var dto = entity.ToModel<QualIqcOrderReturnDto>();
                 if (dto == null) continue;
 
                 // 收货单

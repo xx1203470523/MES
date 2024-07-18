@@ -42,7 +42,6 @@
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="6.2.2" />
-    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.152" />
     <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.175" />
     <PackageReference Include="Hymson.Elasticsearch" Version="2.1.175" />
     <PackageReference Include="Hymson.Excel" Version="2.1.175" />

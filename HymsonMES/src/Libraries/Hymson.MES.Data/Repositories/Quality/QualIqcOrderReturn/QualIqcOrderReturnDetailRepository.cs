@@ -11,20 +11,20 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// <summary>
     /// 仓储（iqc检验单（新））
     /// </summary>
-    public partial class QualIqcOrderLiteDetailRepository : BaseRepository, IQualIqcOrderLiteDetailRepository
+    public partial class QualIqcOrderReturnDetailRepository : BaseRepository, IQualIqcOrderReturnDetailRepository
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public QualIqcOrderLiteDetailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public QualIqcOrderReturnDetailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(QualIqcOrderLiteDetailEntity entity)
+        public async Task<int> InsertAsync(QualIqcOrderReturnDetailEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
@@ -35,7 +35,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<QualIqcOrderLiteDetailEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<QualIqcOrderReturnDetailEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(QualIqcOrderLiteDetailEntity entity)
+        public async Task<int> UpdateAsync(QualIqcOrderReturnDetailEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(IEnumerable<QualIqcOrderLiteDetailEntity> entities)
+        public async Task<int> UpdateRangeAsync(IEnumerable<QualIqcOrderReturnDetailEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, entities);
@@ -90,10 +90,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualIqcOrderLiteDetailEntity> GetByIdAsync(long id)
+        public async Task<QualIqcOrderReturnDetailEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<QualIqcOrderLiteDetailEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryFirstOrDefaultAsync<QualIqcOrderReturnDetailEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -101,10 +101,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderLiteDetailEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<QualIqcOrderReturnDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualIqcOrderLiteDetailEntity>(GetByIdsSql, new { Ids = ids });
+            return await conn.QueryAsync<QualIqcOrderReturnDetailEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderLiteDetailEntity>> GetEntitiesAsync(QualIqcOrderLiteDetailQuery query)
+        public async Task<IEnumerable<QualIqcOrderReturnDetailEntity>> GetEntitiesAsync(QualIqcOrderReturnDetailQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
@@ -126,7 +126,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             }
 
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualIqcOrderLiteDetailEntity>(template.RawSql, query);
+            return await conn.QueryAsync<QualIqcOrderReturnDetailEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualIqcOrderLiteDetailEntity>> GetPagedListAsync(QualIqcOrderLiteDetailPagedQuery pagedQuery)
+        public async Task<PagedInfo<QualIqcOrderReturnDetailEntity>> GetPagedListAsync(QualIqcOrderReturnDetailPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -150,11 +150,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<QualIqcOrderLiteDetailEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<QualIqcOrderReturnDetailEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<QualIqcOrderLiteDetailEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<QualIqcOrderReturnDetailEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -163,23 +163,23 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// <summary>
     /// 
     /// </summary>
-    public partial class QualIqcOrderLiteDetailRepository
+    public partial class QualIqcOrderReturnDetailRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_lite_detail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order_lite_detail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_lite_detail /**where**/  ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return_detail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order_return_detail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return_detail /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_iqc_order_lite_detail(`Id`, `SiteId`, `IQCOrderId`, `MaterialId`, `MaterialReceiptDetailId`, `Status`, `IsQualified`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IQCOrderId, @MaterialId, @MaterialReceiptDetailId, @Status, @IsQualified, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_iqc_order_lite_detail(`Id`, `SiteId`, `IQCOrderId`, `MaterialId`, `MaterialReceiptDetailId`, `Status`, `IsQualified`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IQCOrderId, @MaterialId, @MaterialReceiptDetailId, @Status, @IsQualified, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_iqc_order_return_detail(`Id`, `SiteId`, `IQCOrderId`, `MaterialId`, `MaterialReceiptDetailId`, `Status`, `IsQualified`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IQCOrderId, @MaterialId, @MaterialReceiptDetailId, @Status, @IsQualified, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_iqc_order_return_detail(`Id`, `SiteId`, `IQCOrderId`, `MaterialId`, `MaterialReceiptDetailId`, `Status`, `IsQualified`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IQCOrderId, @MaterialId, @MaterialReceiptDetailId, @Status, @IsQualified, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_iqc_order_lite_detail SET IsQualified = @IsQualified, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_iqc_order_lite_detail SET IsQualified = @IsQualified, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_iqc_order_return_detail SET IsQualified = @IsQualified, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_iqc_order_return_detail SET IsQualified = @IsQualified, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE qual_iqc_order_lite_detail SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE qual_iqc_order_lite_detail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteSql = "UPDATE qual_iqc_order_return_detail SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE qual_iqc_order_return_detail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM qual_iqc_order_lite_detail WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM qual_iqc_order_lite_detail WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM qual_iqc_order_return_detail WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM qual_iqc_order_return_detail WHERE Id IN @Ids ";
 
     }
 }

@@ -7,7 +7,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// 检验单状态Dto
     /// </summary>
-    public record QualOrderLiteOperationStatusDto
+    public record QualOrderReturnOperationStatusDto
     {
         /// <summary>
         /// 主键
@@ -24,7 +24,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// iqc检验单新增/更新Dto
     /// </summary>
-    public record QualIqcOrderLiteSaveDto : BaseEntityDto
+    public record QualIqcOrderReturnSaveDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
@@ -34,14 +34,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 样品参数
         /// </summary>
-        public IEnumerable<QualIqcOrderLiteDetailSaveDto> Details { get; set; }
+        public IEnumerable<QualIqcOrderReturnDetailSaveDto> Details { get; set; }
 
     }
 
     /// <summary>
     /// iqc检验单新增/更新Dto
     /// </summary>
-    public record QualIqcOrderLiteDetailSaveDto
+    public record QualIqcOrderReturnDetailSaveDto
     {
         /// <summary>
         /// 主键
@@ -68,7 +68,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// iqc检验单Dto
     /// </summary>
-    public record QualIqcOrderLiteDto : BaseEntityDto
+    public record QualIqcOrderReturnDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
@@ -170,7 +170,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// iqc检验单Dto（详情）
     /// </summary>
-    public record QualIqcOrderLiteBaseDto : BaseEntityDto
+    public record QualIqcOrderReturnBaseDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
@@ -227,7 +227,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// iqc检验单Dto（详情）
     /// </summary>
-    public record QualIqcOrderLiteDetailDto : BaseEntityDto
+    public record QualIqcOrderReturnDetailDto : BaseEntityDto
     {
         /// <summary>
         /// Id
@@ -334,7 +334,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// iqc检验单分页Dto
     /// </summary>
-    public class QualIqcOrderLitePagedQueryDto : PagerInfo
+    public class QualIqcOrderReturnPagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 检验单号
@@ -386,7 +386,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// 生成检验单Dto
     /// </summary>
-    public record GenerateOrderLiteDto
+    public record GenerateOrderReturnDto
     {
         /// <summary>
         /// 收货单
