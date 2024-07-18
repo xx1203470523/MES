@@ -6,7 +6,9 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -15,12 +17,17 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public partial class PlanWorkOrderRepository : BaseRepository, IPlanWorkOrderRepository
     {
+        private readonly IMemoryCache _memoryCache;
+
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions,IMemoryCache memoryCache) : base(connectionOptions)
+        {
+            _memoryCache = memoryCache;
+        }
 
         /// <summary>
         /// 删除（软删除）
@@ -77,7 +84,15 @@ namespace Hymson.MES.Data.Repositories.Plan
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderEntity>(GetByIdsSql, new { ids });
         }
-
+        public async Task<IEnumerable<PlanWorkOrderEntity>> GetBySiteIdAsync(long siteId)
+        {
+            var cachedKey = $"{CachedTables.PLAN_WORK_ORDER}&SiteId&{siteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(cachedKey, async (cacheEntity) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<PlanWorkOrderEntity>(GetBySiteIdSql, new { SiteId = siteId });
+            });
+        }
         /// <summary>
         /// 根据 workOrderId 获取数据
         /// </summary>
@@ -88,7 +103,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderRecordEntity>(GetByWorkOrderIdSql, new { workOrderId });
         }
-
+        
         /// <summary>
         /// 根据IDs批量获取数据  含有物料信息
         /// </summary>
@@ -617,6 +632,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string DeletesSql = "UPDATE `plan_work_order`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
 
         const string GetByIdSql = @"SELECT * FROM `plan_work_order`  WHERE Id = @Id ";
+        const string GetBySiteIdSql = @"SELECT * FROM `plan_work_order` WHERE SiteId=@SiteId AND IsDeleted = 0";
         const string GetByIdsSql = @"SELECT
       `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId` ,LockedStatus
     FROM `plan_work_order`  WHERE Id IN @ids ";

@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Services.Dtos.Report;
 using Minio.DataModel;
+using System.Reflection;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -710,8 +711,7 @@ namespace Hymson.MES.Services.Services.Report
                 if (field == null) continue;
 
                 // 获取枚举值上的 ManuSfcStepOperationTypeAttrribute 特性
-                var manuSfcStepOperationTypeAttributes = field.GetCustomAttributes(typeof(ManuSfcStepOperationTypeAttrribute), false);
-                var manuSfcStepOperationTypeAttribute = manuSfcStepOperationTypeAttributes.Length > 0 ? ((ManuSfcStepOperationTypeAttrribute)manuSfcStepOperationTypeAttributes[0]) : null;
+                var manuSfcStepOperationTypeAttribute = field.GetCustomAttribute<ManuSfcStepOperationTypeAttrribute>(false);
                 if (manuSfcStepOperationTypeAttribute != null)
                 {
                     list.Add(new GetManuSfcStepTypeJobOrAssemblyNameDto

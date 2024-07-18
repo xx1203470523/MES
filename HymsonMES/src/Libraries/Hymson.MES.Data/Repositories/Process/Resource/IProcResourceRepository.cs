@@ -26,6 +26,12 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<ProcResourceEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
+        /// 获取此站点所有资源信息 用于缓存整个站点的资源数据 为单个查询 范围查询加速
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceEntity>> GetBySiteIdAsync(long siteId);
+        /// <summary>
         /// 查询详情
         /// </summary>
         /// <param name="id"></param>

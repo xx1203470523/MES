@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                         SiteId = _currentSite.SiteId ?? 0,
                     });
                     break;
-                case WhMaterialInventoryTypeEnum.MaterialBarCodeMerge:
+                case WhMaterialInventoryTypeEnum.CombinedAdd:
                     manubarcoderelationenties = await _manuBarCodeRelationRepository.GetEntitiesAsync(new ManuBarcodeRelationQuery
                     {
                         OutputMaterialStandingBookId = id,
@@ -226,6 +226,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             foreach (var item in manubarcoderelationenties)
             {
+                if (item.InputBarCode == item.OutputBarCode) continue;
                 whMaterialStandingBookRelationEntities.Add(new WhMaterialStandingBookRelationDto()
                 {
                     ParentBarcode = item.InputBarCode,

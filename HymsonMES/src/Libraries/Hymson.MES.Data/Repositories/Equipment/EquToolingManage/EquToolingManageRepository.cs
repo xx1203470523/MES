@@ -5,6 +5,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquToolingManage.Command;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Microsoft.Extensions.Options;
 
@@ -196,6 +197,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
+        ///校准
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> CalibrationAsync(CalibratioCommandCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(CalibrationUpdateSql, command);
+        }
+
+        /// <summary>
         /// 批量更新
         /// </summary>
         /// <param name="procLoadPointEntitys"></param>
@@ -224,10 +236,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string InsertsSql = "INSERT INTO `equ_tools` (`Id`, `SiteId`, `Code`, `Name`, `ToolsId`, `RatedLife`, `RatedLifeUnit`, `CumulativeUsedLife`, `CurrentUsedLife`, `LastVerificationTime`, `IsCalibrated`, `CalibrationCycle`, `CalibrationCycleUnit`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ( @Id , @SiteId , @Code , @Name , @ToolsId , @RatedLife , @RatedLifeUnit , @CumulativeUsedLife , @CurrentUsedLife , @LastVerificationTime , @IsCalibrated , @CalibrationCycle , @CalibrationCycleUnit , @Status , @Remark , @CreatedOn , @CreatedBy , @UpdatedBy , @UpdatedOn , @IsDeleted )";
 
-        const string UpdateSql = "UPDATE `equ_tools` SET NAME = @NAME, STATUS = @STATUS, ToolsId = @ToolsId, RatedLife = @RatedLife,  LastVerificationTime = @LastVerificationTime,RatedLifeUnit = @RatedLifeUnit, IsCalibrated = @IsCalibrated, CalibrationCycle = @CalibrationCycle, CalibrationCycleUnit = @CalibrationCycleUnit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
-        const string UpdatesSql = "UPDATE `equ_tools` SET NAME = @NAME, STATUS = @STATUS, ToolsId = @ToolsId, RatedLife = @RatedLife, LastVerificationTime = @LastVerificationTime, RatedLifeUnit = @RatedLifeUnit, IsCalibrated = @IsCalibrated, CalibrationCycle = @CalibrationCycle, CalibrationCycleUnit = @CalibrationCycleUnit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
+        const string UpdateSql = "UPDATE `equ_tools` SET NAME = @NAME, STATUS = @STATUS, ToolsId = @ToolsId, RatedLife = @RatedLife, RatedLifeUnit = @RatedLifeUnit, IsCalibrated = @IsCalibrated, CalibrationCycle = @CalibrationCycle, CalibrationCycleUnit = @CalibrationCycleUnit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
+        const string UpdatesSql = "UPDATE `equ_tools` SET NAME = @NAME, STATUS = @STATUS, ToolsId = @ToolsId, RatedLife = @RatedLife, RatedLifeUnit = @RatedLifeUnit, IsCalibrated = @IsCalibrated, CalibrationCycle = @CalibrationCycle, CalibrationCycleUnit = @CalibrationCycleUnit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
         const string DeleteSql = "UPDATE `proc_product_process_conversion_factor` SET IsDeleted = Id WHERE Id = @Id ";
-
+        const string CalibrationUpdateSql = "UPDATE `equ_tools` SET LastVerificationTime = @LastVerificationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
         const string DeletesSql = "UPDATE `equ_tools` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         const string GetByIdSql = @"SELECT A.Id, A.Code,A.Name,A.RatedLife,A.RatedLifeUnit,A.CumulativeUsedLife,A.CurrentUsedLife,A.LastVerificationTime,A.IsCalibrated, A.CalibrationCycle,A.CalibrationCycleUnit, A.Status, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName,B.Id AS ToolsId  from equ_tools A JOIN equ_tools_type B ON A.ToolsId = B.Id  WHERE A.Id = @Id ";
         const string GetByIdsSql = @"SELECT  `Id`, `SiteId`, `Code`, `Name`, `ToolsId`, `RatedLife`, `RatedLifeUnit`, `CumulativeUsedLife`, `CurrentUsedLife`, `LastVerificationTime`, `IsCalibrated`, `CalibrationCycle`, `CalibrationCycleUnit`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
