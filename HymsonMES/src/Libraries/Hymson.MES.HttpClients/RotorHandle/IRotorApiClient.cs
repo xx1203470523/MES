@@ -1,6 +1,4 @@
-﻿using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.HttpClients.Requests;
+﻿using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.Rotor;
 using System;
 using System.Collections.Generic;
@@ -43,18 +41,18 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// <returns></returns>
         Task<int> MaterialAsync(IEnumerable<RotorMaterialRequest> list);
 
-        /// <summary>
-        /// 工序同步
-        /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        Task<int> ProcedureAsync(IEnumerable<ProcProcedureEntity> list);
+        ///// <summary>
+        ///// 工序同步
+        ///// </summary>
+        ///// <param name="list"></param>
+        ///// <returns></returns>
+        //Task<int> ProcedureAsync(IEnumerable<ProcProcedureEntity> list);
 
-        /// <summary>
-        /// 工艺路线同步
-        /// </summary>
-        /// <param name="procProcessRouteDetails"></param>
-        /// <returns></returns>
-        Task<bool> ProcedureLineSync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetails);  
+        ///// <summary>
+        ///// 工艺路线同步
+        ///// </summary>
+        ///// <param name="procProcessRouteDetails"></param>
+        ///// <returns></returns>
+        //Task<bool> ProcedureLineSync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetails);  
     }
 }

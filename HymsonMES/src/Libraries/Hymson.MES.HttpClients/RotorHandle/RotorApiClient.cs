@@ -4,7 +4,6 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.Rotor;
@@ -74,10 +73,10 @@ namespace Hymson.MES.HttpClients.RotorHandle
             _httpClient.BaseAddress = new Uri(urlList.ElementAt(0).Value);
         }
 
-        public Task<bool> ProcedureLineSync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetails)
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<bool> ProcedureLineSync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetails)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         /// <summary>
         /// 工单激活
@@ -144,14 +143,14 @@ namespace Hymson.MES.HttpClients.RotorHandle
             return num;
         }
 
-        /// <summary>
-        /// 工序同步
-        /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public async Task<int> ProcedureAsync(IEnumerable<ProcProcedureEntity> list)
-        {
-            throw new NotImplementedException();
-        }
+        ///// <summary>
+        ///// 工序同步
+        ///// </summary>
+        ///// <param name="list"></param>
+        ///// <returns></returns>
+        //public async Task<int> ProcedureAsync(IEnumerable<ProcProcedureEntity> list)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }
