@@ -557,7 +557,7 @@ namespace Hymson.MES.Services.Services.Equipment
                     {
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", index);
                     }
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES13518);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES13522);
                     validationFailure.FormattedMessagePlaceholderValues.Add("toolTypeCode", item.Code);
                     validationFailures.Add(validationFailure);
                     continue;
