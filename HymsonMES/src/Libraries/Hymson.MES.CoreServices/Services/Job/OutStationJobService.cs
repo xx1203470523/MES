@@ -1264,36 +1264,39 @@ namespace Hymson.MES.CoreServices.Services.Job
             #endregion
 
             #region 置于合格工艺路线排队（非末工序置于下工序排队，末工序为完成）
-            // 已完工（置于在制完成）
-            if (nextProcedure == null)
-            {
-                //responseBo.IsLastProcedure = true;
-
-                // 清空复投次数
-                sfcProduceEntity.RepeatedCount = 0;
-
-                // 标记条码为"在制-完成"
-                //responseBo.IsCompleted = true;
-                manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
-                sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
-            }
-            // 未完工（置于下工序排队）
             else
             {
-                responseBo.NextProcedureCode = nextProcedure.Code;
+                // 已完工（置于在制完成）
+                if (nextProcedure == null)
+                {
+                    //responseBo.IsLastProcedure = true;
 
-                // 条码状态跟在制品状态一致
-                manuSfcEntity.Status = SfcStatusEnum.lineUp;
-                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
+                    // 清空复投次数
+                    sfcProduceEntity.RepeatedCount = 0;
 
-                // 更新下一工序
-                sfcProduceEntity.ProcedureId = nextProcedure.Id;
+                    // 标记条码为"在制-完成"
+                    //responseBo.IsCompleted = true;
+                    manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
+                    sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
+                }
+                // 未完工（置于下工序排队）
+                else
+                {
+                    responseBo.NextProcedureCode = nextProcedure.Code;
 
-                // 一旦切换工序，复投次数重置
-                sfcProduceEntity.RepeatedCount = 0;
+                    // 条码状态跟在制品状态一致
+                    manuSfcEntity.Status = SfcStatusEnum.lineUp;
+                    sfcProduceEntity.Status = SfcStatusEnum.lineUp;
 
-                // 不置空的话，进站时，可能校验不通过
-                sfcProduceEntity.ResourceId = null;
+                    // 更新下一工序
+                    sfcProduceEntity.ProcedureId = nextProcedure.Id;
+
+                    // 一旦切换工序，复投次数重置
+                    sfcProduceEntity.RepeatedCount = 0;
+
+                    // 不置空的话，进站时，可能校验不通过
+                    sfcProduceEntity.ResourceId = null;
+                }
             }
             #endregion
 
