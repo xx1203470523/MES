@@ -9,7 +9,7 @@ namespace Hymson.MES.HttpClients.Requests.Rotor
     /// <summary>
     /// 转子线LMS物料数据
     /// </summary>
-    public class RotorMaterialSync
+    public class RotorMaterialRequest
     {
         /// <summary>
         /// 物料编号

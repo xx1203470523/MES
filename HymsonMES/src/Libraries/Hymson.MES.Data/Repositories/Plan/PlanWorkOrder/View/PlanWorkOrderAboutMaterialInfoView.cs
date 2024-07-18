@@ -110,4 +110,17 @@ namespace Hymson.MES.Data.Repositories.Plan
 
 
     }
+
+    /// <summary>
+    /// 马威工单数据
+    /// </summary>
+    public class PlanWorkOrderMavelView : PlanWorkOrderAboutMaterialInfoView
+    {
+        /// <summary>
+        /// 订单号
+        /// </summary>
+        public string OrderNo { get; set; }
+    }
+
+
 }

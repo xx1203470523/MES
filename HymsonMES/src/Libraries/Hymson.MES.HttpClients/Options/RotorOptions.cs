@@ -14,9 +14,10 @@ namespace Hymson.MES.HttpClients.Options
         /// <summary>
         /// 基础地址
         /// </summary>
-        public string BaseAddressUri { get; set; } = "";
+        public string BaseAddressUri { get; set; } = "http://192.168.160.101:8001/";
         /// <summary>
         /// 请求token
+        /// 2V55DBFUQOOM8OI0TE1B2ON3HF2QXK6W
         /// </summary>
         public string SYSTOKEN { get; set; } = "2V55DBFUQOOM8OI0TE1B2ON3HF2QXK6W";
         /// <summary>
