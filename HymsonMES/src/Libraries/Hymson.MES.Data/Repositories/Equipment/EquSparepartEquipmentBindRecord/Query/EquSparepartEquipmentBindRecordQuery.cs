@@ -31,5 +31,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// 操作类型1、绑定 2、卸载
         /// </summary>
         public BindOperationTypeEnum? OperationType { get; set; }
+
+        /// <summary>
+        /// 备件id
+        /// </summary>
+        public IEnumerable<long>? SparepartIds { get; set; }
     }
 }
