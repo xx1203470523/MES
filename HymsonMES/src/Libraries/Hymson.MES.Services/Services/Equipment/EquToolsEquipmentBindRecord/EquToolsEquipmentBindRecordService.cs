@@ -111,7 +111,8 @@ namespace Hymson.MES.Services.Services.Equipment
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17702)).WithData("code", toolsEntity.Code);
             }
-            if (toolsEntity.RatedLife - toolsEntity.CurrentUsedLife <= 0)
+            var currentUsedLife=toolsEntity.CurrentUsedLife ?? 0;
+            if (toolsEntity.RatedLife - currentUsedLife <= 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17705));
             }
@@ -144,7 +145,7 @@ namespace Hymson.MES.Services.Services.Equipment
             //校验工具所属工具类型是否允许在设备使用（工具类型在所有设备组均可使用或工具类型分配的设备组包含该设备所属的设备组），若不允许，则报错：工具XXX不允许在设备XXX使用；
             var toolTypeId = toolsEntity.ToolsId;
             var equToolsTypeEntity = await _equToolsTypeRepository.GetByIdAsync(toolTypeId);
-            if (equToolsTypeEntity?.IsAllMaterialUsed != true)
+            if (equToolsTypeEntity?.IsAllEquipmentUsed != true)
             {
                 var groupRelationViews = await _equToolingTypeEquipment.GetEntitiesAsync(new EquToolsTypeEquipmentGroupRelationQuery
                 {
@@ -348,13 +349,14 @@ namespace Hymson.MES.Services.Services.Equipment
             if (toolsEntity != null)
             {
                 var currentUsedLife = toolsEntity.CurrentUsedLife ?? 0;
+                var cumulativeUsedLife = toolsEntity.CumulativeUsedLife ?? 0;
                 if ((toolsEntity.RatedLife - currentUsedLife - saveDto.CurrentUsedLife) <= 0)
                 {
                     toolsEntity.Status = DisableOrEnableEnum.Disable;
                 }
                 toolsEntity.UpdatedBy = updatedBy;
                 toolsEntity.UpdatedOn = updatedOn;
-                toolsEntity.CumulativeUsedLife = toolsEntity.CumulativeUsedLife + saveDto.CurrentUsedLife;
+                toolsEntity.CumulativeUsedLife = cumulativeUsedLife + saveDto.CurrentUsedLife;
                 toolsEntity.CurrentUsedLife = currentUsedLife + saveDto.CurrentUsedLife;
 
                 toolsRecordEntity = new EquToolsRecordEntity()
