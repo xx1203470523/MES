@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Report;
+using System;
 using System.Collections.Generic;
 using System.Security.Policy;
 
@@ -85,10 +86,11 @@ namespace Hymson.MES.Services.Services.Report
         /// <returns></returns>
         public async Task<PagedInfo<WorkOrderStepControlViewDto>> GetWorkOrderStepControlPageListAsync(WorkOrderStepControlOptimizePagedQueryDto param)
         {
+            var siteId = _currentSite.SiteId ?? 0;
             var pagedQuery = param.ToQuery<PlanWorkOrderPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.SiteId = siteId;
             // 判断是否有获取到站点码 
-            if (param.OrderCode == null)
+            if (string.IsNullOrWhiteSpace(param.OrderCode))
             {
                 return null;
             }
@@ -101,13 +103,15 @@ namespace Hymson.MES.Services.Services.Report
                 return new PagedInfo<WorkOrderStepControlViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, listDto.Count());
             }
 
-            var siteId = _currentSite.SiteId ?? 0;
-            var orderId = pagedInfo.Data.FirstOrDefault()?.Id ?? 0;
+            var planWorkOrder = pagedInfo.Data.FirstOrDefault();
+            var orderId = planWorkOrder?.Id ?? 0;
+            var processRouteId = planWorkOrder?.ProcessRouteId ?? 0;
+            var productId = planWorkOrder?.ProductId??0;
             var manuSfcProduceResultquery = new ManuSfcProduceVehiclePagedQuery()
             {
                 WorkOrderId = orderId,
                 //ProductId = pagedInfo.Data.First().ProductId,
-                ProcessRouteId = pagedInfo.Data.First().ProcessRouteId,
+                ProcessRouteId = processRouteId,
                 PageIndex = 1,
                 PageSize = 100000,
                 SiteId = siteId
@@ -123,7 +127,7 @@ namespace Hymson.MES.Services.Services.Report
             // 查询物料
             var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId));
             // 查询工序节点明细
-            var procProcessRouteDetailNodeTask = _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(pagedInfo.Data.First().ProcessRouteId ?? 0);
+            var procProcessRouteDetailNodeTask = _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(processRouteId);
             //查询工序
             var procProceduresTask = _procProcedureRepository.GetByIdsAsync(procProcessRouteDetailNodeTask.Result.Select(x => x.ProcedureId));
 
@@ -142,7 +146,7 @@ namespace Hymson.MES.Services.Services.Report
                 var sfcInfoIds = sfcInfoEntities.Select(x => x.Id).Distinct().ToList();
                 sfcScrapEntities = await _sfcScrapRepository.GetEntitiesAsync(new ManuSfcScrapQuery
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = siteId,
                     SfcinfoIds = sfcInfoIds
                 });
             }
@@ -154,11 +158,20 @@ namespace Hymson.MES.Services.Services.Report
                 var passViews = manuSfcProduceResult.Data.Where(x => x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.lineUp);
                 var activityViews = manuSfcProduceResult.Data.Where(x => x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.Activity);
                 var lockViews = manuSfcProduceResult.Data.Where(x => x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.Locked);
-                var material = materials.FirstOrDefault(x => x.Id == pagedInfo.Data.First().ProductId);
+                var material = materials.FirstOrDefault(x => x.Id == productId);
                 var passDownQuantity = passViews.Sum(x => x.Qty);
                 var processDownQuantity = activityViews.Sum(x => x.Qty);
                 var lockQuantity = lockViews.Sum(x => x.Qty);
-                var finishProductQuantity = summaryResult.LastOrDefault(x =>  x.ProcedureId == item.ProcedureId)?.OutputQty;
+
+                var finishProductQuantity = 0m;
+                var summaryEntities=summaryResult.Where(x => x.ProcedureId == item.ProcedureId);
+                if(summaryEntities.Any())
+                {
+                    var sfcSummaryEntities = summaryEntities.GroupBy(x => x.SFC).Select(g => g.Last());
+
+                    //一个条码有多个的取后面那个
+                    finishProductQuantity = sfcSummaryEntities.Sum(x => x.OutputQty??0);
+                }           
 
                 var scrapViews = manuSfcProduceResult.Data.Where(x => x.ProcedureId == item.ProcedureId && x.Status == SfcStatusEnum.Scrapping);
                 var scrapQuantity = 0m;
@@ -177,13 +190,13 @@ namespace Hymson.MES.Services.Services.Report
                     Serialno = item.ManualSortNumber,
                     ProcedureCode = procedures?.Code ?? "",
                     MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
-                    ProcessRout = pagedInfo.Data.First().ProcessRouteCode + "/" + pagedInfo.Data.First().ProcessRouteVersion,
-                    OrderCode = pagedInfo.Data.FirstOrDefault()?.OrderCode ?? "",
+                    ProcessRout = planWorkOrder?.ProcessRouteCode + "/" + planWorkOrder?.ProcessRouteVersion,
+                    OrderCode = planWorkOrder?.OrderCode ?? "",
                     PassDownQuantity = passDownQuantity,
                     ProcessDownQuantity = processDownQuantity,
                     ScrapQuantity = scrapQuantity,
                     LockQuantity = lockQuantity,
-                    FinishProductQuantity = finishProductQuantity ?? 0,
+                    FinishProductQuantity = finishProductQuantity,
                 });
             }
 
