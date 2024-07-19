@@ -81,29 +81,24 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string InspectionOrder { get; set; }
 
         /// <summary>
-        /// 收货单号
+        /// 退料单号
         /// </summary>
-        public string ReceiptNum { get; set; }
+        public string ReqOrderCode { get; set; }
 
         /// <summary>
-        /// 供应商ID
+        /// 生产工单ID
         /// </summary>
-        public long SupplierId { get; set; }
+        public long WorkOrderId { get; set; }
 
         /// <summary>
-        /// 供应商编码
+        /// 生产工单编码
         /// </summary>
-        public string SupplierCode { get; set; }
-
-        /// <summary>
-        /// 供应商名称
-        /// </summary>
-        public string SupplierName { get; set; }
+        public string WorkOrderCode { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public InspectionStatusEnum Status { get; set; }
+        public IQCLiteStatusEnum Status { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
@@ -183,9 +178,9 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string InspectionOrder { get; set; }
 
         /// <summary>
-        /// 收货单号
+        /// 退料单号
         /// </summary>
-        public string ReceiptNum { get; set; }
+        public string ReqOrderCode { get; set; }
 
         /// <summary>
         /// 供应商ID
@@ -205,7 +200,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public InspectionStatusEnum Status { get; set; }
+        public IQCLiteStatusEnum Status { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
@@ -292,7 +287,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public InspectionStatusEnum Status { get; set; }
+        public IQCLiteStatusEnum Status { get; set; }
 
         /// <summary>
         /// 是否合格;0、不合格 1、合格
@@ -357,29 +352,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string? MaterialVersion { get; set; }
 
         /// <summary>
-        /// 供应商编码
+        /// 工单编码
         /// </summary>
-        public string? SupplierCode { get; set; }
-
-        /// <summary>
-        /// 供应商名称
-        /// </summary>
-        public string? SupplierName { get; set; }
-
-        /// <summary>
-        /// 供应商批次
-        /// </summary>
-        public string? SupplierBatch { get; set; }
-
-        /// <summary>
-        /// 内部
-        /// </summary>
-        public string? InternalBatch { get; set; }
+        public string? WorkOrderCode { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public InspectionStatusEnum? Status { get; set; }
+        public IQCLiteStatusEnum? Status { get; set; }
 
     }
 

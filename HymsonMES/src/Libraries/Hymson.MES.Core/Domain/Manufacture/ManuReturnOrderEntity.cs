@@ -14,38 +14,38 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 退料单据号
         /// </summary>
-        public string? ReqOrderCode { get; set; }
+        public string ReqOrderCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id，工单借料情况下，接收物料的工单
         /// </summary>
         public string TargetWorkOrderCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 退料单类型0:工单退料 1:工单借料
         /// </summary>
         public ManuReturnTypeEnum Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
         /// </summary>
         public WhWarehouseReturnStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料描述
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id，待退料的工单
         /// </summary>
         public string SourceWorkOrderCode { get; set; }
 
-       
+
     }
 }

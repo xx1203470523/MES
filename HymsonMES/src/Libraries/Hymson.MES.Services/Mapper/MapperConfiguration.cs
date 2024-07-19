@@ -45,6 +45,7 @@ using Hymson.MES.Data.Repositories.EquSpotcheckPlan;
 using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Data.Repositories.Inte;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.InteBusinessField.View;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
@@ -117,21 +118,6 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
-using Hymson.MES.Services.Dtos.EquRepairOrder;
-using Hymson.MES.Core.Domain.EquRepairOrder;
-using Hymson.MES.Data.Repositories.EquRepairOrder;
-using Hymson.MES.Core.Domain.EquSparepartInventory;
-using Hymson.MES.Data.Repositories.EquSparepartInventory;
-using Hymson.MES.Services.Dtos.EquEquipmentRecord;
-using Hymson.MES.Core.Domain.EquEquipmentRecord;
-using Hymson.MES.Data.Repositories.EquEquipmentRecord;
-using Hymson.MES.Services.Dtos.EquSparepartRecord;
-using Hymson.MES.Core.Domain.EquSparepartRecord;
-using Hymson.MES.Data.Repositories.EquSparepartRecord;
-using Hymson.MES.Services.Dtos.EquSparepartInventory;
-using Hymson.MES.Data.Repositories.Equipment.View;
-using Hymson.MES.Data.Repositories.Manufacture.Query;
-using Hymson.MES.Data.Repositories.Integrated.InteBusinessField.View;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -1283,6 +1269,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualEnvOrderDetailModifyDto, QualEnvOrderDetailEntity>();
             CreateMap<QualEnvOrderDetailPagedQueryDto, QualEnvOrderDetailPagedQuery>();
             #endregion
+
             #region FQC检测单
             CreateMap<QualFqcOrderPagedQueryDto, QualFqcOrderPagedQuery>();
             CreateMap<QualFqcOrderEntity, QualFqcOrderDto>();
@@ -1306,13 +1293,18 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualMaterialUnqualifiedDataPagedQueryDto, QualMaterialUnqualifiedDataPagedQuery>();
             #endregion
 
-
-
             #region IQC_Lite
             CreateMap<QualIqcOrderLitePagedQueryDto, QualIqcOrderLitePagedQuery>();
             CreateMap<QualIqcOrderLiteEntity, QualIqcOrderLiteDto>();
             CreateMap<QualIqcOrderLiteEntity, QualIqcOrderLiteBaseDto>();
             CreateMap<QualIqcOrderLiteDetailEntity, QualIqcOrderLiteDetailDto>();
+            #endregion
+
+            #region IQC_Return
+            CreateMap<QualIqcOrderReturnPagedQueryDto, QualIqcOrderReturnPagedQuery>();
+            CreateMap<QualIqcOrderReturnEntity, QualIqcOrderReturnDto>();
+            CreateMap<QualIqcOrderReturnEntity, QualIqcOrderReturnBaseDto>();
+            CreateMap<QualIqcOrderReturnDetailEntity, QualIqcOrderReturnDetailDto>();
             #endregion
 
         }
@@ -1614,4 +1606,5 @@ namespace Hymson.MES.Services.Mapper
         public int Order => 0;
 
     }
+
 }

@@ -5,6 +5,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
     /// </summary>
     public class ManuReturnOrderDetailQuery
     {
-    
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 退料单ID
+        /// </summary>
+        public long? ReturnOrderId { get; set; }
+
     }
 }

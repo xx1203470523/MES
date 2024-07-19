@@ -23,19 +23,19 @@ namespace Hymson.MES.Core.Domain.Quality
         public long IQCOrderId { get; set; }
 
         /// <summary>
+        /// 条码
+        /// </summary>
+        public string? BarCode { get; set; }
+
+        /// <summary>
         /// 物料id
         /// </summary>
         public long? MaterialId { get; set; }
 
         /// <summary>
-        /// 供应商Id
+        /// 退料单详情Id
         /// </summary>
-        public long? SupplierId { get; set; }
-
-        /// <summary>
-        /// 收货单详情Id
-        /// </summary>
-        public long MaterialReceiptDetailId { get; set; }
+        public long ReturnOrderDetailId { get; set; }
 
         /// <summary>
         /// 是否合格;0、不合格 1、合格
