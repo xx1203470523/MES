@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -112,6 +113,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly Data.Repositories.Parameter.IManuProductParameterRepository _manuProductParameterRepository;
 
         /// <summary>
+        /// 标准参数
+        /// </summary>
+        private readonly IProcParameterRepository _procParameterRepository;
+
+        /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteID = 0;
@@ -134,7 +140,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             IWaterMarkService waterMarkService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
-            Data.Repositories.Parameter.IManuProductParameterRepository manuProductParameterRepository)
+            Data.Repositories.Parameter.IManuProductParameterRepository manuProductParameterRepository,
+            IProcParameterRepository procParameterRepository)
         {
             _workItemInfoRepository = workItemInfoRepository;
             _workProcessDataRepository = workProcessDataRepository;
@@ -151,6 +158,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuProductParameterRepository = manuProductParameterRepository;
+            _procParameterRepository = procParameterRepository;
         }
 
         /// <summary>
@@ -270,6 +278,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             ProcMaterialQuery materialQuery = new ProcMaterialQuery();
             materialQuery.SiteId = SiteID;
             List<ProcMaterialEntity> mesMaterialList = await GetMesMaterialAsync(materialQuery);
+            //MES参数
+            ProcParameterQuery paramQuery = new ProcParameterQuery();
+            paramQuery.SiteId = SiteID;
+            List<ProcParameterEntity> mesParamList = (await _procParameterRepository.GetProcParameterEntitiesAsync(paramQuery)).ToList();
             #endregion
 
             //MES过站数据
@@ -342,6 +354,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     {
                         SfcParamDto curParamDto = new SfcParamDto();
                         curParamDto.ParamName = paramItem.Name;
+                        curParamDto.ParamCode = paramItem.NameCode;
                         curParamDto.Unit = paramItem.Unit;
                         curParamDto.Value = Convert.ToDecimal(paramItem.Value);
                         curParamDto.StrValue = paramItem.StrValue;
@@ -459,7 +472,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 if(mesItem.ParamList.Count > 0)
                 {
                     List<Core.Domain.Parameter.ManuProductParameterEntity> addParamList =
-                        GetParamList(mesItem.ParamList, mesItem.ProcedureCode, stepId, mesItem.Sfc, procedureId);
+                        GetParamList(mesItem.ParamList, stepId, mesItem.Sfc, procedureId, mesParamList);
                     manuParamList.AddRange(addParamList);
                 }
                 //写入到NG表
@@ -482,8 +495,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
             await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
             await InsertOrUpdateAsync(sfcUpdateList);
-
-            //await _manuProductParameterRepository.InsertRangeAsync(manuParamList);
+            await _manuProductParameterRepository.InsertRangeMavelAsync(manuParamList);
             trans.Complete();
 
 
@@ -778,7 +790,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="procedureId"></param>
         /// <returns></returns>
         private List<Core.Domain.Parameter.ManuProductParameterEntity> GetParamList(List<SfcParamDto> parammList,
-            string produceCode, long stepId, string sfc, long procedureId)
+            long stepId, string sfc, long procedureId, List<ProcParameterEntity> mesParamList)
         {
             List<Core.Domain.Parameter.ManuProductParameterEntity> resultList = new List<Core.Domain.Parameter.ManuProductParameterEntity>();
             
@@ -787,8 +799,16 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 return resultList;
             }
 
-            foreach(var item in parammList)
+            long paramId = 0;
+
+            foreach (var item in parammList)
             {
+                ProcParameterEntity? mesParam = mesParamList.Where(m => m.ParameterCode == item.ParamCode).FirstOrDefault();
+                if(mesParam != null)
+                {
+                    paramId = mesParam.Id;
+                }
+
                 Core.Domain.Parameter.ManuProductParameterEntity model = new Core.Domain.Parameter.ManuProductParameterEntity();
                 model.Id = IdGenProvider.Instance.CreateId();
                 model.SiteId = SiteID;
