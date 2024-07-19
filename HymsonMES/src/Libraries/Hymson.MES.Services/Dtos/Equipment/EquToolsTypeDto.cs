@@ -32,7 +32,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 额定寿命
         /// </summary>
-        public decimal RatedLife { get; set; }
+        public decimal? RatedLife { get; set; }
 
         ///// <summary>
         ///// 额定寿命单位
@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 额定寿命
         /// </summary>
-        public decimal RatedLife { get; set; }
+        public decimal? RatedLife { get; set; }
 
         /// <summary>
         /// 额定寿命单位
@@ -282,7 +282,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 额定使用寿命
         /// </summary>
         [EpplusTableColumn(Header = "额定使用寿命(必填,数字)", Order = 4)]
-        public decimal RatedLife { get; set; }
+        public decimal? RatedLife { get; set; }
 
         /// <summary>
         /// 是否校准 1、是 2、否
