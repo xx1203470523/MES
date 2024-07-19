@@ -28,11 +28,6 @@ namespace Hymson.MES.Core.Domain.Quality
         public long? MaterialId { get; set; }
 
         /// <summary>
-        /// 供应商Id
-        /// </summary>
-        public long? SupplierId { get; set; }
-
-        /// <summary>
         /// 收货单详情Id
         /// </summary>
         public long MaterialReceiptDetailId { get; set; }

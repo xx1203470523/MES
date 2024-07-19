@@ -200,7 +200,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder)) sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
             if (pagedQuery.IQCOrderIds != null) sqlBuilder.Where(" Id IN @IQCOrderIds ");
-            if (pagedQuery.SupplierIds != null) sqlBuilder.Where(" SupplierId IN @SupplierIds ");
+            if (pagedQuery.WorkOrderIds != null) sqlBuilder.Where(" WorkOrderId IN @WorkOrderIds ");
             if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
             if (pagedQuery.IsQualified.HasValue) sqlBuilder.Where("IsQualified = @IsQualified");
 
@@ -230,8 +230,8 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return /**where**/ /**orderby**/ LIMIT @MaxRows ";
         const string GetEntitySqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_return /**where**/ /**orderby**/ LIMIT 1 ";
 
-        const string InsertSql = "INSERT INTO qual_iqc_order_return(`Id`, `SiteId`, `InspectionOrder`, `MaterialReceiptId`, `SupplierId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialReceiptId, @SupplierId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_iqc_order_return(`Id`, `SiteId`, `InspectionOrder`, `MaterialReceiptId`, `SupplierId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @MaterialReceiptId, @SupplierId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_iqc_order_return(`Id`, `SiteId`, `InspectionOrder`, `ReturnOrderId`, `WorkOrderId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @ReturnOrderId, @WorkOrderId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_iqc_order_return(`Id`, `SiteId`, `InspectionOrder`, `ReturnOrderId`, `WorkOrderId`, `Status`, `IsQualified`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @ReturnOrderId, @WorkOrderId, @Status, @IsQualified, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
         const string UpdateSql = "UPDATE qual_iqc_order_return SET Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_iqc_order_return SET Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";

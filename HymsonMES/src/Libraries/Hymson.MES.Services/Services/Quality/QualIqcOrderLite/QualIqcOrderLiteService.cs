@@ -158,7 +158,7 @@ namespace Hymson.MES.Services.Services.Quality
             if (orderEntities != null && orderEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11993))
-                    .WithData("ReceiptNum", receiptEntity.ReceiptNum);
+                    .WithData("Code", receiptEntity.ReceiptNum);
             }
 
             // 当前信息
@@ -566,6 +566,7 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderLitePagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
+            /*
             // 转换产品编码/版本变为产品ID
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode)
                 || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName)
@@ -581,6 +582,7 @@ namespace Hymson.MES.Services.Services.Quality
                 if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.MaterialIds = procMaterialEntities.Select(s => s.Id);
                 else pagedQuery.MaterialIds = Array.Empty<long>();
             }
+            */
 
             // 转换供应商编码变为供应商ID
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode)
@@ -596,6 +598,7 @@ namespace Hymson.MES.Services.Services.Quality
                 else pagedQuery.SupplierIds = Array.Empty<long>();
             }
 
+            /*
             // 将供应商批次/内部批次转换为收货单详情ID
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierBatch)
                 || !string.IsNullOrWhiteSpace(pagedQueryDto.InternalBatch))
@@ -609,6 +612,7 @@ namespace Hymson.MES.Services.Services.Quality
                 if (receiptDetailEntities != null && receiptDetailEntities.Any()) pagedQuery.MaterialReceiptDetailIds = receiptDetailEntities.Select(s => s.Id);
                 else pagedQuery.MaterialReceiptDetailIds = Array.Empty<long>();
             }
+            */
 
             // 查询数据
             var pagedInfo = await _qualIqcOrderLiteRepository.GetPagedListAsync(pagedQuery);
@@ -641,9 +645,8 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="operationType"></param>
-        /// <param name="handleBo"></param>
         /// <returns></returns>
-        private async Task<int> CommonOperationAsync(QualIqcOrderLiteEntity entity, OrderOperateTypeEnum operationType, QCHandleBo? handleBo = null)
+        private async Task<int> CommonOperationAsync(QualIqcOrderLiteEntity entity, OrderOperateTypeEnum operationType)
         {
             // 更新时间
             var updatedBy = _currentUser.UserName;

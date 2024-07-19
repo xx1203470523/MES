@@ -23,14 +23,14 @@ namespace Hymson.MES.Core.Domain.Quality
         public string InspectionOrder { get; set; }
 
         /// <summary>
-        /// 收货单ID;wh_material_receipt的id
+        /// 退料单ID;manu_return_order的id
         /// </summary>
-        public long MaterialReceiptId { get; set; }
+        public long ReturnOrderId { get; set; }
 
         /// <summary>
-        /// 供应商Id
+        /// 工单Id
         /// </summary>
-        public long? SupplierId { get; set; }
+        public long? WorkOrderId { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭

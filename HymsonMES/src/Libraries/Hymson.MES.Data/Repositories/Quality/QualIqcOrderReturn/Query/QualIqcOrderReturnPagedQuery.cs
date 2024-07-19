@@ -45,9 +45,9 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public IEnumerable<long>? MaterialIds { get; set; }
 
         /// <summary>
-        /// ID集合（供应商）
+        /// ID集合（生产工单）
         /// </summary>
-        public IEnumerable<long>? SupplierIds { get; set; }
+        public IEnumerable<long>? WorkOrderIds { get; set; }
 
         /// <summary>
         /// 收货单详情Id

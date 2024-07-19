@@ -13,13 +13,13 @@ using Hymson.MES.CoreServices.Bos.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Query;
-using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.MES.Data.Repositories.WHMaterialReceipt;
-using Hymson.MES.Data.Repositories.WhMaterialReceiptDetail;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
@@ -63,14 +63,14 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualIqcOrderAnnexRepository _qualIqcOrderAnnexRepository;
 
         /// <summary>
-        /// 仓储接口（收货单）
+        /// 仓储接口（生产退料单）
         /// </summary>
-        private readonly IWhMaterialReceiptRepository _whMaterialReceiptRepository;
+        private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
 
         /// <summary>
-        /// 仓储接口（收货单详情）
+        /// 仓储接口（生产退料单详情）
         /// </summary>
-        private readonly IWhMaterialReceiptDetailRepository _whMaterialReceiptDetailRepository;
+        private readonly IManuReturnOrderDetailRepository _manuReturnOrderDetailRepository;
 
         /// <summary>
         /// 仓储接口（物料维护）
@@ -78,9 +78,9 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
-        /// 仓储接口（供应商维护）
+        /// 仓储接口（生产工单）
         /// </summary>
-        private readonly IWhSupplierRepository _whSupplierRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
         /// 仓储接口（附件维护）
@@ -101,10 +101,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="qualIqcOrderReturnDetailRepository"></param>
         /// <param name="qualIqcOrderOperateRepository"></param>
         /// <param name="qualIqcOrderAnnexRepository"></param>
-        /// <param name="whMaterialReceiptRepository"></param>
-        /// <param name="whMaterialReceiptDetailRepository"></param>
+        /// <param name="manuReturnOrderRepository"></param>
+        /// <param name="manuReturnOrderDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
-        /// <param name="whSupplierRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="iqcOrderCreateService"></param>
         public QualIqcOrderReturnService(ICurrentUser currentUser, ICurrentSite currentSite,
@@ -112,10 +112,10 @@ namespace Hymson.MES.Services.Services.Quality
             IQualIqcOrderReturnDetailRepository qualIqcOrderReturnDetailRepository,
             IQualIqcOrderOperateRepository qualIqcOrderOperateRepository,
             IQualIqcOrderAnnexRepository qualIqcOrderAnnexRepository,
-            IWhMaterialReceiptRepository whMaterialReceiptRepository,
-            IWhMaterialReceiptDetailRepository whMaterialReceiptDetailRepository,
+            IManuReturnOrderRepository manuReturnOrderRepository,
+            IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
             IProcMaterialRepository procMaterialRepository,
-            IWhSupplierRepository whSupplierRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
             IInteAttachmentRepository inteAttachmentRepository,
             IIQCOrderCreateService iqcOrderCreateService)
         {
@@ -125,10 +125,10 @@ namespace Hymson.MES.Services.Services.Quality
             _qualIqcOrderReturnDetailRepository = qualIqcOrderReturnDetailRepository;
             _qualIqcOrderOperateRepository = qualIqcOrderOperateRepository;
             _qualIqcOrderAnnexRepository = qualIqcOrderAnnexRepository;
-            _whMaterialReceiptRepository = whMaterialReceiptRepository;
-            _whMaterialReceiptDetailRepository = whMaterialReceiptDetailRepository;
+            _manuReturnOrderRepository = manuReturnOrderRepository;
+            _manuReturnOrderDetailRepository = manuReturnOrderDetailRepository;
             _procMaterialRepository = procMaterialRepository;
-            _whSupplierRepository = whSupplierRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _iqcOrderCreateService = iqcOrderCreateService;
         }
@@ -145,49 +145,49 @@ namespace Hymson.MES.Services.Services.Quality
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 读取收货单
-            var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(requestDto.ReceiptId)
+            var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(requestDto.ReceiptId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES11901));
 
             // 校验是否已生成过检验单
             var orderEntities = await _qualIqcOrderReturnRepository.GetEntitiesAsync(new QualIqcOrderReturnQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                MaterialReceiptId = receiptEntity.Id
+                MaterialReceiptId = returnEntity.Id
             });
             if (orderEntities != null && orderEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11993))
-                    .WithData("ReceiptNum", receiptEntity.ReceiptNum);
+                throw new CustomerValidationException(nameof(ErrorCode.MES11996))
+                    .WithData("Code", returnEntity.ReqOrderCode);
             }
 
             // 当前信息
             var user = _currentUser.UserName;
             var time = HymsonClock.Now();
 
-            // 读取收货单明细
-            var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
+            // 读取退料单明细
+            var receiptDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
-                SiteId = receiptEntity.SiteId,
-                MaterialReceiptId = receiptEntity.Id
+                SiteId = returnEntity.SiteId,
+                ReturnOrderId = returnEntity.Id
             });
 
             // 生成检验单号
             var inspectionOrder = await _iqcOrderCreateService.GenerateIQCOrderCodeAsync(new IQCOrderCreateBo
             {
-                SiteId = receiptEntity.SiteId,
+                SiteId = returnEntity.SiteId,
                 UserName = user,
-                MaterialReceiptEntity = receiptEntity,
-                MaterialReceiptDetailEntities = receiptDetailEntities
+                //MaterialReceiptEntity = returnEntity,
+                //MaterialReceiptDetailEntities = receiptDetailEntities
             });
 
             // 检验单
             var orderEntity = new QualIqcOrderReturnEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = receiptEntity.SiteId,
+                SiteId = returnEntity.SiteId,
                 InspectionOrder = inspectionOrder,
-                MaterialReceiptId = receiptEntity.Id,
-                SupplierId = receiptEntity.SupplierId,
+                ReturnOrderId = returnEntity.Id,
+                //WorkOrderId = returnEntity.WorkOrderId,
                 Status = InspectionStatusEnum.WaitInspect,
                 IsQualified = null,
                 CreatedBy = user,
@@ -198,10 +198,10 @@ namespace Hymson.MES.Services.Services.Quality
             var orderDetailEntities = receiptDetailEntities.Select(s => new QualIqcOrderReturnDetailEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = receiptEntity.SiteId,
+                SiteId = returnEntity.SiteId,
                 IQCOrderId = orderEntity.Id,
-                MaterialReceiptDetailId = s.Id,
-                MaterialId = s.MaterialId,
+                ReturnOrderDetailId = s.Id,
+                //MaterialId = s.MaterialId,
                 IsQualified = null,
                 CreatedBy = user,
                 CreatedOn = time
@@ -446,23 +446,25 @@ namespace Hymson.MES.Services.Services.Quality
             dto.StatusText = dto.Status.GetDescription();
             dto.InspectionTime = entity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
 
-            // 读取收货单
-            var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(entity.MaterialReceiptId);
-            if (receiptEntity == null) return dto;
+            // 读取退料单
+            var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(entity.ReturnOrderId);
+            if (returnEntity == null) return dto;
 
-            dto.ReceiptNum = receiptEntity.ReceiptNum;
-            dto.ReceiptTime = receiptEntity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
+            dto.ReqOrderCode = returnEntity.ReqOrderCode;
+            dto.ReceiptTime = returnEntity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
 
+            /*
             // 读取供应商
             if (entity.SupplierId.HasValue)
             {
-                var supplierEntity = await _whSupplierRepository.GetByIdAsync(entity.SupplierId.Value);
+                var supplierEntity = await _inteWorkCenterRepository.GetByIdAsync(entity.SupplierId.Value);
                 if (supplierEntity != null)
                 {
                     dto.SupplierCode = supplierEntity.Code;
                     dto.SupplierName = supplierEntity.Name;
                 }
             }
+            */
 
             return dto;
         }
@@ -488,11 +490,11 @@ namespace Hymson.MES.Services.Services.Quality
             });
             if (detailEntities == null || !detailEntities.Any()) return dtos;
 
-            // 收货单明细
-            var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
+            // 退料单明细
+            var returnDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
                 SiteId = orderEntity.SiteId,
-                MaterialReceiptId = orderEntity.MaterialReceiptId
+                ReturnOrderId = orderEntity.ReturnOrderId
             });
 
             // 读取产品
@@ -504,12 +506,12 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 var dto = entity.ToModel<QualIqcOrderReturnDetailDto>();
 
-                // 收货单明细
-                var materialReceiptDetailEntity = receiptDetailEntities.FirstOrDefault(f => f.Id == entity.MaterialReceiptDetailId);
-                if (materialReceiptDetailEntity != null)
+                // 退料单明细
+                var materialReturnDetailEntity = returnDetailEntities.FirstOrDefault(f => f.Id == entity.ReturnOrderDetailId);
+                if (materialReturnDetailEntity != null)
                 {
-                    dto.InternalBatch = materialReceiptDetailEntity.InternalBatch;
-                    dto.Qty = materialReceiptDetailEntity.Qty;
+                    dto.InternalBatch = materialReturnDetailEntity.Batch;
+                    dto.Qty = materialReturnDetailEntity.Qty;
                 }
 
                 // 产品
@@ -581,32 +583,16 @@ namespace Hymson.MES.Services.Services.Quality
                 else pagedQuery.MaterialIds = Array.Empty<long>();
             }
 
-            // 转换供应商编码变为供应商ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode)
-                || !string.IsNullOrWhiteSpace(pagedQueryDto.SupplierName))
+            // 转换工作中心编码变为工作中心ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.WorkOrderCode))
             {
-                var whSupplierEntities = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery
+                var workOrderEntities = await _planWorkOrderRepository.GetEntitiesAsync(new PlanWorkOrderNewQuery
                 {
                     SiteId = pagedQuery.SiteId,
-                    Code = pagedQueryDto.SupplierCode,
-                    Name = pagedQueryDto.SupplierName
+                    OrderCode = pagedQueryDto.WorkOrderCode
                 });
-                if (whSupplierEntities != null && whSupplierEntities.Any()) pagedQuery.SupplierIds = whSupplierEntities.Select(s => s.Id);
-                else pagedQuery.SupplierIds = Array.Empty<long>();
-            }
-
-            // 将供应商批次/内部批次转换为收货单详情ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierBatch)
-                || !string.IsNullOrWhiteSpace(pagedQueryDto.InternalBatch))
-            {
-                var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
-                {
-                    SiteId = pagedQuery.SiteId,
-                    SupplierBatch = pagedQueryDto.SupplierBatch,
-                    InternalBatch = pagedQueryDto.InternalBatch
-                });
-                if (receiptDetailEntities != null && receiptDetailEntities.Any()) pagedQuery.MaterialReceiptDetailIds = receiptDetailEntities.Select(s => s.Id);
-                else pagedQuery.MaterialReceiptDetailIds = Array.Empty<long>();
+                if (workOrderEntities != null && workOrderEntities.Any()) pagedQuery.WorkOrderIds = workOrderEntities.Select(s => s.Id);
+                else pagedQuery.WorkOrderIds = Array.Empty<long>();
             }
 
             // 查询数据
@@ -640,9 +626,8 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="operationType"></param>
-        /// <param name="handleBo"></param>
         /// <returns></returns>
-        private async Task<int> CommonOperationAsync(QualIqcOrderReturnEntity entity, OrderOperateTypeEnum operationType, QCHandleBo? handleBo = null)
+        private async Task<int> CommonOperationAsync(QualIqcOrderReturnEntity entity, OrderOperateTypeEnum operationType)
         {
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -680,9 +665,9 @@ namespace Hymson.MES.Services.Services.Quality
         {
             List<QualIqcOrderReturnDto> dtos = new();
 
-            // 读取收货单
-            var receiptEntities = await _whMaterialReceiptRepository.GetByIdsAsync(entities.Select(x => x.MaterialReceiptId));
-            var receiptDic = receiptEntities.ToDictionary(x => x.Id, x => x);
+            // 读取退料单
+            var returnEntities = await _manuReturnOrderRepository.GetByIdsAsync(entities.Select(x => x.ReturnOrderId));
+            var returnDic = returnEntities.ToDictionary(x => x.Id, x => x);
 
             // 检验单操作
             var orderOperationEntities = await _qualIqcOrderOperateRepository.GetEntitiesAsync(new QualIqcOrderOperateQuery
@@ -691,20 +676,20 @@ namespace Hymson.MES.Services.Services.Quality
                 IQCOrderIds = entities.Select(s => s.Id)
             });
 
-            // 读取供应商
-            var supplierEntities = await _whSupplierRepository.GetByIdsAsync(entities.Where(w => w.SupplierId.HasValue).Select(x => x.SupplierId!.Value));
-            var supplierDic = supplierEntities.ToDictionary(x => x.Id, x => x);
+            // 读取生产工单
+            var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(entities.Where(w => w.WorkOrderId.HasValue).Select(x => x.WorkOrderId!.Value));
+            var workOrderDic = workOrderEntities.ToDictionary(x => x.Id, x => x);
 
             foreach (var entity in entities)
             {
                 var dto = entity.ToModel<QualIqcOrderReturnDto>();
                 if (dto == null) continue;
 
-                // 收货单
-                var receiptEntity = receiptDic[entity.MaterialReceiptId];
+                // 退料单
+                var receiptEntity = returnDic[entity.ReturnOrderId];
                 if (receiptEntity != null)
                 {
-                    dto.ReceiptNum = receiptEntity.ReceiptNum;
+                    dto.ReqOrderCode = receiptEntity.ReqOrderCode;
                 }
 
                 // 检验人
@@ -715,20 +700,18 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.InspectionOn = inspectionEntity.CreatedOn;
                 }
 
-                // 供应商
-                if (entity.SupplierId.HasValue)
+                // 生产工单
+                if (entity.WorkOrderId.HasValue)
                 {
-                    var supplierEntity = supplierDic[entity.SupplierId.Value];
-                    if (supplierEntity != null)
+                    var workOrderEntity = workOrderDic[entity.WorkOrderId.Value];
+                    if (workOrderEntity != null)
                     {
-                        dto.SupplierCode = supplierEntity.Code;
-                        dto.SupplierName = supplierEntity.Name;
+                        dto.WorkOrderCode = workOrderEntity.OrderCode;
                     }
                 }
                 else
                 {
-                    dto.SupplierCode = "-";
-                    dto.SupplierName = "-";
+                    dto.WorkOrderCode = "-";
                 }
 
                 dtos.Add(dto);
