@@ -9,7 +9,7 @@ namespace Hymson.MES.HttpClients.Requests.Rotor
     /// <summary>
     /// 转子LMS工序结构
     /// </summary>
-    public class RotorProcedureSync
+    public class RotorProcedureRequest
     {
         /// <summary>
         /// 工站编码

@@ -1,5 +1,6 @@
-﻿using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.HttpClients.Requests;
+﻿using Hymson.MES.HttpClients.Requests;
+using Hymson.MES.HttpClients.Requests.Rotor;
+using Hymson.MES.HttpClients.Responses.Rotor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,41 +19,41 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// </summary>
         /// <param name="rotorWorkOrder"></param>
         /// <returns></returns>
-        Task<bool> WorkOrderSync(RotorWorkOrderSync rotorWorkOrder);
+        Task<RotorResponse> WorkOrderAsync(RotorWorkOrderRequest rotorWorkOrder);
 
         /// <summary>
         /// 工单激活
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
-        Task<bool> WorkOrderStart(string workOrderCode);
+        Task<bool> WorkOrderStartAsync(string workOrderCode);
 
         /// <summary>
         /// 工单取消激活
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
-        Task<bool> WorkOrderStop(string workOrderCode);
+        Task<bool> WorkOrderStopAsync(string workOrderCode);
 
         /// <summary>
         /// 物料同步
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        Task<int> MaterialSync(IEnumerable<ProcMaterialEntity> list);
+        Task<RotorResponse> MaterialAsync(IEnumerable<RotorMaterialRequest> list);
 
-        /// <summary>
-        /// 工序同步
-        /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        Task<int> ProcedureSync(IEnumerable<ProcProcedureEntity> list);
+        ///// <summary>
+        ///// 工序同步
+        ///// </summary>
+        ///// <param name="list"></param>
+        ///// <returns></returns>
+        //Task<int> ProcedureAsync(IEnumerable<ProcProcedureEntity> list);
 
-        /// <summary>
-        /// 工艺路线同步
-        /// </summary>
-        /// <param name="procProcessRouteDetails"></param>
-        /// <returns></returns>
-        Task<bool> ProcedureLineSync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetails);  
+        ///// <summary>
+        ///// 工艺路线同步
+        ///// </summary>
+        ///// <param name="procProcessRouteDetails"></param>
+        ///// <returns></returns>
+        //Task<bool> ProcedureLineSync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetails);  
     }
 }

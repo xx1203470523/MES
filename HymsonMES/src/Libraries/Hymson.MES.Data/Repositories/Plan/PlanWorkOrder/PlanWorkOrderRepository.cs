@@ -549,6 +549,21 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         #endregion
+
+        #region 马威
+
+        /// <summary>
+        /// 根据ID获取数据，含有物料信息
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderMavelView> GetByIdMavelAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstAsync<PlanWorkOrderMavelView>(GetByIdMavelSql, new { id = id });
+        }
+
+        #endregion
     }
 
 
@@ -627,6 +642,17 @@ namespace Hymson.MES.Data.Repositories.Plan
     FROM `plan_work_order`wo 
     LEFT JOIN proc_material m on wo.ProductId=m.Id  
     WHERE wo.Id IN @ids ";
+        const string GetByIdMavelSql = @"
+        SELECT
+              wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, 
+              wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`,
+              wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
+              m.MaterialCode, m.MaterialName,m.Version as MaterialVersion ,pwp.WorkPlanCode  OrderNo
+            FROM `plan_work_order`wo 
+            LEFT JOIN proc_material m on wo.ProductId=m.Id and m.IsDeleted = 0
+            left join plan_work_plan pwp on pwp.Id = wo.WorkPlanId and pwp.IsDeleted = 0
+            WHERE wo.Id = @id;
+        ";
 
         const string GetByWorkFarmId = "SELECT PWO.* FROM plan_work_order PWO " +
             "LEFT JOIN inte_work_center_relation IWCR ON IWCR.WorkCenterId = PWO.WorkCenterId " +

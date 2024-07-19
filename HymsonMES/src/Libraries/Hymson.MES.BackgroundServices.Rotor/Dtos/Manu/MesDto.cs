@@ -144,6 +144,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         public string ParamName { get; set; }
 
         /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParamCode { get; set; }
+
+        /// <summary>
         /// 单位
         /// </summary>
         public string Unit { get; set; }

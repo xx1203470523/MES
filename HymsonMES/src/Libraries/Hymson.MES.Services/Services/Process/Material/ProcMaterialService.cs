@@ -11,10 +11,14 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
+using Hymson.MES.HttpClients.Requests.Rotor;
+using Hymson.MES.HttpClients.RotorHandle;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Common;
@@ -25,6 +29,7 @@ using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using OfficeOpenXml.Attributes;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Transactions;
 
@@ -60,6 +65,8 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IMinioService _minioService;
 
         private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
+        private readonly ISysConfigRepository _sysConfigRepository;
+        private readonly IRotorApiClient _rotorApiClient;
 
         /// <summary>
         /// 
@@ -80,6 +87,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="excelService"></param>
         /// <param name="minioService"></param>
         /// <param name="procMaterialGroupRepository"></param>
+        /// <param name="sysConfigRepository"></param>
+        /// <param name="rotorApiClient"></param>
         public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository,
             AbstractValidator<ProcMaterialCreateDto> validationCreateRules,
             AbstractValidator<ProcMaterialModifyDto> validationModifyRules,
@@ -92,7 +101,9 @@ namespace Hymson.MES.Services.Services.Process
             IProcBomRepository procBomRepository,
             IPlanWorkOrderRepository planWorkOrderRepository, ILocalizationService localizationService,
             IExcelService excelService,
-            IMinioService minioService, IProcMaterialGroupRepository procMaterialGroupRepository)
+            IMinioService minioService, IProcMaterialGroupRepository procMaterialGroupRepository,
+            ISysConfigRepository sysConfigRepository,
+            IRotorApiClient rotorApiClient)
         {
             _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
@@ -114,6 +125,8 @@ namespace Hymson.MES.Services.Services.Process
             _minioService = minioService;
 
             _procMaterialGroupRepository = procMaterialGroupRepository;
+            _sysConfigRepository = sysConfigRepository;
+            _rotorApiClient = rotorApiClient;
         }
 
 
@@ -698,8 +711,90 @@ namespace Hymson.MES.Services.Services.Process
             #endregion
 
             #region 操作数据库
-            await _procMaterialRepository.UpdateStatusAsync(changeStatusCommand);
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                if (param.Status == SysDataStatusEnum.Enable)
+                {
+                    bool orderSwitch = await GetOrderSynSwtich();
+                    if(orderSwitch == true)
+                    {
+                        List<ProcMaterialEntity> matList = new List<ProcMaterialEntity>() { material };
+                        List<RotorMaterialRequest> reqList = LmsMaterialChange(matList);
+                        var lmsResult = await _rotorApiClient.MaterialAsync(reqList);
+                        if (lmsResult.IsSuccess == false)
+                        {
+                            ts.Dispose();
+                        }
+                    }
+                }
+
+                await _procMaterialRepository.UpdateStatusAsync(changeStatusCommand);
+
+                ts.Complete();
+            }
+
             #endregion
+        }
+
+        /// <summary>
+        /// lms物料转换
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private List<RotorMaterialRequest> LmsMaterialChange(IEnumerable<ProcMaterialEntity> list)
+        {
+            List<RotorMaterialRequest> resultList = new List<RotorMaterialRequest>();
+            foreach (var rotor in list)
+            {
+                RotorMaterialRequest model = new RotorMaterialRequest();
+                model.MaterialCode = rotor.MaterialCode;
+                model.MaterialName = rotor.MaterialName;
+                model.MatSpecification = rotor.Specifications ?? "";
+                //model.MaterialType = rotor.BuyType == null ? "1" : ((int)rotor.BuyType!).ToString();
+                model.MaterialVersion = rotor.Version ?? "";
+                model.MaterialUnit = rotor.Unit ?? "";
+                model.BarcodeType = "";
+                model.BatchCodeRegular = "";
+                model.EffectiveDays = rotor.ValidTime ?? 0;
+                model.WarnAmount = null;
+                model.Enable = true;
+                if (rotor.BuyType == null || rotor.BuyType == Core.Enums.MaterialBuyTypeEnum.SelfControl)
+                {
+                    model.MaterialType = "自制件";
+                }
+                else if (rotor.BuyType == Core.Enums.MaterialBuyTypeEnum.Purchase)
+                {
+                    model.MaterialType = "采购件";
+                }
+                else
+                {
+                    model.MaterialType = "自制/采购";
+                }
+
+                resultList.Add(model);
+            }
+
+            return resultList;
+        }
+
+        /// <summary>
+        /// LMS同步开关
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> GetOrderSynSwtich()
+        {
+            var nioMatList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorLmsSwitch });
+            if (nioMatList == null || !nioMatList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.RotorLmsSwitch.ToString());
+            }
+            string nioMatConfigValue = nioMatList.ElementAt(0).Value;
+            if (nioMatConfigValue == "1")
+            {
+                return true;
+            }
+            return false;
         }
 
         #endregion

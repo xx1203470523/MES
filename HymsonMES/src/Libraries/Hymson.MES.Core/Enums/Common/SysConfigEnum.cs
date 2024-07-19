@@ -47,5 +47,20 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("NioBaseConfig")]
         NioBaseConfig = 8,
+        /// <summary>
+        /// 转子LMS的TOKEN
+        /// </summary>
+        [Description("RotorLmsToken")]
+        RotorLmsToken = 10,
+        /// <summary>
+        /// 转子LMS的Url
+        /// </summary>
+        [Description("RotorLmsUrl")]
+        RotorLmsUrl = 11,
+        /// <summary>
+        /// 转子LMS同步开关
+        /// </summary>
+        [Description("RotorLmsSwitch")]
+        RotorLmsSwitch = 12,
     }
 }

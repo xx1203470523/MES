@@ -28,6 +28,9 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Transactions;
+using Hymson.MES.HttpClients.RotorHandle;
+using Hymson.MES.HttpClients.Requests;
+using Hymson.MES.Data.Repositories.Common;
 
 namespace Hymson.MES.Services.Services.Plan;
 
@@ -58,6 +61,8 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
     private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
 
     private readonly IEquEquipmentRepository _equipmentRepository;
+    private readonly IRotorApiClient _rotorApiClient;
+    private readonly ISysConfigRepository _sysConfigRepository;
 
     public PlanWorkOrderActivationService(
         ICurrentUser currentUser,
@@ -75,7 +80,9 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
         IProcMaterialRepository procMaterialRepository,
         IProcProcessRouteRepository procProcessRouteRepository,
-        IProcResourceRepository procResourceRepository)
+        IProcResourceRepository procResourceRepository,
+        IRotorApiClient rotorApiClient,
+        ISysConfigRepository sysConfigRepository)
     {
         _currentUser = currentUser;
         _currentSite = currentSite;
@@ -98,6 +105,8 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         _procResourceRepository = procResourceRepository;
         _procProcedureRepository = procProcedureRepository;
         _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
+        _rotorApiClient = rotorApiClient;
+        _sysConfigRepository = sysConfigRepository;
     }
 
     /// <summary>
@@ -337,6 +346,44 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
     }
 
     /// <summary>
+    /// MES工单转换为LMS工单
+    /// </summary>
+    /// <param name="view"></param>
+    /// <returns></returns>
+    private RotorWorkOrderRequest LmsOrderChange(PlanWorkOrderMavelView view)
+    {
+        RotorWorkOrderRequest model = new RotorWorkOrderRequest();
+        model.OrderNo = view.OrderNo;
+        model.WorkNo = view.OrderCode; //"CSCW188"
+        model.ItemNo = view.MaterialCode; //"CSCW188"
+        model.WorkTotal = (int)(view.Qty * (1 + view.OverScale));
+        model.VersionNo = 1;
+        model.ProductTypeNO = $"{model.ItemNo}_{model.VersionNo}";
+        model.PlanTime = HymsonClock.Now().ToString("yyyy-MM-dd HH:mm:ss");
+
+        return model;
+    }
+
+    /// <summary>
+    /// LMS同步开关
+    /// </summary>
+    /// <returns></returns>
+    private async Task<bool> GetOrderSynSwtich()
+    {
+        var nioMatList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorLmsSwitch });
+        if (nioMatList == null || !nioMatList.Any())
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.RotorLmsSwitch.ToString());
+        }
+        string nioMatConfigValue = nioMatList.ElementAt(0).Value;
+        if(nioMatConfigValue == "1")
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
     /// 激活工单
     /// </summary>
     /// <param name="workOrder"></param>
@@ -440,6 +487,18 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
 
                 default:
                     break;
+            }
+
+            bool orderSwitch = await GetOrderSynSwtich();
+            if (orderSwitch == true)
+            {
+                PlanWorkOrderMavelView order = await _planWorkOrderRepository.GetByIdMavelAsync(activationWorkOrderDto.Id);
+                RotorWorkOrderRequest lmsOrder = LmsOrderChange(order);
+                var lmsResult = await _rotorApiClient.WorkOrderAsync(lmsOrder);
+                if (lmsResult.IsSuccess == false)
+                {
+                    ts.Dispose();
+                }
             }
 
             ts.Complete();

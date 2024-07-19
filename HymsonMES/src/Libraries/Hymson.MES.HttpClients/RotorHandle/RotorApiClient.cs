@@ -1,10 +1,20 @@
-﻿using Hymson.MES.Core.Domain.Process;
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.Rotor;
+using Hymson.MES.HttpClients.Responses.Rotor;
+using Hymson.Utils;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Net.NetworkInformation;
@@ -18,28 +28,68 @@ namespace Hymson.MES.HttpClients.RotorHandle
     /// </summary>
     public class RotorApiClient : IRotorApiClient
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly HttpClient _httpClient;
+
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly RotorOption _options;
-        public RotorApiClient(HttpClient httpClient, IOptions<RotorOption> options)
+
+        /// <summary>
+        /// 系统配置
+        /// </summary>
+        private readonly ISysConfigRepository _sysConfigRepository;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public RotorApiClient(HttpClient httpClient, IOptions<RotorOption> options,
+            ISysConfigRepository sysConfigRepository)
         {
             _httpClient = httpClient;
             _options = options.Value;
+            _sysConfigRepository = sysConfigRepository;
         }
 
-        public Task<bool> ProcedureLineSync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetails)
+        /// <summary>
+        /// 初始化URL和TOKEN
+        /// </summary>
+        /// <returns></returns>
+        private async Task InitAsync()
         {
-            throw new NotImplementedException();
+            var tokenList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorLmsToken });
+            if (tokenList == null || !tokenList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.NioMaterial.ToString());
+            }
+            _httpClient.DefaultRequestHeaders.Add("SYSTOKEN", tokenList.ElementAt(0).Value);
+
+            var urlList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorLmsUrl });
+            if (urlList == null || !urlList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.NioMaterial.ToString());
+            }
+            _httpClient.BaseAddress = new Uri(urlList.ElementAt(0).Value);
         }
+
+        //public Task<bool> ProcedureLineSync(IEnumerable<ProcProcessRouteDetailLinkEntity> procProcessRouteDetails)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         /// <summary>
         /// 工单激活
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
-        public async Task<bool> WorkOrderStart(string workOrderCode)
+        public async Task<bool> WorkOrderStartAsync(string workOrderCode)
         {
-            var httpResponse = await _httpClient.GetAsync($"{_options.SetWorkOrderStatusRoute}?WorkNo={workOrderCode}&status=R");
+            await InitAsync();
 
+            var httpResponse = await _httpClient.GetAsync($"{_options.SetWorkOrderStatusRoute}?WorkNo={workOrderCode}&status=R");
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             return httpResponse.IsSuccessStatusCode;
@@ -50,10 +100,11 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
-        public async Task<bool> WorkOrderStop(string workOrderCode)
+        public async Task<bool> WorkOrderStopAsync(string workOrderCode)
         {
-            var httpResponse = await _httpClient.GetAsync($"{_options.SetWorkOrderStatusRoute}?WorkNo={workOrderCode}&status=S");
+            await InitAsync();
 
+            var httpResponse = await _httpClient.GetAsync($"{_options.SetWorkOrderStatusRoute}?WorkNo={workOrderCode}&status=T");
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             return httpResponse.IsSuccessStatusCode;
@@ -64,13 +115,18 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// </summary>
         /// <param name="rotorWorkOrder"></param>
         /// <returns></returns>
-        public async Task<bool> WorkOrderSync(RotorWorkOrderSync rotorWorkOrder)
+        public async Task<RotorResponse> WorkOrderAsync(RotorWorkOrderRequest param)
         {
-            var httpResponse = await _httpClient.PostAsJsonAsync<RotorWorkOrderSync>(_options.CreateOrderRoute, rotorWorkOrder);
+            await InitAsync();
 
+            var httpResponse = await _httpClient.PostAsJsonAsync<RotorWorkOrderRequest>(_options.CreateOrderRoute, param);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+            httpResponse.EnsureSuccessStatusCode();
 
-            return httpResponse.IsSuccessStatusCode;
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            RotorResponse result = JsonConvert.DeserializeObject<RotorResponse>(jsonResponse);
+
+            return result;
         }
 
         /// <summary>
@@ -78,45 +134,36 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public async Task<int> MaterialSync(IEnumerable<ProcMaterialEntity> list)
+        public async Task<RotorResponse> MaterialAsync(IEnumerable<RotorMaterialRequest> list)
         {
-            List<RotorMaterialSync> rotorList = Change(list);
+            await InitAsync();
+            RotorResponse result = new RotorResponse();
 
-            foreach (var rotor in rotorList)
+            foreach (var rotor in list)
             {
                 var httpResponse = await _httpClient.PostAsJsonAsync(_options.MaterialSyncRoute, rotor);
                 await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
-            }
 
-            return 0;
-
-            List<RotorMaterialSync> Change(IEnumerable<ProcMaterialEntity> list)
-            {
-                return list.Select(m => new RotorMaterialSync()
+                httpResponse.EnsureSuccessStatusCode();
+                string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<RotorResponse>(jsonResponse);
+                if(result.IsSuccess == false)
                 {
-                    MaterialCode = m.MaterialCode,
-                    MaterialName = m.MaterialName,
-                    MatSpecification = m.Specifications ?? "",
-                    MaterialType = m.BuyType == null ? "1" : ((int)m.BuyType!).ToString(),
-                    MaterialVersion = m.Version ?? "",
-                    MaterialUnit = m.Unit ?? "",
-                    BarcodeType = "",
-                    BatchCodeRegular = "",
-                    EffectiveDays = m.ValidTime,
-                    WarnAmount = null,
-                    Enable = true
-                }).ToList();
+                    return result;
+                }
             }
+
+            return result;
         }
 
-        /// <summary>
-        /// 工序同步
-        /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public async Task<int> ProcedureSync(IEnumerable<ProcProcedureEntity> list)
-        {
-            throw new NotImplementedException();
-        }
+        ///// <summary>
+        ///// 工序同步
+        ///// </summary>
+        ///// <param name="list"></param>
+        ///// <returns></returns>
+        //public async Task<int> ProcedureAsync(IEnumerable<ProcProcedureEntity> list)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

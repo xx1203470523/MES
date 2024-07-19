@@ -38,6 +38,13 @@ namespace Hymson.MES.Data.Repositories.Parameter
         Task<int> InsertRangeAsync(IEnumerable<ManuProductParameterEntity> list);
 
         /// <summary>
+        /// 插入参数
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        Task<int> InsertRangeMavelAsync(IEnumerable<ManuProductParameterEntity> list);
+
+        /// <summary>
         ///查询参数
         /// </summary>
         /// <param name="param"></param>

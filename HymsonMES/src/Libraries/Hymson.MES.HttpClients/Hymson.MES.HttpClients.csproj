@@ -17,11 +17,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Responses\" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\Hymson.MES.Core\Hymson.MES.Core.csproj" />
+		<ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
 	</ItemGroup>
 
 </Project>

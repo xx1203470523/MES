@@ -141,6 +141,39 @@ namespace Hymson.MES.Data.Repositories.Parameter
         }
 
         /// <summary>
+        /// 插入参数
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public async Task<int> InsertRangeMavelAsync(IEnumerable<ManuProductParameterEntity> list)
+        {
+            var dic = new Dictionary<string, List<ManuProductParameterEntity>>();
+            //List<string> tableNameList = new List<string>();
+
+
+            using var conn = GetMESParamterDbConnection();
+            List<Task<int>> tasks = new();
+
+            int maxNum = 999;
+            int batchNum = list.Count() / maxNum + 1;
+            for (var i = 0; i < batchNum; ++i)
+            {
+                List<ManuProductParameterEntity> curList = list.Skip(i * maxNum).Take(maxNum).ToList();
+                string insertSql = $"INSERT INTO manu_product_procedure_parameter(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,  `SfcstepId`,`ResourceId`,`ParameterGroupId` ) VALUES (@Id, @SiteId, @SFC,@ProcedureId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted,@SfcstepId,@ResourceId,@ParameterGroupId)";
+                tasks.Add(conn.ExecuteAsync(insertSql, curList));
+            }
+
+            //foreach (var dicItem in dic)
+            //{
+            //    string insertSql = $"INSERT INTO manu_product_procedure_parameter(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,  `SfcstepId`,`ResourceId`,`ParameterGroupId` ) VALUES (@Id, @SiteId, @SFC,@ProcedureId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted,@SfcstepId,@ResourceId,@ParameterGroupId)";
+            //    tasks.Add(conn.ExecuteAsync(insertSql, dicItem.Value));
+            //}
+            var result = await Task.WhenAll(tasks);
+
+            return result.Sum();
+        }
+
+        /// <summary>
         /// 查询参数
         /// </summary>
         /// <param name="param"></param>
