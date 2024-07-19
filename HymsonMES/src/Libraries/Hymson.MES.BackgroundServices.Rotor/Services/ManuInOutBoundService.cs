@@ -355,6 +355,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         SfcParamDto curParamDto = new SfcParamDto();
                         curParamDto.ParamName = paramItem.Name;
                         curParamDto.ParamCode = paramItem.NameCode;
+                        curParamDto.CreateOn = paramItem.CreateTime;
                         curParamDto.Unit = paramItem.Unit;
                         curParamDto.Value = Convert.ToDecimal(paramItem.Value);
                         curParamDto.StrValue = paramItem.StrValue;
@@ -817,9 +818,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 model.SFC = sfc;
                 model.ParameterId = 1;
                 model.ParameterValue = item.ParamValue;
-                model.CreatedOn = HymsonClock.Now();
+                //model.CreatedOn = HymsonClock.Now();
                 model.CreatedBy = "LMS-JOB";
                 model.UpdatedBy = model.CreatedBy;
+                model.CreatedOn = item.CreateOn;
 
                 resultList.Add(model);
             }

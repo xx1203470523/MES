@@ -4,6 +4,8 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.View;
 using Microsoft.Extensions.Options;
 
 using System.Text;
@@ -148,8 +150,6 @@ namespace Hymson.MES.Data.Repositories.Parameter
         public async Task<int> InsertRangeMavelAsync(IEnumerable<ManuProductParameterEntity> list)
         {
             var dic = new Dictionary<string, List<ManuProductParameterEntity>>();
-            //List<string> tableNameList = new List<string>();
-
 
             using var conn = GetMESParamterDbConnection();
             List<Task<int>> tasks = new();
@@ -163,14 +163,27 @@ namespace Hymson.MES.Data.Repositories.Parameter
                 tasks.Add(conn.ExecuteAsync(insertSql, curList));
             }
 
-            //foreach (var dicItem in dic)
-            //{
-            //    string insertSql = $"INSERT INTO manu_product_procedure_parameter(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,  `SfcstepId`,`ResourceId`,`ParameterGroupId` ) VALUES (@Id, @SiteId, @SFC,@ProcedureId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted,@SfcstepId,@ResourceId,@ParameterGroupId)";
-            //    tasks.Add(conn.ExecuteAsync(insertSql, dicItem.Value));
-            //}
             var result = await Task.WhenAll(tasks);
 
             return result.Sum();
+        }
+
+        /// <summary>
+        /// 获取马威参数
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetManuParamMavelAsync(EntityByWaterMarkQuery query)
+        {
+            string sql = $@"
+                select * 
+                from manu_product_procedure_parameter
+                WHERE Id > @StartWaterMarkId 
+                ORDER BY Id ASC 
+                LIMIT @Rows"";
+            ";
+
+            using var conn = GetMESParamterDbConnection();
+            return await conn.QueryAsync<ManuProductParameterEntity>(sql, query);
         }
 
         /// <summary>

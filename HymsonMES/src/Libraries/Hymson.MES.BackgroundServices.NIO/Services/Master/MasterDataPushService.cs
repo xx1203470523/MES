@@ -8,6 +8,7 @@ using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Param.View;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Proceduce;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Proceduce.View;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Data.Repositories.Common;
@@ -76,6 +77,25 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         }
 
         /// <summary>
+        /// 获取基础配置数据
+        /// </summary>
+        /// <returns></returns>
+        private async Task<IEnumerable<SysConfigEntity>> GetBaseConfig()
+        {
+            //基础数据配置
+            SysConfigQuery configQuery = new SysConfigQuery();
+            configQuery.Type = SysConfigEnum.NioBaseConfig;
+            configQuery.Codes = new List<string>() { "NioRotorConfig", "NioStatorConfig" };
+            var baseConfigList = await _sysConfigRepository.GetEntitiesAsync(configQuery);
+            if (baseConfigList == null || !baseConfigList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", "NioRotorConfig&NioStatorConfig");
+            }
+
+            return baseConfigList;
+        }
+
+        /// <summary>
         /// 主数据（产品）
         /// </summary>
         /// <returns></returns>
@@ -84,81 +104,31 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var buzScene = BuzSceneEnum.Master_Product;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
-            //站点配置
-            //var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
-            //if (configEntities == null || !configEntities.Any())
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.MainSite.ToString());
-            //}
-            //long siteId = long.Parse(configEntities.ElementAt(0).Value);
-            //主数据物料查询
-            var nioMatList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.NioMaterial });
-            if (nioMatList == null || !nioMatList.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.NioMaterial.ToString());
-            }
-            string nioMatConfigValue = nioMatList.ElementAt(0).Value;
-            DateTime createdOn = nioMatList.ElementAt(0).CreatedOn;
-            List<string> configList = nioMatConfigValue.Split('&').ToList();
+
+            //基础数据配置
+            var baseConfigList = await GetBaseConfig();
+
             List<ProductDto> dtos = new List<ProductDto>();
-            foreach (var item in configList)
+            foreach (var item in baseConfigList)
             {
-                List<string> mapMat = item.Split('=').ToList();
-                List<string> curMesList = mapMat[0].Split(',').ToList();
-                List<string> curNioList = mapMat[1].Split(',').ToList();
+                var curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(item.Value);
 
                 ProductDto dto = new ProductDto();
-                dto.VendorProductCode = curMesList[0];
-                dto.VendorProductName = curMesList[1];
-                dto.NioProductCode = curNioList[0];
-                dto.NioProductName = curNioList[1];
+                dto.VendorProductCode = curConfig.VendorProductCode;
+                dto.VendorProductName = curConfig.VendorProductName;
+                dto.NioProductCode = curConfig.NioProductCode;
+                dto.NioProductName = curConfig.NioProductName;
                 dto.NioHardwareRevision = "1.0";
                 dto.NioSoftwareRevision = "1.0";
                 dto.NioModel = "ES8";
                 dto.Launched = false;
-                dto.UpdateTime = GetTimestamp(createdOn, createdOn);
+                dto.UpdateTime = GetTimestamp(HymsonClock.Now(),HymsonClock.Now());
 
                 dtos.Add(dto);
             }
 
-            //MavelMaterialQuery mavelMaterialQuery = new MavelMaterialQuery() { SiteId = siteId };
-            //var materialList = await _procMaterialMavelRepository.GetSelfControlListAsync(mavelMaterialQuery);
-            //if (materialList == null || materialList.Any() == false)
-            //{
-            //    return;
-            //}
-
             await AddToPushQueueAsync(config, buzScene, dtos);
         }
-
-        ///// <summary>
-        ///// 获取转子，定义线配置
-        ///// </summary>
-        ///// <returns></returns>
-        ///// <exception cref="CustomerValidationException"></exception>
-        //private async Task<(List<string>,List<string>)> GetLineConfig()
-        //{
-        //    SysConfigQuery configQuery = new SysConfigQuery() { Codes = new List<string>() { "Rotor", "Stator" } };
-        //    var configList = await _sysConfigRepository.GetEntitiesAsync(configQuery);
-        //    if (configList == null || !configList.Any() || configList.Count() != 2)
-        //    {
-        //        throw new CustomerValidationException(nameof(ErrorCode.MES10140));
-        //    }
-        //    string rotorConfig = configList.Where(m => m.Type == SysConfigEnum.Rotor).FirstOrDefault().Value;
-        //    string statorConfig = configList.Where(m => m.Type == SysConfigEnum.Stator).FirstOrDefault().Value;
-        //    if (string.IsNullOrEmpty(rotorConfig) == true || string.IsNullOrEmpty(statorConfig) == true)
-        //    {
-        //        throw new CustomerValidationException(nameof(ErrorCode.MES10140));
-        //    }
-        //    List<string> rotorConfigList = rotorConfig.Split(",").ToList();
-        //    List<string> statorConfigList = statorConfig.Split(",").ToList();
-        //    if (rotorConfigList.Count() != 6 || statorConfigList.Count() != 6)
-        //    {
-        //        throw new CustomerValidationException(nameof(ErrorCode.MES10140));
-        //    }
-
-        //    return (rotorConfigList, statorConfigList);
-        //}
 
         /// <summary>
         /// 主数据（工序）
@@ -178,14 +148,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             long siteId = long.Parse(configEntities.ElementAt(0).Value);
 
             //基础数据配置
-            SysConfigQuery configQuery = new SysConfigQuery();
-            configQuery.Type = SysConfigEnum.NioBaseConfig;
-            configQuery.Codes = new List<string>() { "NioRotorConfig", "NioStatorConfig" };
-            var baseConfigList = await _sysConfigRepository.GetEntitiesAsync(configQuery);
-            if (baseConfigList == null || !baseConfigList.Any() || baseConfigList.Count() != 2)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", "NioRotorConfig&NioStatorConfig");
-            }
+            var baseConfigList = await GetBaseConfig();
 
             //主数据查询
             MavelProducreQuery query = new MavelProducreQuery() { SiteId = siteId };
@@ -267,14 +230,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 return;
             }
             //基础数据配置
-            SysConfigQuery configQuery = new SysConfigQuery();
-            configQuery.Type = SysConfigEnum.NioBaseConfig;
-            configQuery.Codes = new List<string>() { "NioRotorConfig", "NioStatorConfig" };
-            var baseConfigList = await _sysConfigRepository.GetEntitiesAsync(configQuery);
-            if (baseConfigList == null || !baseConfigList.Any() || baseConfigList.Count() != 2)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", "NioRotorConfig&NioStatorConfig");
-            }
+            var baseConfigList = await GetBaseConfig();
 
             //组装数据
             var dtos = new List<FieldDto> { };
@@ -348,14 +304,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
             //基础数据配置
-            SysConfigQuery configQuery = new SysConfigQuery();
-            configQuery.Type = SysConfigEnum.NioBaseConfig;
-            configQuery.Codes = new List<string>() { "NioRotorConfig", "NioStatorConfig" };
-            var baseConfigList = await _sysConfigRepository.GetEntitiesAsync(configQuery);
-            if (baseConfigList == null || !baseConfigList.Any() || baseConfigList.Count() != 2)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", "NioRotorConfig&NioStatorConfig");
-            }
+            var baseConfigList = await GetBaseConfig();
 
             //产品一次良率
             var dtos = new List<PassrateTargetDto> { };

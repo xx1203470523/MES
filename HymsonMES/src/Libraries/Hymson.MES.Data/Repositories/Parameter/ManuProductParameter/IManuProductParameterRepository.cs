@@ -1,5 +1,8 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Parameter;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.View;
+using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Parameter
 {
@@ -43,6 +46,13 @@ namespace Hymson.MES.Data.Repositories.Parameter
         /// <param name="list"></param>
         /// <returns></returns>
         Task<int> InsertRangeMavelAsync(IEnumerable<ManuProductParameterEntity> list);
+
+        /// <summary>
+        /// 获取马威参数
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductParameterEntity>> GetManuParamMavelAsync(EntityByWaterMarkQuery query);
 
         /// <summary>
         ///查询参数
