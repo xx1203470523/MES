@@ -221,7 +221,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            sqlBuilder.Select(@"WorkOrderId,ProductId,ProcedureId,OutputQty");
+            sqlBuilder.Select(@"WorkOrderId,ProductId,ProcedureId,OutputQty,SFC");
             //产品
             if (query.ProductId.HasValue && query.ProductId > 0)
             {
