@@ -7,7 +7,9 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.Rotor;
+using Hymson.MES.HttpClients.Responses.Rotor;
 using Hymson.Utils;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -113,14 +115,18 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// </summary>
         /// <param name="rotorWorkOrder"></param>
         /// <returns></returns>
-        public async Task<bool> WorkOrderAsync(RotorWorkOrderRequest param)
+        public async Task<RotorResponse> WorkOrderAsync(RotorWorkOrderRequest param)
         {
             await InitAsync();
 
             var httpResponse = await _httpClient.PostAsJsonAsync<RotorWorkOrderRequest>(_options.CreateOrderRoute, param);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+            httpResponse.EnsureSuccessStatusCode();
 
-            return httpResponse.IsSuccessStatusCode;
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            RotorResponse result = JsonConvert.DeserializeObject<RotorResponse>(jsonResponse);
+
+            return result;
         }
 
         /// <summary>
@@ -128,19 +134,26 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public async Task<int> MaterialAsync(IEnumerable<RotorMaterialRequest> list)
+        public async Task<RotorResponse> MaterialAsync(IEnumerable<RotorMaterialRequest> list)
         {
             await InitAsync();
+            RotorResponse result = new RotorResponse();
 
-            int num = 0;
             foreach (var rotor in list)
             {
                 var httpResponse = await _httpClient.PostAsJsonAsync(_options.MaterialSyncRoute, rotor);
                 await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
-                ++num;
+
+                httpResponse.EnsureSuccessStatusCode();
+                string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<RotorResponse>(jsonResponse);
+                if(result.IsSuccess == false)
+                {
+                    return result;
+                }
             }
 
-            return num;
+            return result;
         }
 
         ///// <summary>

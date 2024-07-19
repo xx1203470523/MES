@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.Rotor;
+using Hymson.MES.HttpClients.Responses.Rotor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// </summary>
         /// <param name="rotorWorkOrder"></param>
         /// <returns></returns>
-        Task<bool> WorkOrderAsync(RotorWorkOrderRequest rotorWorkOrder);
+        Task<RotorResponse> WorkOrderAsync(RotorWorkOrderRequest rotorWorkOrder);
 
         /// <summary>
         /// 工单激活
@@ -39,7 +40,7 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        Task<int> MaterialAsync(IEnumerable<RotorMaterialRequest> list);
+        Task<RotorResponse> MaterialAsync(IEnumerable<RotorMaterialRequest> list);
 
         ///// <summary>
         ///// 工序同步

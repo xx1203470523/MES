@@ -494,8 +494,8 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
             {
                 PlanWorkOrderMavelView order = await _planWorkOrderRepository.GetByIdMavelAsync(activationWorkOrderDto.Id);
                 RotorWorkOrderRequest lmsOrder = LmsOrderChange(order);
-                bool lmsResult = await _rotorApiClient.WorkOrderAsync(lmsOrder);
-                if (lmsResult == false)
+                var lmsResult = await _rotorApiClient.WorkOrderAsync(lmsOrder);
+                if (lmsResult.IsSuccess == false)
                 {
                     ts.Dispose();
                 }

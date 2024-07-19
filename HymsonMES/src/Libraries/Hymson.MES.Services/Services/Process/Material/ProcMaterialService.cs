@@ -721,8 +721,8 @@ namespace Hymson.MES.Services.Services.Process
                     {
                         List<ProcMaterialEntity> matList = new List<ProcMaterialEntity>() { material };
                         List<RotorMaterialRequest> reqList = LmsMaterialChange(matList);
-                        int lmsResult = await _rotorApiClient.MaterialAsync(reqList);
-                        if (lmsResult < 1)
+                        var lmsResult = await _rotorApiClient.MaterialAsync(reqList);
+                        if (lmsResult.IsSuccess == false)
                         {
                             ts.Dispose();
                         }
