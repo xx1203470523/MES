@@ -1,7 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.View;
 using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Parameter

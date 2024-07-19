@@ -5,7 +5,6 @@ using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.View;
 using Microsoft.Extensions.Options;
 
 using System.Text;

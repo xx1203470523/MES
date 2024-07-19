@@ -19,5 +19,15 @@
         /// 生产统计业务标识
         /// </summary>
         public const string ManuSfcSummary = "ManuSfcSummaryStatistic";
+
+        /// <summary>
+        /// 蔚来参数数据
+        /// </summary>
+        public const string NioParam = "NioParam";
+
+        /// <summary>
+        /// 蔚来生产数据
+        /// </summary>
+        public const string NioManuData = "NioManuData";
     }
 }
