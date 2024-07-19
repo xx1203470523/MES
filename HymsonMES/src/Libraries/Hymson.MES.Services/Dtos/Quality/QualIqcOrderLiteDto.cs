@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public InspectionStatusEnum Status { get; set; }
+        public IQCLiteStatusEnum Status { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
@@ -205,7 +205,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public InspectionStatusEnum Status { get; set; }
+        public IQCLiteStatusEnum Status { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
@@ -292,7 +292,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public InspectionStatusEnum Status { get; set; }
+        public IQCLiteStatusEnum Status { get; set; }
 
         /// <summary>
         /// 是否合格;0、不合格 1、合格
@@ -383,7 +383,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public InspectionStatusEnum? Status { get; set; }
+        public IQCLiteStatusEnum? Status { get; set; }
 
     }
 

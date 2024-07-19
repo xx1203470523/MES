@@ -189,7 +189,7 @@ namespace Hymson.MES.Services.Services.Quality
                 InspectionOrder = inspectionOrder,
                 MaterialReceiptId = receiptEntity.Id,
                 SupplierId = receiptEntity.SupplierId,
-                Status = InspectionStatusEnum.WaitInspect,
+                Status = IQCLiteStatusEnum.WaitInspect,
                 IsQualified = null,
                 CreatedBy = user,
                 CreatedOn = time
@@ -232,17 +232,17 @@ namespace Hymson.MES.Services.Services.Quality
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 检查当前操作类型是否已经执行过
-            if (entity.Status != InspectionStatusEnum.WaitInspect) return default;
+            if (entity.Status != IQCLiteStatusEnum.WaitInspect) return default;
             switch (entity.Status)
             {
-                case InspectionStatusEnum.WaitInspect:
+                case IQCLiteStatusEnum.WaitInspect:
                     // 继续接下来的操作
                     break;
-                case InspectionStatusEnum.Completed:
-                case InspectionStatusEnum.Closed:
-                    throw new CustomerValidationException(nameof(ErrorCode.MES11914))
-                        .WithData("Status", $"{InspectionStatusEnum.Completed.GetDescription()}/{InspectionStatusEnum.Closed.GetDescription()}");
-                case InspectionStatusEnum.Inspecting:
+                case IQCLiteStatusEnum.Completed:
+                //case InspectionStatusEnum.Closed:
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES11914))
+                //        .WithData("Status", $"{InspectionStatusEnum.Completed.GetDescription()}/{InspectionStatusEnum.Closed.GetDescription()}");
+                case IQCLiteStatusEnum.Inspecting:
                 default: return default;
             }
 
@@ -250,13 +250,15 @@ namespace Hymson.MES.Services.Services.Quality
             switch (requestDto.OperationType)
             {
                 case OrderOperateTypeEnum.Start:
-                    entity.Status = InspectionStatusEnum.Inspecting;
+                    entity.Status = IQCLiteStatusEnum.Inspecting;
                     break;
                 case OrderOperateTypeEnum.Complete:
-                    entity.Status = entity.IsQualified == TrueOrFalseEnum.Yes ? InspectionStatusEnum.Closed : InspectionStatusEnum.Completed;
+                    entity.Status = IQCLiteStatusEnum.Completed;
+                    //entity.Status = entity.IsQualified == TrueOrFalseEnum.Yes ? InspectionStatusEnum.Closed : InspectionStatusEnum.Completed;
                     break;
                 case OrderOperateTypeEnum.Close:
-                    entity.Status = InspectionStatusEnum.Closed;
+                    //entity.Status = IQCLiteStatusEnum.Closed;
+                    //entity.Status = InspectionStatusEnum.Closed;
                     break;
                 default:
                     break;
@@ -321,7 +323,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 更新检验单状态
-            orderEntity.Status = InspectionStatusEnum.Completed;
+            orderEntity.Status = IQCLiteStatusEnum.Completed;
             orderEntity.UpdatedBy = user;
             orderEntity.UpdatedOn = time;
 
@@ -418,7 +420,7 @@ namespace Hymson.MES.Services.Services.Quality
             if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
             var entities = await _qualIqcOrderLiteRepository.GetByIdsAsync(ids);
-            if (entities != null && entities.Any(a => a.Status != InspectionStatusEnum.WaitInspect))
+            if (entities != null && entities.Any(a => a.Status != IQCLiteStatusEnum.WaitInspect))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10137));
             }
