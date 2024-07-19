@@ -331,6 +331,18 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     CreatedBy = _currentEquipment.Name,
                     UpdatedBy = _currentEquipment.Name
                 };
+
+                var manuSfcProceProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduceList.First().ProcedureId);
+                var bindProcducreEntity = await _procProcedureRepository.GetByCodeAsync("OP120", _currentEquipment.SiteId);
+                //当前绑定条码所在工序
+                var netxtProcedureId = sfcProduceList.First().ProcedureId;
+                //清安：Pack绑定模组时，生成的Pack在制工序跳过箱体预处理，获取该工序的下一道工序
+                if (manuSfcProceProcedureEntity.Code == "OP230")
+                {
+                    netxtProcedureId = bindProcducreEntity.Id;
+                }
+
+
                 manuSfcProduce = new ManuSfcProduceEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -345,7 +357,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     EquipmentId = _currentEquipment.Id ?? 0,
                     ResourceId = procResource.Id,
                     Qty = 1,//进站默认都是1个
-                    ProcedureId = sfcProduceList.First().ProcedureId,//当前绑定条码所在工序
+                    ProcedureId = netxtProcedureId,
                     Status = SfcProduceStatusEnum.Activity,//接口进站直接为活动
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
