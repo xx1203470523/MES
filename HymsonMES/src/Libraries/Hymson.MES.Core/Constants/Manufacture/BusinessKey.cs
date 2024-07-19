@@ -29,5 +29,10 @@
         /// 蔚来生产数据
         /// </summary>
         public const string NioManuData = "NioManuData";
+
+        /// <summary>
+        /// 一次良率
+        /// </summary>
+        public const string NioPassrateProduct = "NioPassrateProduct";
     }
 }

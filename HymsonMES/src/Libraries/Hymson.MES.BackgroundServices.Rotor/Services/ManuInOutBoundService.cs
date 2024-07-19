@@ -449,7 +449,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 if (mesItem.Type == 2)
                 {
                     ManuSfcStepEntity step = GetStepEntity(mesItem.Sfc, mesItem.Type, mesItem.ProcedureCode,
-                        mesItem.IsPassed, mesOrder, procedureId);
+                        mesItem.IsPassed, mesOrder, procedureId, mesItem.Date);
                     stepId = step.Id;
                     stepList.Add(step);
                     sfcUpdateList.Add(new ManuSfcDto()
@@ -700,9 +700,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="type">1-进站 2-出站</param>
         /// <param name="produceCode"></param>
         /// <param name="mesOrder"></param>
+        /// <param name="procedureId"></param>
+        /// <param name="createdOn"></param>
         /// <returns></returns>
         private ManuSfcStepEntity GetStepEntity(string sfc, int type, string produceCode,
-            bool isPassed, PlanWorkOrderEntity ?mesOrder, long procedureId)
+            bool isPassed, PlanWorkOrderEntity ?mesOrder, long procedureId, DateTime createdOn)
         {
             ManuSfcStepEntity step = new ManuSfcStepEntity();
             step.Id = IdGenProvider.Instance.CreateId();
@@ -716,6 +718,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             step.AfterOperationStatus = type == 1 ? Core.Enums.SfcStatusEnum.lineUp : Core.Enums.SfcStatusEnum.Activity;
             step.UpdatedBy = "";
             step.ProcedureId = procedureId;
+            step.CreatedOn = createdOn;
 
             if (mesOrder != null)
             {
@@ -739,8 +742,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <param name="matList"></param>
         /// <returns></returns>
         private List<ManuSfcCirculationEntity> GetCirculaList(string sfc, List<SfcUpMatDto> upList,
-            string produceCode, PlanWorkOrderEntity ?mesOrder, List<ProcMaterialEntity> matList,
-            long procedureId)
+            string produceCode, PlanWorkOrderEntity ?mesOrder, 
+            List<ProcMaterialEntity> matList, long procedureId)
         {
             List<ManuSfcCirculationEntity> list = new List<ManuSfcCirculationEntity>();
 

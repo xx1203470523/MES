@@ -4,7 +4,9 @@ using Hymson.MES.BackgroundServices.NIO.Dtos.Buz;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Common;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Data.Repositories.Common;
@@ -72,6 +74,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
+        /// 物料
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
         /// 操作员账号
         /// </summary>
         private readonly string NIO_USER_ID = "LMS001";
@@ -80,6 +87,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// 操作员密码
         /// </summary>
         private readonly string NIO_USER_NAME = "MAVLE";
+
+        /// <summary>
+        /// NIO调试字段
+        /// </summary>
+        private readonly bool NIO_DEBUG = true;
 
         /// <summary>
         /// 构造函数
@@ -92,7 +104,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             IProcParameterRepository procParameterRepository,
             IProcProcedureRepository procProcedureRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IProcMaterialRepository procMaterialRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -104,6 +117,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _procProcedureRepository = procProcedureRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _procMaterialRepository = procMaterialRepository;
         }
 
         /// <summary>
@@ -124,7 +138,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
             long siteId = long.Parse(configEntities.ElementAt(0).Value);
             //获取基础配置
-            var baseConfigList = await GetBaseConfig();
+            var baseConfigList = await GetBaseConfigAsync();
             //获取当前水位
             var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioParam);
             //获取参数表数据
@@ -201,7 +215,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.StationStatus = "passed";
                 model.VendorStationStatus = model.StationStatus;
                 model.VendorValueStatus = model.StationStatus;
-                model.Debug = true;
+                model.Debug = NIO_DEBUG;
                 model.UpdateTime = GetTimestamp(HymsonClock.Now());
 
                 dtos.Add(model);
@@ -234,7 +248,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
             long siteId = long.Parse(configEntities.ElementAt(0).Value);
             //获取基础配置
-            var baseConfigList = await GetBaseConfig();
+            var baseConfigList = await GetBaseConfigAsync();
             //获取当前水位
             var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioManuData);
             //获取步骤数据
@@ -327,8 +341,63 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 
-            // TODO: 替换为实际数据
+            //站点配置
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
+            if (configEntities == null || !configEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139));
+            }
+            long siteId = long.Parse(configEntities.ElementAt(0).Value);
+            //获取基础配置
+            var baseConfigList = await GetBaseConfigAsync();
+            IEnumerable<NIOConfigBaseDto> baseDataList = GetBaseData(baseConfigList);
+            //获取当前水位
+            var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioPassrateProduct);
+            //获取步骤数据
+            EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery() { Rows = 100, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
+            var stepList = await _manuSfcStepRepository.GetSfcStepMavelAsync(stepQuery);
+            //型号
+            List<long> materialIdList = stepList.Where(m => m.ProductId != 0).Select(m => m.ProductId).Distinct().ToList();
+            IEnumerable<ProcMaterialEntity> materialList = await _procMaterialRepository.GetByIdsAsync(materialIdList);
+
             var dtos = new List<PassrateProductDto> { };
+
+            //数据预处理
+            stepList = stepList.Where(m => m.ProductId != 0).ToList();
+            List<long> productIdList = stepList.Select(m => m.ProductId).Distinct().ToList();
+            foreach(var item in productIdList)
+            {
+                //物料是否存在系统中
+                ProcMaterialEntity ?curMat = materialList.Where(m => m.Id == item).FirstOrDefault();
+                if(curMat == null)
+                {
+                    continue;
+                }
+                //物料是否在当前配置的型号
+                string materialCode = curMat.MaterialCode;
+                NIOConfigBaseDto? curConfig = baseDataList.Where(m => m.VendorProductCode == materialCode).FirstOrDefault();
+                if(curConfig == null)
+                {
+                    continue;
+                }
+
+                var curlAllStepList = stepList.Where(m => m.ProductId == item).ToList();
+
+                PassrateProductDto model = new PassrateProductDto();
+                model.PlantId = curConfig.PlantId;
+                model.WorkshopId = curConfig.WorkshopId;
+                model.ProductionLineId = curConfig.ProductionLineId;
+                model.VendorProductNum = curConfig.VendorProductCode;
+                model.VendorProductName = curConfig.VendorProductName;
+                model.PassRateTarget = Convert.ToDecimal(curConfig.PassRateTarget);
+                model.PassRate = GetPassRate(curlAllStepList);
+                model.UpdateTime = GetTimestamp(HymsonClock.Now());
+                model.Debug = NIO_DEBUG;
+
+                dtos.Add(model);
+            }
+
+            // TODO: 替换为实际数据
             await AddToPushQueueAsync(config, buzScene, dtos);
         }
 
@@ -426,7 +495,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// 获取基础配置数据
         /// </summary>
         /// <returns></returns>
-        private async Task<IEnumerable<SysConfigEntity>> GetBaseConfig()
+        private async Task<IEnumerable<SysConfigEntity>> GetBaseConfigAsync()
         {
             //基础数据配置
             SysConfigQuery configQuery = new SysConfigQuery();
@@ -481,5 +550,58 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
         }
+
+        /// <summary>
+        /// 获取基础配置数据
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<NIOConfigBaseDto> GetBaseData(IEnumerable<SysConfigEntity> list)
+        {
+            List<NIOConfigBaseDto> resultList = new List<NIOConfigBaseDto>();
+
+            //基础数据配置
+            foreach(var item in list)
+            {
+                NIOConfigBaseDto model = JsonConvert.DeserializeObject<NIOConfigBaseDto>(item.Value);
+                resultList.Add(model);
+            }
+
+            return resultList;
+        }
+
+        /// <summary>
+        /// 获取良率
+        /// </summary>
+        /// <param name="stepList"></param>
+        /// <returns></returns>
+        private decimal GetPassRate(List<ManuSfcStepEntity> stepList)
+        {
+            decimal result = 0;
+            //获取所有条码
+            List<string> sfcList = stepList.Select(m => m.SFC).Distinct().ToList();
+            //获取所有NG条码
+            List<string> ngSfcList = stepList.Where(m => m.ScrapQty > 0).Select(m => m.SFC).Distinct().ToList();
+            //获取NG条码是否有重复，并且第一条是NG的
+            int firstOkNg = 0; //第一次OK后续NG
+            var ngStepList = stepList.Where(m => ngSfcList.Contains(m.SFC) == true).ToList();
+            foreach(var item in ngSfcList)
+            {
+                var curNgStepList = ngStepList.Where(m => m.SFC == item).ToList();
+                if(curNgStepList.Count > 1)
+                {
+                    //查找最早一个
+                    var maxEarNg = curNgStepList.OrderBy(m => m.CreatedOn).FirstOrDefault();
+                    if(maxEarNg!.ScrapQty > 0)
+                    {
+                        ++firstOkNg;
+                    }
+                }
+            }
+
+            result = (sfcList.Count - ngSfcList.Count + firstOkNg) / sfcList.Count;
+            result = decimal.Round(result, 4);
+            return result;
+        }
+
     }
 }
