@@ -29,7 +29,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 额定寿命
         /// </summary>
-        public decimal RatedLife { get; set; }
+        public decimal? RatedLife { get; set; }
 
         /// <summary>
         /// 额定寿命单位
