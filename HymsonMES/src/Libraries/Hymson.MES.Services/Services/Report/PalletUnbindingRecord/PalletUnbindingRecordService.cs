@@ -99,7 +99,7 @@ namespace Hymson.MES.Services.Services.Report.PalletUnbindingRecord
                 {
                     vehicleFreightRecord.OperateType = (int)VehicleOperationEnum.Unbind;
                 }
-                vehicleFreightRecord.BindAndUnbindTime = pageInfo.CreatedOn.ToString("yyyy-MM-dd HH:MM:ss");
+                vehicleFreightRecord.BindAndUnbindTime = pageInfo.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
                 vehicleFreightRecord.CreateBy = pageInfo.CreatedBy;
                 listDto.Add(vehicleFreightRecord);
             }
