@@ -53,15 +53,11 @@ namespace Hymson.MES.EquipmentServices.Validators.EquVerifyHelper
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19154));
             }
-            List<string> downList = new List<string>() { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
-            //if(dto.StateCode == "3" && downList.Contains(dto.DownReason)  == false)
+            //List<string> downList = new List<string>() { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" };
+            //if (!string.IsNullOrWhiteSpace(dto.DownReason) && !downList.Contains(dto.DownReason))
             //{
             //    throw new CustomerValidationException(nameof(ErrorCode.MES19162));
             //}
-            if (!string.IsNullOrWhiteSpace(dto.DownReason) && !downList.Contains(dto.DownReason))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19162));
-            }
         }
 
         /// <summary>
@@ -396,7 +392,7 @@ namespace Hymson.MES.EquipmentServices.Validators.EquVerifyHelper
         /// <exception cref="CustomerValidationException"></exception>
         public static void ToolLifeDto(ToolLifeDto dto)
         {
-            if (dto.ToolLifes.IsNullOrEmpty() == true && string.IsNullOrEmpty(dto.ToolCode) == true) 
+            if (string.IsNullOrWhiteSpace(dto.ToolCode) && (dto.ToolLifes.IsNullOrEmpty() || dto.ToolLifes.Any(x => string.IsNullOrWhiteSpace(x.ToolCode))))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19151));
             }
