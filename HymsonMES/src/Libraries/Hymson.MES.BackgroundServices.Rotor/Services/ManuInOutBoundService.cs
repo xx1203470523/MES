@@ -118,6 +118,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly IProcParameterRepository _procParameterRepository;
 
         /// <summary>
+        /// 转子线操作人
+        /// </summary>
+        private readonly string OperationBy = "RotorLMSJOB";
+
+        /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteID = 0;
@@ -207,7 +212,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
             else
             {
-                startWaterMarkTime = DateTime.Parse("2024-07-01 01:01:01");
+                startWaterMarkTime = DateTime.Parse("2024-07-14 01:01:01");
             }
             DateTime start = startWaterMarkTime;
 
@@ -264,9 +269,13 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //List<string> orderCodeList = bindList.Select(m => m.WorkNo).Distinct().ToList();
             //5. 查询产品和工单的对应关系
             List<WorkOrderListDto> productOrderList = await GetProductOrder(sfcList);
-            List<string> lmsOrderList = productOrderList.Select(m => m.WorkNo).Distinct().ToList();
+            List<string> allLmsOrderList = productOrderList.Select(m => m.WorkNo).Distinct().ToList();
+            List<string> lmsOrderList = new List<string>();
             //转子线接收MES的工单后，会生成两个工单，一个带FX的工单，是铁芯工单，还有一个正常的工单是压轴主线 
-            lmsOrderList.ForEach(m => m = m.Replace("FX", ""));
+            foreach(var item in allLmsOrderList)
+            {
+                lmsOrderList.Add(LmsOrderFxChange(item));
+            }
             #endregion
 
             #region 获取MES数据
@@ -324,7 +333,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 WorkOrderListDto? curProductOrder = productOrderList.Where(m => m.ProductNo == item.ProductNo).FirstOrDefault();
                 if(curProductOrder != null)
                 {
-                    mesDto.OrderCode = curProductOrder.WorkNo;
+                    mesDto.OrderCode = LmsOrderFxChange(curProductOrder.WorkNo);
                 }
 
                 //处理上料信息
@@ -344,10 +353,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                                 BarCode = upItem.MatValue,
                                 MatCode = upItem.MatCode,
                                 MatType = MatType_One,
-                                MatNum = upItem.MatNum
+                                MatNum = 1
                             });
                         }
-                        if(string.IsNullOrEmpty(upItem.MatBatchCode) == false)
+                        //条码不为空，并且两个条码不同（设备异常数据会导致两个条码相同）
+                        if(string.IsNullOrEmpty(upItem.MatBatchCode) == false && upItem.MatBatchCode != upItem.MatValue)
                         {
                             sfcUpList.Add(new SfcUpMatDto()
                             {
@@ -435,6 +445,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             List<ManuSfcStepEntity> stepList = new List<ManuSfcStepEntity>();
             List<ManuSfcDto> sfcUpdateList = new List<ManuSfcDto>(); //条码表，条码信息表
             List<Core.Domain.Parameter.ManuProductParameterEntity> manuParamList = new List<Core.Domain.Parameter.ManuProductParameterEntity>();
+            List<ManuSfcDto> barCodeList = new List<ManuSfcDto>(); //原材料条码写条码表，条码信息表
 
             #region 整理成MES表结构数据
 
@@ -453,8 +464,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 }
                 long stepId = 0;
 
+
                 //工单
-                var mesOrder = mesOrderList.Where(m => m.OrderCode == mesItem.OrderCode).FirstOrDefault();
+                var mesOrder = mesOrderList.Where(m => m.OrderCode == LmsOrderFxChange(mesItem.OrderCode)).FirstOrDefault();
                 //工序
                 long procedureId = 0;
                 ProcProcedureEntity ?mesProcedure = mesProcedureList.Where(m => m.Code == mesItem.ProcedureCode).FirstOrDefault();
@@ -477,15 +489,33 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         Status = SfcStatusEnum.lineUp,
                         Sfc = mesItem.Sfc,
                         UpdatedOn = now,
-                        UserId = "LMS-JOB"
+                        UserId = OperationBy
                     });
                 }
                 //写入到流转表ManuSfcCirculationEntity
                 if (mesItem.UpMatList.Count > 0)
                 {
                     List<ManuSfcCirculationEntity> curCirculaList = GetCirculaList(mesItem.Sfc, mesItem.UpMatList,
-                        mesItem.ProcedureCode, mesOrder, mesMaterialList, procedureId);
+                        mesItem.ProcedureCode, mesOrder, mesMaterialList, procedureId, mesItem.Date);
                     circulaList.AddRange(curCirculaList);
+                    //上料信息也要写入到条码表，条码信息表
+                    foreach(var item in mesItem.UpMatList)
+                    {
+                        if (item.BarCode == mesItem.Sfc)
+                        {
+                            continue;
+                        }
+                        barCodeList.Add(new ManuSfcDto()
+                        {
+                            WorkOrder = mesOrder,
+                            SiteId = SiteID,
+                            Status = SfcStatusEnum.Complete,
+                            Sfc = item.BarCode,
+                            MaterialCode = item.MatCode,
+                            UpdatedOn = now,
+                            UserId = OperationBy
+                        });
+                    }
                 }
                 //写入到参数表
                 if(mesItem.ParamList.Count > 0)
@@ -514,6 +544,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
             await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
             await InsertOrUpdateAsync(sfcUpdateList);
+            await InsertRawMaterialAsync(barCodeList, mesMaterialList);
             await _manuProductParameterRepository.InsertRangeMavelAsync(manuParamList);
             trans.Complete();
 
@@ -543,6 +574,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 AND EndTime IS NOT NULL
                 AND EndTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
                 AND ProductStatus = '{ProductStatus_Out}'
+-- and ProductNo = 'E3001131AFV15881001001TPL060102H60400043'
                 ORDER BY EndTime ASC;
             ";
 
@@ -732,11 +764,18 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             step.ScrapQty = isPassed == true ? 0 : 1; //有报废数量代表不合格
             step.Remark = produceCode; //备注字段存放工序，用于NIO直接取
             step.Operatetype = Core.Enums.Manufacture.ManuSfcStepTypeEnum.Receive;
-            step.CurrentStatus = type == 1 ? Core.Enums.SfcStatusEnum.Activity : Core.Enums.SfcStatusEnum.lineUp;
-            step.AfterOperationStatus = type == 1 ? Core.Enums.SfcStatusEnum.lineUp : Core.Enums.SfcStatusEnum.Activity;
-            step.UpdatedBy = "";
+            step.CurrentStatus = SfcStatusEnum.Activity;
+            step.AfterOperationStatus = SfcStatusEnum.lineUp;
+            step.UpdatedBy = OperationBy;
+            step.CreatedBy = OperationBy;
             step.ProcedureId = procedureId;
             step.CreatedOn = createdOn;
+            step.UpdatedOn = HymsonClock.Now();
+            if(produceCode == "OP150") //未工序设置为完成
+            {
+                step.CurrentStatus = SfcStatusEnum.Complete;
+                step.AfterOperationStatus = SfcStatusEnum.Complete;
+            }
 
             if (mesOrder != null)
             {
@@ -761,7 +800,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <returns></returns>
         private List<ManuSfcCirculationEntity> GetCirculaList(string sfc, List<SfcUpMatDto> upList,
             string produceCode, PlanWorkOrderEntity ?mesOrder, 
-            List<ProcMaterialEntity> matList, long procedureId)
+            List<ProcMaterialEntity> matList, long procedureId, DateTime createdOn)
         {
             List<ManuSfcCirculationEntity> list = new List<ManuSfcCirculationEntity>();
 
@@ -778,9 +817,12 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 model.CirculationBarCode = item.BarCode;
                 model.CirculationQty = item.MatNum;
                 model.Location = produceCode;
-                model.UpdatedBy = "";
+                model.CreatedBy = OperationBy;
+                model.UpdatedBy = OperationBy;
                 model.CirculationType = Core.Enums.Manufacture.SfcCirculationTypeEnum.Consume;
                 model.ProcedureId = procedureId;
+                model.CreatedOn = createdOn;
+                model.UpdatedOn = HymsonClock.Now();
 
                 ProcMaterialEntity? materialEntity = matList.Where(m => m.MaterialCode == item.MatCode).FirstOrDefault();
                 if(materialEntity != null)
@@ -837,12 +879,14 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 model.ProcedureId = procedureId;
                 model.SfcstepId = stepId;
                 model.SFC = sfc;
-                model.ParameterId = 1;
+                model.ParameterId = paramId;
                 model.ParameterValue = item.ParamValue;
                 //model.CreatedOn = HymsonClock.Now();
-                model.CreatedBy = "LMS-JOB";
-                model.UpdatedBy = model.CreatedBy;
+                model.CreatedBy = OperationBy;
+                model.UpdatedBy = OperationBy;
                 model.CreatedOn = item.CreateOn;
+                model.CollectionTime = item.CreateOn;
+                model.UpdatedOn = HymsonClock.Now();
 
                 resultList.Add(model);
             }
@@ -970,6 +1014,81 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             return sfcList.Count;
         }
 
+        /// <summary>
+        /// 插入原材料到条码，条码信息表
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        private async Task<int> InsertRawMaterialAsync(List<ManuSfcDto> commands, List<ProcMaterialEntity> mesMaterialList)
+        {
+            List<string> sfcList = commands.Select(m => m.Sfc).Distinct().ToList();
+            List<string> existSfcList = new List<string>();
+            List<ManuSfcEntity> addSfcList = new List<ManuSfcEntity>();
+            List<ManuSfcInfoEntity> addSfcInfoList = new List<ManuSfcInfoEntity>();
+
+            ManuSfcStatusQuery sfcQuery = new ManuSfcStatusQuery();
+            sfcQuery.SiteId = (long)commands[0].SiteId!;
+            sfcQuery.Sfcs = sfcList;
+            var dbList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(sfcQuery);
+            List<string> dbSfcList = dbList.Select(m => m.SFC).ToList();
+
+            foreach (var item in commands)
+            {
+                if (existSfcList.Contains(item.Sfc) == true)
+                {
+                    continue;
+                }
+                existSfcList.Add(item.Sfc);
+                if (dbSfcList.Contains(item.Sfc) == true) //已经存在
+                {
+                    continue;
+                }
+                //物料如果不为空，则直接取对应物料；如果为空，则取工单的型号
+                long ProductId = 0;
+                var curMaterial = mesMaterialList.Where(m => m.MaterialCode ==  item.MaterialCode).FirstOrDefault();
+                if(curMaterial != null)
+                {
+                    ProductId = curMaterial.Id;
+                }
+                else
+                {
+                    ProductId = item.WorkOrder == null ? 0 : item.WorkOrder.ProductId;
+                }
+                var sfcEntity = new ManuSfcEntity()
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SFC = item.Sfc,
+                    Qty = 1,
+                    SiteId = (long)item.SiteId!,
+                    ScrapQty = 0,
+                    Status = SfcStatusEnum.Complete,
+                    Type = Core.Enums.Manufacture.SfcTypeEnum.NoProduce,
+                    CreatedBy = item.UserId,
+                    UpdatedBy = item.UserId
+                };
+                addSfcList.Add(sfcEntity);
+                addSfcInfoList.Add(new ManuSfcInfoEntity()
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SfcId = sfcEntity.Id,
+                    ProcessRouteId = item.WorkOrder?.ProcessRouteId,
+                    ProductBOMId = item.WorkOrder?.ProductBOMId,
+                    ProductId = ProductId,
+                    WorkOrderId = item.WorkOrder?.Id,
+                    SiteId = (long)item.SiteId,
+                    IsUsed = true,
+                    CreatedBy = item.UserId,
+                    UpdatedBy = item.UserId
+                });
+            }
+
+            await _manuSfcRepository.InsertRangeAsync(addSfcList);
+            await _manuSfcInfoRepository.InsertsAsync(addSfcInfoList);
+
+            return addSfcList.Count;
+        }
+
+
         #endregion
 
         /// <summary>
@@ -1070,5 +1189,14 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             return localDateTime;
         }
 
+        /// <summary>
+        /// lms工单复线转换
+        /// </summary>
+        /// <param name="orderCode"></param>
+        /// <returns></returns>
+        private string LmsOrderFxChange(string orderCode)
+        {
+            return orderCode.Replace("FX", "").Replace("XF","").Replace("XFFX", "");
+        }
     }
 }

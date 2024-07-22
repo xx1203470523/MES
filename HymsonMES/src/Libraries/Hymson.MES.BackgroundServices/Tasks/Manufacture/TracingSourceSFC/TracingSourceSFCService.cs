@@ -94,7 +94,7 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.TracingSourceSFC);
 
             // 获取流转表数据（因为这张表的数据会有更新操作，所以不能用常规水位）
-            DateTime startWaterMarkTime = ConvertFromUnixTimeMilliseconds(waterMarkId);
+            DateTime startWaterMarkTime = UnixTimestampMillisToDateTime(waterMarkId);
             var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
             {
                 StartWaterMarkTime = startWaterMarkTime,
@@ -250,7 +250,7 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
             if (maxUpdateWaterMarkUpdatedOn != null)
             {
-                long timestamp = ConvertToUnixTimeMilliseconds(maxUpdateWaterMarkUpdatedOn.Value);
+                long timestamp = GetTimestampInMilliseconds(maxUpdateWaterMarkUpdatedOn.Value);
                 rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
             }
             trans.Complete();
@@ -290,6 +290,41 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             DateTime nowInTargetTimeZone = TimeZoneInfo.ConvertTime(nowOffset.DateTime, targetTimeZone);
 
             return nowInTargetTimeZone;
+        }
+
+        /// <summary>
+        /// 转为毫秒时间戳
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        private long GetTimestampInMilliseconds(DateTime? dateTime)
+        {
+            if (dateTime == null)
+            {
+                return 0;
+            }
+
+            // 首先将本地时间转换为UTC时间  
+            DateTime utcDateTime = ((DateTime)dateTime).ToUniversalTime();
+            // 然后计算UTC时间与Unix纪元（1970年1月1日UTC）之间的差值  
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan timeSpan = utcDateTime - epoch;
+            return (long)timeSpan.TotalMilliseconds;
+        }
+
+        /// <summary>
+        /// 将Unix时间戳（毫秒）转换为DateTime  
+        /// </summary>
+        /// <param name="timestamp"></param>
+        /// <returns></returns>
+        private DateTime UnixTimestampMillisToDateTime(long timestamp)
+        {
+            // 将Unix时间戳转换为UTC DateTime  
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            DateTime utcDateTime = epoch.AddMilliseconds(timestamp);
+            // 然后将UTC DateTime转换为本地时间  
+            DateTime localDateTime = utcDateTime.ToLocalTime();
+            return localDateTime;
         }
 
 
