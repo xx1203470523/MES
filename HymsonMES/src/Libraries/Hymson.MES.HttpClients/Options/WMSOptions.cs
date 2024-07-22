@@ -14,13 +14,13 @@ namespace Hymson.MES.HttpClients.Options
         /// <summary>
         /// 基础地址
         /// </summary>
-        public string BaseAddressUri { get; set; } = "http://192.168.126.148:20040/";
+        public string BaseAddressUri { get; set; } = "";
 
         /// <summary>
         /// 请求token
         /// 2V55DBFUQOOM8OI0TE1B2ON3HF2QXK6W
         /// </summary>
-        public string SYSTOKEN { get; set; } = "2V55DBFUQOOM8OI0TE1B2ON3HF2QXK6W";
+        public string SysToken { get; set; } = "";
 
         /// <summary>
         /// 创建工单

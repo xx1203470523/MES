@@ -94,12 +94,13 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.TracingSourceSFC);
 
             // 获取流转表数据（因为这张表的数据会有更新操作，所以不能用常规水位）
-            DateTime startWaterMarkTime = DateTimeOffset.FromUnixTimeMilliseconds(waterMarkId).DateTime;
+            DateTime startWaterMarkTime = ConvertFromUnixTimeMilliseconds(waterMarkId);
             var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
             {
                 StartWaterMarkTime = startWaterMarkTime,
                 Rows = limitCount
             });
+
             if (manuSfcCirculationList == null || !manuSfcCirculationList.Any()) return;
 
             var user = $"{BusinessKey.TracingSourceSFC}作业";
@@ -249,12 +250,48 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
             if (maxUpdateWaterMarkUpdatedOn != null)
             {
-                long timestamp = ((DateTimeOffset)maxUpdateWaterMarkUpdatedOn.Value).ToUnixTimeMilliseconds();
+                long timestamp = ConvertToUnixTimeMilliseconds(maxUpdateWaterMarkUpdatedOn.Value);
                 rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
             }
             trans.Complete();
 
         }
+
+        /// <summary>
+        /// 将DateTime转换为Unix时间戳（毫秒）
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        private static long ConvertToUnixTimeMilliseconds(DateTime dateTime)
+        {
+            // 转换为东八区时区的时间
+            TimeZoneInfo targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("China Standard Time"); // 示例时区
+            DateTime nowInTargetTimeZone = TimeZoneInfo.ConvertTimeFromUtc(dateTime, targetTimeZone);
+
+            // 将DateTime转换为DateTimeOffset，并计算时间戳
+            DateTimeOffset nowOffset = new(nowInTargetTimeZone);
+            long timestamp = nowOffset.ToUnixTimeMilliseconds();
+
+            return timestamp;
+        }
+
+        /// <summary>
+        /// 将Unix时间戳（毫秒）转换为DateTime
+        /// </summary>
+        /// <param name="timestamp"></param>
+        /// <returns></returns>
+        private static DateTime ConvertFromUnixTimeMilliseconds(long timestamp)
+        {
+            // 将时间戳转换为DateTimeOffset
+            DateTimeOffset nowOffset = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
+
+            // 转换为东八区时区的时间
+            TimeZoneInfo targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("China Standard Time"); // 示例时区
+            DateTime nowInTargetTimeZone = TimeZoneInfo.ConvertTime(nowOffset.DateTime, targetTimeZone);
+
+            return nowInTargetTimeZone;
+        }
+
 
     }
 }
