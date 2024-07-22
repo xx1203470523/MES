@@ -498,6 +498,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
                 if (lmsResult.IsSuccess == false)
                 {
                     ts.Dispose();
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16418)).WithData("msg", lmsResult.Message);
                 }
             }
 
