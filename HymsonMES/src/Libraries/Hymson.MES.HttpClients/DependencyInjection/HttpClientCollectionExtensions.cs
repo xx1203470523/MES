@@ -1,4 +1,5 @@
 ﻿
+using Hymson.HttpClientHandlers;
 using Hymson.MES.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,10 +24,11 @@ namespace Microsoft.Extensions.DependencyInjection
            
             var printOptions = new PrintOptions();
             configuration.GetSection("PrintOptions").Bind(printOptions);
+            services.AddClientHandlerService();
             services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
             {
                 httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
-            });
+            }).AddHttpMessageHandler<LoggingDelegatingHandler>();
 
             return services;
         }
