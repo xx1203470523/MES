@@ -163,5 +163,18 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request);
 
+        /// <summary>
+        /// 成品入库
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task ProductReceiptRequestAsync(ProductReceiptRequest request);
+
+        /// <summary>
+        /// 取消入库
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<bool> ProductReceiptCancelAsync(MaterialReturnCancel request);
     }
 }

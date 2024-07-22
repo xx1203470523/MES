@@ -135,6 +135,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> RefreshQtyAsync(RefreshQtyCommand command);
         Task<int> ClearQtyAsync(ClearQtyCommand command);
         Task<int> RefreshStatusAsync(RefreshStatusCommand command);
+
+        Task<IEnumerable<ManuContainerBarcodeEntity>> GetByContainerIdAsync(ManuContainerIdQuery query);
         #endregion
     }
 }

@@ -128,4 +128,132 @@ namespace Hymson.MES.HttpClients.Requests
         public string SendOn { get; set; }
     }
 
+    /// <summary>
+    /// 成品入库退料申请单
+    /// </summary>
+    public record ProductReceiptCancel
+    {
+        /// <summary>
+        /// 仓库编号
+        /// </summary>
+        [JsonPropertyName("warehouseCode")]
+        public string WarehouseCode { get; set; }
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        /// 
+        [JsonPropertyName("syncCode")]
+        public string SyncCode { get; set; }
+        [JsonPropertyName("type")]
+        public int Type { get; set; } = 101;
+        /// <summary>
+        /// 下发日期
+        /// </summary>
+        /// 
+        [JsonPropertyName("sendOn")]
+        public string SendOn { get; set; }
+
+    }
+    /// <summary>
+    /// 入库退料DTO
+    /// </summary>
+    public record ProductReceiptCancelDto
+    {
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        public string SyncCode { get; set; }
+        public string SendOn { get; set; }
+    }
+
+    /// <summary>
+    /// 入库申请单
+    /// </summary>
+    public record ProductReceiptRequest
+    {
+        /// <summary>
+        /// 仓库编号
+        /// </summary>
+        [JsonPropertyName("warehouseCode")]
+        public string WarehouseCode { get; set; }
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        /// 
+        [JsonPropertyName("syncCode")]
+        public string SyncCode { get; set; }
+        [JsonPropertyName("type")]
+        public int Type { get; set; } = 101;
+        /// <summary>
+        /// 下发日期
+        /// </summary>
+        /// 
+        [JsonPropertyName("sendOn")]
+        public string SendOn { get; set; }
+        /// <summary>
+        /// 退料信息
+        /// </summary>
+        /// 
+        [JsonPropertyName("details")]
+        public List<ProductReceiptItemDto> Details { get; set; }
+    }
+
+    /// <summary>
+    /// 成品入库
+    /// </summary>
+    public record ProductReceiptRequestDto
+    {
+
+        public string SyncCode { get; set; }
+
+
+        public string SendOn { get; set; }
+
+        public List<ProductReceiptItemDto> Details { get; set; }
+    }
+    /// <summary>
+    /// 成品入库明细item
+    /// </summary>
+    public record ProductReceiptItemDto
+    {
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        /// 
+        [JsonPropertyName("materialCode")]
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 单位编号
+        /// </summary>
+        /// 
+        [JsonPropertyName("unitCode")]
+        public string UnitCode { get; set; }
+
+        /// <summary>
+        /// 物料数量
+        /// </summary>
+        /// 
+        [JsonPropertyName("quantity")]
+        public string Quantity { get; set; }
+        /// <summary>
+        /// 物料批次号
+        /// </summary>
+        /// 
+        [JsonPropertyName("lotCode")]
+        public string LotCode { get; set; }
+        /// <summary>
+        /// 物料条码
+        /// </summary>
+        /// 
+        [JsonPropertyName("sfc")]
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 箱码
+        /// </summary>
+        [JsonPropertyName("boxCode")]
+        public string? BoxCode { get; set; }
+
+    }
 }
