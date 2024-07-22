@@ -20,6 +20,9 @@ using Hymson.MES.Data.Repositories.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.WHMaterialReceipt;
 using Hymson.MES.Data.Repositories.WhMaterialReceiptDetail;
+using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Requests.WMS;
+using Hymson.MES.HttpClients.RotorHandle;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
@@ -93,6 +96,11 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IIQCOrderCreateService _iqcOrderCreateService;
 
         /// <summary>
+        /// 服务接口（WMS）
+        /// </summary>
+        private readonly IWMSApiClient _wmsApiClient;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -107,6 +115,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="whSupplierRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="iqcOrderCreateService"></param>
+        /// <param name="wmsApiClient"></param>
         public QualIqcOrderLiteService(ICurrentUser currentUser, ICurrentSite currentSite,
             IQualIqcOrderLiteRepository qualIqcOrderLiteRepository,
             IQualIqcOrderLiteDetailRepository qualIqcOrderLiteDetailRepository,
@@ -117,7 +126,8 @@ namespace Hymson.MES.Services.Services.Quality
             IProcMaterialRepository procMaterialRepository,
             IWhSupplierRepository whSupplierRepository,
             IInteAttachmentRepository inteAttachmentRepository,
-            IIQCOrderCreateService iqcOrderCreateService)
+            IIQCOrderCreateService iqcOrderCreateService,
+            IWMSApiClient wmsApiClient)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -131,6 +141,7 @@ namespace Hymson.MES.Services.Services.Quality
             _whSupplierRepository = whSupplierRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _iqcOrderCreateService = iqcOrderCreateService;
+            _wmsApiClient = wmsApiClient;
         }
 
 
@@ -323,6 +334,10 @@ namespace Hymson.MES.Services.Services.Quality
             orderEntity.Status = IQCLiteStatusEnum.Completed;
             orderEntity.UpdatedBy = user;
             orderEntity.UpdatedOn = time;
+
+            // TODO: 将结果推送给WMS
+            var wmsRequestDto = new IQCReceiptRequestDto { };
+            await _wmsApiClient.IQCReceiptCallBackAsync(wmsRequestDto);
 
             // 保存
             var rows = 0;

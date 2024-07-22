@@ -1,11 +1,12 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.SystemServices.Dtos
+namespace Hymson.MES.HttpClients.Requests.WMS
 {
     /// <summary>
     /// IQC请求Dto
     /// </summary>
-    public record WhMaterialReceiptDto : BaseEntityDto
+    public record IQCReturnRequestDto : BaseEntityDto
     {
         /// <summary>
         /// 收货单号
@@ -25,14 +26,14 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<WhMaterialReceiptMaterialDto>? Details { get; set; }
+        public IEnumerable<IQCReturnMaterialRequestDto>? Details { get; set; }
 
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public record WhMaterialReceiptMaterialDto : BaseEntityDto
+    public record IQCReturnMaterialRequestDto : BaseEntityDto
     {
         /// <summary>
         /// 物料编码
@@ -73,6 +74,11 @@ namespace Hymson.MES.SystemServices.Dtos
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public TrueOrFalseEnum IsQualified { get; set; }
 
     }
 

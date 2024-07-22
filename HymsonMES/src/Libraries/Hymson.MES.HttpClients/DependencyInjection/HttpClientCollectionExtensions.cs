@@ -20,7 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddHttpClientService(this IServiceCollection services, IConfiguration configuration)
         {
-           
+
             //var printOptions = new PrintOptions();
             //configuration.GetSection("PrintOptions").Bind(printOptions);
             //services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
@@ -29,8 +29,8 @@ namespace Microsoft.Extensions.DependencyInjection
             //});
 
             var wmsOptions = new XnebulaWMSOption();
-            configuration.GetSection("XnebulaWMSOptions").Bind(wmsOptions);
-            services.AddHttpClient<IXnebulaWMSApiClient, XnebulaWMSApiClient>().ConfigureHttpClient(httpClient =>
+            configuration.GetSection("WMSOptions").Bind(wmsOptions);
+            services.AddHttpClient<IWMSApiClient, WMSApiClient>().ConfigureHttpClient(httpClient =>
             {
                 httpClient.BaseAddress = new Uri(wmsOptions.BaseAddressUri);
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", wmsOptions.Token);
@@ -54,7 +54,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        
+
 
         /// <summary>
         /// 添加配置
@@ -68,6 +68,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        
+
     }
 }
