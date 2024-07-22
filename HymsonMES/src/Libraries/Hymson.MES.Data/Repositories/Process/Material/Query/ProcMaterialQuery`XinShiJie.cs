@@ -8,7 +8,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 物料编码列表
         /// </summary>
-        public string[]? MaterialCodes { get; set; }
+        public IEnumerable<string>? MaterialCodes { get; set; }
 
     }
 }

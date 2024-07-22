@@ -44,6 +44,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 工单id，待退料的工单
         /// </summary>
+        public long SourceWorkOrderId { get; set; }
+
+        /// <summary>
+        /// 工单id，待退料的工单
+        /// </summary>
         public string SourceWorkOrderCode { get; set; }
 
 

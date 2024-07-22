@@ -1,12 +1,16 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.WHMaterialReceipt;
 using Hymson.MES.Core.Domain.WHMaterialReceiptDetail;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.WHMaterialReceipt;
@@ -34,6 +38,11 @@ namespace Hymson.MES.SystemServices.Services.Quality
         private readonly ISysConfigRepository _sysConfigRepository;
 
         /// <summary>
+        /// 服务接口（检验单生成）
+        /// </summary>
+        private readonly IIQCOrderCreateService _iqcOrderCreateService;
+
+        /// <summary>
         /// 仓储接口（物料）
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
@@ -49,24 +58,43 @@ namespace Hymson.MES.SystemServices.Services.Quality
         private readonly IWhMaterialReceiptRepository _whMaterialReceiptRepository;
 
         /// <summary>
+        /// 仓储接口（iqc检验单）
+        /// </summary>
+        private readonly IQualIqcOrderLiteRepository _qualIqcOrderLiteRepository;
+
+        /// <summary>
+        /// 仓储接口（iqc检验单明细）
+        /// </summary>
+        private readonly IQualIqcOrderLiteDetailRepository _qualIqcOrderLiteDetailRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="sysConfigRepository"></param>
+        /// <param name="iqcOrderCreateService"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="whSupplierRepository"></param>
         /// <param name="whMaterialReceiptRepository"></param>
+        /// <param name="qualIqcOrderLiteRepository"></param>
+        /// <param name="qualIqcOrderLiteDetailRepository"></param>
         public QualIQCService(ILogger<QualIQCService> logger,
             ISysConfigRepository sysConfigRepository,
+            IIQCOrderCreateService iqcOrderCreateService,
             IProcMaterialRepository procMaterialRepository,
             IWhSupplierRepository whSupplierRepository,
-            IWhMaterialReceiptRepository whMaterialReceiptRepository)
+            IWhMaterialReceiptRepository whMaterialReceiptRepository,
+            IQualIqcOrderLiteRepository qualIqcOrderLiteRepository,
+            IQualIqcOrderLiteDetailRepository qualIqcOrderLiteDetailRepository)
         {
             _logger = logger;
             _sysConfigRepository = sysConfigRepository;
+            _iqcOrderCreateService = iqcOrderCreateService;
             _procMaterialRepository = procMaterialRepository;
             _whSupplierRepository = whSupplierRepository;
             _whMaterialReceiptRepository = whMaterialReceiptRepository;
+            _qualIqcOrderLiteRepository = qualIqcOrderLiteRepository;
+            _qualIqcOrderLiteDetailRepository = qualIqcOrderLiteDetailRepository;
         }
 
 
@@ -150,6 +178,41 @@ namespace Hymson.MES.SystemServices.Services.Quality
                 details.Add(detail);
             }
 
+            // 自动添加到来料IQC
+            // 生成检验单号
+            var inspectionOrder = await _iqcOrderCreateService.GenerateCommonIQCOrderCodeAsync(new CoreServices.Bos.Common.BaseBo
+            {
+                SiteId = siteId,
+                User = updateUser
+            });
+
+            // 检验单
+            var orderEntity = new QualIqcOrderLiteEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = entity.SiteId,
+                InspectionOrder = inspectionOrder,
+                MaterialReceiptId = entity.Id,
+                SupplierId = entity.SupplierId,
+                Status = IQCLiteStatusEnum.WaitInspect,
+                IsQualified = null,
+                CreatedBy = updateUser,
+                CreatedOn = updateTime
+            };
+
+            // 检验单明细
+            var orderDetailEntities = details.Select(s => new QualIqcOrderLiteDetailEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = entity.SiteId,
+                IQCOrderId = orderEntity.Id,
+                MaterialReceiptDetailId = s.Id,
+                MaterialId = s.MaterialId,
+                IsQualified = null,
+                CreatedBy = updateUser,
+                CreatedOn = updateTime
+            });
+
             // 插入数据
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
@@ -157,6 +220,11 @@ namespace Hymson.MES.SystemServices.Services.Quality
             // 先删除
             // await _whMaterialReceiptRepository.DeletesDetailByIdAsync(new long[] { entity.Id });
             if (details.Any()) await _whMaterialReceiptRepository.InsertDetailAsync(details);
+
+            // 保存IQC检验单
+            rows += await _qualIqcOrderLiteRepository.InsertAsync(orderEntity);
+            rows += await _qualIqcOrderLiteDetailRepository.InsertRangeAsync(orderDetailEntities);
+
             trans.Complete();
             return rows;
         }

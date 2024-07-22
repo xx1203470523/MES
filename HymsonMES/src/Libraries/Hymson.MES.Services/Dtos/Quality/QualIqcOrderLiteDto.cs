@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式;1-让步；2-挑选；3-返工；4-报废；
         /// </summary>
-        public HandMethodEnum? HandMethod { get; set; }
+        public IQCHandMethodEnum? HandMethod { get; set; }
 
     }
 
@@ -123,7 +123,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式
         /// </summary>
-        public HandMethodEnum? HandMethod { get; set; }
+        public IQCHandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 报检人
@@ -213,14 +213,34 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string StatusText { get; set; }
 
         /// <summary>
+        /// 收货人
+        /// </summary>
+        public string ReceiptUser { get; set; }
+
+        /// <summary>
         /// 收货时间
         /// </summary>
         public string ReceiptTime { get; set; }
 
         /// <summary>
+        /// 送检人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
         /// 送检时间
         /// </summary>
-        public string InspectionTime { get; set; }
+        public string CreatedOn { get; set; }
+
+        /// <summary>
+        /// 更新人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public string UpdatedOn { get; set; }
 
     }
 
@@ -280,11 +300,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long? SupplierId { get; set; }
 
         /// <summary>
-        /// 收货单详情Id
-        /// </summary>
-        public long MaterialReceiptDetailId { get; set; }
-
-        /// <summary>
         /// 数量
         /// </summary>
         public decimal? Qty { get; set; }
@@ -307,7 +322,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式;1-让步；2-挑选；3-返工；4-报废；
         /// </summary>
-        public HandMethodEnum? HandMethod { get; set; }
+        public IQCHandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 不合格处理方式
@@ -357,6 +372,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string? MaterialVersion { get; set; }
         */
+
+        /// <summary>
+        /// 收货单号
+        /// </summary>
+        public string? ReceiptNum { get; set; }
 
         /// <summary>
         /// 供应商编码

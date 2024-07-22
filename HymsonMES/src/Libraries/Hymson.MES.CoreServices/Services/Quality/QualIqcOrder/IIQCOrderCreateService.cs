@@ -1,4 +1,5 @@
-﻿using Hymson.MES.CoreServices.Bos.Quality;
+﻿using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.CoreServices.Bos.Quality;
 
 namespace Hymson.MES.CoreServices.Services.Quality
 {
@@ -20,6 +21,13 @@ namespace Hymson.MES.CoreServices.Services.Quality
         /// <param name="bo"></param>
         /// <returns></returns>
         Task<string> GenerateIQCOrderCodeAsync(IQCOrderCreateBo bo);
+
+        /// <summary>
+        /// 检验单号生成
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<string> GenerateCommonIQCOrderCodeAsync(BaseBo bo);
 
     }
 }

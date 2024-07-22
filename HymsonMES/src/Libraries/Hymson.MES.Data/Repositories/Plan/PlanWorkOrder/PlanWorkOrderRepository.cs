@@ -300,7 +300,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             if (!string.IsNullOrWhiteSpace(pageQuery.OrderCode))
             {
                 sqlBuilder.Where("wo.OrderCode = @OrderCode");
-            }           
+            }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -326,7 +326,11 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            if (!string.IsNullOrWhiteSpace(query.OrderCode)) sqlBuilder.Where("OrderCode LIKE @OrderCode");
+            if (!string.IsNullOrWhiteSpace(query.OrderCode))
+            {
+                query.OrderCode = $"%{query.OrderCode}%";
+                sqlBuilder.Where("OrderCode LIKE @OrderCode");
+            }
             if (query.Codes != null && query.Codes.Any())
             {
                 sqlBuilder.Where("OrderCode IN @Codes");

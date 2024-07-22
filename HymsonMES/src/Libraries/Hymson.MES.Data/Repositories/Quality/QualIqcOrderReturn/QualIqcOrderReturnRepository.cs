@@ -119,9 +119,9 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-            if (query.SupplierId.HasValue)
+            if (query.WorkOrderId.HasValue)
             {
-                sqlBuilder.Where("SupplierId = @SupplierId");
+                sqlBuilder.Where("WorkOrderId = @WorkOrderId");
             }
             if (query.Status.HasValue)
             {
@@ -153,13 +153,13 @@ namespace Hymson.MES.Data.Repositories.Quality
             //{
             //    sqlBuilder.Where("MaterialId = @MaterialId");
             //}
-            if (query.MaterialReceiptId.HasValue)
+            if (query.ReturnOrderId.HasValue)
             {
-                sqlBuilder.Where("MaterialReceiptId = @MaterialReceiptId");
+                sqlBuilder.Where("ReturnOrderId = @ReturnOrderId");
             }
-            if (query.SupplierId.HasValue)
+            if (query.WorkOrderId.HasValue)
             {
-                sqlBuilder.Where("SupplierId = @SupplierId");
+                sqlBuilder.Where("WorkOrderId = @WorkOrderId");
             }
             if (query.Status.HasValue)
             {
@@ -198,9 +198,14 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder)) sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
+            if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder))
+            {
+                pagedQuery.InspectionOrder = $"%{pagedQuery.InspectionOrder}%";
+                sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
+            }
             if (pagedQuery.IQCOrderIds != null) sqlBuilder.Where(" Id IN @IQCOrderIds ");
-            if (pagedQuery.WorkOrderIds != null) sqlBuilder.Where(" WorkOrderId IN @WorkOrderIds ");
+            if (pagedQuery.ReturnOrderIds != null && pagedQuery.ReturnOrderIds.Any()) sqlBuilder.Where(" ReturnOrderId IN @ReturnOrderIds ");
+            if (pagedQuery.WorkOrderIds != null && pagedQuery.WorkOrderIds.Any()) sqlBuilder.Where(" WorkOrderId IN @WorkOrderIds ");
             if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
             if (pagedQuery.IsQualified.HasValue) sqlBuilder.Where("IsQualified = @IsQualified");
 

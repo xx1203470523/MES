@@ -157,8 +157,7 @@ namespace Hymson.MES.Services.Services.Quality
             });
             if (orderEntities != null && orderEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11993))
-                    .WithData("Code", receiptEntity.ReceiptNum);
+                throw new CustomerValidationException(nameof(ErrorCode.MES11993)).WithData("Code", receiptEntity.ReceiptNum);
             }
 
             // 当前信息
@@ -173,12 +172,10 @@ namespace Hymson.MES.Services.Services.Quality
             });
 
             // 生成检验单号
-            var inspectionOrder = await _iqcOrderCreateService.GenerateIQCOrderCodeAsync(new IQCOrderCreateBo
+            var inspectionOrder = await _iqcOrderCreateService.GenerateCommonIQCOrderCodeAsync(new CoreServices.Bos.Common.BaseBo
             {
                 SiteId = receiptEntity.SiteId,
-                UserName = user,
-                MaterialReceiptEntity = receiptEntity,
-                MaterialReceiptDetailEntities = receiptDetailEntities
+                User = user
             });
 
             // 检验单
@@ -447,13 +444,15 @@ namespace Hymson.MES.Services.Services.Quality
             // 实体到DTO转换
             var dto = entity.ToModel<QualIqcOrderLiteBaseDto>();
             dto.StatusText = dto.Status.GetDescription();
-            dto.InspectionTime = entity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
+            dto.CreatedOn = entity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
+            dto.UpdatedOn = entity.UpdatedOn?.ToString("yyyy-MM-dd HH:mm:ss") ?? "";
 
             // 读取收货单
             var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(entity.MaterialReceiptId);
             if (receiptEntity == null) return dto;
 
             dto.ReceiptNum = receiptEntity.ReceiptNum;
+            dto.ReceiptUser = receiptEntity.CreatedBy;
             dto.ReceiptTime = receiptEntity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
 
             // 读取供应商
@@ -585,6 +584,18 @@ namespace Hymson.MES.Services.Services.Quality
                 else pagedQuery.MaterialIds = Array.Empty<long>();
             }
             */
+
+            // 将收货单号转换为收货单ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.ReceiptNum))
+            {
+                var receiptEntities = await _whMaterialReceiptRepository.GetEntitiesAsync(new WhMaterialReceiptQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    ReceiptNum = pagedQueryDto.ReceiptNum
+                });
+                if (receiptEntities != null && receiptEntities.Any()) pagedQuery.ReceiptIds = receiptEntities.Select(s => s.Id);
+                else pagedQuery.ReceiptIds = Array.Empty<long>();
+            }
 
             // 转换供应商编码变为供应商ID
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode)

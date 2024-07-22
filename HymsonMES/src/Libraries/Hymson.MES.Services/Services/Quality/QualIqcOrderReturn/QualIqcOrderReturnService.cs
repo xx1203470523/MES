@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Quality
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // 读取收货单
+            // 读取退料单
             var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(requestDto.ReceiptId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES11901));
 
@@ -152,12 +152,11 @@ namespace Hymson.MES.Services.Services.Quality
             var orderEntities = await _qualIqcOrderReturnRepository.GetEntitiesAsync(new QualIqcOrderReturnQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                MaterialReceiptId = returnEntity.Id
+                ReturnOrderId = returnEntity.Id
             });
             if (orderEntities != null && orderEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11996))
-                    .WithData("Code", returnEntity.ReqOrderCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES11996)).WithData("Code", returnEntity.ReqOrderCode);
             }
 
             // 当前信息
@@ -165,20 +164,30 @@ namespace Hymson.MES.Services.Services.Quality
             var time = HymsonClock.Now();
 
             // 读取退料单明细
-            var receiptDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
+            var returnDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
                 SiteId = returnEntity.SiteId,
                 ReturnOrderId = returnEntity.Id
             });
 
             // 生成检验单号
-            var inspectionOrder = await _iqcOrderCreateService.GenerateIQCOrderCodeAsync(new IQCOrderCreateBo
+            var inspectionOrder = await _iqcOrderCreateService.GenerateCommonIQCOrderCodeAsync(new CoreServices.Bos.Common.BaseBo
             {
                 SiteId = returnEntity.SiteId,
-                UserName = user,
-                //MaterialReceiptEntity = returnEntity,
-                //MaterialReceiptDetailEntities = receiptDetailEntities
+                User = user
             });
+
+            /*
+            // 根据工单Code读取工单信息
+            var workOrderEntities = await _planWorkOrderRepository.GetEntitiesAsync(new PlanWorkOrderNewQuery
+            {
+                SiteId = returnEntity.SiteId,
+                OrderCode = returnEntity.SourceWorkOrderCode
+            });
+
+            var workOrderEntity = workOrderEntities.FirstOrDefault()
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES13221));
+            */
 
             // 检验单
             var orderEntity = new QualIqcOrderReturnEntity
@@ -187,25 +196,42 @@ namespace Hymson.MES.Services.Services.Quality
                 SiteId = returnEntity.SiteId,
                 InspectionOrder = inspectionOrder,
                 ReturnOrderId = returnEntity.Id,
-                //WorkOrderId = returnEntity.WorkOrderId,
+                WorkOrderId = returnEntity.SourceWorkOrderId,
                 Status = IQCLiteStatusEnum.WaitInspect,
                 IsQualified = null,
                 CreatedBy = user,
                 CreatedOn = time
             };
 
-            // 检验单明细
-            var orderDetailEntities = receiptDetailEntities.Select(s => new QualIqcOrderReturnDetailEntity
+            /*
+            // 根据物料Code读取物料信息
+            var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
             {
-                Id = IdGenProvider.Instance.CreateId(),
                 SiteId = returnEntity.SiteId,
-                IQCOrderId = orderEntity.Id,
-                ReturnOrderDetailId = s.Id,
-                //MaterialId = s.MaterialId,
-                IsQualified = null,
-                CreatedBy = user,
-                CreatedOn = time
+                MaterialCodes = returnDetailEntities.Select(s => s.MaterialCode)
             });
+            */
+
+            // 检验单明细
+            List<QualIqcOrderReturnDetailEntity> orderDetailEntities = new();
+            foreach (var item in returnDetailEntities)
+            {
+                //var materialEntity = materialEntities.FirstOrDefault(f => f.MaterialCode == item.MaterialCode);
+                var orderDetailEntity = new QualIqcOrderReturnDetailEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = returnEntity.SiteId,
+                    IQCOrderId = orderEntity.Id,
+                    ReturnOrderDetailId = item.Id,
+                    BarCode = item.MaterialBarCode,
+                    MaterialId = item.MaterialId, //materialEntity?.Id ?? 0,
+                    IsQualified = null,
+                    CreatedBy = user,
+                    CreatedOn = time
+                };
+
+                orderDetailEntities.Add(orderDetailEntity);
+            }
 
             // 保存
             var rows = 0;
@@ -446,27 +472,26 @@ namespace Hymson.MES.Services.Services.Quality
             // 实体到DTO转换
             var dto = entity.ToModel<QualIqcOrderReturnBaseDto>();
             dto.StatusText = dto.Status.GetDescription();
-            dto.InspectionTime = entity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
+            dto.CreatedOn = entity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
+            dto.UpdatedOn = entity.UpdatedOn?.ToString("yyyy-MM-dd HH:mm:ss") ?? "";
 
             // 读取退料单
             var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(entity.ReturnOrderId);
             if (returnEntity == null) return dto;
 
             dto.ReqOrderCode = returnEntity.ReqOrderCode;
-            dto.ReceiptTime = returnEntity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
+            dto.ReturnUser = returnEntity.CreatedBy;
+            dto.ReturnTime = returnEntity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
 
-            /*
-            // 读取供应商
-            if (entity.SupplierId.HasValue)
+            // 读取工单
+            if (entity.WorkOrderId.HasValue)
             {
-                var supplierEntity = await _inteWorkCenterRepository.GetByIdAsync(entity.SupplierId.Value);
-                if (supplierEntity != null)
+                var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(entity.WorkOrderId.Value);
+                if (workOrderEntity != null)
                 {
-                    dto.SupplierCode = supplierEntity.Code;
-                    dto.SupplierName = supplierEntity.Name;
+                    dto.WorkOrderCode = workOrderEntity.OrderCode;
                 }
             }
-            */
 
             return dto;
         }
@@ -512,7 +537,7 @@ namespace Hymson.MES.Services.Services.Quality
                 var materialReturnDetailEntity = returnDetailEntities.FirstOrDefault(f => f.Id == entity.ReturnOrderDetailId);
                 if (materialReturnDetailEntity != null)
                 {
-                    dto.InternalBatch = materialReturnDetailEntity.Batch;
+                    dto.MaterialBarCode = materialReturnDetailEntity.MaterialBarCode;
                     dto.Qty = materialReturnDetailEntity.Qty;
                 }
 
@@ -526,7 +551,6 @@ namespace Hymson.MES.Services.Services.Quality
                         dto.MaterialCode = materialEntity.MaterialCode;
                         dto.MaterialName = materialEntity.MaterialName;
                         dto.MaterialVersion = materialEntity.Version ?? "";
-                        dto.Specifications = materialEntity.Specifications ?? "";
                         //dto.Unit = materialEntity.Unit ?? "";
                     }
                 }
@@ -569,6 +593,7 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderReturnPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
+            /*
             // 转换产品编码/版本变为产品ID
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode)
                 || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName)
@@ -584,8 +609,21 @@ namespace Hymson.MES.Services.Services.Quality
                 if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.MaterialIds = procMaterialEntities.Select(s => s.Id);
                 else pagedQuery.MaterialIds = Array.Empty<long>();
             }
+            */
 
-            // 转换工作中心编码变为工作中心ID
+            // 将退料单号变为退料单ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.ReqOrderCode))
+            {
+                var returnEntities = await _manuReturnOrderRepository.GetEntitiesAsync(new ManuReturnOrderQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    ReqOrderCode = pagedQueryDto.ReqOrderCode
+                });
+                if (returnEntities != null && returnEntities.Any()) pagedQuery.ReturnOrderIds = returnEntities.Select(s => s.Id);
+                else pagedQuery.ReturnOrderIds = Array.Empty<long>();
+            }
+
+            // 转换工单编码变为工单ID
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.WorkOrderCode))
             {
                 var workOrderEntities = await _planWorkOrderRepository.GetEntitiesAsync(new PlanWorkOrderNewQuery

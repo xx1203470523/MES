@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式;1-让步；2-挑选；3-返工；4-报废；
         /// </summary>
-        public HandMethodEnum? HandMethod { get; set; }
+        public IQCHandMethodEnum? HandMethod { get; set; }
 
     }
 
@@ -118,7 +118,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式
         /// </summary>
-        public HandMethodEnum? HandMethod { get; set; }
+        public IQCHandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 报检人
@@ -183,19 +183,14 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string ReqOrderCode { get; set; }
 
         /// <summary>
-        /// 供应商ID
+        /// 工单ID
         /// </summary>
-        public long SupplierId { get; set; }
+        public long WorkOrderId { get; set; }
 
         /// <summary>
-        /// 供应商编码
+        /// 工单编码
         /// </summary>
-        public string SupplierCode { get; set; }
-
-        /// <summary>
-        /// 供应商名称
-        /// </summary>
-        public string SupplierName { get; set; }
+        public string WorkOrderCode { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
@@ -208,15 +203,34 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string StatusText { get; set; }
 
         /// <summary>
-        /// 收货时间
+        /// 退料人
         /// </summary>
-        public string ReceiptTime { get; set; }
+        public string ReturnUser { get; set; }
+
+        /// <summary>
+        /// 退料时间
+        /// </summary>
+        public string ReturnTime { get; set; }
+
+        /// <summary>
+        /// 送检人
+        /// </summary>
+        public string CreatedBy { get; set; }
 
         /// <summary>
         /// 送检时间
         /// </summary>
-        public string InspectionTime { get; set; }
+        public string CreatedOn { get; set; }
 
+        /// <summary>
+        /// 更新人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public string UpdatedOn { get; set; }
     }
 
     /// <summary>
@@ -233,6 +247,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// IQC检验单Id
         /// </summary>
         public long IQCOrderId { get; set; }
+
+        /// <summary>
+        /// 物料条码
+        /// </summary>
+        public string MaterialBarCode { get; set; }
 
         /// <summary>
         /// 物料id
@@ -255,29 +274,19 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string MaterialVersion { get; set; }
 
         /// <summary>
-        /// 供应商批次
-        /// </summary>
-        public string SupplierBatch { get; set; }
-
-        /// <summary>
-        /// 内部
-        /// </summary>
-        public string InternalBatch { get; set; }
-
-        /// <summary>
-        /// 规格型号
-        /// </summary>
-        public string Specifications { get; set; }
-
-        /// <summary>
         /// 供应商Id
         /// </summary>
         public long? SupplierId { get; set; }
 
         /// <summary>
-        /// 收货单详情Id
+        /// 供应商编码
         /// </summary>
-        public long MaterialReceiptDetailId { get; set; }
+        public string SupplierCode { get; set; }
+
+        /// <summary>
+        /// 供应商名称
+        /// </summary>
+        public string SupplierName { get; set; }
 
         /// <summary>
         /// 数量
@@ -302,7 +311,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式;1-让步；2-挑选；3-返工；4-报废；
         /// </summary>
-        public HandMethodEnum? HandMethod { get; set; }
+        public IQCHandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 不合格处理方式
@@ -336,6 +345,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string? InspectionOrder { get; set; }
 
+        /*
         /// <summary>
         /// 物料编码
         /// </summary>
@@ -350,6 +360,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 物料版本
         /// </summary>
         public string? MaterialVersion { get; set; }
+        */
+
+        /// <summary>
+        /// 退料单号
+        /// </summary>
+        public string? ReqOrderCode { get; set; }
 
         /// <summary>
         /// 工单编码
