@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public long SiteId { get; set; }
 
         /// <summary>
-        /// 收货单明细
+        /// 收货单Id
         /// </summary>
         public long? MaterialReceiptId { get; set; }
 
@@ -42,9 +42,5 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// </summary>
         public IEnumerable<InspectionStatusEnum>? StatusArr { get; set; }
 
-        /// <summary>
-        /// 收货单明细Ids
-        /// </summary>
-        public IEnumerable<long>? MaterialReceiptDetailIds { get; set; }
     }
 }

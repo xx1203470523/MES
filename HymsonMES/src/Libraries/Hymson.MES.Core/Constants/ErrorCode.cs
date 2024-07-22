@@ -527,7 +527,7 @@
         public const string MES11993 = "检验单已生成，不允许重复生成！收货单【{Code}】";
         public const string MES11994 = "没有查询到检验单【{Code}】的明细！";
         public const string MES11995 = "检验单明细存在缺失！";
-        public const string MES11996 = "检验单已生成，不允许重复生成！退货单【{Code}】";
+        public const string MES11996 = "检验单已生成，不允许重复生成！退料单【{Code}】";
 
         public const string MES11908 = "样本条码【{Code}】已存在检验类型为【{Type}】的数据！";
         public const string MES11909 = "请录入样本条码！";

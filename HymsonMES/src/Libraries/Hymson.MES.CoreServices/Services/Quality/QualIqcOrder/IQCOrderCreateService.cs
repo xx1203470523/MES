@@ -2,6 +2,7 @@
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Quality;
 using Hymson.MES.CoreServices.Extension;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
@@ -430,6 +431,38 @@ namespace Hymson.MES.CoreServices.Services.Quality
             {
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
+                CodeRuleId = codeRules.First().Id,
+                Count = 1
+            });
+
+            return orderCodes.First();
+        }
+
+        /// <summary>
+        /// 检验单号生成
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<string> GenerateCommonIQCOrderCodeAsync(BaseBo bo)
+        {
+            var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
+            {
+                SiteId = bo.SiteId,
+                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.IQC
+            });
+            if (codeRules == null || !codeRules.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11991));
+            }
+            if (codeRules.Count() > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11992));
+            }
+
+            var orderCodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new Bos.Manufacture.ManuGenerateBarcode.GenerateBarcodeBo
+            {
+                SiteId = bo.SiteId,
+                UserName = bo.User,
                 CodeRuleId = codeRules.First().Id,
                 Count = 1
             });

@@ -50,9 +50,9 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public IEnumerable<long>? SupplierIds { get; set; }
 
         /// <summary>
-        /// 收货单详情Id
+        /// 收货单Id
         /// </summary>
-        public IEnumerable<long>? MaterialReceiptDetailIds { get; set; }
+        public IEnumerable<long>? ReceiptIds { get; set; }
 
     }
 }

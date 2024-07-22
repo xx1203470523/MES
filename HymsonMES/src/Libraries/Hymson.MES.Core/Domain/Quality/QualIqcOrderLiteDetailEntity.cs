@@ -40,7 +40,7 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 不合格处理方式;1-让步；2-挑选；3-返工；4-报废；
         /// </summary>
-        public HandMethodEnum? HandMethod { get; set; }
+        public IQCHandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 处理人
