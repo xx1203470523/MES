@@ -269,10 +269,15 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 //当前条码生产信息，兼容多段工序，根据工单和条码确认
                 //var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc && x.WorkOrderId == planWorkOrder.Id);
                 var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc);
+                var procProcedure = procProcedures.FirstOrDefault(a => a.Id == sfcProduceEntity?.ProcedureId);
                 if (sfcProduceEntity != null)
                 {
+                    //模组码绑定时会有进站动作，这时不校验（秀）
+                    var isCheck = true;
+                    if (sfcProduceEntity.SFC.Contains("QAM") && procProcedure?.Code == "OP230") isCheck = false;
+
                     // 校验设备资源对应的工序和在制工序是否一直
-                    if (procedureEntity.Id != sfcProduceEntity.ProcedureId)
+                    if (isCheck && procedureEntity.Id != sfcProduceEntity.ProcedureId)
                     {
                         //_logger.LogError($"工艺路线卡控,进站条码：{inBoundMoreDto.SFCs},进站资源对应工序：在制品工序不一致");
                         throw new CustomerValidationException(nameof(ErrorCode.MES16353)).WithData("SFC", string.Join(",", inBoundMoreDto.SFCs));
@@ -485,7 +490,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                         SiteId = _currentEquipment.SiteId,
                         //根据进站工序从创建生产记录
                         //ProcedureId =  processRouteFirstProcedure.ProcedureId ,
-                        ProcedureId =  procedureEntity.Id,
+                        ProcedureId = procedureEntity.Id,
                         EquipmentId = _currentEquipment.Id ?? 0,
                         ProductId = planWorkOrderEntity.ProductId,
                         WorkOrderId = planWorkOrderEntity.Id,

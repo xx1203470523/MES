@@ -280,7 +280,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 
             bool checkResult = true;
             //清安：模组码箱体预处理绑定时，不卡控在制工序必须和绑定工序一致
-            if (manuSfcProceProcedureEntity.Code == "OP230" && sfcProduceEntity.Status == SfcProduceStatusEnum.lineUp )
+            if (manuSfcProceProcedureEntity.Code == "OP230")
             {
                 checkResult = false;
             }
