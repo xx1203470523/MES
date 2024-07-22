@@ -92,4 +92,45 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public string Remark { get; set; } = "";
     }
+
+    /// <summary>
+    /// 容器表Dto
+    /// </summary>
+    public record InteContainerInfoViewDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 容器名称
+        /// </summary>
+        public string Name { get; set; } = "";
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string Code { get; set; } = "";
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; } = "";
+
+        /// <summary>
+        /// 品检状态
+        /// </summary>
+        public QualifiedStatusEnum Type { get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string Unit { get; set; }
+
+       /// <summary>
+       /// 数量
+       /// </summary>
+        public decimal Qty {  get; set; }
+
+        /// <summary>
+        /// 批次
+        /// </summary>
+        public string Batch { get; set; }
+    }
 }

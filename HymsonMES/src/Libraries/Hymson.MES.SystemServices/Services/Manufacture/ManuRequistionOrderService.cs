@@ -93,6 +93,7 @@ namespace Hymson.MES.SystemServices.Services
         private readonly ILocalizationService _localizationService;
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
         private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
+        private readonly IManuProductReceiptOrderRepository _manuProductReceiptOrderRepository;
 
         /// <summary>
         /// 构造函数
@@ -110,7 +111,8 @@ namespace Hymson.MES.SystemServices.Services
             IManuSfcRepository manuSfcRepository, IManuSfcInfoRepository manuSfcInfoRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
             IManuReturnOrderRepository manuReturnOrderRepository,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IManuProductReceiptOrderRepository manuProductReceiptOrderRepository)
         {
             _currentSystem = currentSystem;
             _traceLogService = traceLogService;
@@ -127,6 +129,7 @@ namespace Hymson.MES.SystemServices.Services
             _localizationService = localizationService;
             _manuRequistionOrderRepository = manuRequistionOrderRepository;
             _manuReturnOrderRepository = manuReturnOrderRepository;
+            _manuProductReceiptOrderRepository = manuProductReceiptOrderRepository;
         }
 
         public async Task PickMaterialsCallBackAsync(ProductionPickCallBackDto productionPickDto)
@@ -595,6 +598,80 @@ namespace Hymson.MES.SystemServices.Services
                 SiteId = siteId
             });
             return procMaterials;
+        }
+
+        /// <summary>
+        /// WMS入库请求结果反馈
+        /// </summary>
+        /// <param name="productionPickDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task ProductReceiptCallBackAsync(ProductionReturnCallBackDto productionPickDto)
+        {
+            //根据结果 标记这个单据是否创建成功
+            if (productionPickDto == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+            var id = productionPickDto.RequistionId.Split('_')[1];
+            var returnOrderEntity = await _manuProductReceiptOrderRepository.GetByIdAsync(long.Parse(id));
+            if (returnOrderEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16050)).WithData("orderId", productionPickDto.RequistionId);
+            }
+            switch (productionPickDto.State)
+            {
+                case ManuMaterialFormResponseEnum.Created:
+                    returnOrderEntity.Status = ProductReceiptStatusEnum.Created;
+                    break;
+                case ManuMaterialFormResponseEnum.Failed:
+                    returnOrderEntity.Status = ProductReceiptStatusEnum.Failed;
+                    break;
+                case ManuMaterialFormResponseEnum.ApprovalingSuccess:
+                    returnOrderEntity.Status = ProductReceiptStatusEnum.ApprovalingSuccess;
+                    break;
+                case ManuMaterialFormResponseEnum.ApprovalingFailed:
+                    returnOrderEntity.Status = ProductReceiptStatusEnum.ApprovalingFailed;
+                    break;
+                case ManuMaterialFormResponseEnum.CancelFailed:
+                    break;
+                case ManuMaterialFormResponseEnum.CancelSuccess:
+                    returnOrderEntity.Status = ProductReceiptStatusEnum.Cancel;
+                    break;
+                default:
+                    break;
+            }
+
+            if (returnOrderEntity.Status == ProductReceiptStatusEnum.ApprovalingSuccess)
+            {
+                string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
+                var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
+                {
+                    SiteId = _currentSystem.SiteId,
+                    OrderCode = orderCode,
+                });
+                var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryWorkOrderIdQuery
+                {
+                    SiteId = _currentSystem.SiteId,
+                    WorkOrderId = planWorkOrderEntity.Id
+                });
+                returnOrderEntity.Status = ProductReceiptStatusEnum.Receipt;
+                using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+                {
+
+                    await _whMaterialInventoryRepository.DeletesAsync(whMaterialInventoryEntities.Select(w => w.Id).ToArray());
+
+                    await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
+                }
+
+            }
+            else
+            {
+                await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
+            }
+
+
+
         }
     }
 }

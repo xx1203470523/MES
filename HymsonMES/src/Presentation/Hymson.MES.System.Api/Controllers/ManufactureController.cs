@@ -83,5 +83,19 @@ namespace Hymson.MES.System.Api.Controllers
         {
             await _manuRotorService.UploadCrossingStationData(stationData);
         }
+
+        /// <summary>
+        /// 成品入库单结果反馈
+        /// </summary>
+        /// <param name="callBackDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ProductReceiptCallBack")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        [LogDescription("成品入库单结果反馈", BusinessType.INSERT)]
+        public async Task ProductReceiptCallBackAsync([FromBody] ProductionReturnCallBackDto callBackDto)
+        {
+            await _manuRequistionOrderService.ProductReceiptCallBackAsync(callBackDto);
+        }
     }
 }

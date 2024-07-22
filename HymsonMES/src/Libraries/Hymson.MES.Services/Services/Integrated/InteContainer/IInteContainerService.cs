@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Inte;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -73,4 +74,11 @@ public interface IInteContainerService
     /// <returns></returns>
     Task UpdateStatusAsync(ChangeStatusDto param);
 
+
+    /// <summary>
+    /// 根据容器编码查询信息
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    Task<InteContainerInfoViewDto> QueryContainerInfoByCodeAsync(InteContainerQueryDto queryDto);
 }

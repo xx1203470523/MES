@@ -183,3 +183,31 @@ public class InteContainerInfoQueryDto : QueryDtoAbstraction
     /// </summary>
     public SysDataStatusEnum? Status { get; set; }
 }
+
+public class InteContainerQueryDto
+{
+    /// <summary>
+    /// 容器编码
+    /// </summary>
+    public string? Code { get; set; }
+
+    /// <summary>
+    /// 产线编码
+    /// </summary>
+    public string? WorkCenterCode { get; set; }
+
+    /// <summary>
+    /// 物料编码
+    /// </summary>
+    public string? MaterialCode { get; set; }
+
+    /// <summary>
+    /// 工单ID
+    /// </summary>
+    public long? Id { get; set; }
+
+    /// <summary>
+    /// 物料Id
+    /// </summary>
+    public long? ProductId {  get; set; }
+}

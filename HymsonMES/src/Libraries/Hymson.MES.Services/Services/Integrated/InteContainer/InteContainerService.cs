@@ -7,19 +7,26 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Inte;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality;
+using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Inte;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Plan;
+using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Data;
+using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Integrated.InteContainer;
 
@@ -35,8 +42,10 @@ public partial class InteContainerService : IInteContainerService
     private readonly IInteContainerInfoRepository _inteContainerInfoRepository;
     private readonly IInteContainerSpecificationRepository _inteContainerSpecificationRepository;
     private readonly IInteContainerFreightRepository _inteContainerFreightRepository;
-
+    private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
+    private readonly ISequenceService _sequenceService;
     private readonly IProcMaterialRepository _procMaterialRepository;
+    private readonly IQualFqcOrderRepository _qualFqcOrderRepository;
 
     private readonly ILocalizationService _localizationService;
 
@@ -52,7 +61,10 @@ public partial class InteContainerService : IInteContainerService
         ILocalizationService localizationService,
         AbstractValidator<InteContainerInfoDto> validationContainerInfoCreateRules,
         AbstractValidator<InteContainerInfoUpdateDto> validationContainerInfoUpdateRules,
-        IInteContainerInfoRepository inteContainerInfoRepository)
+        IInteContainerInfoRepository inteContainerInfoRepository,
+        IManuContainerBarcodeRepository manuContainerBarcodeRepository,
+        ISequenceService sequenceService,
+        IQualFqcOrderRepository qualFqcOrderRepository)
     {
         _currentUser = currentUser;
         _currentSite = currentSite;
@@ -64,6 +76,9 @@ public partial class InteContainerService : IInteContainerService
         _validationContainerInfoCreateRules = validationContainerInfoCreateRules;
         _validationContainerInfoUpdateRules = validationContainerInfoUpdateRules;
         _inteContainerInfoRepository = inteContainerInfoRepository;
+        _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
+        _sequenceService = sequenceService;
+        _qualFqcOrderRepository = qualFqcOrderRepository;
     }
 
     /// <summary>
@@ -624,4 +639,37 @@ public partial class InteContainerService : IInteContainerService
     }
 
     #endregion
+
+    /// <summary>
+    /// 根据容器编码查询信息
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    public async Task<InteContainerInfoViewDto> QueryContainerInfoByCodeAsync(InteContainerQueryDto queryDto )
+    {
+        InteContainerInfoViewDto inteContainerInfoViewDto = new InteContainerInfoViewDto();
+        var checkEntity = await _inteContainerRepository.GetByCodeAsync(new EntityByCodeQuery
+        {
+            Site = _currentSite.SiteId ?? 123456,
+            Code = queryDto.Code ?? ""
+        });
+        var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
+        if (checkEntity == null)
+            return inteContainerInfoViewDto;
+        var InspectionOrder = $"{queryDto.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
+        var entity = await _manuContainerBarcodeRepository.GetByContainerIdAsync(new ManuContainerIdQuery { ContainerId= checkEntity.Id, SiteId = _currentSite.SiteId ?? 123456});
+        inteContainerInfoViewDto.Type = QualifiedStatusEnum.Qualified;
+        inteContainerInfoViewDto.Unit = "个";
+        inteContainerInfoViewDto.Qty = 1;// entity.Count();
+        //var qualFqcOrderLists = await _qualFqcOrderRepository.GetEntitiesAsync(new QualFqcOrderQuery
+        //{
+        //    WorkOrderId = queryDto.Id,
+        //    SiteId = _currentSite.SiteId ?? 123456,
+        //});
+        //var qualFqcOrders = qualFqcOrderLists.Where(x => x.MaterialId == queryDto.ProductId).ToList();
+
+        inteContainerInfoViewDto.Batch = InspectionOrder;
+
+        return inteContainerInfoViewDto;
+    }
 }

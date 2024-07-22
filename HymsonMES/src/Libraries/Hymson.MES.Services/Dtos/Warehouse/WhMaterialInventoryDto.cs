@@ -11,6 +11,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Warehouse;
+using System.Text.Json.Serialization;
 
 namespace Hymson.MES.Services.Dtos.Warehouse
 {
@@ -667,7 +668,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 工序代码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
         
 
         /// <summary>
@@ -716,6 +717,80 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string WorkCode { get; set; }
 
     }
+
+    /// <summary>
+    /// 派工单领料申请
+    /// </summary>
+    public record ProductReceiptRequest
+    {
+        /// <summary>
+        /// 派工单编码
+        /// </summary>
+        public string WorkCode { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long OrderCodeId { get; set; }
+
+        /// <summary>
+        /// 领料数量
+        /// </summary>
+        public List<ProductReceiptDetailRequest> Items { get; set; }
+    }
+
+    /// <summary>
+    /// 成品入库申请
+    /// </summary>
+    public record ProductReceiptDetailRequest
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? Sfc { get; set; }
+
+        /// <summary>
+        /// 箱码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 批次号
+        /// </summary>
+        public string Batch {  get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string Unit {  get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 品检状态
+        /// </summary>
+        public string? Status { get; set; }
+
+        /// <summary>
+        /// 仓库编号
+        /// </summary>
+        public string? WarehouseCode { get; set; }
+    }
+
+    
     /// <summary>
     /// 取消退料
     /// </summary>
