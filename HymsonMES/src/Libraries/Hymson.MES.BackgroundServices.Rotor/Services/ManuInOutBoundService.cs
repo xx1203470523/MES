@@ -207,7 +207,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
             else
             {
-                startWaterMarkTime = DateTime.Parse("2024-04-01 01:01:01");
+                startWaterMarkTime = DateTime.Parse("2024-07-01 01:01:01");
             }
             DateTime start = startWaterMarkTime;
 
@@ -265,6 +265,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //5. 查询产品和工单的对应关系
             List<WorkOrderListDto> productOrderList = await GetProductOrder(sfcList);
             List<string> lmsOrderList = productOrderList.Select(m => m.WorkNo).Distinct().ToList();
+            //转子线接收MES的工单后，会生成两个工单，一个带FX的工单，是铁芯工单，还有一个正常的工单是压轴主线 
+            lmsOrderList.ForEach(m => m = m.Replace("FX", ""));
             #endregion
 
             #region 获取MES数据
@@ -332,16 +334,32 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     foreach (var upItem in curUpMatList)
                     {
-                        sfcUpList.Add(new SfcUpMatDto()
+                        if(string.IsNullOrEmpty(upItem.MatValue) == false)
                         {
-                            MatName = upItem.MatName,
-                            MatValue = upItem.MatValue,
-                            MatBatchCode = upItem.MatBatchCode,
-                            BarCode = string.IsNullOrEmpty(upItem.MatValue) ? upItem.MatBatchCode : upItem.MatValue,
-                            MatCode = string.IsNullOrEmpty(upItem.MatValue) ? upItem.LotCode : upItem.MatCode,
-                            MatType = string.IsNullOrEmpty(upItem.MatValue) ? MatType_One : MatType_Batch,
-                            MatNum = upItem.MatNum
-                        });
+                            sfcUpList.Add(new SfcUpMatDto()
+                            {
+                                MatName = upItem.MatName,
+                                MatValue = upItem.MatValue,
+                                MatBatchCode = upItem.MatBatchCode,
+                                BarCode = upItem.MatValue,
+                                MatCode = upItem.MatCode,
+                                MatType = MatType_One,
+                                MatNum = upItem.MatNum
+                            });
+                        }
+                        if(string.IsNullOrEmpty(upItem.MatBatchCode) == false)
+                        {
+                            sfcUpList.Add(new SfcUpMatDto()
+                            {
+                                MatName = upItem.MatName,
+                                MatValue = upItem.MatValue,
+                                MatBatchCode = upItem.MatBatchCode,
+                                BarCode = upItem.MatBatchCode,
+                                MatCode = upItem.LotCode,
+                                MatType = MatType_Batch,
+                                MatNum = upItem.MatNum
+                            });
+                        }
                     }
                 }
                 

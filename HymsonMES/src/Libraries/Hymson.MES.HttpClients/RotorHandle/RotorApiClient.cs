@@ -44,6 +44,11 @@ namespace Hymson.MES.HttpClients.RotorHandle
         private readonly ISysConfigRepository _sysConfigRepository;
 
         /// <summary>
+        /// 是否初始化
+        /// </summary>
+        private bool IsInit = false;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public RotorApiClient(HttpClient httpClient, IOptions<RotorOption> options,
@@ -60,6 +65,11 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// <returns></returns>
         private async Task InitAsync()
         {
+            if (IsInit == true)
+            {
+                return;
+            }
+            IsInit = true;
             var tokenList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorLmsToken });
             if (tokenList == null || !tokenList.Any())
             {
