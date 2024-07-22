@@ -122,6 +122,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Dtos
         public string VendorProductName { get; set; }
 
         /// <summary>
+        /// NIO产品代码
+        /// </summary>
+        public string NioProductCode { get; set; }
+
+        /// <summary>
+        /// NIO产品名称
+        /// </summary>
+        public string NioProductName { get; set; }
+
+        /// <summary>
         /// 产品一次良率
         /// </summary>
         public string PassRateTarget { get; set; }

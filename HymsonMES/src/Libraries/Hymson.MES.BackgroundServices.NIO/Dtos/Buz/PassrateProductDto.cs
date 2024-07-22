@@ -1,10 +1,53 @@
 ﻿namespace Hymson.MES.BackgroundServices.NIO.Dtos.Buz
 {
-    /// <summary>
-    /// 产品一次合格率
-    /// </summary>
+    /// <summary>  
+    /// 产品一次合格率  
+    /// </summary>  
     public class PassrateProductDto
     {
+        /// <summary>  
+        /// 工厂唯一标识  
+        /// </summary>  
+        public string PlantId { get; set; }
 
+        /// <summary>  
+        /// 车间唯一标识（如果适用）  
+        /// </summary>  
+        public string WorkshopId { get; set; }
+
+        /// <summary>  
+        /// 生产线唯一标识（如果适用）  
+        /// </summary>  
+        public string ProductionLineId { get; set; }
+
+        /// <summary>  
+        /// 合作伙伴总成产品代码  
+        /// </summary>  
+        public string VendorProductNum { get; set; }
+
+        /// <summary>  
+        /// 合作伙伴总成物料名称  
+        /// </summary>  
+        public string VendorProductName { get; set; }
+
+        /// <summary>  
+        /// 合格率（百分比形式，例如：99）  
+        /// </summary>  
+        public decimal PassRate { get; set; }
+
+        /// <summary>  
+        /// 合格率目标（百分比形式，例如：98）  
+        /// </summary>  
+        public decimal PassRateTarget { get; set; }
+
+        /// <summary>  
+        /// 更新时间（Unix时间戳，秒）  
+        /// </summary>  
+        public long UpdateTime { get; set; }
+
+        /// <summary>  
+        /// 调试标志  
+        /// </summary>  
+        public bool Debug { get; set; }
     }
 }

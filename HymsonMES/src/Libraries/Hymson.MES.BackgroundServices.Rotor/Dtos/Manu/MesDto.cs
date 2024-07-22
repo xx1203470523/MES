@@ -180,6 +180,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         /// 1-OK 其他-NG
         /// </summary>
         public bool Result { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreateOn { get; set; }
     }
 
 }

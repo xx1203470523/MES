@@ -155,6 +155,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 获取马威参数
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetSfcStepMavelAsync(EntityByWaterSiteIdQuery query)
+        {
+            string sql = $@"
+                select * 
+                from manu_sfc_step t1
+                where t1.SiteId = @SiteId
+                and Id > @StartWaterMarkId 
+                ORDER BY Id ASC 
+                LIMIT @Rows;
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcStepEntity>(sql, query);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuSfcStepEntity"></param>
