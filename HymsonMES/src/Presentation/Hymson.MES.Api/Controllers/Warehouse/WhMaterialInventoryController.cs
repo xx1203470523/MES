@@ -230,7 +230,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <summary>
         /// 领料申请 按照工单数量领料
         /// </summary>
-        /// <param name="sfcs"></param>
+        /// <param name="request"></param>
         [HttpPost("PickMaterialsRequest")]
         [LogDescription("领料申请", BusinessType.INSERT)]
         public async Task PickMaterialsRequestAsync([FromBody] PickMaterialsRequest request)
@@ -240,7 +240,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <summary>
         /// 领料申请  按照物料明细领料
         /// </summary>
-        /// <param name="sfcs"></param>
+        /// <param name="request"></param>
         [HttpPost("PickMaterialsRequestV2")]
         [LogDescription("领料申请", BusinessType.INSERT)]
         public async Task PickMaterialsRequestAsync([FromBody] PickMaterialsRequestV2 request)
@@ -250,7 +250,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <summary>
         /// 取消领料
         /// </summary>
-        /// <param name="sfcs"></param>
+        /// <param name="request"></param>
         [HttpPost("PickMaterialsCancel")]
         [LogDescription("取消领料", BusinessType.INSERT)]
         public async Task<bool> PickMaterialsCancelAsync([FromBody] PickMaterialsCancel request)
@@ -260,7 +260,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <summary>
         /// 退料申请
         /// </summary>
-        /// <param name="sfcs"></param>
+        /// <param name="request"></param>
         [HttpPost("MaterialReturnRequest")]
         [LogDescription("退料申请", BusinessType.INSERT)]
         public async Task MaterialReturnRequestAsync([FromBody] MaterialReturnRequest request)
@@ -270,7 +270,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// <summary>
         /// 取消退料
         /// </summary>
-        /// <param name="sfcs"></param>
+        /// <param name="request"></param>
         [HttpPost("MaterialReturnCancel")]
         [LogDescription("取消退料", BusinessType.INSERT)]
         public async Task<bool> MaterialReturnCancelAsync([FromBody] MaterialReturnCancel request)
