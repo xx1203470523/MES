@@ -230,6 +230,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             {
                 sqlBuilder.Where("MaterialBarCode IN @MaterialBarCodes");
             }
+            if (whMaterialInventoryQuery.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where("WorkOrderId=@WorkOrderId");
+            }
 
             using var conn = GetMESDbConnection();
             var whMaterialInventoryEntities = await conn.QueryAsync<WhMaterialInventoryEntity>(template.RawSql, whMaterialInventoryQuery);

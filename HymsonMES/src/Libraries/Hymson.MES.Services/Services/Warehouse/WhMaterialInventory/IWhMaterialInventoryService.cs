@@ -170,5 +170,12 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="request"></param>
         /// <returns></returns>
         Task<bool> ProductReceiptCancelAsync(MaterialReturnCancel request);
+
+        /// <summary>
+        /// 根据工单查询工单的领料列表
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WhMaterialInventoryDetailDto>> GetPickMaterialsByOrderidAsync(long orderId);
     }
 }

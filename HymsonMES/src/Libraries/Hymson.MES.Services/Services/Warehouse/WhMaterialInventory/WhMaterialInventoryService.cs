@@ -1274,12 +1274,13 @@ namespace Hymson.MES.Services.Services.Warehouse
             await _validationPickMaterialsRequest.ValidateAndThrowAsync(request);
             //派工单校验
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
-             {
-                 SiteId = _currentSite.SiteId??0,
-                 OrderCode = request.WorkCode,
-             });
-            if(planWorkOrderEntity != null) {
-                if(planWorkOrderEntity.Status== PlanWorkOrderStatusEnum.Finish)
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                OrderCode = request.WorkCode,
+            });
+            if (planWorkOrderEntity != null)
+            {
+                if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Finish)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16048)).WithData("WorkOrder", request.WorkCode);
                 }
@@ -1298,15 +1299,15 @@ namespace Hymson.MES.Services.Services.Warehouse
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
                 Status = WhWarehouseRequistionStatusEnum.Approvaling,
-                Type =  ManuRequistionTypeEnum.WorkOrderPicking,
+                Type = ManuRequistionTypeEnum.WorkOrderPicking,
                 WorkOrderCode = request.WorkCode,
                 WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
                 WorkPlanId = planWorkPlanEntity.Id
             };
-            
+
 
             //获取派工单指定BOM记录
-           
+
             //var bomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrderEntity.ProductBOMId);
 
             var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
@@ -1316,7 +1317,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 PlanProductId = planWorkOrderEntity.ProductId,
             });
 
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkPlanMaterialEntities.Select(b=>b.MaterialId).Distinct().ToArray());
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkPlanMaterialEntities.Select(b => b.MaterialId).Distinct().ToArray());
             var productionPickMaterialDtos = new List<HttpClients.Requests.ProductionPickMaterialDto>();
             var validationFailures = new List<ValidationFailure>();
             foreach (var item in planWorkPlanMaterialEntities)
@@ -1342,7 +1343,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 HttpClients.Requests.ProductionPickMaterialDto productionPickMaterialDto = new HttpClients.Requests.ProductionPickMaterialDto
                 {
                     MaterialCode = materialEntity.MaterialCode,
-                    Quantity = (request.Qty * item.Usages*(1+item.Loss)).ToString(),
+                    Quantity = (request.Qty * item.Usages * (1 + item.Loss)).ToString(),
                     UnitCode = materialEntity.Unit
                 };
                 productionPickMaterialDtos.Add(productionPickMaterialDto);
@@ -1358,7 +1359,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SendOn = HymsonClock.Now().ToString(),
                 details = productionPickMaterialDtos
             });
-            if(response)
+            if (response)
             {
                 await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
             }
@@ -1369,11 +1370,11 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request)
         {
             var requistionOrderEntity = await _manuRequistionOrderRepository.GetByIdAsync(request.RequistionOrderId);
-            if(requistionOrderEntity.Status == WhWarehouseRequistionStatusEnum.Approvaling)
+            if (requistionOrderEntity.Status == WhWarehouseRequistionStatusEnum.Approvaling)
             {
                 var response = await _wmsRequest.MaterialPickingCancelAsync(new HttpClients.Requests.MaterialPickingCancelDto
                 {
-                    SendOn= HymsonClock.Now().ToString(),
+                    SendOn = HymsonClock.Now().ToString(),
                     SyncCode = $"{request.WorkCode}_{request.RequistionOrderId}",
                 });
                 return response;
@@ -1389,9 +1390,9 @@ namespace Hymson.MES.Services.Services.Warehouse
             //获取派工单对象
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
             {
-                SiteId = _currentSite.SiteId??0,
+                SiteId = _currentSite.SiteId ?? 0,
                 OrderCode = request.WorkCode
-            })?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", request.WorkCode);
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", request.WorkCode);
             var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new WhMaterialInventoryWorkOrderIdQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
@@ -1399,11 +1400,11 @@ namespace Hymson.MES.Services.Services.Warehouse
             });
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryEntities.Select(b => b.MaterialId).Distinct().ToArray());
             var returnMaterialDtos = new List<HttpClients.Requests.ProductionReturnMaterialItemDto>();
-           
+
             foreach (var item in whMaterialInventoryEntities)
             {
                 var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
-               
+
 
                 HttpClients.Requests.ProductionReturnMaterialItemDto returnMaterialDto = new HttpClients.Requests.ProductionReturnMaterialItemDto
                 {
@@ -1424,12 +1425,12 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
             var response = await _wmsRequest.MaterialReturnRequestAsync(new HttpClients.Requests.MaterialReturnRequestDto
             {
-                
+
                 SyncCode = $"{request.WorkCode}_{manuReturnOrderEntity.Id}",
                 SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
                 Details = returnMaterialDtos
             });
-            if(response)
+            if (response)
                 await _manuReturnOrderRepository.InsertAsync(manuReturnOrderEntity);
             else
             {
@@ -1584,7 +1585,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
             //查询生产计划产品
-            var planWorkPlanProductEntity = await _planWorkPlanProductRepository.GetByPlanIdAndProductIdAsync(planWorkPlanEntity.Id,planWorkOrderEntity.ProductId)
+            var planWorkPlanProductEntity = await _planWorkPlanProductRepository.GetByPlanIdAndProductIdAsync(planWorkPlanEntity.Id, planWorkOrderEntity.ProductId)
               ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
             //创建领料申请单
             ManuRequistionOrderEntity manuRequistionOrderEntity = new ManuRequistionOrderEntity
@@ -1632,7 +1633,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(p=>p.MaterialId== item.MaterialId);
+                var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(p => p.MaterialId == item.MaterialId);
                 HttpClients.Requests.ProductionPickMaterialDto productionPickMaterialDto = new HttpClients.Requests.ProductionPickMaterialDto
                 {
                     MaterialCode = materialEntity.MaterialCode,
@@ -1660,6 +1661,40 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
             }
+        }
+
+        /// <summary>
+        /// 根据工单查询工单的领料列表
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WhMaterialInventoryDetailDto>> GetPickMaterialsByOrderidAsync(long orderId)
+        {
+            var whMaterialInventories=new List<WhMaterialInventoryDetailDto>();
+            var inventoryEntities = await _whMaterialInventoryRepository.GetWhMaterialInventoryEntitiesAsync(new WhMaterialInventoryQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkOrderId = orderId
+            });
+            if(inventoryEntities==null || !inventoryEntities.Any())
+            {
+                return whMaterialInventories;
+            }
+
+            var materialIds = inventoryEntities.Select(x => x.MaterialId).Distinct().ToArray();
+            var  procMaterialEntities= await _procMaterialRepository.GetByIdsAsync(materialIds);
+
+            foreach (var whMaterial in inventoryEntities)
+            {
+                var material = procMaterialEntities.FirstOrDefault(x => x.Id == whMaterial.MaterialId);
+
+                var whMaterialInventoryDto = whMaterial.ToModel<WhMaterialInventoryDetailDto>(); 
+                whMaterialInventoryDto.MaterialCode = material?.MaterialCode ?? "";
+                whMaterialInventoryDto.MaterialName = material?.MaterialName ?? "";
+                whMaterialInventoryDto.Specifications = material?.Specifications ?? "";
+                whMaterialInventories.Add(whMaterialInventoryDto);
+            }
+            return whMaterialInventories;
         }
     }
 }
