@@ -323,16 +323,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string Remark { get; set; }
 
-        /// <summary>
-        /// 是否免检
-        /// </summary>
-        public TrueOrFalseEnum IsFree { get; set; } = TrueOrFalseEnum.No;
-
-        /// <summary>
-        /// 是否免检
-        /// </summary>
-        public string IsFreeText { get; set; }
-
     }
 
     /// <summary>

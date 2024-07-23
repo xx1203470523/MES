@@ -211,16 +211,19 @@ namespace Hymson.MES.SystemServices.Services.Plan
             // 判断是否有不存在的产品编码
             var productCodes = workPlanDtos.SelectMany(s => s.Products).Select(s => s.ProductCode).Distinct();
             var productEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = currentBo.SiteId, MaterialCodes = productCodes });
-            if (productEntities == null || productEntities.Any())
+
+            /*
+            if (productEntities == null || !productEntities.Any())
             {
                 // 这里应该提示产品不存在
                 throw new CustomerValidationException(nameof(ErrorCode.MES10251)).WithData("Code", string.Join(',', productCodes));
             }
+            */
 
             // 判断BOM编码是否存在
             var bomCodes = workPlanDtos.SelectMany(s => s.Products).Select(s => s.BomCode).Distinct();
             var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = currentBo.SiteId, Codes = bomCodes });
-            if (bomEntities == null || bomEntities.Any())
+            if (bomEntities == null || !bomEntities.Any())
             {
                 // 这里应该提示BOM不存在
                 throw new CustomerValidationException(nameof(ErrorCode.MES10233)).WithData("bomCode", string.Join(',', bomCodes));
@@ -305,18 +308,20 @@ namespace Hymson.MES.SystemServices.Services.Plan
                 // 遍历产品列表
                 foreach (var productDto in planDto.Products)
                 {
+                    /*
                     // 读取产品实体
                     var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == productDto.ProductCode)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES10245)).WithData("Code", productDto.ProductCode);
+                    */
 
                     // 添加生产计划产品
                     var WorkPlanProductId = productDto.Id ?? IdGenProvider.Instance.CreateId();
                     resposeBo.ProductAdds.Add(new PlanWorkPlanProductEntity
                     {
                         WorkPlanId = planEntity.Id,
-                        ProductId = productEntity.Id,
+                        ProductId = 0, //productEntity.Id,
                         ProductCode = productDto.ProductCode,
-                        ProductVersion = productEntity.Version ?? "",
+                        ProductVersion = "", //productEntity.Version ?? "",
                         BomId = productDto.BomId,
                         BomCode = productDto.BomCode,
                         BomVersion = productDto.BomVersion,

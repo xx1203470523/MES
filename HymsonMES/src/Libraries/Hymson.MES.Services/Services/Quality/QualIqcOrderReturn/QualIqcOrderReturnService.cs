@@ -7,7 +7,6 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -572,16 +571,6 @@ namespace Hymson.MES.Services.Services.Quality
                     dto.MaterialName = "-";
                     dto.MaterialVersion = "-";
                 }
-
-                // 如果是免检
-                if (dto.IsFree == TrueOrFalseEnum.Yes)
-                {
-                    dto.IsQualified = TrueOrFalseEnum.Yes;
-                    dto.Remark = "";
-                }
-
-                // 输出显示文本
-                dto.IsFreeText = dto.IsFree.GetDescription();
 
                 if (dto.IsQualified.HasValue) dto.IsQualifiedText = dto.IsQualified.GetDescription();
                 else dto.IsQualifiedText = "";
