@@ -40,5 +40,18 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         Task<bool> MaterialReturnCancelAsync(MaterialReturnCancelDto request);
 
+        /// <summary>
+        /// 入库申请
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<bool> ProductReceiptRequestAsync(ProductReceiptRequestDto request);
+
+        /// <summary>
+        /// 取消入库
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<bool> ProductReceiptCancelAsync(ProductReceiptCancelDto request);
     }
 }

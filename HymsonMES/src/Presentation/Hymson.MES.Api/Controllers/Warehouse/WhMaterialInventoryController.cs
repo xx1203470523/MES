@@ -277,5 +277,26 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.MaterialReturnCancelAsync(request);
         }
+
+        /// <summary>
+        /// 入库申请
+        /// </summary>
+        /// <param name="request"></param>
+        [HttpPost("ProductReceiptRequest")]
+        [LogDescription("入库申请", BusinessType.INSERT)]
+        public async Task ProductReceiptRequestAsync([FromBody] ProductReceiptRequest request)
+        {
+            await _whMaterialInventoryService.ProductReceiptRequestAsync(request);
+        }
+        /// <summary>
+        /// 取消入库
+        /// </summary>
+        /// <param name="request"></param>
+        [HttpPost("ProductReceiptCancel")]
+        [LogDescription("取消入库", BusinessType.INSERT)]
+        public async Task<bool> ProductReceiptCancelAsync([FromBody] MaterialReturnCancel request)
+        {
+            return await _whMaterialInventoryService.ProductReceiptCancelAsync(request);
+        }
     }
 }

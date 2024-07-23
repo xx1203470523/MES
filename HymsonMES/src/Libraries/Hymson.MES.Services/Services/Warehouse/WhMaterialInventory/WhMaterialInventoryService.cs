@@ -29,6 +29,8 @@ using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Hymson.Web.Framework.WorkContext;
+using System.Reactive;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -93,6 +95,13 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
         private readonly IPlanWorkPlanProductRepository _planWorkPlanProductRepository;
         private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
+        private readonly IManuProductReceiptOrderRepository _manuProductReceiptOrderRepository;
+        /// <summary>
+        /// 当前系统
+        /// </summary>
+        private readonly ICurrentSystem _currentSystem;
+
+        private readonly IManuProductReceiptOrderDetailRepository _manuProductReceiptOrderDetailRepository;
 
         /// <summary>
         /// 构造函数
@@ -108,7 +117,28 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
+        /// <param name="validationBarCodeSplitAdjust"></param>
+        /// <param name="validationPickMaterialsRequest"></param>
         /// <param name="whMaterialInventoryCoreService"></param>
+        /// <param name="inteCodeRulesRepository"></param>
+        /// <param name="inteCodeRulesMakeRepository"></param>
+        /// <param name="manuGenerateBarcodeService"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="sfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="manuRequistionOrderRepository"></param>
+        /// <param name="wMSRequest"></param>
+        /// <param name="procBomRepository"></param>
+        /// <param name="procBomDetailRepository"></param>
+        /// <param name="manuReturnOrderDetailRepository"></param>
+        /// <param name="manuReturnOrderRepository"></param>
+        /// <param name="planWorkPlanMaterialRepository"></param>
+        /// <param name="planWorkPlanRepository"></param>
+        /// <param name="planWorkPlanProductRepository"></param>
+        /// <param name="manuBarCodeRelationRepository"></param>
+        /// <param name="manuProductReceiptOrderRepository"></param>
+        /// <param name="currentSystem"></param>
+        /// <param name="manuProductReceiptOrderDetailRepository"></param>
         public WhMaterialInventoryService(ICurrentUser currentUser, ICurrentSite currentSite,
             ILocalizationService localizationService,
             IProcMaterialRepository procMaterialRepository,
@@ -137,7 +167,10 @@ namespace Hymson.MES.Services.Services.Warehouse
             IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
             IPlanWorkPlanRepository planWorkPlanRepository,
             IPlanWorkPlanProductRepository planWorkPlanProductRepository,
-            IManuBarCodeRelationRepository manuBarCodeRelationRepository)
+            IManuBarCodeRelationRepository manuBarCodeRelationRepository,
+            IManuProductReceiptOrderRepository manuProductReceiptOrderRepository,
+            ICurrentSystem currentSystem,
+            IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -165,10 +198,13 @@ namespace Hymson.MES.Services.Services.Warehouse
             _procBomRepository = procBomRepository;
             _procMaterialRepository = procMaterialRepository;
             _manuReturnOrderDetailRepository = manuReturnOrderDetailRepository;
-            _manuReturnOrderRepository  = manuReturnOrderRepository;
+            _manuReturnOrderRepository = manuReturnOrderRepository;
             _planWorkPlanRepository = planWorkPlanRepository;
             _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
             _planWorkPlanProductRepository = planWorkPlanProductRepository;
+            _manuProductReceiptOrderRepository = manuProductReceiptOrderRepository;
+            _currentSystem = currentSystem;
+            _manuProductReceiptOrderDetailRepository = manuProductReceiptOrderDetailRepository;
         }
 
 
@@ -1353,6 +1389,115 @@ namespace Hymson.MES.Services.Services.Warehouse
             else
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16051)).WithData("msg", "请求发送失败");
+            }
+        }
+
+        /// <summary>
+        /// 成品入库申请
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task ProductReceiptRequestAsync(ProductReceiptRequest request)
+        {
+            //获取派工单对象
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                OrderCode = request.WorkCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", request.WorkCode);
+            var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new WhMaterialInventoryWorkOrderIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkOrderId = planWorkOrderEntity.Id
+            });
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryEntities.Select(b => b.MaterialId).Distinct().ToArray());
+            var returnMaterialDtos = new List<HttpClients.Requests.ProductReceiptItemDto>();
+            var manuProductReceiptOrderDetails = new List<ManuProductReceiptOrderDetailEntity>();
+            //创建入库申请单
+            ManuProductReceiptOrderEntity manuProductReceiptOrderEntity = new ManuProductReceiptOrderEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                Status = ProductReceiptStatusEnum.Approvaling,
+                WorkOrderCode = request.OrderCodeId,
+                WarehouseOrderCode = request.WorkCode,
+                CreatedBy = _currentSystem.Name,
+                UpdatedBy = _currentSystem.Name,
+            };
+            foreach (var item in request.Items)
+            {
+                // var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
+
+                HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
+                {
+                    BoxCode = item.Code,
+                    LotCode = item.Batch,
+                    MaterialCode = request.MaterialCode,
+                    Quantity = item.Qty.ToString(),
+                    UnitCode = item.Unit,
+                };
+                ManuProductReceiptOrderDetailEntity manuProductReceiptOrderDetailEntity = new ManuProductReceiptOrderDetailEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    ProductReceiptId = manuProductReceiptOrderEntity.Id,
+                    MaterialCode = request.MaterialCode,
+                    MaterialName = request.MaterialName,
+                    ContaineCode = item.Code,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Unit = item.Unit,
+                    CreatedBy = _currentSystem.Name,
+                    UpdatedBy = _currentSystem.Name,
+                };
+                manuProductReceiptOrderDetails.Add(manuProductReceiptOrderDetailEntity);
+                returnMaterialDtos.Add(returnMaterialDto);
+            }
+            //using (var trans = TransactionHelper.GetTransactionScope())
+            //{
+            //    await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
+            //    await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
+            //    trans.Complete();
+            //}
+            var response = await _wmsRequest.ProductReceiptRequestAsync(new HttpClients.Requests.ProductReceiptRequestDto
+            {
+                SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
+                SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
+                Details = returnMaterialDtos
+            });
+            if (response)
+            {
+                using (var trans = TransactionHelper.GetTransactionScope())
+                {
+                    await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
+                    await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
+                    trans.Complete();
+                }
+            }
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16051)).WithData("msg", "请求发送失败");
+            }
+        }
+
+        /// <summary>
+        /// 成品入库取消
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<bool> ProductReceiptCancelAsync(MaterialReturnCancel request)
+        {
+            var manuProductReceiptOrder = await _manuProductReceiptOrderRepository.GetByIdAsync(request.ReturnOrderId);
+            if (manuProductReceiptOrder.Status == ProductReceiptStatusEnum.Approvaling)
+            {
+                var response = await _wmsRequest.ProductReceiptCancelAsync(new HttpClients.Requests.ProductReceiptCancelDto
+                {
+                    SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
+                    SyncCode = $"{request.WorkCode}_{request.ReturnOrderId}",
+                });
+                return response;
+            }
+            else
+            {
+                return false;
             }
         }
 

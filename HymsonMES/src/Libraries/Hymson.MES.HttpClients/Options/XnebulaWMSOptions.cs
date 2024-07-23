@@ -32,6 +32,16 @@ namespace Hymson.MES.HttpClients
         /// 取消入库操作配置
         /// </summary>
         public WMSReceiptCancelOptions ReceiptCancel { get; set; }
+
+        /// <summary>
+        /// 成品入库单配置 
+        /// </summary>
+        public WMSProductReceiptOptions ProductReceiptOptions { get; set; }
+
+        /// <summary>
+        /// 取消成品入库操作配置
+        /// </summary>
+        public WMSProductReceiptCancelOptions ProductReceiptCancel { get; set; }
     }
     /// <summary>
     /// 出库单操作
@@ -90,6 +100,39 @@ namespace Hymson.MES.HttpClients
     public class WMSReceiptCancelOptions
     {
 
+        /// <summary>
+        /// 仓库编码
+        /// </summary>
+        public string WarehouseCode { get; set; }
+        /// <summary>
+        /// 单据类型
+        /// </summary>
+        public int Type { get; set; }
+        /// <summary>
+        /// 路由信息
+        /// </summary>
+        public string RoutePath { get; set; }
+    }
+
+    public class WMSProductReceiptOptions
+    {
+
+        /// <summary>
+        /// 仓库编码
+        /// </summary>
+        public string WarehouseCode { get; set; }
+        /// <summary>
+        /// 单据类型
+        /// </summary>
+        public int Type { get; set; }
+        /// <summary>
+        /// 路由信息
+        /// </summary>
+        public string RoutePath { get; set; }
+    }
+
+    public class WMSProductReceiptCancelOptions
+    {
         /// <summary>
         /// 仓库编码
         /// </summary>

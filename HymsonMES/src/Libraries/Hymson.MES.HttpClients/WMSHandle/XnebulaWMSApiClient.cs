@@ -90,9 +90,36 @@ namespace Hymson.MES.HttpClients
             return httpResponse.IsSuccessStatusCode;
         }
 
-       
+        public async Task<bool> ProductReceiptCancelAsync(ProductReceiptCancelDto request)
+        {
+            ProductReceiptCancel productReceiptCancel = new ProductReceiptCancel()
+            {
+                SendOn = request.SendOn,
+                SyncCode = request.SyncCode,
+                Type = _options.ProductReceiptCancel.Type,
+                WarehouseCode = _options.ProductReceiptCancel.WarehouseCode
+            };
+            var httpResponse = await _httpClient.PostAsJsonAsync<ProductReceiptCancel>(_options.ProductReceiptCancel.RoutePath, productReceiptCancel);
 
-       
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+            return httpResponse.IsSuccessStatusCode;
+        }
 
+        public async Task<bool> ProductReceiptRequestAsync(ProductReceiptRequestDto request)
+        {
+            ProductReceiptRequest materialReturnRequest = new ProductReceiptRequest()
+            {
+                SendOn = request.SendOn,
+                SyncCode = request.SyncCode,
+                Details = request.Details,
+                Type = _options.ProductReceiptOptions.Type,
+                WarehouseCode = _options.ProductReceiptOptions.WarehouseCode
+            };
+
+            var httpResponse = await _httpClient.PostAsJsonAsync<ProductReceiptRequest>(_options.ProductReceiptOptions.RoutePath, materialReturnRequest);
+
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+            return httpResponse.IsSuccessStatusCode;
+        }
     }
 }

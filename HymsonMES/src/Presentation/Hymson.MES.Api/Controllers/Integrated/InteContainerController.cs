@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Inte;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
-    /// ¿ØÖÆÆ÷£¨ÈİÆ÷Î¬»¤£©
+    /// æ§åˆ¶å™¨ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
     /// </summary>
     [ApiController]
     [Route("api/v2/[controller]")]
@@ -22,7 +23,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         private readonly IInteContainerService _inteContainerService;
 
         /// <summary>
-        /// ¹¹Ôìº¯Êı£¨ÈİÆ÷Î¬»¤£©
+        /// æ„é€ å‡½æ•°ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
         /// </summary>
         /// <param name="inteContainerService"></param>
         public InteContainerController(IInteContainerService inteContainerService)
@@ -31,12 +32,12 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// Ìí¼Ó£¨ÈİÆ÷Î¬»¤£©
+        /// æ·»åŠ ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [LogDescription("Ìí¼ÓÈİÆ÷", BusinessType.INSERT)]
+        [LogDescription("æ·»åŠ å®¹å™¨", BusinessType.INSERT)]
         [PermissionDescription("inte:container:insert")]
         public async Task CreateAsync(InteContainerInfoDto createDto)
         {
@@ -44,12 +45,12 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// ¸üĞÂ£¨ÈİÆ÷Î¬»¤£©
+        /// æ›´æ–°ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [LogDescription("¸üĞÂÈİÆ÷", BusinessType.UPDATE)]
+        [LogDescription("æ›´æ–°å®¹å™¨", BusinessType.UPDATE)]
         [PermissionDescription("inte:container:update")]
         public async Task ModifyAsync(InteContainerInfoUpdateDto modifyDto)
         {
@@ -57,7 +58,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// ²éÑ¯ÈİÆ÷ĞÅÏ¢
+        /// æŸ¥è¯¢å®¹å™¨ä¿¡æ¯
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -68,7 +69,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// ²éÑ¯ÈİÆ÷¹æ¸ñĞÅÏ¢
+        /// æŸ¥è¯¢å®¹å™¨è§„æ ¼ä¿¡æ¯
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -79,7 +80,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// ²éÑ¯ÈİÆ÷×°ÔØÁĞ±í
+        /// æŸ¥è¯¢å®¹å™¨è£…è½½åˆ—è¡¨
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -90,12 +91,12 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// É¾³ı£¨ÈİÆ÷Î¬»¤£©
+        /// åˆ é™¤ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [LogDescription("É¾³ıÈİÆ÷", BusinessType.DELETE)]
+        [LogDescription("åˆ é™¤å®¹å™¨", BusinessType.DELETE)]
         [PermissionDescription("inte:container:delete")]
         public async Task DeletesAsync(IEnumerable<long> ids)
         {
@@ -103,7 +104,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// »ñÈ¡·ÖÒ³Êı¾İ£¨ÈİÆ÷Î¬»¤£©
+        /// è·å–åˆ†é¡µæ•°æ®ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
@@ -116,7 +117,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// ²éÑ¯ÏêÇé£¨ÈİÆ÷Î¬»¤£©
+        /// æŸ¥è¯¢è¯¦æƒ…ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -126,15 +127,26 @@ namespace Hymson.MES.Api.Controllers.Integrated
             return await _inteContainerService.GetDetailAsync(id);
         }
 
-        #region ×´Ì¬±ä¸ü
         /// <summary>
-        /// ÆôÓÃ£¨ÈİÆ÷Î¬»¤£©
+        /// æŸ¥è¯¢è¯¦æƒ…ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet("queryByCode")]
+        public async Task<InteContainerInfoViewDto> QueryContainerInfoByCodeAsync([FromQuery] InteContainerQueryDto queryDto)
+        {
+            return await _inteContainerService.QueryContainerInfoByCodeAsync(queryDto);
+        }
+
+        #region çŠ¶æ€å˜æ›´
+        /// <summary>
+        /// å¯ç”¨ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("updateStatusEnable")]
-        [LogDescription("ÈİÆ÷Î¬»¤", BusinessType.UPDATE)]
+        [LogDescription("å®¹å™¨ç»´æŠ¤", BusinessType.UPDATE)]
         [PermissionDescription("inte:container:updateStatusEnable")]
         public async Task UpdateStatusEnable([FromBody] long id)
         {
@@ -142,13 +154,13 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// ±£Áô£¨ÈİÆ÷Î¬»¤£©
+        /// ä¿ç•™ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("updateStatusRetain")]
-        [LogDescription("ÈİÆ÷Î¬»¤", BusinessType.UPDATE)]
+        [LogDescription("å®¹å™¨ç»´æŠ¤", BusinessType.UPDATE)]
         [PermissionDescription("inte:container:updateStatusRetain")]
         public async Task UpdateStatusRetain([FromBody] long id)
         {
@@ -156,13 +168,13 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// ·Ï³ı£¨ÈİÆ÷Î¬»¤£©
+        /// åºŸé™¤ï¼ˆå®¹å™¨ç»´æŠ¤ï¼‰
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("updateStatusAbolish")]
-        [LogDescription("ÈİÆ÷Î¬»¤", BusinessType.UPDATE)]
+        [LogDescription("å®¹å™¨ç»´æŠ¤", BusinessType.UPDATE)]
         [PermissionDescription("inte:container:updateStatusAbolish")]
         public async Task UpdateStatusAbolish([FromBody] long id)
         {

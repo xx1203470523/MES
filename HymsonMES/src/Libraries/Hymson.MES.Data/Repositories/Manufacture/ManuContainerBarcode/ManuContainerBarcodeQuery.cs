@@ -28,4 +28,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public long SiteId { get; set; }
     }
+
+    /// <summary>
+    /// 容器条码表 查询参数
+    /// </summary>
+    public partial class ManuContainerIdQuery
+    {
+        /// <summary>
+        /// 容器Id
+        /// </summary>
+        public long? ContainerId { get; set; }
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
+    }
 }
