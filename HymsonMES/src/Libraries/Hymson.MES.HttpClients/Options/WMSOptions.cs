@@ -12,19 +12,18 @@
 
         /// <summary>
         /// 请求token
-        /// 2V55DBFUQOOM8OI0TE1B2ON3HF2QXK6W
         /// </summary>
         public string SysToken { get; set; } = "";
 
         /// <summary>
-        /// IQC来料检验
+        /// WMS回调路径（来料）
         /// </summary>
-        public string IQCReceiptRoute { get; set; } = "api/Order/Create";
+        public string IQCReceiptRoute { get; set; } = "";
 
         /// <summary>
-        /// 创建工单
+        /// WMS回调路径（退料）
         /// </summary>
-        public string IQCReturnRoute { get; set; } = "api/Order/Create";
+        public string IQCReturnRoute { get; set; } = "";
 
     }
 }

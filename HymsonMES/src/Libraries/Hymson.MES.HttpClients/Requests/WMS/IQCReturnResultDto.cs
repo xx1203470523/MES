@@ -11,12 +11,12 @@ namespace Hymson.MES.HttpClients.Requests.WMS
         /// <summary>
         /// 收货单号
         /// </summary>
-        public string ReceiptNum { get; set; } = "";
+        public string ReturnOrderCode { get; set; } = "";
 
         /// <summary>
         /// 供应商编码
         /// </summary>
-        public string SupplierCode { get; set; } = "";
+        public string WorkOrderCode { get; set; } = "";
 
         /// <summary>
         /// 备注
@@ -26,14 +26,14 @@ namespace Hymson.MES.HttpClients.Requests.WMS
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<IQCReturnMaterialRequestDto>? Details { get; set; }
+        public IEnumerable<IQCReturnMaterialResultDto>? Details { get; set; }
 
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public record IQCReturnMaterialRequestDto : BaseEntityDto
+    public record IQCReturnMaterialResultDto : BaseEntityDto
     {
         /// <summary>
         /// 物料编码
@@ -51,12 +51,12 @@ namespace Hymson.MES.HttpClients.Requests.WMS
         public string InternalBatch { get; set; } = "";
 
         /// <summary>
-        /// 计划发货数量
+        /// 计划退货数量
         /// </summary>
         public decimal? PlanQty { get; set; }
 
         /// <summary>
-        /// 实收数量
+        /// 实退数量
         /// </summary>
         public decimal? Qty { get; set; }
 

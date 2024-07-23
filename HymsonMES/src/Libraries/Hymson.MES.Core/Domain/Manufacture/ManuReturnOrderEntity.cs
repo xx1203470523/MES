@@ -14,7 +14,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 退料单据号
         /// </summary>
-        public string ReqOrderCode { get; set; }
+        public string ReturnOrderCode { get; set; }
 
         /// <summary>
         /// 工单id，工单借料情况下，接收物料的工单

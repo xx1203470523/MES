@@ -4,6 +4,7 @@ using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.RotorHandle;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -20,6 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddHttpClientService(this IServiceCollection services, IConfiguration configuration)
         {
+            AddHttpClientConfig(services, configuration);
 
             //var printOptions = new PrintOptions();
             //configuration.GetSection("PrintOptions").Bind(printOptions);
@@ -28,19 +30,11 @@ namespace Microsoft.Extensions.DependencyInjection
             //    httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
             //});
 
-            var wmsOptions = new WMSOptions();
-            configuration.GetSection("WMSOptions").Bind(wmsOptions);
-            services.AddHttpClient<IWMSApiClient, WMSApiClient>().ConfigureHttpClient(httpClient =>
-            {
-                httpClient.BaseAddress = new Uri(wmsOptions.BaseAddressUri);
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", wmsOptions.SysToken);
-            });
-
             var xnebulaWMSOption = new XnebulaWMSOption();
             configuration.GetSection("XnebulaWMSOptions").Bind(xnebulaWMSOption);
             services.AddHttpClient<IXnebulaWMSApiClient, XnebulaWMSApiClient>().ConfigureHttpClient(httpClient =>
             {
-                httpClient.BaseAddress = new Uri(wmsOptions.BaseAddressUri);
+                httpClient.BaseAddress = new Uri(xnebulaWMSOption.BaseAddressUri);
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", xnebulaWMSOption.Token);
             });
 
@@ -59,10 +53,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
             });
 
+            services.AddSingleton<IWMSApiClient, WMSApiClient>();
             return services;
         }
-
-
 
         /// <summary>
         /// 添加配置
@@ -70,9 +63,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
+        private static IServiceCollection AddHttpClientConfig(IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<PrintOptions>(configuration.GetSection(nameof(PrintOptions)));
+            services.Configure<WMSOptions>(configuration.GetSection(nameof(WMSOptions)));
             return services;
         }
 

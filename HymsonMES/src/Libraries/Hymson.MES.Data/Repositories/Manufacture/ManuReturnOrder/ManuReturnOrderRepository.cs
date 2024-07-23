@@ -137,9 +137,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             if (pagedQuery.Type.HasValue) sqlBuilder.Where(" Type = @Type ");
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.ReqOrderCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ReturnOrderCode))
             {
-                sqlBuilder.Where(" ReqOrderCode = @ReqOrderCode ");
+                sqlBuilder.Where(" ReturnOrderCode = @ReturnOrderCode ");
             }
 
             if (pagedQuery.SourceWorkOrderIds != null) sqlBuilder.Where(" SourceWorkOrderId IN @SourceWorkOrderIds ");
@@ -169,11 +169,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_return_order /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_return_order /**where**/  ";
 
-        const string InsertSql = "INSERT INTO manu_return_order(  `Id`, `ReqOrderCode`, `TargetWorkOrderCode`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, SourceWorkOrderId, `SourceWorkOrderCode`) VALUES (  @Id, @ReqOrderCode, @TargetWorkOrderCode, @Type, @Status,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @SourceWorkOrderId, @SourceWorkOrderCode) ";
-        const string InsertsSql = "INSERT INTO manu_return_order(  `Id`, `ReqOrderCode`, `TargetWorkOrderCode`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, SourceWorkOrderId, `SourceWorkOrderCode`) VALUES (  @Id, @ReqOrderCode, @TargetWorkOrderCode, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @SourceWorkOrderId, @SourceWorkOrderCode) ";
+        const string InsertSql = "INSERT INTO manu_return_order(  `Id`, `ReturnOrderCode`, `TargetWorkOrderCode`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, SourceWorkOrderId, `SourceWorkOrderCode`) VALUES (  @Id, @ReturnOrderCode, @TargetWorkOrderCode, @Type, @Status,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @SourceWorkOrderId, @SourceWorkOrderCode) ";
+        const string InsertsSql = "INSERT INTO manu_return_order(  `Id`, `ReturnOrderCode`, `TargetWorkOrderCode`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, SourceWorkOrderId, `SourceWorkOrderCode`) VALUES (  @Id, @ReturnOrderCode, @TargetWorkOrderCode, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @SourceWorkOrderId, @SourceWorkOrderCode) ";
 
-        const string UpdateSql = "UPDATE manu_return_order SET   ReqOrderCode = @ReqOrderCode, TargetWorkOrderCode = @TargetWorkOrderCode, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, SourceWorkOrderCode = @SourceWorkOrderCode WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE manu_return_order SET   ReqOrderCode = @ReqOrderCode, TargetWorkOrderCode = @TargetWorkOrderCode, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, SourceWorkOrderCode = @SourceWorkOrderCode WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE manu_return_order SET ReturnOrderCode = @ReturnOrderCode, TargetWorkOrderCode = @TargetWorkOrderCode, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, SourceWorkOrderCode = @SourceWorkOrderCode WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE manu_return_order SET ReturnOrderCode = @ReturnOrderCode, TargetWorkOrderCode = @TargetWorkOrderCode, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, SourceWorkOrderCode = @SourceWorkOrderCode WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE manu_return_order SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE manu_return_order SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

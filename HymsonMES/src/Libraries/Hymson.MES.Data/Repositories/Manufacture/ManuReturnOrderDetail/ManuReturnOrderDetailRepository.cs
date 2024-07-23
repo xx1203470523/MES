@@ -120,9 +120,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
-            if (query.RequistionOrderId.HasValue)
+            if (query.ReturnOrderId.HasValue)
             {
-                sqlBuilder.Where(" RequistionOrderId = @RequistionOrderId ");
+                sqlBuilder.Where(" ReturnOrderId = @ReturnOrderId ");
             }
 
             sqlBuilder.AddParameters(query);

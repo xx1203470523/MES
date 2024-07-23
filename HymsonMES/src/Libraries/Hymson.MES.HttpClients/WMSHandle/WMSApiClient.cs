@@ -1,6 +1,8 @@
 ﻿using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests.WMS;
 using Microsoft.Extensions.Options;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace Hymson.MES.HttpClients
@@ -13,18 +15,24 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 
         /// </summary>
-        private readonly HttpClient _httpClient;
-        private readonly WMSOptions _options;
-
+        private readonly IOptions<WMSOptions> _options;
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="httpClient"></param>
+        private readonly HttpClient _httpClient;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         /// <param name="options"></param>
-        public WMSApiClient(HttpClient httpClient, IOptions<WMSOptions> options)
+        /// <param name="httpClient"></param>
+        public WMSApiClient(IOptions<WMSOptions> options, HttpClient httpClient)
         {
+            _options = options;
+
             _httpClient = httpClient;
-            _options = options.Value;
+            _httpClient.BaseAddress = new Uri(_options.Value.BaseAddressUri);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.Value.SysToken);
         }
 
         /// <summary>
@@ -34,7 +42,7 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         public async Task<bool> IQCReceiptCallBackAsync(IQCReceiptResultDto dto)
         {
-            var httpResponse = await _httpClient.PostAsJsonAsync(_options.IQCReceiptRoute, dto);
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReceiptRoute, dto);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             return httpResponse.IsSuccessStatusCode;
@@ -47,7 +55,7 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         public async Task<bool> IQCReturnCallBackAsync(IQCReturnResultDto dto)
         {
-            var httpResponse = await _httpClient.PostAsJsonAsync(_options.IQCReturnRoute, dto);
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReturnRoute, dto);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             return httpResponse.IsSuccessStatusCode;
