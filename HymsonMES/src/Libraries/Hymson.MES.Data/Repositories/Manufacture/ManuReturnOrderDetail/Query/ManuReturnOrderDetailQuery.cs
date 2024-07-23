@@ -13,7 +13,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         /// <summary>
         /// 退料单ID
         /// </summary>
-        public long? ReturnOrderId { get; set; }
+        public long? RequistionOrderId { get; set; }
 
     }
 }

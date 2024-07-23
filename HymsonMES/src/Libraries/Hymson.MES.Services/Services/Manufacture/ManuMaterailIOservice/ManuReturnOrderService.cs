@@ -214,7 +214,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var entities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                ReturnOrderId = returnId
+                RequistionOrderId = returnId
             });
 
             // 读取退料单

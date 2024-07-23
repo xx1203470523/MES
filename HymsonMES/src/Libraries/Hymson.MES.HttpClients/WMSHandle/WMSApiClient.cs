@@ -50,6 +50,5 @@ namespace Hymson.MES.HttpClients
             return false;
         }
 
-
     }
 }

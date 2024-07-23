@@ -1442,6 +1442,8 @@ namespace Hymson.MES.Services.Mapper
             #region ManuReturnOrder
             CreateMap<ManuReturnOrderPagedQueryDto, ManuReturnOrderPagedQuery>();
             CreateMap<ManuReturnOrderEntity, ManuReturnOrderDto>();
+            CreateMap<ManuReturnOrderDetailEntity, ManuReturnOrderDetailDto>();
+            
             #endregion
         }
 
