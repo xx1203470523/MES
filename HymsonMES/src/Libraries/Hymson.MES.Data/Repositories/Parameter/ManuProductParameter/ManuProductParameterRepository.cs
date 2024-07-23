@@ -1,12 +1,15 @@
 ﻿using Dapper;
 using Force.Crc32;
+using Hymson.DbConnection.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
-
+using MySql.Data.MySqlClient;
+using System.Data;
+using System.Reflection;
 using System.Text;
 using static Dapper.SqlMapper;
 
@@ -19,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
     {
         private readonly ParameterOptions _parameterOptions;
 
-        public ManuProductParameterRepository(IOptions<ConnectionOptions> connectionOptions, IOptions<ParameterOptions> parameterOptions) : base(connectionOptions)
+        public ManuProductParameterRepository(IOptions<Options.ConnectionOptions> connectionOptions, IOptions<ParameterOptions> parameterOptions) : base(connectionOptions)
         {
             _parameterOptions = parameterOptions.Value;
         }
@@ -148,12 +151,12 @@ namespace Hymson.MES.Data.Repositories.Parameter
         /// <returns></returns>
         public async Task<int> InsertRangeMavelAsync(IEnumerable<ManuProductParameterEntity> list)
         {
-            var dic = new Dictionary<string, List<ManuProductParameterEntity>>();
+            //var dic = new Dictionary<string, List<ManuProductParameterEntity>>();
 
             using var conn = GetMESParamterDbConnection();
             List<Task<int>> tasks = new();
 
-            int maxNum = 999;
+            int maxNum = 500;
             int batchNum = list.Count() / maxNum + 1;
             for (var i = 0; i < batchNum; ++i)
             {
@@ -163,8 +166,178 @@ namespace Hymson.MES.Data.Repositories.Parameter
             }
 
             var result = await Task.WhenAll(tasks);
-
             return result.Sum();
+
+            //var listData = list.ToList();
+            //BulkLoaderData<ManuProductParameterEntity>(listData, "manu_product_procedure_parameter");
+
+            //return list.Count();
+        }
+
+        /// <summary>
+        /// 使用MySqlBulkLoader批量插入数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public int BulkLoaderData<T>(List<T> data, string tableName)
+        {
+            if (data.Count <= 0) return 0;
+
+            using (var connection = GetMESParamterDbConnection())
+            {
+                try
+                {
+                    if (connection.State == ConnectionState.Closed)
+                    {
+                        connection.Open();
+                    }
+                    //  sqlTransaction = connection.BeginTransaction();
+
+
+                    var dt = ConvertEntitiesToDataTable<T>(data, tableName); //将List转成dataTable
+                    string tmpPath = Path.GetTempFileName();
+                    ToCsv(dt, tmpPath); //将DataTable转成CSV文件
+                    MySqlConnection mysqlCon = (MySqlConnection)connection;
+                    var insertCount = BulkLoad(mysqlCon, dt, tmpPath); //使用MySqlBulkLoader插入数据
+
+                    try
+                    {
+                        if (File.Exists(tmpPath)) File.Delete(tmpPath);
+                    }
+                    catch (Exception)
+                    {
+                        //删除文件失败
+
+                    }
+                    return insertCount; //返回执行成功的条数
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public static DataTable ConvertEntitiesToDataTable<T>(List<T> entities, string tableName)
+        {
+            // 创建DataTable
+            DataTable dataTable = new DataTable(tableName);
+
+            // 获取类型信息
+            Type entityType = typeof(T);
+            PropertyInfo[] properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            // 为DataTable添加列
+            foreach (PropertyInfo property in properties)
+            {
+                // 获取属性的类型
+                Type propertyType = property.PropertyType;
+
+                // 检查属性是否是可空类型
+                if (Nullable.GetUnderlyingType(propertyType) != null)
+                {
+                    propertyType = Nullable.GetUnderlyingType(propertyType);
+                }
+
+                // 根据属性类型设置列的数据类型
+                dataTable.Columns.Add(property.Name, propertyType);
+            }
+
+            // 填充DataTable
+            foreach (T entity in entities)
+            {
+                DataRow row = dataTable.NewRow();
+                foreach (PropertyInfo property in properties)
+                {
+                    object value = property.GetValue(entity);
+                    // 检查值是否为可空类型且为null
+                    if (value != null && Nullable.GetUnderlyingType(property.PropertyType) != null)
+                    {
+                        // 转换为非可空类型
+                        value = Convert.ChangeType(value, Nullable.GetUnderlyingType(property.PropertyType));
+                    }
+                    else if (value == null)
+                    {
+                        value = DBNull.Value;
+                    }
+                    row[property.Name] = value;
+                }
+                dataTable.Rows.Add(row);
+            }
+
+            return dataTable;
+        }
+
+        /// <summary>
+        /// MySqlBulkLoader批量导入
+        /// </summary>
+        /// <param name="_mySqlConnection">数据库连接地址</param>
+        /// <param name="table"></param>
+        /// <param name="csvName"></param>
+        /// <returns></returns>
+        public static int BulkLoad(MySqlConnection _mySqlConnection, DataTable table, string csvName)
+        {
+            var columns = table.Columns.Cast<DataColumn>().Select(colum => colum.ColumnName).ToList();
+            MySqlBulkLoader bulk = new MySqlBulkLoader(_mySqlConnection)
+            {
+                FieldTerminator = "\t",
+                FieldQuotationCharacter = '"',
+                EscapeCharacter = '"',
+                Local = true,
+                LineTerminator = "\r\n",
+                FileName = csvName,
+                NumberOfLinesToSkip = 1,
+                TableName = table.TableName,
+            };
+
+            bulk.Columns.AddRange(columns);
+            return bulk.Load();
+        }
+
+        /// <summary>
+        ///将DataTable转换为标准的CSV文件
+        /// </summary>
+        /// <param name="table">数据表</param>
+        /// <param name="tmpPath">文件地址</param>
+        /// <returns>返回标准的CSV</returns>
+        public static void ToCsv(DataTable table, string tmpPath)
+        {
+            //以半角逗号（即,）作分隔符，列为空也要表达其存在。
+            //列内容如存在半角逗号（即,）则用半角引号（即""）将该字段值包含起来。
+            //列内容如存在半角引号（即"）则应替换成半角双引号（""）转义，并用半角引号（即""）将该字段值包含起来。
+            StringBuilder sb = new StringBuilder();
+            DataColumn colum;
+            sb.Append("\r\n");// 设置空表头 解决跳过第一行的BUG，依赖MySqlBulkLoader.NumberOfLinesToSkip = 1
+            foreach (DataRow row in table.Rows)
+            {
+                for (int i = 0; i < table.Columns.Count; i++)
+                {
+                    Type _datatype = typeof(DateTime);
+                    colum = table.Columns[i];
+                    if (i != 0) sb.Append("\t");
+                    //if (colum.DataType == typeof(string) && row[colum].ToString().Contains(","))
+                    //{
+                    //    sb.Append("\"" + row[colum].ToString().Replace("\"", "\"\"") + "\"");
+                    //}
+                    if (colum.DataType == _datatype)
+                    {
+                        sb.Append(((DateTime)row[colum]).ToString("yyyy/MM/dd HH:mm:ss"));
+                    }
+                    else sb.Append(row[colum].ToString());
+                }
+                sb.Append("\r\n");
+            }
+            StreamWriter sw = new StreamWriter(tmpPath, false, UTF8Encoding.UTF8);
+            sw.Write(sb.ToString());
+            sw.Close();
         }
 
         /// <summary>

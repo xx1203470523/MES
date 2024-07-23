@@ -262,6 +262,8 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
         /// <returns></returns>
         public async Task<IEnumerable<ReceiptMaterialDetailDto>> QueryDetailByReceiptIdAsync(long receiptId)
         {
+            List<ReceiptMaterialDetailDto> dtos = new();
+
             var entities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
@@ -269,36 +271,28 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
             });
 
             // 读取收货单
-            var receiptEntities = await _whMaterialReceiptRepository.GetByIdsAsync(entities.Select(x => x.MaterialReceiptId));
-            var receiptDic = receiptEntities.ToDictionary(x => x.Id, x => x);
+            var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(receiptId);
+            if (receiptEntity == null) return dtos;
 
             // 读取产品
-            //var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Select(x => x.MaterialId));
             var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
 
             // 读取供应商
-            var supplierEntities = await _whSupplierRepository.GetByIdsAsync(receiptEntities.Select(x => x.SupplierId));
-            var supplierDic = supplierEntities.ToDictionary(x => x.Id, x => x);
+            var supplierEntity = await _whSupplierRepository.GetByIdAsync(receiptEntity.SupplierId);
 
-            List<ReceiptMaterialDetailDto> dtos = new();
             foreach (var entity in entities)
             {
                 var dto = entity.ToModel<ReceiptMaterialDetailDto>();
 
                 // 收货单
-                var receiptEntity = receiptDic[entity.MaterialReceiptId];
-                if (receiptEntity != null)
-                {
-                    dto.ReceiptNum = receiptEntity.ReceiptNum;
+                dto.ReceiptNum = receiptEntity.ReceiptNum;
 
-                    // 供应商                    
-                    supplierDic.TryGetValue(receiptEntity.SupplierId, out var supplierEntity);
-                    if (supplierEntity != null)
-                    {
-                        dto.SupplierCode = supplierEntity.Code;
-                        dto.SupplierName = supplierEntity.Name;
-                    }
+                // 供应商
+                if (supplierEntity != null)
+                {
+                    dto.SupplierCode = supplierEntity.Code;
+                    dto.SupplierName = supplierEntity.Name;
                 }
 
                 // 产品

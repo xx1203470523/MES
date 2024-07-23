@@ -17,5 +17,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         /// 工单
         /// </summary>
         public PlanWorkOrderEntity? WorkOrder { get; set; }
+
+        /// <summary>
+        /// 物料编码，上料物料时，物料编码取这个
+        /// </summary>
+        public string MaterialCode { get; set; }
     }
 }

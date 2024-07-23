@@ -1,6 +1,5 @@
 ﻿using Hymson.Logging.Services;
 using Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC;
-using Microsoft.Extensions.Logging;
 using Quartz;
 
 namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture

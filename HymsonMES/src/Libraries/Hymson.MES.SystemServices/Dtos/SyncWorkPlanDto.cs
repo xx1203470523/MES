@@ -37,7 +37,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 计划单号 
         /// </summary>
-        public string WorkPlanCode { get; set; } = "";
+        public string PlanCode { get; set; } = "";
 
         /// <summary>
         /// 生产时间（计划）
@@ -69,7 +69,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 计划产品ID
         /// </summary>
-        public long ProductId { get; set; }
+        public long? ProductId { get; set; }
 
         /// <summary>
         /// 产品编号 

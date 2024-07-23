@@ -385,18 +385,18 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record GenerateOrderReturnDto
     {
         /// <summary>
-        /// 收货单
+        /// 退料单
         /// </summary>
-        public long ReceiptId { get; set; }
+        public long OrderId { get; set; }
 
         /// <summary>
-        /// 收货单
+        /// 退料单
         /// </summary>
-        public string ReceiptNum { get; set; }
+        public string OrderNo { get; set; }
 
         /*
         /// <summary>
-        /// 收货单明细ID集合
+        /// 退料单明细ID集合
         /// </summary>
         public IEnumerable<long> Details { get; set; }
         */

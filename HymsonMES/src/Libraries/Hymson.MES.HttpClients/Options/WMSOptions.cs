@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.HttpClients.Options
+﻿namespace Hymson.MES.HttpClients.Options
 {
     /// <summary>
     /// wms操作配置

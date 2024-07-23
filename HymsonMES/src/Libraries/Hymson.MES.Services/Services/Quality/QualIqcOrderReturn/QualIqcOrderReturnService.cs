@@ -153,7 +153,7 @@ namespace Hymson.MES.Services.Services.Quality
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 读取退料单
-            var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(requestDto.ReceiptId)
+            var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(requestDto.OrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES11901));
 
             // 校验是否已生成过检验单
@@ -175,7 +175,7 @@ namespace Hymson.MES.Services.Services.Quality
             var returnDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
                 SiteId = returnEntity.SiteId,
-                ReturnOrderId = returnEntity.Id
+                RequistionOrderId = returnEntity.Id
             });
 
             // 生成检验单号
@@ -533,7 +533,7 @@ namespace Hymson.MES.Services.Services.Quality
             var returnDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
                 SiteId = orderEntity.SiteId,
-                ReturnOrderId = orderEntity.ReturnOrderId
+                RequistionOrderId = orderEntity.ReturnOrderId
             });
 
             // 读取产品

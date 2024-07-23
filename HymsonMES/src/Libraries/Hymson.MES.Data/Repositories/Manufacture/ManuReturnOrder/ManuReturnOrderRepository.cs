@@ -135,6 +135,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
+            if (pagedQuery.Type.HasValue) sqlBuilder.Where(" Type = @Type ");
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ReqOrderCode))
+            {
+                sqlBuilder.Where(" ReqOrderCode = @ReqOrderCode ");
+            }
+
+            if (pagedQuery.SourceWorkOrderIds != null) sqlBuilder.Where(" SourceWorkOrderId IN @SourceWorkOrderIds ");
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
