@@ -43,20 +43,8 @@ using Hymson.MessagePush.Helper;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Hymson.Web.Framework.Attributes;
-using MailKit.Search;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Org.BouncyCastle.Asn1.Ocsp;
-using Org.BouncyCastle.Pqc.Crypto.Lms;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Transactions;
-using static Dapper.SqlMapper;
 
 namespace Hymson.MES.EquipmentServices.Services.Qkny
 {
@@ -185,6 +173,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuSfcGradeRepository _manuSfcGradeRepository;
 
         /// <summary>
+        /// 产品不良录入仓储
+        /// </summary>
+        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -210,7 +203,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             AbstractValidator<OperationLoginDto> validationOperationLoginDto,
             IManuProductParameterService manuProductParameterService,
             IProcMaterialRepository procMaterialRepository,
-            IManuSfcGradeRepository manuSfcGradeRepository)
+            IManuSfcGradeRepository manuSfcGradeRepository,
+            IManuProductBadRecordRepository manuProductBadRecordRepository)
         {
             _equEquipmentRepository = equEquipmentRepository;
             _planWorkOrderService = planWorkOrderService;
@@ -237,6 +231,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _validationOperationLoginDto = validationOperationLoginDto;
             _manuProductParameterService = manuProductParameterService;
             _manuSfcGradeRepository = manuSfcGradeRepository;
+            _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
 
@@ -940,18 +935,30 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             EquVerifyHelper.GetSfcInfoDto(dto);
             //获取设备基础信息
             var equResModel = await _equEquipmentService.GetEquResAsync(dto);
+
+            var sfcList = new List<SortingSfcInfo>();
+
             //查询降级信息
             var downgradingSfcs = await _manuDowngradingRepository.GetBySFCsAsync(new ManuDowngradingBySFCsQuery
             {
                 SiteId = equResModel.SiteId,
                 SFCs = dto.SfcList
             });
-
-            return downgradingSfcs.Select(x => new SortingSfcInfo
+            if (downgradingSfcs != null && downgradingSfcs.Any())
             {
-                SFC = x.SFC,
-                Grade = x.Grade
-            }).ToList();
+                foreach (var item in downgradingSfcs)
+                {
+                    if (sfcList.Any(x => x.SFC == item.SFC))
+                    {
+                        continue;
+                    }
+                    sfcList.Add(new SortingSfcInfo { SFC = item.SFC, Grade = "1" });
+                }
+            }
+
+            //查询Marking信息
+
+            return sfcList;
         }
 
         /// <summary>

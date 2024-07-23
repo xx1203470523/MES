@@ -18,7 +18,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
     }
 
     /// <summary>
-    /// 电芯降级信息
+    /// 电芯信息
     /// </summary>
     public record SortingSfcInfo
     {
@@ -27,13 +27,8 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// </summary>
         public string SFC { get; set; } = "";
 
-        ///// <summary>
-        ///// 是否为降级品
-        ///// </summary>
-        //public bool IsDowngrading { get; set; } = false;
-
         /// <summary>
-        /// 降级等级
+        /// 电芯等级（1-降级 2-Marking）
         /// </summary>
         public string Grade { get; set; } = "";
     }
