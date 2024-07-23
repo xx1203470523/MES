@@ -521,6 +521,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string MaterialName { get; set; }
 
         /// <summary>
+        /// 物料的规格型号
+        /// </summary>
+        public string Specifications { get; set; }
+
+        /// <summary>
         /// 物料版本
         /// </summary>
         public string MaterialVersion { get; set; }
