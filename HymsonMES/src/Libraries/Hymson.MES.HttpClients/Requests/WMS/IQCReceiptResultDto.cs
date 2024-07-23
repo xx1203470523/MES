@@ -26,14 +26,14 @@ namespace Hymson.MES.HttpClients.Requests.WMS
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<IQCReceiptMaterialRequestDto>? Details { get; set; }
+        public IEnumerable<IQCReceiptMaterialResultDto>? Details { get; set; }
 
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public record IQCReceiptMaterialRequestDto : BaseEntityDto
+    public record IQCReceiptMaterialResultDto : BaseEntityDto
     {
         /// <summary>
         /// 物料编码

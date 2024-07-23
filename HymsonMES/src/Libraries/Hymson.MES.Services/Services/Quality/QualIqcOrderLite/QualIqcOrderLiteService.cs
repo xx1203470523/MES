@@ -335,16 +335,7 @@ namespace Hymson.MES.Services.Services.Quality
             orderEntity.UpdatedBy = user;
             orderEntity.UpdatedOn = time;
 
-            // TODO 读取收货单
 
-            // IQC结果
-            var iqcResultDto = new IQCReceiptResultDto
-            {
-                //ReceiptNum = 
-            };
-
-            // 将结果推送给WMS
-            await _wmsApiClient.IQCReceiptCallBackAsync(iqcResultDto);
 
             // 保存
             var rows = 0;
@@ -813,6 +804,53 @@ namespace Hymson.MES.Services.Services.Quality
             return dtos;
         }
 
+        /// <summary>
+        /// IQC收货回调
+        /// </summary>
+        /// <param name="orderEntity"></param>
+        /// <param name="updateDetailEntities"></param>
+        /// <returns></returns>
+        private async Task IQCReceiptCallBackAsync(QualIqcOrderLiteEntity orderEntity, List<QualIqcOrderLiteDetailEntity> updateDetailEntities)
+        {
+            // 读取收货单
+            var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(orderEntity.MaterialReceiptId);
+
+            // 读取收货单明细
+            var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
+            {
+                SiteId = orderEntity.SiteId,
+                MaterialReceiptId = orderEntity.MaterialReceiptId
+            });
+
+            if (receiptEntity == null) return;
+            if (!orderEntity.SupplierId.HasValue) return;
+
+            // 读取供应商
+            var supplierEntity = await _whSupplierRepository.GetByIdAsync(orderEntity.SupplierId.Value);
+
+            List<IQCReceiptMaterialResultDto> details = new();
+            foreach (var item in updateDetailEntities)
+            {
+                var receiptDetailEntity = receiptDetailEntities.FirstOrDefault(f => f.Id == item.MaterialReceiptDetailId);
+                if (receiptDetailEntity == null) continue;
+
+                details.Add(new IQCReceiptMaterialResultDto
+                {
+                    MaterialCode = receiptDetailEntity.MaterialBatchCode,
+                    PlanQty = receiptDetailEntity.PlanQty,
+                    Qty = receiptDetailEntity.Qty,
+                    IsQualified = item.IsQualified ?? TrueOrFalseEnum.No
+                });
+            }
+
+            // 将结果推送给WMS
+            await _wmsApiClient.IQCReceiptCallBackAsync(new IQCReceiptResultDto
+            {
+                ReceiptNum = receiptEntity.ReceiptNum,
+                SupplierCode = supplierEntity?.Code ?? "",
+                Details = details
+            });
+        }
         #endregion
 
     }
