@@ -419,20 +419,6 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 //正常出站
                 if ((curWorkPos.WorkPosType & 2) == 2 && item.ProductStatus == ProductStatus_Out && mesDto.IsPassed == true)
                 {
-                    //OP710工序在出站的时候把铁芯码和轴码绑定，把铁芯码当成轴码上料记录来处理
-                    //if(mesDto.ProcedureCode == "OP710")
-                    //{
-                    //    List<WorkOrderRelationDto> op710List = bindList.Where(m => m.ProductNo == item.ProductNo).ToList();
-                    //    if(op710List != null && op710List.Count > 0)
-                    //    {
-                    //        mesDto.UpMatList.AddRange(op710List.Select(m => new SfcUpMatDto()
-                    //        {
-                    //            BarCode = m.ProductNo,
-                    //            MatType = 1,
-                    //            MatNum = 1
-                    //        }));
-                    //    }
-                    //}
                     mesDto.Type = 2;
                 }
 
@@ -463,7 +449,6 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     continue;
                 }
                 long stepId = 0;
-
 
                 //工单
                 var mesOrder = mesOrderList.Where(m => m.OrderCode == LmsOrderFxChange(mesItem.OrderCode)).FirstOrDefault();
@@ -541,7 +526,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             using var trans = TransactionHelper.GetTransactionScope();
 
             await _manuSfcCirculationRepository.InsertRangeAsync(circulaList);
-            await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
+            //await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
+            await _manuSfcStepRepository.InsertRangeAsync(stepList);
             await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
             await InsertOrUpdateAsync(sfcUpdateList);
             await InsertRawMaterialAsync(barCodeList, mesMaterialList);
