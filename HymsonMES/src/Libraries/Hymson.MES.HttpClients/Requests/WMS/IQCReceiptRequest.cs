@@ -6,7 +6,7 @@ namespace Hymson.MES.HttpClients.Requests.WMS
     /// <summary>
     /// IQC请求Dto
     /// </summary>
-    public record IQCReceiptRequestDto : BaseEntityDto
+    public record IQCReceiptResultDto : BaseEntityDto
     {
         /// <summary>
         /// 收货单号

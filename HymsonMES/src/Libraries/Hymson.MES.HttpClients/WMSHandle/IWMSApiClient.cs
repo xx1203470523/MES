@@ -12,14 +12,14 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<bool> IQCReceiptCallBackAsync(IQCReceiptRequestDto request);
+        Task<bool> IQCReceiptCallBackAsync(IQCReceiptResultDto request);
 
         /// <summary>
         /// 回调（退料IQC）
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<bool> IQCReturnCallBackAsync(IQCReturnRequestDto request);
+        Task<bool> IQCReturnCallBackAsync(IQCReturnResultDto request);
 
     }
 }

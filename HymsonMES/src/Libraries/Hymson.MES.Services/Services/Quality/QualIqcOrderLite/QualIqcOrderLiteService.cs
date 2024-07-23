@@ -335,9 +335,16 @@ namespace Hymson.MES.Services.Services.Quality
             orderEntity.UpdatedBy = user;
             orderEntity.UpdatedOn = time;
 
-            // TODO: 将结果推送给WMS
-            var wmsRequestDto = new IQCReceiptRequestDto { };
-            await _wmsApiClient.IQCReceiptCallBackAsync(wmsRequestDto);
+            // TODO 读取收货单
+
+            // IQC结果
+            var iqcResultDto = new IQCReceiptResultDto
+            {
+                //ReceiptNum = 
+            };
+
+            // 将结果推送给WMS
+            await _wmsApiClient.IQCReceiptCallBackAsync(iqcResultDto);
 
             // 保存
             var rows = 0;

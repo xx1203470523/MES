@@ -17,8 +17,14 @@
         public string SysToken { get; set; } = "";
 
         /// <summary>
+        /// IQC来料检验
+        /// </summary>
+        public string IQCReceiptRoute { get; set; } = "api/Order/Create";
+
+        /// <summary>
         /// 创建工单
         /// </summary>
-        public string CreateOrderRoute { get; set; } = "api/Order/Create";
+        public string IQCReturnRoute { get; set; } = "api/Order/Create";
+
     }
 }

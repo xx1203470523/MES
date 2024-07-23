@@ -1,9 +1,6 @@
 ﻿using Hymson.MES.HttpClients.Options;
-using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.WMS;
-using Hymson.MES.HttpClients.Responses.Rotor;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System.Net.Http.Json;
 
 namespace Hymson.MES.HttpClients
@@ -33,28 +30,27 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 回调（来料IQC）
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<bool> IQCReceiptCallBackAsync(IQCReceiptRequestDto request)
+        public async Task<bool> IQCReceiptCallBackAsync(IQCReceiptResultDto dto)
         {
-            var httpResponse = await _httpClient.PostAsJsonAsync(_options.CreateOrderRoute, request);
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.IQCReceiptRoute, dto);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
-            httpResponse.EnsureSuccessStatusCode();
 
-            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
-            return true;
+            return httpResponse.IsSuccessStatusCode;
         }
 
         /// <summary>
         /// 回调（退料IQC）
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<bool> IQCReturnCallBackAsync(IQCReturnRequestDto request)
+        public async Task<bool> IQCReturnCallBackAsync(IQCReturnResultDto dto)
         {
-            // TODO
-            await Task.CompletedTask;
-            return false;
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.IQCReturnRoute, dto);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            return httpResponse.IsSuccessStatusCode;
         }
 
     }

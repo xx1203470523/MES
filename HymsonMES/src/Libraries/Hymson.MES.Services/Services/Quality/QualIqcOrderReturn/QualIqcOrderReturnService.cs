@@ -360,7 +360,7 @@ namespace Hymson.MES.Services.Services.Quality
             orderEntity.UpdatedOn = time;
 
             // TODO: 将结果推送给WMS
-            var wmsRequestDto = new IQCReturnRequestDto { };
+            var wmsRequestDto = new IQCReturnResultDto { };
             await _wmsApiClient.IQCReturnCallBackAsync(wmsRequestDto);
 
             // 保存
