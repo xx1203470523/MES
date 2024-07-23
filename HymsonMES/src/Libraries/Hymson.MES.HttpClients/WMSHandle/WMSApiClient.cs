@@ -1,6 +1,10 @@
 ﻿using Hymson.MES.HttpClients.Options;
+using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.WMS;
+using Hymson.MES.HttpClients.Responses.Rotor;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using System.Net.Http.Json;
 
 namespace Hymson.MES.HttpClients
 {
@@ -33,9 +37,12 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         public async Task<bool> IQCReceiptCallBackAsync(IQCReceiptRequestDto request)
         {
-            // TODO
-            await Task.CompletedTask;
-            return false;
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.CreateOrderRoute, request);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+            httpResponse.EnsureSuccessStatusCode();
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            return true;
         }
 
         /// <summary>
