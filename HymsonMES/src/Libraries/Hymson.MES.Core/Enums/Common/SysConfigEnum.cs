@@ -62,5 +62,10 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("RotorLmsSwitch")]
         RotorLmsSwitch = 12,
+        /// <summary>
+        /// 转子工序良率
+        /// </summary>
+        [Description("RotorPassrateStation")]
+        RotorPassrateStation = 13,
     }
 }

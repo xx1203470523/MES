@@ -130,6 +130,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="sfcIds"></param>
         /// <returns></returns>
         Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateIsUsedCommand manuSfcInfoUpdateIsUsedCommand);
+
+        /// <summary>
+        /// 获取工单数量
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WorkOrderQtyView>> GetWorkOrderQtyMavelAsync(WorkOrderQtyQuery query);
         #endregion
 
 

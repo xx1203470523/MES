@@ -351,7 +351,26 @@ namespace Hymson.MES.Data.Repositories.Parameter
                 from manu_product_procedure_parameter
                 WHERE Id > @StartWaterMarkId 
                 ORDER BY Id ASC 
-                LIMIT @Rows"";
+                LIMIT @Rows;
+            ";
+
+            using var conn = GetMESParamterDbConnection();
+            return await conn.QueryAsync<ManuProductParameterEntity>(sql, query);
+        }
+
+        /// <summary>
+        /// 获取马威参数
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetManuNgParamMavelAsync(EntityByWaterMarkQuery query)
+        {
+            string sql = $@"
+                select * 
+                from manu_product_procedure_parameter
+                WHERE Id > @StartWaterMarkId 
+                AND ParameterGroupId  = 1
+                ORDER BY Id ASC 
+                LIMIT @Rows;
             ";
 
             using var conn = GetMESParamterDbConnection();
