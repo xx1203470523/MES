@@ -6,9 +6,9 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -580,6 +580,25 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstAsync<PlanWorkOrderMavelView>(GetByIdMavelSql, new { id = id });
+        }
+
+        /// <summary>
+        /// 获取马威
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderMaterialMavleView>> GetWorkOrderMavelAsync(long siteId)
+        {
+            string sql = $@"
+                select t2.MaterialCode ,t2.MaterialName ,t1.*
+                from plan_work_order t1
+                inner join proc_material t2 on t1.ProductId = t2.Id and t2.IsDeleted = 0
+                where t1.SiteId  = siteId
+                and t1.IsDeleted  = 0
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<PlanWorkOrderMaterialMavleView>(sql);
         }
 
         #endregion

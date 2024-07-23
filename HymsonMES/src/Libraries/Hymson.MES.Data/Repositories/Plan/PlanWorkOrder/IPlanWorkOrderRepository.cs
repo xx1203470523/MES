@@ -244,6 +244,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         Task<PlanWorkOrderMavelView> GetByIdMavelAsync(long id);
 
+        /// <summary>
+        /// 获取工单数据
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderMaterialMavleView>> GetWorkOrderMavelAsync(long siteId);
+
         #endregion
     }
 }
