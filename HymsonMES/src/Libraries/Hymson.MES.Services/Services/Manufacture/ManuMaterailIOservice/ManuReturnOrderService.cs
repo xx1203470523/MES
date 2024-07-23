@@ -9,7 +9,10 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -40,19 +43,44 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
 
         /// <summary>
+        /// 仓储接口（生产退料明细单）
+        /// </summary>
+        private readonly IManuReturnOrderDetailRepository _manuReturnOrderDetailRepository;
+
+        /// <summary>
+        /// 仓储接口（物料维护）
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
+        /// 仓储接口（生产工单）
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="manuReturnOrderRepository"></param>
-        public ManuReturnOrderService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuReturnOrderSaveDto> validationSaveRules, 
-            IManuReturnOrderRepository manuReturnOrderRepository)
+        /// <param name="manuReturnOrderDetailRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        public ManuReturnOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
+            AbstractValidator<ManuReturnOrderSaveDto> validationSaveRules,
+            IManuReturnOrderRepository manuReturnOrderRepository,
+            IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _manuReturnOrderRepository = manuReturnOrderRepository;
+            _manuReturnOrderDetailRepository = manuReturnOrderDetailRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
 
@@ -96,7 +124,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
@@ -137,12 +165,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ManuReturnOrderDto?> QueryByIdAsync(long id) 
+        public async Task<ManuReturnOrderDto?> QueryByIdAsync(long id)
         {
-           var manuReturnOrderEntity = await _manuReturnOrderRepository.GetByIdAsync(id);
-           if (manuReturnOrderEntity == null) return null;
-           
-           return manuReturnOrderEntity.ToModel<ManuReturnOrderDto>();
+            var manuReturnOrderEntity = await _manuReturnOrderRepository.GetByIdAsync(id);
+            if (manuReturnOrderEntity == null) return null;
+
+            return manuReturnOrderEntity.ToModel<ManuReturnOrderDto>();
         }
 
         /// <summary>
@@ -154,11 +182,77 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var pagedQuery = pagedQueryDto.ToQuery<ManuReturnOrderPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.Type = ManuReturnTypeEnum.WorkOrderReturn;
             var pagedInfo = await _manuReturnOrderRepository.GetPagedListAsync(pagedQuery);
+
+            // 转换工单编码变为工单ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.WorkOrderCode))
+            {
+                var workOrderEntities = await _planWorkOrderRepository.GetEntitiesAsync(new PlanWorkOrderNewQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    OrderCode = pagedQueryDto.WorkOrderCode
+                });
+                if (workOrderEntities != null && workOrderEntities.Any()) pagedQuery.SourceWorkOrderIds = workOrderEntities.Select(s => s.Id);
+                else pagedQuery.SourceWorkOrderIds = Array.Empty<long>();
+            }
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<ManuReturnOrderDto>());
             return new PagedInfo<ManuReturnOrderDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 查询详情（生产退料表）
+        /// </summary>
+        /// <param name="returnId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuReturnOrderDetailDto>> QueryDetailByReturnIdAsync(long returnId)
+        {
+            List<ManuReturnOrderDetailDto> dtos = new();
+
+            var entities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ReturnOrderId = returnId
+            });
+
+            // 读取退料单
+            var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(returnId);
+
+            // 读取产品
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Select(x => x.MaterialId));
+            var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
+
+            // 读取生产工单
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(returnEntity.SourceWorkOrderId);
+
+            foreach (var entity in entities)
+            {
+                var dto = entity.ToModel<ManuReturnOrderDetailDto>();
+
+                /*
+                // 退料单
+                dto.ReqOrderCode = returnEntity.ReqOrderCode;
+
+                // 供应商
+                if (workOrderEntity != null)
+                {
+                    dto.SupplierCode = workOrderEntity.OrderCode;
+                }
+                */
+
+                // 产品
+                materialDic.TryGetValue(entity.MaterialId, out var materialEntity);
+                if (materialEntity != null)
+                {
+                    dto.MaterialCode = materialEntity.MaterialCode;
+                    dto.MaterialName = materialEntity.MaterialName;
+                }
+
+                dtos.Add(dto);
+            }
+            return dtos;
         }
 
     }

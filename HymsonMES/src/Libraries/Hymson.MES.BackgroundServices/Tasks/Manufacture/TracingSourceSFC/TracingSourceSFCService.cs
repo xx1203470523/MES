@@ -1,7 +1,6 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
@@ -248,7 +247,7 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
 
             // 更新水位
             var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
-            if (maxUpdateWaterMarkUpdatedOn != null)
+            if (maxUpdateWaterMarkUpdatedOn.HasValue)
             {
                 long timestamp = ConvertToUnixTimeMilliseconds(maxUpdateWaterMarkUpdatedOn.Value);
                 rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
@@ -291,7 +290,6 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
 
             return nowInTargetTimeZone;
         }
-
 
     }
 }

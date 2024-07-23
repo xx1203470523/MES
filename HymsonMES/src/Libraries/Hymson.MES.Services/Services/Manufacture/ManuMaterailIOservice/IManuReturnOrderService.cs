@@ -50,5 +50,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         Task<PagedInfo<ManuReturnOrderDto>> GetPagedListAsync(ManuReturnOrderPagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 查询详情（生产退料表）
+        /// </summary>
+        /// <param name="returnId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuReturnOrderDetailDto>> QueryDetailByReturnIdAsync(long returnId);
+
     }
 }
