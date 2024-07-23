@@ -74,6 +74,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
+        /// 条码表仓储
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public InteVehicleService(IInteVehicleRepository inteVehicleRepository,
@@ -85,7 +90,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             IManuProductBadRecordRepository manuProductBadRecordRepository,
             IMasterDataService masterDataService,
             IManuProductNgRecordRepository manuProductNgRecordRepository,
-            IManuSfcInfoRepository manuSfcInfoRepository)
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcRepository manuSfcRepository)
         {
             _inteVehicleRepository = inteVehicleRepository;
             _inteVehicleRepository = inteVehicleRepository;
@@ -98,6 +104,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             _masterDataService = masterDataService;
             _manuProductNgRecordRepository = manuProductNgRecordRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
+            _manuSfcRepository = manuSfcRepository;
         }
 
         /// <summary>
@@ -123,48 +130,29 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
         public async Task VehicleBindOperationAsync(InteVehicleBindDto param)
         {
             List<string> sfcList = param.SfcList.Select(m => m.Sfc).ToList();
-            ManuSfcProduceBySfcsQuery sfcQuery = new ManuSfcProduceBySfcsQuery();
-            sfcQuery.SiteId = param.SiteId;
-            sfcQuery.Sfcs = sfcList;
-            //查数据库中在制品条码
-            var sfcProductList = (await _manuSfcProduceRepository.GetListBySfcsAsync(sfcQuery)).ToList(); ;
-            if (sfcProductList == null || sfcProductList.Count == 0)
+
+            //校验条码是否存在
+            var sfcEntities = await _manuSfcRepository.GetListAsync(new ManuSfcQuery { SiteId = param.SiteId, SFCs = sfcList });
+            if (sfcEntities == null || !sfcEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45112));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45112)).WithData("SfcListStr", string.Join(",", param.SfcList));
             }
-            //数量校验
-            var dbSfcList = sfcProductList.Select(m => m.SFC).ToList();
-            if (dbSfcList.Count != param.SfcList.Count)
+            var noExistSfcs = sfcList.Except(sfcEntities.Select(x => x.SFC));
+            if (noExistSfcs != null && noExistSfcs.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45113))
-                    .WithData("ContainerCode", param.ContainerCode)
-                    .WithData("SfcCount", sfcList.Count)
-                    .WithData("DbSfcCount", dbSfcList.Count);
-            }
-            //条码差异校验
-            var exceptList = dbSfcList.Except(sfcList).ToList();
-            if (exceptList != null && exceptList.Count > 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45114));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45112)).WithData("SfcListStr", string.Join(",", noExistSfcs));
             }
 
             //校验条码是否已绑定
-            //绑盘前校验 该条码是否已绑盘
-            InteVehiceSfcListQuery bindSfcQuery = new InteVehiceSfcListQuery();
-            bindSfcQuery.SiteId = param.SiteId;
-            bindSfcQuery.SfcList = sfcList;
-            var dbBindSfc = (await _inteVehiceFreightStackRepository.GetBySfcListAsync(bindSfcQuery)).ToList();
-            if (dbBindSfc != null && dbBindSfc.Count > 0)
+            var dbBindSfc = await _inteVehiceFreightStackRepository.GetBySfcListAsync(new InteVehiceSfcListQuery { SiteId = param.SiteId, SfcList = sfcList });
+            if (dbBindSfc != null && dbBindSfc.Any())
             {
                 string sfcListStr = string.Join(",", dbBindSfc.Select(m => m.BarCode).ToList());
                 throw new CustomerValidationException(nameof(ErrorCode.MES45115)).WithData("SfcList", string.Join(",", sfcListStr));
             }
 
-            //托盘数量校验
-            InteVehicleCodeQuery vehicleQuery = new InteVehicleCodeQuery();
-            vehicleQuery.SiteId = param.SiteId;
-            vehicleQuery.Code = param.ContainerCode;
-            var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(vehicleQuery);
+            //校验载具信息
+            var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery { SiteId = param.SiteId, Code = param.ContainerCode });
             if (inteVehicleEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45110));
@@ -182,24 +170,27 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45118));
             }
+
+            #region 校验载具装载数量
+
             //获取托盘实际能用的数量
             var vehicleDetail = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
             int okMaxNum = vehicleDetail.Where(i => i.Status == true).ToList().Count;
             //获取托盘已经绑定的记录
-            InteVehiceFreightStackQuery vehicelStackQuery = new InteVehiceFreightStackQuery();
-            vehicelStackQuery.SiteId = param.SiteId;
-            vehicelStackQuery.VehicleId = inteVehicleEntity.Id;
-            var vehiceStatckList = (await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(vehicelStackQuery)).ToList();
-            //校验数量
-            if (vehiceStatckList != null && vehiceStatckList.Count > 0)
+            var vehiceStatckList = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery
             {
-                //已经绑定的数量+当前数量
-                var curNum = vehiceStatckList.Count + sfcList.Count;
-                if (curNum > okMaxNum * vehicleTypeEntity.CellQty)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES45119));
-                }
+                SiteId = param.SiteId,
+                VehicleId = inteVehicleEntity.Id,
+            });
+            var alreadyBindCount = vehiceStatckList?.Count() ?? 0;  //已绑定数量
+
+            //已经绑定的数量 + 当前数量 > 载具单元格总数 * 单元数量
+            if (alreadyBindCount + sfcList.Count > okMaxNum * vehicleTypeEntity.CellQty)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES45119));
             }
+
+            #endregion
 
             DateTime curDate = HymsonClock.Now();
             //插入记录
@@ -207,16 +198,21 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
             //List<InteVehicleFreightEntity> updateQtyList = new List<InteVehicleFreightEntity>();
             List<InteVehicleFreightRecordEntity> recordList = new List<InteVehicleFreightRecordEntity>();
             var paramSfcList = param.SfcList.OrderBy(x => x.Location.ParseToInt());
-            var locationIds = vehicleDetail.OrderBy(x => x.Location?.ParseToInt()).Select(x => x.Id).ToList();
+            var locationIds = vehicleDetail.OrderBy(x => x.Location?.ParseToInt()).Select(x => new { x.Id, x.Location }).ToList();
+            if (vehiceStatckList != null && vehiceStatckList.Any())
+            {
+                locationIds = vehicleDetail.Where(x => !vehiceStatckList.Any(z => z.LocationId == x.Id)).OrderBy(x => x.Location?.ParseToInt())
+                    .Select(x => new { x.Id, x.Location }).ToList();
+            }
             foreach (var item in paramSfcList)
             {
                 //获取位置号Id
-                var locationId = vehicleDetail.Where(x => x.Location == item.Location).FirstOrDefault()?.Id ?? 0;
+                var locationId = locationIds.Where(x => x.Location == item.Location).FirstOrDefault()?.Id ?? 0;
                 if (locationId == 0)
                 {
-                    locationId = locationIds.FirstOrDefault();
+                    locationId = locationIds.FirstOrDefault()?.Id ?? 0;
                 }
-                locationIds.Remove(locationId);
+                locationIds.RemoveAll(x => x.Id == locationId);
 
                 InteVehicleFreightStackEntity addModel = new InteVehicleFreightStackEntity();
                 addModel.Id = IdGenProvider.Instance.CreateId();
@@ -267,78 +263,54 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.InteVehicle
         /// <returns></returns>
         public async Task<int> VehicleUnBindOperationAsync(InteVehicleUnBindDto param)
         {
-            //获取托盘
-            InteVehicleCodeQuery vehicleQuery = new InteVehicleCodeQuery();
-            vehicleQuery.SiteId = param.SiteId;
-            vehicleQuery.Code = param.ContainerCode;
-            var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(vehicleQuery);
-            if (inteVehicleEntity == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45110))
-                    .WithData("ContainerCode", param.ContainerCode);
-            }
+            var sfcList = param.SfcList.Distinct().ToList();
 
-            //查数据库中在制品条码
-            List<string> sfcList = param.SfcList;
-            ManuSfcProduceBySfcsQuery sfcQuery = new ManuSfcProduceBySfcsQuery();
-            sfcQuery.SiteId = param.SiteId;
-            sfcQuery.Sfcs = sfcList;
-            var sfcProductList = (await _manuSfcProduceRepository.GetListBySfcsAsync(sfcQuery)).ToList();
-            if (sfcProductList == null || sfcProductList.Count == 0)
+            //查询条码绑定信息
+            var bindEntities = await _inteVehiceFreightStackRepository.GetBySfcListAsync(new InteVehiceSfcListQuery { SiteId = param.SiteId, SfcList = sfcList });
+            if (bindEntities == null || !bindEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45112))
-                    .WithData("SfcListStr", string.Join(",", sfcList));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45120)).WithData("sfc", string.Join(",", sfcList));
             }
-            //数量校验
-            var dbSfcList = sfcProductList.Select(m => m.SFC).ToList();
-            if (dbSfcList.Count != sfcList.Count)
+            var noBindSfcs = sfcList.Except(bindEntities.Select(x => x.BarCode));
+            if (noBindSfcs != null && noBindSfcs.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45113))
-                    .WithData("ContainerCode", param.ContainerCode)
-                    .WithData("SfcCount", sfcList.Count)
-                    .WithData("DbSfcCount", dbSfcList.Count);
-            }
-            //条码差异校验
-            var exceptList = dbSfcList.Except(sfcList).ToList();
-            if (exceptList != null && exceptList.Count > 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45114));
+                throw new CustomerValidationException(nameof(ErrorCode.MES45120)).WithData("sfc", string.Join(",", noBindSfcs));
             }
 
             //组装数据
             DateTime curDate = HymsonClock.Now();
-            List<UpdateVehicleFreightStackCommand> updateList = new List<UpdateVehicleFreightStackCommand>();
-            List<InteVehicleFreightRecordEntity> recordList = new List<InteVehicleFreightRecordEntity>();
-            foreach (var item in param.SfcList)
+            var updateList = new List<UpdateVehicleFreightStackCommand>();
+            var recordList = new List<InteVehicleFreightRecordEntity>();
+            foreach (var item in bindEntities)
             {
-                UpdateVehicleFreightStackCommand updateModel = new UpdateVehicleFreightStackCommand();
-                updateModel.BarCode = item;
-                updateModel.VehicleId = inteVehicleEntity.Id;
-                updateModel.UpdatedOn = curDate;
-                updateModel.UpdatedBy = param.UserName;
+                var updateModel = new UpdateVehicleFreightStackCommand
+                {
+                    BarCode = item.BarCode,
+                    VehicleId = item.VehicleId,
+                    UpdatedOn = curDate,
+                    UpdatedBy = param.UserName
+                };
                 updateList.Add(updateModel);
 
-                InteVehicleFreightRecordEntity recordEntity = new InteVehicleFreightRecordEntity();
-                recordEntity.Id = IdGenProvider.Instance.CreateId();
-                recordEntity.BarCode = item;
-                recordEntity.LocationId = 0;
-                recordEntity.SiteId = param.SiteId;
-                recordEntity.CreatedBy = param.UserName;
-                recordEntity.UpdatedBy = param.UserName;
-                recordEntity.CreatedOn = curDate;
-                recordEntity.UpdatedOn = curDate;
-                recordEntity.VehicleId = inteVehicleEntity.Id;
-                recordEntity.OperateType = (int)VehicleOperationEnum.Unbind;
+                var recordEntity = new InteVehicleFreightRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = param.SiteId,
+                    VehicleId = item.VehicleId,
+                    BarCode = item.BarCode,
+                    LocationId = item.LocationId,
+                    OperateType = (int)VehicleOperationEnum.Unbind,
+                    CreatedBy = param.UserName,
+                    UpdatedBy = param.UserName,
+                    CreatedOn = curDate,
+                    UpdatedOn = curDate
+                };
                 recordList.Add(recordEntity);
             }
-            int delNum = 0;
+
             //数据库操作
-            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
-            delNum = await _inteVehiceFreightStackRepository.DeleteByVehiceBarCode(updateList);
-            if (delNum != updateList.Count)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES45120));
-            }
+            using var trans = TransactionHelper.GetTransactionScope();
+            var delNum = await _inteVehiceFreightStackRepository.DeleteByVehiceBarCode(updateList);
             await _inteVehicleFreightRecordRepository.InsertsAsync(recordList);
             trans.Complete();
 

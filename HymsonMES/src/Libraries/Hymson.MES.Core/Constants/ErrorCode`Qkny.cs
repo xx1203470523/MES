@@ -286,9 +286,9 @@ namespace Hymson.MES.Core.Constants
         public const string MES45119 = "载具装载数量加上这次已超过最大值";
 
         /// <summary>
-        /// 载具中条码和系统中不匹配，部分条码没有解绑
+        /// 条码未绑定载具或已解绑
         /// </summary>
-        public const string MES45120 = "载具中条码和系统中不匹配，部分条码没有解绑";
+        public const string MES45120 = "条码【{sfc}】未绑定载具或已解绑！";
 
         /// <summary>
         /// 托盘NG中上传的不合格代码在系统中不存在
