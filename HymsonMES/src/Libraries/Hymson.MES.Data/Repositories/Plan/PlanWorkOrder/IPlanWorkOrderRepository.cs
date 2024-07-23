@@ -67,7 +67,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(IEnumerable<long> ids);
-
+        /// <summary>
+        /// 获取此站点所有工单信息 用于缓存整个站点的工单数据 为单个查询 范围查询加速
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetBySiteIdAsync(long siteId);
         /// <summary>
         /// 根据 workOrderId 获取数据
         /// </summary>

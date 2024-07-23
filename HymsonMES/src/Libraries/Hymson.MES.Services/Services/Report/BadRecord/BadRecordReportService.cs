@@ -1,3 +1,4 @@
+using AutoMapper.Execution;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -101,17 +102,22 @@ namespace Hymson.MES.Services.Services.Report
             var unqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(unqualifiedIds);
 
             List<ManuProductBadRecordReportViewDto> listDto = new List<ManuProductBadRecordReportViewDto>();
+            var sumNum = badRecordslist.ToList().Sum(x => x.Num);
             foreach (var item in badRecordslist)
             {
                 var unqualifiedCodeEntitie = unqualifiedCodeEntities.FirstOrDefault((y => y.Id == item.UnqualifiedId));
-
-                listDto.Add(new ManuProductBadRecordReportViewDto
+                var manuProductBadRecordReport = new ManuProductBadRecordReportViewDto
                 {
                     UnqualifiedId = item.UnqualifiedId,
                     Num = item.Num,
                     UnqualifiedCode = unqualifiedCodeEntitie?.UnqualifiedCode ?? "",
                     UnqualifiedCodeName = unqualifiedCodeEntitie?.UnqualifiedCodeName ?? ""
-                });
+                };
+                if (sumNum > 0)
+                {
+                    manuProductBadRecordReport.Percentage = Math.Round((((decimal)item.Num / sumNum)*100M), 6);
+                }
+                listDto.Add(manuProductBadRecordReport);
             }
 
             return listDto;

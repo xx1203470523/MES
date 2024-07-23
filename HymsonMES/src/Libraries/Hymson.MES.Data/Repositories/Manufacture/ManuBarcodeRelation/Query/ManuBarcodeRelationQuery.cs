@@ -29,15 +29,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         public long? OutputSfcStepId { get; set; }
 
         /// <summary>
-        /// 投入条码表
+        /// 投入条码步骤表Id
         /// </summary>
         public long? InputSfcStepId { get; set; }
 
 
         /// <summary>
-        /// 投入条码表
+        /// 投入条码步骤表Id
         /// </summary>
         public long? DisassembledSfcStepId { get; set; }
+
+        /// <summary>
+        /// 投入条码台账表id
+        /// </summary>
+        public long? OutputMaterialStandingBookId { get; set; }
+
+        /// <summary>
+        /// 投入条码台账表Id
+        /// </summary>
+        public long? InputMaterialStandingBookId { get; set; }
     }
 
     /// <summary>

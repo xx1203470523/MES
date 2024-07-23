@@ -51,6 +51,11 @@
         public const string PLAN_WORK_ORDER_BIND = "plan_work_order_bind";
 
         /// <summary>
+        /// 工单表
+        /// </summary>
+        public const string PLAN_WORK_ORDER = "plan_work_order";
+
+        /// <summary>
         /// BOM明细表
         /// </summary>
         public const string PROC_BOM_DETAIL= "proc_bom_detail";

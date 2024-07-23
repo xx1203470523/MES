@@ -24,5 +24,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// 空值 : false  
         /// </summary>
         public IEnumerable<string>?  Codes { get; set; }
+
+        ///资源类型Id列表
+        public IEnumerable<long> ToolTypeIds { get; set; }
     }
 }
