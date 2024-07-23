@@ -27,7 +27,6 @@ using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Data;
-using System.Linq;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -190,8 +189,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
         }
-
-
 
         #region 让步接收
         /// <summary>
@@ -617,7 +614,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
         #endregion
 
-
         #region 设备误判
         /// <summary>
         /// 根据条码查询信息（设备误判）
@@ -844,7 +840,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             return rowArray.Sum();
         }
         #endregion
-
 
         #region 返工
         /// <summary>
@@ -1140,7 +1135,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
         #endregion
 
-
         #region 离脱
         /// <summary>
         /// 根据条码查询信息（离脱）
@@ -1402,8 +1396,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             return rowArray.Sum();
         }
         #endregion
-
-
 
         #region 内部方法
         /// <summary>
@@ -2340,6 +2332,5 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         #endregion
-
     }
 }

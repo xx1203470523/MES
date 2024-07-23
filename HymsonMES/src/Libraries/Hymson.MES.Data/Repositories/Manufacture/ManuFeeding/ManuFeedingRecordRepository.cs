@@ -1,6 +1,7 @@
 using Dapper;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
@@ -12,7 +13,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     {
         public ManuFeedingRecordRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-
         }
 
         /// <summary>
@@ -37,6 +37,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
             return await conn.ExecuteAsync(InsertSql, entities);
         }
 
+        /// <summary>
+        /// 获取单条数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ManuFeedingRecordEntity> GetEntity(ManuFeedingRecordQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            if (query.MaterialStandingbookId.HasValue)
+            {
+                sqlBuilder.Where("MaterialStandingbookId=@MaterialStandingbookId");
+            }
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuFeedingRecordEntity>(templateData.RawSql, query);
+        }
     }
 
     /// <summary>
@@ -44,6 +65,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     /// </summary>
     public partial class ManuFeedingRecordRepository
     {
-        const string InsertSql = "INSERT INTO `manu_feeding_record`(`Id`, `ResourceId`, `FeedingPointId`, `ProductId`, `BarCode`, MaterialId, `Qty`, `DirectionType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, MaterialType, WorkOrderId, LoadSource) VALUES (@Id, @ResourceId, @FeedingPointId, @ProductId, @BarCode, @MaterialId, @Qty, @DirectionType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @MaterialType, @WorkOrderId, @LoadSource)  ";
+        const string InsertSql = "INSERT INTO `manu_feeding_record`(`Id`, `ResourceId`, `FeedingPointId`, `ProductId`, `BarCode`, MaterialId, `Qty`, `DirectionType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, MaterialType, WorkOrderId, LoadSource, MaterialStandingbookId) VALUES (@Id, @ResourceId, @FeedingPointId, @ProductId, @BarCode, @MaterialId, @Qty, @DirectionType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @MaterialType, @WorkOrderId, @LoadSource,@MaterialStandingbookId)  ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_feeding_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT 1 ";
     }
 }

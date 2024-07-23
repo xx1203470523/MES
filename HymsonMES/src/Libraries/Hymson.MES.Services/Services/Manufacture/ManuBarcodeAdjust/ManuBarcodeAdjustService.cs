@@ -726,7 +726,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //Batch = "",//自制品 没有
                     Quantity = splitDto.Qty,
                     Unit = procMaterialEntitity?.Unit ?? "",
-                    Type = WhMaterialInventoryTypeEnum.Split,
+                    Type = WhMaterialInventoryTypeEnum.MaterialBarCodeSplit,
                     Source = MaterialInventorySourceEnum.ManuComplete,
                     SiteId = siteId,
                     CreatedBy = updatedBy,
@@ -1111,7 +1111,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Batch = whMaterialInventoryFather.Batch,
                         Quantity = qty,//库存修改为0 
                         Unit = material?.Unit ?? "",
-                        Type = WhMaterialInventoryTypeEnum.Merge,
+                        Type = WhMaterialInventoryTypeEnum.MaterialBarCodeMerge,
                         Source = whMaterialInventoryFather?.Source ?? MaterialInventorySourceEnum.ManuComplete,
                         SiteId = siteId,
                         CreatedBy = updatedBy,

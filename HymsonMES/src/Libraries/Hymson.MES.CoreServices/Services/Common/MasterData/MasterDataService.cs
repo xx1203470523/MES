@@ -5,6 +5,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Plan;
@@ -177,12 +178,16 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <summary>
         ///产品参数采集
         /// </summary>
-        private readonly Data.Repositories.Parameter.IManuProductParameterRepository _productParameterRepository;
+        private readonly IManuProductParameterRepository _productParameterRepository;
 
         /// <summary>
         /// 仓储接口（产品工序时间）
         /// </summary>
         private readonly IProcProductTimecontrolRepository _procProductTimecontrolRepository;
+        /// <summary>
+        /// 参数
+        /// </summary>
+        private readonly IProcParameterRepository _procParameterRepository;
 
         /// <summary>
         /// 构造函数
@@ -241,8 +246,8 @@ namespace Hymson.MES.CoreServices.Services.Common
             IProcSortingRuleRepository sortingRuleRepository,
             IProcSortingRuleDetailRepository sortingRuleDetailRepository,
             IEquEquipmentRepository equEquipmentRepository,
-            Data.Repositories.Parameter.IManuProductParameterRepository productParameterRepository,
-            IProcProductTimecontrolRepository procProductTimecontrolRepository)
+            IManuProductParameterRepository productParameterRepository,
+            IProcProductTimecontrolRepository procProductTimecontrolRepository, IProcParameterRepository procParameterRepository)
         {
             _logger = logger;
             _sequenceService = sequenceService;
@@ -272,6 +277,7 @@ namespace Hymson.MES.CoreServices.Services.Common
             _equEquipmentRepository = equEquipmentRepository;
             _productParameterRepository = productParameterRepository;
             _procProductTimecontrolRepository = procProductTimecontrolRepository;
+            _procParameterRepository = procParameterRepository;
         }
 
         /// <summary>
@@ -1656,6 +1662,67 @@ namespace Hymson.MES.CoreServices.Services.Common
             var parameterList = await _productParameterRepository.GetProductParameterBySFCEntitiesAsync(parameterBySfcQuery);
             return parameterList;
         }
+        #region 获取基础数据带缓存 主要用于循环加载中使用
+        public async Task<ProcMaterialEntity?> GetProcMaterialEntityAsync(long siteId, long id)
+        {
+            var procMaterialEntities = await _procMaterialRepository.GetBySiteIdAsync(siteId);
+            if (procMaterialEntities == null || !procMaterialEntities.Any()) return null;
+            return procMaterialEntities.FirstOrDefault(x => x.Id == id);
+        }
 
+        public async Task<PlanWorkOrderEntity?> GetPlanWorkOrderEntityAsync(long siteId, long id)
+        {
+            var planWorkOrderEntities=await _planWorkOrderRepository.GetBySiteIdAsync(siteId);
+            if (planWorkOrderEntities == null || !planWorkOrderEntities.Any()) return null;
+            return planWorkOrderEntities.FirstOrDefault(x=>x.Id == id); 
+        }
+
+        public Task<InteWorkCenterEntity?> GetInteWorkCenterEntityAsync(long siteId, long id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ProcProcessRouteEntity?> GetProcProcessRouteEntityAsync(long siteId, long id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ProcBomEntity?> GetProcBomEntityAsync(long siteId, long id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ProcResourceEntity?> GetProcResourceEntityAsync(long siteId, long id)
+        {
+            var procResourceEntities = await _procResourceRepository.GetBySiteIdAsync(siteId);
+            if (procResourceEntities == null || !procResourceEntities.Any())
+                return null;
+            return procResourceEntities.FirstOrDefault(x => x.Id == id);
+        }
+
+        public async Task<EquEquipmentEntity?> GetEquEquipmentEntityAsync(long siteId, long id)
+        {
+            var equEquipmentEntities = await _equEquipmentRepository.GetBySiteIdAsync(new Data.Repositories.Equipment.EquEquipment.Query.EquQuery
+            {
+                SiteId = siteId
+            });
+            if (equEquipmentEntities == null || !equEquipmentEntities.Any()) return null;
+            return equEquipmentEntities.FirstOrDefault(e => e.Id == id);
+        }
+
+        public async Task<ProcProcedureEntity?> GetProcProcedureEntityAsync(long siteId, long id)
+        {
+            var procProcedureEntities = await _procProcedureRepository.GetBySiteIdAsync(siteId);
+            if (procProcedureEntities == null || !procProcedureEntities.Any()) return null;
+            return procProcedureEntities.FirstOrDefault(p => p.Id == id);
+        }
+
+        public async Task<ProcParameterEntity?> GetProcParameterEntityAsync(long siteId, long id)
+        {
+            var procParameterEntities = await _procParameterRepository.GetBySiteIdAsync(siteId);
+            if (procParameterEntities == null || !procParameterEntities.Any()) return null;
+            return procParameterEntities.FirstOrDefault(x => x.Id == id);
+        }
+        #endregion
     }
 }

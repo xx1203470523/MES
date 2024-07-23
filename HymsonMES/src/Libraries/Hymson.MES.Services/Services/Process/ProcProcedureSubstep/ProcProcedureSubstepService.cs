@@ -106,12 +106,12 @@ namespace Hymson.MES.Services.Services.Process
             var siteId = _currentSite.SiteId ?? 0;
 
             //编码唯一性校验
-            var inteJobEntity = await _procProcedureSubstepRepository.GetByCodeAsync(new EntityByCodeQuery
+            var procedureSubstepEntity = await _procProcedureSubstepRepository.GetByCodeAsync(new EntityByCodeQuery
             {
                 Site = siteId,
                 Code = param.Code
             });
-            if (inteJobEntity != null)
+            if (procedureSubstepEntity != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17751)).WithData("code", param.Code);
             }

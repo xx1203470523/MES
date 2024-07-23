@@ -41,6 +41,6 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 批次拆分
         /// </summary>
         [Description("批次拆分")]
-        Batch_Split = 7
+        Batch_Split = 7,
     }
 }

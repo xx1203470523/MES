@@ -54,13 +54,13 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 校准周期
         /// </summary>
-        [EpplusTableColumn(Header = "校准周期（天，周，月）", Order = 7)]
+        [EpplusTableColumn(Header = "校准周期", Order = 7)]
         public decimal? CalibrationCycle { get; set; }
 
         /// <summary>
         /// 校准周期单位
         /// </summary>
-        [EpplusTableColumn(Header = "校准周期单位", Order = 8)]
+        [EpplusTableColumn(Header = "校准周期单位（天，周，月）", Order = 8)]
         public ToolingTypeEnum? CalibrationCycleUnit { get; set; }
 
         /// <summary>
