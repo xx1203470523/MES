@@ -490,7 +490,7 @@ namespace Hymson.MES.Services.Services.Quality
             var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(entity.ReturnOrderId);
             if (returnEntity == null) return dto;
 
-            dto.ReqOrderCode = returnEntity.ReturnOrderCode;
+            dto.ReturnOrderCode = returnEntity.ReturnOrderCode;
             dto.ReturnUser = returnEntity.CreatedBy;
             dto.ReturnTime = returnEntity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -594,31 +594,13 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedQuery = pagedQueryDto.ToQuery<QualIqcOrderReturnPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
-            /*
-            // 转换产品编码/版本变为产品ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode)
-                || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName)
-                || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialVersion))
-            {
-                var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
-                {
-                    SiteId = pagedQuery.SiteId,
-                    MaterialCode = pagedQueryDto.MaterialCode,
-                    MaterialName = pagedQueryDto.MaterialName,
-                    Version = pagedQueryDto.MaterialVersion
-                });
-                if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.MaterialIds = procMaterialEntities.Select(s => s.Id);
-                else pagedQuery.MaterialIds = Array.Empty<long>();
-            }
-            */
-
             // 将退料单号变为退料单ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.ReqOrderCode))
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.ReturnOrderCode))
             {
                 var returnEntities = await _manuReturnOrderRepository.GetEntitiesAsync(new ManuReturnOrderQuery
                 {
                     SiteId = pagedQuery.SiteId,
-                    ReqOrderCode = pagedQueryDto.ReqOrderCode
+                    ReturnOrderCode = pagedQueryDto.ReturnOrderCode
                 });
                 if (returnEntities != null && returnEntities.Any()) pagedQuery.ReturnOrderIds = returnEntities.Select(s => s.Id);
                 else pagedQuery.ReturnOrderIds = Array.Empty<long>();
@@ -730,7 +712,7 @@ namespace Hymson.MES.Services.Services.Quality
                 var receiptEntity = returnDic[entity.ReturnOrderId];
                 if (receiptEntity != null)
                 {
-                    dto.ReqOrderCode = receiptEntity.ReturnOrderCode;
+                    dto.ReturnOrderCode = receiptEntity.ReturnOrderCode;
                 }
 
                 // 检验人

@@ -116,6 +116,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+            if (!string.IsNullOrWhiteSpace(query.ReturnOrderCode))
+            {
+                query.ReturnOrderCode = $"%{query.ReturnOrderCode}%";
+                sqlBuilder.Where("ReturnOrderCode LIKE @ReturnOrderCode");
+            }
+            sqlBuilder.AddParameters(query);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuReturnOrderEntity>(template.RawSql, query);
         }

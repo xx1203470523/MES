@@ -133,7 +133,8 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
             //sqlBuilder.Where("SiteId = @SiteId");
             if (!string.IsNullOrWhiteSpace(query.ReceiptNum))
             {
-                sqlBuilder.Where(" ReceiptNum = @ReceiptNum ");
+                query.ReceiptNum = $"%{query.ReceiptNum}%";
+                sqlBuilder.Where("ReceiptNum LIKE @ReceiptNum");
             }
             sqlBuilder.AddParameters(query);
 

@@ -17,7 +17,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 退料单据号
         /// </summary>
-        public string ReqOrderCode { get; set; }
+        public string ReturnOrderCode { get; set; }
 
         /// <summary>
         /// 工单id，工单借料情况下，接收物料的工单
@@ -92,12 +92,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 退料单据号
         /// </summary>
-        public string ReqOrderCode { get; set; }
+        public string ReturnOrderCode { get; set; }
 
         /// <summary>
         /// 工单id，工单借料情况下，接收物料的工单
         /// </summary>
-        public string TargetWorkOrderCode { get; set; }
+        public string WorkOrderCode { get; set; }
 
         /// <summary>
         /// 退料单类型0:工单退料 1:工单借料
@@ -162,7 +162,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 退料单号
         /// </summary>
-        public string? ReqOrderCode { get; set; }
+        public string? ReturnOrderCode { get; set; }
 
         /// <summary>
         /// 编码（工单）

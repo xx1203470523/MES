@@ -203,11 +203,17 @@ namespace Hymson.MES.Data.Repositories.Quality
                 pagedQuery.InspectionOrder = $"%{pagedQuery.InspectionOrder}%";
                 sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
             }
-            if (pagedQuery.IQCOrderIds != null) sqlBuilder.Where(" Id IN @IQCOrderIds ");
-            if (pagedQuery.ReturnOrderIds != null && pagedQuery.ReturnOrderIds.Any()) sqlBuilder.Where(" ReturnOrderId IN @ReturnOrderIds ");
-            if (pagedQuery.WorkOrderIds != null && pagedQuery.WorkOrderIds.Any()) sqlBuilder.Where(" WorkOrderId IN @WorkOrderIds ");
+            if (pagedQuery.ReturnOrderIds != null) sqlBuilder.Where(" ReturnOrderId IN @ReturnOrderIds ");
+            if (pagedQuery.WorkOrderIds != null) sqlBuilder.Where(" WorkOrderId IN @WorkOrderIds ");
             if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
             if (pagedQuery.IsQualified.HasValue) sqlBuilder.Where("IsQualified = @IsQualified");
+
+            // 限定时间
+            if (pagedQuery.CreatedOn != null && pagedQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { DateStart = pagedQuery.CreatedOn[0], DateEnd = pagedQuery.CreatedOn[1] });
+                sqlBuilder.Where(" CreatedOn >= @DateStart AND CreatedOn < @DateEnd ");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
