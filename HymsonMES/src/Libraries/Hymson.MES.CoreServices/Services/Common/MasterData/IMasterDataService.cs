@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Plan;
@@ -357,6 +358,83 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <param name="parameterBySfcQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<Core.Domain.Parameter.ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery);
+
+
+        #region 获取基础数据带缓存 主要用于循环加载中使用
+        /// <summary>
+        /// 通过Id获取物料实体数据 走缓存 主要用于循环加载中使用
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcMaterialEntity?> GetProcMaterialEntityAsync(long siteId, long id);
+        /// <summary>
+        /// 通过Id获取工单实体数据 走缓存 主要用于循环加载中使用
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+
+        Task<PlanWorkOrderEntity?> GetPlanWorkOrderEntityAsync(long siteId, long id);
+
+        /// <summary>
+        /// 通过Id获取工作中心实体数据 走缓存 主要用于循环加载中使用
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<InteWorkCenterEntity?> GetInteWorkCenterEntityAsync(long siteId, long id);
+
+        /// <summary>
+        /// 通过Id获取工艺路线实体数据 走缓存 主要用于循环加载中使用
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcProcessRouteEntity?> GetProcProcessRouteEntityAsync(long siteId, long id);
+
+        /// <summary>
+        /// 通过Id获取BOM实体数据 走缓存 主要用于循环加载中使用
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcBomEntity?> GetProcBomEntityAsync(long siteId, long id);
+
+        /// <summary>
+        /// 通过Id获取资源实体数据 走缓存 主要用于循环加载中使用
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcResourceEntity?> GetProcResourceEntityAsync(long siteId, long id);
+        /// <summary>
+        /// 通过Id获取设备实体数据 走缓存 主要用于循环加载中使用
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<EquEquipmentEntity?> GetEquEquipmentEntityAsync(long siteId, long id);
+
+
+        /// <summary>
+        /// 通过Id获取工序实体数据 走缓存 主要用于循环加载中使用
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity?> GetProcProcedureEntityAsync(long siteId,  long id);
+
+        /// <summary>
+        /// 通过Id获取参数实体数据 走缓存 主要用于循环加载中使用
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ProcParameterEntity?> GetProcParameterEntityAsync(long siteId, long id);
+
+
+        #endregion 获取基础数据带缓存 主要用于循环加载中使用
 
     }
 }

@@ -578,8 +578,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
 
-            // 添加物料台账记录
-            rows += await _whMaterialStandingbookRepository.InsertAsync(new WhMaterialStandingbookEntity
+            var materialStandingbookEntity = new WhMaterialStandingbookEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = entity.SiteId,
@@ -596,7 +595,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 CreatedOn = entity.CreatedOn,
                 UpdatedBy = entity.UpdatedBy,
                 UpdatedOn = entity.UpdatedOn
-            });
+            };
+
+            // 添加物料台账记录
+            rows += await _whMaterialStandingbookRepository.InsertAsync(materialStandingbookEntity);
 
             // 将状态更新为"使用中"
             rows += await _whMaterialInventoryRepository.UpdatePointByBarCodeAsync(new UpdateStatusByBarCodeCommand
@@ -609,7 +611,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             });
 
             rows += await _manuFeedingRepository.InsertAsync(entity);
-            rows += await _manuFeedingRecordRepository.InsertAsync(GetManuFeedingRecord(entity, FeedingDirectionTypeEnum.Load));
+            rows += await _manuFeedingRecordRepository.InsertAsync(GetManuFeedingRecord(entity, FeedingDirectionTypeEnum.Load, materialStandingbookEntity.Id));
             trans.Complete();
 
             // 因为前端要展开这级表格，所以把ID返回去
@@ -661,8 +663,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 var material = materials.FirstOrDefault(w => w.Id == entity.ProductId);
                 if (material == null) continue;
 
-                // 添加物料台账记录
-                whMaterialStandingbookEntities.Add(new WhMaterialStandingbookEntity
+                var materialStandingbookEntity = new WhMaterialStandingbookEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = entity.SiteId,
@@ -673,13 +674,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     Batch = inventory.Batch,
                     Quantity = entity.Qty,
                     Unit = material.Unit ?? "",
-                    Type = WhMaterialInventoryTypeEnum.MaterialReturn,
+                    Type = WhMaterialInventoryTypeEnum.MaterialUnloading,
                     Source = inventory.Source,
                     CreatedBy = entity.UpdatedBy,
                     CreatedOn = now,
                     UpdatedBy = entity.UpdatedBy,
                     UpdatedOn = now
-                });
+                };
+                // 添加物料台账记录
+                whMaterialStandingbookEntities.Add(materialStandingbookEntity);
 
                 // 将状态恢复为"待使用"
                 updateStatusByBarCodeCommands.Add(new UpdateStatusByBarCodeCommand
@@ -692,7 +695,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 });
 
                 // 添加操作记录
-                manuFeedingRecordEntities.Add(GetManuFeedingRecord(entity, FeedingDirectionTypeEnum.Unload));
+                manuFeedingRecordEntities.Add(GetManuFeedingRecord(entity, FeedingDirectionTypeEnum.Unload, materialStandingbookEntity.Id));
             }
 
             // 开启事务
@@ -716,9 +719,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         }
 
 
-
-
-
         #region 内部方法
         /// <summary>
         /// 获取上料记录对象
@@ -726,11 +726,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="entity"></param>
         /// <param name="directionType"></param>
         /// <returns></returns>
-        private static ManuFeedingRecordEntity GetManuFeedingRecord(ManuFeedingEntity entity, FeedingDirectionTypeEnum directionType)
+        private static ManuFeedingRecordEntity GetManuFeedingRecord(ManuFeedingEntity entity, FeedingDirectionTypeEnum directionType,long materialStandingbookId)
         {
             return new ManuFeedingRecordEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
+                MaterialStandingbookId=materialStandingbookId,
                 ResourceId = entity.ResourceId,
                 FeedingPointId = entity.FeedingPointId,
                 ProductId = entity.ProductId,

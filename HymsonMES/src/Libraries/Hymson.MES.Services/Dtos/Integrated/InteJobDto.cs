@@ -163,7 +163,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 设定值
         /// </summary>
-        public string SetValue { get; set; }
+        public string SetValue { get; set; } = "";
 
         /// <summary>
         /// 规则名称

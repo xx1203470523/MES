@@ -5,6 +5,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
     /// </summary>
     public class EquToolsTypeQuery
     {
-    
-    }
+        /// <summary>
+        /// 工厂
+        /// </summary>
+        public long SiteId { get; set; }
+
+        //
+        public  IEnumerable<string>? Codes { get; set; }
+}
 }

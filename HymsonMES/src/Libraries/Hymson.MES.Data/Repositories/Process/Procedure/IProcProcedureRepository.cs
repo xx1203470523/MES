@@ -44,6 +44,12 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<ProcProcedureEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 获取此站点所有工序信息 用于缓存整个站点的工序数据 为单个查询 范围查询加速
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureEntity>> GetBySiteIdAsync(long siteId);
+        /// <summary>
         /// 根据Code查询对象
         /// </summary>
         /// <param name="query"></param>

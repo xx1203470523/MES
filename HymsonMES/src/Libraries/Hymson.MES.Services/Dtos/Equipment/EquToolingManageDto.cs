@@ -209,7 +209,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 额定使用寿命单位
         /// </summary>
-        public ToolingTypeEnum RatedLifeUnit { get; set; }
+        public ToolingTypeEnum? RatedLifeUnit { get; set; }
         /// <summary>
         /// 是否效准
         /// </summary>
@@ -269,7 +269,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 额定使用寿命单位
         /// </summary>
-        public ToolingTypeEnum RatedLifeUnit { get; set; }
+        public ToolingTypeEnum? RatedLifeUnit { get; set; }
 
         /// <summary>
         /// 是否效准
