@@ -40,16 +40,6 @@ namespace Hymson.MES.SystemServices.Dtos
         public string PlanCode { get; set; } = "";
 
         /// <summary>
-        /// 生产时间（计划）
-        /// </summary>
-        public DateTime? PlanStartTime { get; set; }
-
-        /// <summary>
-        /// 结束时间（计划）
-        /// </summary>
-        public DateTime? PlanEndTime { get; set; }
-
-        /// <summary>
         /// 产品明细
         /// </summary>
         public List<SyncWorkPlanProductDto> Products { get; set; } = new();
@@ -67,19 +57,9 @@ namespace Hymson.MES.SystemServices.Dtos
         public long? Id { get; set; }
 
         /// <summary>
-        /// 计划产品ID
-        /// </summary>
-        public long? ProductId { get; set; }
-
-        /// <summary>
         /// 产品编号 
         /// </summary>
         public string ProductCode { get; set; } = "";
-
-        /// <summary>
-        /// 产品版本
-        /// </summary>
-        public string ProductVersion { get; set; } = "";
 
         /// <summary>
         /// BomId
@@ -100,6 +80,16 @@ namespace Hymson.MES.SystemServices.Dtos
         /// 生产数量
         /// </summary>
         public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 生产时间（计划）
+        /// </summary>
+        public DateTime? StartTime { get; set; }
+
+        /// <summary>
+        /// 结束时间（计划）
+        /// </summary>
+        public DateTime? EndTime { get; set; }
 
         /// <summary>
         /// 超产比例

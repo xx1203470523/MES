@@ -284,5 +284,15 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.ProductReceiptCancelAsync(request);
         }
+      /// <summary>
+        /// 根据工单查询工单的领料列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("getByOrderId/{id}")]
+        public async Task<IEnumerable<WhMaterialInventoryDetailDto>> GetPickMaterialsByOrderidAsync(long id)
+        {
+            return await _whMaterialInventoryService.GetPickMaterialsByOrderidAsync(id);
+        }
     }
 }
