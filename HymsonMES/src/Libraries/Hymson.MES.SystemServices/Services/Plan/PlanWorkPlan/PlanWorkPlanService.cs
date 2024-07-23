@@ -227,7 +227,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
             }
 
             // 读取已存在的生产计划记录
-            var WorkPlanCodes = lineDtoDict.Select(s => s.WorkPlanCode).Distinct();
+            var WorkPlanCodes = lineDtoDict.Select(s => s.PlanCode).Distinct();
             var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = currentBo.SiteId, Codes = WorkPlanCodes });
 
             // 遍历数据
@@ -257,14 +257,14 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10246)).WithData("Code", productDto.BomCode);
                 */
 
-                var planEntity = planEntities.FirstOrDefault(f => f.WorkPlanCode == planDto.WorkPlanCode);
+                var planEntity = planEntities.FirstOrDefault(f => f.WorkPlanCode == planDto.PlanCode);
 
                 // 不存在的新生产计划
                 if (planEntity == null)
                 {
                     planEntity = new PlanWorkPlanEntity
                     {
-                        WorkPlanCode = planDto.WorkPlanCode,
+                        WorkPlanCode = planDto.PlanCode,
                         RequirementNumber = planDto.RequirementNumber,
                         PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value,
                         PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value,
@@ -313,7 +313,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     resposeBo.ProductAdds.Add(new PlanWorkPlanProductEntity
                     {
                         WorkPlanId = planEntity.Id,
-                        ProductId = productDto.ProductId,
+                        ProductId = productDto.ProductId ?? 0,
                         ProductCode = productDto.ProductCode,
                         ProductVersion = productDto.ProductVersion,
                         BomId = productDto.BomId,
