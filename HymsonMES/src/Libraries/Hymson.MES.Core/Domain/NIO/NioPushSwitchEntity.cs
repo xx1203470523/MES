@@ -2,7 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
 
-namespace Hymson.MES.BackgroundServices.NIO
+namespace Hymson.MES.Core.NIO
 {
     /// <summary>
     /// 数据实体（蔚来推送开关）   
@@ -23,9 +23,9 @@ namespace Hymson.MES.BackgroundServices.NIO
         public string Path { get; set; }
 
         /// <summary>
-        /// 请求路径
+        /// 请求路径（0:Get;1:Post;2:Put;3:Delete;）
         /// </summary>
-        public RestSharp.Method Method { get; set; }
+        public int Method { get; set; }
 
         /// <summary>
         /// 业务场景;0：表示总开关；

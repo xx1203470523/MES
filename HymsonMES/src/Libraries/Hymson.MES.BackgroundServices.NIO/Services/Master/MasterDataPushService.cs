@@ -2,7 +2,6 @@
 using Hymson.MES.BackgroundServices.NIO.Dtos;
 using Hymson.MES.BackgroundServices.NIO.Dtos.Master;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Material;
-using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Material.View;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Param;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Param.View;
 using Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Proceduce;
@@ -11,14 +10,11 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
+using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.Utils;
 using Newtonsoft.Json;
-using System;
-using System.Security.Policy;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {

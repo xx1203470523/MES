@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
+using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -21,8 +22,6 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 using Newtonsoft.Json;
-using System.Diagnostics;
-using System.Security.Policy;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {

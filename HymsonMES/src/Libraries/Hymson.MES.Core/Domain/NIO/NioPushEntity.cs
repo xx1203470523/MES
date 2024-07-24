@@ -2,7 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.Enums.Plan;
 
-namespace Hymson.MES.BackgroundServices.NIO
+namespace Hymson.MES.Core.NIO
 {
     /// <summary>
     /// 数据实体（蔚来推送表）   
