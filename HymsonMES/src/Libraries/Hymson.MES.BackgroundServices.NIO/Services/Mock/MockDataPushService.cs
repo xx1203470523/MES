@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
 using Hymson.MES.Core.Enums.Mavel;
-using Hymson.Utils;
+using Hymson.MES.CoreServices.Extension;
+using Hymson.MES.Data.NIO;
 using RestSharp;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services

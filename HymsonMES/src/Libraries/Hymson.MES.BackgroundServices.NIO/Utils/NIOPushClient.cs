@@ -1,5 +1,7 @@
-﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
-using Hymson.MES.BackgroundServices.NIO.Utils;
+﻿using Hymson.MES.BackgroundServices.NIO.Utils;
+using Hymson.MES.Core.NIO;
+using Hymson.MES.CoreServices.Bos.NIO;
+using Hymson.MES.CoreServices.Extension;
 using RestSharp;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
@@ -19,11 +21,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         //public const string HOST = "https://openapi-nexus-stg.nio.com";
 
         /// <summary>
-        /// 
+        /// 固定（勿改）
         /// </summary>
         public const string APP_KEY = "APP17459815";
         /// <summary>
-        /// 
+        /// 固定（勿改）
         /// </summary>
         public const string APP_SECRET = "mcqh6XEHPoyvDAbSlXKYR9CCfQfLC4Hj6GAWafgbOmh6ONCkSSDBquhEGXtHKaFS7dOhvdKVPiDTU2zedifWQZ4j5Tuk0d5z4voKsYoUucvOehPC6wHUGWUNP2RvYJPh";
 
@@ -76,7 +78,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var METHOD = $"{config.Method}".ToUpper();
 
             // 组装数据
-            var dataObj = new NIORequestDto<T>
+            var dataObj = new NIORequestBo<T>
             {
                 SchemaCode = config.SchemaCode,
                 List = data
@@ -85,7 +87,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, BODY);
 
             var client = new RestClient(HOST);
-            var request = new RestRequest(path, config.Method);
+            var request = new RestRequest(path, (Method)config.Method);
             request.AddHeader("appKey", APP_KEY);
             request.AddHeader("timestamp", TIMESTAMP);
             request.AddHeader("nonce", NONCE);
@@ -119,7 +121,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, body);
 
             var client = new RestClient(HOST);
-            var request = new RestRequest(path, config.Method);
+            var request = new RestRequest(path, (Method)config.Method);
             request.AddHeader("appKey", APP_KEY);
             request.AddHeader("timestamp", TIMESTAMP);
             request.AddHeader("nonce", NONCE);

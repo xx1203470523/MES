@@ -1,13 +1,14 @@
-﻿using Azure;
-using Hymson.MES.BackgroundServices.NIO.Dtos;
+﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.Enums.Plan;
+using Hymson.MES.Core.NIO;
+using Hymson.MES.CoreServices.Extension;
+using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
-using MySqlX.XDevAPI.Common;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {

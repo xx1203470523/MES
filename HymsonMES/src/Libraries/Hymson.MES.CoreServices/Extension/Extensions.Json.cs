@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Hymson.MES.BackgroundServices.NIO
+namespace Hymson.MES.CoreServices.Extension
 {
     /// <summary>
     /// 
