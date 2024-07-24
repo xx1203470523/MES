@@ -136,8 +136,8 @@ namespace Hymson.MES.SystemServices.Services.Process
 
             // 判断是否有不存在的物料编码
             var materialCodes = lineDtoDict.SelectMany(s => s.BomMaterials).Select(s => s.MaterialCode).Distinct();
-            var materialEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = siteId, MaterialCodes = materialCodes });
-            if (materialEntities == null || materialEntities.Any())
+            var materialEntities = await _procMaterialRepository.GetEntitiesAsync(new ProcMaterialQuery { SiteId = siteId, MaterialCodes = materialCodes });
+            if (materialEntities == null || !materialEntities.Any())
             {
                 // 这里应该提示物料不存在
                 return resposeBo;
