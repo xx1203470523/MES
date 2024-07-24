@@ -143,6 +143,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly string PRODUCRE_CP_Z = "ROP130";
 
         /// <summary>
+        /// 末工序
+        /// </summary>
+        private readonly string PRODUCRE_END = "ROP150";
+
+        /// <summary>
         /// 工序前缀
         /// </summary>
         private readonly string PRODUCRE_PREFIX = "R";
@@ -151,6 +156,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// 站点ID
         /// </summary>
         public long SiteID = 0;
+
+        /// <summary>
+        /// 调试变量
+        /// </summary>
+        public int VAR_DEBUG = 0;
 
         /// <summary>
         /// 构造函数
@@ -375,6 +385,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         {
                             sfcUpList.Add(new SfcUpMatDto()
                             {
+                                MainMatCode = upItem.ProductTypeNo,
                                 MatName = upItem.MatName,
                                 MatValue = upItem.MatValue,
                                 MatBatchCode = upItem.MatBatchCode,
@@ -389,6 +400,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         {
                             sfcUpList.Add(new SfcUpMatDto()
                             {
+                                MainMatCode = upItem.ProductTypeNo,
                                 MatName = upItem.MatName,
                                 MatValue = upItem.MatValue,
                                 MatBatchCode = upItem.MatBatchCode,
@@ -456,6 +468,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             #endregion
 
             List<ManuSfcCirculationEntity> circulaList = new List<ManuSfcCirculationEntity>();
+            List<ManuBarCodeRelationEntity> circulaBarList = new List<ManuBarCodeRelationEntity>();
             List<ManuSfcStepEntity> stepList = new List<ManuSfcStepEntity>();
             List<ManuSfcDto> sfcUpdateList = new List<ManuSfcDto>(); //条码表，条码信息表
             List<Core.Domain.Parameter.ManuProductParameterEntity> manuParamList = new List<Core.Domain.Parameter.ManuProductParameterEntity>();
@@ -487,6 +500,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     var mesOrderMat = mesMaterialList.Where(m => m.Id == mesOrder.ProductId).FirstOrDefault();
                     productCode = mesOrderMat == null ? "" : mesOrderMat.MaterialCode;
+                }
+                else
+                {
+                    VAR_DEBUG = 3;
                 }
                 //工序
                 long procedureId = 0;
@@ -522,7 +539,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     //上料信息也要写入到条码表，条码信息表
                     foreach(var item in mesItem.UpMatList)
                     {
-                        if (item.BarCode == mesItem.Sfc)
+                        if (item.BarCode == mesItem.Sfc) //铁芯4个合一个的时候，会有条码合上料条码相同的记录
                         {
                             continue;
                         }
@@ -560,11 +577,6 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     List<Core.Domain.Parameter.ManuProductParameterEntity> addParamList =
                         GetParamList(mesItem.ParamList, stepId, mesItem.Sfc, procedureId, mesParamList);
                     manuParamList.AddRange(addParamList);
-                }
-                //写入到NG表
-                if(mesItem.NgList.Count > 0)
-                {
-
                 }
             }
 
@@ -810,7 +822,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             step.ProcedureId = procedureId;
             step.CreatedOn = createdOn;
             step.UpdatedOn = HymsonClock.Now();
-            if(produceCode == "OP150") //未工序设置为完成
+            if(produceCode == PRODUCRE_END) //未工序设置为完成
             {
                 step.CurrentStatus = SfcStatusEnum.Complete;
                 step.AfterOperationStatus = SfcStatusEnum.Complete;
@@ -823,6 +835,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 step.ProductId = mesOrder.ProductId;
                 step.WorkCenterId = mesOrder.WorkCenterId;
                 step.WorkOrderId = mesOrder.Id;
+            }
+            else
+            {
+                VAR_DEBUG = 3;
             }
 
             return step;
@@ -872,25 +888,43 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 model.CreatedOn = createdOn;
                 model.UpdatedOn = HymsonClock.Now();
 
-                ProcMaterialEntity? materialEntity = matList.Where(m => m.MaterialCode == item.MatCode).FirstOrDefault();
-                if(materialEntity != null)
+                //上料条码
+                ProcMaterialEntity? upMatModel = matList.Where(m => m.MaterialCode == item.MatCode).FirstOrDefault();
+                if(upMatModel != null)
                 {
-                    if(produceCode != PRODUCRE_CP_Z)
+                    if(produceCode != PRODUCRE_CP_Z) 
                     {
-                        model.CirculationProductId = materialEntity.Id;
-                        model.CirculationMainProductId = materialEntity.Id;
+                        model.CirculationProductId = upMatModel.Id;
+                        model.CirculationMainProductId = upMatModel.Id;
                     }
-                    else
+                    else //如果是轴码对成品码工序，则调转两个产品
                     {
-
+                        model.ProductId = upMatModel.Id;
+                    }
+                }
+                //当前产品条码
+                ProcMaterialEntity? curMatModel = matList.Where(m => m.MaterialCode == item.MainMatCode).FirstOrDefault();
+                if(curMatModel != null)
+                {
+                    if (produceCode != PRODUCRE_CP_Z)
+                    {
+                        model.ProductId = curMatModel.Id;
+                    }
+                    else //如果是轴码对成品码工序，则调转两个产品
+                    {
+                        model.CirculationProductId = curMatModel.Id;
+                        model.CirculationMainProductId = curMatModel.Id;
                     }
                 }
 
                 if (mesOrder != null)
                 {
-                    model.ProductId = mesOrder.ProductId;
                     model.WorkOrderId = mesOrder.Id;
                     model.CirculationWorkOrderId = mesOrder.Id;
+                }
+                else
+                {
+                    VAR_DEBUG = 3;
                 }
 
                 list.Add(model);
