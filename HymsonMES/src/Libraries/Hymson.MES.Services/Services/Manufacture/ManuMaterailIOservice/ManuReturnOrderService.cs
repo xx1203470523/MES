@@ -214,7 +214,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var entities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                RequistionOrderId = returnId
+                ReturnOrderId = returnId
             });
 
             // 读取退料单
@@ -225,7 +225,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
 
             // 读取生产工单
-            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(returnEntity.SourceWorkOrderId);
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(returnEntity.WorkOrderId);
 
             foreach (var entity in entities)
             {

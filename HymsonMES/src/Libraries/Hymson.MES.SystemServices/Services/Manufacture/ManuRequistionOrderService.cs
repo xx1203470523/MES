@@ -190,59 +190,56 @@ namespace Hymson.MES.SystemServices.Services
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16050)).WithData("orderId", productionPickDto.RequistionId);
             }
-            switch (productionPickDto.State)
-            {
-                case ManuMaterialFormResponseEnum.Created:
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Created;
-                    break;
-                case ManuMaterialFormResponseEnum.Failed:
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Failed;
-                    break;
-                case ManuMaterialFormResponseEnum.ApprovalingSuccess:
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingSuccess;
-                    break;
-                case ManuMaterialFormResponseEnum.ApprovalingFailed:
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingFailed;
-                    break;
-                case ManuMaterialFormResponseEnum.CancelFailed:
-                    break;
-                case ManuMaterialFormResponseEnum.CancelSuccess:
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Cancel;
-                    break;
-                default:
-                    break;
-            }
+            //switch (productionPickDto.State)
+            //{
+            //    case ManuMaterialFormResponseEnum.Created:
+            //        returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Created;
+            //        break;
+            //    case ManuMaterialFormResponseEnum.Failed:
+            //        returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Failed;
+            //        break;
+            //    case ManuMaterialFormResponseEnum.ApprovalingSuccess:
+            //        returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingSuccess;
+            //        break;
+            //    case ManuMaterialFormResponseEnum.ApprovalingFailed:
+            //        returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingFailed;
+            //        break;
+            //    case ManuMaterialFormResponseEnum.CancelFailed:
+            //        break;
+            //    case ManuMaterialFormResponseEnum.CancelSuccess:
+            //        returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Cancel;
+            //        break;
+            //    default:
+            //        break;
+            //}
             
-            if (returnOrderEntity.Status == WhWarehouseReturnStatusEnum.ApprovalingSuccess)
-            {
-                string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
-                var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
-                {
-                    SiteId = _currentSystem.SiteId,
-                    OrderCode = orderCode,
-                });
-                var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryWorkOrderIdQuery
-                {
-                    SiteId = _currentSystem.SiteId,
-                    WorkOrderId = planWorkOrderEntity.Id
-                });
-                returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Return;
-                using (TransactionScope ts = TransactionHelper.GetTransactionScope())
-                {
+            //if (returnOrderEntity.Status == WhWarehouseReturnStatusEnum.ApprovalingSuccess)
+            //{
+            //    string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
+            //    var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
+            //    {
+            //        SiteId = _currentSystem.SiteId,
+            //        OrderCode = orderCode,
+            //    });
+            //    var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryWorkOrderIdQuery
+            //    {
+            //        SiteId = _currentSystem.SiteId,
+            //        WorkOrderId = planWorkOrderEntity.Id
+            //    });
+            //    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Return;
+            //    using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            //    {
                     
-                    await _whMaterialInventoryRepository.DeletesAsync(whMaterialInventoryEntities.Select(w => w.Id).ToArray());
+            //        await _whMaterialInventoryRepository.DeletesAsync(whMaterialInventoryEntities.Select(w => w.Id).ToArray());
                     
-                    await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
-                }
+            //        await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
+            //    }
                 
-            }
-            else
-            {
-                await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
-            }
-            
-              
-           
+            //}
+            //else
+            //{
+            //    await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
+            //}
         }
 
         /// <summary>
@@ -613,7 +610,8 @@ namespace Hymson.MES.SystemServices.Services
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            var id = productionPickDto.RequistionId.Split('_')[1];
+            var id = productionPickDto.RequistionId.Split
+                ('_')[1];
             var returnOrderEntity = await _manuProductReceiptOrderRepository.GetByIdAsync(long.Parse(id));
             if (returnOrderEntity == null)
             {
@@ -669,9 +667,6 @@ namespace Hymson.MES.SystemServices.Services
             {
                 await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
             }
-
-
-
         }
     }
 }

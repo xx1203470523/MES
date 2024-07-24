@@ -25,14 +25,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
     public enum ManuReturnTypeEnum : sbyte
     {
         /// <summary>
-        /// PICKING
+        /// 实仓退料
         /// </summary>
-        [Description("工单退料")]
+        [Description("实仓退料")]
         WorkOrderReturn = 1,
         /// <summary>
-        /// 工单补料
+        /// 虚仓退料
         /// </summary>
-        [Description("工单借料")]
+        [Description("虚仓退料")]
         WorkOrderBorrow = 2
     }
 

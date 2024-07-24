@@ -45,7 +45,7 @@ namespace Hymson.MES.Core.Enums
        
     }
     /// <summary>
-    /// 退料申请状态0:单据申请，1创建成功,2创建失败,3：审批成功4：WMS审批失败5.取消退料6.已退料
+    /// 退料申请状态 1、申请成功待检验 2、检验中 3、检验完成待入库 4、退料入库中 5、退料入库完成 6、取消退料
     /// </summary>
     public enum WhWarehouseReturnStatusEnum : byte
     {

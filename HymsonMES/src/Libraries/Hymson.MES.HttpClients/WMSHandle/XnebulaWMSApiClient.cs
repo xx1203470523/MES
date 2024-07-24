@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using MailKit.Net.Smtp;
+using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 
 namespace Hymson.MES.HttpClients
 {
@@ -16,7 +17,7 @@ namespace Hymson.MES.HttpClients
     {
         private readonly HttpClient _httpClient;
         private readonly XnebulaWMSOption _options;
-        public XnebulaWMSApiClient(HttpClient httpClient,IOptions<XnebulaWMSOption> options)
+        public XnebulaWMSApiClient(HttpClient httpClient, IOptions<XnebulaWMSOption> options)
         {
             _httpClient = httpClient;
             _options = options.Value;
@@ -24,7 +25,7 @@ namespace Hymson.MES.HttpClients
 
         public async Task<bool> MaterialPickingRequestAsync(MaterialPickingRequestDto request)
         {
-            
+
             MaterialPickingRequest materialPickingRequest = new MaterialPickingRequest()
             {
                 SendOn = request.SendOn,
@@ -33,15 +34,15 @@ namespace Hymson.MES.HttpClients
                 Type = _options.Delivery.Type,
                 WarehouseCode = _options.Delivery.WarehouseCode
             };
-           
+
             var httpResponse = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(_options.Delivery.RoutePath, materialPickingRequest);
-            
+
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             return httpResponse.IsSuccessStatusCode;
         }
 
-        
+
 
         public async Task<bool> MaterialPickingCancelAsync(MaterialPickingCancelDto request)
         {
@@ -117,6 +118,31 @@ namespace Hymson.MES.HttpClients
             };
 
             var httpResponse = await _httpClient.PostAsJsonAsync<ProductReceiptRequest>(_options.ProductReceiptOptions.RoutePath, materialReturnRequest);
+
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+            return httpResponse.IsSuccessStatusCode;
+        }
+
+
+        public async Task<bool> WarehousingEntryRequestAsync(WarehousingEntryDto request)
+        {
+            WarehousingEntryRequest materialReturnRequest = new WarehousingEntryRequest()
+            {
+                Type = request.Type,
+                WarehouseCode = request.WarehouseCode,
+                SyncCode = request.SyncCode,
+                SendOn = request.SendOn,
+                SupplierCode = request.SupplierCode,
+                CustomerCode = request.CustomerCode,
+                PurchaseType = request.PurchaseType,
+                InboundCategory = request.InboundCategory,
+                IsAutoExecute = request.IsAutoExecute,
+                CreatedBy = request.CreatedBy,
+                Remark = request.Remark,
+                Details = request.Details
+            };
+
+            var httpResponse = await _httpClient.PostAsJsonAsync<WarehousingEntryRequest>(_options.Receipt.RoutePath, materialReturnRequest);
 
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
             return httpResponse.IsSuccessStatusCode;

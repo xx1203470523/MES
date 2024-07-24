@@ -12,11 +12,13 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("物料接收")]
         MaterialReceiving = 1,
+
         /// <summary>
         /// 物料退料
         /// </summary>
         [Description("物料退料")]
         MaterialReturn = 2,
+
         /// <summary>
         /// 物料加载
         /// </summary>
@@ -40,41 +42,49 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("库存维护")]
         InventoryModify = 6,
+
         /// <summary>
         /// 条码拆分
         /// </summary>
         [Description("条码拆分")]
         Split = 7,
+
         /// <summary>
         /// 条码合并
         /// </summary>
         [Description("条码合并")]
         Merge = 8,
+
         /// <summary>
         /// 离脱
         /// </summary>
         [Description("离脱")]
         Detachment = 9,
+
         // <summary>
         /// 物料报废
         /// </summary>
         [Description("物料报废")]
         MaterialScrapping = 10,
+
         /// <summary>
         /// 取消报废
         /// </summary>
         [Description("取消报废")]
         CancelScrapping = 11,
+
         /// <summary>
         /// 物料拆分
         /// </summary>
         [Description("物料拆分")]
         MaterialBarCodeSplit = 12,
+
         /// <summary>
         /// 物料合并
         /// </summary>
         [Description("物料合并")]
         MaterialBarCodeMerge = 13,
+
         /// <summary>
         /// 物料锁定
         /// </summary>
@@ -97,6 +107,18 @@ namespace Hymson.MES.Core.Enums
         /// 不良处置
         /// </summary>
         [Description("不良处置")]
-        BadDisposal = 18
+        BadDisposal = 18,
+
+        /// <summary>
+        /// 退料申请
+        /// </summary>
+        [Description("退料申请")]
+        ReturnApplication = 19,
+
+        /// <summary>
+        /// 退料确认
+        /// </summary>
+        [Description("退料确认")]
+        ReturnApplicationConfirm = 19
     }
 }

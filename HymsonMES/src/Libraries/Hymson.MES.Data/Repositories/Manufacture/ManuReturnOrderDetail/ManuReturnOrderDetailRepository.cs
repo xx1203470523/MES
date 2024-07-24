@@ -3,6 +3,8 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuReturnOrder.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuReturnOrderDetail.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Microsoft.Extensions.Options;
 
@@ -120,9 +122,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
-            if (query.RequistionOrderId.HasValue)
+            if (query.ReturnOrderId.HasValue)
             {
-                sqlBuilder.Where(" RequistionOrderId = @RequistionOrderId ");
+                sqlBuilder.Where(" ReturnOrderId = @ReturnOrderId ");
             }
 
             sqlBuilder.AddParameters(query);
@@ -159,6 +161,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return new PagedInfo<ManuReturnOrderDetailEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据Id批量更新状态
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateManuReturnOrderDetailIsReceivedByIdRangeAsync(IEnumerable<UpdateManuReturnOrderDetailIsReceivedByIdCommand> commands)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateManuReturnOrderDetailIsReceivedByIdSql, commands);
+        }
     }
 
 
@@ -171,12 +183,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_return_order_detail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_return_order_detail /**where**/  ";
 
-        const string InsertSql = "INSERT INTO manu_return_order_detail(`Id`, `RequistionOrderId`, MaterialId, `MaterialCode`, `Version`, `MaterialBarCode`, `Batch`, `Qty`, `WarehouseId`, SupplierId, `SupplierCode`, `ExpirationDate`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @RequistionOrderId, @MaterialId, @MaterialCode, @Version, @MaterialBarCode, @Batch, @Qty, @WarehouseId, @SupplierId, @SupplierCode, @ExpirationDate, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
-        const string InsertsSql = "INSERT INTO manu_return_order_detail(`Id`, `RequistionOrderId`, MaterialId, `MaterialCode`, `Version`, `MaterialBarCode`, `Batch`, `Qty`, `WarehouseId`, SupplierId, `SupplierCode`, `ExpirationDate`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @RequistionOrderId, @MaterialId, @MaterialCode, @Version, @MaterialBarCode, @Batch, @Qty, @WarehouseId, @SupplierId, @SupplierCode, @ExpirationDate, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertSql = "INSERT INTO manu_return_order_detail(`Id`, `ReturnOrderId`, MaterialId,  `MaterialBarCode`, `Batch`, `Qty`, `WarehouseId`, SupplierId,  `ExpirationDate`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @RequistionOrderId, @MaterialId, @MaterialCode, @Version, @MaterialBarCode, @Batch, @Qty, @WarehouseId, @SupplierId, @SupplierCode, @ExpirationDate, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT INTO manu_return_order_detail(`Id`, `ReturnOrderId`, MaterialId,  `MaterialBarCode`, `Batch`, `Qty`, `WarehouseId`, SupplierId,  `ExpirationDate`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @RequistionOrderId, @MaterialId, @MaterialCode, @Version, @MaterialBarCode, @Batch, @Qty, @WarehouseId, @SupplierId, @SupplierCode, @ExpirationDate, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE manu_return_order_detail SET RequistionOrderId = @RequistionOrderId, MaterialCode = @MaterialCode, Version = @Version, MaterialBarCode = @MaterialBarCode, Batch = @Batch, Qty = @Qty, WarehouseId = @WarehouseId, SupplierCode = @SupplierCode, ExpirationDate = @ExpirationDate, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE manu_return_order_detail SET RequistionOrderId = @RequistionOrderId, MaterialCode = @MaterialCode, Version = @Version, MaterialBarCode = @MaterialBarCode, Batch = @Batch, Qty = @Qty, WarehouseId = @WarehouseId, SupplierCode = @SupplierCode, ExpirationDate = @ExpirationDate, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
-
+        const string UpdateSql = "UPDATE manu_return_order_detail SET ReturnOrderId = @ReturnOrderId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, Qty = @Qty, WarehouseId = @WarehouseId,  ExpirationDate = @ExpirationDate, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE manu_return_order_detail SET ReturnOrderId = @ReturnOrderId,  MaterialBarCode = @MaterialBarCode, Batch = @Batch, Qty = @Qty, WarehouseId = @WarehouseId,  ExpirationDate = @ExpirationDate, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdateManuReturnOrderDetailIsReceivedByIdSql = "UPDATE manu_return_order_detail SET IsReceived = @IsReceived , UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE manu_return_order_detail SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE manu_return_order_detail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 

@@ -164,7 +164,7 @@ namespace Hymson.MES.Services.Services.Quality
             });
             if (orderEntities != null && orderEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11996)).WithData("Code", returnEntity.ReqOrderCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES11996)).WithData("Code", returnEntity.ReturnOrderCode);
             }
 
             // 当前信息
@@ -175,7 +175,7 @@ namespace Hymson.MES.Services.Services.Quality
             var returnDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
                 SiteId = returnEntity.SiteId,
-                RequistionOrderId = returnEntity.Id
+                ReturnOrderId = returnEntity.Id
             });
 
             // 生成检验单号
@@ -204,7 +204,7 @@ namespace Hymson.MES.Services.Services.Quality
                 SiteId = returnEntity.SiteId,
                 InspectionOrder = inspectionOrder,
                 ReturnOrderId = returnEntity.Id,
-                WorkOrderId = returnEntity.SourceWorkOrderId,
+                WorkOrderId = returnEntity.WorkOrderId,
                 Status = IQCLiteStatusEnum.WaitInspect,
                 IsQualified = null,
                 CreatedBy = user,
@@ -491,7 +491,7 @@ namespace Hymson.MES.Services.Services.Quality
             var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(entity.ReturnOrderId);
             if (returnEntity == null) return dto;
 
-            dto.ReqOrderCode = returnEntity.ReqOrderCode;
+            dto.ReqOrderCode = returnEntity.ReturnOrderCode;
             dto.ReturnUser = returnEntity.CreatedBy;
             dto.ReturnTime = returnEntity.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -533,7 +533,7 @@ namespace Hymson.MES.Services.Services.Quality
             var returnDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
                 SiteId = orderEntity.SiteId,
-                RequistionOrderId = orderEntity.ReturnOrderId
+                ReturnOrderId = orderEntity.ReturnOrderId
             });
 
             // 读取产品
@@ -741,7 +741,7 @@ namespace Hymson.MES.Services.Services.Quality
                 var receiptEntity = returnDic[entity.ReturnOrderId];
                 if (receiptEntity != null)
                 {
-                    dto.ReqOrderCode = receiptEntity.ReqOrderCode;
+                    dto.ReqOrderCode = receiptEntity.ReturnOrderCode;
                 }
 
                 // 检验人

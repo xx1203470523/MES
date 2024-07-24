@@ -14,6 +14,7 @@ using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -1373,9 +1374,9 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
-                Status = WhWarehouseReturnStatusEnum.Approvaling,
+                Status = WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful,
                 Type = ManuReturnTypeEnum.WorkOrderReturn,
-                SourceWorkOrderCode = request.WorkCode,
+                //SourceWorkOrderCode = request.WorkCode,
             };
             var response = await _wmsRequest.MaterialReturnRequestAsync(new HttpClients.Requests.MaterialReturnRequestDto
             {
@@ -1504,7 +1505,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request)
         {
             var returnOrderEntity = await _manuReturnOrderRepository.GetByIdAsync(request.ReturnOrderId);
-            if (returnOrderEntity.Status == WhWarehouseReturnStatusEnum.Approvaling)
+            if (returnOrderEntity.Status == WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful)
             {
                 var response = await _wmsRequest.MaterialReturnCancelAsync(new HttpClients.Requests.MaterialReturnCancelDto
                 {

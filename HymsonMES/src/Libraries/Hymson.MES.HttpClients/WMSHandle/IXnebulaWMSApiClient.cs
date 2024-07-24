@@ -1,6 +1,7 @@
 ﻿
 
 using Hymson.MES.HttpClients.Requests;
+using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,5 +54,12 @@ namespace Hymson.MES.HttpClients
         /// <param name="request"></param>
         /// <returns></returns>
         Task<bool> ProductReceiptCancelAsync(ProductReceiptCancelDto request);
+
+        /// <summary>
+        /// 生产入库
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<bool> WarehousingEntryRequestAsync(WarehousingEntryDto request);
     }
 }
