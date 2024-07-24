@@ -122,7 +122,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //MES数据入库
             using var trans = TransactionHelper.GetTransactionScope();
 
-            await _manuRotorPackListRepository.InsertsAsync(insertList);
+            await _manuRotorPackListRepository.InsertRangeAsync(insertList);
             await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
 
             trans.Complete();
