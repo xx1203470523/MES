@@ -1,9 +1,25 @@
 #! /bin/bash
 PublishEnvironment=Release
 timestamp=$(date +%Y%m%d%H%M%S)
-serviceName=hymson-mes-api-prod
-registryUrl=192.168.180.149:5000/xnebula
+registryUrl=nuget.czhipu.com/xnebula
 imageName=hymson.mes.api
 sudo docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Api/Dockerfile .
+sudo docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
+sudo docker push $registryUrl/$imageName:$timestamp
+
+imageName=hymson.mes.equipment.api
+sudo docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Equipment.Api/sudo dockerfile .
+sudo docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
+sudo docker push $registryUrl/$imageName:$timestamp
+
+
+imageName=hymson.mes.backgroundtasks
+sudo docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.BackgroundTasks/sudo dockerfile .
+sudo docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
+sudo docker push $registryUrl/$imageName:$timestamp
+
+
+imageName=hymson.mes.system.api
+sudo docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.System.Api/sudo dockerfile .
 sudo docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
 sudo docker push $registryUrl/$imageName:$timestamp
