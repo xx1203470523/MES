@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Google.Protobuf.WellKnownTypes;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Mavel.Rotor;
 using Hymson.MES.Core.Domain.Warehouse;
@@ -80,8 +81,9 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor
     public partial class ManuRotorSfcRepository
     {
         const string InsertSql = $@"
-            INSERT INTO manu_rotor_sfc (Id,Sfc,TxSfc,ZSfc,WorkOrderId,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted,SiteId,IsFinish,SfcMaterialId,TxSfcMaterialCode,ZSfcMaterialCode) VALUES
-	        (@Id,@Sfc,@TxSfc,@ZSfc,@WorkOrderId,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted,@SiteId,@IsFinish,@SfcMaterialId,@TxSfcMaterialCode,@ZSfcMaterialCode);
+        INSERT INTO `manu_rotor_sfc`
+        (`Id`, `Sfc`, `TxSfc`, `ZSfc`, `WorkOrderId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `IsFinish`, `TxSfcMaterialCode`, `ZSfcMaterialCode`, `SfcMaterialCode`)
+        VALUES(@Id, @Sfc, @TxSfc, @ZSfc, @WorkOrderId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @IsFinish,@TxSfcMaterialCode, @ZSfcMaterialCode, @SfcMaterialCode)
         ";
 
         const string UpdateSql = $@"

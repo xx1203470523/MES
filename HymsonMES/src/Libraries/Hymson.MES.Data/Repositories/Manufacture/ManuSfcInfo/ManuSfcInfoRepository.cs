@@ -228,9 +228,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             string sql = $@"
                 select WorkOrderId ,count(*) Qty
-                from manu_sfc_info mss 
+                from manu_sfc_step mss 
                 where SiteId  = {query.SiteId}
                 and WorkOrderId in ({string.Join(",",query.OrderIdList)})
+                and Remark  = 'ROP150'
                 group by WorkOrderId 
             ";
 
