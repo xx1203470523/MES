@@ -57,5 +57,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         Task<IEnumerable<ManuReturnOrderDetailDto>> QueryDetailByReturnIdAsync(long returnId);
 
+        /// <summary>
+        /// 根据工单查询退料明细
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        Task<List<OrderManuReturnDetailDto>> GetReturnDetailByOrderIdAsync(long workOrderId);
+
     }
 }

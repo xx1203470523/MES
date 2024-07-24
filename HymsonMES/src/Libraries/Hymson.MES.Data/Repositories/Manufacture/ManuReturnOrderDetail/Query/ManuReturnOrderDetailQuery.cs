@@ -15,5 +15,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         /// </summary>
         public long? ReturnOrderId { get; set; }
 
+        /// <summary>
+        /// 退料单Id列表
+        /// </summary>
+        public IEnumerable<long>? ReturnOrderIds { get; set; }
+
     }
 }
