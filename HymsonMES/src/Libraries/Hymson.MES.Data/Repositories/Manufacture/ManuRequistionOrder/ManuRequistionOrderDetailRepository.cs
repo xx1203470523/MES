@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuRequistionOrderDetailEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SitId=@SiteId");
+            sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
             if (manuRequistionOrderDetailQuery.RequistionOrderIds!=null&&manuRequistionOrderDetailQuery.RequistionOrderIds.Any())
             {

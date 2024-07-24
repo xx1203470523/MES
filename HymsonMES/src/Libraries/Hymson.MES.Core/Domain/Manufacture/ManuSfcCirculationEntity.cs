@@ -63,7 +63,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long? CirculationWorkOrderId { get; set; }
 
         /// <summary>
-        /// 流转后产品id
+        /// 流转后产品id-替代料
         /// </summary>
         public long CirculationProductId { get; set; }
 

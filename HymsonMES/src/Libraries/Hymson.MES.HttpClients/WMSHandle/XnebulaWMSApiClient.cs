@@ -112,11 +112,11 @@ namespace Hymson.MES.HttpClients
                 SendOn = request.SendOn,
                 SyncCode = request.SyncCode,
                 Details = request.Details,
-                Type = _options.ProductReceiptOptions.Type,
-                WarehouseCode = _options.ProductReceiptOptions.WarehouseCode
+                Type = _options.ProductReceipt.Type,
+                WarehouseCode = _options.ProductReceipt.WarehouseCode
             };
 
-            var httpResponse = await _httpClient.PostAsJsonAsync<ProductReceiptRequest>(_options.ProductReceiptOptions.RoutePath, materialReturnRequest);
+            var httpResponse = await _httpClient.PostAsJsonAsync<ProductReceiptRequest>(_options.ProductReceipt.RoutePath, materialReturnRequest);
 
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
             return httpResponse.IsSuccessStatusCode;

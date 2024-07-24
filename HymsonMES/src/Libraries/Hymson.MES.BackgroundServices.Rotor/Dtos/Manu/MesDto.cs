@@ -108,6 +108,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         public string BarCode { get; set; }
 
         /// <summary>
+        /// 最终物料编码
+        /// </summary>
+        public string MatCode { get; set; }
+
+        /// <summary>
         /// 物料名称
         /// </summary>
         public string MatName { get; set; }
@@ -128,9 +133,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Dtos.Manu
         public int? MatNum { get; set; }
 
         /// <summary>
-        /// 物料编码
+        /// 主物料编码
         /// </summary>
-        public string MatCode { get; set; }
+        public string MainMatCode { get; set; }
     }
 
     /// <summary>
