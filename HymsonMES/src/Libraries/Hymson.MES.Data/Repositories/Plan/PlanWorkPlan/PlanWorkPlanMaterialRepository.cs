@@ -154,7 +154,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM plan_work_plan_material /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM plan_work_plan_material /**where**/  ";
 
-        const string InsertsSql = "INSERT INTO plan_work_plan_material(Id, WorkPlanId, WorkPlanProductId, BomId, Usages, Loss, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (@Id, @WorkPlanId, @WorkPlanProductId, @BomId, @Usages, @Loss, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT INTO plan_work_plan_material(Id, WorkPlanId, WorkPlanProductId, MaterialId, BomId, Usages, Loss, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (@Id, @WorkPlanId, @WorkPlanProductId, @MaterialId, @BomId, @Usages, @Loss, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
         const string DeletesSql = "UPDATE plan_work_plan_material SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @ids ";
         //const string DeleteByParentIdsSql = "UPDATE plan_work_plan_material SET IsDeleted = Id , UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE WorkPlanId IN @ParentIds";
