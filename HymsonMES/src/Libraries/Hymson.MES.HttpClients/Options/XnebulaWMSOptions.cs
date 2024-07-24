@@ -36,7 +36,7 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 成品入库单配置 
         /// </summary>
-        public WMSProductReceiptOptions ProductReceiptOptions { get; set; }
+        public WMSProductReceiptOptions ProductReceipt { get; set; }
 
         /// <summary>
         /// 取消成品入库操作配置

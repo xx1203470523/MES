@@ -1,5 +1,4 @@
 ﻿using Hymson.MES.BackgroundServices.Rotor.Services;
-using Hymson.SqlActuator.Services;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
@@ -11,21 +10,21 @@ using System.Threading.Tasks;
 namespace Hymson.MES.BackgroundTasks.Rotor.Jobs
 {
     [DisallowConcurrentExecution]
-    internal class ManuDataJob : IJob
+    internal class PackListJob : IJob
     {
-        private readonly IManuInOutBoundService _manuInOutBoundService;
-        private readonly ILogger<ManuDataJob> _logger;
+        private readonly IPackListService _packListService;
+        private readonly ILogger<PackListJob> _logger;
 
-        public ManuDataJob(IManuInOutBoundService manuInOutBoundService, ILogger<ManuDataJob> logger)
+        public PackListJob(IPackListService packListService, ILogger<PackListJob> logger)
         {
-            _manuInOutBoundService = manuInOutBoundService;
+            _packListService = packListService;
             _logger = logger;
         }
         public async Task Execute(IJobExecutionContext context)
         {
             try
             {
-                await _manuInOutBoundService.InOutBoundAsync(100);
+                await _packListService.ExecAsync(50);
             }
             catch (Exception ex)
             {

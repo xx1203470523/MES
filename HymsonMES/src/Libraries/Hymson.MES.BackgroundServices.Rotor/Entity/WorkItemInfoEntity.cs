@@ -29,6 +29,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Entity
         public string ProductNo { get; set; }
 
         /// <summary>
+        /// 产品编号的物料型号
+        /// </summary>
+        public string ProductTypeNo { get; set; }
+
+        /// <summary>
         /// 工位编码
         /// </summary>
         public string WorkPosNo { get; set; }
