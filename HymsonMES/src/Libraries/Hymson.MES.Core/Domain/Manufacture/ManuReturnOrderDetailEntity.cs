@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -13,7 +14,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 所属退料单Id
         /// </summary>
-        public long RequistionOrderId { get; set; }
+        public long ReturnOrderId { get; set; }
 
         /// <summary>
         /// 物料ID
@@ -75,6 +76,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-
+        /// <summary>
+        /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
+        /// </summary>
+        public WhWarehouseReturnStatusEnum? Status { get; set; }
     }
 }
