@@ -114,13 +114,16 @@ namespace Hymson.MES.SystemServices.Services.Plan
             var resposeSummaryBo = new SyncWorkPlanSummaryBo();
             resposeSummaryBo.Adds.AddRange(resposeBo.Adds);
             resposeSummaryBo.Updates.AddRange(resposeBo.Updates);
+            resposeSummaryBo.ProductAdds.AddRange(resposeBo.ProductAdds);
+            resposeSummaryBo.ProductUpdates.AddRange(resposeBo.ProductUpdates);
 
-            var WorkPlanIds = resposeBo.Adds.Select(s => s.Id);
+            var workPlanIds = resposeBo.Adds.Select(s => s.Id);
+            workPlanIds = workPlanIds.Concat(resposeBo.Updates.Select(s => s.Id));
 
             // 删除数据
             var command = new DeleteByParentIdsCommand
             {
-                ParentIds = WorkPlanIds,
+                ParentIds = workPlanIds,
                 UpdatedBy = currentBo.User,
                 UpdatedOn = currentBo.Time
             };
@@ -271,7 +274,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
                         // TODO: 这里的字段需要确认
                         OverScale = 0,
-                        Type = 0,
+                        Type = planDto.Type,
                         Status = PlanWorkPlanStatusEnum.NotStarted,
 
                         Remark = "",
@@ -300,6 +303,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     planEntity.PlanStartTime = firstProductDto.StartTime ?? SqlDateTime.MinValue.Value;
                     planEntity.PlanEndTime = firstProductDto.EndTime ?? SqlDateTime.MaxValue.Value;
 
+                    planEntity.Type = planDto.Type;
                     planEntity.UpdatedBy = currentBo.User;
                     planEntity.UpdatedOn = currentBo.Time;
                     resposeBo.Updates.Add(planEntity);
@@ -308,20 +312,18 @@ namespace Hymson.MES.SystemServices.Services.Plan
                 // 遍历产品列表
                 foreach (var productDto in planDto.Products)
                 {
-                    /*
                     // 读取产品实体
                     var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == productDto.ProductCode)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES10245)).WithData("Code", productDto.ProductCode);
-                    */
 
                     // 添加生产计划产品
-                    var WorkPlanProductId = productDto.Id ?? IdGenProvider.Instance.CreateId();
+                    var workPlanProductId = productDto.Id ?? IdGenProvider.Instance.CreateId();
                     resposeBo.ProductAdds.Add(new PlanWorkPlanProductEntity
                     {
                         WorkPlanId = planEntity.Id,
-                        ProductId = 0, //productEntity.Id,
+                        ProductId = productEntity.Id,
                         ProductCode = productDto.ProductCode,
-                        ProductVersion = "", //productEntity.Version ?? "",
+                        ProductVersion = productEntity.Version ?? "",
                         BomId = productDto.BomId,
                         BomCode = productDto.BomCode,
                         BomVersion = productDto.BomVersion,
@@ -329,7 +331,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                         OverScale = productDto.OverScale,
 
                         Remark = "",
-                        Id = WorkPlanProductId,
+                        Id = workPlanProductId,
                         SiteId = currentBo.SiteId,
                         CreatedBy = currentBo.User,
                         CreatedOn = currentBo.Time,
@@ -341,7 +343,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     resposeBo.MaterialAdds.AddRange(productDto.Materials.Select(s => new PlanWorkPlanMaterialEntity
                     {
                         WorkPlanId = planEntity.Id,
-                        WorkPlanProductId = WorkPlanProductId,
+                        WorkPlanProductId = workPlanProductId,
                         MaterialId = s.MaterialId,
                         MaterialCode = s.MaterialCode,
                         MaterialVersion = s.MaterialVersion,

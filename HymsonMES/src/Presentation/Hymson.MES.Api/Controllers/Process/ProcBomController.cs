@@ -66,10 +66,12 @@ namespace Hymson.MES.Api.Controllers.Process
         {
             return await _procBomService.GetProcBomMaterialAsync(bomId);
         }
+
         /// <summary>
         /// 获取领料BOM明细
         /// </summary>
         /// <param name="orderId"></param>
+        /// 
         /// <returns></returns>
         [HttpGet("material/picklist")]
         public async Task<List<ProcBomDetailView>> GetPickBomMaterialAsync(long orderId)
@@ -102,7 +104,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:bom:update")]
         public async Task UpdateProcBomAsync([FromBody] ProcBomModifyDto parm)
         {
-             await _procBomService.ModifyProcBomAsync(parm);
+            await _procBomService.ModifyProcBomAsync(parm);
         }
 
         /// <summary>
@@ -213,7 +215,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpGet]
         [Route("judgeBomIdIsUsedByActivatedOrder/{id}")]
-        public async Task<bool> JudgeBomIsReferencedByActivatedWorkOrder(long id) 
+        public async Task<bool> JudgeBomIsReferencedByActivatedWorkOrder(long id)
         {
             return await _procBomService.JudgeBomIsReferencedByActivatedWorkOrder(id);
         }
