@@ -298,6 +298,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 产品条码
         /// </summary>
         public string SFC { get; set; }
+
+        /// <summary>
+        /// 报废数量
+        /// </summary>
+        public decimal ScrapQty { get; set; }
     }
 
     #endregion

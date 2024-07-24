@@ -793,7 +793,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 更新条码数量
         /// </summary>
-        const string UpdateQtyByIdSql = @"UPDATE manu_sfc SET Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE SFC = @SFC ";
+        const string UpdateQtyByIdSql = @"UPDATE manu_sfc SET Qty=@Qty, ScrapQty = @ScrapQty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE SFC = @SFC ";
 
         const string GetEntitiesSqlTemplate= "SELECT /**select**/ FROM `manu_sfc` ms /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         #endregion

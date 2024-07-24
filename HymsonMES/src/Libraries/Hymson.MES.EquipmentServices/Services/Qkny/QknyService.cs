@@ -440,6 +440,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             UpdateQtyBySfcCommand command = new UpdateQtyBySfcCommand();
             command.SFC = dto.Sfc;
             command.Qty = dto.OkQty;
+            command.ScrapQty = dto.NgQty;
             command.SiteId = equResModel.SiteId;
             command.UpdatedBy = dto.EquipmentCode;
             command.UpdatedOn = HymsonClock.Now();

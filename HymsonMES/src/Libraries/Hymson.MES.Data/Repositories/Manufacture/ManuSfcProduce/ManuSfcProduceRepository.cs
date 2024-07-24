@@ -1083,7 +1083,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 更新条码数量
         /// </summary>
-        const string UpdateQtyBySfcsSql = @"UPDATE manu_sfc_produce SET Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND SFC = @SFC ";
+        const string UpdateQtyBySfcsSql = @"UPDATE manu_sfc_produce SET Qty = @Qty, ScrapQty = @ScrapQty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND SFC = @SFC ";
 
         /// <summary>
         /// 获取设备最新条码
