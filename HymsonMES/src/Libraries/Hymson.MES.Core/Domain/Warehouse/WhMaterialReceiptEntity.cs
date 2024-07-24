@@ -15,21 +15,30 @@ namespace Hymson.MES.Core.Domain.WHMaterialReceipt
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 收货单号
         /// </summary>
         public string ReceiptNum { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 供应商Id
         /// </summary>
         public long SupplierId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       
+        /// <summary>
+        /// 同步编码（WMS需要给ERP）
+        /// </summary>
+        public string? SyncCode { get; set; }
+
+        /// <summary>
+        /// 同步Id（WMS需要给ERP）
+        /// </summary>
+        public long? SyncId { get; set; }
+
     }
 }

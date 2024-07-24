@@ -39,7 +39,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         public async Task<int> InsertRangeAsync(IEnumerable<WhMaterialReceiptEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(InsertSql, entities);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         public async Task<int> UpdateRangeAsync(IEnumerable<WhMaterialReceiptEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
         /// <summary>
@@ -189,13 +189,11 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM wh_material_receipt /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM wh_material_receipt /**where**/  ";
 
-        const string InsertSql = "INSERT INTO wh_material_receipt(  `Id`, `SiteId`, `ReceiptNum`, `SupplierId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ReceiptNum, @SupplierId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO wh_material_receipt(  `Id`, `SiteId`, `ReceiptNum`, `SupplierId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @ReceiptNum, @SupplierId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO wh_material_receipt(`Id`, `SiteId`, `ReceiptNum`, `SupplierId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, SyncCode, SyncId) VALUES (@Id, @SiteId, @ReceiptNum, @SupplierId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @SyncCode, @SyncId) ";
 
-        const string InsertDetailSql = "INSERT INTO wh_material_receipt_detail(`Id`, `MaterialReceiptId`, `SiteId`, `MaterialId`, `SupplierBatch`, InternalBatch, `PlanQty`,`Qty`, `PlanTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES(@Id, @MaterialReceiptId, @SiteId, @MaterialId, @SupplierBatch,@InternalBatch, @PlanQty,@Qty, @PlanTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, 0)";
+        const string InsertDetailSql = "INSERT INTO wh_material_receipt_detail(`Id`, `MaterialReceiptId`, `SiteId`, `MaterialId`, `SupplierBatch`, InternalBatch, `PlanQty`, `Qty`, `PlanTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES(@Id, @MaterialReceiptId, @SiteId, @MaterialId, @SupplierBatch,@InternalBatch, @PlanQty,@Qty, @PlanTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, 0)";
 
-        const string UpdateSql = "UPDATE wh_material_receipt SET   SiteId = @SiteId, ReceiptNum = @ReceiptNum, SupplierId = @SupplierId, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE wh_material_receipt SET   SiteId = @SiteId, ReceiptNum = @ReceiptNum, SupplierId = @SupplierId, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE wh_material_receipt SET ReceiptNum = @ReceiptNum, SupplierId = @SupplierId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE wh_material_receipt SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE wh_material_receipt SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
