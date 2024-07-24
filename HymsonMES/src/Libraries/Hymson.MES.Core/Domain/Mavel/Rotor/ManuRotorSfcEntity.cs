@@ -50,6 +50,11 @@ namespace Hymson.MES.Core.Domain.Mavel.Rotor
         /// <summary>
         /// 是否完成
         /// </summary>
-        public bool IsFinish { get; set; } = false;
+        public int IsFinish { get; set; }
+
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
     }
 }

@@ -6,7 +6,6 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
-using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -594,11 +593,28 @@ namespace Hymson.MES.Data.Repositories.Plan
                 from plan_work_order t1
                 inner join proc_material t2 on t1.ProductId = t2.Id and t2.IsDeleted = 0
                 where t1.SiteId  = siteId
-                and t1.IsDeleted  = 0
+                and t1.IsDeleted  = 0;
             ";
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderMaterialMavleView>(sql);
+        }
+
+        /// <summary>
+        /// 更新工单完成数量
+        /// </summary>
+        /// <param name="planWorkOrderEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatesCompleteQtyMavleAsync(IEnumerable<PlanWorkOrderEntity> planWorkOrderEntitys)
+        {
+            string UpdatesSql = $@"
+                update plan_work_order_record
+                set FinishProductQuantity = @Qty,UpdatedBy = @UpdatedBy,UpdatedOn =@UpdatedOn
+                where WorkOrderId = @Id;
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdatesSql, planWorkOrderEntitys);
         }
 
         #endregion
