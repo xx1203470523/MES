@@ -589,10 +589,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<IEnumerable<PlanWorkOrderMaterialMavleView>> GetWorkOrderMavelAsync(long siteId)
         {
             string sql = $@"
-                select t2.MaterialCode ,t2.MaterialName ,t1.*
+                select t2.MaterialCode ,t2.MaterialName ,t3.FinishProductQuantity , t1.*
                 from plan_work_order t1
                 inner join proc_material t2 on t1.ProductId = t2.Id and t2.IsDeleted = 0
-                where t1.SiteId  = siteId
+                inner join plan_work_order_record t3 on t3.WorkOrderId = t1.Id and t3.IsDeleted = 0
+                where t1.SiteId  = {siteId}
                 and t1.IsDeleted  = 0;
             ";
 

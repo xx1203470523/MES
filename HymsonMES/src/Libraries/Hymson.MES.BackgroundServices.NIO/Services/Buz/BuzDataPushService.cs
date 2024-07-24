@@ -280,6 +280,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
                 dtos.Add(model);
             }
+            if(dtos == null || dtos.Count == 0)
+            {
+                return;
+            }
 
             //MES数据入库
             using var trans = TransactionHelper.GetTransactionScope();
@@ -327,7 +331,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 }
                 string procedureCode = item.Remark;
                 NIOConfigBaseDto curConfig = new NIOConfigBaseDto();
-                if (procedureCode.Length == ROTOR_OP_LEN)
+                if (procedureCode[0] == ROTOR_CHAR)
                 {
                     curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(GetRotorConfig(baseConfigList));
                 }
@@ -371,7 +375,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             using var trans = TransactionHelper.GetTransactionScope();
 
             await AddToPushQueueAsync(config, buzScene, dtos);
-            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioParam, stepList.Max(x => x.Id));
+            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioManuData, stepList.Max(x => x.Id));
 
             trans.Complete();
         }
@@ -410,7 +414,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取已经走完的追溯记录
             EntityByWaterMarkTimeQuery rotorQuery = new EntityByWaterMarkTimeQuery();
             rotorQuery.StartWaterMarkTime = startWaterMarkTime;
-            rotorQuery.Rows = WATER_ROWS;
+            rotorQuery.Rows = 3;
             var rotorSfcList = await _manuRotorSfcRepository.GetListAsync(rotorQuery);
             if (rotorSfcList == null || rotorSfcList.Count() == 0)
             {
@@ -431,14 +435,14 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             {
                 return;
             }
-            List<string> orderId = rotorSfcList.Select(m => m.SfcMaterialCode).Distinct().ToList();
+            List<string> sfcMatList = rotorSfcList.Select(m => m.SfcMaterialCode).Distinct().ToList();
             List<string> txMatList = rotorSfcList.Select(m => m.TxSfcMaterialCode).Distinct().ToList();
             List<string> zMatList = rotorSfcList.Select(m => m.ZSfcMaterialCode).Distinct().ToList();
             List<string> cirMatList = new List<string>();
-            cirMatList.AddRange(txMatList);
+            cirMatList.AddRange(sfcMatList);
             cirMatList.AddRange(txMatList);
             cirMatList.AddRange(cirMatList);
-            cirMatList = cirMatList.Distinct().ToList();
+            cirMatList = cirMatList.Where(m => string.IsNullOrEmpty(m) == false).Distinct().ToList();
             //查询铁芯码，轴码，总成码物料的数据
             ProcMaterialsByCodeQuery matQuery = new ProcMaterialsByCodeQuery();
             matQuery.SiteId = siteId;
@@ -461,9 +465,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 var zSfcMaterial = materialList.Where(m => m.MaterialCode == item.ZSfcMaterialCode).FirstOrDefault();
 
                 //查铁芯上料数据
+                List<string> existTxList = new List<string>();
                 var curTxSfcList = cirSfcList.Where(m => m.SFC == txSfc).ToList();
                 foreach(var txItem in curTxSfcList)
                 {
+                    if(existTxList.Contains(txItem.CirculationBarCode) == true)
+                    {
+                        continue;
+                    }
+                    existTxList.Add(txItem.CirculationBarCode);
+
                     MaterialDto txModel = new MaterialDto();
                     txModel.VendorProductNum = sfcMaterial?.MaterialCode;
                     txModel.VendorProductName = sfcMaterial?.MaterialName;
@@ -497,9 +508,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 }
 
                 //查轴码上料数据
+                List<string> zExistList = new List<string>();
                 var curZSfcList = cirSfcList.Where(m => m.SFC == zSfc).ToList();
                 foreach(var zItem in  curZSfcList)
                 {
+                    if(zExistList.Contains(zItem.CirculationBarCode) == true)
+                    {
+                        continue;
+                    }
+                    zExistList.Add(zItem.CirculationBarCode);
+
                     MaterialDto zModel = new MaterialDto();
 
                     zModel.VendorProductNum = sfcMaterial?.MaterialCode;
@@ -534,7 +552,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 }
             }
 
+            DateTime ?maxUpdateTime = rotorSfcList.Max(x => x.UpdatedOn);
+            long timestamp = GetTimestampInMilliseconds(maxUpdateTime);
+
+            //MES数据入库
+            using var trans = TransactionHelper.GetTransactionScope();
+
             await AddToPushQueueAsync(config, buzScene, dtos);
+            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioMaterial, timestamp);
+
+            trans.Complete();
         }
 
         /// <summary>
@@ -604,8 +631,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 dtos.Add(model);
             }
 
-            // TODO: 替换为实际数据
+            using var trans = TransactionHelper.GetTransactionScope();
+
             await AddToPushQueueAsync(config, buzScene, dtos);
+            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioPassrateProduct, stepList.Max(x => x.Id));
+
+            trans.Complete();
         }
 
         /// <summary>
@@ -657,7 +688,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 }
                 string procedureCode = item.Code;
                 NIOConfigBaseDto curConfig = new NIOConfigBaseDto();
-                if (procedureCode.Length == ROTOR_OP_LEN)
+                if (procedureCode[0] == ROTOR_CHAR)
                 {
                     curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(GetRotorConfig(baseConfigList));
                 }
@@ -681,7 +712,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 dtos.Add(model);
             }
 
+            using var trans = TransactionHelper.GetTransactionScope();
+
             await AddToPushQueueAsync(config, buzScene, dtos);
+            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioPassrateProcedure, stepList.Max(x => x.Id));
+
+            trans.Complete();
 
             decimal GetPassrateStation(string configValue, string procedureCode)
             {
@@ -750,10 +786,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取基础配置
             var baseConfigList = await GetBaseConfigAsync();
             //获取当前水位
-            var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioParam);
+            var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioIssue);
             //获取参数表数据
             EntityByWaterMarkQuery waterQuery = new EntityByWaterMarkQuery() { Rows = WATER_ROWS, StartWaterMarkId = startWaterMarkId };
-            var paramList = await _manuProductParameterRepository.GetManuParamMavelAsync(waterQuery);
+            var paramList = await _manuProductParameterRepository.GetManuNgParamMavelAsync(waterQuery);
             if (paramList == null || paramList.Any() == false) return;
             //获取标准参数，用于获取根据ID获取名称（参数表在其他库）
             ProcParameterQuery paramQuery = new ProcParameterQuery() { SiteId = siteId };
@@ -817,7 +853,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 dtos.Add(model);
             }
 
+            using var trans = TransactionHelper.GetTransactionScope();
+
             await AddToPushQueueAsync(config, buzScene, dtos);
+            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioIssue, paramList.Max(x => x.Id));
+
+            trans.Complete();
         }
 
         /// <summary>
@@ -852,6 +893,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     continue;
                 }
 
+                if(item.FinishProductQuantity <= 0)
+                {
+                    continue;
+                }
+
                 WorkOrderDto model = new WorkOrderDto();
                 model.PlantId = curConfig.PlantId;
                 model.WorkshopId = curConfig.WorkshopId;
@@ -862,7 +908,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.NioProductCode = curConfig.NioProductCode;
                 model.NioProductName = curConfig.NioProductName;
                 model.NioModel = "ES8";
-                model.Quantity = (int)item.Qty;
+                model.Quantity = (int)item.FinishProductQuantity;
                 model.NioHardwareRevision = "1.0";
                 model.NioSoftwareRevision = "1.0";
                 model.NioProjectName = "";
@@ -871,6 +917,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
                 model.WorkorderId = item.OrderCode;
                 model.OrderCreateTime = GetTimestamp(item.CreatedOn);
+
+                dtos.Add(model);
             }
 
             await AddToPushQueueAsync(config, buzScene, dtos);

@@ -58,6 +58,21 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly IProcProductParameterGroupMavelRepository _procProductParameterGroupMavelRepository;
 
         /// <summary>
+        /// 转子工序标识
+        /// </summary>
+        private readonly string ROTOR_PRODUCRE_FLAG = "R";
+
+        /// <summary>
+        /// NIO软件版本号
+        /// </summary>
+        private readonly string NIO_SOFT_VERSION = "A";
+
+        /// <summary>
+        /// NIO DEBUG
+        /// </summary>
+        private readonly bool NIO_DEBUG = true;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="nioPushSwitchRepository"></param>
@@ -118,10 +133,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 dto.VendorProductName = curConfig.VendorProductName;
                 dto.NioProductCode = curConfig.NioProductCode;
                 dto.NioProductName = curConfig.NioProductName;
-                dto.NioHardwareRevision = "1.0";
-                dto.NioSoftwareRevision = "1.0";
-                dto.NioModel = "ES8";
-                dto.Launched = false;
+                dto.NioSoftwareRevision = NIO_SOFT_VERSION;
+                //dto.NioHardwareRevision = "1.0";
+                //dto.NioModel = "ES8";
+                //dto.Launched = false;
+                dto.Debug = NIO_DEBUG;
                 dto.UpdateTime = GetTimestamp(HymsonClock.Now(),HymsonClock.Now());
 
                 dtos.Add(dto);
@@ -161,13 +177,13 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             List<StationDto> dtos = new List<StationDto>();
             foreach (var item in producreList)
             {
-                if(item.Code.Length != 5 && item.Code.Length != 6)
-                {
-                    continue;
-                }
+                //if(item.Code.Length != 6)
+                //{
+                //    continue;
+                //}
                 StationDto model = new StationDto();
                 NIOConfigBaseDto curConfig = new NIOConfigBaseDto();
-                if (item.Code.Length == 5) //转子
+                if (item.Code.Contains(ROTOR_PRODUCRE_FLAG) == true) //转子
                 {
                     var baseConfigModel = baseConfigList.Where(m => m.Code == "NioRotorConfig").FirstOrDefault();
                     if(baseConfigModel == null)
@@ -198,7 +214,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.StationId = item.Code;
                 model.StationName = item.Name;
                 model.KeyStation = true;
-                model.VendorProductNum = "";
+                //model.VendorProductNum = "";
+                model.Debug = NIO_DEBUG;
                 model.UpdateTime = GetTimestamp(item.CreatedOn, item.UpdatedOn);
                 dtos.Add(model);
             }
@@ -303,6 +320,14 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var buzScene = BuzSceneEnum.Master_PassrateTarget;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
+
+            ////站点配置
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
+            if (configEntities == null || !configEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139));
+            }
+            long siteId = long.Parse(configEntities.ElementAt(0).Value);
             //基础数据配置
             var baseConfigList = await GetBaseConfig();
 
@@ -324,10 +349,91 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
                 dtos.Add(dto);
             }
-            //工序一次良率，待确认
+            //获取工序
+            MavelProducreQuery query = new MavelProducreQuery() { SiteId = siteId };
+            var producreList = await _procProcedureMavelRepository.GetList(query);
+            if (producreList == null || producreList.Any() == false)
+            {
+                return;
+            }
+            //获取工序一次良率
+            var passrateStationConfigList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorPassrateStation });
+            if (passrateStationConfigList == null || !passrateStationConfigList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", "RotorPassrateStation");
+            }
+            string passrateConfig = passrateStationConfigList.ElementAt(0).Value;
+
+            foreach(var item in producreList)
+            {
+                StationDto model = new StationDto();
+                NIOConfigBaseDto curConfig = new NIOConfigBaseDto();
+                if (item.Code.Contains(ROTOR_PRODUCRE_FLAG) == true) //转子
+                {
+                    var baseConfigModel = baseConfigList.Where(m => m.Code == "NioRotorConfig").FirstOrDefault();
+                    if (baseConfigModel == null)
+                    {
+                        continue;
+                    }
+                    curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(baseConfigModel.Value);
+                }
+                else //定子
+                {
+                    var baseConfigModel = baseConfigList.Where(m => m.Code == "NioStatorConfig").FirstOrDefault();
+                    if (baseConfigModel == null)
+                    {
+                        continue;
+                    }
+                    curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(baseConfigModel.Value);
+                }
+
+                PassrateTargetDto dto = new PassrateTargetDto();
+                dto.PlantId = curConfig.PlantId;
+                dto.VendorProductCode = curConfig.VendorProductCode;
+                dto.VendorProductName = curConfig.VendorProductName;
+                dto.PassRateType = "station";
+                dto.WorkshopId = curConfig.WorkshopId;
+                dto.ProductionLineId = curConfig.ProductionLineId;
+                dto.StationId = item.Code;
+                dto.PassRateTarget = GetPassrateStation(passrateConfig, item.Code).ToString();
+                dto.UpdateTime = GetTimestamp(DateTime.Now, DateTime.Now);
+                dtos.Add(dto);
+            }
 
             // TODO: 替换为实际数据
             await AddToPushQueueAsync(config, buzScene, dtos);
+
+            decimal GetPassrateStation(string configValue, string procedureCode)
+            {
+                decimal result = 0.9m;
+                if (string.IsNullOrEmpty(configValue) == true)
+                {
+                    return result;
+                }
+
+                List<string> list = configValue.Split('&').ToList();
+                foreach (var item in list)
+                {
+                    List<string> itemList = item.Split('=').ToList();
+                    if (itemList.Count != 2)
+                    {
+                        return result;
+                    }
+                    if (itemList[0] == "default")
+                    {
+                        result = Convert.ToDecimal(itemList[1]);
+                        continue;
+                    }
+                    if (itemList[0] == procedureCode)
+                    {
+                        result = Convert.ToDecimal(itemList[1]);
+                        break;
+                    }
+                }
+
+                result = Math.Round(result, 5);
+                return result;
+            }
         }
 
         /// <summary>
