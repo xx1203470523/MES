@@ -30,7 +30,7 @@ spec:
         ports: 
           - name: equ-api-svc        #端口的名称
             containerPort: 80  #容器需要监听的端口号
-            hostPort: 12003
+            hostPort: 20033
       volumes:
       - name: equ-api-volume
         # 挂载 /data/foo，但仅当该目录已经存在时
