@@ -838,7 +838,10 @@ namespace Hymson.MES.Services.Services.Quality
                     MaterialCode = receiptDetailEntity.MaterialBatchCode,
                     PlanQty = receiptDetailEntity.PlanQty,
                     Qty = receiptDetailEntity.Qty,
-                    IsQualified = item.IsQualified ?? TrueOrFalseEnum.No
+                    IsQualified = item.IsQualified ?? TrueOrFalseEnum.No,
+                    BarCode = receiptDetailEntity.BarCode,
+                    SyncId = receiptDetailEntity.SyncId,
+                    WarehouseCode = "TODO"
                 });
             }
 
@@ -847,6 +850,8 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 ReceiptNum = receiptEntity.ReceiptNum,
                 SupplierCode = supplierEntity?.Code ?? "",
+                SyncCode = receiptEntity.SyncCode,
+                SyncId = receiptEntity.SyncId,
                 Details = details
             });
         }
