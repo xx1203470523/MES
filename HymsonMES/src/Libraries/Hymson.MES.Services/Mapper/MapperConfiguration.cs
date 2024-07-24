@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.EquSparepartInventory;
 using Hymson.MES.Core.Domain.EquSparepartRecord;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Mavel.Rotor;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Qual;
@@ -1440,9 +1441,12 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            CreateMap<ManuRotorPackListEntity, ManuRotorPackListSaveDto>();
+            CreateMap<ManuRotorPackListPagedQueryDto, ManuRotorPackListPagedQuery>();
+            CreateMap<ManuRotorPackListEntity, ManuRotorPackListDto>();
 
-
-
+            CreateMap<ManuProductReceiptOrderEntity, ManuProductReceiptOrderSaveDto>();
+            
             #region ManuReturnOrder
             CreateMap<ManuReturnOrderPagedQueryDto, ManuReturnOrderPagedQuery>();
             CreateMap<ManuReturnOrderEntity, ManuReturnOrderDto>();

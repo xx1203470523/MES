@@ -148,6 +148,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return new PagedInfo<ManuProductReceiptOrderDetailEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据IDs获取数据（批量）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetByProductReceiptIdsAsync(long[] ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuProductReceiptOrderDetailEntity>(GetByProductReceiptIdsSql, new { Ids = ids });
+        }
     }
 
 
@@ -160,8 +170,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_product_receipt_order_detail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_product_receipt_order_detail /**where**/  ";
 
-        const string InsertSql = "INSERT INTO manu_product_receipt_order_detail(  `Id`, `ProductReceiptId`, `MaterialCode`, `MaterialName`, `Sfc`, `Unit`, `Qty`, `WarehouseId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ContaineCode`) VALUES (  @Id, @ProductReceiptId, @MaterialCode, @MaterialName, @Sfc, @Unit, @Qty, @WarehouseId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ContaineCode) ";
-        const string InsertsSql = "INSERT INTO manu_product_receipt_order_detail(  `Id`, `ProductReceiptId`, `MaterialCode`, `MaterialName`, `Sfc`, `Unit`, `Qty`, `WarehouseId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ContaineCode`) VALUES (  @Id, @ProductReceiptId, @MaterialCode, @MaterialName, @Sfc, @Unit, @Qty, @WarehouseId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ContaineCode) ";
+        const string InsertSql = "INSERT INTO manu_product_receipt_order_detail(  `Id`, `ProductReceiptId`, `MaterialCode`, `MaterialName`, `Sfc`, `Unit`, `Qty`, `WarehouseId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ContaineCode`, `Batch`, `WarehouseCode`) VALUES (  @Id, @ProductReceiptId, @MaterialCode, @MaterialName, @Sfc, @Unit, @Qty, @WarehouseId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ContaineCode,@Batch,@WarehouseCode) ";
+        const string InsertsSql = "INSERT INTO manu_product_receipt_order_detail(  `Id`, `ProductReceiptId`, `MaterialCode`, `MaterialName`, `Sfc`, `Unit`, `Qty`, `WarehouseId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `ContaineCode`, `Batch`, `WarehouseCode`) VALUES (  @Id, @ProductReceiptId, @MaterialCode, @MaterialName, @Sfc, @Unit, @Qty, @WarehouseId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ContaineCode,@Batch,@WarehouseCode) ";
 
         const string UpdateSql = "UPDATE manu_product_receipt_order_detail SET   ProductReceiptId = @ProductReceiptId, MaterialCode = @MaterialCode, MaterialName = @MaterialName, Sfc = @Sfc, Unit = @Unit, Qty = @Qty, WarehouseId = @WarehouseId, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE manu_product_receipt_order_detail SET   ProductReceiptId = @ProductReceiptId, MaterialCode = @MaterialCode, MaterialName = @MaterialName, Sfc = @Sfc, Unit = @Unit, Qty = @Qty, WarehouseId = @WarehouseId, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
@@ -171,6 +181,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetByIdSql = @"SELECT * FROM manu_product_receipt_order_detail WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_product_receipt_order_detail WHERE Id IN @Ids ";
+
+        const string GetByProductReceiptIdsSql = @"SELECT * FROM manu_product_receipt_order_detail WHERE ProductReceiptId IN @Ids ";
 
     }
 }

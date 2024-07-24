@@ -21,7 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddHttpClientService(this IServiceCollection services, IConfiguration configuration)
         {
-            AddHttpClientConfig(services, configuration);
+            
 
             //var printOptions = new PrintOptions();
             //configuration.GetSection("PrintOptions").Bind(printOptions);
@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
             //    httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
             //});
 
-            var xnebulaWMSOption = new XnebulaWMSOption();
+            var xnebulaWMSOption = new XnebulaWMSOptions();
             configuration.GetSection("XnebulaWMSOptions").Bind(xnebulaWMSOption);
             services.AddHttpClient<IXnebulaWMSApiClient, XnebulaWMSApiClient>().ConfigureHttpClient(httpClient =>
             {
@@ -54,6 +54,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             services.AddSingleton<IWMSApiClient, WMSApiClient>();
+            AddHttpClientConfig(services, configuration);
             return services;
         }
 
@@ -66,6 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddHttpClientConfig(IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<PrintOptions>(configuration.GetSection(nameof(PrintOptions)));
+            services.Configure<XnebulaWMSOptions>(configuration.GetSection(nameof(XnebulaWMSOptions)));
             services.Configure<WMSOptions>(configuration.GetSection(nameof(WMSOptions)));
             return services;
         }

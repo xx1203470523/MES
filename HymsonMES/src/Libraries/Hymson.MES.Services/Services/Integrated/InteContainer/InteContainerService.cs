@@ -656,14 +656,12 @@ public partial class InteContainerService : IInteContainerService
     public async Task<InteContainerInfoViewDto> QueryContainerInfoByCodeAsync(InteContainerQueryDto queryDto)
     {
         InteContainerInfoViewDto inteContainerInfoViewDto = new InteContainerInfoViewDto();
-        var checkEntity = await _inteContainerRepository.GetByCodeAsync(new EntityByCodeQuery
-        {
-            Site = _currentSite.SiteId ?? 123456,
-            Code = queryDto.Code ?? ""
-        });
+        //var checkEntity = await _inteContainerRepository.GetByCodeAsync(new EntityByCodeQuery
+        //{
+        //    Site = _currentSite.SiteId ?? 123456,
+        //    Code = queryDto.Code ?? ""
+        //});
         var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
-        if (checkEntity == null)
-            return inteContainerInfoViewDto;
         var InspectionOrder = $"{queryDto.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
         // var entity = await _manuContainerBarcodeRepository.GetByContainerIdAsync(new ManuContainerIdQuery { ContainerId= checkEntity.Id, SiteId = _currentSite.SiteId ?? 123456});
         //查询条码绑定信息
