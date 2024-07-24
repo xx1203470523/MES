@@ -10,6 +10,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
 using System.Text.Json.Serialization;
 
@@ -767,7 +768,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 箱码
         /// </summary>
-        public string Code { get; set; }
+        public string BoxCode { get; set; }
 
         /// <summary>
         /// 批次号
@@ -787,7 +788,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 品检状态
         /// </summary>
-        public string? Status { get; set; }
+        public ProductReceiptQualifiedStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 仓库编号

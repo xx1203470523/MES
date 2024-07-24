@@ -9,7 +9,7 @@ namespace Hymson.MES.HttpClients
     /// <summary>
     /// 仓库操作
     /// </summary>
-    public class XnebulaWMSOption
+    public class XnebulaWMSOptions
     {
         /// <summary>
         /// 基础路径

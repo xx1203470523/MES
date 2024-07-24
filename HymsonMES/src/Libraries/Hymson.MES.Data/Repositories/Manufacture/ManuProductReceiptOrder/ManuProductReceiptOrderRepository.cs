@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
+using IdGen;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -148,6 +149,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return new PagedInfo<ManuProductReceiptOrderEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据工单id获取数据（批量）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductReceiptOrderEntity>> GetByWorkOrderIdsSqlAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuProductReceiptOrderEntity>(GetByWorkOrderIdsSql, new { Id = id });
+        }
     }
 
 
@@ -171,6 +182,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetByIdSql = @"SELECT * FROM manu_product_receipt_order WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_product_receipt_order WHERE Id IN @Ids ";
+
+        const string GetByWorkOrderIdsSql = @"SELECT * FROM manu_product_receipt_order WHERE WorkOrderCode = @Id ";
 
     }
 }
