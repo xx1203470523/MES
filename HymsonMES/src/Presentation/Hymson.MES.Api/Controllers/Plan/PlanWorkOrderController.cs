@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan.PlanWorkOrder;
 using Hymson.Web.Framework.Attributes;
@@ -174,6 +175,17 @@ namespace Hymson.MES.Api.Controllers.Plan
         public async Task CancelLockedAsync(List<PlanWorkOrderLockedDto> parms)
         {
             await _planWorkOrderService.ModifyWorkOrderLockedAsync(parms);
+        }
+
+        /// <summary>
+        /// 获取领料列表
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        [HttpGet("pick/{workOrderId}")]
+        public async Task<List<ManuRequistionOrderEntity>> GetPickHistoryByWorkOrderIdAsync(long workOrderId)
+        {
+            return await _planWorkOrderService.GetPickHistoryByWorkOrderIdAsync(workOrderId);
         }
     }
 }

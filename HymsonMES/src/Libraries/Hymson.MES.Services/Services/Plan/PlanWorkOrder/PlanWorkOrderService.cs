@@ -5,6 +5,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -632,5 +633,21 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             return new PlanWorkOrderDetailViewDto();
         }
 
+        public async Task<List<ManuRequistionOrderEntity>> GetPickHistoryByWorkOrderIdAsync(long workOrderId)
+        {
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
+            if (planWorkOrderEntity != null)
+            {
+                var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.OrderCode, planWorkOrderEntity.SiteId);
+                var lst = requistionOrderEntities.ToList();
+                foreach (var item in lst)
+                {
+                    item.ReqOrderCode = $"{planWorkOrderEntity.OrderCode}_{item.Id}";
+                }
+                return lst;
+            }
+            return new List<ManuRequistionOrderEntity>();
+
+        }
     }
 }

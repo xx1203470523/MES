@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 
 namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
@@ -56,6 +57,8 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
         Task<decimal> GetPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode);
+        
+        Task<List<ManuRequistionOrderEntity>> GetPickHistoryByWorkOrderIdAsync(long workOrderId);
 
         /// <summary>
         /// 修改工单状态
