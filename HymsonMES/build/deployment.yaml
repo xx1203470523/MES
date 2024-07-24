@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   creationTimestamp: null
-  namespace: prod
   labels:
     app: mes-api
   name: mes-api
@@ -15,7 +14,6 @@ spec:
   template:
     metadata:
       creationTimestamp: null
-      namespace: prod
       labels:
         app: mes-api
     spec:
@@ -26,18 +24,5 @@ spec:
         ports: 
           - name: mes-api-svc        #端口的名称
             containerPort: 80  #容器需要监听的端口号
+            hostPort: 9999
 status: {}
----
-apiVersion: apps/v1
-kind: Service
-metadata:
-  name: mes-api-service
-  namespace: prod
-spec:
-  selector:
-    app: mes-api
-  ports:
-  - name: mes-api-service-port
-    protocol: TCP
-    port: 9999
-    targetPort: mes-api-svc 
