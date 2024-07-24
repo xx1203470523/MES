@@ -902,6 +902,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         model.ProductId = upMatModel.Id;
                     }
                 }
+                else
+                {
+                    VAR_DEBUG = 0;
+                }
                 //当前产品条码
                 ProcMaterialEntity? curMatModel = matList.Where(m => m.MaterialCode == item.MainMatCode).FirstOrDefault();
                 if(curMatModel != null)
@@ -915,6 +919,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         model.CirculationProductId = curMatModel.Id;
                         model.CirculationMainProductId = curMatModel.Id;
                     }
+                }
+                else
+                {
+                    VAR_DEBUG = 0;
                 }
 
                 if (mesOrder != null)
