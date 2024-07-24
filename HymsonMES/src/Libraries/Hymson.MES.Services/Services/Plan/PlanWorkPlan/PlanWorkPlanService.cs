@@ -151,6 +151,9 @@ namespace Hymson.MES.Services.Services.Plan
                 remainingQty -= partitionQty;
             }
 
+            // 检查间计算的数量是否等于原数量
+            if (list.Sum(s => s.Qty) != planProductEntity.Qty) throw new CustomerValidationException(nameof(ErrorCode.MES16054));
+
             return list;
         }
 
