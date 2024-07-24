@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: system-api
+  name: system-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: system-api
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: system-api
+    spec:
+      containers:
+      - image: nuget.czhipu.com/xnebula/hymson.mes.system.api:20240724081238
+        name: system-api
+        volumeMounts:
+          - mountPath: /logs
+            name: system-api-volume
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        resources: {}
+        ports: 
+          - name: system-api-svc        #端口的名称
+            containerPort: 80  #容器需要监听的端口号
+            hostPort: 12002
+      volumes:
+      - name: system-api-volume
+        # 挂载 /data/foo，但仅当该目录已经存在时
+        hostPath:
+          path: /data/logs # 主机上的目录位置
+          type: DirectoryOrCreate # 此字段可选
+status: {}
