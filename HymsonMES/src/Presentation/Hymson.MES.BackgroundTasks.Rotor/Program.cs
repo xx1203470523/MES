@@ -51,6 +51,7 @@ Host.CreateDefaultBuilder(args)
            q.UseMicrosoftDependencyInjectionJobFactory();
 
            q.AddJobAndTrigger<ManuDataJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<PackListJob>(hostContext.Configuration);
 
            q.UsePersistentStore((persistentStoreOptions) =>
            {

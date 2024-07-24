@@ -314,6 +314,11 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where(" Id IN @MaterialIds ");
             }
 
+            if (query.MaterialCodes != null && query.MaterialCodes.Any())
+            {
+                sqlBuilder.Where(" MaterialCode IN @MaterialCodes ");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcMaterialEntity>(template.RawSql, query);
         }
