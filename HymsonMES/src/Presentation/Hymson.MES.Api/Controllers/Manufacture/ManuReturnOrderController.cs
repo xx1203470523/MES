@@ -47,7 +47,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("create")]
         public async Task AddAsync([FromBody] ManuReturnOrderSaveDto saveDto)
         {
-             await _manuReturnOrderService.CreateAsync(saveDto);
+            await _manuReturnOrderService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("update")]
         public async Task UpdateAsync([FromBody] ManuReturnOrderSaveDto saveDto)
         {
-             await _manuReturnOrderService.ModifyAsync(saveDto);
+            await _manuReturnOrderService.ModifyAsync(saveDto);
         }
 
         /// <summary>
@@ -95,6 +95,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<PagedInfo<ManuReturnOrderDto>> QueryPagedListAsync([FromQuery] ManuReturnOrderPagedQueryDto pagedQueryDto)
         {
             return await _manuReturnOrderService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 根据工单查询退料明细
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        [HttpGet("returnDetail/{workOrderId}")]
+        public async Task<List<OrderManuReturnDetailDto>> GetReturnDetailByOrderIdAsync(long workOrderId)
+        {
+            return await _manuReturnOrderService.GetReturnDetailByOrderIdAsync(workOrderId);
         }
 
     }

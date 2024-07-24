@@ -21,7 +21,6 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long MaterialId { get; set; }
 
-        /// <summary>
         /// 物料条码
         /// </summary>
         public string MaterialBarCode { get; set; }
@@ -55,6 +54,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 物料描述
         /// </summary>
+
         public string? Remark { get; set; }
 
         /// <summary>

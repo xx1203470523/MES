@@ -4,23 +4,23 @@ using Hymson.MES.Services.Dtos.Manufacture;
 namespace Hymson.MES.Services.Services.Manufacture
 {
     /// <summary>
-    /// 服务接口（生产退料单）
+    /// 服务接口（工单完工入库）
     /// </summary>
-    public interface IManuReturnOrderService
+    public interface IManuProductReceiptOrderService
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(ManuReturnOrderSaveDto saveDto);
+        Task<int> CreateAsync(ManuProductReceiptOrderSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(ManuReturnOrderSaveDto saveDto);
+        Task<int> ModifyAsync(ManuProductReceiptOrderSaveDto saveDto);
 
         /// <summary>
         /// 删除
@@ -41,28 +41,20 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ManuReturnOrderDto?> QueryByIdAsync(long id);
+        Task<ManuProductReceiptOrderDto?> QueryByIdAsync(long id);
 
         /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuReturnOrderDto>> GetPagedListAsync(ManuReturnOrderPagedQueryDto pagedQueryDto);
-
+        Task<PagedInfo<ManuProductReceiptOrderDto>> GetPagedListAsync(ManuProductReceiptOrderPagedQueryDto pagedQueryDto);
+        
         /// <summary>
-        /// 查询详情（生产退料表）
-        /// </summary>
-        /// <param name="returnId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuReturnOrderDetailDto>> QueryDetailByReturnIdAsync(long returnId);
-
-        /// <summary>
-        /// 根据工单查询退料明细
+        /// 根据工单查询入库记录
         /// </summary>
         /// <param name="workOrderId"></param>
         /// <returns></returns>
-        Task<List<OrderManuReturnDetailDto>> GetReturnDetailByOrderIdAsync(long workOrderId);
-
+        Task<IEnumerable<ManuProductReceiptOrderDetailDto>> QueryByWorkIdAsync(long workOrderId);
     }
 }

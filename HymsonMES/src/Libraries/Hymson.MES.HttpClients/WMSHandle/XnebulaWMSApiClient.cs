@@ -11,8 +11,8 @@ namespace Hymson.MES.HttpClients
     public class XnebulaWMSApiClient : IXnebulaWMSApiClient
     {
         private readonly HttpClient _httpClient;
-        private readonly XnebulaWMSOption _options;
-        public XnebulaWMSApiClient(HttpClient httpClient, IOptions<XnebulaWMSOption> options)
+        private readonly XnebulaWMSOptions _options;
+        public XnebulaWMSApiClient(HttpClient httpClient,IOptions<XnebulaWMSOptions> options)
         {
             _httpClient = httpClient;
             _options = options.Value;

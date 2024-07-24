@@ -1477,7 +1477,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
                 HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
                 {
-                    BoxCode = item.Code,
+                    BoxCode = item.BoxCode,
                     LotCode = item.Batch,
                     MaterialCode = request.MaterialCode,
                     Quantity = item.Qty.ToString(),
@@ -1486,10 +1486,14 @@ namespace Hymson.MES.Services.Services.Warehouse
                 ManuProductReceiptOrderDetailEntity manuProductReceiptOrderDetailEntity = new ManuProductReceiptOrderDetailEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
+                    Batch = item.Batch,
+                    WarehouseCode = item.WarehouseCode ?? "",
+                    Sfc = item.Sfc ?? "",
                     ProductReceiptId = manuProductReceiptOrderEntity.Id,
                     MaterialCode = request.MaterialCode,
                     MaterialName = request.MaterialName,
-                    ContaineCode = item.Code,
+                    ContaineCode = item.BoxCode,
+                    Status = item.Status ?? 0,
                     SiteId = _currentSite.SiteId ?? 0,
                     Unit = item.Unit,
                     CreatedBy = _currentSystem.Name,
@@ -1498,31 +1502,31 @@ namespace Hymson.MES.Services.Services.Warehouse
                 manuProductReceiptOrderDetails.Add(manuProductReceiptOrderDetailEntity);
                 returnMaterialDtos.Add(returnMaterialDto);
             }
-            //using (var trans = TransactionHelper.GetTransactionScope())
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
+                await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
+                trans.Complete();
+            }
+            //var response = await _wmsRequest.ProductReceiptRequestAsync(new HttpClients.Requests.ProductReceiptRequestDto
             //{
-            //    await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
-            //    await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
-            //    trans.Complete();
+            //    SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
+            //    SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
+            //    Details = returnMaterialDtos
+            //});
+            //if (response)
+            //{
+            //    using (var trans = TransactionHelper.GetTransactionScope())
+            //    {
+            //        await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
+            //        await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
+            //        trans.Complete();
+            //    }
             //}
-            var response = await _wmsRequest.ProductReceiptRequestAsync(new HttpClients.Requests.ProductReceiptRequestDto
-            {
-                SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
-                SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
-                Details = returnMaterialDtos
-            });
-            if (response)
-            {
-                using (var trans = TransactionHelper.GetTransactionScope())
-                {
-                    await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
-                    await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
-                    trans.Complete();
-                }
-            }
-            else
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16051)).WithData("msg", "请求发送失败");
-            }
+            //else
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES16051)).WithData("msg", "请求发送失败");
+            //}
         }
 
         /// <summary>

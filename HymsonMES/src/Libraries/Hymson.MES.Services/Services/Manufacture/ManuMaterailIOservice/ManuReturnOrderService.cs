@@ -8,6 +8,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -263,5 +264,57 @@ namespace Hymson.MES.Services.Services.Manufacture
             return dtos;
         }
 
+        /// <summary>
+        /// 根据工单查询退料明细
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        public async Task<List<OrderManuReturnDetailDto>> GetReturnDetailByOrderIdAsync(long workOrderId)
+        {
+            var details = new List<OrderManuReturnDetailDto>();
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
+            if (planWorkOrderEntity == null)
+            {
+                return details;
+            }
+
+            var returnOrderEntities = await _manuReturnOrderRepository.GetEntitiesAsync(new ManuReturnOrderQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkOrderId = workOrderId
+            });
+            if (returnOrderEntities == null || !returnOrderEntities.Any())
+            {
+                return details;
+            }
+
+            var returnOrderIds = returnOrderEntities.Select(x => x.Id).ToArray();
+            var returnOrderDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ReturnOrderIds = returnOrderIds
+            });
+
+            var materIds = returnOrderDetailEntities.Select(x => x.MaterialId).ToArray();
+            var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(materIds);
+            foreach (var item in returnOrderDetailEntities)
+            {
+                var retrurnOrder = returnOrderEntities.FirstOrDefault(x => x.Id == item.ReturnOrderId);
+                var material = procMaterialEntities.FirstOrDefault(x => x.Id == item.MaterialId);
+                details.Add(new OrderManuReturnDetailDto
+                {
+                    ReturnOrderCode = retrurnOrder?.ReturnOrderCode ?? "",
+                    MaterialCode = material?.MaterialCode??"",
+                    MaterialName = material?.MaterialName ?? "",
+                    Version = material?.Version ?? "",
+                    MaterialBarCode = item.MaterialBarCode,
+                    Batch = item.Batch,
+                    Qty = item.Qty,
+                    ReturnTime = retrurnOrder?.CreatedOn ?? item.CreatedOn,
+                    Status = retrurnOrder?.Status
+                });
+            }
+            return details;
+        }
     }
 }
