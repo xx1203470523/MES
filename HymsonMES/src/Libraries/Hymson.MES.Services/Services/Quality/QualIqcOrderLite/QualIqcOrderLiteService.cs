@@ -5,12 +5,15 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
@@ -42,6 +45,11 @@ namespace Hymson.MES.Services.Services.Quality
         /// 当前站点
         /// </summary>
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 系统配置
+        /// </summary>
+        private readonly ISysConfigRepository _sysConfigRepository;
 
         /// <summary>
         /// 仓储接口（iqc检验单）
@@ -103,6 +111,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="sysConfigRepository"></param>
         /// <param name="qualIqcOrderLiteRepository"></param>
         /// <param name="qualIqcOrderLiteDetailRepository"></param>
         /// <param name="qualIqcOrderOperateRepository"></param>
@@ -115,6 +124,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="iqcOrderCreateService"></param>
         /// <param name="wmsApiClient"></param>
         public QualIqcOrderLiteService(ICurrentUser currentUser, ICurrentSite currentSite,
+            ISysConfigRepository sysConfigRepository,
             IQualIqcOrderLiteRepository qualIqcOrderLiteRepository,
             IQualIqcOrderLiteDetailRepository qualIqcOrderLiteDetailRepository,
             IQualIqcOrderOperateRepository qualIqcOrderOperateRepository,
@@ -129,6 +139,7 @@ namespace Hymson.MES.Services.Services.Quality
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _sysConfigRepository = sysConfigRepository;
             _qualIqcOrderLiteRepository = qualIqcOrderLiteRepository;
             _qualIqcOrderLiteDetailRepository = qualIqcOrderLiteDetailRepository;
             _qualIqcOrderOperateRepository = qualIqcOrderOperateRepository;
@@ -827,6 +838,13 @@ namespace Hymson.MES.Services.Services.Quality
             // 读取供应商
             var supplierEntity = await _whSupplierRepository.GetByIdAsync(orderEntity.SupplierId.Value);
 
+            // 站点配置
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.WarehouseCode });
+            if (configEntities == null || !configEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.WarehouseCode.GetDescription());
+            }
+
             List<IQCReceiptMaterialResultDto> details = new();
             foreach (var item in updateDetailEntities)
             {
@@ -841,7 +859,7 @@ namespace Hymson.MES.Services.Services.Quality
                     IsQualified = item.IsQualified ?? TrueOrFalseEnum.No,
                     BarCode = receiptDetailEntity.BarCode,
                     SyncId = receiptDetailEntity.SyncId,
-                    WarehouseCode = "TODO"
+                    WarehouseCode = GetWarehouseCode(configEntities, item.IsQualified)
                 });
             }
 
@@ -854,6 +872,25 @@ namespace Hymson.MES.Services.Services.Quality
                 SyncId = receiptEntity.SyncId,
                 Details = details
             });
+        }
+
+        /// <summary>
+        /// 获取仓库编码
+        /// </summary>
+        /// <param name="configEntities"></param>
+        /// <param name="isQualified"></param>
+        /// <returns></returns>
+        private static string GetWarehouseCode(IEnumerable<SysConfigEntity> configEntities, TrueOrFalseEnum? isQualified)
+        {
+            var configEntity = configEntities.FirstOrDefault();
+
+            if (configEntity == null) return "not configured";
+            if (isQualified == null) return "no result";
+
+            if (string.IsNullOrWhiteSpace(configEntity?.Value)) return "no configured value";
+
+            var warehouseCodeArray = configEntity.Value.Split('|');
+            return isQualified == TrueOrFalseEnum.Yes ? warehouseCodeArray[0] : warehouseCodeArray[1];
         }
         #endregion
 

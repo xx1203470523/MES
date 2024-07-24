@@ -65,31 +65,34 @@ namespace Hymson.MES.SystemServices.Services.Quality
             var user = "MES.System.Api";
             var time = HymsonClock.Now();
 
+            // 通过BuzScene分组
+            var buzSceneDict = requestDtos.ToLookup(x => x.BuzScene).ToDictionary(d => d.Key, d => d);
+
             var rows = 0;
-            foreach (var item in requestDtos)
+            foreach (var buzScene in buzSceneDict)
             {
                 // 子开关是否开启
-                var config = await _nioPushSwitchRepository.GetBySceneAsync(item.BuzScene);
-                if (config == null || config.IsEnabled != TrueOrFalseEnum.Yes) return 0;
+                var config = await _nioPushSwitchRepository.GetBySceneAsync(buzScene.Key);
+                if (config == null || config.IsEnabled != TrueOrFalseEnum.Yes) continue;
 
                 // 保存
-                rows += await _nioPushRepository.InsertAsync(new NioPushEntity
+                rows += await _nioPushRepository.InsertRangeAsync(buzScene.Value.Select(s => new NioPushEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SchemaCode = config.SchemaCode,
-                    BuzScene = item.BuzScene,
+                    BuzScene = s.BuzScene,
                     Status = PushStatusEnum.Wait,
                     Content = new
                     {
                         config.SchemaCode,
-                        List = item.Data
+                        List = s.Data
                     }.ToSerializeLower(),
-                    Remark = item.BuzScene.GetDescription(),
+                    Remark = s.BuzScene.GetDescription(),
                     CreatedBy = user,
                     CreatedOn = time,
                     UpdatedBy = user,
                     UpdatedOn = time
-                });
+                }));
             }
 
             return rows;
