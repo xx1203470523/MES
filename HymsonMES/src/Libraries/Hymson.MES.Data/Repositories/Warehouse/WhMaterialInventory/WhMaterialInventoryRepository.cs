@@ -308,7 +308,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpPointByBarCodeSql, commands);
+        }
 
+        /// <summary>
+        /// 批量更新更新状态和数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateWhMaterialInventoryStatusAndQtyByIdRangeAsync(IEnumerable<UpdateWhMaterialInventoryStatusAndQtyByIdCommand> commands)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateWhMaterialInventoryStatusAndQtyByIdSql, commands);
         }
 
         /// <summary>
@@ -343,6 +353,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpStatusByIdsSql, command);
+        }
+
+
+        /// <summary>
+        /// 更新状态（批量--不操作数量）
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns> 
+        public async Task<int> UpdateAndCheckStatusByIdAsync(IEnumerable<UpdateAndCheckStatusByIdCommand> commands)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateAndCheckStatusByIdSql, commands);
         }
 
         /// <summary>
@@ -444,7 +466,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateQuantityResidueRangeSql, updateQuantityCommand);
         }
-        
+
 
         /// <summary>
         /// 更新库存数量(减少库存)
@@ -533,6 +555,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             return await conn.ExecuteAsync(ScrapPartialWhMaterialInventoryByIdSql, commands);
         }
 
+        /// <summary>
+        ///修改库存数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatePartialWhMaterialInventoryByIdAsync(IEnumerable<UpdatePartialWhMaterialInventoryByIdCommand> commands)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdatePartialWhMaterialInventoryByIdSql, commands);
+        }
+
         #region 顷刻
 
         /// <summary>
@@ -581,7 +614,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateIncreaseQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue + @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateReduceQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue - @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateReduceQuantityResidueWithCheckSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue - @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode AND QuantityResidue = @QuantityOriginal; ";
-        
+
         const string UpdateReduceQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue - @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         /// <summary>
         /// 按实际传入
@@ -591,8 +624,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
 
         const string UpPointByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpdateWhMaterialInventoryStatusAndQtyByIdSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id; ";
         const string UpStatusByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode = @BarCode; ";
         const string UpStatusByIdsSql = "UPDATE wh_material_inventory SET Status = @Status,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
+        const string UpdateAndCheckStatusByIdSql = "UPDATE wh_material_inventory SET Status = @Status,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND Status=@CurrentStatus";
         const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET QuantityResidue = 0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE SiteId = @SiteId AND MaterialBarCode IN @BarCodeList";
         const string UpdateWhMaterialInventoryEmptyByIdSql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id = @Id ";
@@ -615,7 +650,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
         const string UpdateQuantityResidueBySfcsSql = "UPDATE wh_material_inventory SET QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode IN @Sfcs AND QuantityResidue >0  ";
         const string ScrapPartialWhMaterialInventoryByIdSql = "UPDATE wh_material_inventory SET QuantityResidue = @Qty,ScrapQty = @ScrapQty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id=@Id AND QuantityResidue =@CurrentQuantityResidue ";
-
+        const string UpdatePartialWhMaterialInventoryByIdSql = "UPDATE wh_material_inventory SET QuantityResidue = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id=@Id AND QuantityResidue =@CurrentQuantityResidue ";
 
         #region 顷刻
 

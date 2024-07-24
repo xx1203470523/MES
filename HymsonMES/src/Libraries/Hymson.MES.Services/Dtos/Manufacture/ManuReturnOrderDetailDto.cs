@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Warehouse;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -244,7 +245,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
         /// </summary>
-        public WhWarehouseReturnStatusEnum? Status { get; set; }
+        public WhWarehouseMaterialReturnStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 领料时间

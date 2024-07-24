@@ -1,6 +1,7 @@
 ﻿
 
 using Hymson.MES.HttpClients.Requests;
+using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -21,17 +21,6 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long MaterialId { get; set; }
 
-        /// <summary>
-        /// 物料编码
-        /// </summary>
-        public string MaterialCode { get; set; }
-
-        /// <summary>
-        /// 物料版本
-        /// </summary>
-        public string Version { get; set; }
-
-        /// <summary>
         /// 物料条码
         /// </summary>
         public string MaterialBarCode { get; set; }
@@ -39,7 +28,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 物料批次
         /// </summary>
-        public string Batch { get; set; }
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 退料数量
@@ -56,20 +45,17 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long SupplierId { get; set; }
 
-        /// <summary>
-        /// 供应商编码
-        /// </summary>
-        public string SupplierCode { get; set; }
 
         /// <summary>
         /// 物料的有效期（过期时间)
         /// </summary>
-        public DateTime ExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
         /// <summary>
         /// 物料描述
         /// </summary>
-        public string Remark { get; set; }
+
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 站点Id
@@ -77,8 +63,8 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long SiteId { get; set; }
 
         /// <summary>
-        /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
+        /// 是否被接收
         /// </summary>
-        public WhWarehouseReturnStatusEnum? Status { get; set; }
+        public YesOrNoEnum? IsReceived { get; set; }
     }
 }

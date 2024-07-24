@@ -204,7 +204,7 @@ namespace Hymson.MES.Services.Services.Quality
                 SiteId = returnEntity.SiteId,
                 InspectionOrder = inspectionOrder,
                 ReturnOrderId = returnEntity.Id,
-                WorkOrderId = returnEntity.SourceWorkOrderId,
+                WorkOrderId = returnEntity.ReturnWarehouseId,
                 Status = IQCLiteStatusEnum.WaitInspect,
                 IsQualified = null,
                 CreatedBy = user,

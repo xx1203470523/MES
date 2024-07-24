@@ -61,6 +61,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         Task<int> UpdatePointByBarCodeRangeAsync(IEnumerable<UpdateStatusByBarCodeCommand> commands);
 
         /// <summary>
+        /// 更新数量和状态
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateWhMaterialInventoryStatusAndQtyByIdRangeAsync(IEnumerable<UpdateWhMaterialInventoryStatusAndQtyByIdCommand> commands);
+
+        /// <summary>
         /// 更新状态（批量）
         /// </summary>
         /// <param name="command"></param>
@@ -73,6 +80,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="command"></param>
         /// <returns></returns> 
          Task<int> UpdateStatusByIdsAsync(UpdateStatusByIdCommand command);
+
+        /// <summary>
+        ///更新状态
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateAndCheckStatusByIdAsync(IEnumerable<UpdateAndCheckStatusByIdCommand> commands);
 
         /// <summary>
         /// 更新状态（批量--不操作数量）
@@ -249,6 +263,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="commands"></param>
         /// <returns></returns>
         Task<int> ScrapPartialWhMaterialInventoryByIdAsync(IEnumerable<ScrapPartialWhMaterialInventoryByIdCommand> commands);
+
+        /// <summary>
+        /// 修改库存数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdatePartialWhMaterialInventoryByIdAsync(IEnumerable<UpdatePartialWhMaterialInventoryByIdCommand> commands);
 
         #region 顷刻
 

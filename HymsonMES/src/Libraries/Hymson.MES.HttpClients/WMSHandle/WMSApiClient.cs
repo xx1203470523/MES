@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests.WMS;
+using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Microsoft.Extensions.Options;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -58,6 +59,35 @@ namespace Hymson.MES.HttpClients
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReturnRoute, dto);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
+            return httpResponse.IsSuccessStatusCode;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<bool> WarehousingEntryRequestAsync(WarehousingEntryDto request)
+        {
+            WarehousingEntryRequest materialReturnRequest = new WarehousingEntryRequest()
+            {
+                Type = request.Type,
+                WarehouseCode = request.WarehouseCode,
+                SyncCode = request.SyncCode,
+                SendOn = request.SendOn,
+                SupplierCode = request.SupplierCode,
+                CustomerCode = request.CustomerCode,
+                PurchaseType = request.PurchaseType,
+                InboundCategory = request.InboundCategory,
+                IsAutoExecute = request.IsAutoExecute,
+                CreatedBy = request.CreatedBy,
+                Remark = request.Remark,
+                Details = request.Details
+            };
+            
+            var httpResponse = await _httpClient.PostAsJsonAsync<WarehousingEntryRequest>(_options.Value.Receipt.RoutePath, materialReturnRequest);
+
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
             return httpResponse.IsSuccessStatusCode;
         }
 
