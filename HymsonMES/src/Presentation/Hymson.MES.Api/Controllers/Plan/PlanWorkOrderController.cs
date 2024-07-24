@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
-using Hymson.MES.Services.Services.Plan;
+using Hymson.MES.Services.Services.Plan.PlanWorkOrder;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 

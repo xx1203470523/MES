@@ -60,6 +60,13 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         Task<IEnumerable<ProcQualificationAuthenticationDto>> GetProcedureAuthSetListAsync(long procedureId);
 
         /// <summary>
+        /// 获取子步骤设置
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceConfigSubstepDto>> GetProcedureSubStepListAsync(long procedureId);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procProcedureCreateDto"></param>

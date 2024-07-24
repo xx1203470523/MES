@@ -1,11 +1,6 @@
-﻿using Hymson.SqlActuator.Services;
-using Microsoft.Extensions.Logging;
+﻿using Hymson.Logging.Services;
+using Hymson.SqlActuator.Services;
 using Quartz;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.BackgroundTasks.Jobs
 {
@@ -13,12 +8,12 @@ namespace Hymson.MES.BackgroundTasks.Jobs
     internal class SqlExecuteJob : IJob
     {
         private readonly ISqlExecuteTaskService _sqlExecuteTaskService;
-        private readonly ILogger<SqlExecuteJob> _logger;
+        private readonly IAlarmLogService _alarmLogService;
 
-        public SqlExecuteJob(ISqlExecuteTaskService sqlExecuteTaskService,ILogger<SqlExecuteJob> logger)
+        public SqlExecuteJob(ISqlExecuteTaskService sqlExecuteTaskService, IAlarmLogService alarmLogService)
         {
-            _sqlExecuteTaskService = sqlExecuteTaskService;
-            _logger = logger;
+                _sqlExecuteTaskService = sqlExecuteTaskService;
+            _alarmLogService = alarmLogService;
         }
         public async Task Execute(IJobExecutionContext context)
         {
@@ -28,7 +23,7 @@ namespace Hymson.MES.BackgroundTasks.Jobs
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "后台执行sql语句出错:");
+                _alarmLogService.WriteAlarmLogEntry(new Logging.AlarmLogEntry("后台执行sql语句出错:" + ex.Message, ex.StackTrace ?? ""));
             }
         }
     }

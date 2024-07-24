@@ -1,13 +1,10 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
-using Hymson.MES.Data.Repositories.Plan.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -30,17 +27,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> InsertAsync(EquToolingTypeEntity entity)
         {
-            try
-            {
-                using var conn = GetMESDbConnection();
-                return await conn.ExecuteAsync(InsertSql, entity);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
@@ -48,7 +36,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<EquSparePartsGroupEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<EquToolingTypeEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -70,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(IEnumerable<EquSparePartsGroupEntity> entities)
+        public async Task<int> UpdateRangeAsync(IEnumerable<EquToolingTypeEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, entities);
@@ -92,19 +80,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
-            try
-            {
-                using var conn = GetMESDbConnection();
-                return await conn.ExecuteAsync(DeletesSql, command);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeletesSql, command);
         }
 
         /// <summary>
@@ -126,10 +105,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<EquSparePartsGroupEntity> GetByCodeAsync(EntityByCodeQuery query)
+        public async Task<EquToolingTypeEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<EquSparePartsGroupEntity>(GetByCodeSql, query);
+            return await conn.QueryFirstOrDefaultAsync<EquToolingTypeEntity>(GetByCodeSql, query);
         }
 
         /// <summary>
@@ -139,17 +118,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<EquToolingTypeEntity> GetByIdAsync(long id)
         {
-            try
-            {
-                using var conn = GetMESDbConnection();
-                return await conn.QueryFirstOrDefaultAsync<EquToolingTypeEntity>(GetByIdSql, new { Id = id });
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-          
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<EquToolingTypeEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -157,10 +127,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquSparePartsGroupEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquToolingTypeEntity>> GetByIdsAsync(IEnumerable<long>  ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquSparePartsGroupEntity>(GetByIdsSql, new { Ids = ids });
+            return await conn.QueryAsync<EquToolingTypeEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -168,12 +138,19 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquSparePartsGroupEntity>> GetEntitiesAsync(EquSparePartsGroupQuery query)
+        public async Task<IEnumerable<EquToolingTypeEntity>> GetEntitiesAsync(EquToolingTypeQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquSparePartsGroupEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+            if (query.Codes!=null&& query.Codes.Any())
+            {
+                sqlBuilder.Where("Code IN @Codes");
+            }
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquSparePartsGroupEntity>(template.RawSql, query);
+            return await conn.QueryAsync<EquToolingTypeEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -222,9 +199,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var totalCount = await totalCountTask;
             return new PagedInfo<EquToolingTypeEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
     }
-
 
     /// <summary>
     /// 
@@ -235,11 +210,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_tooling_type_manage` /**where**/ ";
         const string GetEquSparePartsGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `equ_sparepart_type` /**where**/  ";
-
+                                           FROM `equ_tooling_type_manage` /**where**/  ";
+            
         const string InsertSql = "INSERT INTO `equ_tooling_type_manage`(  `Id`, `Code`, `Name`, `Status`, `Calibration`, `LifeSpan`, `Cycle`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Status, @Calibration, @LifeSpan, @Cycle,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `equ_sparepart_type`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        
+        const string InsertsSql = "INSERT INTO `equ_tooling_type_manage`(  `Id`, `Code`, `Name`, `Status`, `Calibration`, `LifeSpan`, `Cycle`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Status, @Calibration, @LifeSpan, @Cycle,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+
         //更新equ_tools_type_equipment_group_relation 工具类型和设备组关系表
         const string UpdateEquipmentSql = "UPDATE `equ_tools_type_equipment_group_relation` SET   ToolTypeId = @ToolTypeId  WHERE Id = @Id ";
         //更新equ_tools_type_material_relation 工具类型和物料关系表     
@@ -247,9 +222,9 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         //更新equ_tooling_type_manage 工具类型管理
         const string UpdateSql = "UPDATE `equ_tooling_type_manage` SET   Code = @Code, Name = @Name, Status = @Status, Calibration = @Calibration, LifeSpan = @LifeSpan, Cycle = @Cycle, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_sparepart_type` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `equ_tooling_type_manage` SET   Code = @Code, Name = @Name, Status = @Status, Calibration = @Calibration, LifeSpan = @LifeSpan, Cycle = @Cycle, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE `equ_sparepart_type` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `equ_tooling_type_manage` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
         const string DeletesSql = "UPDATE `equ_tooling_type_manage` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string DeleteEquipmentGroupSql = "DELETE FROM equ_tools_type_equipment_group_relation WHERE ToolTypeId IN @Ids";

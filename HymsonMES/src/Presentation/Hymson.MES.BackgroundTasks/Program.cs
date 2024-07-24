@@ -44,7 +44,7 @@ Host.CreateDefaultBuilder(args)
        services.AddPrintBackgroundService(hostContext.Configuration);
        services.AddClearCacheService(hostContext.Configuration);
        services.AddPrintService(hostContext.Configuration);
-       
+       services.AddTraceLogService();
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
        var programName = hostContext.Configuration.GetSection("Quartz").GetValue<string>("ProgramName");
        // Add the required Quartz.NET services

@@ -417,6 +417,16 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(template.RawSql, template.Parameters);
         }
+
+        public async Task<IEnumerable<ProcProcedureEntity>> GetBySiteIdAsync(long siteId)
+        {
+            var cachedKey = $"{CachedTables.PROC_PROCEDURE}&SiteId={siteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(cachedKey, async (cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<ProcProcedureEntity>(GetBySiteIdSql, new { SiteId= siteId });
+            });
+        }
     }
 
     /// <summary>
@@ -437,7 +447,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateSql = "UPDATE `proc_procedure` SET  Name = @Name, Type = @Type, PackingLevel = @PackingLevel, ResourceTypeId = @ResourceTypeId, Cycle = @Cycle, IsRepairReturn = @IsRepairReturn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsRejudge=@IsRejudge,IsValidNGCode=@IsValidNGCode WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_procedure` SET IsDeleted =Id,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
         const string GetByIdSql = @"SELECT * FROM `proc_procedure`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM `proc_procedure`  WHERE Id IN @ids and IsDeleted=0  ";
+        const string GetBySiteIdSql = @"SELECT * FROM `proc_procedure`  WHERE SiteId = @SiteId AND IsDeleted=0";
+        const string GetByIdsSql = @"SELECT * FROM `proc_procedure`  WHERE Id IN @ids AND IsDeleted=0  ";
         const string GetByCodeSql = "SELECT * FROM proc_procedure WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
 
         const string GetProcProdureByResourceIdSql = "SELECT P.* FROM proc_procedure P INNER JOIN  proc_resource R ON R.ResTypeId = P.ResourceTypeId WHERE R.IsDeleted = 0 AND P.IsDeleted = 0 AND R.SiteId = @SiteId AND P.SiteId = @SiteId AND R.Id = @ResourceId";

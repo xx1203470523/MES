@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -91,6 +92,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 备注 
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 作业规则
+        /// </summary>
+        public List<InteJobConfigDto> ConfigList { get; set; }
     }
 
     /// <summary>
@@ -119,6 +125,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 备注 
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 作业规则
+        /// </summary>
+        public List<InteJobConfigDto> ConfigList { get; set; }
     }
 
     /// <summary>
@@ -142,6 +153,22 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 类程序 
         /// </summary>
         public string? ClassProgram { get; set; }
+    }
+
+    /// <summary>
+    /// 作业配置Dto
+    /// </summary>
+    public record InteJobConfigDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 设定值
+        /// </summary>
+        public string SetValue { get; set; } = "";
+
+        /// <summary>
+        /// 规则名称
+        /// </summary>
+        public string RuleName { get; set; }
     }
 }
 

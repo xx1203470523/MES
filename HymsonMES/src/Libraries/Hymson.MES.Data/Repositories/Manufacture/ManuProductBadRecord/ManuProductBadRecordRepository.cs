@@ -525,22 +525,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateStatusByIdSql = "UPDATE manu_product_bad_record SET Remark = @Remark, Status = @Status, DisposalResult = @DisposalResult, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id = @Id AND Status != @Status ";
 
         const string GetPagedInfoReportDataSqlTemplate = @"
-                    select 
-                            rbr.UnqualifiedId, COUNT(rbr.SFC) as num 
-                    from manu_product_bad_record rbr
-                    LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
-
-                    -- LEFT join manu_sfc s on s.SFC=rbr.SFC
-                    left join manu_sfc_info si on si.Id= rbr.SfcInfoId -- 为了获取关联信息
-
-                    LEFT JOIN proc_material m on m.Id=si.ProductId  -- 为了查询物料编码
-                    LEFT join plan_work_order o on o.Id=si.WorkOrderId -- 为了查询工单编码
-
-                    /**where**/
-                    GROUP BY rbr.UnqualifiedId 
-                    ORDER BY num desc
-
-                    LIMIT @Offset,@Rows 
+                     SELECT * 
+                     FROM (
+                      SELECT 
+          rbr.UnqualifiedId, COUNT( DISTINCT rbr.SFC) AS num 
+          FROM manu_product_bad_record rbr
+          LEFT JOIN proc_procedure p ON p.Id=rbr.OutflowOperationId -- 为了查询工序编码
+       -- LEFT JOIN manu_sfc s on s.SFC=rbr.SFC
+          LEFT JOIN manu_sfc_info si ON si.Id= rbr.SfcInfoId  AND si.IsUsed=1 -- 为了获取关联信息
+          LEFT JOIN proc_material m ON m.Id=si.ProductId  -- 为了查询物料编码
+          LEFT JOIN plan_work_order o ON o.Id=si.WorkOrderId -- 为了查询工单编码
+          /**where**/ 
+	      GROUP BY rbr.UnqualifiedId 
+          ) AS TAB 
+           ORDER BY  num DESC
+          LIMIT @Offset,@Rows 
                      ";
         const string GetPagedInfoReportCountSqlTemplate = @" 
                     select 

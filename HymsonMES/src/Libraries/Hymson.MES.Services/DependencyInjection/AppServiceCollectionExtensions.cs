@@ -28,10 +28,8 @@ namespace Microsoft.Extensions.DependencyInjection
             AddConfig(services, configuration);
 
             AddServices(services);
-            AddServicesForXinShiJie(services);
 
             AddValidators(services);
-            AddValidatorsForXinShiJie(services);
 
             return services;
         }

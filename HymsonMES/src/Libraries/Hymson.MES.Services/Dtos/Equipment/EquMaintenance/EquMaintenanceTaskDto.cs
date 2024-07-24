@@ -170,6 +170,7 @@ namespace Hymson.MES.Services.Dtos.Equipment.EquMaintenance
         /// 是否延期
         /// </summary>
         public TrueOrFalseEnum? IsDefer { get; set; }
+        public string? IsDeferText { get; set; }
 
         /// <summary>
         /// 计划备注
