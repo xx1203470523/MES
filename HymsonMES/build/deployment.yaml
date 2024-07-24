@@ -3,38 +3,38 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: hymson-mes-api
-  name: hymson-mes-api
+    app: mes-api
+  name: mes-api
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: hymson-mes-api
+      app: mes-api
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: hymson-mes-api
+        app: mes-api
     spec:
       containers:
       - image: nuget.czhipu.com/xnebula/hymson.mes.api:20240723103454
-        name: hymson-mes-api
+        name: mes-api
         resources: {}
         ports: 
-          - name: hymson-mes-api-svc        #端口的名称
+          - name: mes-api-svc        #端口的名称
             containerPort: 80  #容器需要监听的端口号
 status: {}
 ---
 apiVersion: apps/v1
 kind: Service
 metadata:
-  name: hymson-mes-api-service
+  name: mes-api-service
 spec:
   selector:
-    app: hymson-mes-api
+    app: mes-api
   ports:
-  - name: hymson-mes-api-service-port
+  - name: mes-api-service-port
     protocol: TCP
     port: 20001
-    targetPort: hymson-mes-api-svc 
+    targetPort: mes-api-svc 
