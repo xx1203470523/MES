@@ -118,6 +118,7 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
+using System.Reflection;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -280,6 +281,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquToolingTypeEntity, EquToolingTypeDto>();
             CreateMap<EquToolingTypeSaveDto, EquToolingTypeEntity>();
 
+            CreateMap<EquToolsTypePagedQueryDto, EquToolsTypePagedQuery>();
+            CreateMap<EquToolsTypeEntity, EquToolsTypeDto>();
+            CreateMap<EquToolsTypeSaveDto, EquToolsTypeEntity>();
             #endregion
 
             #region EquToolsManage
@@ -1607,6 +1611,12 @@ namespace Hymson.MES.Services.Mapper
             #region MarkingInterceptReport
             CreateMap<MarkingInterceptReportPagedQueryDto, MarkingReportReportPagedQuery>();
             CreateMap<MarkingRecordQueryReportView, MarkingRecordReportDto>();
+            #endregion
+
+            #region 追溯
+            CreateMap<ManuSfcSummaryEntity, ProcedureSourceDto>();
+            CreateMap<ManuBarCodeRelationEntity, MaterialSourceDto>();
+            CreateMap<ManuSfcStepEntity, StepSourceDto>();
             #endregion
         }
 

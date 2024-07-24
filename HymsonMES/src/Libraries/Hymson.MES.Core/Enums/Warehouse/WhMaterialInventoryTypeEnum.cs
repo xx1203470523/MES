@@ -32,93 +32,98 @@ namespace Hymson.MES.Core.Enums
         ManuComplete = 4,
 
         /// <summary>
-        /// 步骤控制
-        /// </summary>
-        [Description("步骤控制")]
-        StepControl = 5,
-
-        /// <summary>
         /// 库存维护   (仅仅做记录使用)
         /// </summary>
         [Description("库存维护")]
         InventoryModify = 6,
 
         /// <summary>
-        /// 条码拆分
-        /// </summary>
-        [Description("条码拆分")]
-        Split = 7,
-
-        /// <summary>
-        /// 条码合并
-        /// </summary>
-        [Description("条码合并")]
-        Merge = 8,
-
-        /// <summary>
-        /// 离脱
-        /// </summary>
-        [Description("离脱")]
-        Detachment = 9,
-
-        // <summary>
-        /// 物料报废
-        /// </summary>
-        [Description("物料报废")]
-        MaterialScrapping = 10,
-
-        /// <summary>
-        /// 取消报废
-        /// </summary>
-        [Description("取消报废")]
-        CancelScrapping = 11,
-
-        /// <summary>
         /// 物料拆分
         /// </summary>
         [Description("物料拆分")]
-        MaterialBarCodeSplit = 12,
+        MaterialBarCodeSplit = 7,
 
         /// <summary>
         /// 物料合并
         /// </summary>
         [Description("物料合并")]
-        MaterialBarCodeMerge = 13,
+        MaterialBarCodeMerge = 8,
 
         /// <summary>
         /// 物料锁定
         /// </summary>
         [Description("物料锁定")]
-        MaterialBarCodeLock = 15,
+        MaterialBarCodeLock = 9,
 
         /// <summary>
         /// 物料解锁
         /// </summary>
         [Description("物料解锁")]
-        MaterialBarCodeUnLock = 16 ,
+        MaterialBarCodeUnLock = 10,
 
         /// <summary>
-        /// 不良录入
+        /// 物料不良录入
         /// </summary>
-        [Description("不良录入")]
-        BadEntry = 17,
+        [Description("物料不良录入")]
+        BadEntry = 11,
 
         /// <summary>
         /// 不良处置
         /// </summary>
         [Description("不良处置")]
-        BadDisposal = 18,
+        BadDisposal = 12,
 
+        /// <summary>
+        /// 物料拆分新增
+        /// </summary>
+        [Description("物料拆分新增")]
+        SplitAdd = 13,
+
+        /// <summary>
+        /// 物料合并新增
+        /// </summary>
+        [Description("物料合并新增")]
+        CombinedAdd = 14,
+
+        // <summary>
+        /// 物料报废
+        /// </summary>
+        [Description("物料报废")]
+        MaterialScrapping = 15,
+
+        /// <summary>
+        /// 取消报废
+        /// </summary>
+        [Description("取消报废")]
+        CancelScrapping = 16,
+
+        /// <summary>
+        /// 离脱
+        /// </summary>
+        [Description("离脱")]
+        Detachment = 17,
+
+        /// <summary>
+        /// 物料卸载
+        /// </summary>       
+        [Description("物料卸载")]
+        MaterialUnloading = 18,
+
+        /// <summary>
+        /// 步骤控制
+        /// </summary>
+        [Description("步骤控制")]
+        StepControl = 19,
         /// <summary>
         /// 退料申请
         /// </summary>
         [Description("退料申请")]
-        ReturnApplication = 19,
+        ReturnApplication = 20,
 
         /// <summary>
         /// 退料确认
         /// </summary>
         [Description("退料确认")]
-        ReturnApplicationConfirm = 19
+        ReturnApplicationConfirm = 21
     }
 }

@@ -117,9 +117,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+            if (!string.IsNullOrWhiteSpace(query.ReturnOrderCode))
+            {
+                query.ReturnOrderCode = $"%{query.ReturnOrderCode}%";
+                sqlBuilder.Where("ReturnOrderCode LIKE @ReturnOrderCode");
+            }
+            sqlBuilder.AddParameters(query);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuReturnOrderEntity>(template.RawSql, query);
         }
+
 
         /// <summary>
         /// 查询单个实体
@@ -159,9 +168,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             if (pagedQuery.Type.HasValue) sqlBuilder.Where(" Type = @Type ");
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.ReqOrderCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ReturnOrderCode))
             {
-                sqlBuilder.Where(" ReturnOrderCode = @ReqOrderCode ");
+                sqlBuilder.Where(" ReturnOrderCode = @ReturnOrderCode ");
             }
 
             if (pagedQuery.SourceWorkOrderIds != null) sqlBuilder.Where(" WorkOrderId IN @SourceWorkOrderIds ");
@@ -202,6 +211,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
     }
 
+
     /// <summary>
     /// 
     /// </summary>
@@ -209,15 +219,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM manu_return_order /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_return_order /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_return_order /**where**/  LIMIT 1 ";
-        const string GetSingleEntitySqlTemplate = @"SELECT /**select**/ FROM manu_return_order /**where**/  ";
-        const string InsertSql = "INSERT INTO manu_return_order(  `Id`, `ReturnOrderCode`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, ReturnWarehouseId, `ReceiveWarehouseId`) VALUES (  @Id, @ReqOrderCode, @Type, @Status,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ReturnWarehouseId, @ReceiveWarehouseId) ";
-        const string InsertsSql = "INSERT INTO manu_return_order(  `Id`, `ReturnOrderCode`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, ReturnWarehouseId, `ReceiveWarehouseId`) VALUES (  @Id, @ReqOrderCode, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ReturnWarehouseId, @ReceiveWarehouseId) ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_return_order /**where**/  ";
+        const string GetSingleEntitySqlTemplate = @"SELECT /**select**/ FROM manu_return_order /**where**/ LIMIT 1 ";
+        const string InsertSql = "INSERT INTO manu_return_order(  `Id`, `ReturnOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, ReturnWarehouseId, `ReceiveWarehouseId`) VALUES (  @Id, @ReturnOrderCode, @WorkOrderId, @Type, @Status,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ReturnWarehouseId, @ReceiveWarehouseId) ";
+        const string InsertsSql = "INSERT INTO manu_return_order(  `Id`, `ReturnOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, ReturnWarehouseId, `ReceiveWarehouseId`) VALUES (  @Id, @ReturnOrderCode, @WorkOrderId, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ReturnWarehouseId, @ReceiveWarehouseId) ";
 
-        const string UpdateSql = "UPDATE manu_return_order SET   ReturnOrderCode = @ReturnOrderCode,   Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, ReturnWarehouseId = @ReturnWarehouseId, ReceiveWarehouseId = @ReceiveWarehouseId WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE manu_return_order SET   ReturnOrderCode = @ReturnOrderCode, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, ReturnWarehouseId = @ReturnWarehouseId, ReceiveWarehouseId = @ReceiveWarehouseId WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE manu_return_order SET ReturnOrderCode = @ReturnOrderCode, WorkOrderId = @WorkOrderId, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, ReturnWarehouseId = @ReturnWarehouseId, ReceiveWarehouseId = @ReceiveWarehouseId WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE manu_return_order SET ReturnOrderCode = @ReturnOrderCode, WorkOrderId = @WorkOrderId, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, ReturnWarehouseId = @ReturnWarehouseId, ReceiveWarehouseId = @ReceiveWarehouseId WHERE Id = @Id ";
         const string UpdateManuReturnOrderStatusByIdSql = "UPDATE manu_return_order SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-
         const string DeleteSql = "UPDATE manu_return_order SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE manu_return_order SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 

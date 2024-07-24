@@ -1,6 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Integrated;
-using System.Xml;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.SystemServices.Dtos
 {
@@ -64,7 +64,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 工序编码
         /// </summary>
-        public string? ProcedureCode { get; set; } = "";
+        public string ProcedureCode { get; set; } = "";
 
         /// <summary>
         /// 物料用量
@@ -75,6 +75,11 @@ namespace Hymson.MES.SystemServices.Dtos
         /// 物料损耗
         /// </summary>
         public decimal MaterialLoss { get; set; }
+
+        /// <summary>
+        /// Bom联副产品类型
+        /// </summary>
+        public ManuProductTypeEnum? BomProductType { get; set; } = ManuProductTypeEnum.Normal;
 
         /// <summary>
         /// 物料的替代料列表
@@ -132,7 +137,7 @@ namespace Hymson.MES.SystemServices.Dtos
         /// 替代比
         /// </summary>
         public decimal Proportion { get; set; }
-        
+
         /// <summary>
         /// 生效日期
         /// </summary>

@@ -31,8 +31,23 @@
         public const string NioManuData = "NioManuData";
 
         /// <summary>
-        /// 一次良率
+        /// 产品一次良率
         /// </summary>
         public const string NioPassrateProduct = "NioPassrateProduct";
+
+        /// <summary>
+        /// 工序一次良率
+        /// </summary>
+        public const string NioPassrateProcedure = "NioPassrateProcedure";
+
+        /// <summary>
+        /// 物料追溯
+        /// </summary>
+        public const string NioMaterial = "NioMaterial";
+
+        /// <summary>
+        /// 转子线包装列表
+        /// </summary>
+        public const string RotorPackList = "RotorPackList";
     }
 }

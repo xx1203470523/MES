@@ -9,7 +9,6 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
-using Hymson.MES.CoreServices.Bos.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -22,7 +21,6 @@ using Hymson.MES.Data.Repositories.WHMaterialReceipt;
 using Hymson.MES.Data.Repositories.WhMaterialReceiptDetail;
 using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Requests.WMS;
-using Hymson.MES.HttpClients.RotorHandle;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
@@ -335,9 +333,8 @@ namespace Hymson.MES.Services.Services.Quality
             orderEntity.UpdatedBy = user;
             orderEntity.UpdatedOn = time;
 
-            // TODO: 将结果推送给WMS
-            var wmsRequestDto = new IQCReceiptRequestDto { };
-            await _wmsApiClient.IQCReceiptCallBackAsync(wmsRequestDto);
+            // 回调WMS
+            await IQCReceiptCallBackAsync(orderEntity, updateDetailEntities);
 
             // 保存
             var rows = 0;
@@ -806,6 +803,58 @@ namespace Hymson.MES.Services.Services.Quality
             return dtos;
         }
 
+        /// <summary>
+        /// IQC回调（来料）
+        /// </summary>
+        /// <param name="orderEntity"></param>
+        /// <param name="updateDetailEntities"></param>
+        /// <returns></returns>
+        private async Task IQCReceiptCallBackAsync(QualIqcOrderLiteEntity orderEntity, List<QualIqcOrderLiteDetailEntity> updateDetailEntities)
+        {
+            // 读取收货单
+            var receiptEntity = await _whMaterialReceiptRepository.GetByIdAsync(orderEntity.MaterialReceiptId);
+
+            // 读取收货单明细
+            var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
+            {
+                SiteId = orderEntity.SiteId,
+                MaterialReceiptId = orderEntity.MaterialReceiptId
+            });
+
+            if (receiptEntity == null) return;
+            if (!orderEntity.SupplierId.HasValue) return;
+
+            // 读取供应商
+            var supplierEntity = await _whSupplierRepository.GetByIdAsync(orderEntity.SupplierId.Value);
+
+            List<IQCReceiptMaterialResultDto> details = new();
+            foreach (var item in updateDetailEntities)
+            {
+                var receiptDetailEntity = receiptDetailEntities.FirstOrDefault(f => f.Id == item.MaterialReceiptDetailId);
+                if (receiptDetailEntity == null) continue;
+
+                details.Add(new IQCReceiptMaterialResultDto
+                {
+                    MaterialCode = receiptDetailEntity.MaterialBatchCode,
+                    PlanQty = receiptDetailEntity.PlanQty,
+                    Qty = receiptDetailEntity.Qty,
+                    IsQualified = item.IsQualified ?? TrueOrFalseEnum.No,
+                    BarCode = receiptDetailEntity.BarCode,
+                    SyncId = receiptDetailEntity.SyncId,
+                    WarehouseCode = "TODO"
+                });
+            }
+
+            // 将结果推送给WMS
+            await _wmsApiClient.IQCReceiptCallBackAsync(new IQCReceiptResultDto
+            {
+                ReceiptNum = receiptEntity.ReceiptNum,
+                SupplierCode = supplierEntity?.Code ?? "",
+                SyncCode = receiptEntity.SyncCode,
+                SyncId = receiptEntity.SyncId,
+                Details = details
+            });
+        }
         #endregion
 
     }

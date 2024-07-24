@@ -22,6 +22,7 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Data.Repositories.WhWareHouse;
 using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Hymson.MES.Services.Dtos.Manufacture.WhMaterialReturn;
 using Hymson.Snowflake;
@@ -71,13 +72,13 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
 
         private readonly IWhSupplierRepository _whSupplierRepository;
 
-        private readonly XnebulaWMSOption _options;
+        private readonly IOptions<WMSOptions> _options;
         /// <summary>
         /// 服务接口（检验单生成）
         /// </summary>
         private readonly IIQCOrderCreateService _iqcOrderCreateService;
 
-        private readonly IXnebulaWMSApiClient _wmsRequest;
+        private readonly IWMSApiClient _wmsRequest;
 
         private readonly IQualIqcOrderReturnRepository _qualIqcOrderReturnRepository;
 
@@ -111,6 +112,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
         /// <param name="inteCodeRulesRepository"></param>
         /// <param name="manuGenerateBarcodeService"></param>
         /// <param name="whWarehouseRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
         public WhMaterialReturnService(ICurrentUser currentUser, ICurrentSite currentSite,
             ILocalizationService localizationService,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
@@ -120,7 +122,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
             IWhSupplierRepository whSupplierRepository,
             IIQCOrderCreateService iQCOrderCreateService,
-            IOptions<XnebulaWMSOption> options, IXnebulaWMSApiClient xnebulaWMSApiClient,
+            IOptions<WMSOptions> options, IWMSApiClient xnebulaWMSApiClient,
             IQualIqcOrderReturnRepository qualIqcOrderReturnRepository,
             IQualIqcOrderReturnDetailRepository qualIqcOrderReturnDetailRepository,
             IInteCodeRulesRepository inteCodeRulesRepository,
@@ -138,7 +140,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             _manuReturnOrderDetailRepository = manuReturnOrderDetailRepository;
             _whSupplierRepository = whSupplierRepository;
             _iqcOrderCreateService = iQCOrderCreateService;
-            _options = options.Value;
+            _options = options;
             _wmsRequest = xnebulaWMSApiClient;
             _qualIqcOrderReturnRepository = qualIqcOrderReturnRepository;
             _qualIqcOrderReturnDetailRepository = qualIqcOrderReturnDetailRepository;
@@ -158,7 +160,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             var whWarehouseEntity = await _whWarehouseRepository.GetOneAsync(new Data.Repositories.WhWareHouse.Query.WhWarehouseQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Code = _options.Receipt.WarehouseCode
+                Code = _options.Value.Receipt.WarehouseCode
             });
 
             if (whWarehouseEntity == null)
@@ -194,7 +196,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                 Type = BillBusinessTypeEnum.MaterialReturnForm,
                 IsAutoExecute = param.Type == ManuReturnTypeEnum.WorkOrderBorrow,
                 CreatedBy = _currentUser.UserName,
-                WarehouseCode = _options.Receipt.WarehouseCode,
+                WarehouseCode = _options.Value.Receipt.WarehouseCode,
                 Remark = param.Remark,
             };
 
@@ -212,7 +214,11 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                 Status = WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful,
                 ReceiveWarehouseId = whWarehouseEntity.Id,
                 Type = param.Type,
-                Remark = param.Remark
+                Remark = param.Remark,
+                CreatedBy = _currentUser.UserName,
+                UpdatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedOn = HymsonClock.Now()
             };
 
             if (param.Type == ManuReturnTypeEnum.WorkOrderReturn)
@@ -288,20 +294,27 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedOn = HymsonClock.Now()
-                }
-                );
+                });
 
-                manuReturnOrderDetailEntities.Add(new ManuReturnOrderDetailEntity
+                var manuReturnOrderDetailEntity = new ManuReturnOrderDetailEntity
                 {
                     ReturnOrderId = manuReturnOrderEntity.Id,
                     MaterialId = materialEntity.Id,
+                    WarehouseId = whWarehouseEntity.Id,
                     MaterialBarCode = materialBarCode,
                     Batch = whMaterialInventoryEntity.Batch,
                     Qty = whMaterialInventoryEntity.QuantityResidue,
                     SupplierId = whMaterialInventoryEntity.SupplierId,
                     ExpirationDate = whMaterialInventoryEntity.DueDate,
                     SiteId = whMaterialInventoryEntity.SiteId,
-                });
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
+                };
+
+                manuReturnOrderDetailEntities.Add(manuReturnOrderDetailEntity);
 
                 if (param.Type == ManuReturnTypeEnum.WorkOrderReturn)
                 {
@@ -326,6 +339,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                 warehousingEntryDetails.Add(new ReceiptDetailDto
                 {
                     ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
+                    SyncId = manuReturnOrderDetailEntity.Id,
                     MaterialCode = materialEntity.MaterialCode,
                     LotCode = whMaterialInventoryEntity.Batch,
                     UnitCode = materialEntity.Unit,
@@ -364,7 +378,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
         /// <summary>
         /// 退料单号生成
         /// </summary>
-        /// <param name="bo"></param>
+        /// <param name="siteId"></param>
+        /// <param name="userName"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
         private async Task<string> GenerateMaintenanceOrderCodeAsync(long siteId, string userName)

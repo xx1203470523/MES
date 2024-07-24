@@ -1,12 +1,7 @@
 ﻿using Hymson.MES.HttpClients.Requests;
-using Microsoft.Extensions.Options;
-using System.Net.Http;
-using System.Net;
-using System.Net.Http.Json;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Constants;
-using MailKit.Net.Smtp;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
+using Microsoft.Extensions.Options;
+using System.Net.Http.Json;
 
 namespace Hymson.MES.HttpClients
 {
@@ -25,7 +20,6 @@ namespace Hymson.MES.HttpClients
 
         public async Task<bool> MaterialPickingRequestAsync(MaterialPickingRequestDto request)
         {
-
             MaterialPickingRequest materialPickingRequest = new MaterialPickingRequest()
             {
                 SendOn = request.SendOn,
@@ -41,8 +35,6 @@ namespace Hymson.MES.HttpClients
 
             return httpResponse.IsSuccessStatusCode;
         }
-
-
 
         public async Task<bool> MaterialPickingCancelAsync(MaterialPickingCancelDto request)
         {
@@ -113,36 +105,11 @@ namespace Hymson.MES.HttpClients
                 SendOn = request.SendOn,
                 SyncCode = request.SyncCode,
                 Details = request.Details,
-                Type = _options.ProductReceiptOptions.Type,
-                WarehouseCode = _options.ProductReceiptOptions.WarehouseCode
+                Type = _options.ProductReceipt.Type,
+                WarehouseCode = _options.ProductReceipt.WarehouseCode
             };
 
-            var httpResponse = await _httpClient.PostAsJsonAsync<ProductReceiptRequest>(_options.ProductReceiptOptions.RoutePath, materialReturnRequest);
-
-            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
-            return httpResponse.IsSuccessStatusCode;
-        }
-
-
-        public async Task<bool> WarehousingEntryRequestAsync(WarehousingEntryDto request)
-        {
-            WarehousingEntryRequest materialReturnRequest = new WarehousingEntryRequest()
-            {
-                Type = request.Type,
-                WarehouseCode = request.WarehouseCode,
-                SyncCode = request.SyncCode,
-                SendOn = request.SendOn,
-                SupplierCode = request.SupplierCode,
-                CustomerCode = request.CustomerCode,
-                PurchaseType = request.PurchaseType,
-                InboundCategory = request.InboundCategory,
-                IsAutoExecute = request.IsAutoExecute,
-                CreatedBy = request.CreatedBy,
-                Remark = request.Remark,
-                Details = request.Details
-            };
-
-            var httpResponse = await _httpClient.PostAsJsonAsync<WarehousingEntryRequest>(_options.Receipt.RoutePath, materialReturnRequest);
+            var httpResponse = await _httpClient.PostAsJsonAsync<ProductReceiptRequest>(_options.ProductReceipt.RoutePath, materialReturnRequest);
 
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
             return httpResponse.IsSuccessStatusCode;

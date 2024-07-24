@@ -499,11 +499,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public IEnumerable<WhMaterialInventoryStatusEnum>? Statuss { get; set; }
 
 
-        #region 添加 库存修改功能时添加 karl
-        /// <summary>
-        /// 接收时间  时间范围  数组
-        /// </summary>
-        public DateTime[]? CreatedOnRange { get; set; }
+    #region 添加 库存修改功能时添加 karl
+    /// <summary>
+    /// 接收时间  时间范围  数组
+    /// </summary>
+    public DateTime[]? CreatedOnRange { get; set; }
 
         #endregion
     }
@@ -519,6 +519,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 物料名称
         /// </summary>
         public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料的规格型号
+        /// </summary>
+        public string Specifications { get; set; }
 
         /// <summary>
         /// 物料版本

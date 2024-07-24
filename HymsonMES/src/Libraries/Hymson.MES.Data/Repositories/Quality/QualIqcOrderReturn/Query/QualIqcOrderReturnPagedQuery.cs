@@ -35,11 +35,6 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public TrueOrFalseEnum? IsQualified { get; set; }
 
         /// <summary>
-        /// ID集合（检验单）
-        /// </summary>
-        public IEnumerable<long>? IQCOrderIds { get; set; }
-
-        /// <summary>
         /// ID集合（物料）
         /// </summary>
         public IEnumerable<long>? MaterialIds { get; set; }
@@ -53,6 +48,11 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 退料单Id
         /// </summary>
         public IEnumerable<long>? ReturnOrderIds { get; set; }
+
+        /// <summary>
+        /// 退料单创建时间（时间范围-数组）
+        /// </summary>
+        public DateTime[]? CreatedOn { get; set; }
 
     }
 }

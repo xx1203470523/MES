@@ -859,7 +859,7 @@
         public const string MES13501 = "工具维护失败";
         public const string MES13502 = "新增工具失败";
         public const string MES13503 = "工具类型{ToolTypeCode}不存在";
-        public const string MES13504 = "工具{ToolCode}已经存在";
+        public const string MES13504 = "工具编码{ToolCode}已经存在";
         public const string MES13505 = "编码不可为空";
         public const string MES13506 = "编码长度为50.";
         public const string MES13507 = "名称不可为空";
@@ -871,6 +871,14 @@
         public const string MES13513 = "需要校准时校准周期不可为空";
         public const string MES13514 = "需要校准时校准周期单位不可为空";
         public const string MES13515 = "需要校准时最后校验时间不可为空";
+        public const string MES13516 = "工具类型已被工具引用,不能删除!";
+        public const string MES13517 = "工具{ToolCode}重复";
+        public const string MES13518 = "需要校准时校准周期为正整数";
+        public const string MES13519 = "工具类型关联的设备组不存在";
+        public const string MES13520 = "工具类型关联的物料不存在";
+        public const string MES13521 = "需要校准不可为空";
+        public const string MES13522 = "工具类型{toolTypeCode}已经存在";
+        public const string MES13523 = "工具类型{toolTypeCode}无需校准";
         #endregion
 
         #region 环境检验 13600
@@ -894,6 +902,11 @@
         public const string MES13617 = "检验单号生成失败：环境检验类型编码规则未维护！";
         public const string MES13618 = "检验单号生成失败：编码规则错误，不允许同时存在多条环境检验类型编码规则！";
 
+        #endregion
+
+        #region 备件维护 13700
+        public const string MES13701 = "工具维护失败";
+        public const string MES13702 = "工具类型{codes}已经存在";
         #endregion
 
         #region  14000段项目使用 平台请勿使用
@@ -2310,6 +2323,9 @@
         public const string MES17704 = "设备{code}位置{position}已安装工具，请卸载后再进行操作!";
         public const string MES17705 = "工具无剩余寿命，不可使用!";
         public const string MES17706 = "工具本次使用寿命需大于0";
+        public const string MES17707 = "工具{toolCode}不允许在设备{equipmentCode}使用!";
+        public const string MES17708 = "工具{toolCode}不允许对产品使用!";
+        public const string MES17709 = "工具{toolCode}不允许对产品{productCode}使用!";
         #endregion
 
         #region 子步骤管理 17750

@@ -1,6 +1,10 @@
 ﻿using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests.WMS;
+using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Microsoft.Extensions.Options;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace Hymson.MES.HttpClients
 {
@@ -12,42 +16,79 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 
         /// </summary>
-        private readonly HttpClient _httpClient;
-        private readonly WMSOptions _options;
-
+        private readonly IOptions<WMSOptions> _options;
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="httpClient"></param>
+        private readonly HttpClient _httpClient;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         /// <param name="options"></param>
-        public WMSApiClient(HttpClient httpClient, IOptions<WMSOptions> options)
+        /// <param name="httpClient"></param>
+        public WMSApiClient(IOptions<WMSOptions> options, HttpClient httpClient)
         {
+            _options = options;
+
             _httpClient = httpClient;
-            _options = options.Value;
+            _httpClient.BaseAddress = new Uri(_options.Value.BaseAddressUri);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.Value.SysToken);
         }
 
         /// <summary>
         /// 回调（来料IQC）
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<bool> IQCReceiptCallBackAsync(IQCReceiptRequestDto request)
+        public async Task<bool> IQCReceiptCallBackAsync(IQCReceiptResultDto dto)
         {
-            // TODO
-            await Task.CompletedTask;
-            return false;
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReceiptRoute, dto);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            return httpResponse.IsSuccessStatusCode;
         }
 
         /// <summary>
         /// 回调（退料IQC）
         /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<bool> IQCReturnCallBackAsync(IQCReturnResultDto dto)
+        {
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReturnRoute, dto);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            return httpResponse.IsSuccessStatusCode;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<bool> IQCReturnCallBackAsync(IQCReturnRequestDto request)
+        public async Task<bool> WarehousingEntryRequestAsync(WarehousingEntryDto request)
         {
-            // TODO
-            await Task.CompletedTask;
-            return false;
+            WarehousingEntryRequest materialReturnRequest = new WarehousingEntryRequest()
+            {
+                Type = request.Type,
+                WarehouseCode = request.WarehouseCode,
+                SyncCode = request.SyncCode,
+                SendOn = request.SendOn,
+                SupplierCode = request.SupplierCode,
+                CustomerCode = request.CustomerCode,
+                PurchaseType = request.PurchaseType,
+                InboundCategory = request.InboundCategory,
+                IsAutoExecute = request.IsAutoExecute,
+                CreatedBy = request.CreatedBy,
+                Remark = request.Remark,
+                Details = request.Details
+            };
+            
+            var httpResponse = await _httpClient.PostAsJsonAsync<WarehousingEntryRequest>(_options.Value.Receipt.RoutePath, materialReturnRequest);
+
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+            return httpResponse.IsSuccessStatusCode;
         }
 
     }

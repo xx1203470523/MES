@@ -30,7 +30,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             _manuFeedingService = manuFeedingService;
         }
 
-
         /// <summary>
         /// 查询资源（物料加载）
         /// </summary>
@@ -98,6 +97,5 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             await _manuFeedingService.DeletesAsync(ids);
         }
-
     }
 }

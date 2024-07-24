@@ -54,6 +54,13 @@ namespace Hymson.MES.Data.Repositories.Parameter
         Task<IEnumerable<ManuProductParameterEntity>> GetManuParamMavelAsync(EntityByWaterMarkQuery query);
 
         /// <summary>
+        /// 获取马威NG参数
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductParameterEntity>> GetManuNgParamMavelAsync(EntityByWaterMarkQuery query);
+
+        /// <summary>
         ///查询参数
         /// </summary>
         /// <param name="param"></param>

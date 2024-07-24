@@ -82,4 +82,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query
         public DateTime CreatedOn { get; set; }
     }
 
+    /// <summary>
+    /// 获取工单数量
+    /// </summary>
+    public class WorkOrderQtyQuery
+    {
+        /// <summary>
+        /// 工单数量
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 工单ID列表
+        /// </summary>
+        public List<long> OrderIdList { get; set; }
+    }
+
 }

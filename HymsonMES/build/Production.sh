@@ -1,15 +1,25 @@
 #! /bin/bash
-serviceName=hymson-mes-api-prod
-docker service rm $serviceName
-docker service create \
-  --with-registry-auth \
-  --name $serviceName \
-  --mode global \
-  --publish mode=host,published=30223,target=80 \
-  --env ASPNETCORE_ENVIRONMENT=Production \
-  --env TZ="Asia/Shanghai" \
-  --env SERVICE_CHECK_HTTP=/health \
-  --env SERVICE_NAME={{.Service.Name}} \
-  --hostname="{{.Node.ID}}-{{.Service.Name}}"\
-   --mount type=volume,src=hymsonvolume,dst=/logs \
-   harbor.xnebula.com/new-energy/hymson.mes.api:20231109014106
+PublishEnvironment=Release
+timestamp=$(date +%Y%m%d%H%M%S)
+registryUrl=nuget.czhipu.com/xnebula
+imageName=hymson.mes.api
+sudo docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Api/Dockerfile .
+sudo docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
+sudo docker push $registryUrl/$imageName:$timestamp
+
+imageName=hymson.mes.equipment.api
+sudo docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Equipment.Api/Dockerfile .
+sudo docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
+sudo docker push $registryUrl/$imageName:$timestamp
+
+
+imageName=hymson.mes.backgroundtasks
+sudo docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.BackgroundTasks/Dockerfile .
+sudo docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
+sudo docker push $registryUrl/$imageName:$timestamp
+
+
+imageName=hymson.mes.system.api
+sudo docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.System.Api/Dockerfile .
+sudo docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
+sudo docker push $registryUrl/$imageName:$timestamp

@@ -188,7 +188,6 @@ namespace Hymson.MES.Api.Controllers.Warehouse
             await _whMaterialInventoryService.UpdateOutsideWhMaterialInventoryAsync(modifyDto);
         }
 
-        
         /// <summary>
         /// 物料条码拆分
         /// </summary>
@@ -200,9 +199,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         public async Task<string> BarcodeSplitAdjustAsync(MaterialBarCodeSplitAdjustDto adjustDto)
         {
             return await _whMaterialInventoryService.BarcodeSplitAdjustAsync(adjustDto);
-
         }
-
 
         /// <summary>
         /// 物料合并
@@ -215,17 +212,6 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         public async Task<string> BarcodeMergeAdjustAsync(MaterialBarCodeMergeAdjust adjustDto)
         {
             return await _whMaterialInventoryService.BarcodeMergeAdjustAsync(adjustDto);
-        }
-
-        /// <summary>
-        /// 验证条码 拆分合并
-        /// </summary>
-        /// <param name="sfcs"></param>
-        [HttpPost("mergeAdjustVerifySfcs")]
-        [LogDescription("验证条码", BusinessType.INSERT)]
-        public async Task<bool> MergeAdjustVerifySfcsAsync(string[] sfcs)
-        {
-            return await _whMaterialInventoryService.MergeAdjustVerifySfcAsync(sfcs);
         }
         /// <summary>
         /// 领料申请 按照工单数量领料
@@ -297,6 +283,16 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         public async Task<bool> ProductReceiptCancelAsync([FromBody] MaterialReturnCancel request)
         {
             return await _whMaterialInventoryService.ProductReceiptCancelAsync(request);
+        }
+      /// <summary>
+        /// 根据工单查询工单的领料列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("getByOrderId/{id}")]
+        public async Task<IEnumerable<WhMaterialInventoryDetailDto>> GetPickMaterialsByOrderidAsync(long id)
+        {
+            return await _whMaterialInventoryService.GetPickMaterialsByOrderidAsync(id);
         }
     }
 }

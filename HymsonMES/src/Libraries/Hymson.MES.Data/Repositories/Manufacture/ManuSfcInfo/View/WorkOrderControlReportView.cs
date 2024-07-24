@@ -121,4 +121,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public decimal Qty { get; set; }
     }
+
+    /// <summary>
+    /// 工单数量视图
+    /// </summary>
+    public class WorkOrderQtyView
+    {
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int Qty { get; set; }
+    }
+
 }

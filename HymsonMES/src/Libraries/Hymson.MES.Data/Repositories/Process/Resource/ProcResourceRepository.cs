@@ -585,6 +585,17 @@ namespace Hymson.MES.Data.Repositories.Process
             var procResourceEntities = await conn.QueryAsync<ProcResourceEntity>(template.RawSql, procResourceQuery);
             return procResourceEntities;
         }
+
+        public async Task<IEnumerable<ProcResourceEntity>> GetBySiteIdAsync(long siteId)
+        {
+            var cachedKey = $"{CachedTables.PROC_RESOURCE}&SiteId={siteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(cachedKey, async (cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<ProcResourceEntity>(GetBySiteIdSql, new { SiteId = siteId });
+            });
+
+        }
     }
 
     /// <summary>
@@ -596,6 +607,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByResTypeIdsSql = "select * from proc_resource where SiteId=@SiteId and ResTypeId in @Ids and IsDeleted =0 ";
         const string GetByIdsAndStatusSql = "select * from proc_resource where  Id  in @Ids and Status=@Status";
         const string GetByIdsSql = "select * from proc_resource  WHERE Id IN @ids and IsDeleted=0";
+        const string GetBySiteIdSql = "select * from proc_resource  WHERE SiteId = @SiteId AND IsDeleted=0";
         const string GetByCodeSql = "SELECT * FROM proc_resource WHERE `IsDeleted` = 0 AND SiteId = @Site AND ResCode = @Code LIMIT 1";
         const string GetByResourceCode = "SELECT Id, ResCode FROM proc_resource WHERE IsDeleted = 0 AND ResCode = @ResCode and SiteId =@SiteId ";
         const string GetByEquipmentCode = @"SELECT R.Id, R.ResCode FROM proc_resource_equipment_bind REB 

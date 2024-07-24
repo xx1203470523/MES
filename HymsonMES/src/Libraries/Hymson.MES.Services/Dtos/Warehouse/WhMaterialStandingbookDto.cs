@@ -301,7 +301,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public decimal? Batch { get; set; } = 0;
+        public string? Batch { get; set; } 
 
         /// <summary>
         /// 物料编码
@@ -311,6 +311,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 物料版本
         /// </summary>
-        public string? MaterialVersion { get; set; } 
+        public string? MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public WhMaterialInventoryTypeEnum? Type { get; set; }
     }
 }

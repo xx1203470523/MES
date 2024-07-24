@@ -9,44 +9,44 @@ namespace Hymson.MES.Core.Domain.Process
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class ProcBomDetailEntity: BaseEntity
+    public class ProcBomDetailEntity : BaseEntity
     {
         /// <summary>
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
         public long SiteId { get; set; }
-        
+
         /// <summary>
         /// 描述 :所属BomID 
         /// 空值 : false  
         /// </summary>
         public long BomId { get; set; }
-        
+
         /// <summary>
         /// 描述 :所属工序ID 
         /// 空值 : false  
         /// </summary>
         public long ProcedureId { get; set; }
-        
+
         /// <summary>
         /// 描述 :所属物料ID 
         /// 空值 : false  
         /// </summary>
         public long MaterialId { get; set; }
-        
+
         /// <summary>
         /// 描述 :参考点 
         /// 空值 : true  
         /// </summary>
         public string ReferencePoint { get; set; }
-        
+
         /// <summary>
         /// 描述 :用量 
         /// 空值 : false  
         /// </summary>
         public decimal Usages { get; set; }
-        
+
         /// <summary>
         /// 描述 :损耗 
         /// 空值 : true  
@@ -74,11 +74,11 @@ namespace Hymson.MES.Core.Domain.Process
         /// 序号
         /// </summary>
         public int Seq { get; set; }
-        
+
         /// <summary>
         /// Bom联副产品类型
         /// </summary>
+        public ManuProductTypeEnum BomProductType { get; set; }
 
-        public ManuProductTypeEnum BomProductType {  get; set; }
     }
 }

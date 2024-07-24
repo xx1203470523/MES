@@ -35,11 +35,6 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public TrueOrFalseEnum? IsQualified { get; set; }
 
         /// <summary>
-        /// ID集合（检验单）
-        /// </summary>
-        public IEnumerable<long>? IQCOrderIds { get; set; }
-
-        /// <summary>
         /// ID集合（物料）
         /// </summary>
         public IEnumerable<long>? MaterialIds { get; set; }

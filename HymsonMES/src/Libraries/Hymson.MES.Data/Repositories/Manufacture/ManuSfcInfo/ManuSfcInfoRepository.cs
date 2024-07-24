@@ -218,6 +218,26 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesIsUsedSql, manuSfcInfoUpdateIsUsedCommand);
         }
+
+        /// <summary>
+        /// 马威获取工单数量
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WorkOrderQtyView>> GetWorkOrderQtyMavelAsync(WorkOrderQtyQuery query)
+        {
+            string sql = $@"
+                select WorkOrderId ,count(*) Qty
+                from manu_sfc_step mss 
+                where SiteId  = {query.SiteId}
+                and WorkOrderId in ({string.Join(",",query.OrderIdList)})
+                and Remark  = 'ROP150'
+                group by WorkOrderId 
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<WorkOrderQtyView>(sql);
+        }
         #endregion
 
         /// <summary>

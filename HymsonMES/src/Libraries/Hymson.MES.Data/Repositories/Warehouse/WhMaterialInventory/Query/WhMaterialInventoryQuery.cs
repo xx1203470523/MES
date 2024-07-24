@@ -8,7 +8,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// <summary>
         /// 物料条码
         /// </summary>
-        public string MaterialBarCode { get; set; }
+        public string MaterialBarCode { get; set; } = "";
 
         /// <summary>
         /// 站点id
@@ -19,5 +19,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// 物料条码列表
         /// </summary>
         public IEnumerable<string>? MaterialBarCodes { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
     }
 }

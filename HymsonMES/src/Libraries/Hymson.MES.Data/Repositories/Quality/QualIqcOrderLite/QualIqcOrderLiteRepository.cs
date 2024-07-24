@@ -203,9 +203,8 @@ namespace Hymson.MES.Data.Repositories.Quality
                 pagedQuery.InspectionOrder = $"%{pagedQuery.InspectionOrder}%";
                 sqlBuilder.Where(" InspectionOrder LIKE @InspectionOrder ");
             }
-            if (pagedQuery.IQCOrderIds != null) sqlBuilder.Where(" Id IN @IQCOrderIds ");
-            if (pagedQuery.SupplierIds != null && pagedQuery.SupplierIds.Any()) sqlBuilder.Where(" SupplierId IN @SupplierIds ");
-            if (pagedQuery.ReceiptIds != null && pagedQuery.ReceiptIds.Any()) sqlBuilder.Where(" MaterialReceiptId IN @ReceiptIds ");
+            if (pagedQuery.SupplierIds != null) sqlBuilder.Where(" SupplierId IN @SupplierIds ");
+            if (pagedQuery.ReceiptIds != null) sqlBuilder.Where(" MaterialReceiptId IN @ReceiptIds ");
             if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
             if (pagedQuery.IsQualified.HasValue) sqlBuilder.Where("IsQualified = @IsQualified");
 

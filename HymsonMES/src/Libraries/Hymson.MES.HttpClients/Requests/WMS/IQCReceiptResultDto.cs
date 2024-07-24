@@ -6,7 +6,7 @@ namespace Hymson.MES.HttpClients.Requests.WMS
     /// <summary>
     /// IQC请求Dto
     /// </summary>
-    public record IQCReturnRequestDto : BaseEntityDto
+    public record IQCReceiptResultDto : BaseEntityDto
     {
         /// <summary>
         /// 收货单号
@@ -24,16 +24,26 @@ namespace Hymson.MES.HttpClients.Requests.WMS
         public string Remark { get; set; } = "";
 
         /// <summary>
+        /// 同步编码（WMS需要给ERP）
+        /// </summary>
+        public string? SyncCode { get; set; }
+
+        /// <summary>
+        /// 同步Id（WMS需要给ERP）
+        /// </summary>
+        public long? SyncId { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<IQCReturnMaterialRequestDto>? Details { get; set; }
+        public IEnumerable<IQCReceiptMaterialResultDto>? Details { get; set; }
 
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public record IQCReturnMaterialRequestDto : BaseEntityDto
+    public record IQCReceiptMaterialResultDto : BaseEntityDto
     {
         /// <summary>
         /// 物料编码
@@ -79,6 +89,21 @@ namespace Hymson.MES.HttpClients.Requests.WMS
         /// 是否合格;0、不合格 1、合格
         /// </summary>
         public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
+        /// 条码（唯一码）
+        /// </summary>
+        public string? BarCode { get; set; }
+
+        /// <summary>
+        /// 同步Id（WMS需要给ERP）
+        /// </summary>
+        public long? SyncId { get; set; }
+
+        /// <summary>
+        /// 仓库编码
+        /// </summary>
+        public string? WarehouseCode { get; set; }
 
     }
 

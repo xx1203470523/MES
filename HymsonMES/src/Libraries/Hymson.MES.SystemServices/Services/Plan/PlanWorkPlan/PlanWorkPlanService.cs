@@ -196,9 +196,9 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// </summary>
         /// <param name="configEntity"></param>
         /// <param name="currentBo"></param>
-        /// <param name="lineDtoDict"></param>
+        /// <param name="workPlanDtos"></param>
         /// <returns></returns>
-        private async Task<SyncWorkPlanSummaryBo?> ConvertWorkPlanListAsync(SysConfigEntity? configEntity, BaseBo currentBo, IEnumerable<SyncWorkPlanDto> lineDtoDict)
+        private async Task<SyncWorkPlanSummaryBo?> ConvertWorkPlanListAsync(SysConfigEntity? configEntity, BaseBo currentBo, IEnumerable<SyncWorkPlanDto> workPlanDtos)
         {
             // 判断是否存在（配置）
             if (configEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
@@ -209,50 +209,50 @@ namespace Hymson.MES.SystemServices.Services.Plan
             var resposeBo = new SyncWorkPlanSummaryBo();
 
             // 判断是否有不存在的产品编码
-            var productCodes = lineDtoDict.SelectMany(s => s.Products).Select(s => s.ProductCode).Distinct();
+            var productCodes = workPlanDtos.SelectMany(s => s.Products).Select(s => s.ProductCode).Distinct();
             var productEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = currentBo.SiteId, MaterialCodes = productCodes });
-            if (productEntities == null || productEntities.Any())
+
+            /*
+            if (productEntities == null || !productEntities.Any())
             {
                 // 这里应该提示产品不存在
                 throw new CustomerValidationException(nameof(ErrorCode.MES10251)).WithData("Code", string.Join(',', productCodes));
             }
+            */
 
             // 判断BOM编码是否存在
-            var bomCodes = lineDtoDict.SelectMany(s => s.Products).Select(s => s.BomCode).Distinct();
+            var bomCodes = workPlanDtos.SelectMany(s => s.Products).Select(s => s.BomCode).Distinct();
             var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = currentBo.SiteId, Codes = bomCodes });
-            if (bomEntities == null || bomEntities.Any())
+            if (bomEntities == null || !bomEntities.Any())
             {
                 // 这里应该提示BOM不存在
                 throw new CustomerValidationException(nameof(ErrorCode.MES10233)).WithData("bomCode", string.Join(',', bomCodes));
             }
 
             // 读取已存在的生产计划记录
-            var WorkPlanCodes = lineDtoDict.Select(s => s.PlanCode).Distinct();
-            var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = currentBo.SiteId, Codes = WorkPlanCodes });
+            var workPlanCodes = workPlanDtos.Select(s => s.PlanCode).Distinct();
+            var planEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery { SiteId = currentBo.SiteId, Codes = workPlanCodes });
 
             // 遍历数据
-            foreach (var planDto in lineDtoDict)
+            foreach (var planDto in workPlanDtos)
             {
-                /*
                 // 产品不能为空
                 if (planDto.Products.Count == 0)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10249)).WithData("Code", planDto.WorkPlanCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10249)).WithData("Code", planDto.PlanCode);
                 }
 
                 // 不支持一个生产计划多个产品
                 if (planDto.Products.Count > 1)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10248)).WithData("Code", planDto.WorkPlanCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10248)).WithData("Code", planDto.PlanCode);
                 }
 
                 // 获取产品对象
-                var productDto = planDto.Products.FirstOrDefault();
-                if (productDto == null) continue;
+                var firstProductDto = planDto.Products.FirstOrDefault();
+                if (firstProductDto == null) continue;
 
-                var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == productDto.ProductCode)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10245)).WithData("Code", productDto.ProductCode);
-                
+                /*
                 var bomEntity = bomEntities.FirstOrDefault(f => f.BomCode == productDto.BomCode)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10246)).WithData("Code", productDto.BomCode);
                 */
@@ -266,8 +266,8 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     {
                         WorkPlanCode = planDto.PlanCode,
                         RequirementNumber = planDto.RequirementNumber,
-                        PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value,
-                        PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value,
+                        PlanStartTime = firstProductDto.StartTime ?? SqlDateTime.MinValue.Value,
+                        PlanEndTime = firstProductDto.EndTime ?? SqlDateTime.MaxValue.Value,
 
                         // TODO: 这里的字段需要确认
                         OverScale = 0,
@@ -297,8 +297,8 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     }
 
                     // 除了数量/时间，好像什么都不能随便改
-                    planEntity.PlanStartTime = planDto.PlanStartTime ?? SqlDateTime.MinValue.Value;
-                    planEntity.PlanEndTime = planDto.PlanEndTime ?? SqlDateTime.MinValue.Value;
+                    planEntity.PlanStartTime = firstProductDto.StartTime ?? SqlDateTime.MinValue.Value;
+                    planEntity.PlanEndTime = firstProductDto.EndTime ?? SqlDateTime.MaxValue.Value;
 
                     planEntity.UpdatedBy = currentBo.User;
                     planEntity.UpdatedOn = currentBo.Time;
@@ -308,14 +308,20 @@ namespace Hymson.MES.SystemServices.Services.Plan
                 // 遍历产品列表
                 foreach (var productDto in planDto.Products)
                 {
+                    /*
+                    // 读取产品实体
+                    var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == productDto.ProductCode)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES10245)).WithData("Code", productDto.ProductCode);
+                    */
+
                     // 添加生产计划产品
                     var WorkPlanProductId = productDto.Id ?? IdGenProvider.Instance.CreateId();
                     resposeBo.ProductAdds.Add(new PlanWorkPlanProductEntity
                     {
                         WorkPlanId = planEntity.Id,
-                        ProductId = productDto.ProductId ?? 0,
+                        ProductId = 0, //productEntity.Id,
                         ProductCode = productDto.ProductCode,
-                        ProductVersion = productDto.ProductVersion,
+                        ProductVersion = "", //productEntity.Version ?? "",
                         BomId = productDto.BomId,
                         BomCode = productDto.BomCode,
                         BomVersion = productDto.BomVersion,

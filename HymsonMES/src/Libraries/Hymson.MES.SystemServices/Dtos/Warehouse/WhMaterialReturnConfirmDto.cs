@@ -33,6 +33,9 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         public string? Remark { set; get; }
     }
 
+    /// <summary>
+    /// 退料
+    /// </summary>
     public class MaterialReturnReceiptDetails
     {
         /// <summary>

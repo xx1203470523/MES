@@ -39,7 +39,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 额定使用寿命单位
         /// </summary>
-        public ToolingTypeEnum RatedLifeUnit { get; set; }
+        public ToolingTypeEnum? RatedLifeUnit { get; set; }
 
         /// <summary>
         /// 累计使用寿命

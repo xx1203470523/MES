@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 退料单号
         /// </summary>
-        public string ReqOrderCode { get; set; }
+        public string ReturnOrderCode { get; set; }
 
         /// <summary>
         /// 生产工单ID
@@ -180,7 +180,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 退料单号
         /// </summary>
-        public string ReqOrderCode { get; set; }
+        public string ReturnOrderCode { get; set; }
 
         /// <summary>
         /// 工单ID
@@ -323,16 +323,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string Remark { get; set; }
 
-        /// <summary>
-        /// 是否免检
-        /// </summary>
-        public TrueOrFalseEnum IsFree { get; set; } = TrueOrFalseEnum.No;
-
-        /// <summary>
-        /// 是否免检
-        /// </summary>
-        public string IsFreeText { get; set; }
-
     }
 
     /// <summary>
@@ -345,27 +335,10 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string? InspectionOrder { get; set; }
 
-        /*
-        /// <summary>
-        /// 物料编码
-        /// </summary>
-        public string? MaterialCode { get; set; }
-
-        /// <summary>
-        /// 物料名称
-        /// </summary>
-        public string? MaterialName { get; set; }
-
-        /// <summary>
-        /// 物料版本
-        /// </summary>
-        public string? MaterialVersion { get; set; }
-        */
-
         /// <summary>
         /// 退料单号
         /// </summary>
-        public string? ReqOrderCode { get; set; }
+        public string? ReturnOrderCode { get; set; }
 
         /// <summary>
         /// 工单编码
@@ -376,6 +349,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
         public IQCLiteStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 退料单创建时间（时间范围-数组）
+        /// </summary>
+        public DateTime[]? CreatedOn { get; set; }
 
     }
 

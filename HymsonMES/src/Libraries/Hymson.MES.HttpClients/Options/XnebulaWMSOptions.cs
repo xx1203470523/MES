@@ -14,7 +14,7 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 基础路径
         /// </summary>
-        public string BaseAddressUri { get; set; } = "";
+        public string BaseAddressUri { get; set; } = "http://192.168.126.148:20040/";
         public string Token { get; set; } = "";
         /// <summary>
         /// 出库操作配置
@@ -36,7 +36,7 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 成品入库单配置 
         /// </summary>
-        public WMSProductReceiptOptions ProductReceiptOptions { get; set; }
+        public WMSProductReceiptOptions ProductReceipt { get; set; }
 
         /// <summary>
         /// 取消成品入库操作配置
@@ -83,7 +83,6 @@ namespace Hymson.MES.HttpClients
     /// </summary>
     public class WMSReceiptOptions
     {
-       
         /// <summary>
         /// 仓库编码
         /// </summary>

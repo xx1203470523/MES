@@ -11,8 +11,8 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -58,6 +58,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
+        /// 仓储接口（供应商维护）
+        /// </summary>
+        private readonly IWhSupplierRepository _whSupplierRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -67,12 +72,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuReturnOrderDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="whSupplierRepository"></param>
         public ManuReturnOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<ManuReturnOrderSaveDto> validationSaveRules,
             IManuReturnOrderRepository manuReturnOrderRepository,
             IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
             IProcMaterialRepository procMaterialRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IWhSupplierRepository whSupplierRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -81,6 +88,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuReturnOrderDetailRepository = manuReturnOrderDetailRepository;
             _procMaterialRepository = procMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _whSupplierRepository = whSupplierRepository;
         }
 
 
@@ -211,36 +219,31 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             List<ManuReturnOrderDetailDto> dtos = new();
 
-            var entities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
+            var returnDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 ReturnOrderId = returnId
             });
 
-            // 读取退料单
-            var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(returnId);
-
             // 读取产品
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Select(x => x.MaterialId));
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(returnDetailEntities.Select(x => x.MaterialId));
             var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
 
-            // 读取生产工单
-            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(returnEntity.WorkOrderId);
+            // 读取供应商
+            var supplierEntities = await _whSupplierRepository.GetByIdsAsync(returnDetailEntities.Select(s => s.SupplierId));
 
-            foreach (var entity in entities)
+            foreach (var entity in returnDetailEntities)
             {
                 var dto = entity.ToModel<ManuReturnOrderDetailDto>();
-
-                /*
-                // 退料单
-                dto.ReqOrderCode = returnEntity.ReqOrderCode;
+                if (dto == null) continue;
 
                 // 供应商
-                if (workOrderEntity != null)
+                var supplierEntity = supplierEntities.FirstOrDefault(f => f.Id == entity.SupplierId);
+                if (supplierEntity != null)
                 {
-                    dto.SupplierCode = workOrderEntity.OrderCode;
+                    dto.SupplierCode = supplierEntity.Code;
+                    dto.SupplierName = supplierEntity.Name;
                 }
-                */
 
                 // 产品
                 materialDic.TryGetValue(entity.MaterialId, out var materialEntity);
@@ -248,6 +251,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     dto.MaterialCode = materialEntity.MaterialCode;
                     dto.MaterialName = materialEntity.MaterialName;
+                }
+                else
+                {
+                    dto.MaterialCode = "-";
+                    dto.MaterialName = "-";
                 }
 
                 dtos.Add(dto);
