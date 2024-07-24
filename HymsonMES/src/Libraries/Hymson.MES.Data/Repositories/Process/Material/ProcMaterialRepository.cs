@@ -71,12 +71,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcMaterialEntity> GetByIdAsync(long id)
         {
-            var key = $"{CachedTables.PROC_MATERIAL}&{id}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = GetMESDbConnection();
-                return await conn.QueryFirstOrDefaultAsync<ProcMaterialEntity>(GetMaterialByIdSql, new { Id = id });
-            });
+            //var key = $"{CachedTables.PROC_MATERIAL}&{id}";
+            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            //{
+            //    using var conn = GetMESDbConnection();
+            //    return await conn.QueryFirstOrDefaultAsync<ProcMaterialEntity>(GetMaterialByIdSql, new { Id = id });
+            //});
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialEntity>(GetMaterialByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -310,6 +312,11 @@ namespace Hymson.MES.Data.Repositories.Process
             if (query.MaterialIds != null && query.MaterialIds.Any())
             {
                 sqlBuilder.Where(" Id IN @MaterialIds ");
+            }
+
+            if (query.MaterialCodes != null && query.MaterialCodes.Any())
+            {
+                sqlBuilder.Where(" MaterialCode IN @MaterialCodes ");
             }
 
             using var conn = GetMESDbConnection();
