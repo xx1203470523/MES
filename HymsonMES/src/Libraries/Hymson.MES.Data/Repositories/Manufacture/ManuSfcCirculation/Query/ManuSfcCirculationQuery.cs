@@ -109,6 +109,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public SfcCirculationTypeEnum[] CirculationTypes { get; set; }
 
         /// <summary>
+        /// 工单id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
         /// 工序id
         /// </summary>
         public long? ProcedureId { get; set; }

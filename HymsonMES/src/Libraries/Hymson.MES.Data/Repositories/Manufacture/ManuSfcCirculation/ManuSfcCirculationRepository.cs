@@ -131,6 +131,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("ProcedureId = @ProcedureId");
             }
+
+            if (query.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where("WorkOrderId = @WorkOrderId");
+            }
             if (query.CirculationMainProductId.HasValue)
             {
                 sqlBuilder.Where("CirculationMainProductId = @CirculationMainProductId");
