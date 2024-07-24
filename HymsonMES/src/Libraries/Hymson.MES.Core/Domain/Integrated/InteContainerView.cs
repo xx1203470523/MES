@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -116,7 +117,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 品检状态
         /// </summary>
-        public QualifiedStatusEnum Type { get; set; }
+        public ProductReceiptQualifiedStatusEnum Type { get; set; }
 
         /// <summary>
         /// 单位
@@ -132,5 +133,10 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 批次
         /// </summary>
         public string Batch { get; set; }
+
+        /// <summary>
+        /// 仓库
+        /// </summary>
+        public string WarehouseCode {  get; set; }
     }
 }

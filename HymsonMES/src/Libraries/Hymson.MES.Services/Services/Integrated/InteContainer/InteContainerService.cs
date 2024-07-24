@@ -9,6 +9,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Inte;
@@ -52,6 +53,11 @@ public partial class InteContainerService : IInteContainerService
     private readonly AbstractValidator<InteContainerInfoDto> _validationContainerInfoCreateRules;
     private readonly AbstractValidator<InteContainerInfoUpdateDto> _validationContainerInfoUpdateRules;
 
+    /// <summary>
+    /// 流转表
+    /// </summary>
+    private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
+
     public InteContainerService(ICurrentUser currentUser,
         ICurrentSite currentSite,
         IInteContainerRepository inteContainerRepository,
@@ -64,7 +70,8 @@ public partial class InteContainerService : IInteContainerService
         IInteContainerInfoRepository inteContainerInfoRepository,
         IManuContainerBarcodeRepository manuContainerBarcodeRepository,
         ISequenceService sequenceService,
-        IQualFqcOrderRepository qualFqcOrderRepository)
+        IQualFqcOrderRepository qualFqcOrderRepository,
+        IManuSfcCirculationRepository manuSfcCirculationRepository)
     {
         _currentUser = currentUser;
         _currentSite = currentSite;
@@ -79,6 +86,7 @@ public partial class InteContainerService : IInteContainerService
         _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
         _sequenceService = sequenceService;
         _qualFqcOrderRepository = qualFqcOrderRepository;
+        _manuSfcCirculationRepository = manuSfcCirculationRepository;
     }
 
     /// <summary>
@@ -645,7 +653,7 @@ public partial class InteContainerService : IInteContainerService
     /// </summary>
     /// <param name="queryDto"></param>
     /// <returns></returns>
-    public async Task<InteContainerInfoViewDto> QueryContainerInfoByCodeAsync(InteContainerQueryDto queryDto )
+    public async Task<InteContainerInfoViewDto> QueryContainerInfoByCodeAsync(InteContainerQueryDto queryDto)
     {
         InteContainerInfoViewDto inteContainerInfoViewDto = new InteContainerInfoViewDto();
         var checkEntity = await _inteContainerRepository.GetByCodeAsync(new EntityByCodeQuery
@@ -657,17 +665,17 @@ public partial class InteContainerService : IInteContainerService
         if (checkEntity == null)
             return inteContainerInfoViewDto;
         var InspectionOrder = $"{queryDto.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
-        var entity = await _manuContainerBarcodeRepository.GetByContainerIdAsync(new ManuContainerIdQuery { ContainerId= checkEntity.Id, SiteId = _currentSite.SiteId ?? 123456});
-        inteContainerInfoViewDto.Type = QualifiedStatusEnum.Qualified;
+        // var entity = await _manuContainerBarcodeRepository.GetByContainerIdAsync(new ManuContainerIdQuery { ContainerId= checkEntity.Id, SiteId = _currentSite.SiteId ?? 123456});
+        //查询条码绑定信息
+        var manuSfcCirculationEntits = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery
+        {
+            SiteId = _currentSite.SiteId ?? 123456,
+            WorkOrderId = queryDto.Id,
+        });
+        inteContainerInfoViewDto.Type = ProductReceiptQualifiedStatusEnum.Qualified;
         inteContainerInfoViewDto.Unit = "个";
-        inteContainerInfoViewDto.Qty = 1;// entity.Count();
-        //var qualFqcOrderLists = await _qualFqcOrderRepository.GetEntitiesAsync(new QualFqcOrderQuery
-        //{
-        //    WorkOrderId = queryDto.Id,
-        //    SiteId = _currentSite.SiteId ?? 123456,
-        //});
-        //var qualFqcOrders = qualFqcOrderLists.Where(x => x.MaterialId == queryDto.ProductId).ToList();
-
+        inteContainerInfoViewDto.Qty = manuSfcCirculationEntits.Count();
+        inteContainerInfoViewDto.WarehouseCode = "成品仓";
         inteContainerInfoViewDto.Batch = InspectionOrder;
 
         return inteContainerInfoViewDto;
