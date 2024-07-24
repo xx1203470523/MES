@@ -23,7 +23,6 @@ spec:
         volumeMounts:
           - mountPath: /logs
             name: mes-api-volume
-            readOnly: true
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Production"
@@ -37,5 +36,5 @@ spec:
         # 挂载 /data/foo，但仅当该目录已经存在时
         hostPath:
           path: /data/logs # 主机上的目录位置
-          type: Directory # 此字段可选
+          type: DirectoryOrCreate # 此字段可选
 status: {}
