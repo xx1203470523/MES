@@ -259,7 +259,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 更新 BOM IsCurrentVersion 为 false
         /// </summary>
         const string UpdateIsCurrentVersionIsFalseSql = "UPDATE `proc_bom` SET IsCurrentVersion = false WHERE Id in @ids ";
-        const string UpdatesSql = "UPDATE `proc_bom` SET  BomName = @BomName, Status = @Status, Version = @Version, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `proc_bom` SET BomCode = @BomCode, BomName = @BomName, Status = @Status, Version = @Version, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_bom` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_bom` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         const string GetByIdSql = @"SELECT * FROM `proc_bom`  WHERE Id = @Id ";

@@ -276,7 +276,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                         RequirementNumber = planDto.RequirementNumber,
                         PlanStartTime = firstProductDto.StartTime ?? SqlDateTime.MinValue.Value,
                         PlanEndTime = firstProductDto.EndTime ?? SqlDateTime.MaxValue.Value,
-
+                        
                         // TODO: 这里的字段需要确认
                         OverScale = 0,
                         Type = planDto.Type,
