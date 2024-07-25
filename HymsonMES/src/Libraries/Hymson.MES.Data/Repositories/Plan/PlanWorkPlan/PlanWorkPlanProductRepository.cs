@@ -96,7 +96,11 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
-            // TODO
+            if (!string.IsNullOrWhiteSpace(pageQuery.ProductCode))
+            {
+                pageQuery.ProductCode = $"%{pageQuery.ProductCode}%";
+                sqlBuilder.Where("ProductCode LIKE @ProductCode");
+            }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

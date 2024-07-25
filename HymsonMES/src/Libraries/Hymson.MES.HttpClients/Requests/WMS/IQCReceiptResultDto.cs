@@ -46,6 +46,11 @@ namespace Hymson.MES.HttpClients.Requests.WMS
     public record IQCReceiptMaterialResultDto : BaseEntityDto
     {
         /// <summary>
+        /// WMS收货明细Id
+        /// </summary>
+        public long? ReceiptDetailId { get; set; }
+
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; } = "";

@@ -135,9 +135,28 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
+            if (!string.IsNullOrWhiteSpace(query.WorkPlanCode))
+            {
+                query.WorkPlanCode = $"%{query.WorkPlanCode}%";
+                sqlBuilder.Where(" WorkPlanCode LIKE @WorkPlanCode ");
+            }
+
             if (query.Codes != null && query.Codes.Any())
             {
                 sqlBuilder.Where("WorkPlanCode IN @Codes");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.WorkPlanCode))
+            {
+                query.WorkPlanCode = $"%{query.WorkPlanCode}%";
+                sqlBuilder.Where(" WorkPlanCode LIKE @WorkPlanCode ");
+            }
+
+            // 限定时间
+            if (query.PlanStartTime != null && query.PlanStartTime.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { DateStart = query.PlanStartTime[0], DateEnd = query.PlanStartTime[1] });
+                sqlBuilder.Where(" PlanStartTime >= @DateStart AND PlanStartTime < @DateEnd ");
             }
 
             using var conn = GetMESDbConnection();

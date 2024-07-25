@@ -482,49 +482,30 @@ namespace Hymson.MES.Services.Dtos.Plan
     public class PlanWorkPlanProductPagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 工单号
+        /// 计划单号
         /// </summary>
-        public string? WorkOrderCode { get; set; }
+        public string? WorkPlanCode { get; set; }
 
         /// <summary>
-        /// 物料编码
+        /// 产品编码
         /// </summary>
-        public string? MaterialCode { get; set; }
+        public string? ProductCode { get; set; }
 
         /// <summary>
-        /// 工作中心代码
+        /// 计划类型(1:试产工单;2:生产工单;)
         /// </summary>
-        public string? WorkCenterCode { get; set; }
+        public PlanWorkOrderTypeEnum Type { get; set; }
 
         /// <summary>
-        /// 工单类型
+        /// 计划状态
         /// </summary>
-        public PlanWorkOrderTypeEnum? Type { get; set; }
+        public PlanWorkPlanStatusEnum Status { get; set; }
 
         /// <summary>
-        /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
-        /// </summary>
-        public PlanWorkOrderStatusEnum? Status { get; set; }
-
-        /// <summary>
-        /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
-        /// </summary>
-        public IEnumerable<PlanWorkOrderStatusEnum>? InStatus { get; set; }
-
-        /// <summary>
-        /// 计划开始时间  时间范围  数组
+        /// 计划开始时间（时间范围-数组）
         /// </summary>
         public DateTime[]? PlanStartTime { get; set; }
 
-        /// <summary>
-        /// 查询状态集合
-        /// </summary>
-        public IEnumerable<PlanWorkOrderStatusEnum>? Statuss { get; set; }
-
-        /// <summary>
-        /// 物料版本
-        /// </summary>
-        public string? MaterialVersion { get; set; }
     }
 
 }

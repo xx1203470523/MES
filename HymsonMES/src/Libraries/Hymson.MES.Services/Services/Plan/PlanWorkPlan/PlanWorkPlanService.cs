@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Query;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -330,8 +331,21 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<PagedInfo<PlanWorkPlanProductDto>> GetPageListAsync(PlanWorkPlanProductPagedQueryDto pagedQueryDto)
         {
+            var siteId = _currentSite.SiteId ?? 0;
+
+            // 查询生产计划
+            var workPlanEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery
+            {
+                SiteId = siteId,
+                WorkPlanCode = pagedQueryDto.WorkPlanCode,
+                Type = pagedQueryDto.Type,
+                Status = pagedQueryDto.Status,
+                PlanStartTime = pagedQueryDto.PlanStartTime
+            });
+
+            // 查询分页数据
             var pagedQuery = pagedQueryDto.ToQuery<PlanWorkPlanProductPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = siteId;
             var pagedInfo = await _planWorkPlanProductRepository.GetPagedInfoAsync(pagedQuery);
 
             // 读取生产计划
