@@ -13,5 +13,14 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
     /// </summary>
     public class QualFqcInspectionMavalQuery
     {
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// SFC
+        /// </summary>
+        public string SFC { get; set; } 
     }
 }
