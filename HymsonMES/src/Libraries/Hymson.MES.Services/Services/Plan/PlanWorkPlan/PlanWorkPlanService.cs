@@ -204,8 +204,7 @@ namespace Hymson.MES.Services.Services.Plan
             // 检查子工单的计划时间是否超出生产计划的时间范围
             if (dto.Details.Any(a => a.PlanStartTime < workPlanEntity.PlanStartTime || a.PlanStartTime > workPlanEntity.PlanEndTime))
             {
-                // TODO: 子工单的计划时间超出生产计划的时间范围
-                throw new CustomerValidationException(nameof(ErrorCode.MES16017));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16055));
             }
 
             // 当前对象
@@ -407,16 +406,30 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="planProductId"></param>
         /// <returns></returns>
-        public async Task<string> QueryOrderByPlanIdAsync(long planProductId)
+        public async Task<IEnumerable<PlanWorkPlanDetailSaveDto>> QueryOrderByPlanIdAsync(long planProductId)
         {
             // 检查生产计划是否存在
             var workPlanProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(planProductId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16018));
 
+            List<PlanWorkPlanDetailSaveDto> dtos = new();
+
             // 查询生产计划的子工单
             var workOrderEntities = await _planWorkOrderRepository.GetByPlanProductIdAsync(workPlanProductEntity.Id);
+            if (workOrderEntities == null || !workOrderEntities.Any()) return dtos;
 
-            return default;
+            foreach (var item in workOrderEntities)
+            {
+                dtos.Add(new PlanWorkPlanDetailSaveDto
+                {
+                    WorkOrderCode = item.OrderCode,
+                    PlanStartTime = item.PlanStartTime,
+                    PlanEndTime = item.PlanEndTime,
+                    Qty = item.Qty
+                });
+            }
+
+            return dtos;
         }
 
         // TODO: 读取生产计划的物料

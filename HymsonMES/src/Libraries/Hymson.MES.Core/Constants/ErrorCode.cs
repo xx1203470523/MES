@@ -1234,6 +1234,7 @@
         public const string MES16052 = "指定生产计划未找到,工单编码为：【{WorkOrder}】。";
         public const string MES16053 = "生产工单编码出现重复，请检查！";
         public const string MES16054 = "子工单总数量已超过生产计划计划数量，请检查！";
+        public const string MES16055 = "子工单的计划时间超出生产计划的时间范围，请检查！";
         #endregion
 
         #region 条码接收 16100
