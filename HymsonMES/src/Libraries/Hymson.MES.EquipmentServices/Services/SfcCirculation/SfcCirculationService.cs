@@ -1000,13 +1000,13 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 UpdatedOn = HymsonClock.Now()
             });
             using var ts = TransactionHelper.GetTransactionScope();
-            //NG设定的CSS直接软删除
-            await _manuSfcCirculationRepository.DeleteRangeAsync(new DeleteCommand
-            {
-                UserId = _currentEquipment.Name,
-                DeleteOn = HymsonClock.Now(),
-                Ids = delEntities.Select(c => c.Id)
-            });
+            ////NG设定的CSS直接软删除
+            //await _manuSfcCirculationRepository.DeleteRangeAsync(new DeleteCommand
+            //{
+            //    UserId = _currentEquipment.Name,
+            //    DeleteOn = HymsonClock.Now(),
+            //    Ids = delEntities.Select(c => c.Id)
+            //});
             await _manuSfcCcsNgRecordRepository.InsertsAsync(manuSfcCcsNgRecords);
             ts.Complete();
         }
