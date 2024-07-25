@@ -534,11 +534,11 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             var manuRequistionOrderEntities = await _manuRequistionOrderRepository.GetManuRequistionOrderEntitiesAsync(new ManuRequistionQueryByWorkOrders
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                WorkOrders = dtos.Select(d => d.OrderCode).Distinct().ToArray(),
+                WorkOrderIds = dtos.Select(d => d.Id).Distinct().ToArray(),
             });
             var requistiongroup = manuRequistionOrderEntities.Where(m => m.Type == Core.Domain.Manufacture.ManuRequistionTypeEnum.WorkOrderPicking
             && (m.Status != WhWarehouseRequistionStatusEnum.ApprovalingFailed
-            || m.Status != WhWarehouseRequistionStatusEnum.Failed)).GroupBy(m => m.WorkOrderCode);
+            || m.Status != WhWarehouseRequistionStatusEnum.Failed)).GroupBy(m => m.WorkOrderId);
             List<PlanWorkOrderListDetailViewDto> dtolist = dtos.ToList();
             //dtolist.ForEach(d =>
             //{
@@ -550,7 +550,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             dtolist.ForEach(d =>
             {
                 // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
-                var qty = requistiongroup.FirstOrDefault(r => r.Key == d.OrderCode)?.Count() ?? 0;
+                var qty = requistiongroup.FirstOrDefault(r => r.Key == d.Id)?.Count() ?? 0;
                 d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked : PlanWorkOrderPickStatusEnum.FinishPicked;
 
                 d.PassDownQuantity = d.Qty;
@@ -645,7 +645,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
             if (planWorkOrderEntity != null)
             {
-                var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.OrderCode, planWorkOrderEntity.SiteId);
+                var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.Id, planWorkOrderEntity.SiteId);
                 var lst = requistionOrderEntities.ToList();
                 foreach (var item in lst)
                 {
@@ -670,7 +670,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 return details;
             }
 
-            var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.OrderCode, planWorkOrderEntity.SiteId);
+            var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.Id, planWorkOrderEntity.SiteId);
             if (requistionOrderEntities == null || !requistionOrderEntities.Any())
             {
                 return details;

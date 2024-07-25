@@ -524,7 +524,7 @@ namespace Hymson.MES.SystemServices.Services
             {
                 Id = requistionOrderId,
                 ReqOrderCode = erpRequisitionOrder,
-                WorkOrderCode = planWorkOrderEntity.OrderCode,
+                WorkOrderId = planWorkOrderEntity.Id,
                 Status = WhWarehouseRequistionStatusEnum.Picked,
                 Type = ManuRequistionTypeEnum.WorkOrderPicking,
                 Remark = "",
@@ -668,6 +668,7 @@ namespace Hymson.MES.SystemServices.Services
                         Qty = productReceiptOrderDetailEntities.Count(),
                     });
                     await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
+                    ts.Complete();
                 }
 
             }

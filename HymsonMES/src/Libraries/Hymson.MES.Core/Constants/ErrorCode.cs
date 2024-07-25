@@ -491,7 +491,9 @@
         public const string MES11725 = "无需要处置！";
 
 
-
+         
+        public const string MES11750 = "工序编码{Code}不存在"; 
+        public const string MES11751 = "资源编码{Code}不存在";
 
         #endregion
 
