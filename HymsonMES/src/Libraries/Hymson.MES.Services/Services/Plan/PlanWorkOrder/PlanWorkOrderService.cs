@@ -552,7 +552,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             {
                 // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
                 //var qty = requistiongroup.FirstOrDefault(r => r.Key == d.Id)?.Count() ?? 0;
-                d.PickStatus = manuRequistionOrderEntities.Any(x=>x.Status!= WhMaterialPickingStatusEnum.CancelMaterialReturn) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked ;
+                d.PickStatus = manuRequistionOrderEntities.Any(x=>x.Status!= WhMaterialPickingStatusEnum.CancelMaterialReturn&&x.WorkOrderId==d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked ;
 
                 d.PassDownQuantity = d.Qty;
             });
