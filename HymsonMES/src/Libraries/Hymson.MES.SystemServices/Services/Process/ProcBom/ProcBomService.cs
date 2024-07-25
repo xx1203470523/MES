@@ -172,6 +172,8 @@ namespace Hymson.MES.SystemServices.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10406));
             }
 
+            var defaultStatus = SysDataStatusEnum.Enable;
+
             // 遍历数据
             foreach (var bomDto in lineDtoDict)
             {
@@ -187,7 +189,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                         BomCode = bomDto.BomCode,
                         BomName = bomDto.BomName,
                         Version = bomDto.BomVersion,
-                        Status = SysDataStatusEnum.Enable,
+                        Status = defaultStatus,
                         Remark = "",
 
                         SiteId = siteId,
@@ -206,6 +208,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                     bomEntity.BomCode = bomDto.BomCode;
                     bomEntity.BomName = bomDto.BomName;
                     bomEntity.Version = bomDto.BomVersion;
+                    bomEntity.Status = defaultStatus;
                     bomEntity.UpdatedBy = updateUser;
                     bomEntity.UpdatedOn = updateTime;
                     resposeBo.Updates.Add(bomEntity);
@@ -299,5 +302,6 @@ namespace Hymson.MES.SystemServices.Services.Process
         /// 新增（BOM明细-替代料）
         /// </summary>
         public List<ProcBomDetailReplaceMaterialEntity> ReplaceDetailAdds { get; set; } = new();
+
     }
 }
