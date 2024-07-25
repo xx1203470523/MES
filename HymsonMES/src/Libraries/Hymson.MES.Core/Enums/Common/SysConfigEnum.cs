@@ -76,6 +76,11 @@ namespace Hymson.MES.Core.Enums
         /// 工艺路线编码
         /// </summary>
         [Description("ProcessRouteCode")]
-        ProcessRouteCode = 15
+        ProcessRouteCode = 15,
+        /// <summary>
+        /// 工作中心编码
+        /// </summary>
+        [Description("WorkCenterCode")]
+        WorkCenterCode = 16
     }
 }

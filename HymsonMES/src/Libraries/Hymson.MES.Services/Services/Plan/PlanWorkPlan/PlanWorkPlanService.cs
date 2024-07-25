@@ -241,22 +241,30 @@ namespace Hymson.MES.Services.Services.Plan
             workPlanEntity.UpdatedBy = currentBo.User;
             workPlanEntity.UpdatedOn = currentBo.Time;
 
+            // 工作中心编码配置
+            var workCenterConfigs = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.WorkCenterCode });
+            if (workCenterConfigs == null || !workCenterConfigs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.ProcessRouteCode.GetDescription());
+            }
+
             // 读取工作中心
+            var workCenterCode = GetWorkCenterCode(workCenterConfigs, workPlanEntity.PlanType);
             var workCenterEntity = await _inteWorkCenterRepository.GetEntityAsync(new InteWorkCenterOneQuery
             {
                 SiteId = workPlanEntity.SiteId,
-                Code = workPlanEntity.WorkCenterCode
+                Code = workCenterCode
             });
 
             // 工艺路线编码配置
-            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ProcessRouteCode });
-            if (configEntities == null || !configEntities.Any())
+            var processRouteConfigs = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ProcessRouteCode });
+            if (processRouteConfigs == null || !processRouteConfigs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.ProcessRouteCode.GetDescription());
             }
 
             // 读取工艺路线
-            var processRouteCode = GetProcessRouteCode(configEntities, workPlanEntity.PlanType);
+            var processRouteCode = GetProcessRouteCode(processRouteConfigs, workPlanEntity.PlanType);
             var processRouteEntity = await _procProcessRouteRepository.GetByCodeAsync(new ProcProcessRoutesByCodeQuery
             {
                 SiteId = workPlanEntity.SiteId,
@@ -500,6 +508,23 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="planType"></param>
         /// <returns></returns>
         private static string GetProcessRouteCode(IEnumerable<SysConfigEntity> configEntities, PlanWorkPlanTypeEnum planType)
+        {
+            var configEntity = configEntities.FirstOrDefault();
+            if (configEntity == null) return "not configured";
+
+            if (string.IsNullOrWhiteSpace(configEntity?.Value)) return "no configured value";
+
+            var valueArray = configEntity.Value.Split('|');
+            return planType == PlanWorkPlanTypeEnum.Rotor ? valueArray[0] : valueArray[1];
+        }
+
+        /// <summary>
+        /// 获取工作中心编码
+        /// </summary>
+        /// <param name="configEntities"></param>
+        /// <param name="planType"></param>
+        /// <returns></returns>
+        private static string GetWorkCenterCode(IEnumerable<SysConfigEntity> configEntities, PlanWorkPlanTypeEnum planType)
         {
             var configEntity = configEntities.FirstOrDefault();
             if (configEntity == null) return "not configured";
