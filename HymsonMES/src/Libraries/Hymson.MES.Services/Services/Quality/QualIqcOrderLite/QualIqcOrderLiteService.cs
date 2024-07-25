@@ -838,7 +838,7 @@ namespace Hymson.MES.Services.Services.Quality
             // 读取供应商
             var supplierEntity = await _whSupplierRepository.GetByIdAsync(orderEntity.SupplierId.Value);
 
-            // 站点配置
+            // 仓库编码配置
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.WarehouseCode });
             if (configEntities == null || !configEntities.Any())
             {
@@ -889,8 +889,8 @@ namespace Hymson.MES.Services.Services.Quality
 
             if (string.IsNullOrWhiteSpace(configEntity?.Value)) return "no configured value";
 
-            var warehouseCodeArray = configEntity.Value.Split('|');
-            return isQualified == TrueOrFalseEnum.Yes ? warehouseCodeArray[0] : warehouseCodeArray[1];
+            var valueArray = configEntity.Value.Split('|');
+            return isQualified == TrueOrFalseEnum.Yes ? valueArray[0] : valueArray[1];
         }
         #endregion
 

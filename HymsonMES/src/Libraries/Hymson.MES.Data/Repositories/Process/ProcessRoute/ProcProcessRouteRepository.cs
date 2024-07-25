@@ -239,6 +239,17 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 根据编码获取工艺路线信息
         /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcProcessRouteEntity> GetByCodeAsync(ProcProcessRoutesByCodeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteEntity>(GetByCodeSql, query);
+        }
+
+        /// <summary>
+        /// 根据编码获取工艺路线信息
+        /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteEntity>> GetByCodesAsync(ProcProcessRoutesByCodeQuery param)
@@ -270,6 +281,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string UpdateStatusSql = "UPDATE `proc_process_route` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
-        const string GetByCodesSql = @"SELECT * FROM `proc_process_route` WHERE Code IN @Codes AND SiteId= @SiteId  AND IsDeleted=0 ";
+        const string GetByCodeSql = @"SELECT * FROM `proc_process_route` WHERE SiteId = @SiteId AND IsDeleted = 0 AND Code = @Code; ";
+        const string GetByCodesSql = @"SELECT * FROM `proc_process_route` WHERE Code IN @Codes AND SiteId = @SiteId  AND IsDeleted=0 ";
     }
 }

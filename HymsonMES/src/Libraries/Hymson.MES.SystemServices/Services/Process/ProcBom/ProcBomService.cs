@@ -157,8 +157,12 @@ namespace Hymson.MES.SystemServices.Services.Process
             }
 
             // 读取已存在的BOM记录
+            /*
             var bomCodes = lineDtoDict.Select(s => s.BomCode).Distinct();
             var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = siteId, Codes = bomCodes });
+            */
+            var bomIds = lineDtoDict.Select(s => s.Id ?? IdGenProvider.Instance.CreateId()).Distinct();
+            var bomEntities = await _procBomRepository.GetByIdsAsync(bomIds);
 
             // 读取已存在的工序记录
             var procedureCodes = lineDtoDict.SelectMany(s => s.BomMaterials).Select(s => s.ProcedureCode).Distinct();
@@ -168,10 +172,12 @@ namespace Hymson.MES.SystemServices.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10406));
             }
 
+            var defaultStatus = SysDataStatusEnum.Enable;
+
             // 遍历数据
             foreach (var bomDto in lineDtoDict)
             {
-                var bomEntity = bomEntities.FirstOrDefault(f => f.BomCode == bomDto.BomCode);
+                var bomEntity = bomEntities.FirstOrDefault(f => f.Id == bomDto.Id);
 
                 // 不存在的新BOM
                 if (bomEntity == null)
@@ -183,7 +189,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                         BomCode = bomDto.BomCode,
                         BomName = bomDto.BomName,
                         Version = bomDto.BomVersion,
-                        Status = SysDataStatusEnum.Build, // 因为ERP不传工序，数据有缺陷，所以需要在MES去点启用
+                        Status = defaultStatus,
                         Remark = "",
 
                         SiteId = siteId,
@@ -199,8 +205,10 @@ namespace Hymson.MES.SystemServices.Services.Process
                 // 之前已存在的BOM
                 else
                 {
+                    bomEntity.BomCode = bomDto.BomCode;
                     bomEntity.BomName = bomDto.BomName;
                     bomEntity.Version = bomDto.BomVersion;
+                    bomEntity.Status = defaultStatus;
                     bomEntity.UpdatedBy = updateUser;
                     bomEntity.UpdatedOn = updateTime;
                     resposeBo.Updates.Add(bomEntity);
@@ -246,7 +254,7 @@ namespace Hymson.MES.SystemServices.Services.Process
                     {
                         resposeBo.ReplaceDetailAdds.AddRange(bomMaterialDto.ReplaceMaterials.Select(s => new ProcBomDetailReplaceMaterialEntity
                         {
-                            Id = IdGenProvider.Instance.CreateId(),
+                            Id = s.Id ?? IdGenProvider.Instance.CreateId(),
                             BomId = bomEntity.Id,
                             BomDetailId = bomDetailId,
                             ReplaceMaterialId = s.Id ?? IdGenProvider.Instance.CreateId(),
@@ -294,5 +302,6 @@ namespace Hymson.MES.SystemServices.Services.Process
         /// 新增（BOM明细-替代料）
         /// </summary>
         public List<ProcBomDetailReplaceMaterialEntity> ReplaceDetailAdds { get; set; } = new();
+
     }
 }

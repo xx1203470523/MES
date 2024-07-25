@@ -71,7 +71,16 @@ namespace Hymson.MES.Core.Enums
         /// 仓库编码
         /// </summary>
         [Description("WarehouseCode")]
-        WarehouseCode = 14
-
+        WarehouseCode = 14,
+        /// <summary>
+        /// 工艺路线编码
+        /// </summary>
+        [Description("ProcessRouteCode")]
+        ProcessRouteCode = 15,
+        /// <summary>
+        /// 工作中心编码
+        /// </summary>
+        [Description("WorkCenterCode")]
+        WorkCenterCode = 16
     }
 }

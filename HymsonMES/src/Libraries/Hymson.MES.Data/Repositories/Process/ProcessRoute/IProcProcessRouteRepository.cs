@@ -104,6 +104,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 根据编码获取工艺路线信息
         /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcProcessRouteEntity> GetByCodeAsync(ProcProcessRoutesByCodeQuery query);
+
+        /// <summary>
+        /// 根据编码获取工艺路线信息
+        /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcProcessRouteEntity>> GetByCodesAsync(ProcProcessRoutesByCodeQuery param);
