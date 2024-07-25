@@ -205,7 +205,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             var codeRules = await _inteCodeRulesRepository.GetListAsync(new InteCodeRulesReQuery
             {
                 SiteId = siteId,
-                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.MaterialReturnOrder
+                CodeType = Core.Enums.Integrated.CodeRuleCodeTypeEnum.MaterialPickingOrder
             });
             if (codeRules == null || !codeRules.Any())
             {
