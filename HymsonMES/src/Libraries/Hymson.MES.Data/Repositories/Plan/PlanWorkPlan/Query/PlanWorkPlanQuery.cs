@@ -1,3 +1,5 @@
+using Hymson.MES.Core.Enums;
+
 namespace Hymson.MES.Data.Repositories.Plan.Query
 {
     /// <summary>
@@ -21,14 +23,24 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
         public long? WorkPlanProductId { get; set; }
 
         /// <summary>
+        /// 编码集合
+        /// </summary>
+        public IEnumerable<string>? Codes { get; set; }
+
+        /// <summary>
         /// 计划单号
         /// </summary>
         public string? WorkPlanCode { get; set; }
 
         /// <summary>
-        /// 编码集合
+        /// 计划类型(1:试产工单;2:生产工单;)
         /// </summary>
-        public IEnumerable<string>? Codes { get; set; }
+        public PlanWorkOrderTypeEnum Type { get; set; }
+
+        /// <summary>
+        /// 计划状态
+        /// </summary>
+        public PlanWorkPlanStatusEnum Status { get; set; }
 
         /// <summary>
         /// 计划开始时间（时间范围-数组）

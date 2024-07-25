@@ -146,30 +146,6 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("WorkPlanCode IN @Codes");
             }
 
-            // 限定时间
-            if (query.PlanStartTime != null && query.PlanStartTime.Length >= 2)
-            {
-                sqlBuilder.AddParameters(new { DateStart = query.PlanStartTime[0], DateEnd = query.PlanStartTime[1] });
-                sqlBuilder.Where(" PlanStartTime >= @DateStart AND PlanStartTime < @DateEnd ");
-            }
-
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<PlanWorkPlanEntity>(template.RawSql, query);
-        }
-
-        /// <summary>
-        /// 查询List
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<PlanWorkPlanEntity>> GetEntitiesAsync(PlanWorkPlanProductPagedQuery query)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.Select("*");
-
             if (!string.IsNullOrWhiteSpace(query.WorkPlanCode))
             {
                 query.WorkPlanCode = $"%{query.WorkPlanCode}%";

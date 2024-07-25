@@ -333,9 +333,8 @@ namespace Hymson.MES.Services.Services.Plan
         {
             var siteId = _currentSite.SiteId ?? 0;
 
-            /*
             // 查询生产计划
-            var workPlanEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanProductPagedQuery
+            var workPlanEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery
             {
                 SiteId = siteId,
                 WorkPlanCode = pagedQueryDto.WorkPlanCode,
@@ -343,7 +342,6 @@ namespace Hymson.MES.Services.Services.Plan
                 Status = pagedQueryDto.Status,
                 PlanStartTime = pagedQueryDto.PlanStartTime
             });
-            */
 
             // 查询分页数据
             var pagedQuery = pagedQueryDto.ToQuery<PlanWorkPlanProductPagedQuery>();

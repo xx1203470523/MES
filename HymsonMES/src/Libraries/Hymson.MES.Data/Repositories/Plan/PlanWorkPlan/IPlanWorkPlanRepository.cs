@@ -66,12 +66,5 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         Task<IEnumerable<PlanWorkPlanEntity>> GetEntitiesAsync(PlanWorkPlanQuery query);
 
-        /// <summary>
-        /// 查询List
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        Task<IEnumerable<PlanWorkPlanEntity>> GetEntitiesAsync(PlanWorkPlanProductPagedQuery query);
-
     }
 }

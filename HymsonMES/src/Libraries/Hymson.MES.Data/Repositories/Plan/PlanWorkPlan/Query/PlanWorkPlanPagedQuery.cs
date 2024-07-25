@@ -80,34 +80,9 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
         public long SiteId { get; set; }
 
         /// <summary>
-        /// 计划单号
-        /// </summary>
-        public string? WorkPlanCode { get; set; }
-
-        /// <summary>
         /// 产品编码
         /// </summary>
         public string? ProductCode { get; set; }
-
-        /// <summary>
-        /// 计划类型(1:试产工单;2:生产工单;)
-        /// </summary>
-        public PlanWorkOrderTypeEnum Type { get; set; }
-
-        /// <summary>
-        /// 计划状态
-        /// </summary>
-        public PlanWorkPlanStatusEnum Status { get; set; }
-
-        /// <summary>
-        /// 计划开始时间（时间范围-数组）
-        /// </summary>
-        public DateTime[]? PlanStartTime { get; set; }
-
-        /// <summary>
-        /// 集合（工单计划）
-        /// </summary>
-        public IEnumerable<long>? WorkPlanIds { get; set; }
 
     }
 
