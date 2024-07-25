@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.SystemServices.Services.Warehouse
+namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
 {
-    public  interface IWhMaterialReturnService
+    public interface IWhMaterialPickingService
     {
         /// <summary>
         /// 退料确认
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<string> WhMaterialReturnConfirmAsync(WhMaterialReturnConfirmDto param);
+        Task<string> MaterialPickingReceiveAsync(WhMaterialPickingReceiveDto param);
     }
 }
