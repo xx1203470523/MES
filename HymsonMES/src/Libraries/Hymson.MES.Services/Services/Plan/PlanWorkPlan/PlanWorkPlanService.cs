@@ -289,7 +289,7 @@ namespace Hymson.MES.Services.Services.Plan
                 ProductBOMId = workPlanProductEntity.BomId,
                 Type = workPlanEntity.Type,
                 OverScale = workPlanProductEntity.OverScale,
-                Status = PlanWorkOrderStatusEnum.NotStarted,
+                Status = PlanWorkOrderStatusEnum.SendDown,
 
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = currentBo.SiteId,

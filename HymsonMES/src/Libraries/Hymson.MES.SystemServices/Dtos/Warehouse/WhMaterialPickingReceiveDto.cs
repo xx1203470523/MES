@@ -13,8 +13,8 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
     public  class WhMaterialPickingReceiveDto
     { 
         /// <summary>
-      /// 领料单号
-      /// </summary>
+        /// 领料单号
+        /// </summary>
         public string RequistionOrderCode { set; get; }
 
         /// <summary>
