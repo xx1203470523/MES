@@ -354,9 +354,9 @@ namespace Hymson.MES.SystemServices.Services.Plan
                             MaterialId = materialEntity.Id,
                             MaterialCode = materialEntity.MaterialCode,
                             MaterialVersion = materialEntity.Version ?? "",
-                            //BomId = s.BomId,
-                            Usages = materialDto.Usages,
-                            Loss = materialDto.Loss,
+                            BomId = materialDto.BomId,
+                            Usages = materialDto.MaterialDosage,
+                            Loss = materialDto.MaterialLoss,
 
                             Remark = "",
                             Id = materialDto.Id ?? IdGenProvider.Instance.CreateId(),

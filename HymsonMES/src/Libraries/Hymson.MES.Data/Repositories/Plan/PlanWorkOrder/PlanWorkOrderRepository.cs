@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions,IMemoryCache memoryCache) : base(connectionOptions)
+        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _memoryCache = memoryCache;
         }
@@ -83,6 +83,12 @@ namespace Hymson.MES.Data.Repositories.Plan
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderEntity>(GetByIdsSql, new { ids });
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<PlanWorkOrderEntity>> GetBySiteIdAsync(long siteId)
         {
             var cachedKey = $"{CachedTables.PLAN_WORK_ORDER}&SiteId&{siteId}";
@@ -92,6 +98,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                 return await conn.QueryAsync<PlanWorkOrderEntity>(GetBySiteIdSql, new { SiteId = siteId });
             });
         }
+
         /// <summary>
         /// 根据 workOrderId 获取数据
         /// </summary>
@@ -102,7 +109,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderRecordEntity>(GetByWorkOrderIdSql, new { workOrderId });
         }
-        
+
         /// <summary>
         /// 根据IDs批量获取数据  含有物料信息
         /// </summary>
@@ -123,6 +130,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderEntity>(GetByWorkFarmId, new { WorkCenterType = WorkCenterTypeEnum.Farm, workFarmId });
+        }
+
+        /// <summary>
+        /// 根据计划产品ID获取工单数据
+        /// </summary>
+        /// <param name="planProductId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderEntity>> GetByPlanProductIdAsync(long planProductId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<PlanWorkOrderEntity>(GetByPlanProductIdSql, new { WorkPlanProductId = planProductId });
         }
 
         /// <summary>
@@ -355,7 +373,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
-        /// 获取List   equal
+        /// 获取List
         /// </summary>
         /// <param name="planWorkOrderQuery"></param>
         /// <returns></returns>
@@ -653,7 +671,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                         /**where**/   ";
         const string GetPlanWorkOrderEntitiesSqlTemplate = @"SELECT /**select**/ FROM `plan_work_order` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `plan_work_order`(  `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkPlanId) VALUES (   @Id, @OrderCode, @ProductId, @WorkCenterType, @WorkCenterId, @ProcessRouteId, @ProductBOMId, @Type, @Qty, @Status, @OverScale, @PlanStartTime, @PlanEndTime, @IsLocked, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkPlanId );  ";
+        const string InsertSql = "INSERT INTO `plan_work_order`(`Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkPlanId, WorkPlanProductId) VALUES (   @Id, @OrderCode, @ProductId, @WorkCenterType, @WorkCenterId, @ProcessRouteId, @ProductBOMId, @Type, @Qty, @Status, @OverScale, @PlanStartTime, @PlanEndTime, @IsLocked, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkPlanId, @WorkPlanProductId);  ";
         const string InsertPlanWorkOrderRecordSql = "INSERT INTO `plan_work_order_record`(  `Id`, `RealStart`, `RealEnd`, `InputQty`, `UnqualifiedQuantity`, `FinishProductQuantity`, `PassDownQuantity`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `WorkOrderId`, `WorkPlanId`) VALUES (   @Id, @RealStart, @RealEnd, @InputQty, @UnqualifiedQuantity, @FinishProductQuantity, @PassDownQuantity, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId, @WorkPlanId )";
 
         const string UpdateSql = "UPDATE `plan_work_order` SET  ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
@@ -714,6 +732,8 @@ namespace Hymson.MES.Data.Repositories.Plan
             "LEFT JOIN inte_work_center_relation IWCR ON IWCR.WorkCenterId = PWO.WorkCenterId " +
             "LEFT JOIN inte_work_center IWC ON IWC.Id = IWCR.SubWorkCenterId " +
             "WHERE PWO.IsDeleted = 0 AND PWO.WorkCenterType = @WorkCenterType AND IWCR.SubWorkCenterId = @workFarmId ";
+
+        const string GetByPlanProductIdSql = "SELECT * FROM plan_work_order WHERE IsDeleted = 0 AND WorkPlanProductId = @WorkPlanProductId; ";
 
         const string GetByWorkLineId = "SELECT PWO.* FROM plan_work_order_activation PWOA " +
             "LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId " +

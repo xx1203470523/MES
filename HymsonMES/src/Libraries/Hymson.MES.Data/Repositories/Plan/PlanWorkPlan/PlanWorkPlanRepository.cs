@@ -135,6 +135,11 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
+            if (query.Codes != null && query.Codes.Any())
+            {
+                sqlBuilder.Where("WorkPlanCode IN @Codes");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkPlanEntity>(template.RawSql, query);
         }

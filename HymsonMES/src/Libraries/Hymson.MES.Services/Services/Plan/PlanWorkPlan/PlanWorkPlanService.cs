@@ -194,15 +194,12 @@ namespace Hymson.MES.Services.Services.Plan
                 Codes = workOrderCodes,
             });
 
-            /*
             // 检查子工单的总数量是否等于计划数量
             var sumQuantity = dto.Details.Sum(s => s.Qty);
-            if (sumQuantity != workPlanEntity.Qty)
+            if (sumQuantity != workPlanProductEntity.Qty)
             {
-                // TODO: 子工单的总数量不等于计划数量
-                throw new CustomerValidationException(nameof(ErrorCode.MES16017));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16054));
             }
-            */
 
             // 检查子工单的计划时间是否超出生产计划的时间范围
             if (dto.Details.Any(a => a.PlanStartTime < workPlanEntity.PlanStartTime || a.PlanStartTime > workPlanEntity.PlanEndTime))
@@ -243,6 +240,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 ProductId = workPlanProductEntity.ProductId,
                 WorkPlanId = workPlanEntity.Id,
+                WorkPlanProductId = workPlanProductEntity.Id,
                 ProcessRouteId = 0,
                 ProductBOMId = 0,
                 Type = workPlanEntity.Type,
@@ -404,8 +402,22 @@ namespace Hymson.MES.Services.Services.Plan
             return dto;
         }
 
-        // TODO: 读取生产计划已经下发的子工单
+        /// <summary>
+        /// 读取生产计划已经下发的子工单
+        /// </summary>
+        /// <param name="planProductId"></param>
+        /// <returns></returns>
+        public async Task<string> QueryOrderByPlanIdAsync(long planProductId)
+        {
+            // 检查生产计划是否存在
+            var workPlanProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(planProductId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16018));
 
+            // 查询生产计划的子工单
+            var workOrderEntities = await _planWorkOrderRepository.GetByPlanProductIdAsync(workPlanProductEntity.Id);
+
+            return default;
+        }
 
         // TODO: 读取生产计划的物料
 

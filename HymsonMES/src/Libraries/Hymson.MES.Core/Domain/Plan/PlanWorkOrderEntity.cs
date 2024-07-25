@@ -103,5 +103,10 @@ namespace Hymson.MES.Core.Domain.Plan
         /// </summary>
         public long? WorkPlanId { get; set; }
 
+        /// <summary>
+        /// 生产计划产品id
+        /// </summary>
+        public long? WorkPlanProductId { get; set; }
+
     }
 }
