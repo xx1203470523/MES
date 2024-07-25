@@ -86,7 +86,7 @@ namespace Hymson.MES.Api.Controllers.Report
         [HttpGet("MaterialSources/{sfc}")]
         public async Task<IEnumerable<MaterialSourceDto>> GetMaterialSourcesAsync(string sfc)
         {
-            return await _tracingSFCService.GetMaterialSourcesAsync(sfc);
+            return await _tracingSFCService.GetOldMaterialSourcesAsync(sfc);
         }
 
 
