@@ -16,7 +16,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
         }
 
         /// <summary>
-        /// 
+        /// 领料
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>

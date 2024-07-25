@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Services.Dtos.Warehouse;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Services.Dtos.Warehouse;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking
         /// </summary>
         public long OrderId { get; set; }
 
+        /// <summary>
+        /// 退仓类型1：实仓，2：虚仓
+        /// </summary>
+        public ManuReturnTypeEnum Type { get; set; }
         /// <summary>
         /// 领料数量
         /// </summary>
