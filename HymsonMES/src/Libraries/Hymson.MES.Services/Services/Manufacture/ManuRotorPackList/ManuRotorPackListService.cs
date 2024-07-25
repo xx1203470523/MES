@@ -13,6 +13,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.PackList;
+using Hymson.MES.Data.Repositories.QualFqcInspectionMaval;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -46,6 +47,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         private readonly ISequenceService _sequenceService;
 
+        private readonly IQualFqcInspectionMavalRepository _qualFqcInspectionMavalRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -54,14 +57,16 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="validationSaveRules"></param>
         /// <param name="manuRotorPackListRepository"></param>
         /// <param name="sequenceService"></param>
+        /// <param name="qualFqcInspectionMavalRepository"></param>
         public ManuRotorPackListService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuRotorPackListSaveDto> validationSaveRules,
-            IManuRotorPackListRepository manuRotorPackListRepository, ISequenceService sequenceService)
+            IManuRotorPackListRepository manuRotorPackListRepository, ISequenceService sequenceService, IQualFqcInspectionMavalRepository qualFqcInspectionMavalRepository)
         {
             _sequenceService = sequenceService;
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _manuRotorPackListRepository = manuRotorPackListRepository;
+            _qualFqcInspectionMavalRepository = qualFqcInspectionMavalRepository;
         }
 
 
@@ -181,18 +186,41 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuRotorPackListEntity = await _manuRotorPackListRepository.GetEntitiesAsync(new ManuRotorPackListQuery { BoxCode = query.BoxCode, Sfc = query.Sfc, SiteId = _currentSite.SiteId ?? 0 });
             if (manuRotorPackListEntity.Any() == false)
                 return manuRotors;
+
+            var sfcs = manuRotorPackListEntity.Select(x => x.ProductCode).ToList();
+            var qualFqcs = await _qualFqcInspectionMavalRepository.GetQualFqcInspectionMavalEntitiesAsync(new QualFqcInspectionMavalQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFCs = sfcs,
+            });
             foreach (var item in manuRotorPackListEntity)
             {
                 var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
                 var InspectionOrder = $"{query.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
+                var qualFqc = qualFqcs.FirstOrDefault(x => x.SFC == item.ProductCode);
+                var type = ProductReceiptQualifiedStatusEnum.ToBeBnspected;
+                var WarehouseCode = "待检验仓";
+                if (qualFqc != null)
+                {
+                    if (qualFqc.JudgmentResults== FqcJudgmentResultsEnum.Unqualified)
+                    {
+                        WarehouseCode = "不良品仓";
+                        type = ProductReceiptQualifiedStatusEnum.Unqualified;
+                    }
+                    if (qualFqc.JudgmentResults == FqcJudgmentResultsEnum.Qualified)
+                    {
+                        WarehouseCode = "成品仓";
+                        type = ProductReceiptQualifiedStatusEnum.Qualified;
+                    }
+                }
                 var manuRotorPackView = new ManuRotorPackViewDto
                 {
-                    Sfc=item.ProductCode,
-                    BoxCode= item.BoxCode,
-                    Type = ProductReceiptQualifiedStatusEnum.Qualified,
+                    Sfc = item.ProductCode,
+                    BoxCode = item.BoxCode,
+                    Type = type,
                     Unit = "个",
                     Qty = 1,
-                    WarehouseCode = "成品仓",
+                    WarehouseCode = WarehouseCode,
                     Batch = InspectionOrder,
                 };
                 manuRotors.Add(manuRotorPackView);

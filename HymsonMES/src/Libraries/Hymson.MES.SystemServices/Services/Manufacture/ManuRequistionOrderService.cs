@@ -668,6 +668,7 @@ namespace Hymson.MES.SystemServices.Services
                         Qty = productReceiptOrderDetailEntities.Count(),
                     });
                     await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
+                    ts.Complete();
                 }
 
             }
