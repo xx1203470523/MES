@@ -21,15 +21,15 @@ namespace Hymson.MES.System.Api.Controllers
         /// 业务接口（生产领料）
         /// </summary>
         private readonly IManuRequistionOrderService _manuRequistionOrderService;
-        private readonly IManuRotorService _manuRotorService;
+        // private readonly IManuRotorService _manuRotorService;
         /// <summary>
-        /// 构造函数
+        /// 构造函数, IManuRotorService manuRotorService
         /// </summary>
         public ManufactureController(IManuRequistionOrderService manuRequistionOrderService
-            , IManuRotorService manuRotorService) 
+            ) 
         { 
             _manuRequistionOrderService = manuRequistionOrderService;
-            _manuRotorService = manuRotorService;
+            // _manuRotorService = manuRotorService;
         }
         /// <summary>
         /// 生产领料(WMS领料单完成后)
@@ -75,14 +75,14 @@ namespace Hymson.MES.System.Api.Controllers
         /// </summary>
         /// <param name="callBackDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("RotorUploadCrossingStationData")]
-        [ProducesResponseType(typeof(ResultDto), 200)]
-        [LogDescription("转子线过站上报", BusinessType.INSERT)]
-        public async Task RotorUploadCrossingStationDataAsync([FromBody] RotorCrossingStationData stationData)
-        {
-            await _manuRotorService.UploadCrossingStationData(stationData);
-        }
+        //[HttpPost]
+        //[Route("RotorUploadCrossingStationData")]
+        //[ProducesResponseType(typeof(ResultDto), 200)]
+        //[LogDescription("转子线过站上报", BusinessType.INSERT)]
+        //public async Task RotorUploadCrossingStationDataAsync([FromBody] RotorCrossingStationData stationData)
+        //{
+        //    await _manuRotorService.UploadCrossingStationData(stationData);
+        //}
 
         /// <summary>
         /// 成品入库单结果反馈

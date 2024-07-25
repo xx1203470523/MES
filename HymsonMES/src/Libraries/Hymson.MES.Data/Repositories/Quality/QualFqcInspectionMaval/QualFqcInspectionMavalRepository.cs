@@ -120,14 +120,25 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="qualFqcInspectionMavalQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFqcInspectionMavalEntity>> GetQualFqcInspectionMavalEntitiesAsync(QualFqcInspectionMavalQuery qualFqcInspectionMavalQuery)
+        public async Task<IEnumerable<QualFqcInspectionMavalEntity>> GetQualFqcInspectionMavalEntitiesAsync(QualFqcInspectionMavalQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetQualFqcInspectionMavalEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.SFCs != null && query.SFCs.Any())
+            {
+                sqlBuilder.Where("Sfc IN @SFCs");
+            }
+
+            sqlBuilder.AddParameters(query);
             using var conn = GetMESDbConnection();
-            var qualFqcInspectionMavalEntities = await conn.QueryAsync<QualFqcInspectionMavalEntity>(template.RawSql, qualFqcInspectionMavalQuery);
+            var qualFqcInspectionMavalEntities = await conn.QueryAsync<QualFqcInspectionMavalEntity>(template.RawSql, query);
             return qualFqcInspectionMavalEntities;
         }
 

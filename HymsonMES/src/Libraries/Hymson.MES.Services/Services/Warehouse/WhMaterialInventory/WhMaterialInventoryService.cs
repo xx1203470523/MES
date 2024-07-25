@@ -1301,9 +1301,9 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SiteId = _currentSite.SiteId ?? 0,
                 Status = WhWarehouseRequistionStatusEnum.Approvaling,
                 Type = ManuRequistionTypeEnum.WorkOrderPicking,
-                WorkOrderCode = request.WorkCode,
-                WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
-                WorkPlanId = planWorkPlanEntity.Id
+                WorkOrderId = planWorkOrderEntity.Id,
+                //WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
+                //WorkPlanId = planWorkPlanEntity.Id
             };
 
 
@@ -1618,9 +1618,9 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SiteId = _currentSite.SiteId ?? 0,
                 Status = WhWarehouseRequistionStatusEnum.Approvaling,
                 Type = ManuRequistionTypeEnum.WorkOrderPicking,
-                WorkOrderCode = planWorkOrderEntity.OrderCode,
-                WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
-                WorkPlanId = planWorkPlanEntity.Id
+                WorkOrderId = planWorkOrderEntity.Id,
+                //WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
+                //WorkPlanId = planWorkPlanEntity.Id
             };
 
 

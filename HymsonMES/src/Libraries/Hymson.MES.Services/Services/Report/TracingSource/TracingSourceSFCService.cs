@@ -180,7 +180,7 @@ namespace Hymson.MES.Services.Services
             {
                 var procMaterialEntity = await _masterDataService.GetProcMaterialEntityAsync(_currentSite.SiteId ?? 0, manuSfcCirculationEntity.ProductId);
                 if (procMaterialEntity == null) continue;
-                var materialSourceDto = manuSfcCirculationEntity.ToModel<MaterialSourceDto>();
+                var materialSourceDto = new MaterialSourceDto();
                 materialSourceDto.CirculationQty = manuSfcCirculationEntity.CirculationQty ?? 0;
                 materialSourceDto.CirculationBarCode = manuSfcCirculationEntity.SFC;
                 materialSourceDto.Sfc = manuSfcCirculationEntity.CirculationBarCode;
@@ -266,6 +266,8 @@ namespace Hymson.MES.Services.Services
             var procParameterEntity = await _masterDataService.GetProcParameterEntityAsync(_currentSite.SiteId ?? 0, manuProductParameterEntity.ParameterId);
             productParameterSourceDto.ParameterName = procParameterEntity == null ? "" : procParameterEntity.ParameterName;
             productParameterSourceDto.ParameterCode = procParameterEntity == null ? "" : procParameterEntity.ParameterCode;
+
+            productParameterSourceDto.CollectionTime= manuProductParameterEntity.CollectionTime;
         }
         /// <summary>
         /// 

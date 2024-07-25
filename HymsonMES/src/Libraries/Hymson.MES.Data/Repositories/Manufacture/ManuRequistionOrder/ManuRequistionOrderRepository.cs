@@ -71,10 +71,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByIdsSql, new { Ids = ids});
         }
-        public async Task<IEnumerable<ManuRequistionOrderEntity>> GetByOrderCodeAsync(string orderCode,long siteId)
+        public async Task<IEnumerable<ManuRequistionOrderEntity>> GetByOrderCodeAsync(long orderId, long siteId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByOrderCodeSql, new { WorkOrderCode = orderCode, SiteId= siteId });
+            return await conn.QueryAsync<ManuRequistionOrderEntity>(GetByOrderIdSql, new { WorkOrderId = orderId, SiteId= siteId });
         }
 
         /// <summary>
@@ -120,9 +120,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
-            if (manuRequistionOrderQuery.WorkOrders!=null&&manuRequistionOrderQuery.WorkOrders.Length>0)
+            if (manuRequistionOrderQuery.WorkOrderIds!=null&&manuRequistionOrderQuery.WorkOrderIds.Any())
             {
-                sqlBuilder.Where("WorkOrderCode IN @WorkOrders");
+                sqlBuilder.Where("WorkOrderId IN @WorkOrderIds");
             }
             sqlBuilder.AddParameters(manuRequistionOrderQuery);
             using var conn = GetMESDbConnection();
@@ -160,7 +160,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         public async Task<int> InsertsAsync(List<ManuRequistionOrderEntity> manuRequistionOrderEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, manuRequistionOrderEntitys);
+            return await conn.ExecuteAsync(InsertSql, manuRequistionOrderEntitys);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         public async Task<int> UpdatesAsync(List<ManuRequistionOrderEntity> manuRequistionOrderEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, manuRequistionOrderEntitys);
+            return await conn.ExecuteAsync(UpdateSql, manuRequistionOrderEntitys);
         }
         #endregion
 
@@ -197,24 +197,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
                                             /**select**/
                                            FROM `manu_requistion_order` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_requistion_order`(  `Id`, `ReqOrderCode`, `WorkOrderCode`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ReqOrderCode, @WorkOrderCode, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `manu_requistion_order`(  `Id`, `ReqOrderCode`, `WorkOrderCode`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ReqOrderCode, @WorkOrderCode, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `manu_requistion_order`(  `Id`, `ReqOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ReqOrderCode, @WorkOrderId, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
-        const string UpdateSql = "UPDATE `manu_requistion_order` SET   ReqOrderCode = @ReqOrderCode, WorkOrderCode = @WorkOrderCode, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_requistion_order` SET   ReqOrderCode = @ReqOrderCode, WorkOrderCode = @WorkOrderCode, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_requistion_order` SET   ReqOrderCode = @ReqOrderCode, WorkOrderId = @WorkOrderId, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_requistion_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_requistion_order` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `ReqOrderCode`, `WorkOrderCode`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                               `Id`, `ReqOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_requistion_order`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `ReqOrderCode`, `WorkOrderCode`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                                          `Id`, `ReqOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_requistion_order`  WHERE Id IN @Ids ";
 
         const string GetByCodeSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND ReqOrderCode = @ReqOrderCode and SiteId=@SiteId ";
-        const string GetByOrderCodeSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND WorkOrderCode = @WorkOrderCode and SiteId=@SiteId ";
+        const string GetByOrderIdSql = @"SELECT *  FROM `manu_requistion_order` WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId and SiteId=@SiteId ";
         #endregion
     }
 }

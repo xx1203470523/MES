@@ -26,7 +26,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 工单Code
         /// </summary>
-        public string WorkOrderCode { get; set; }
+        public long WorkOrderId { get; set; }
 
         /// <summary>
         /// 领料单类型 0:工单领料 1:工单补料
@@ -37,18 +37,19 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 状态
         /// </summary>
         public WhWarehouseRequistionStatusEnum? Status { get; set; }
-        /// <summary>
-        /// 计划编码
-        /// </summary>
-        public string WorkPlanCode { get; set; }
-        /// <summary>
-        /// 计划Id
-        /// </summary>
-        public long WorkPlanId { get; set; }
-        /// <summary>
-        /// 领料数量
-        /// </summary>
-        public int Qty { get; set; }
+
+        ///// <summary>
+        ///// 计划编码
+        ///// </summary>
+        //public string WorkPlanCode { get; set; }
+        ///// <summary>
+        ///// 计划Id
+        ///// </summary>
+        //public long WorkPlanId { get; set; }
+        ///// <summary>
+        ///// 领料数量
+        ///// </summary>
+        //public int Qty { get; set; }
 
         /// <summary>
         /// 物料描述

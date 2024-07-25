@@ -23,24 +23,24 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long RequistionOrderId { get; set; }
 
        /// <summary>
-        /// 物料编码
+        /// 物料Id
         /// </summary>
-        public string MaterialCode { get; set; }
+        public long MaterialId { get; set; }
 
-       /// <summary>
-        /// 物料版本
-        /// </summary>
-        public string Version { get; set; }
+       ///// <summary>
+       // /// 物料版本
+       // /// </summary>
+       // public string Version { get; set; }
 
-       /// <summary>
-        /// 物料条码
-        /// </summary>
-        public string MaterialBarCode { get; set; }
+       ///// <summary>
+       // /// 物料条码
+       // /// </summary>
+       // public string MaterialBarCode { get; set; }
 
-       /// <summary>
-        /// 物料批次
-        /// </summary>
-        public string Batch { get; set; }
+       ///// <summary>
+       // /// 物料批次
+       // /// </summary>
+       // public string Batch { get; set; }
 
        /// <summary>
         /// 领料数量
@@ -52,20 +52,20 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long? WarehouseId { get; set; }
 
-       /// <summary>
-        /// 供应商编码
-        /// </summary>
-        public string SupplierCode { get; set; }
+        ///// <summary>
+        // /// 供应商编码
+        // /// </summary>
+        // public string SupplierCode { get; set; }
 
-       /// <summary>
-        /// 物料的有效期（过期时间)
-        /// </summary>
-        public DateTime ExpirationDate { get; set; }
+        ///// <summary>
+        // /// 物料的有效期（过期时间)
+        // /// </summary>
+        // public DateTime ExpirationDate { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 站点Id
