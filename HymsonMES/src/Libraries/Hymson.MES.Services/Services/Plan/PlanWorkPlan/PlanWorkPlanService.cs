@@ -4,11 +4,16 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Plan;
 using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -28,6 +33,11 @@ namespace Hymson.MES.Services.Services.Plan
     {
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 系统配置
+        /// </summary>
+        private readonly ISysConfigRepository _sysConfigRepository;
 
         /// <summary>
         /// 仓储接口（生产计划）
@@ -65,10 +75,16 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
+        /// 仓储接口（工艺路线）
+        /// </summary>
+        private readonly IProcProcessRouteRepository _procProcessRouteRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="sysConfigRepository"></param>
         /// <param name="planWorkPlanRepository"></param>
         /// <param name="planWorkPlanProductRepository"></param>
         /// <param name="planWorkPlanMaterialRepository"></param>
@@ -76,17 +92,21 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procMaterialRepository"></param>
+        /// <param name="procProcessRouteRepository"></param>
         public PlanWorkPlanService(ICurrentUser currentUser, ICurrentSite currentSite,
+            ISysConfigRepository sysConfigRepository,
             IPlanWorkPlanRepository planWorkPlanRepository,
             IPlanWorkPlanProductRepository planWorkPlanProductRepository,
             IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IProcBomRepository procBomRepository,
-            IProcMaterialRepository procMaterialRepository)
+            IProcMaterialRepository procMaterialRepository,
+            IProcProcessRouteRepository procProcessRouteRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _sysConfigRepository = sysConfigRepository;
             _planWorkPlanRepository = planWorkPlanRepository;
             _planWorkPlanProductRepository = planWorkPlanProductRepository;
             _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
@@ -94,6 +114,7 @@ namespace Hymson.MES.Services.Services.Plan
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _procBomRepository = procBomRepository;
             _procMaterialRepository = procMaterialRepository;
+            _procProcessRouteRepository = procProcessRouteRepository;
         }
 
 
@@ -133,15 +154,15 @@ namespace Hymson.MES.Services.Services.Plan
                 if (i != dto.Count)
                 {
                     splitDto.Qty = partitionQty;
-                    splitDto.PlanStartDate = planEntity.PlanStartTime.AddDays((i - 1) * partitionDay);
-                    splitDto.PlanEndDate = planEntity.PlanStartTime.AddDays(i * partitionDay);
+                    splitDto.PlanStartTime = planEntity.PlanStartTime.AddDays((i - 1) * partitionDay);
+                    splitDto.PlanEndTime = planEntity.PlanStartTime.AddDays(i * partitionDay);
                 }
                 // 如果是最后一条
                 else
                 {
                     splitDto.Qty = remainingQty;
-                    splitDto.PlanStartDate = planEntity.PlanStartTime.AddDays((i - 1) * partitionDay);
-                    splitDto.PlanEndDate = planEntity.PlanEndTime;
+                    splitDto.PlanStartTime = planEntity.PlanStartTime.AddDays((i - 1) * partitionDay);
+                    splitDto.PlanEndTime = planEntity.PlanEndTime;
                 }
 
                 // 添加到待返回
@@ -194,21 +215,17 @@ namespace Hymson.MES.Services.Services.Plan
                 Codes = workOrderCodes,
             });
 
-            /*
             // 检查子工单的总数量是否等于计划数量
             var sumQuantity = dto.Details.Sum(s => s.Qty);
-            if (sumQuantity != workPlanEntity.Qty)
+            if (sumQuantity != workPlanProductEntity.Qty)
             {
-                // TODO: 子工单的总数量不等于计划数量
-                throw new CustomerValidationException(nameof(ErrorCode.MES16017));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16054));
             }
-            */
 
             // 检查子工单的计划时间是否超出生产计划的时间范围
             if (dto.Details.Any(a => a.PlanStartTime < workPlanEntity.PlanStartTime || a.PlanStartTime > workPlanEntity.PlanEndTime))
             {
-                // TODO: 子工单的计划时间超出生产计划的时间范围
-                throw new CustomerValidationException(nameof(ErrorCode.MES16017));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16055));
             }
 
             // 当前对象
@@ -224,11 +241,34 @@ namespace Hymson.MES.Services.Services.Plan
             workPlanEntity.UpdatedBy = currentBo.User;
             workPlanEntity.UpdatedOn = currentBo.Time;
 
+            // 工作中心编码配置
+            var workCenterConfigs = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.WorkCenterCode });
+            if (workCenterConfigs == null || !workCenterConfigs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.ProcessRouteCode.GetDescription());
+            }
+
             // 读取工作中心
+            var workCenterCode = GetWorkCenterCode(workCenterConfigs, workPlanEntity.PlanType);
             var workCenterEntity = await _inteWorkCenterRepository.GetEntityAsync(new InteWorkCenterOneQuery
             {
                 SiteId = workPlanEntity.SiteId,
-                Code = workPlanEntity.WorkCenterCode
+                Code = workCenterCode
+            });
+
+            // 工艺路线编码配置
+            var processRouteConfigs = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ProcessRouteCode });
+            if (processRouteConfigs == null || !processRouteConfigs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.ProcessRouteCode.GetDescription());
+            }
+
+            // 读取工艺路线
+            var processRouteCode = GetProcessRouteCode(processRouteConfigs, workPlanEntity.PlanType);
+            var processRouteEntity = await _procProcessRouteRepository.GetByCodeAsync(new ProcProcessRoutesByCodeQuery
+            {
+                SiteId = workPlanEntity.SiteId,
+                Code = processRouteCode
             });
 
             List<PlanWorkOrderEntity> workOrderEntites = new();
@@ -243,8 +283,9 @@ namespace Hymson.MES.Services.Services.Plan
 
                 ProductId = workPlanProductEntity.ProductId,
                 WorkPlanId = workPlanEntity.Id,
-                ProcessRouteId = 0,
-                ProductBOMId = 0,
+                WorkPlanProductId = workPlanProductEntity.Id,
+                ProcessRouteId = processRouteEntity?.Id ?? 0,
+                ProductBOMId = workPlanProductEntity.BomId,
                 Type = workPlanEntity.Type,
                 OverScale = workPlanProductEntity.OverScale,
                 Status = PlanWorkOrderStatusEnum.NotStarted,
@@ -404,8 +445,36 @@ namespace Hymson.MES.Services.Services.Plan
             return dto;
         }
 
-        // TODO: 读取生产计划已经下发的子工单
+        /// <summary>
+        /// 读取生产计划已经下发的子工单
+        /// </summary>
+        /// <param name="planProductId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkPlanDetailSaveDto>> QueryOrderByPlanIdAsync(long planProductId)
+        {
+            // 检查生产计划是否存在
+            var workPlanProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(planProductId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16018));
 
+            List<PlanWorkPlanDetailSaveDto> dtos = new();
+
+            // 查询生产计划的子工单
+            var workOrderEntities = await _planWorkOrderRepository.GetByPlanProductIdAsync(workPlanProductEntity.Id);
+            if (workOrderEntities == null || !workOrderEntities.Any()) return dtos;
+
+            foreach (var item in workOrderEntities)
+            {
+                dtos.Add(new PlanWorkPlanDetailSaveDto
+                {
+                    WorkOrderCode = item.OrderCode,
+                    PlanStartTime = item.PlanStartTime,
+                    PlanEndTime = item.PlanEndTime,
+                    Qty = item.Qty
+                });
+            }
+
+            return dtos;
+        }
 
         // TODO: 读取生产计划的物料
 
@@ -429,5 +498,42 @@ namespace Hymson.MES.Services.Services.Plan
             return workPlanMaterialEntities.Select(s => s.ToModel<PlanWorkPlanMaterialDto>());
         }
 
+
+
+        #region 内部方法
+        /// <summary>
+        /// 获取工艺路线编码
+        /// </summary>
+        /// <param name="configEntities"></param>
+        /// <param name="planType"></param>
+        /// <returns></returns>
+        private static string GetProcessRouteCode(IEnumerable<SysConfigEntity> configEntities, PlanWorkPlanTypeEnum planType)
+        {
+            var configEntity = configEntities.FirstOrDefault();
+            if (configEntity == null) return "not configured";
+
+            if (string.IsNullOrWhiteSpace(configEntity?.Value)) return "no configured value";
+
+            var valueArray = configEntity.Value.Split('|');
+            return planType == PlanWorkPlanTypeEnum.Rotor ? valueArray[0] : valueArray[1];
+        }
+
+        /// <summary>
+        /// 获取工作中心编码
+        /// </summary>
+        /// <param name="configEntities"></param>
+        /// <param name="planType"></param>
+        /// <returns></returns>
+        private static string GetWorkCenterCode(IEnumerable<SysConfigEntity> configEntities, PlanWorkPlanTypeEnum planType)
+        {
+            var configEntity = configEntities.FirstOrDefault();
+            if (configEntity == null) return "not configured";
+
+            if (string.IsNullOrWhiteSpace(configEntity?.Value)) return "no configured value";
+
+            var valueArray = configEntity.Value.Split('|');
+            return planType == PlanWorkPlanTypeEnum.Rotor ? valueArray[0] : valueArray[1];
+        }
+        #endregion
     }
 }

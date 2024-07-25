@@ -144,55 +144,55 @@
         /// </summary>
         public long UpdateTime { get; set; }
 
-        /// <summary>
-        /// 关联部件01的电子条码，最大长度64
-        /// </summary>
-        public string PartCode01 { get; set; }
+        ///// <summary>
+        ///// 关联部件01的电子条码，最大长度64
+        ///// </summary>
+        //public string PartCode01 { get; set; }
 
-        /// <summary>
-        /// 关联部件01的批次号，最大长度64
-        /// </summary>
-        public string PartBatch01 { get; set; }
+        ///// <summary>
+        ///// 关联部件01的批次号，最大长度64
+        ///// </summary>
+        //public string PartBatch01 { get; set; }
 
-        /// <summary>
-        /// 关联部件01的名称，最大长度32
-        /// </summary>
-        public string PartName01 { get; set; }
+        ///// <summary>
+        ///// 关联部件01的名称，最大长度32
+        ///// </summary>
+        //public string PartName01 { get; set; }
 
-        /// <summary>
-        /// 关联部件02的电子条码，最大长度64
-        /// </summary>
-        public string PartCode02 { get; set; }
+        ///// <summary>
+        ///// 关联部件02的电子条码，最大长度64
+        ///// </summary>
+        //public string PartCode02 { get; set; }
 
-        /// <summary>
-        /// 关联部件02的批次号，最大长度64
-        /// </summary>
-        public string PartBatch02 { get; set; }
+        ///// <summary>
+        ///// 关联部件02的批次号，最大长度64
+        ///// </summary>
+        //public string PartBatch02 { get; set; }
 
-        /// <summary>
-        /// 关联部件02的名称，最大长度32
-        /// </summary>
-        public string PartName02 { get; set; }
+        ///// <summary>
+        ///// 关联部件02的名称，最大长度32
+        ///// </summary>
+        //public string PartName02 { get; set; }
 
-        /// <summary>
-        /// 关联部件03的电子条码，最大长度64
-        /// </summary>
-        public string PartCode03 { get; set; }
+        ///// <summary>
+        ///// 关联部件03的电子条码，最大长度64
+        ///// </summary>
+        //public string PartCode03 { get; set; }
 
-        /// <summary>
-        /// 关联部件03的批次号，最大长度64
-        /// </summary>
-        public string PartBatch03 { get; set; }
+        ///// <summary>
+        ///// 关联部件03的批次号，最大长度64
+        ///// </summary>
+        //public string PartBatch03 { get; set; }
 
-        /// <summary>
-        /// 关联部件03的名称，最大长度32
-        /// </summary>
-        public string PartName03 { get; set; }
+        ///// <summary>
+        ///// 关联部件03的名称，最大长度32
+        ///// </summary>
+        //public string PartName03 { get; set; }
 
-        /// <summary>
-        /// 控制项点位代码，最大长度128
-        /// </summary>
-        public string GatherSpot { get; set; }
+        ///// <summary>
+        ///// 控制项点位代码，最大长度128
+        ///// </summary>
+        //public string GatherSpot { get; set; }
 
         /// <summary>
         /// 是否调试

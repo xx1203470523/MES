@@ -377,12 +377,12 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 计划开始时间
         /// </summary>
-        public DateTime PlanStartDate { get; set; }
+        public DateTime PlanStartTime { get; set; }
 
         /// <summary>
         /// 计划结束时间
         /// </summary>
-        public DateTime PlanEndDate { get; set; }
+        public DateTime PlanEndTime { get; set; }
 
     }
 

@@ -224,13 +224,17 @@ namespace Hymson.MES.SystemServices.Services.Plan
             }
             */
 
-            // 读取已存在的BOM记录
+            // 读取已存在的BOM记录（因为U8会出现重复编码）
+            /*
             var bomCodes = workPlanDtos.SelectMany(s => s.Products).Select(s => s.BomCode).Distinct();
             var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = currentBo.SiteId, Codes = bomCodes });
+            */
+            var bomIds = workPlanDtos.SelectMany(s => s.Products).Select(s => s.BomId).Distinct();
+            var bomEntities = await _procBomRepository.GetByIdsAsync(bomIds);
             if (bomEntities == null || !bomEntities.Any())
             {
                 // 这里应该提示BOM不存在
-                throw new CustomerValidationException(nameof(ErrorCode.MES10233)).WithData("bomCode", string.Join(',', bomCodes));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10252));
             }
 
             // 读取已存在的生产计划记录
@@ -272,14 +276,14 @@ namespace Hymson.MES.SystemServices.Services.Plan
                         RequirementNumber = planDto.RequirementNumber,
                         PlanStartTime = firstProductDto.StartTime ?? SqlDateTime.MinValue.Value,
                         PlanEndTime = firstProductDto.EndTime ?? SqlDateTime.MaxValue.Value,
-
+                        
                         // TODO: 这里的字段需要确认
                         OverScale = 0,
                         Type = planDto.Type,
                         Status = PlanWorkPlanStatusEnum.NotStarted,
 
                         Remark = "",
-                        Id = IdGenProvider.Instance.CreateId(),
+                        Id = planDto.Id ?? IdGenProvider.Instance.CreateId(),
                         SiteId = currentBo.SiteId,
                         CreatedBy = currentBo.User,
                         CreatedOn = currentBo.Time,
@@ -354,9 +358,9 @@ namespace Hymson.MES.SystemServices.Services.Plan
                             MaterialId = materialEntity.Id,
                             MaterialCode = materialEntity.MaterialCode,
                             MaterialVersion = materialEntity.Version ?? "",
-                            //BomId = s.BomId,
-                            Usages = materialDto.Usages,
-                            Loss = materialDto.Loss,
+                            BomId = materialDto.BomId,
+                            Usages = materialDto.MaterialDosage,
+                            Loss = materialDto.MaterialLoss,
 
                             Remark = "",
                             Id = materialDto.Id ?? IdGenProvider.Instance.CreateId(),

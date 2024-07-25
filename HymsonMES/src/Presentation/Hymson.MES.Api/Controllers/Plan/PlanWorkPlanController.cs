@@ -58,6 +58,17 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
+        /// 读取生产计划已经下发的子工单
+        /// </summary>
+        /// <param name="planProductId"></param>
+        /// <returns></returns>
+        [HttpGet("orders/{planProductId}")]
+        public async Task<IEnumerable<PlanWorkPlanDetailSaveDto>?> QueryOrderByPlanIdAsync(long planProductId)
+        {
+            return await _planWorkPlanService.QueryOrderByPlanIdAsync(planProductId);
+        }
+
+        /// <summary>
         /// 查询ID集合（生产计划物料）
         /// </summary>
         /// <param name="planProductId"></param>

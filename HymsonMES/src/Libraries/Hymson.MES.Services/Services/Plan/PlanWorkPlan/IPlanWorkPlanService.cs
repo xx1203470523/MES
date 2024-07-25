@@ -44,6 +44,13 @@ namespace Hymson.MES.Services.Services.Plan
         Task<PlanWorkPlanProductDetailDto?> QueryByIdAsync(long planProductId);
 
         /// <summary>
+        /// 读取生产计划已经下发的子工单
+        /// </summary>
+        /// <param name="planProductId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkPlanDetailSaveDto>> QueryOrderByPlanIdAsync(long planProductId);
+
+        /// <summary>
         /// 根据planProductId查询
         /// </summary>
         /// <param name="planProductId"></param>

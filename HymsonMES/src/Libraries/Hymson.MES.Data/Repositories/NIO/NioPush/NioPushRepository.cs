@@ -1,13 +1,13 @@
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.NIO;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
 
-namespace Hymson.MES.BackgroundServices.NIO
+namespace Hymson.MES.Data.NIO
 {
     /// <summary>
     /// 仓储（蔚来推送表）

@@ -70,8 +70,14 @@ namespace Hymson.MES.Core.Domain.Process
         public long? SiteId { get; set; }
 
         /// <summary>
+        /// 编码
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
         /// 编码集合
         /// </summary>
         public IEnumerable<string?> Codes { get; set; }
+
     }
 }

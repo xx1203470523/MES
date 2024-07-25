@@ -21,9 +21,6 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
-using System.Net.NetworkInformation;
-using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
@@ -55,7 +52,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         private readonly IManuRequistionOrderDetailRepository _manuRequistionOrderDetailRepository;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
@@ -66,9 +63,11 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         /// <param name="procBomRepository"></param>
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="manuRequistionOrderRepository"></param>
         /// <param name="planWorkOrderStatusRecordRepository"></param>
         /// <param name="planWorkOrderActivationRecordRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="manuRequistionOrderDetailRepository"></param>
         /// <param name="validationChangeStatusRules"></param>
         public PlanWorkOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<PlanWorkOrderCreateDto> validationCreateRules,
@@ -688,14 +687,14 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 var requistionOrder = requistionOrderEntities.FirstOrDefault(x => x.Id == item.RequistionOrderId);
                 details.Add(new ManuRequistionOrderDetailDto
                 {
-                    ReqOrderCode=requistionOrder?.ReqOrderCode??"",
-                    MaterialCode=item.MaterialCode,
-                    Version=item.Version,
-                    MaterialBarCode=item.MaterialBarCode,
-                    Batch=item.Batch,
-                    Qty=item.Qty,
-                    PickTime= requistionOrder?.CreatedOn??item.CreatedOn,
-                    Status=requistionOrder?.Status
+                    ReqOrderCode = requistionOrder?.ReqOrderCode ?? "",
+                    MaterialCode = item.MaterialCode,
+                    Version = item.Version,
+                    MaterialBarCode = item.MaterialBarCode,
+                    Batch = item.Batch,
+                    Qty = item.Qty,
+                    PickTime = requistionOrder?.CreatedOn ?? item.CreatedOn,
+                    Status = requistionOrder?.Status
                 });
             }
             return details;

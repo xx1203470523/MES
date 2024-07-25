@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Plan;
 
 namespace Hymson.MES.Core.Domain.Plan
 {
@@ -37,9 +38,14 @@ namespace Hymson.MES.Core.Domain.Plan
         public string? RequirementNumber { get; set; } = "";
 
         /// <summary>
-        /// 计划类型
+        /// 计划类型(1:试产工单;2:生产工单;)
         /// </summary>
         public PlanWorkOrderTypeEnum Type { get; set; }
+
+        /// <summary>
+        /// 计划类型(1:转子;2:定子;)
+        /// </summary>
+        public PlanWorkPlanTypeEnum PlanType { get; set; } = PlanWorkPlanTypeEnum.Rotor;
 
         /// <summary>
         /// 计划状态

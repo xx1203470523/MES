@@ -20,22 +20,6 @@ namespace Hymson.MES.BackgroundServices.NIO.Dtos
     }
 
     /// <summary>
-    /// 基类（请求）
-    /// </summary>
-    public class NIORequestDto<T>
-    {
-        /// <summary>
-        /// 业务场景编码
-        /// </summary>
-        public string SchemaCode { get; set; }
-
-        /// <summary>
-        /// 集合
-        /// </summary>
-        public IEnumerable<T> List { get; set; }
-    }
-
-    /// <summary>
     /// 基类（响应）
     /// </summary>
     public class NIOResponseDto
