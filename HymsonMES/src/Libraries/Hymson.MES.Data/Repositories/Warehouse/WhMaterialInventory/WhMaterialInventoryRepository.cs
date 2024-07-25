@@ -235,6 +235,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                 sqlBuilder.Where("WorkOrderId=@WorkOrderId");
             }
 
+            if (whMaterialInventoryQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("Status=@Status");
+            }
+
             using var conn = GetMESDbConnection();
             var whMaterialInventoryEntities = await conn.QueryAsync<WhMaterialInventoryEntity>(template.RawSql, whMaterialInventoryQuery);
             return whMaterialInventoryEntities;
