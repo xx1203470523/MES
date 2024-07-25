@@ -80,7 +80,7 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         [HttpGet("order/materialList")]
-        public async Task<List<ProcBomDetailView>> GetOrderBomMaterialAsync(long orderId)
+        public async Task<List<ProcOrderBomDetailDto>> GetOrderBomMaterialAsync(long orderId)
         {
             return await _procBomService.GetOrderBomMaterialAsync(orderId);
         }

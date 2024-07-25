@@ -701,9 +701,9 @@ namespace Hymson.MES.Services.Services.Process
             return procBomDetailViews;
         }
 
-        public async Task<List<ProcBomDetailView>> GetOrderBomMaterialAsync(long orderId)
+        public async Task<List<ProcOrderBomDetailDto>> GetOrderBomMaterialAsync(long orderId)
         {
-            var procBomDetailViews = new List<ProcBomDetailView>();
+            var procBomDetailViews = new List<ProcOrderBomDetailDto>();
 
             //工单信息
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderId);
@@ -743,7 +743,7 @@ namespace Hymson.MES.Services.Services.Process
                 var needQty = (mainMaterials.Sum(x => x.Usages + x.Loss)+ replaceMaterials.Sum(x=>x.Usages+x.Loss))??0;
 
                 var receiveQty = requistionOrderDetailEntities.Where(x => x.MaterialCode == material.MaterialCode).Sum(x=>x.Qty);
-                procBomDetailViews.Add(new ProcBomDetailView
+                procBomDetailViews.Add(new ProcOrderBomDetailDto
                 {
                     MaterialId = material.Id,
                     MaterialCode = material.MaterialCode,

@@ -99,4 +99,34 @@ namespace Hymson.MES.Data.Repositories.Process
 
     }
 
+    /// <summary>
+    /// BOM明细
+    /// </summary>
+    public class ProcOrderBomDetailDto : BaseEntity
+    {
+        /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 用量
+        /// </summary>
+        public decimal Usages { get; set; }
+    }
 }
