@@ -98,4 +98,5 @@ namespace Hymson.MES.Data.Repositories.Process
         public ManuProductTypeEnum BomProductType { get; set; }
 
     }
+
 }
