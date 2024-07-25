@@ -981,7 +981,8 @@
 
         public const string MES15151 = "领料单单工单不存在！";
         public const string MES15152 = "申请【{System}】领料单失败";
-
+        public const string MES15153 = "退料单号生成失败：退料单类型编码规则未维护！";
+        public const string MES15154 = "退料单号生成失败，同时存在多条退料单类型编码规则！";
         public const string MES15160 = "领料单【{ReqOrderCode}】收料在系统中不存在！";
         public const string MES15161 = "领料单【{ReqOrderCode}】收料状态已完成，不能领料！";
         public const string MES15162 = "领料单【{ReqOrderCode}】收料原始数据没有物料明细！";
