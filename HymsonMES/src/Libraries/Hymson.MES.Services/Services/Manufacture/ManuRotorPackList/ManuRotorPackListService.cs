@@ -5,13 +5,16 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Mavel.Rotor;
+using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.PackList;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -41,6 +44,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuRotorPackListRepository _manuRotorPackListRepository;
 
+        private readonly ISequenceService _sequenceService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -48,9 +53,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="manuRotorPackListRepository"></param>
-        public ManuRotorPackListService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuRotorPackListSaveDto> validationSaveRules, 
-            IManuRotorPackListRepository manuRotorPackListRepository)
+        /// <param name="sequenceService"></param>
+        public ManuRotorPackListService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuRotorPackListSaveDto> validationSaveRules,
+            IManuRotorPackListRepository manuRotorPackListRepository, ISequenceService sequenceService)
         {
+            _sequenceService = sequenceService;
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
@@ -98,7 +105,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
@@ -139,12 +146,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ManuRotorPackListDto?> QueryByIdAsync(long id) 
+        public async Task<ManuRotorPackListDto?> QueryByIdAsync(long id)
         {
-           var manuRotorPackListEntity = await _manuRotorPackListRepository.GetByIdAsync(id);
-           if (manuRotorPackListEntity == null) return null;
-           
-           return manuRotorPackListEntity.ToModel<ManuRotorPackListDto>();
+            var manuRotorPackListEntity = await _manuRotorPackListRepository.GetByIdAsync(id);
+            if (manuRotorPackListEntity == null) return null;
+
+            return manuRotorPackListEntity.ToModel<ManuRotorPackListDto>();
         }
 
         /// <summary>
@@ -163,5 +170,34 @@ namespace Hymson.MES.Services.Services.Manufacture
             return new PagedInfo<ManuRotorPackListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+        /// <summary>
+        /// 根据ID查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuRotorPackViewDto>> QueryByIdAsync(ManuRotorPackListQuery query)
+        {
+            List<ManuRotorPackViewDto> manuRotors = new List<ManuRotorPackViewDto>();
+            var manuRotorPackListEntity = await _manuRotorPackListRepository.GetEntitiesAsync(new ManuRotorPackListQuery { BoxCode = query.BoxCode, Sfc = query.Sfc, SiteId = _currentSite.SiteId ?? 0 });
+            if (manuRotorPackListEntity.Any() == false)
+                return manuRotors;
+            foreach (var item in manuRotorPackListEntity)
+            {
+                var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
+                var InspectionOrder = $"{query.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
+                var manuRotorPackView = new ManuRotorPackViewDto
+                {
+                    Sfc=item.ProductCode,
+                    BoxCode= item.BoxCode,
+                    Type = ProductReceiptQualifiedStatusEnum.Qualified,
+                    Unit = "个",
+                    Qty = 1,
+                    WarehouseCode = "成品仓",
+                    Batch = InspectionOrder,
+                };
+                manuRotors.Add(manuRotorPackView);
+            };
+            return manuRotors;
+        }
     }
 }

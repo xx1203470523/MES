@@ -31,7 +31,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using System.Reactive;
+using System.Linq;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -1457,6 +1457,23 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SiteId = _currentSite.SiteId ?? 0,
                 WorkOrderId = planWorkOrderEntity.Id
             });
+            if (request.Items.Any())
+            {
+                
+                var Sfcs = request.Items.Select(m => m.Sfc);
+                var manuProductReceipts = await _manuProductReceiptOrderDetailRepository.GetListAsync(new QueryManuProductReceiptOrderDetail
+                {
+                    SFCs = Sfcs,
+                    SiteId = _currentSite.SiteId ?? 0,
+                });
+                var sfcList = manuProductReceipts.Select(x => x.Sfc).ToArray();
+                if (manuProductReceipts.Any())
+                {
+                   // var sfcStrings = sfcList.Except(request.Items.Select(x => x.Sfc));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17754));
+                }
+                  
+            }
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryEntities.Select(b => b.MaterialId).Distinct().ToArray());
             var returnMaterialDtos = new List<HttpClients.Requests.ProductReceiptItemDto>();
             var manuProductReceiptOrderDetails = new List<ManuProductReceiptOrderDetailEntity>();
@@ -1473,6 +1490,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
             foreach (var item in request.Items)
             {
+
                 // var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
 
                 HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
@@ -1492,6 +1510,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     ProductReceiptId = manuProductReceiptOrderEntity.Id,
                     MaterialCode = request.MaterialCode,
                     MaterialName = request.MaterialName,
+                    Qty = item.Qty,
                     ContaineCode = item.BoxCode,
                     Status = item.Status ?? 0,
                     SiteId = _currentSite.SiteId ?? 0,
@@ -1502,31 +1521,31 @@ namespace Hymson.MES.Services.Services.Warehouse
                 manuProductReceiptOrderDetails.Add(manuProductReceiptOrderDetailEntity);
                 returnMaterialDtos.Add(returnMaterialDto);
             }
-            using (var trans = TransactionHelper.GetTransactionScope())
+            //using (var trans = TransactionHelper.GetTransactionScope())
+            //{
+            //    await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
+            //    await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
+            //    trans.Complete();
+            //}
+            var response = await _wmsRequest.ProductReceiptRequestAsync(new HttpClients.Requests.ProductReceiptRequestDto
             {
-                await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
-                await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
-                trans.Complete();
+                SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
+                SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
+                Details = returnMaterialDtos
+            });
+            if (response)
+            {
+                using (var trans = TransactionHelper.GetTransactionScope())
+                {
+                    await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
+                    await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
+                    trans.Complete();
+                }
             }
-            //var response = await _wmsRequest.ProductReceiptRequestAsync(new HttpClients.Requests.ProductReceiptRequestDto
-            //{
-            //    SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
-            //    SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
-            //    Details = returnMaterialDtos
-            //});
-            //if (response)
-            //{
-            //    using (var trans = TransactionHelper.GetTransactionScope())
-            //    {
-            //        await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
-            //        await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
-            //        trans.Complete();
-            //    }
-            //}
-            //else
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES16051)).WithData("msg", "请求发送失败");
-            //}
+            else
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16051)).WithData("msg", "请求发送失败");
+            }
         }
 
         /// <summary>

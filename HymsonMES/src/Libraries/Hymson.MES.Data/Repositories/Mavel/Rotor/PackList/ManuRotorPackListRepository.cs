@@ -124,6 +124,20 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor.PackList
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(query.BoxCode))
+            {
+                sqlBuilder.Where("BoxCode=@BoxCode ");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Sfc))
+            {
+                sqlBuilder.Where("ProductCode=@Sfc ");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuRotorPackListEntity>(template.RawSql, query);
         }
