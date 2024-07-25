@@ -135,7 +135,7 @@ namespace Hymson.MES.SystemServices.Services.Quality
                 SiteId = siteId,
                 Codes = new List<string> { dto.SupplierCode }
             });
-            if (supplierEntities == null || !supplierEntities.Any()) return 0;
+            if (supplierEntities == null || !supplierEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES152015));
 
             // 读取物料
             var materialEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery
