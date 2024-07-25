@@ -638,7 +638,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 替代物料Id
         /// </summary>
-        public long ReplaceMaterialId { get; set; }
+        public long ReplaceMaterialId { get; set; } = 0;
 
         /// <summary>
         /// 物料编码
@@ -661,22 +661,10 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public decimal Usages { get; set; }
 
         /// <summary>
-        /// 是否启用替代物料
-        /// </summary>
-        public bool IsEnableReplace { get; set; }
-
-        /// <summary>
-        /// 序号
-        /// </summary>
-        public int Seq { get; set; }
-
-
-        /// <summary>
         /// 工序代码
         /// </summary>
         public string? Code { get; set; }
         
-
         /// <summary>
         /// 是否主物料，1：主物料
         /// </summary>
