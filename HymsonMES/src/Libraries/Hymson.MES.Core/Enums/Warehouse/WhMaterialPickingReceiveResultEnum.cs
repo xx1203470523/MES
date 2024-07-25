@@ -22,7 +22,7 @@ namespace Hymson.MES.Core.Enums.Warehouse
         /// <summary>
         /// 取消发料
         /// </summary>
-        [Description("取消收料")]
+        [Description("取消发料")]
         CancelMaterialReceipt = 3
     }
 }
