@@ -1302,8 +1302,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 Status = WhWarehouseRequistionStatusEnum.Approvaling,
                 Type = ManuRequistionTypeEnum.WorkOrderPicking,
                 WorkOrderId = planWorkOrderEntity.Id,
-                WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
-                WorkPlanId = planWorkPlanEntity.Id
+                //WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
+                //WorkPlanId = planWorkPlanEntity.Id
             };
 
 
@@ -1619,8 +1619,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                 Status = WhWarehouseRequistionStatusEnum.Approvaling,
                 Type = ManuRequistionTypeEnum.WorkOrderPicking,
                 WorkOrderId = planWorkOrderEntity.Id,
-                WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
-                WorkPlanId = planWorkPlanEntity.Id
+                //WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
+                //WorkPlanId = planWorkPlanEntity.Id
             };
 
 

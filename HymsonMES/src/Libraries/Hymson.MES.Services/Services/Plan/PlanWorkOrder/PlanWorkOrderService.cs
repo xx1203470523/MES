@@ -688,10 +688,11 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 details.Add(new ManuRequistionOrderDetailDto
                 {
                     ReqOrderCode = requistionOrder?.ReqOrderCode ?? "",
-                    MaterialCode = item.MaterialCode,
-                    Version = item.Version,
-                    MaterialBarCode = item.MaterialBarCode,
-                    Batch = item.Batch,
+
+                    //MaterialCode = item.MaterialCode,
+                    //Version = item.Version,
+                    //MaterialBarCode = item.MaterialBarCode,
+                    //Batch = item.Batch,
                     Qty = item.Qty,
                     PickTime = requistionOrder?.CreatedOn ?? item.CreatedOn,
                     Status = requistionOrder?.Status

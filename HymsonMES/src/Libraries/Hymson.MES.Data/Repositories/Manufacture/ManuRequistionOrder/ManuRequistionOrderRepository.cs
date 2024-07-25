@@ -160,7 +160,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         public async Task<int> InsertsAsync(List<ManuRequistionOrderEntity> manuRequistionOrderEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, manuRequistionOrderEntitys);
+            return await conn.ExecuteAsync(InsertSql, manuRequistionOrderEntitys);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         public async Task<int> UpdatesAsync(List<ManuRequistionOrderEntity> manuRequistionOrderEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, manuRequistionOrderEntitys);
+            return await conn.ExecuteAsync(UpdateSql, manuRequistionOrderEntitys);
         }
         #endregion
 
@@ -198,10 +198,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
                                            FROM `manu_requistion_order` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `manu_requistion_order`(  `Id`, `ReqOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ReqOrderCode, @WorkOrderId, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `manu_requistion_order`(  `Id`, `ReqOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ReqOrderCode, @WorkOrderId, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
         const string UpdateSql = "UPDATE `manu_requistion_order` SET   ReqOrderCode = @ReqOrderCode, WorkOrderId = @WorkOrderId, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_requistion_order` SET   ReqOrderCode = @ReqOrderCode, WorkOrderId = @WorkOrderId, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_requistion_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_requistion_order` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

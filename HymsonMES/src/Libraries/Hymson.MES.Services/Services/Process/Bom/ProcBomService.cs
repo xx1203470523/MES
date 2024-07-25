@@ -681,11 +681,11 @@ namespace Hymson.MES.Services.Services.Process
                     SiteId = planWorkOrderEntity.SiteId,
                     RequistionOrderIds = requistionOrderEntities.Select(r => r.Id).ToArray(),
                 });
-                var requistionMaterialGroup = requistionOrderDetailEntities.GroupBy(r => r.MaterialCode);
+                var requistionMaterialGroup = requistionOrderDetailEntities.GroupBy(r => r.MaterialId);
                 foreach (var item in procBomDetailViews)
                 {
                     //已领料
-                    var receivedMaterialList = requistionMaterialGroup.FirstOrDefault(g => g.Key == item.MaterialCode)?.ToList();
+                    var receivedMaterialList = requistionMaterialGroup.FirstOrDefault(g => g.Key == item.MaterialId)?.ToList();
                     if (receivedMaterialList != null && receivedMaterialList.Any())
                     {
                         item.Usages = item.Usages * planWorkOrderEntity.Qty * (1 + item.Loss ?? 0) - receivedMaterialList.Sum(r => r.Qty) * item.Usages * (1 + item.Loss ?? 0);
@@ -742,7 +742,7 @@ namespace Hymson.MES.Services.Services.Process
                 var replaceMaterials = replaceBomDetails.Where(x => x.ReplaceMaterialId == material.Id);
                 var needQty = (mainMaterials.Sum(x => x.Usages + x.Loss)+ replaceMaterials.Sum(x=>x.Usages+x.Loss))??0;
 
-                var receiveQty = requistionOrderDetailEntities.Where(x => x.MaterialCode == material.MaterialCode).Sum(x=>x.Qty);
+                var receiveQty = requistionOrderDetailEntities.Where(x => x.MaterialId == material.Id).Sum(x=>x.Qty);
                 procBomDetailViews.Add(new ProcOrderBomDetailDto
                 {
                     MaterialId = material.Id,
