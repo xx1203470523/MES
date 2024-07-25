@@ -5,7 +5,6 @@
  *builder:  pengxin
  *build datetime: 2024-07-24 03:09:40
  */
-using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -16,21 +15,18 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.QualFqcInspectionMavalAttachment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.QualFqcInspectionMaval;
-using Hymson.MES.Core.Domain.QualFqcInspectionMavalAttachment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.QualFqcInspectionMavalAttachment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.QualFqcInspectionMaval;
-using Hymson.MES.Data.Repositories.QualFqcInspectionMavalAttachment;
 using Hymson.MES.Services.Dtos.QualFqcInspectionMaval;
 using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.QualFqcInspectionMaval;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Transactions;
+using Mysqlx.Crud;
 
 namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
 {
@@ -78,41 +74,53 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
+
+            //验证DTO
+            await _validationCreateRules.ValidateAndThrowAsync(qualFqcInspectionMavalCreateDto);
+
             var siteId = _currentSite.SiteId ?? 0;
+
             var procProcedure = await _procProcedureRepository.GetByCodeAsync(new EntityByCodeQuery { Code = qualFqcInspectionMavalCreateDto.ProcedureCode, Site = siteId })
              ?? throw new CustomerValidationException(nameof(ErrorCode.MES11750)).WithData("Code", qualFqcInspectionMavalCreateDto.ProcedureCode);
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Code = qualFqcInspectionMavalCreateDto.ResourceCode, Site = siteId })
              ?? throw new CustomerValidationException(nameof(ErrorCode.MES11751)).WithData("Code", qualFqcInspectionMavalCreateDto.ProcedureCode);
-            //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(qualFqcInspectionMavalCreateDto);
 
-            //DTO转换实体
-            var qualFqcInspectionMavalEntity = qualFqcInspectionMavalCreateDto.ToEntity<QualFqcInspectionMavalEntity>();
-             
-            qualFqcInspectionMavalEntity.SFC = qualFqcInspectionMavalCreateDto.SFC;
-            qualFqcInspectionMavalEntity.ProcedureId = procProcedure.Id;
-            qualFqcInspectionMavalEntity.ResourceId = procResource.Id;
-            qualFqcInspectionMavalEntity.Qty = qualFqcInspectionMavalCreateDto.Qty;
-            qualFqcInspectionMavalEntity.JudgmentResults = qualFqcInspectionMavalCreateDto.JudgmentResults;
-
-            qualFqcInspectionMavalEntity.Id = qualFqcInspectionMavalCreateDto.Id != 0 ? qualFqcInspectionMavalCreateDto.Id : IdGenProvider.Instance.CreateId();
-            qualFqcInspectionMavalEntity.CreatedBy = _currentUser.UserName;
-            qualFqcInspectionMavalEntity.UpdatedBy = _currentUser.UserName;
-            qualFqcInspectionMavalEntity.CreatedOn = HymsonClock.Now();
-            qualFqcInspectionMavalEntity.UpdatedOn = HymsonClock.Now();
-            qualFqcInspectionMavalEntity.SiteId = _currentSite.SiteId ?? 0;
-
-            try
+            var qualFqcInspectionMaval = await _qualFqcInspectionMavalRepository.GetBySFCAsync(new QualFqcInspectionMavalQuery { SFC = qualFqcInspectionMavalCreateDto.SFC, SiteId = siteId });
+            if (qualFqcInspectionMaval != null)
             {
+                qualFqcInspectionMaval.JudgmentResults = qualFqcInspectionMavalCreateDto.JudgmentResults;
+                qualFqcInspectionMaval.ProcedureId = procProcedure.Id;
+                qualFqcInspectionMaval.ResourceId = procResource.Id;
+                qualFqcInspectionMaval.UpdatedBy = _currentUser.UserName;
+                qualFqcInspectionMaval.UpdatedOn = HymsonClock.Now();
+                await _qualFqcInspectionMavalRepository.UpdateAsync(qualFqcInspectionMaval);
+                //var row = await _qualFqcInspectionMavalRepository.DeleteAsync(qualFqcInspectionMaval.Id);
+                //if (row <= 0)
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES11752)).WithData("SFC", qualFqcInspectionMavalCreateDto.SFC);
+                //}
+            }
+            else
+            {
+                //DTO转换实体
+                var qualFqcInspectionMavalEntity = qualFqcInspectionMavalCreateDto.ToEntity<QualFqcInspectionMavalEntity>();
+
+                qualFqcInspectionMavalEntity.SFC = qualFqcInspectionMavalCreateDto.SFC;
+                qualFqcInspectionMavalEntity.ProcedureId = procProcedure.Id;
+                qualFqcInspectionMavalEntity.ResourceId = procResource.Id;
+                qualFqcInspectionMavalEntity.Qty = qualFqcInspectionMavalCreateDto.Qty;
+                qualFqcInspectionMavalEntity.JudgmentResults = qualFqcInspectionMavalCreateDto.JudgmentResults;
+
+                qualFqcInspectionMavalEntity.Id = qualFqcInspectionMavalCreateDto.Id != 0 ? qualFqcInspectionMavalCreateDto.Id : IdGenProvider.Instance.CreateId();
+                qualFqcInspectionMavalEntity.CreatedBy = _currentUser.UserName;
+                qualFqcInspectionMavalEntity.UpdatedBy = _currentUser.UserName;
+                qualFqcInspectionMavalEntity.CreatedOn = HymsonClock.Now();
+                qualFqcInspectionMavalEntity.UpdatedOn = HymsonClock.Now();
+                qualFqcInspectionMavalEntity.SiteId = _currentSite.SiteId ?? 0;
+
                 //入库
                 await _qualFqcInspectionMavalRepository.InsertAsync(qualFqcInspectionMavalEntity);
             }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-
         }
 
         /// <summary>
@@ -143,6 +151,7 @@ namespace Hymson.MES.Services.Services.QualFqcInspectionMaval
         public async Task<PagedInfo<QualFqcInspectionMavalDto>> GetPagedListAsync(QualFqcInspectionMavalPagedQueryDto qualFqcInspectionMavalPagedQueryDto)
         {
             var qualFqcInspectionMavalPagedQuery = qualFqcInspectionMavalPagedQueryDto.ToQuery<QualFqcInspectionMavalPagedQuery>();
+            qualFqcInspectionMavalPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _qualFqcInspectionMavalRepository.GetPagedInfoAsync(qualFqcInspectionMavalPagedQuery);
 
             //实体到DTO转换 装载数据

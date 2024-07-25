@@ -195,6 +195,10 @@ namespace Hymson.MES.Services.Dtos.QualFqcInspectionMaval
     /// </summary>
     public class QualFqcInspectionMavalPagedQueryDto : PagerInfo
     {
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; }
     }
 
 

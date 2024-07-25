@@ -22,5 +22,10 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// 条码组
         /// </summary>
         public IEnumerable<string> SFCs { get; set; }
+
+        /// <summary>
+        /// SFC
+        /// </summary>
+        public string SFC { get; set; }
     }
 }

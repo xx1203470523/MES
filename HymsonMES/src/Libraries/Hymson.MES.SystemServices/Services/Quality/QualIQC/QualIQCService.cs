@@ -105,16 +105,18 @@ namespace Hymson.MES.SystemServices.Services.Quality
         /// <returns></returns>
         public async Task<int> SubmitIncomingAsync(WhMaterialReceiptDto dto)
         {
-            if (dto == null || dto.Details == null) return 0;
-            if (!dto.Details.Any()) return 0;
+            if (dto == null || dto.Details == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            if (!dto.Details.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16602));
 
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
-            if (configEntities == null || !configEntities.Any()) return 0;
-
-            var configEntity = configEntities.FirstOrDefault();
+            if (configEntities == null || !configEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.MainSite.GetDescription());
+            }
 
             // 判断是否存在（配置）
-            if (configEntity == null) return default;
+            var configEntity = configEntities.FirstOrDefault()
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 初始化
             var siteId = configEntity.Value.ParseToLong();
@@ -165,7 +167,7 @@ namespace Hymson.MES.SystemServices.Services.Quality
                 var detail = item.ToEntity<WHMaterialReceiptDetailEntity>();
                 if (detail == null) continue;
 
-                detail.Id = IdGenProvider.Instance.CreateId();
+                detail.Id = item.ReceiptDetailId ?? IdGenProvider.Instance.CreateId();
                 detail.MaterialReceiptId = entity.Id;
                 detail.MaterialId = materialEntity.Id;
                 detail.CreatedBy = updateUser;

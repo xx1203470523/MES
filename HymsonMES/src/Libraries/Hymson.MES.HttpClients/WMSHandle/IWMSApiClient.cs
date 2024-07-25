@@ -28,5 +28,12 @@ namespace Hymson.MES.HttpClients
         /// <param name="request"></param>
         /// <returns></returns>
         Task<bool> WarehousingEntryRequestAsync(WarehousingEntryDto request);
+
+        /// <summary>
+        /// 出库单
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<bool> WarehousingDeliveryRequestAsync(DeliveryDto request);
     }
 }

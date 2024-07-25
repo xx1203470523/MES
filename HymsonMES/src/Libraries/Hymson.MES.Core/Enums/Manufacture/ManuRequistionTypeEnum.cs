@@ -8,14 +8,14 @@ namespace Hymson.MES.Core.Domain.Manufacture
     public enum ManuRequistionTypeEnum : sbyte
     {
         /// <summary>
-        /// PICKING
+        /// 实仓领料
         /// </summary>
-        [Description("实仓退料")]
+        [Description("实仓领料")]
         WorkOrderPicking = 1,
         /// <summary>
-        /// 工单补料
+        /// 虚仓领料
         /// </summary>
-        [Description("虚仓退料")]
+        [Description("虚仓领料")]
         WorkOrderReplenishment = 2
     }
 

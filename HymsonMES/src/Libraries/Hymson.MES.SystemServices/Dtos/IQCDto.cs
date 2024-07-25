@@ -45,6 +45,11 @@ namespace Hymson.MES.SystemServices.Dtos
     public record WhMaterialReceiptMaterialDto : BaseEntityDto
     {
         /// <summary>
+        /// WMS收货明细Id
+        /// </summary>
+        public long? ReceiptDetailId { get; set; }
+
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; } = "";

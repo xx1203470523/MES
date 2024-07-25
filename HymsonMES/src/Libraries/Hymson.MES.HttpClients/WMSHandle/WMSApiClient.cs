@@ -63,7 +63,7 @@ namespace Hymson.MES.HttpClients
         }
 
         /// <summary>
-        /// 
+        /// 入库申请单
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -86,6 +86,34 @@ namespace Hymson.MES.HttpClients
             };
             
             var httpResponse = await _httpClient.PostAsJsonAsync<WarehousingEntryRequest>(_options.Value.Receipt.RoutePath, materialReturnRequest);
+
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+            return httpResponse.IsSuccessStatusCode;
+        }
+
+        /// <summary>
+        /// 出库申请单
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<bool> WarehousingDeliveryRequestAsync(DeliveryDto request)
+        {
+            DeliveryRequest deliveryRequest = new DeliveryRequest()
+            {
+                Type = request.Type,
+                WarehouseCode = request.WarehouseCode,
+                SyncCode = request.SyncCode,
+                SendOn = request.SendOn,
+                SupplierCode = request.SupplierCode,
+                CustomerCode = request.CustomerCode,
+                StockOutCategory = request.StockOutCategory,
+                IsAutoExecute = request.IsAutoExecute,
+                CreatedBy = request.CreatedBy,
+                Remark = request.Remark,
+                Details = request.Details
+            };
+
+            var httpResponse = await _httpClient.PostAsJsonAsync<DeliveryRequest>(_options.Value.Delivery.RoutePath, deliveryRequest);
 
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
             return httpResponse.IsSuccessStatusCode;

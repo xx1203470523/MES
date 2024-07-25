@@ -491,9 +491,10 @@
         public const string MES11725 = "无需要处置！";
 
 
-         
-        public const string MES11750 = "工序编码{Code}不存在"; 
+
+        public const string MES11750 = "工序编码{Code}不存在";
         public const string MES11751 = "资源编码{Code}不存在";
+        public const string MES11752 = "条码{SFC}已检验，请刷新后重试！";
 
         #endregion
 
@@ -979,6 +980,7 @@
         public const string MES15150 = "退料单【{ReturnOrderCode}】条码【{MaterialCode}】已经入库完成，无法执行入库！";
 
         public const string MES15151 = "领料单单工单不存在！";
+        public const string MES15152 = "申请【{System}】领料单失败";
         #endregion
 
         #region 物料台账 15200
