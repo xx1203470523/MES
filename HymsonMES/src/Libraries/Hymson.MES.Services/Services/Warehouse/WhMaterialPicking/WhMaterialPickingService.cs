@@ -20,6 +20,13 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.Snowflake;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.Utils;
+using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.HttpClients.Requests.XnebulaWMS;
+using Hymson.Utils.Tools;
+using Hymson.MES.HttpClients.Options;
+using Microsoft.Extensions.Options;
+using Hymson.MES.HttpClients;
+using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
 {
@@ -43,17 +50,46 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
 
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
+        private readonly IOptions<WMSOptions> _options;
+
+        private readonly IWMSApiClient _wmsRequest;
+
+        private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
+
+        private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
+
         /// <summary>
-        /// 
+        /// 物料维护 仓储
         /// </summary>
-        /// <param name="manuRequistionOrderDetailRepository"></param>
-        /// <param name="manuRequistionOrderRepository"></param>
-        public WhMaterialPickingService(ICurrentUser currentUser, ICurrentSite currentSite, IManuRequistionOrderDetailRepository manuRequistionOrderDetailRepository, IManuRequistionOrderRepository manuRequistionOrderRepository)
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        public WhMaterialPickingService(ICurrentUser currentUser,
+            ICurrentSite currentSite,
+            IManuRequistionOrderRepository manuRequistionOrderRepository,
+            IManuRequistionOrderDetailRepository manuRequistionOrderDetailRepository,
+            IInteCodeRulesRepository inteCodeRulesRepository,
+            IManuGenerateBarcodeService manuGenerateBarcodeService,
+            IWhWarehouseRepository whWarehouseRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IOptions<WMSOptions> options,
+            IWMSApiClient wmsRequest,
+            IProcMaterialRepository procMaterialRepository,
+            IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _manuRequistionOrderDetailRepository = manuRequistionOrderDetailRepository;
             _manuRequistionOrderRepository = manuRequistionOrderRepository;
+            _manuRequistionOrderDetailRepository = manuRequistionOrderDetailRepository;
+            _inteCodeRulesRepository = inteCodeRulesRepository;
+            _manuGenerateBarcodeService = manuGenerateBarcodeService;
+            _whWarehouseRepository = whWarehouseRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
+            _options = options;
+            _wmsRequest = wmsRequest;
+            _procMaterialRepository = procMaterialRepository;
+            _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
         }
 
         /// <summary>
@@ -75,25 +111,85 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                 throw new CustomerValidationException(nameof(ErrorCode.MES16048)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
             }
 
-            var requistionOrderCode = await GenerateOrderCodeAsync(_currentSite.SiteId??0, _currentUser.UserName);
+            //查询生产计划
+            var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+
+            var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                PlanId = planWorkPlanEntity.Id,
+                PlanProductId = planWorkOrderEntity.WorkPlanProductId??0
+            });
+
+            var requistionOrderCode = await GenerateOrderCodeAsync(_currentSite.SiteId ?? 0, _currentUser.UserName);
 
             //创建领料申请单
             ManuRequistionOrderEntity manuRequistionOrderEntity = new ManuRequistionOrderEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
-                ReqOrderCode= requistionOrderCode,
+                ReqOrderCode = requistionOrderCode,
                 Status = WhMaterialPickingStatusEnum.ApplicationSuccessful,
-                Type = ManuRequistionTypeEnum.WorkOrderPicking,
+                Type = param.Type,
                 WorkOrderId = planWorkOrderEntity.Id,
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName,
                 CreatedOn = HymsonClock.Now(),
                 UpdatedOn = HymsonClock.Now()
             };
+            var manuRequistionOrderDetailEntities = new List<ManuRequistionOrderDetailEntity>();
 
-           //foreach(var item )
+            var deliveryDto = new DeliveryDto()
+            {
+                Type = BillBusinessTypeEnum.MaterialReturnForm,
+                IsAutoExecute = param.Type == ManuRequistionTypeEnum.WorkOrderReplenishment,
+                CreatedBy = _currentUser.UserName,
+                WarehouseCode = _options.Value.Delivery.WarehouseCode,
+                SyncCode = requistionOrderCode,
+            };
 
+            var warehousingDeliveryDetails = new List<DeliveryDetailDto>();
+            var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(param.Details.Select(x => x.MaterialId));
+            //咱不验证数量 TODO by王克明
+            foreach (var item in param.Details)
+            {
+                manuRequistionOrderDetailEntities.Add(new ManuRequistionOrderDetailEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    RequistionOrderId = manuRequistionOrderEntity.Id,
+                    MaterialId = item.MaterialId,
+                    Qty = item.Qty,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
+                });
+                var procMaterialEntity = procMaterialEntities.FirstOrDefault(x => x.Id == item.MaterialId);
+                warehousingDeliveryDetails.Add(new DeliveryDetailDto
+                {
+                    ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                    ProductionOrderDetailID = planWorkOrderEntity.WorkPlanProductId,
+                    ProductionOrderComponentID = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId)?.Id,
+                    MaterialCode = procMaterialEntity?.MaterialCode,
+                    UnitCode = procMaterialEntity?.Unit,
+                    Quantity = item.Qty
+                });
+            }
+
+            deliveryDto.Details = warehousingDeliveryDetails;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
+                await _manuRequistionOrderDetailRepository.InsertsAsync(manuRequistionOrderDetailEntities);
+                var response = await _wmsRequest.WarehousingDeliveryRequestAsync(deliveryDto);
+                if (!response)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15152)).WithData("System", "WMS");
+                }
+                trans.Complete();
+            }
             return requistionOrderCode;
         }
 

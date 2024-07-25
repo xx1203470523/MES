@@ -979,6 +979,7 @@
         public const string MES15150 = "退料单【{ReturnOrderCode}】条码【{MaterialCode}】已经入库完成，无法执行入库！";
 
         public const string MES15151 = "领料单单工单不存在！";
+        public const string MES15152 = "申请【{System}】领料单失败";
         #endregion
 
         #region 物料台账 15200
