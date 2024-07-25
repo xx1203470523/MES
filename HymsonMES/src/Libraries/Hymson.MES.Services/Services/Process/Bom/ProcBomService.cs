@@ -649,15 +649,17 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<List<ProcBomDetailView>> GetPickBomMaterialAsync(long orderId)
         {
             var procBomDetailViews = new List<ProcBomDetailView>();
-            //查找领料明细
+
+            //工单信息
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderId);
+            //工单Bom主物料信息
             var mainBomDetails = await _procBomDetailRepository.GetListMainAsync(planWorkOrderEntity.ProductBOMId);
+            //工单Bom替代物料信息
             var replaceBomDetails = await _procBomDetailRepository.GetListReplaceAsync(planWorkOrderEntity.ProductBOMId);
 
             if (mainBomDetails.Any())
             {
                 mainBomDetails = mainBomDetails.OrderBy(x => x.Seq).ToList();
-
                 procBomDetailViews.AddRange(mainBomDetails);
             }
             if (replaceBomDetails.Any())
@@ -667,7 +669,6 @@ namespace Hymson.MES.Services.Services.Process
             
             //查找领料单集合
             var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.OrderCode, planWorkOrderEntity.SiteId);
-            
             if (requistionOrderEntities.Any())
             {
                 var requistionOrderDetailEntities = await _manuRequistionOrderDetailRepository.GetManuRequistionOrderDetailEntitiesAsync(new ManuRequistionOrderDetailQuery
@@ -684,15 +685,14 @@ namespace Hymson.MES.Services.Services.Process
                     {
                         item.Usages = item.Usages * planWorkOrderEntity.Qty * (1 + item.Loss ?? 0) - receivedMaterialList.Sum(r => r.Qty) * item.Usages * (1 + item.Loss ?? 0);
                     }
-
                 }
             }
+
             //汇总出领料明细集合
             foreach (var item in procBomDetailViews)
             {
                 item.Usages = item.Usages * planWorkOrderEntity.Qty * (1 + item.Loss ?? 0);
             }
-
             return procBomDetailViews;
         }
 
