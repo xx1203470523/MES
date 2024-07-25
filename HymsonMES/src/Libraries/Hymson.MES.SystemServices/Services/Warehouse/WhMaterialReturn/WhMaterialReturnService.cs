@@ -253,18 +253,17 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
             {
                 if (param.Details != null && param.Details.Any())
                 {
-
                     var materialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
                     {
-                        SiteId = _currentSystem.SiteId,
+                        SiteId = siteId,
                         BarCodes = param.Details.Select(x => x.MaterialBarCode)
                     });
                     //查询到物料信息
                     var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialInventoryEntities.Select(x => x.MaterialId));
 
-                    foreach (var item in param.Details)
+                    foreach (var detailItem in param.Details)
                     {
-                        var manuReturnOrderDetailEntity = manuReturnOrderDetails.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode);
+                        var manuReturnOrderDetailEntity = manuReturnOrderDetails.FirstOrDefault(x => x.MaterialBarCode == detailItem.MaterialBarCode);
 
                         if (manuReturnOrderDetailEntity == null)
                         {
@@ -276,17 +275,17 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                         if (manuReturnOrderDetailEntity.IsReceived == YesOrNoEnum.Yes)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES15150))
-                       .WithData("ReturnOrderCode", param.ReturnOrderCode)
-                       .WithData("MaterialCode", param.ReturnOrderCode);
+                                .WithData("ReturnOrderCode", param.ReturnOrderCode)
+                                .WithData("MaterialCode", param.ReturnOrderCode);
                         }
-                        if (manuReturnOrderDetailEntity.Qty != item.Qty)
+
+                        if (manuReturnOrderDetailEntity.Qty != detailItem.Qty)
                         {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES15150))
-                                     .WithData("ReturnOrderCode", param.ReturnOrderCode)
-                                     .WithData("MaterialCode", param.ReturnOrderCode)
-                                     .WithData("PlanQty", manuReturnOrderDetailEntity.Qty)
-                                     .WithData("Qty", item.Qty)
-                                     ;
+                            throw new CustomerValidationException(nameof(ErrorCode.MES15149))
+                                .WithData("ReturnOrderCode", param.ReturnOrderCode)
+                                .WithData("MaterialCode", param.ReturnOrderCode)
+                                .WithData("PlanQty", manuReturnOrderDetailEntity.Qty)
+                                .WithData("Qty", detailItem.Qty);
                         }
 
                         updateManuReturnOrderDetailIsReceivedByIdCommands.Add(new UpdateManuReturnOrderDetailIsReceivedByIdCommand
@@ -296,11 +295,11 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                             UpdatedBy = userName,
                             UpdatedOn = HymsonClock.Now()
                         });
-                        var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode);
 
+                        var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == detailItem.MaterialBarCode);
                         if (whMaterialInventoryEntity == null)
                         {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", item.MaterialBarCode);
+                            throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", detailItem.MaterialBarCode);
                         }
 
                         var materialEntity = materialEntities.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);

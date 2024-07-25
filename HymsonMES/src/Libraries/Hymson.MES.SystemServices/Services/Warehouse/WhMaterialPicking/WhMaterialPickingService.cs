@@ -164,6 +164,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15162)).WithData("ReqOrderCode", param.RequistionOrderCode);
             }
+
             //2.1 查询物料是否在系统中存在
             List<string> materialCodeList = param.Details.Select(m => m.MaterialCode).Distinct().ToList();
             ProcMaterialsByCodeQuery matQuery = new ProcMaterialsByCodeQuery();
