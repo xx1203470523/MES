@@ -101,6 +101,7 @@
         public const string MES10249 = "生产计划【{Code}】产品不能为空！";
         public const string MES10250 = "BOM物料Id【{MaterialId}】所属物料不存在！";
         public const string MES10251 = "物料【{Code}】不存在！";
+        public const string MES10252 = "存在未匹配的BOM，请检查！";
         #endregion
 
         #region 资源 10300
