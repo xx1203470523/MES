@@ -1350,30 +1350,30 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //    continue;
                 //}
 
-                //// 客户改了工艺路线，导致在制工序不存在关闭该校验
-                //var manuSfcProduceStep = manuSfcProduceStepList.Where(it => it.ProcedureId == item.ProcedureId).FirstOrDefault();
-                //if (manuSfcProduceStep == null)
-                //{
-                //    validationFailure.ErrorCode = nameof(ErrorCode.MES18007);
-                //    validationFailures.Add(validationFailure);
-                //    continue;
-                //}
-                //switch (item.Status)
-                //{
-                //    case SfcProduceStatusEnum.lineUp:
-                //        manuSfcProduceStep.lineUpNumber += 1;
-                //        break;
-                //    case SfcProduceStatusEnum.Activity:
-                //        manuSfcProduceStep.activityNumber += 1;
-                //        break;
-                //    case SfcProduceStatusEnum.Complete:
-                //        manuSfcProduceStep.completeNumber += 1;
-                //        break;
-                //    default:
-                //        validationFailure.ErrorCode = nameof(ErrorCode.MES18008);
-                //        validationFailures.Add(validationFailure);
-                //        break;
-                //}
+                // 客户改了工艺路线，导致在制工序不存在关闭该校验
+                var manuSfcProduceStep = manuSfcProduceStepList.Where(it => it.ProcedureId == item.ProcedureId).FirstOrDefault();
+                if (manuSfcProduceStep == null)
+                {
+                    //validationFailure.ErrorCode = nameof(ErrorCode.MES18007);
+                    //validationFailures.Add(validationFailure);
+                    continue;
+                }
+                switch (item.Status)
+                {
+                    case SfcProduceStatusEnum.lineUp:
+                        manuSfcProduceStep.lineUpNumber += 1;
+                        break;
+                    case SfcProduceStatusEnum.Activity:
+                        manuSfcProduceStep.activityNumber += 1;
+                        break;
+                    case SfcProduceStatusEnum.Complete:
+                        manuSfcProduceStep.completeNumber += 1;
+                        break;
+                    default:
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES18008);
+                        validationFailures.Add(validationFailure);
+                        break;
+                }
             }
 
             //已完成入库数据
