@@ -35,6 +35,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
         /// 工厂
         /// </summary>
         public long SiteId { get; set; }
-        public string[]? WorkOrders { get; set; }
+        public IEnumerable<long>? WorkOrderIds { get; set; }
     }
 }
