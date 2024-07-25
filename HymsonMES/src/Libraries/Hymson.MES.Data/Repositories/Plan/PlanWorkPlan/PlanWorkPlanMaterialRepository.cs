@@ -129,7 +129,11 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.QueryAsync<PlanWorkPlanMaterialEntity>(template.RawSql, query);
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<PlanWorkPlanMaterialEntity>> GetEntitiesByPlanIdAsync(PlanWorkPlanByPlanIdQuery query)
         {
             var sqlBuilder = new SqlBuilder();

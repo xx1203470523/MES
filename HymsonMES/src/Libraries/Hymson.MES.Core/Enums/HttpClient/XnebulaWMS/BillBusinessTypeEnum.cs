@@ -3,6 +3,9 @@
 /// <summary>
 /// 单据业务类型
 /// </summary>
+/// <summary>
+/// 单据业务类型
+/// </summary>
 public enum BillBusinessTypeEnum : short
 {
     /// <summary>
@@ -24,9 +27,9 @@ public enum BillBusinessTypeEnum : short
     OtherReceipt = 103,
 
     /// <summary>
-    /// 退料单
+    /// 非工单退料单
     /// </summary>
-    [Description("退料单")]
+    [Description("非工单退料单")]
     MaterialReturnForm = 104,
 
     /// <summary>
@@ -36,13 +39,19 @@ public enum BillBusinessTypeEnum : short
     InboundOrder = 105,
 
     /// <summary>
+    /// 工单退料单
+    /// </summary>
+    [Description("工单退料单")]
+    WorkOrderMaterialReturnForm = 106,
+
+    /// <summary>
     /// 采购退货单
     /// </summary>
     [Description("采购退货单")]
     PurchaseReturnReceipt = 301,
 
     /// <summary>
-    /// 采购退货单
+    /// 销售订单
     /// </summary>
     [Description("销售订单")]
     SalesOrder = 302,
@@ -54,10 +63,16 @@ public enum BillBusinessTypeEnum : short
     OtherDispatch = 303,
 
     /// <summary>
-    /// 材料申请单
+    /// 非工单材料申请单
     /// </summary>
-    [Description("材料申请单")]
+    [Description("非工单材料申请单")]
     MaterialRequestForm = 304,
+
+    /// <summary>
+    /// 工单材料申请单
+    /// </summary>
+    [Description("工单材料申请单")]
+    WorkOrderMaterialRequestForm = 305,
 
     /// <summary>
     /// 物料盘点单
