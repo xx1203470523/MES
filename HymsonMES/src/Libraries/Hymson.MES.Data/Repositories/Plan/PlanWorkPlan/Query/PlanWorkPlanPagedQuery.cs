@@ -84,6 +84,11 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
         /// </summary>
         public string? ProductCode { get; set; }
 
+        /// <summary>
+        /// ID集合（生产计划）
+        /// </summary>
+        public IEnumerable<long>? WorkPlanIds { get; set; }
+
     }
 
 }

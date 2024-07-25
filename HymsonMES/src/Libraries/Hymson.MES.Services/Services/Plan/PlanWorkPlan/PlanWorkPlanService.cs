@@ -346,6 +346,10 @@ namespace Hymson.MES.Services.Services.Plan
             // 查询分页数据
             var pagedQuery = pagedQueryDto.ToQuery<PlanWorkPlanProductPagedQuery>();
             pagedQuery.SiteId = siteId;
+            pagedQuery.ProductCode = pagedQueryDto.ProductCode;
+            pagedQuery.WorkPlanIds = workPlanEntities.Select(s => s.Id);
+
+            // 查询分页数据
             var pagedInfo = await _planWorkPlanProductRepository.GetPagedInfoAsync(pagedQuery);
 
             // 读取生产计划
