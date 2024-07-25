@@ -180,7 +180,7 @@ namespace Hymson.MES.Services.Services
             {
                 var procMaterialEntity = await _masterDataService.GetProcMaterialEntityAsync(_currentSite.SiteId ?? 0, manuSfcCirculationEntity.ProductId);
                 if (procMaterialEntity == null) continue;
-                var materialSourceDto = manuSfcCirculationEntity.ToModel<MaterialSourceDto>();
+                var materialSourceDto = new MaterialSourceDto();
                 materialSourceDto.CirculationQty = manuSfcCirculationEntity.CirculationQty ?? 0;
                 materialSourceDto.CirculationBarCode = manuSfcCirculationEntity.SFC;
                 materialSourceDto.Sfc = manuSfcCirculationEntity.CirculationBarCode;
