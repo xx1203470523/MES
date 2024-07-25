@@ -524,7 +524,7 @@ namespace Hymson.MES.SystemServices.Services
             {
                 Id = requistionOrderId,
                 ReqOrderCode = erpRequisitionOrder,
-                WorkOrderCode = planWorkOrderEntity.OrderCode,
+                WorkOrderId = planWorkOrderEntity.Id,
                 Status = WhWarehouseRequistionStatusEnum.Picked,
                 Type = ManuRequistionTypeEnum.WorkOrderPicking,
                 Remark = "",

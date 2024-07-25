@@ -26,7 +26,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 工单Code
         /// </summary>
-        public string WorkOrderCode { get; set; }
+        public long WorkOrderId { get; set; }
 
         /// <summary>
         /// 领料单类型 0:工单领料 1:工单补料
