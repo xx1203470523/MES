@@ -981,6 +981,8 @@
 
         public const string MES15151 = "领料单单工单不存在！";
         public const string MES15152 = "申请【{System}】领料单失败";
+        public const string MES15153 = "退料单号生成失败：退料单类型编码规则未维护！";
+        public const string MES15154 = "退料单号生成失败，同时存在多条退料单类型编码规则！";
         #endregion
 
         #region 物料台账 15200
