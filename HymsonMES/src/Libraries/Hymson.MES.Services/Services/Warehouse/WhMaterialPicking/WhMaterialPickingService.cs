@@ -119,7 +119,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 PlanId = planWorkPlanEntity.Id,
-                PlanProductId = planWorkOrderEntity.WorkPlanProductId??0
+                PlanProductId = planWorkOrderEntity.WorkPlanProductId ?? 0
             });
 
             var requistionOrderCode = await GenerateOrderCodeAsync(_currentSite.SiteId ?? 0, _currentUser.UserName);
@@ -142,7 +142,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
 
             var deliveryDto = new DeliveryDto()
             {
-                Type = BillBusinessTypeEnum.MaterialReturnForm,
+                Type = BillBusinessTypeEnum.WorkOrderMaterialRequestForm,
                 IsAutoExecute = param.Type == ManuRequistionTypeEnum.WorkOrderReplenishment,
                 CreatedBy = _currentUser.UserName,
                 WarehouseCode = _options.Value.Delivery.WarehouseCode,

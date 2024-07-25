@@ -129,15 +129,19 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.QueryAsync<PlanWorkPlanMaterialEntity>(template.RawSql, query);
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<PlanWorkPlanMaterialEntity>> GetEntitiesByPlanIdAsync(PlanWorkPlanByPlanIdQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.Where("PlanProductId = @PlanProductId");
-            sqlBuilder.Where("PlanId = @PlanId");
+            sqlBuilder.Where("WorkPlanProductId = @PlanProductId");
+            sqlBuilder.Where("WorkPlanId = @PlanId");
             sqlBuilder.Select("*");
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkPlanMaterialEntity>(template.RawSql, query);

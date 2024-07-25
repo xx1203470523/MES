@@ -193,7 +193,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
 
             var warehousingEntryDto = new WarehousingEntryDto()
             {
-                Type = BillBusinessTypeEnum.MaterialReturnForm,
+                Type = BillBusinessTypeEnum.WorkOrderMaterialReturnForm,
                 IsAutoExecute = param.Type == ManuReturnTypeEnum.WorkOrderBorrow,
                 CreatedBy = _currentUser.UserName,
                 WarehouseCode = _options.Value.Receipt.WarehouseCode,

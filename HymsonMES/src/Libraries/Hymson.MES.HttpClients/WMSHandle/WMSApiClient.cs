@@ -84,7 +84,7 @@ namespace Hymson.MES.HttpClients
                 Remark = request.Remark,
                 Details = request.Details
             };
-            
+
             var httpResponse = await _httpClient.PostAsJsonAsync<WarehousingEntryRequest>(_options.Value.Receipt.RoutePath, materialReturnRequest);
 
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
