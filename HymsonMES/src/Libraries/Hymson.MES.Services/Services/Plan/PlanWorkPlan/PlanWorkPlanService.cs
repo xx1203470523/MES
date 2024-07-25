@@ -4,11 +4,16 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Plan;
 using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -28,6 +33,11 @@ namespace Hymson.MES.Services.Services.Plan
     {
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 系统配置
+        /// </summary>
+        private readonly ISysConfigRepository _sysConfigRepository;
 
         /// <summary>
         /// 仓储接口（生产计划）
@@ -65,10 +75,16 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
+        /// 仓储接口（工艺路线）
+        /// </summary>
+        private readonly IProcProcessRouteRepository _procProcessRouteRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="sysConfigRepository"></param>
         /// <param name="planWorkPlanRepository"></param>
         /// <param name="planWorkPlanProductRepository"></param>
         /// <param name="planWorkPlanMaterialRepository"></param>
@@ -76,17 +92,21 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procMaterialRepository"></param>
+        /// <param name="procProcessRouteRepository"></param>
         public PlanWorkPlanService(ICurrentUser currentUser, ICurrentSite currentSite,
+            ISysConfigRepository sysConfigRepository,
             IPlanWorkPlanRepository planWorkPlanRepository,
             IPlanWorkPlanProductRepository planWorkPlanProductRepository,
             IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IProcBomRepository procBomRepository,
-            IProcMaterialRepository procMaterialRepository)
+            IProcMaterialRepository procMaterialRepository,
+            IProcProcessRouteRepository procProcessRouteRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _sysConfigRepository = sysConfigRepository;
             _planWorkPlanRepository = planWorkPlanRepository;
             _planWorkPlanProductRepository = planWorkPlanProductRepository;
             _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
@@ -94,6 +114,7 @@ namespace Hymson.MES.Services.Services.Plan
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _procBomRepository = procBomRepository;
             _procMaterialRepository = procMaterialRepository;
+            _procProcessRouteRepository = procProcessRouteRepository;
         }
 
 
@@ -227,6 +248,21 @@ namespace Hymson.MES.Services.Services.Plan
                 Code = workPlanEntity.WorkCenterCode
             });
 
+            // 工艺路线编码配置
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.ProcessRouteCode });
+            if (configEntities == null || !configEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.ProcessRouteCode.GetDescription());
+            }
+
+            // 读取工艺路线
+            var processRouteCode = GetProcessRouteCode(configEntities, workPlanEntity.PlanType);
+            var processRouteEntity = await _procProcessRouteRepository.GetByCodeAsync(new ProcProcessRoutesByCodeQuery
+            {
+                SiteId = workPlanEntity.SiteId,
+                Code = processRouteCode
+            });
+
             List<PlanWorkOrderEntity> workOrderEntites = new();
             workOrderEntites.AddRange(dto.Details.Select(s => new PlanWorkOrderEntity
             {
@@ -240,8 +276,8 @@ namespace Hymson.MES.Services.Services.Plan
                 ProductId = workPlanProductEntity.ProductId,
                 WorkPlanId = workPlanEntity.Id,
                 WorkPlanProductId = workPlanProductEntity.Id,
-                ProcessRouteId = 0,
-                ProductBOMId = 0,
+                ProcessRouteId = processRouteEntity?.Id ?? 0,
+                ProductBOMId = workPlanProductEntity.BomId,
                 Type = workPlanEntity.Type,
                 OverScale = workPlanProductEntity.OverScale,
                 Status = PlanWorkOrderStatusEnum.NotStarted,
@@ -454,5 +490,25 @@ namespace Hymson.MES.Services.Services.Plan
             return workPlanMaterialEntities.Select(s => s.ToModel<PlanWorkPlanMaterialDto>());
         }
 
+
+
+        #region 内部方法
+        /// <summary>
+        /// 获取工艺路线编码
+        /// </summary>
+        /// <param name="configEntities"></param>
+        /// <param name="planType"></param>
+        /// <returns></returns>
+        private static string GetProcessRouteCode(IEnumerable<SysConfigEntity> configEntities, PlanWorkPlanTypeEnum planType)
+        {
+            var configEntity = configEntities.FirstOrDefault();
+            if (configEntity == null) return "not configured";
+
+            if (string.IsNullOrWhiteSpace(configEntity?.Value)) return "no configured value";
+
+            var valueArray = configEntity.Value.Split('|');
+            return planType == PlanWorkPlanTypeEnum.Rotor ? valueArray[0] : valueArray[1];
+        }
+        #endregion
     }
 }
