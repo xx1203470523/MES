@@ -186,12 +186,18 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task CreateManuSfcCirculationAsync(ManuSfcCirculationBindDto bindDto)
         {
-            //获取条码信息
-            var bindManuSfc = await _manuSfcRepository.GetBySFCAsync(new() { SFC = bindDto.BindSFC, SiteId = 123456 })
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16371)).WithData("BindSFC", bindDto.BindSFC);
+            var manuSfc = await _manuSfcRepository.GetBySFCAsync(new() { SFC = bindDto.SFC, SiteId = 123456 });
+            //?? throw new CustomerValidationException(nameof(ErrorCode.MES16371)).WithData("BindSFC", bindDto.SFC);
 
-            var bindManuSfcInfo = await _manuSfcInfoRepository.GetBySFCAsync(bindManuSfc.Id)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16371)).WithData("BindSFC", bindDto.BindSFC);
+            var manuSfcInfo = await _manuSfcInfoRepository.GetBySFCAsync(manuSfc.Id);
+            //?? throw new CustomerValidationException(nameof(ErrorCode.MES16371)).WithData("BindSFC", bindDto.SFC);
+
+            ////获取条码信息
+            //var bindManuSfc = await _manuSfcRepository.GetBySFCAsync(new() { SFC = bindDto.BindSFC, SiteId = 123456 })
+            //    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16371)).WithData("BindSFC", bindDto.BindSFC);
+
+            //var bindManuSfcInfo = await _manuSfcInfoRepository.GetBySFCAsync(bindManuSfc.Id)
+            //    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16371)).WithData("BindSFC", bindDto.BindSFC);
 
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(bindDto.procedureId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17311));
@@ -215,7 +221,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //获取条码流转记录
             var sfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
             {
-                Sfcs = new string[] { bindDto.SFC } ,
+                Sfcs = new string[] { bindDto.SFC },
                 SiteId = 123456
             });
 
@@ -239,15 +245,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = 123456,
                 ProcedureId = procedureEntity.Id,
                 ResourceId = resourceEntity.Id,
-                EquipmentId = equEuipmentEntity.Id,
+                EquipmentId = equEuipmentEntity?.Id,
                 FeedingPointId = null,
                 SFC = bindDto.BindSFC,
-                WorkOrderId = bindManuSfcInfo.WorkOrderId,
-                ProductId = bindManuSfcInfo.ProductId,
+                WorkOrderId = manuSfcInfo?.WorkOrderId ?? 0,
+                ProductId = manuSfcInfo?.ProductId ?? 0,
                 Location = locationId.ToString(),
                 CirculationBarCode = bindDto.SFC,
-                CirculationWorkOrderId = bindManuSfcInfo.WorkOrderId, //暂不考虑流转后工单变更场景
-                CirculationProductId = bindManuSfcInfo.ProductId, //产品同上
+                CirculationWorkOrderId = manuSfcInfo?.WorkOrderId ?? 0, //暂不考虑流转后工单变更场景
+                CirculationProductId = manuSfcInfo?.ProductId ?? 0, //产品同上
                 CirculationQty = 1,
                 CirculationType = "2",
                 IsDisassemble = Core.Enums.TrueOrFalseEnum.No,
@@ -267,15 +273,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SiteId = 123456,
                     ProcedureId = procedureEntity.Id,
                     ResourceId = resourceEntity.Id,
-                    EquipmentId = equEuipmentEntity.Id,
+                    EquipmentId = equEuipmentEntity?.Id,
                     FeedingPointId = null,
                     SFC = bindDto.SFC,
-                    WorkOrderId = bindManuSfcInfo.WorkOrderId,
-                    ProductId = bindManuSfcInfo.ProductId,
+                    WorkOrderId = manuSfcInfo?.WorkOrderId ?? 0,
+                    ProductId = manuSfcInfo?.ProductId ?? 0,
                     Location = "0",
                     CirculationBarCode = "",
-                    CirculationWorkOrderId = bindManuSfcInfo.WorkOrderId, //暂不考虑流转后工单变更场景
-                    CirculationProductId = bindManuSfcInfo.ProductId, //产品同上
+                    CirculationWorkOrderId = manuSfcInfo?.WorkOrderId ?? 0, //暂不考虑流转后工单变更场景
+                    CirculationProductId = manuSfcInfo?.ProductId ?? 0, //产品同上
                     CirculationQty = 1,
                     CirculationType = "2",
                     IsDisassemble = Core.Enums.TrueOrFalseEnum.No,

@@ -264,7 +264,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             //刻码后一道工序（挤压-刻码-CCS安装）
             //虚拟组件安装后一道工序（人工组件安装(2)-线束固定与连接排固定）
             //客户要去需要在绑定工序后校验数量是否满足
-            if ((new string[] { "OP16", "OP26", "OP28" }).Contains(procedureEntity.Code))
+            //if ((new string[] { "OP16", "OP26", "OP28" }).Contains(procedureEntity.Code))
+            if ((new string[] { "OP16", "OP26" }).Contains(procedureEntity.Code))
             {
                 if (!(manuSfcCirculationEntities?.Any() == true))
                 {
@@ -277,7 +278,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
 
                     if (procedureEntity.Code == "OP16" && manuSfcCirculationEntities?.Count() < 12) result = true;
                     if (procedureEntity.Code == "OP26" && manuSfcCirculationEntities?.Count() < 4) result = true;
-                    if (procedureEntity.Code == "OP28" && manuSfcCirculationEntities?.Count() < 4) result = true;
+                    //if (procedureEntity.Code == "OP28" && manuSfcCirculationEntities?.Count() < 4) result = true;
 
                     if (result)
                     {
