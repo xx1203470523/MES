@@ -10,8 +10,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Extension;
-using Minio.DataModel;
-using OfficeOpenXml.Utils;
+using System.Runtime.InteropServices;
 
 namespace Hymson.MES.Services.Services
 {
@@ -36,6 +35,7 @@ namespace Hymson.MES.Services.Services
         private readonly IManuBarCodeRelationRepository _manuBarCodeRelationRepository;
         private readonly IManuEquipmentParameterRepository _manuEquipmentParameterRepository;
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+        private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
         /// <summary>
         /// 构造函数
@@ -49,6 +49,7 @@ namespace Hymson.MES.Services.Services
         /// <param name="manuBarCodeRelationRepository"></param>
         /// <param name="manuEquipmentParameterRepository"></param>
         /// <param name="manuProductBadRecordRepository"></param>
+        /// <param name="manuSfcCirculationRepository"></param>
         public TracingSourceSFCService(ICurrentSite currentSite,
             ITracingSourceCoreService tracingSourceCoreService,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
@@ -57,7 +58,8 @@ namespace Hymson.MES.Services.Services
             IMasterDataService masterDataService,
             IManuBarCodeRelationRepository manuBarCodeRelationRepository,
             IManuEquipmentParameterRepository manuEquipmentParameterRepository,
-            IManuProductBadRecordRepository manuProductBadRecordRepository)
+            IManuProductBadRecordRepository manuProductBadRecordRepository,
+            IManuSfcCirculationRepository manuSfcCirculationRepository)
         {
             _currentSite = currentSite;
             _tracingSourceCoreService = tracingSourceCoreService;
@@ -68,6 +70,7 @@ namespace Hymson.MES.Services.Services
             _manuBarCodeRelationRepository = manuBarCodeRelationRepository;
             _manuEquipmentParameterRepository = manuEquipmentParameterRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
+            _manuSfcCirculationRepository = manuSfcCirculationRepository;
         }
 
 
@@ -109,7 +112,19 @@ namespace Hymson.MES.Services.Services
             var  procedureSourceDtos=new List<ProcedureSourceDto>();
             foreach (var  manuSfcSummaryEntity in manuSfcSummaryEntities)
             {
-                procedureSourceDtos.Add(manuSfcSummaryEntity.ToModel<ProcedureSourceDto>());
+                var procedureSourceDto = manuSfcSummaryEntity.ToModel<ProcedureSourceDto>();
+               var  planWorkOrderEntity= await  _masterDataService.GetPlanWorkOrderEntityAsync( manuSfcSummaryEntity.SiteId, manuSfcSummaryEntity.WorkOrderId);
+                if (planWorkOrderEntity != null)
+                {
+                    procedureSourceDto.OrderCode = planWorkOrderEntity.OrderCode;
+                }
+                if (manuSfcSummaryEntity.ProcedureId.HasValue)
+                {
+                    var procProcedureEntity = await _masterDataService.GetProcProcedureEntityAsync(manuSfcSummaryEntity.SiteId, manuSfcSummaryEntity.ProcedureId.Value);
+                    procedureSourceDto.ProcedureName = procProcedureEntity?.Name;
+                }
+                
+                procedureSourceDtos.Add(procedureSourceDto);
             }
             return procedureSourceDtos;
         }
@@ -150,7 +165,35 @@ namespace Hymson.MES.Services.Services
             return productParameterSourceDtos;  
         }
 
-        
+        public async Task<IEnumerable<MaterialSourceDto>> GetOldMaterialSourcesAsync(string sfc)
+        {
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationQuery
+            {
+                Sfc = sfc,
+                SiteId = _currentSite.SiteId ?? 0,
+                CirculationTypes = new List<SfcCirculationTypeEnum>() { SfcCirculationTypeEnum.Consume }
+            });
+            var materialSourceDtos = new List<MaterialSourceDto>();
+            if (manuSfcCirculationEntities == null || !manuSfcCirculationEntities.Any()) return materialSourceDtos;
+
+            foreach (var manuSfcCirculationEntity in manuSfcCirculationEntities)
+            {
+                var procMaterialEntity = await _masterDataService.GetProcMaterialEntityAsync(_currentSite.SiteId ?? 0, manuSfcCirculationEntity.ProductId);
+                if (procMaterialEntity == null) continue;
+                var materialSourceDto = manuSfcCirculationEntity.ToModel<MaterialSourceDto>();
+                materialSourceDto.CirculationQty = manuSfcCirculationEntity.CirculationQty ?? 0;
+                materialSourceDto.CirculationBarCode = manuSfcCirculationEntity.SFC;
+                materialSourceDto.Sfc = manuSfcCirculationEntity.CirculationBarCode;
+
+                var procProcedureEntity = await _masterDataService.GetProcProcedureEntityAsync(_currentSite.SiteId ?? 0, manuSfcCirculationEntity.ProcedureId);
+                materialSourceDto.ProcedureCode = procProcedureEntity == null ? "" : procProcedureEntity.Code;
+                materialSourceDto.ProcedureName = procProcedureEntity == null ? "" : procProcedureEntity.Name;
+
+                materialSourceDtos.Add(materialSourceDto);
+
+            }
+            return materialSourceDtos;
+        }
 
         public async Task<IEnumerable<MaterialSourceDto>> GetMaterialSourcesAsync(string sfc)
         {
