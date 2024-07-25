@@ -682,16 +682,20 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 SiteId = _currentSite.SiteId ?? 0,
                 RequistionOrderIds = requistionOrderIds
             });
+
+            var materialIds= manuRequistionOrderDetails.Select(x=>x.MaterialId).ToArray();
+            var procMaterials=await _procMaterialRepository.GetByIdsAsync(materialIds);
             foreach (var item in manuRequistionOrderDetails)
             {
                 var requistionOrder = requistionOrderEntities.FirstOrDefault(x => x.Id == item.RequistionOrderId);
+                var material= procMaterials.FirstOrDefault(x=>x.Id == item.MaterialId);
                 details.Add(new ManuRequistionOrderDetailDto
                 {
                     ReqOrderCode = requistionOrder?.ReqOrderCode ?? "",
-
-                    //MaterialCode = item.MaterialCode,
-                    //Version = item.Version,
-                    //MaterialBarCode = item.MaterialBarCode,
+                    MaterialCode = material?.MaterialCode??"",
+                    Version = material?.Version??"",
+                    MaterialName = material?.MaterialName??"",
+                    //MaterialBarCode = material?.MaterialBarCode??"",
                     //Batch = item.Batch,
                     Qty = item.Qty,
                     PickTime = requistionOrder?.CreatedOn ?? item.CreatedOn,
