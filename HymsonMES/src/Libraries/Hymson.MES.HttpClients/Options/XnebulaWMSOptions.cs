@@ -15,7 +15,7 @@ namespace Hymson.MES.HttpClients
         /// 基础路径
         /// </summary>
         public string BaseAddressUri { get; set; } = "";
-        public string Token { get; set; } = "";
+        public string SysToken { get; set; } = "";
         /// <summary>
         /// 出库操作配置
         /// </summary>
@@ -129,6 +129,7 @@ namespace Hymson.MES.HttpClients
         /// 路由信息
         /// </summary>
         public string RoutePath { get; set; }
+
     }
 
     public class WMSProductReceiptCancelOptions

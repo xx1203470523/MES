@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
@@ -154,8 +155,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 foreach (var entity in productReceiptOrderDetailEntities)
                 {
-                    var  manuProductReceipt = new ManuProductReceiptOrderDetailDto
+                    var manuProductReceiptOrder = manuProductReceiptOrderLists.FirstOrDefault(x => x.Id == entity.ProductReceiptId);
+                    var manuProductReceipt = new ManuProductReceiptOrderDetailDto
                     {
+                        StorageStatus = manuProductReceiptOrder?.Status ?? ProductReceiptStatusEnum.Approvaling,
                         Batch = entity.Batch,
                         Qty = entity.Qty,
                         ContaineCode = entity.ContaineCode,
@@ -167,7 +170,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     };
                     manuProductReceiptOrders.Add(manuProductReceipt);
                 }
-
             }
             return manuProductReceiptOrders;
         }

@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using MailKit.Net.Smtp;
+using System.Net.Http.Headers;
 
 namespace Hymson.MES.HttpClients
 {
