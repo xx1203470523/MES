@@ -14,6 +14,7 @@ using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -470,21 +471,21 @@ namespace Hymson.MES.Services.Services.Warehouse
 
             //if (new MaterialInventorySourceEnum[] { MaterialInventorySourceEnum.ManualEntry, MaterialInventorySourceEnum.WMS, MaterialInventorySourceEnum.LoadingPoint }.Contains(entity.Source))
             //{
-                var detailDto = entity.ToModel<WhMaterialInventoryDetailDto>();
+            var detailDto = entity.ToModel<WhMaterialInventoryDetailDto>();
 
-                //查询关联信息
-                var materialInfo = (await _procMaterialRepository.GetByIdsAsync(new long[] { entity!.MaterialId })).FirstOrDefault();
-                var supplierInfo = (await _whSupplierRepository.GetByIdsAsync(new long[] { entity.SupplierId })).FirstOrDefault();
+            //查询关联信息
+            var materialInfo = (await _procMaterialRepository.GetByIdsAsync(new long[] { entity!.MaterialId })).FirstOrDefault();
+            var supplierInfo = (await _whSupplierRepository.GetByIdsAsync(new long[] { entity.SupplierId })).FirstOrDefault();
 
-                detailDto.MaterialCode = materialInfo?.MaterialCode ?? "";
-                detailDto.MaterialName = materialInfo?.MaterialName ?? "";
-                detailDto.MaterialVersion = materialInfo?.Version ?? "";
+            detailDto.MaterialCode = materialInfo?.MaterialCode ?? "";
+            detailDto.MaterialName = materialInfo?.MaterialName ?? "";
+            detailDto.MaterialVersion = materialInfo?.Version ?? "";
 
-                detailDto.SupplierCode = supplierInfo?.Code ?? "";
-                detailDto.SupplierName = supplierInfo?.Name ?? "";
+            detailDto.SupplierCode = supplierInfo?.Code ?? "";
+            detailDto.SupplierName = supplierInfo?.Name ?? "";
 
 
-                return detailDto;
+            return detailDto;
             //}
             //else
             //{
@@ -1102,7 +1103,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     afterBarcode = inputBarcodeSingle?.MaterialBarCode ?? string.Empty;
                 }
 
-                
+
 
                 var standingbook = new WhMaterialStandingbookEntity
                 {
@@ -1136,7 +1137,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 //{
                 //    continue;
                 //}            
-       
+
                 var manuBarCodeRelationEntity = new ManuBarCodeRelationEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -1156,7 +1157,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     RelationType = ManuBarCodeRelationTypeEnum.SFC_Combined,
                     BusinessContent = new
                     {
-    
+
                         InputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == entity.MaterialBarCode).FirstOrDefault()?.Id,
                         OutputMaterialStandingBookId = whMaterialStandingbookEntities.Where(x => x.MaterialBarCode == inputBarcodeSingle.MaterialBarCode).FirstOrDefault()?.Id
                     }.ToSerialize(),
@@ -1419,9 +1420,9 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
-                Status = WhWarehouseReturnStatusEnum.Approvaling,
+                Status = WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful,
                 Type = ManuReturnTypeEnum.WorkOrderReturn,
-                SourceWorkOrderCode = request.WorkCode,
+                //SourceWorkOrderCode = request.WorkCode,
             };
             var response = await _wmsRequest.MaterialReturnRequestAsync(new HttpClients.Requests.MaterialReturnRequestDto
             {
@@ -1573,7 +1574,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         public async Task<bool> MaterialReturnCancelAsync(MaterialReturnCancel request)
         {
             var returnOrderEntity = await _manuReturnOrderRepository.GetByIdAsync(request.ReturnOrderId);
-            if (returnOrderEntity.Status == WhWarehouseReturnStatusEnum.Approvaling)
+            if (returnOrderEntity.Status == WhWarehouseMaterialReturnStatusEnum.ApplicationSuccessful)
             {
                 var response = await _wmsRequest.MaterialReturnCancelAsync(new HttpClients.Requests.MaterialReturnCancelDto
                 {
@@ -1693,25 +1694,28 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task<IEnumerable<WhMaterialInventoryDetailDto>> GetPickMaterialsByOrderidAsync(long orderId)
         {
-            var whMaterialInventories=new List<WhMaterialInventoryDetailDto>();
+            var whMaterialInventories = new List<WhMaterialInventoryDetailDto>();
             var inventoryEntities = await _whMaterialInventoryRepository.GetWhMaterialInventoryEntitiesAsync(new WhMaterialInventoryQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                WorkOrderId = orderId
+                WorkOrderId = orderId,
+                Status = WhMaterialInventoryStatusEnum.ToBeUsed
             });
-            if(inventoryEntities==null || !inventoryEntities.Any())
+
+            inventoryEntities = inventoryEntities.Where(x => x.QuantityResidue > 0);
+            if (inventoryEntities == null || !inventoryEntities.Any())
             {
                 return whMaterialInventories;
             }
 
             var materialIds = inventoryEntities.Select(x => x.MaterialId).Distinct().ToArray();
-            var  procMaterialEntities= await _procMaterialRepository.GetByIdsAsync(materialIds);
+            var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
 
             foreach (var whMaterial in inventoryEntities)
             {
                 var material = procMaterialEntities.FirstOrDefault(x => x.Id == whMaterial.MaterialId);
 
-                var whMaterialInventoryDto = whMaterial.ToModel<WhMaterialInventoryDetailDto>(); 
+                var whMaterialInventoryDto = whMaterial.ToModel<WhMaterialInventoryDetailDto>();
                 whMaterialInventoryDto.MaterialCode = material?.MaterialCode ?? "";
                 whMaterialInventoryDto.MaterialName = material?.MaterialName ?? "";
                 whMaterialInventoryDto.Specifications = material?.Specifications ?? "";

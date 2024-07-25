@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuReturnOrder.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -16,7 +17,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuReturnOrderEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuReturnOrderEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -58,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuReturnOrderEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -72,7 +73,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuReturnOrderEntity>> GetEntitiesAsync(ManuReturnOrderQuery query);
-        
+
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuReturnOrderEntity> GetSingleEntityAsync(ManuReturnOrderSingleQuery query);
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -80,5 +88,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<PagedInfo<ManuReturnOrderEntity>> GetPagedListAsync(ManuReturnOrderPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 根据Id批量更新状态
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> UpdateManuReturnOrderStatusByIdRangeAsync(IEnumerable<UpdateManuReturnOrderStatusByIdCommand> commands);
+
+        /// <summary>
+        /// 根据Id更新状态
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> UpdateManuReturnOrderStatusByIdAsync(UpdateManuReturnOrderStatusByIdCommand command);
     }
 }

@@ -45,7 +45,7 @@
         public const string MES10136 = "操作数据丢失";
         public const string MES10137 = "只允许删除【待检验】状态的数据！";
         public const string MES10138 = "必须要选择一项查询类型！";
-        public const string MES10139 = "{name}配置信息读取失败！";
+        public const string MES10139 = "【{name}】配置信息读取失败！";
         public const string MES10140 = "定子/转子工厂车间产线信息读取异常！";
 
         #region 物料 10200
@@ -101,6 +101,7 @@
         public const string MES10249 = "生产计划【{Code}】产品不能为空！";
         public const string MES10250 = "BOM物料Id【{MaterialId}】所属物料不存在！";
         public const string MES10251 = "物料【{Code}】不存在！";
+        public const string MES10252 = "存在未匹配的BOM，请检查！";
         #endregion
 
         #region 资源 10300
@@ -929,7 +930,7 @@
 
         #endregion
 
-        #region 车间库存接收  15100
+        #region 车间库存  15100
         public const string MES15100 = "物料库存错误";
         public const string MES15101 = "物料条码【{MaterialCode}】所属物料不存在！";
         public const string MES15102 = "物料条码未关联到供应商";
@@ -957,6 +958,23 @@
         public const string MES15133 = "待拆分数量不能填写小数!";
         public const string MES15134 = "物料仓库有重复的条码或与当前条码无法匹配，导致无法正常记录物料台账!";
         public const string MES15135 = "指定条码错误，不在合并的条码中";
+
+        public const string MES15136 = "物料条码全部不存在";
+        public const string MES15137 = "库存有修改，请刷新后再操作！";
+        public const string MES15138 = "物料条码【{MaterialCode}】不存在";
+        public const string MES15139 = "申请【{System}】退料单失败";
+        public const string MES15140 = "退料单号生成失败：退料单类型编码规则未维护！";
+        public const string MES15141 = "退料单号生成失败，同时存在多条退料单类型编码规则！";
+        public const string MES15142 = "入库仓库不存在，请检查系统配置！";
+        public const string MES15143 = "物料条码【{MaterialCode}】状态不为待使用";
+
+        public const string MES15144 = "退料单【{ReturnOrderCode}】不存在";
+        public const string MES15145 = "退料单【{ReturnOrderCode}】处于检验中，无法执行入库！";
+        public const string MES15146 = "退料单【{ReturnOrderCode}】已完成，无法执行入库！";
+        public const string MES15147 = "退料单【{ReturnOrderCode}】待检验，无法执行入库！";
+        public const string MES15148 = "退料单【{ReturnOrderCode}】不存在条码【{MaterialCode}】，无法执行入库！";
+        public const string MES15149 = "退料单【{ReturnOrderCode}】条码【{MaterialCode}】条码数量申请数量【{PlanQty}】，退料数量为【{Qty}】，数据差异较大，无法执行入库！";
+        public const string MES15150 = "退料单【{ReturnOrderCode}】条码【{MaterialCode}】已经入库完成，无法执行入库！";
         #endregion
 
         #region 物料台账 15200
@@ -1216,6 +1234,8 @@
 
         public const string MES16052 = "指定生产计划未找到,工单编码为：【{WorkOrder}】。";
         public const string MES16053 = "生产工单编码出现重复，请检查！";
+        public const string MES16054 = "子工单总数量已超过生产计划计划数量，请检查！";
+        public const string MES16055 = "子工单的计划时间超出生产计划的时间范围，请检查！";
         #endregion
 
         #region 条码接收 16100

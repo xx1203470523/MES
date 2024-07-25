@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -38,7 +39,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// <summary>
         /// 是否必填
         /// </summary>
-        public bool IsRequired { get; set; } = false;
+        public TrueOrFalseEnum IsRequired { get; set; } = TrueOrFalseEnum.No;
 
         /// <summary>
         /// 顺序（正整数，最大值10000）

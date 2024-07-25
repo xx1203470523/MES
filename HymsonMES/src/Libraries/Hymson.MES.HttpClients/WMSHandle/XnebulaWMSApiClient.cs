@@ -1,12 +1,7 @@
 ﻿using Hymson.MES.HttpClients.Requests;
+using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Microsoft.Extensions.Options;
-using System.Net.Http;
-using System.Net;
 using System.Net.Http.Json;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Constants;
-using MailKit.Net.Smtp;
-using System.Net.Http.Headers;
 
 namespace Hymson.MES.HttpClients
 {
@@ -25,7 +20,6 @@ namespace Hymson.MES.HttpClients
 
         public async Task<bool> MaterialPickingRequestAsync(MaterialPickingRequestDto request)
         {
-            
             MaterialPickingRequest materialPickingRequest = new MaterialPickingRequest()
             {
                 SendOn = request.SendOn,
@@ -34,15 +28,13 @@ namespace Hymson.MES.HttpClients
                 Type = _options.Delivery.Type,
                 WarehouseCode = _options.Delivery.WarehouseCode
             };
-           
+
             var httpResponse = await _httpClient.PostAsJsonAsync<MaterialPickingRequest>(_options.Delivery.RoutePath, materialPickingRequest);
-            
+
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             return httpResponse.IsSuccessStatusCode;
         }
-
-        
 
         public async Task<bool> MaterialPickingCancelAsync(MaterialPickingCancelDto request)
         {

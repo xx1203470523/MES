@@ -78,5 +78,10 @@ namespace Hymson.MES.Core.Enums.Integrated
         [Description("设备维修")]
         EquRepairOrder = 12,
 
+        /// <summary>
+        /// 退料单号
+        /// </summary>
+        [Description("退料单号")]
+        MaterialReturnOrder = 13
     }
 }

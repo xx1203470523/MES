@@ -137,6 +137,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// 物料名称
         /// </summary>
         public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 完成数量
+        /// </summary>
+        public decimal FinishProductQuantity { get; set; }
     }
 
 }

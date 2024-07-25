@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.HttpClients.Requests.WMS;
+using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 
 namespace Hymson.MES.HttpClients
 {
@@ -21,5 +22,11 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         Task<bool> IQCReturnCallBackAsync(IQCReturnResultDto request);
 
+        /// <summary>
+        /// 生产入库
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<bool> WarehousingEntryRequestAsync(WarehousingEntryDto request);
     }
 }

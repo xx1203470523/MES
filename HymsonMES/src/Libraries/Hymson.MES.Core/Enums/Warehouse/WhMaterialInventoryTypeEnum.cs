@@ -113,6 +113,17 @@ namespace Hymson.MES.Core.Enums
         /// 步骤控制
         /// </summary>
         [Description("步骤控制")]
-        StepControl = 19
+        StepControl = 19,
+        /// <summary>
+        /// 退料申请
+        /// </summary>
+        [Description("退料申请")]
+        ReturnApplication = 20,
+
+        /// <summary>
+        /// 退料确认
+        /// </summary>
+        [Description("退料确认")]
+        ReturnApplicationConfirm = 21
     }
 }

@@ -23,6 +23,16 @@ namespace Hymson.MES.SystemServices.Dtos
         public string Remark { get; set; } = "";
 
         /// <summary>
+        /// 同步编码（WMS需要给ERP）
+        /// </summary>
+        public string? SyncCode { get; set; } = "";
+
+        /// <summary>
+        /// 同步Id（WMS需要给ERP）
+        /// </summary>
+        public long? SyncId { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         public IEnumerable<WhMaterialReceiptMaterialDto>? Details { get; set; }
@@ -73,6 +83,16 @@ namespace Hymson.MES.SystemServices.Dtos
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 条码（唯一码）
+        /// </summary>
+        public string? BarCode { get; set; } = "";
+
+        /// <summary>
+        /// 同步Id（WMS需要给ERP）
+        /// </summary>
+        public long? SyncId { get; set; }
 
     }
 

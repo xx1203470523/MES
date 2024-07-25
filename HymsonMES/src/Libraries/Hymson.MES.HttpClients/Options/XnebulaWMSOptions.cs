@@ -83,7 +83,6 @@ namespace Hymson.MES.HttpClients
     /// </summary>
     public class WMSReceiptOptions
     {
-       
         /// <summary>
         /// 仓库编码
         /// </summary>

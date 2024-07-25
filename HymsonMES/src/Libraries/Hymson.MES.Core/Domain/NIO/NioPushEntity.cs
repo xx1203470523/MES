@@ -2,7 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.Enums.Plan;
 
-namespace Hymson.MES.BackgroundServices.NIO
+namespace Hymson.MES.Core.NIO
 {
     /// <summary>
     /// 数据实体（蔚来推送表）   
@@ -23,7 +23,7 @@ namespace Hymson.MES.BackgroundServices.NIO
         public BuzSceneEnum BuzScene { get; set; }
 
         /// <summary>
-        /// 推送状态;1：待推送；2：已推送；3：推送失败；
+        /// 推送状态;0：无需推送；1：待推送；2：已推送；3：推送失败；
         /// </summary>
         public PushStatusEnum Status { get; set; }
 

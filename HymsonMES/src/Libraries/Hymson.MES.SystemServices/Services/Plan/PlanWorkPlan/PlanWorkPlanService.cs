@@ -114,13 +114,16 @@ namespace Hymson.MES.SystemServices.Services.Plan
             var resposeSummaryBo = new SyncWorkPlanSummaryBo();
             resposeSummaryBo.Adds.AddRange(resposeBo.Adds);
             resposeSummaryBo.Updates.AddRange(resposeBo.Updates);
+            resposeSummaryBo.ProductAdds.AddRange(resposeBo.ProductAdds);
+            resposeSummaryBo.MaterialAdds.AddRange(resposeBo.MaterialAdds);
 
-            var WorkPlanIds = resposeBo.Adds.Select(s => s.Id);
+            var workPlanIds = resposeBo.Adds.Select(s => s.Id);
+            workPlanIds = workPlanIds.Concat(resposeBo.Updates.Select(s => s.Id));
 
             // 删除数据
             var command = new DeleteByParentIdsCommand
             {
-                ParentIds = WorkPlanIds,
+                ParentIds = workPlanIds,
                 UpdatedBy = currentBo.User,
                 UpdatedOn = currentBo.Time
             };
@@ -210,6 +213,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
             // 判断是否有不存在的产品编码
             var productCodes = workPlanDtos.SelectMany(s => s.Products).Select(s => s.ProductCode).Distinct();
+            productCodes = productCodes.Concat(workPlanDtos.SelectMany(s => s.Products).SelectMany(s => s.Materials).Select(s => s.MaterialCode).Distinct());
             var productEntities = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery { SiteId = currentBo.SiteId, MaterialCodes = productCodes });
 
             /*
@@ -220,13 +224,17 @@ namespace Hymson.MES.SystemServices.Services.Plan
             }
             */
 
-            // 判断BOM编码是否存在
+            // 读取已存在的BOM记录（因为U8会出现重复编码）
+            /*
             var bomCodes = workPlanDtos.SelectMany(s => s.Products).Select(s => s.BomCode).Distinct();
             var bomEntities = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery { SiteId = currentBo.SiteId, Codes = bomCodes });
+            */
+            var bomIds = workPlanDtos.SelectMany(s => s.Products).Select(s => s.BomId).Distinct();
+            var bomEntities = await _procBomRepository.GetByIdsAsync(bomIds);
             if (bomEntities == null || !bomEntities.Any())
             {
                 // 这里应该提示BOM不存在
-                throw new CustomerValidationException(nameof(ErrorCode.MES10233)).WithData("bomCode", string.Join(',', bomCodes));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10252));
             }
 
             // 读取已存在的生产计划记录
@@ -268,14 +276,14 @@ namespace Hymson.MES.SystemServices.Services.Plan
                         RequirementNumber = planDto.RequirementNumber,
                         PlanStartTime = firstProductDto.StartTime ?? SqlDateTime.MinValue.Value,
                         PlanEndTime = firstProductDto.EndTime ?? SqlDateTime.MaxValue.Value,
-
+                        
                         // TODO: 这里的字段需要确认
                         OverScale = 0,
-                        Type = 0,
+                        Type = planDto.Type,
                         Status = PlanWorkPlanStatusEnum.NotStarted,
 
                         Remark = "",
-                        Id = IdGenProvider.Instance.CreateId(),
+                        Id = planDto.Id ?? IdGenProvider.Instance.CreateId(),
                         SiteId = currentBo.SiteId,
                         CreatedBy = currentBo.User,
                         CreatedOn = currentBo.Time,
@@ -300,6 +308,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     planEntity.PlanStartTime = firstProductDto.StartTime ?? SqlDateTime.MinValue.Value;
                     planEntity.PlanEndTime = firstProductDto.EndTime ?? SqlDateTime.MaxValue.Value;
 
+                    planEntity.Type = planDto.Type;
                     planEntity.UpdatedBy = currentBo.User;
                     planEntity.UpdatedOn = currentBo.Time;
                     resposeBo.Updates.Add(planEntity);
@@ -308,20 +317,18 @@ namespace Hymson.MES.SystemServices.Services.Plan
                 // 遍历产品列表
                 foreach (var productDto in planDto.Products)
                 {
-                    /*
                     // 读取产品实体
                     var productEntity = productEntities.FirstOrDefault(f => f.MaterialCode == productDto.ProductCode)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES10245)).WithData("Code", productDto.ProductCode);
-                    */
 
                     // 添加生产计划产品
-                    var WorkPlanProductId = productDto.Id ?? IdGenProvider.Instance.CreateId();
+                    var workPlanProductId = productDto.Id ?? IdGenProvider.Instance.CreateId();
                     resposeBo.ProductAdds.Add(new PlanWorkPlanProductEntity
                     {
                         WorkPlanId = planEntity.Id,
-                        ProductId = 0, //productEntity.Id,
+                        ProductId = productEntity.Id,
                         ProductCode = productDto.ProductCode,
-                        ProductVersion = "", //productEntity.Version ?? "",
+                        ProductVersion = productEntity.Version ?? "",
                         BomId = productDto.BomId,
                         BomCode = productDto.BomCode,
                         BomVersion = productDto.BomVersion,
@@ -329,7 +336,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                         OverScale = productDto.OverScale,
 
                         Remark = "",
-                        Id = WorkPlanProductId,
+                        Id = workPlanProductId,
                         SiteId = currentBo.SiteId,
                         CreatedBy = currentBo.User,
                         CreatedOn = currentBo.Time,
@@ -338,25 +345,32 @@ namespace Hymson.MES.SystemServices.Services.Plan
                     });
 
                     // 添加生产计划物料
-                    resposeBo.MaterialAdds.AddRange(productDto.Materials.Select(s => new PlanWorkPlanMaterialEntity
+                    foreach (var materialDto in productDto.Materials)
                     {
-                        WorkPlanId = planEntity.Id,
-                        WorkPlanProductId = WorkPlanProductId,
-                        MaterialId = s.MaterialId,
-                        MaterialCode = s.MaterialCode,
-                        MaterialVersion = s.MaterialVersion,
-                        BomId = s.BomId,
-                        Usages = s.Usages,
-                        Loss = s.Loss,
+                        // 读取物料实体
+                        var materialEntity = productEntities.FirstOrDefault(f => f.MaterialCode == materialDto.MaterialCode)
+                            ?? throw new CustomerValidationException(nameof(ErrorCode.MES10251)).WithData("Code", materialDto.MaterialCode);
 
-                        Remark = "",
-                        Id = s.Id ?? IdGenProvider.Instance.CreateId(),
-                        SiteId = currentBo.SiteId,
-                        CreatedBy = currentBo.User,
-                        CreatedOn = currentBo.Time,
-                        UpdatedBy = currentBo.User,
-                        UpdatedOn = currentBo.Time
-                    }));
+                        resposeBo.MaterialAdds.Add(new PlanWorkPlanMaterialEntity
+                        {
+                            WorkPlanId = planEntity.Id,
+                            WorkPlanProductId = workPlanProductId,
+                            MaterialId = materialEntity.Id,
+                            MaterialCode = materialEntity.MaterialCode,
+                            MaterialVersion = materialEntity.Version ?? "",
+                            BomId = materialDto.BomId,
+                            Usages = materialDto.MaterialDosage,
+                            Loss = materialDto.MaterialLoss,
+
+                            Remark = "",
+                            Id = materialDto.Id ?? IdGenProvider.Instance.CreateId(),
+                            SiteId = currentBo.SiteId,
+                            CreatedBy = currentBo.User,
+                            CreatedOn = currentBo.Time,
+                            UpdatedBy = currentBo.User,
+                            UpdatedOn = currentBo.Time
+                        });
+                    }
                 }
 
             }
@@ -383,18 +397,22 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// 新增（工作计划产品）
         /// </summary>
         public List<PlanWorkPlanProductEntity> ProductAdds { get; set; } = new();
+        /*
         /// <summary>
         /// 新增（工作计划产品）
         /// </summary>
         public List<PlanWorkPlanProductEntity> ProductUpdates { get; set; } = new();
+        */
         /// <summary>
         /// 新增（工作计划物料）
         /// </summary>
         public List<PlanWorkPlanMaterialEntity> MaterialAdds { get; set; } = new();
+        /*
         /// <summary>
         /// 新增（工作计划物料）
         /// </summary>
         public List<PlanWorkPlanMaterialEntity> MaterialUpdates { get; set; } = new();
+        */
 
     }
 }
