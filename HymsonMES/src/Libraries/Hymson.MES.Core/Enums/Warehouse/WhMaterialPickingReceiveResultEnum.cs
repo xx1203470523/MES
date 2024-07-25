@@ -10,13 +10,13 @@ namespace Hymson.MES.Core.Enums.Warehouse
         /// <summary>
         /// 发料中
         /// </summary>
-        [Description("退料中")]
+        [Description("发料中")]
         Receiving = 1,
 
         /// <summary>
         /// 发料完成
         /// </summary>
-        [Description("退料完成")]
+        [Description("发料完成")]
         Completed = 2,
 
         /// <summary>
