@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
@@ -178,6 +179,13 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 品检状态
         /// </summary>
         public ProductReceiptQualifiedStatusEnum? Status { get; set; }
+
+
+        /// <summary>
+        /// 入库状态
+        /// </summary>
+        public ProductReceiptStatusEnum StorageStatus { get; set; }
+
 
         /// <summary>
         /// 创建时间

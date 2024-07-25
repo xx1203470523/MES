@@ -73,7 +73,11 @@ namespace Hymson.MES.SystemServices.Services.Quality
             {
                 // 子开关是否开启
                 var config = await _nioPushSwitchRepository.GetBySceneAsync(buzScene.Key);
-                if (config == null || config.IsEnabled != TrueOrFalseEnum.Yes) continue;
+                if (config == null) continue;
+
+                // 默认状态
+                var status = PushStatusEnum.Wait;
+                if (config.IsEnabled == TrueOrFalseEnum.No) status = PushStatusEnum.Off;
 
                 // 保存
                 rows += await _nioPushRepository.InsertRangeAsync(buzScene.Value.Select(s => new NioPushEntity
@@ -81,7 +85,7 @@ namespace Hymson.MES.SystemServices.Services.Quality
                     Id = IdGenProvider.Instance.CreateId(),
                     SchemaCode = config.SchemaCode,
                     BuzScene = s.BuzScene,
-                    Status = PushStatusEnum.Wait,
+                    Status = status,
                     Content = new
                     {
                         config.SchemaCode,

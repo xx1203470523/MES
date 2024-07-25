@@ -154,15 +154,15 @@ namespace Hymson.MES.Services.Services.Plan
                 if (i != dto.Count)
                 {
                     splitDto.Qty = partitionQty;
-                    splitDto.PlanStartDate = planEntity.PlanStartTime.AddDays((i - 1) * partitionDay);
-                    splitDto.PlanEndDate = planEntity.PlanStartTime.AddDays(i * partitionDay);
+                    splitDto.PlanStartTime = planEntity.PlanStartTime.AddDays((i - 1) * partitionDay);
+                    splitDto.PlanEndTime = planEntity.PlanStartTime.AddDays(i * partitionDay);
                 }
                 // 如果是最后一条
                 else
                 {
                     splitDto.Qty = remainingQty;
-                    splitDto.PlanStartDate = planEntity.PlanStartTime.AddDays((i - 1) * partitionDay);
-                    splitDto.PlanEndDate = planEntity.PlanEndTime;
+                    splitDto.PlanStartTime = planEntity.PlanStartTime.AddDays((i - 1) * partitionDay);
+                    splitDto.PlanEndTime = planEntity.PlanEndTime;
                 }
 
                 // 添加到待返回

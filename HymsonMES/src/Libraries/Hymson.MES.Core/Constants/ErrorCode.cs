@@ -491,7 +491,9 @@
         public const string MES11725 = "无需要处置！";
 
 
-
+         
+        public const string MES11750 = "工序编码{Code}不存在"; 
+        public const string MES11751 = "资源编码{Code}不存在";
 
         #endregion
 
@@ -2335,6 +2337,7 @@
         public const string MES17751 = "子步骤{code}已经存在";
         public const string MES17752 = "子步骤不存在！";
         public const string MES17753 = "子步骤已被分配给工序，不允许删除！";
+        public const string MES17754 = "成品码已提交完工入库 ！";
         #endregion
     }
 }

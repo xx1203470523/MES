@@ -44,7 +44,12 @@ namespace Hymson.MES.Services.Services
         /// <returns></returns>
         Task<IEnumerable<ProductParameterSourceDto>> GetProductParameterSourcesAsync(string sfc);
 
-
+        /// <summary>
+        /// 查询此条码原材料追溯信息 老表manu_sfc_circulation实现
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<IEnumerable<MaterialSourceDto>> GetOldMaterialSourcesAsync(string sfc);
         /// <summary>
         /// 查询此条码原材料追溯信息
         /// </summary>

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -50,5 +51,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         Task<PagedInfo<ManuRotorPackListDto>> GetPagedListAsync(ManuRotorPackListPagedQueryDto pagedQueryDto);
 
+        Task<IEnumerable<ManuRotorPackViewDto>> QueryByIdAsync(ManuRotorPackListQuery query);
     }
 }

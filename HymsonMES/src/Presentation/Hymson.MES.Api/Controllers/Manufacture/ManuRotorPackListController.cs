@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Microsoft.AspNetCore.Authorization;
@@ -96,5 +97,16 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             return await _manuRotorPackListService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// （转子装箱记录表）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("rotorpacklist")]
+        public async Task<IEnumerable<ManuRotorPackViewDto>> QueryrotorpacklistAsync([FromQuery] ManuRotorPackListQuery pagedQueryDto)
+        {
+            return await _manuRotorPackListService.QueryByIdAsync(pagedQueryDto);
+        }
     }
 }

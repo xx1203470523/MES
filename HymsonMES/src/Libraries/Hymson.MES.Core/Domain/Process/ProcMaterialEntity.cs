@@ -164,5 +164,10 @@ namespace Hymson.MES.Core.Domain.Process
         /// 原材料类型
         /// </summary>
         public MaterialTypeEnum? MaterialType { get; set; }
+
+        /// <summary>
+        /// 是否唯一码
+        /// </summary>
+        public bool IsOnlyOne { get; set; }
     }
 }

@@ -233,7 +233,7 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrder
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, equRepairOrderEntity);
         }
-
+          
         /// <summary>
         /// 批量更新
         /// </summary>

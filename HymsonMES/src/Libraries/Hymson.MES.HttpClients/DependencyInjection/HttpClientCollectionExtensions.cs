@@ -35,7 +35,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddHttpClient<IXnebulaWMSApiClient, XnebulaWMSApiClient>().ConfigureHttpClient(httpClient =>
             {
                 httpClient.BaseAddress = new Uri(xnebulaWMSOption.BaseAddressUri);
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", xnebulaWMSOption.Token);
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", xnebulaWMSOption.SysToken);
             });
 
             var rotorOptions = new RotorOption();

@@ -740,7 +740,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 领料数量
         /// </summary>
-        public List<ProductReceiptDetailRequest> Items { get; set; }
+        public IEnumerable<ProductReceiptDetailRequest> Items { get; set; }
     }
 
     /// <summary>
@@ -751,7 +751,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 条码
         /// </summary>
-        public string? Sfc { get; set; }
+        public string Sfc { get; set; }
 
         /// <summary>
         /// 箱码
