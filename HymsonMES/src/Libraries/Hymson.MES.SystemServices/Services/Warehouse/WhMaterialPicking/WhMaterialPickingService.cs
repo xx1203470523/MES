@@ -151,16 +151,16 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             reqQuery.SiteId = siteId;
             reqQuery.ReqOrderCode = param.RequistionOrderCode;
             var reqOrder = await _manuRequistionOrderRepository.GetByCodeAsync(reqQuery);
-            if(reqOrder == null)
+            if (reqOrder == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15160)).WithData("ReqOrderCode", param.RequistionOrderCode);
             }
-            if(reqOrder.Status == WhMaterialPickingStatusEnum.Completed)
+            if (reqOrder.Status == WhMaterialPickingStatusEnum.Completed)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15161)).WithData("ReqOrderCode", param.RequistionOrderCode);
             }
             //2. 校验物料明细
-            if(param.Details == null || param.Details.Count() == 0)
+            if (param.Details == null || param.Details.Count() == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15162)).WithData("ReqOrderCode", param.RequistionOrderCode);
             }
@@ -170,7 +170,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             matQuery.SiteId = siteId;
             matQuery.MaterialCodes = materialCodeList;
             var materialList = await _procMaterialRepository.GetByCodesAsync(matQuery);
-            if(materialList == null || materialList.Count() != materialCodeList.Count)
+            if (materialList == null || materialList.Count() != materialCodeList.Count)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15163))
                     .WithData("ReqOrderCode", param.RequistionOrderCode)
@@ -188,16 +188,16 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             orderDetailQuery.SiteId = siteId;
             orderDetailQuery.RequistionOrderIds = new long[] { reqOrder.Id };
             var orderDetailList = await _manuRequistionOrderDetailRepository.GetManuRequistionOrderDetailEntitiesAsync(orderDetailQuery);
-            if(orderDetailList == null || orderDetailList.Count() == 0)
+            if (orderDetailList == null || orderDetailList.Count() == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15164)).WithData("ReqOrderCode", param.RequistionOrderCode);
             }
             //3.1 校验传输过来的物料是否都在领料单物料明细中
-            foreach(var item in param.Details)
+            foreach (var item in param.Details)
             {
                 long curMatId = materialList.Where(m => m.MaterialCode == item.MaterialCode).FirstOrDefault()!.Id;
                 List<long> orderDetailIdList = orderDetailList.Select(m => m.MaterialId).Distinct().ToList();
-                if(orderDetailIdList.Contains(curMatId) == false)
+                if (orderDetailIdList.Contains(curMatId) == false)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15165))
                        .WithData("ReqOrderCode", param.RequistionOrderCode)
@@ -205,13 +205,13 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 }
             }
             //4.1 更新领料单状态
-            if(param.ReceiptResult == WhMaterialPickingReceiveResultEnum.Receiving)
+            if (param.ReceiptResult == WhMaterialPickingReceiveResultEnum.Receiving)
             {
                 reqOrder.Status = WhMaterialPickingStatusEnum.Inspectioning;
             }
-            else if(param.ReceiptResult == WhMaterialPickingReceiveResultEnum.Completed)
+            else if (param.ReceiptResult == WhMaterialPickingReceiveResultEnum.Completed)
             {
-                reqOrder.Status= WhMaterialPickingStatusEnum.Completed;
+                reqOrder.Status = WhMaterialPickingStatusEnum.Completed;
             }
             reqOrder.UpdatedBy = param.OperateBy;
             reqOrder.UpdatedOn = HymsonClock.Now();
@@ -248,9 +248,9 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 bookModel.Id = IdGenProvider.Instance.CreateId();
                 bookModel.MaterialCode = curMatModel.MaterialCode;
                 bookModel.MaterialName = curMatModel.MaterialName;
-                bookModel.MaterialVersion = curMatModel.Version??"";
+                bookModel.MaterialVersion = curMatModel.Version ?? "";
                 bookModel.MaterialBarCode = item.MaterialBarCode;
-                bookModel.Unit = curMatModel.Unit??"";
+                bookModel.Unit = curMatModel.Unit ?? "";
                 bookModel.Quantity = item.Qty;
                 bookModel.Remark = param.Remark;
                 bookModel.Type = WhMaterialInventoryTypeEnum.MaterialReceiving;
@@ -276,6 +276,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 whModel.SiteId = siteId;
                 whModel.MaterialType = MaterialInventoryMaterialTypeEnum.PurchaseParts;
                 whModel.Batch = item.Batch ?? "";
+                whModel.WorkOrderId = reqOrder.WorkOrderId;
                 whModel.CreatedBy = param.OperateBy;
                 whModel.UpdatedBy = param.OperateBy;
                 whModel.CreatedOn = HymsonClock.Now();
@@ -284,7 +285,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             }
             //4.3 更新领料单明细中数量
             List<ManuRequistionOrderDetailEntity> updateOrderDetailList = new List<ManuRequistionOrderDetailEntity>();
-            foreach(var item in materialList)
+            foreach (var item in materialList)
             {
                 decimal sumQty = param.Details.Where(m => m.MaterialCode == item.MaterialCode).Select(m => m.Qty).Sum();
                 var curOrderDetail = orderDetailList.Where(m => m.MaterialId == item.Id).FirstOrDefault();

@@ -158,9 +158,10 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.AddParameters(new { DateStart = query.PlanStartTime[0], DateEnd = query.PlanStartTime[1] });
                 sqlBuilder.Where(" PlanStartTime >= @DateStart AND PlanStartTime < @DateEnd ");
             }
+            sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<PlanWorkPlanEntity>(template.RawSql, query);
+            return await conn.QueryAsync<PlanWorkPlanEntity>(template.RawSql, template.Parameters);
         }
 
     }

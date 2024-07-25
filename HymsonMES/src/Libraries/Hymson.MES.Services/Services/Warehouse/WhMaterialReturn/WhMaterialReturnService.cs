@@ -323,7 +323,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
                         IQCOrderId = qualIqcOrderReturnEntity.Id,
-                        ReturnOrderDetailId = whMaterialInventoryEntity.Id,
+                        ReturnOrderDetailId = manuReturnOrderDetailEntity.Id,
                         BarCode = materialBarCode,
                         MaterialId = whMaterialInventoryEntity.MaterialId,
                         IsQualified = null,

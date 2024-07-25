@@ -142,11 +142,10 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
         /// <returns></returns>
         public async Task<string> WhMaterialReturnConfirmAsync(WhMaterialReturnConfirmDto param)
         {
-
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 
-            var siteId = 30654441397841920;//long.Parse(configEntities.FirstOrDefault()?.Value ?? "0");
+            var siteId = long.Parse(configEntities.FirstOrDefault()?.Value ?? "0");
             var userName = param.OperateBy;
 
             var manuReturnOrderEntity = await _manuReturnOrderRepository.GetSingleEntityAsync(new ManuReturnOrderSingleQuery

@@ -355,6 +355,15 @@ namespace Hymson.MES.Services.Services.Quality
                 updateDetailEntities.Add(detailEntity);
             }
 
+            // 更新退料单状态
+            var returnEntity = await _manuReturnOrderRepository.GetByIdAsync(orderEntity.ReturnOrderId);
+            if (returnEntity != null)
+            {
+                returnEntity.Status = Core.Enums.Warehouse.WhWarehouseMaterialReturnStatusEnum.PendingStorage;
+                returnEntity.UpdatedBy = user;
+                returnEntity.UpdatedOn = time;
+            }
+
             // 更新检验单状态
             orderEntity.Status = IQCLiteStatusEnum.Completed;
             orderEntity.UpdatedBy = user;
@@ -368,6 +377,7 @@ namespace Hymson.MES.Services.Services.Quality
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _qualIqcOrderReturnRepository.UpdateAsync(orderEntity);
             rows += await _qualIqcOrderReturnDetailRepository.UpdateRangeAsync(updateDetailEntities);
+            if (returnEntity != null) rows += await _manuReturnOrderRepository.UpdateAsync(returnEntity);
             trans.Complete();
             return rows;
         }
