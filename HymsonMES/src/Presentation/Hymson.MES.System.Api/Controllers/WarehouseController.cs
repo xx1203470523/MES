@@ -1,6 +1,4 @@
-﻿using Hymson.MES.SystemServices.Dtos;
-using Hymson.MES.SystemServices.Dtos.Warehouse;
-using Hymson.MES.SystemServices.Services;
+﻿using Hymson.MES.SystemServices.Dtos.Warehouse;
 using Hymson.MES.SystemServices.Services.Warehouse;
 using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
@@ -32,15 +30,15 @@ namespace Hymson.MES.System.Api.Controllers
         /// <summary>
         /// 生产退料单结果反馈
         /// </summary>
-        /// <param name="callBackDto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("materialReturnConfirm")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("生产退料确认", BusinessType.INSERT)]
-        public async Task WhMaterialReturnConfirmAsync([FromBody] WhMaterialReturnConfirmDto callBackDto)
+        public async Task WhMaterialReturnConfirmAsync([FromBody] WhMaterialReturnConfirmDto param)
         {
-            await _whMaterialReturnService.WhMaterialReturnConfirmAsync(callBackDto);
+            await _whMaterialReturnService.WhMaterialReturnConfirmAsync(param);
         }
     }
 }

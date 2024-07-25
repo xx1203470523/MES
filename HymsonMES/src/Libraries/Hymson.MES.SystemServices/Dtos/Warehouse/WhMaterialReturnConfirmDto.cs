@@ -31,6 +31,11 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// 备注
         /// </summary>
         public string? Remark { set; get; }
+
+        /// <summary>
+        /// 操作人
+        /// </summary>
+        public string OperateBy { set; get; }
     }
 
     /// <summary>
@@ -41,7 +46,7 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// <summary>
         /// 物料条码
         /// </summary>
-        public string MaterialBarcode { set; get; }
+        public string MaterialBarCode { set; get; }
 
         /// <summary>
         /// 数量
