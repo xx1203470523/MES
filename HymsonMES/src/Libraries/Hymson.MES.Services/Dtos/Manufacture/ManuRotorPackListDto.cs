@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -116,6 +117,44 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long SiteId { get; set; }
 
        
+    }
+
+    public record ManuRotorPackViewDto
+    {
+        /// <summary>
+        /// 箱码
+        /// </summary>
+        public string BoxCode { get; set; } = "";
+
+        /// <summary>
+        /// 成品码
+        /// </summary>
+        public string Sfc { get; set; } = "";
+
+        /// <summary>
+        /// 品检状态
+        /// </summary>
+        public ProductReceiptQualifiedStatusEnum Type { get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string Unit { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 批次
+        /// </summary>
+        public string Batch { get; set; }
+
+        /// <summary>
+        /// 仓库
+        /// </summary>
+        public string WarehouseCode { get; set; }
     }
 
     /// <summary>

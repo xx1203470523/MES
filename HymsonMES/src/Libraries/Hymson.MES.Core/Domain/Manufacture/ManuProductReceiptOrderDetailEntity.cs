@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Manufacture
@@ -52,6 +53,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public ProductReceiptQualifiedStatusEnum? Status { get; set; }
 
         /// <summary>
+        /// 入库状态
+        /// </summary>
+        public ProductReceiptStatusEnum StorageStatus { get; set; }
+
+        /// <summary>
         /// 物料描述
         /// </summary>
         public string Remark { get; set; }
@@ -75,5 +81,18 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 仓库
         /// </summary>
         public string WarehouseCode { get; set; }
+    }
+
+    public class QueryManuProductReceiptOrderDetail
+    {
+        /// <summary>
+        /// 工厂Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 条码组
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
     }
 }
