@@ -282,7 +282,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                         }
                         if (manuReturnOrderDetailEntity.Qty != item.Qty)
                         {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES15150))
+                            throw new CustomerValidationException(nameof(ErrorCode.MES15149))
                                      .WithData("ReturnOrderCode", param.ReturnOrderCode)
                                      .WithData("MaterialCode", param.ReturnOrderCode)
                                      .WithData("PlanQty", manuReturnOrderDetailEntity.Qty)
