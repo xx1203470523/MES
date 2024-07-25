@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// <param name="qualFqcInspectionMavalEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(QualFqcInspectionMavalEntity qualFqcInspectionMavalEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// <param name="qualFqcInspectionMavalEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(QualFqcInspectionMavalEntity qualFqcInspectionMavalEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +66,15 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualFqcInspectionMavalEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<QualFqcInspectionMavalEntity> GetBySFCAsync(QualFqcInspectionMavalQuery param);
+
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -80,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// <param name="qualFqcInspectionMavalQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<QualFqcInspectionMavalEntity>> GetQualFqcInspectionMavalEntitiesAsync(QualFqcInspectionMavalQuery qualFqcInspectionMavalQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
