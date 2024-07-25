@@ -38,7 +38,7 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         public async Task<int> InsertRangeAsync(IEnumerable<WHMaterialReceiptDetailEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(InsertSql, entities);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         public async Task<int> UpdateRangeAsync(IEnumerable<WHMaterialReceiptDetailEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
         /// <summary>
@@ -180,11 +180,9 @@ namespace Hymson.MES.Data.Repositories.WhMaterialReceiptDetail
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM wh_material_receipt_detail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM wh_material_receipt_detail /**where**/  ";
 
-        const string InsertSql = "INSERT INTO wh_material_receipt_detail(  `Id`, `MaterialReceiptId`, `SiteId`, `MaterialId`, MaterialBatchCode, `SupplierBatch`, `InternalBatch`, `PlanQty`, `PlanTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @MaterialReceiptId, @SiteId, @MaterialId, @MaterialBatchCode, @SupplierBatch, @InternalBatch, @PlanQty, @PlanTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO wh_material_receipt_detail(  `Id`, `MaterialReceiptId`, `SiteId`, `MaterialId`, MaterialBatchCode, `SupplierBatch`, `InternalBatch`, `PlanQty`, `PlanTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @MaterialReceiptId, @SiteId, @MaterialId, @MaterialBatchCode, @SupplierBatch, @InternalBatch, @PlanQty, @PlanTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO wh_material_receipt_detail(`Id`, `MaterialReceiptId`, `SiteId`, `MaterialId`, MaterialBatchCode, `SupplierBatch`, `InternalBatch`, `PlanQty`, `PlanTime`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, BarCode, SyncId) VALUES (  @Id, @MaterialReceiptId, @SiteId, @MaterialId, @MaterialBatchCode, @SupplierBatch, @InternalBatch, @PlanQty, @PlanTime, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @BarCode, @SyncId) ";
 
-        const string UpdateSql = "UPDATE wh_material_receipt_detail SET MaterialReceiptId = @MaterialReceiptId, MaterialId = @MaterialId, MaterialBatchCode = @MaterialBatchCode, SupplierBatch = @SupplierBatch, InternalBatch = @InternalBatch, PlanQty = @PlanQty, PlanTime = @PlanTime, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE wh_material_receipt_detail SET MaterialReceiptId = @MaterialReceiptId, MaterialId = @MaterialId, MaterialBatchCode = @MaterialBatchCode, SupplierBatch = @SupplierBatch, InternalBatch = @InternalBatch, PlanQty = @PlanQty, PlanTime = @PlanTime, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE wh_material_receipt_detail SET MaterialReceiptId = @MaterialReceiptId, MaterialId = @MaterialId, MaterialBatchCode = @MaterialBatchCode, SupplierBatch = @SupplierBatch, InternalBatch = @InternalBatch, PlanQty = @PlanQty, PlanTime = @PlanTime, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE wh_material_receipt_detail SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE wh_material_receipt_detail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

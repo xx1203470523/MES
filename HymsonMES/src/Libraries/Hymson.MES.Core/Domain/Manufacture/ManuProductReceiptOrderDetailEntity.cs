@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -15,47 +17,52 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long ProductReceiptId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料名称
         /// </summary>
         public string MaterialName { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 条码
         /// </summary>
         public string Sfc { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 计量单位(字典定义)
         /// </summary>
         public string Unit { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 入库数量
         /// </summary>
         public decimal Qty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 仓库id
         /// </summary>
         public long? WarehouseId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 品检状态
         /// </summary>
-        public bool? Status { get; set; }
+        public ProductReceiptQualifiedStatusEnum? Status { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 入库状态
+        /// </summary>
+        public ProductReceiptStatusEnum StorageStatus { get; set; }
+
+        /// <summary>
         /// 物料描述
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
@@ -64,5 +71,28 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 箱号编码
         /// </summary>
         public string ContaineCode { get; set; }
+
+        /// <summary>
+        /// 批次码
+        /// </summary>
+        public string Batch { get; set; }
+
+        /// <summary>
+        /// 仓库
+        /// </summary>
+        public string WarehouseCode { get; set; }
+    }
+
+    public class QueryManuProductReceiptOrderDetail
+    {
+        /// <summary>
+        /// 工厂Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 条码组
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
     }
 }

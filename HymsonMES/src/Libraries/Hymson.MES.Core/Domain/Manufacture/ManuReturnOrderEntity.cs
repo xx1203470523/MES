@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Warehouse;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -19,7 +20,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 工单id，工单借料情况下，接收物料的工单
         /// </summary>
-        public string TargetWorkOrderCode { get; set; }
+        public long WorkOrderId { get; set; }
 
         /// <summary>
         /// 退料单类型0:工单退料 1:工单借料
@@ -29,7 +30,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
         /// </summary>
-        public WhWarehouseReturnStatusEnum Status { get; set; }
+        public WhWarehouseMaterialReturnStatusEnum Status { get; set; }
 
         /// <summary>
         /// 物料描述
@@ -42,15 +43,13 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long SiteId { get; set; }
 
         /// <summary>
-        /// 工单id，待退料的工单
+        /// 退料仓库id
         /// </summary>
-        public long SourceWorkOrderId { get; set; }
+        public long? ReturnWarehouseId { get; set; }
 
         /// <summary>
-        /// 工单id，待退料的工单
+        /// 接收仓库id
         /// </summary>
-        public string SourceWorkOrderCode { get; set; }
-
-
+        public long? ReceiveWarehouseId { get; set; }
     }
 }

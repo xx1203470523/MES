@@ -136,12 +136,12 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 用量
         /// </summary>
-        public decimal Usages { get; set; }
+        public decimal MaterialDosage { get; set; }
 
         /// <summary>
         /// 损耗
         /// </summary>
-        public decimal Loss { get; set; }
+        public decimal MaterialLoss { get; set; }
 
         /// <summary>
         /// 计划BomId（这里有可能是空，有学问）

@@ -124,8 +124,7 @@ namespace Hymson.MES.SystemServices.Services.Quality
             // 判断是否有传入供应商代码
             if (string.IsNullOrWhiteSpace(dto.SupplierCode))
             {
-                // 供应商代码不能为空
-                return 0;
+                throw new CustomerValidationException(nameof(ErrorCode.MES152015));
             }
 
             // 读取供应商
@@ -178,7 +177,6 @@ namespace Hymson.MES.SystemServices.Services.Quality
                 details.Add(detail);
             }
 
-            // 自动添加到来料IQC
             // 生成检验单号
             var inspectionOrder = await _iqcOrderCreateService.GenerateCommonIQCOrderCodeAsync(new CoreServices.Bos.Common.BaseBo
             {

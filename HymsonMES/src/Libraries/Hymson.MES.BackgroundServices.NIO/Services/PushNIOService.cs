@@ -1,13 +1,14 @@
-﻿using Azure;
-using Hymson.MES.BackgroundServices.NIO.Dtos;
+﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.Enums.Plan;
+using Hymson.MES.Core.NIO;
+using Hymson.MES.CoreServices.Extension;
+using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
-using MySqlX.XDevAPI.Common;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -51,7 +52,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// </summary>
         /// <param name="limitCount"></param>
         /// <returns></returns>
-        public async Task<int> ExecutePushAsync(int limitCount = 1000)
+        public async Task<int> ExecutePushAsync(int limitCount = 5000)
         {
             // 查询全部开关配置
             var configEntities = await _nioPushSwitchRepository.GetEntitiesAsync(new NioPushSwitchQuery { });
@@ -77,23 +78,36 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             foreach (var data in waitPushEntities)
             {
                 var config = configEntities.FirstOrDefault(f => f.BuzScene == data.BuzScene);
-                if (config == null || config.IsEnabled != TrueOrFalseEnum.Yes) continue;
-
-                // 推送
-                var restResponse = await config.ExecuteAsync(data.Content);
-
-                // 处理推送结果
-                data.Status = PushStatusEnum.Failure;
-                if (restResponse.IsSuccessStatusCode)
+                if (config == null)
                 {
-                    var responseContent = restResponse.Content?.ToDeserializeLower<NIOResponseDto>();
-                    if (responseContent != null && responseContent.NexusOpenapi.Code == "QM-000000")
+                    data.Status = PushStatusEnum.NotConfigured;
+                }
+                else
+                {
+                    if (config.IsEnabled == TrueOrFalseEnum.Yes)
                     {
-                        data.Status = PushStatusEnum.Success;
+                        // 推送
+                        var restResponse = await config.ExecuteAsync(data.Content);
+
+                        // 处理推送结果
+                        data.Status = PushStatusEnum.Failure;
+                        if (restResponse.IsSuccessStatusCode)
+                        {
+                            var responseContent = restResponse.Content?.ToDeserializeLower<NIOResponseDto>();
+                            if (responseContent != null && responseContent.NexusOpenapi.Code == "QM-000000")
+                            {
+                                data.Status = PushStatusEnum.Success;
+                            }
+                        }
+
+                        data.Result = restResponse.Content;
+                    }
+                    else
+                    {
+                        data.Status = PushStatusEnum.Off;
                     }
                 }
 
-                data.Result = restResponse.Content;
                 data.UpdatedBy = "PushToNIO";
                 data.UpdatedOn = HymsonClock.Now();
                 updates.Add(data);

@@ -9,13 +9,13 @@ namespace Hymson.MES.HttpClients
     /// <summary>
     /// 仓库操作
     /// </summary>
-    public class XnebulaWMSOption
+    public class XnebulaWMSOptions
     {
         /// <summary>
         /// 基础路径
         /// </summary>
         public string BaseAddressUri { get; set; } = "";
-        public string Token { get; set; } = "";
+        public string SysToken { get; set; } = "";
         /// <summary>
         /// 出库操作配置
         /// </summary>
@@ -36,7 +36,7 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 成品入库单配置 
         /// </summary>
-        public WMSProductReceiptOptions ProductReceiptOptions { get; set; }
+        public WMSProductReceiptOptions ProductReceipt { get; set; }
 
         /// <summary>
         /// 取消成品入库操作配置
@@ -83,7 +83,6 @@ namespace Hymson.MES.HttpClients
     /// </summary>
     public class WMSReceiptOptions
     {
-       
         /// <summary>
         /// 仓库编码
         /// </summary>
@@ -129,6 +128,7 @@ namespace Hymson.MES.HttpClients
         /// 路由信息
         /// </summary>
         public string RoutePath { get; set; }
+
     }
 
     public class WMSProductReceiptCancelOptions

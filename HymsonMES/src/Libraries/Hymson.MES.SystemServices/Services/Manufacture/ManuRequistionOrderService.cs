@@ -1,10 +1,12 @@
 ﻿using FluentValidation;
+using Google.Protobuf.WellKnownTypes;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.Logging;
 using Hymson.Logging.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
@@ -17,6 +19,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
@@ -94,6 +97,7 @@ namespace Hymson.MES.SystemServices.Services
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
         private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
         private readonly IManuProductReceiptOrderRepository _manuProductReceiptOrderRepository;
+        private readonly IManuProductReceiptOrderDetailRepository _manuProductReceiptOrderDetailRepository;
 
         /// <summary>
         /// 构造函数
@@ -112,7 +116,8 @@ namespace Hymson.MES.SystemServices.Services
             IManuRequistionOrderRepository manuRequistionOrderRepository,
             IManuReturnOrderRepository manuReturnOrderRepository,
             ILocalizationService localizationService,
-            IManuProductReceiptOrderRepository manuProductReceiptOrderRepository)
+            IManuProductReceiptOrderRepository manuProductReceiptOrderRepository, 
+            IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository)
         {
             _currentSystem = currentSystem;
             _traceLogService = traceLogService;
@@ -130,6 +135,7 @@ namespace Hymson.MES.SystemServices.Services
             _manuRequistionOrderRepository = manuRequistionOrderRepository;
             _manuReturnOrderRepository = manuReturnOrderRepository;
             _manuProductReceiptOrderRepository = manuProductReceiptOrderRepository;
+            _manuProductReceiptOrderDetailRepository = manuProductReceiptOrderDetailRepository;
         }
 
         public async Task PickMaterialsCallBackAsync(ProductionPickCallBackDto productionPickDto)
@@ -190,59 +196,56 @@ namespace Hymson.MES.SystemServices.Services
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16050)).WithData("orderId", productionPickDto.RequistionId);
             }
-            switch (productionPickDto.State)
-            {
-                case ManuMaterialFormResponseEnum.Created:
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Created;
-                    break;
-                case ManuMaterialFormResponseEnum.Failed:
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Failed;
-                    break;
-                case ManuMaterialFormResponseEnum.ApprovalingSuccess:
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingSuccess;
-                    break;
-                case ManuMaterialFormResponseEnum.ApprovalingFailed:
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingFailed;
-                    break;
-                case ManuMaterialFormResponseEnum.CancelFailed:
-                    break;
-                case ManuMaterialFormResponseEnum.CancelSuccess:
-                    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Cancel;
-                    break;
-                default:
-                    break;
-            }
+            //switch (productionPickDto.State)
+            //{
+            //    case ManuMaterialFormResponseEnum.Created:
+            //        returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Created;
+            //        break;
+            //    case ManuMaterialFormResponseEnum.Failed:
+            //        returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Failed;
+            //        break;
+            //    case ManuMaterialFormResponseEnum.ApprovalingSuccess:
+            //        returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingSuccess;
+            //        break;
+            //    case ManuMaterialFormResponseEnum.ApprovalingFailed:
+            //        returnOrderEntity.Status = WhWarehouseReturnStatusEnum.ApprovalingFailed;
+            //        break;
+            //    case ManuMaterialFormResponseEnum.CancelFailed:
+            //        break;
+            //    case ManuMaterialFormResponseEnum.CancelSuccess:
+            //        returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Cancel;
+            //        break;
+            //    default:
+            //        break;
+            //}
             
-            if (returnOrderEntity.Status == WhWarehouseReturnStatusEnum.ApprovalingSuccess)
-            {
-                string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
-                var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
-                {
-                    SiteId = _currentSystem.SiteId,
-                    OrderCode = orderCode,
-                });
-                var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryWorkOrderIdQuery
-                {
-                    SiteId = _currentSystem.SiteId,
-                    WorkOrderId = planWorkOrderEntity.Id
-                });
-                returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Return;
-                using (TransactionScope ts = TransactionHelper.GetTransactionScope())
-                {
+            //if (returnOrderEntity.Status == WhWarehouseReturnStatusEnum.ApprovalingSuccess)
+            //{
+            //    string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
+            //    var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
+            //    {
+            //        SiteId = _currentSystem.SiteId,
+            //        OrderCode = orderCode,
+            //    });
+            //    var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryWorkOrderIdQuery
+            //    {
+            //        SiteId = _currentSystem.SiteId,
+            //        WorkOrderId = planWorkOrderEntity.Id
+            //    });
+            //    returnOrderEntity.Status = WhWarehouseReturnStatusEnum.Return;
+            //    using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            //    {
                     
-                    await _whMaterialInventoryRepository.DeletesAsync(whMaterialInventoryEntities.Select(w => w.Id).ToArray());
+            //        await _whMaterialInventoryRepository.DeletesAsync(whMaterialInventoryEntities.Select(w => w.Id).ToArray());
                     
-                    await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
-                }
+            //        await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
+            //    }
                 
-            }
-            else
-            {
-                await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
-            }
-            
-              
-           
+            //}
+            //else
+            //{
+            //    await _manuReturnOrderRepository.UpdateAsync(returnOrderEntity);
+            //}
         }
 
         /// <summary>
@@ -613,7 +616,8 @@ namespace Hymson.MES.SystemServices.Services
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            var id = productionPickDto.RequistionId.Split('_')[1];
+            var id = productionPickDto.RequistionId.Split
+                ('_')[1];
             var returnOrderEntity = await _manuProductReceiptOrderRepository.GetByIdAsync(long.Parse(id));
             if (returnOrderEntity == null)
             {
@@ -644,23 +648,25 @@ namespace Hymson.MES.SystemServices.Services
 
             if (returnOrderEntity.Status == ProductReceiptStatusEnum.ApprovalingSuccess)
             {
+                long[] array = new long[] { long.Parse(id) };
                 string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
                 var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
                 {
                     SiteId = _currentSystem.SiteId,
                     OrderCode = orderCode,
                 });
-                var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryWorkOrderIdQuery
-                {
-                    SiteId = _currentSystem.SiteId,
-                    WorkOrderId = planWorkOrderEntity.Id
-                });
+                var productReceiptOrderDetailEntities = await _manuProductReceiptOrderDetailRepository.GetByProductReceiptIdsAsync(array);
                 returnOrderEntity.Status = ProductReceiptStatusEnum.Receipt;
+               
                 using (TransactionScope ts = TransactionHelper.GetTransactionScope())
                 {
-
-                    await _whMaterialInventoryRepository.DeletesAsync(whMaterialInventoryEntities.Select(w => w.Id).ToArray());
-
+                    // 更新完工数量
+                    await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
+                    {
+                        UpdatedOn = DateTime.UtcNow,
+                        WorkOrderId = planWorkOrderEntity.Id,
+                        Qty = productReceiptOrderDetailEntities.Count(),
+                    });
                     await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
                 }
 
@@ -669,9 +675,6 @@ namespace Hymson.MES.SystemServices.Services
             {
                 await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
             }
-
-
-
         }
     }
 }

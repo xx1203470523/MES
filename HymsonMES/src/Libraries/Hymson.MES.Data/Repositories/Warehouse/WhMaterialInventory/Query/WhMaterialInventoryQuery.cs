@@ -1,3 +1,5 @@
+using Hymson.MES.Core.Enums;
+
 namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
 {
     /// <summary>
@@ -24,5 +26,11 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// 工单Id
         /// </summary>
         public long? WorkOrderId { get; set; }
+
+
+        /// <summary>
+        /// 状态;待使用/使用中/锁定
+        /// </summary>
+        public WhMaterialInventoryStatusEnum? Status { get; set; }
     }
 }

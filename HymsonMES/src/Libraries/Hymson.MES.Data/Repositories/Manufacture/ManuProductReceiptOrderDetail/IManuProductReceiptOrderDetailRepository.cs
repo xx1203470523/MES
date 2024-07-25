@@ -80,5 +80,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<PagedInfo<ManuProductReceiptOrderDetailEntity>> GetPagedListAsync(ManuProductReceiptOrderDetailPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 根据主表id入库明细单查询
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetByProductReceiptIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 数据集查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductReceiptOrderDetailEntity>> GetListAsync(QueryManuProductReceiptOrderDetail query);
     }
 }

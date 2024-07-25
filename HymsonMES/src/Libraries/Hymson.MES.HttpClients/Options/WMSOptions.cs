@@ -25,5 +25,47 @@
         /// </summary>
         public string IQCReturnRoute { get; set; } = "";
 
+        /// <summary>
+        /// 出库操作配置
+        /// </summary>
+        public WMSBusinessOptions Delivery { get; set; }
+
+        /// <summary>
+        /// 取消出库操作配置
+        /// </summary>
+        public WMSBusinessOptions DeliveryCancel { get; set; }
+
+        /// <summary>
+        /// 入库操作配置
+        /// </summary>
+        public WMSBusinessOptions Receipt { get; set; }
+
+        /// <summary>
+        /// 取消入库操作配置
+        /// </summary>
+        public WMSBusinessOptions ReceiptCancel { get; set; }
+
+        /// <summary>
+        /// 成品入库单配置 
+        /// </summary>
+        public WMSBusinessOptions ProductReceipt { get; set; }
+
+        /// <summary>
+        /// 取消成品入库操作配置
+        /// </summary>
+        public WMSBusinessOptions ProductReceiptCancel { get; set; }
+    }
+
+    public class WMSBusinessOptions
+    {
+        /// <summary>
+        /// 仓库编码
+        /// </summary>
+        public string WarehouseCode { get; set; }
+
+        /// <summary>
+        /// 路由信息
+        /// </summary>
+        public string RoutePath { get; set; }
     }
 }

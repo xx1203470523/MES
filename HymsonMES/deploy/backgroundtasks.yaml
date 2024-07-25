@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mes-back
+  name: mes-back
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mes-back
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mes-back
+    spec:
+      containers:
+      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks:20240724081238
+        name: mes-back
+        volumeMounts:
+          - mountPath: /logs
+            name: mes-back-volume
+        env:
+        - name: DOTNET_ENVIRONMENT
+          value: "Production"
+        resources: {}
+      volumes:
+      - name: mes-back-volume
+        # 挂载 /data/foo，但仅当该目录已经存在时
+        hostPath:
+          path: /data/logs # 主机上的目录位置
+          type: DirectoryOrCreate # 此字段可选
+status: {}

@@ -24,6 +24,7 @@ using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 using IdGen;
 using MySqlX.XDevAPI.Common;
+using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
@@ -142,9 +143,24 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly string PRODUCRE_CP_Z = "ROP130";
 
         /// <summary>
+        /// 末工序
+        /// </summary>
+        private readonly string PRODUCRE_END = "ROP150";
+
+        /// <summary>
+        /// 工序前缀
+        /// </summary>
+        private readonly string PRODUCRE_PREFIX = "R";
+
+        /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteID = 0;
+
+        /// <summary>
+        /// 调试变量
+        /// </summary>
+        public int VAR_DEBUG = 0;
 
         /// <summary>
         /// 构造函数
@@ -344,6 +360,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     procedureCode = "OP070";
                 }
+                procedureCode = PRODUCRE_PREFIX + procedureCode;
 
                 //基础数据
                 MesOutDto mesDto = new MesOutDto();
@@ -368,6 +385,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         {
                             sfcUpList.Add(new SfcUpMatDto()
                             {
+                                MainMatCode = upItem.ProductTypeNo,
                                 MatName = upItem.MatName,
                                 MatValue = upItem.MatValue,
                                 MatBatchCode = upItem.MatBatchCode,
@@ -382,6 +400,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         {
                             sfcUpList.Add(new SfcUpMatDto()
                             {
+                                MainMatCode = upItem.ProductTypeNo,
                                 MatName = upItem.MatName,
                                 MatValue = upItem.MatValue,
                                 MatBatchCode = upItem.MatBatchCode,
@@ -449,6 +468,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             #endregion
 
             List<ManuSfcCirculationEntity> circulaList = new List<ManuSfcCirculationEntity>();
+            List<ManuBarCodeRelationEntity> circulaBarList = new List<ManuBarCodeRelationEntity>();
             List<ManuSfcStepEntity> stepList = new List<ManuSfcStepEntity>();
             List<ManuSfcDto> sfcUpdateList = new List<ManuSfcDto>(); //条码表，条码信息表
             List<Core.Domain.Parameter.ManuProductParameterEntity> manuParamList = new List<Core.Domain.Parameter.ManuProductParameterEntity>();
@@ -480,6 +500,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     var mesOrderMat = mesMaterialList.Where(m => m.Id == mesOrder.ProductId).FirstOrDefault();
                     productCode = mesOrderMat == null ? "" : mesOrderMat.MaterialCode;
+                }
+                else
+                {
+                    VAR_DEBUG = 3;
                 }
                 //工序
                 long procedureId = 0;
@@ -515,7 +539,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     //上料信息也要写入到条码表，条码信息表
                     foreach(var item in mesItem.UpMatList)
                     {
-                        if (item.BarCode == mesItem.Sfc)
+                        if (item.BarCode == mesItem.Sfc) //铁芯4个合一个的时候，会有条码合上料条码相同的记录
                         {
                             continue;
                         }
@@ -530,7 +554,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                             UserId = OperationBy
                         });
                     }
-                    if(mesItem.ProcedureCode == "OP070")
+                    if(mesItem.ProcedureCode == PRODUCRE_Z_TX)
                     {
                         ManuRotorSfcEntity ?sfc070 = LmsSfcChange(mesItem.Sfc, mesItem.UpMatList, mesItem.ProcedureCode, mesOrder, productCode);
                         if(sfc070 != null)
@@ -538,7 +562,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                             addRotorList.Add(sfc070);
                         }
                     }
-                    if(mesItem.ProcedureCode == "OP130")
+                    if(mesItem.ProcedureCode == PRODUCRE_CP_Z)
                     {
                         ManuRotorSfcEntity? sfc130 = LmsSfcChange(mesItem.Sfc, mesItem.UpMatList, mesItem.ProcedureCode, mesOrder, productCode);
                         if (sfc130 != null)
@@ -553,11 +577,6 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     List<Core.Domain.Parameter.ManuProductParameterEntity> addParamList =
                         GetParamList(mesItem.ParamList, stepId, mesItem.Sfc, procedureId, mesParamList);
                     manuParamList.AddRange(addParamList);
-                }
-                //写入到NG表
-                if(mesItem.NgList.Count > 0)
-                {
-
                 }
             }
 
@@ -576,7 +595,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
             await InsertOrUpdateAsync(sfcUpdateList);
             await InsertRawMaterialAsync(barCodeList, mesMaterialList);
-            await OrderQtyChangeAsync(mesOrderList);
+            await OrderCompleteQtyChangeAsync(mesOrderList);
             await InsertOrUpdateRotorSfcAsync(addRotorList, updateRotorList);
             await _manuProductParameterRepository.InsertRangeMavelAsync(manuParamList);
 
@@ -803,7 +822,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             step.ProcedureId = procedureId;
             step.CreatedOn = createdOn;
             step.UpdatedOn = HymsonClock.Now();
-            if(produceCode == "OP150") //未工序设置为完成
+            if(produceCode == PRODUCRE_END) //未工序设置为完成
             {
                 step.CurrentStatus = SfcStatusEnum.Complete;
                 step.AfterOperationStatus = SfcStatusEnum.Complete;
@@ -816,6 +835,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 step.ProductId = mesOrder.ProductId;
                 step.WorkCenterId = mesOrder.WorkCenterId;
                 step.WorkOrderId = mesOrder.Id;
+            }
+            else
+            {
+                VAR_DEBUG = 3;
             }
 
             return step;
@@ -865,25 +888,51 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 model.CreatedOn = createdOn;
                 model.UpdatedOn = HymsonClock.Now();
 
-                ProcMaterialEntity? materialEntity = matList.Where(m => m.MaterialCode == item.MatCode).FirstOrDefault();
-                if(materialEntity != null)
+                //上料条码
+                ProcMaterialEntity? upMatModel = matList.Where(m => m.MaterialCode == item.MatCode).FirstOrDefault();
+                if(upMatModel != null)
                 {
-                    if(produceCode != PRODUCRE_CP_Z)
+                    if(produceCode != PRODUCRE_CP_Z) 
                     {
-                        model.CirculationProductId = materialEntity.Id;
-                        model.CirculationMainProductId = materialEntity.Id;
+                        model.CirculationProductId = upMatModel.Id;
+                        model.CirculationMainProductId = upMatModel.Id;
                     }
-                    else
+                    else //如果是轴码对成品码工序，则调转两个产品
                     {
-
+                        model.ProductId = upMatModel.Id;
                     }
+                }
+                else
+                {
+                    VAR_DEBUG = 0;
+                }
+                //当前产品条码
+                ProcMaterialEntity? curMatModel = matList.Where(m => m.MaterialCode == item.MainMatCode).FirstOrDefault();
+                if(curMatModel != null)
+                {
+                    if (produceCode != PRODUCRE_CP_Z)
+                    {
+                        model.ProductId = curMatModel.Id;
+                    }
+                    else //如果是轴码对成品码工序，则调转两个产品
+                    {
+                        model.CirculationProductId = curMatModel.Id;
+                        model.CirculationMainProductId = curMatModel.Id;
+                    }
+                }
+                else
+                {
+                    VAR_DEBUG = 0;
                 }
 
                 if (mesOrder != null)
                 {
-                    model.ProductId = mesOrder.ProductId;
                     model.WorkOrderId = mesOrder.Id;
                     model.CirculationWorkOrderId = mesOrder.Id;
+                }
+                else
+                {
+                    VAR_DEBUG = 3;
                 }
 
                 list.Add(model);
@@ -1141,7 +1190,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// </summary>
         /// <param name="mesOrderList"></param>
         /// <returns></returns>
-        private async Task<int> OrderQtyChangeAsync(List<PlanWorkOrderEntity> mesOrderList)
+        private async Task<int> OrderCompleteQtyChangeAsync(List<PlanWorkOrderEntity> mesOrderList)
         {
             if(mesOrderList == null || mesOrderList.Any() == false)
             {
@@ -1175,7 +1224,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 updateList.Add(item);
             }
 
-            return await _planWorkOrderRepository.UpdatesAsync(updateList);
+            return await _planWorkOrderRepository.UpdatesCompleteQtyMavleAsync(updateList);
         }
                
         /// <summary>
@@ -1223,6 +1272,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             model.UpdatedOn = model.CreatedOn;
             model.UpdatedBy = OperationBy;
             model.IsDeleted = 0;
+            model.SiteId = SiteID;
 
             if (produceCode == PRODUCRE_Z_TX )
             {
@@ -1230,7 +1280,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 model.TxSfc = upList[0].BarCode;
                 model.TxSfcMaterialCode = upList[0].MatCode;
                 model.ZSfc = sfc;
-                model.IsFinish = false;
+                model.IsFinish = 0;
                 model.WorkOrderId = mesOrder == null ? 0 : mesOrder.Id;
             }
             if (produceCode == PRODUCRE_CP_Z)
@@ -1238,7 +1288,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 model.Sfc = upList[0].BarCode;
                 model.ZSfc = sfc;
                 model.ZSfcMaterialCode = upList[0].MatCode;
-                model.IsFinish = true;
+                model.IsFinish = 1;
             }
             return model;
         }

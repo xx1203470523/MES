@@ -24,6 +24,16 @@ namespace Hymson.MES.HttpClients.Requests.WMS
         public string Remark { get; set; } = "";
 
         /// <summary>
+        /// 同步编码（WMS需要给ERP）
+        /// </summary>
+        public string? SyncCode { get; set; }
+
+        /// <summary>
+        /// 同步Id（WMS需要给ERP）
+        /// </summary>
+        public long? SyncId { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         public IEnumerable<IQCReceiptMaterialResultDto>? Details { get; set; }
@@ -79,6 +89,21 @@ namespace Hymson.MES.HttpClients.Requests.WMS
         /// 是否合格;0、不合格 1、合格
         /// </summary>
         public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
+        /// 条码（唯一码）
+        /// </summary>
+        public string? BarCode { get; set; }
+
+        /// <summary>
+        /// 同步Id（WMS需要给ERP）
+        /// </summary>
+        public long? SyncId { get; set; }
+
+        /// <summary>
+        /// 仓库编码
+        /// </summary>
+        public string? WarehouseCode { get; set; }
 
     }
 

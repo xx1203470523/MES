@@ -15,12 +15,12 @@ namespace Hymson.MES.Core.Domain.WHMaterialReceiptDetail
         /// </summary>
         public long MaterialReceiptId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料Id
         /// </summary>
         public long MaterialId { get; set; }
@@ -35,12 +35,12 @@ namespace Hymson.MES.Core.Domain.WHMaterialReceiptDetail
         /// </summary>
         public string SupplierBatch { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 内部批次
         /// </summary>
         public string InternalBatch { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 计划发货数量
         /// </summary>
         public decimal? PlanQty { get; set; }
@@ -50,16 +50,25 @@ namespace Hymson.MES.Core.Domain.WHMaterialReceiptDetail
         /// </summary>
         public decimal? Qty { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 计划到货时间
         /// </summary>
         public DateTime? PlanTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       
+        /// <summary>
+        /// 条码（唯一码）
+        /// </summary>
+        public string? BarCode { get; set; }
+
+        /// <summary>
+        /// 同步Id（WMS需要给ERP）
+        /// </summary>
+        public long? SyncId { get; set; }
+
     }
 }

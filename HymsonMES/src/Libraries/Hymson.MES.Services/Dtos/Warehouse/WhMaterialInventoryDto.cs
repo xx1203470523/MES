@@ -10,6 +10,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
 using System.Text.Json.Serialization;
 
@@ -637,7 +638,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 替代物料Id
         /// </summary>
-        public long ReplaceMaterialId { get; set; }
+        public long ReplaceMaterialId { get; set; } = 0;
 
         /// <summary>
         /// 物料编码
@@ -660,22 +661,10 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public decimal Usages { get; set; }
 
         /// <summary>
-        /// 是否启用替代物料
-        /// </summary>
-        public bool IsEnableReplace { get; set; }
-
-        /// <summary>
-        /// 序号
-        /// </summary>
-        public int Seq { get; set; }
-
-
-        /// <summary>
         /// 工序代码
         /// </summary>
         public string? Code { get; set; }
         
-
         /// <summary>
         /// 是否主物料，1：主物料
         /// </summary>
@@ -751,7 +740,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 领料数量
         /// </summary>
-        public List<ProductReceiptDetailRequest> Items { get; set; }
+        public IEnumerable<ProductReceiptDetailRequest> Items { get; set; }
     }
 
     /// <summary>
@@ -762,12 +751,12 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 条码
         /// </summary>
-        public string? Sfc { get; set; }
+        public string Sfc { get; set; }
 
         /// <summary>
         /// 箱码
         /// </summary>
-        public string Code { get; set; }
+        public string BoxCode { get; set; }
 
         /// <summary>
         /// 批次号
@@ -787,7 +776,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 品检状态
         /// </summary>
-        public string? Status { get; set; }
+        public ProductReceiptQualifiedStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 仓库编号

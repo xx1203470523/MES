@@ -1,7 +1,10 @@
-﻿using Hymson.MES.BackgroundServices.NIO.Dtos;
-using Hymson.MES.Core.Enums;
+﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.Enums.Plan;
+using Hymson.MES.Core.NIO;
+using Hymson.MES.CoreServices.Bos.NIO;
+using Hymson.MES.CoreServices.Extension;
+using Hymson.MES.Data.NIO;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -71,7 +74,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 SchemaCode = config.SchemaCode,
                 BuzScene = buzSceneEnum,
                 Status = PushStatusEnum.Wait,
-                Content = new NIORequestDto<T>
+                Content = new NIORequestBo<T>
                 {
                     SchemaCode = config.SchemaCode,
                     List = data

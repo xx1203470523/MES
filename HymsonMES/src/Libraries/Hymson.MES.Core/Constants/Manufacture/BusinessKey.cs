@@ -44,5 +44,15 @@
         /// 物料追溯
         /// </summary>
         public const string NioMaterial = "NioMaterial";
+
+        /// <summary>
+        /// 转子线包装列表
+        /// </summary>
+        public const string RotorPackList = "RotorPackList";
+
+        /// <summary>
+        /// 缺陷数据
+        /// </summary>
+        public const string NioIssue = "NioIssue";
     }
 }
