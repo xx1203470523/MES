@@ -10,12 +10,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// PICKING
         /// </summary>
-        [Description("工单领料")]
+        [Description("实仓退料")]
         WorkOrderPicking = 1,
         /// <summary>
         /// 工单补料
         /// </summary>
-        [Description("工单补料")]
+        [Description("虚仓退料")]
         WorkOrderReplenishment = 2
     }
 

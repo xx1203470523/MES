@@ -21,7 +21,8 @@ namespace Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking
         /// <summary>
         /// 退仓类型1：实仓，2：虚仓
         /// </summary>
-        public ManuReturnTypeEnum Type { get; set; }
+        public ManuRequistionTypeEnum Type { get; set; }
+
         /// <summary>
         /// 领料数量
         /// </summary>

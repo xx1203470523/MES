@@ -8,6 +8,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
@@ -536,9 +537,9 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 SiteId = _currentSite.SiteId ?? 0,
                 WorkOrderIds = dtos.Select(d => d.Id).Distinct().ToArray(),
             });
-            var requistiongroup = manuRequistionOrderEntities.Where(m => m.Type == Core.Domain.Manufacture.ManuRequistionTypeEnum.WorkOrderPicking
-            && (m.Status != WhWarehouseRequistionStatusEnum.ApprovalingFailed
-            || m.Status != WhWarehouseRequistionStatusEnum.Failed)).GroupBy(m => m.WorkOrderId);
+            //var requistiongroup = manuRequistionOrderEntities.Where(m => m.Type == Core.Domain.Manufacture.ManuRequistionTypeEnum.WorkOrderPicking
+            //&& (m.Status != WhWarehouseRequistionStatusEnum.ApprovalingFailed
+            //|| m.Status != WhWarehouseRequistionStatusEnum.Failed)).GroupBy(m => m.WorkOrderId);
             List<PlanWorkOrderListDetailViewDto> dtolist = dtos.ToList();
             //dtolist.ForEach(d =>
             //{
@@ -550,8 +551,8 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             dtolist.ForEach(d =>
             {
                 // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
-                var qty = requistiongroup.FirstOrDefault(r => r.Key == d.Id)?.Count() ?? 0;
-                d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked : PlanWorkOrderPickStatusEnum.FinishPicked;
+                //var qty = requistiongroup.FirstOrDefault(r => r.Key == d.Id)?.Count() ?? 0;
+                d.PickStatus = manuRequistionOrderEntities.Any(x=>x.Status!= WhMaterialPickingStatusEnum.CancelMaterialReturn) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked ;
 
                 d.PassDownQuantity = d.Qty;
             });

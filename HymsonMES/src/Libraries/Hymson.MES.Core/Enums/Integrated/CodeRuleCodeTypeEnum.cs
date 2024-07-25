@@ -82,6 +82,12 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// 退料单号
         /// </summary>
         [Description("退料单号")]
-        MaterialReturnOrder = 13
+        MaterialReturnOrder = 13,
+
+        /// <summary>
+        /// 退料单号
+        /// </summary>
+        [Description("退料单号")]
+        MaterialPickingOrder = 14
     }
 }

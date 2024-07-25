@@ -1299,7 +1299,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
-                Status = WhWarehouseRequistionStatusEnum.Approvaling,
+                //Status = WhWarehouseRequistionStatusEnum.Approvaling,
                 Type = ManuRequistionTypeEnum.WorkOrderPicking,
                 WorkOrderId = planWorkOrderEntity.Id,
                 //WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
@@ -1370,20 +1370,21 @@ namespace Hymson.MES.Services.Services.Warehouse
 
         public async Task<bool> PickMaterialsCancelAsync(PickMaterialsCancel request)
         {
-            var requistionOrderEntity = await _manuRequistionOrderRepository.GetByIdAsync(request.RequistionOrderId);
-            if (requistionOrderEntity.Status == WhWarehouseRequistionStatusEnum.Approvaling)
-            {
-                var response = await _wmsRequest.MaterialPickingCancelAsync(new HttpClients.Requests.MaterialPickingCancelDto
-                {
-                    SendOn = HymsonClock.Now().ToString(),
-                    SyncCode = $"{request.WorkCode}_{request.RequistionOrderId}",
-                });
-                return response;
-            }
-            else
-            {
-                return false;
-            }
+            //var requistionOrderEntity = await _manuRequistionOrderRepository.GetByIdAsync(request.RequistionOrderId);
+            //if (requistionOrderEntity.Status == WhWarehouseRequistionStatusEnum.Approvaling)
+            //{
+            //    var response = await _wmsRequest.MaterialPickingCancelAsync(new HttpClients.Requests.MaterialPickingCancelDto
+            //    {
+            //        SendOn = HymsonClock.Now().ToString(),
+            //        SyncCode = $"{request.WorkCode}_{request.RequistionOrderId}",
+            //    });
+            //    return response;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
+            return false;
         }
 
         public async Task MaterialReturnRequestAsync(MaterialReturnRequest request)
@@ -1616,7 +1617,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
-                Status = WhWarehouseRequistionStatusEnum.Approvaling,
+                //Status = WhWarehouseRequistionStatusEnum.Approvaling,
                 Type = ManuRequistionTypeEnum.WorkOrderPicking,
                 WorkOrderId = planWorkOrderEntity.Id,
                 //WorkPlanCode = planWorkPlanEntity.WorkPlanCode,
