@@ -853,6 +853,7 @@ namespace Hymson.MES.Services.Services.Quality
 
                 details.Add(new IQCReceiptMaterialResultDto
                 {
+                    ReceiptDetailId = receiptDetailEntity.Id,
                     MaterialCode = receiptDetailEntity.MaterialBatchCode,
                     PlanQty = receiptDetailEntity.PlanQty,
                     Qty = receiptDetailEntity.Qty,

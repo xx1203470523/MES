@@ -21,9 +21,20 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
         public long? WorkPlanProductId { get; set; }
 
         /// <summary>
+        /// 计划单号
+        /// </summary>
+        public string? WorkPlanCode { get; set; }
+
+        /// <summary>
         /// 编码集合
         /// </summary>
         public IEnumerable<string>? Codes { get; set; }
+
+        /// <summary>
+        /// 计划开始时间（时间范围-数组）
+        /// </summary>
+        public DateTime[]? PlanStartTime { get; set; }
+
     }
 
     /// <summary>

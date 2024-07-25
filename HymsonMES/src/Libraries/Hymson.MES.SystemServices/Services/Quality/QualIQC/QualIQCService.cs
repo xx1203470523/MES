@@ -114,10 +114,9 @@ namespace Hymson.MES.SystemServices.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.MainSite.GetDescription());
             }
 
-            var configEntity = configEntities.FirstOrDefault();
-
             // 判断是否存在（配置）
-            if (configEntity == null) throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            var configEntity = configEntities.FirstOrDefault()
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
             // 初始化
             var siteId = configEntity.Value.ParseToLong();
@@ -168,7 +167,7 @@ namespace Hymson.MES.SystemServices.Services.Quality
                 var detail = item.ToEntity<WHMaterialReceiptDetailEntity>();
                 if (detail == null) continue;
 
-                detail.Id = IdGenProvider.Instance.CreateId();
+                detail.Id = item.ReceiptDetailId ?? IdGenProvider.Instance.CreateId();
                 detail.MaterialReceiptId = entity.Id;
                 detail.MaterialId = materialEntity.Id;
                 detail.CreatedBy = updateUser;

@@ -80,59 +80,35 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
         public long SiteId { get; set; }
 
         /// <summary>
-        /// 工单号
+        /// 计划单号
         /// </summary>
-        public string? OrderCode { get; set; }
+        public string? WorkPlanCode { get; set; }
 
         /// <summary>
-        /// 物料编码
+        /// 产品编码
         /// </summary>
-        public string? MaterialCode { get; set; }
+        public string? ProductCode { get; set; }
 
         /// <summary>
-        /// 工作中心代码
+        /// 计划类型(1:试产工单;2:生产工单;)
         /// </summary>
-        public string? WorkCenterCode { get; set; }
+        public PlanWorkOrderTypeEnum Type { get; set; }
 
         /// <summary>
-        /// 工单类型
+        /// 计划状态
         /// </summary>
-        public PlanWorkOrderTypeEnum? Type { get; set; }
+        public PlanWorkPlanStatusEnum Status { get; set; }
 
         /// <summary>
-        /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
-        /// </summary>
-        public PlanWorkOrderStatusEnum? Status { get; set; }
-
-        /// <summary>
-        /// 计划开始时间  时间范围  数组
+        /// 计划开始时间（时间范围-数组）
         /// </summary>
         public DateTime[]? PlanStartTime { get; set; }
 
         /// <summary>
-        /// 查询状态集合
+        /// 集合（工单计划）
         /// </summary>
-        public IEnumerable<PlanWorkOrderStatusEnum>? Statuss { get; set; }
+        public IEnumerable<long>? WorkPlanIds { get; set; }
 
-        /// <summary>
-        /// 物料版本
-        /// </summary>
-        public string? MaterialVersion { get; set; }
-
-        /// <summary>
-        /// 产线id
-        /// </summary>
-        public IEnumerable<long>? WorkCenterIds { get; set; }
-
-        /// <summary>
-        /// 不包含的id组
-        /// </summary>
-        public IEnumerable<long>? NotInIds { get; set; }
-
-        /// <summary>
-        /// 工艺路线组
-        /// </summary>
-        public IEnumerable<long>? ProcessRouteIds { get; set; }
     }
 
 }
