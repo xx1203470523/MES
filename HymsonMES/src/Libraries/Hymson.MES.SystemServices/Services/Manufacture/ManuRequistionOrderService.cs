@@ -153,26 +153,26 @@ namespace Hymson.MES.SystemServices.Services
             }
             switch (productionPickDto.State)
             {
-                case ManuMaterialFormResponseEnum.Created:
-                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.Created;
-                    break;
-                case ManuMaterialFormResponseEnum.Failed:
-                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.Failed;
+                //case ManuMaterialFormResponseEnum.Created:
+                //    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.Created;
+                //    break;
+                //case ManuMaterialFormResponseEnum.Failed:
+                //    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.Failed;
                    
-                    break;
-                case ManuMaterialFormResponseEnum.ApprovalingSuccess:
-                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.ApprovalingSuccess;
-                    break;
-                case ManuMaterialFormResponseEnum.ApprovalingFailed:
-                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.ApprovalingFailed;
-                    break;
-                case ManuMaterialFormResponseEnum.CancelFailed:
-                    break;
-                case ManuMaterialFormResponseEnum.CancelSuccess:
-                    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.Cancel;
-                    break;
-                default:
-                    break;
+                //    break;
+                //case ManuMaterialFormResponseEnum.ApprovalingSuccess:
+                //    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.ApprovalingSuccess;
+                //    break;
+                //case ManuMaterialFormResponseEnum.ApprovalingFailed:
+                //    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.ApprovalingFailed;
+                //    break;
+                //case ManuMaterialFormResponseEnum.CancelFailed:
+                //    break;
+                //case ManuMaterialFormResponseEnum.CancelSuccess:
+                //    requistionOrderEntity.Status = WhWarehouseRequistionStatusEnum.Cancel;
+                //    break;
+                //default:
+                //    break;
             }
             await _manuRequistionOrderRepository.UpdateAsync(requistionOrderEntity);
            
@@ -526,7 +526,7 @@ namespace Hymson.MES.SystemServices.Services
                 Id = requistionOrderId,
                 ReqOrderCode = erpRequisitionOrder,
                 WorkOrderId = planWorkOrderEntity.Id,
-                Status = WhWarehouseRequistionStatusEnum.Picked,
+                //Status = WhWarehouseRequistionStatusEnum.Picked,
                 Type = ManuRequistionTypeEnum.WorkOrderPicking,
                 Remark = "",
                 CreatedBy = _currentSystem.Name,

@@ -19,10 +19,10 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
     /// <summary>
     /// 马威FQC检验仓储
     /// </summary>
-    public partial class QualFqcInspectionMavalRepository :BaseRepository, IQualFqcInspectionMavalRepository
+    public partial class QualFqcInspectionMavalRepository : BaseRepository, IQualFqcInspectionMavalRepository
     {
 
-        public QualFqcInspectionMavalRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public QualFqcInspectionMavalRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,18 +57,32 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         public async Task<QualFqcInspectionMavalEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<QualFqcInspectionMavalEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<QualFqcInspectionMavalEntity>(GetByIdSql, new { Id = id });
         }
+
+
+
+        /// <summary>
+        /// 根据SFC获取数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<QualFqcInspectionMavalEntity> GetBySFCAsync(QualFqcInspectionMavalQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<QualFqcInspectionMavalEntity>(GetBySFCSql, param);
+        }
+
 
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualFqcInspectionMavalEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualFqcInspectionMavalEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualFqcInspectionMavalEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<QualFqcInspectionMavalEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -83,12 +97,13 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
+            sqlBuilder.OrderBy("CreatedOn DESC");
 
             //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (qualFqcInspectionMavalPagedQuery.PageIndex - 1) * qualFqcInspectionMavalPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = qualFqcInspectionMavalPagedQuery.PageSize });
@@ -177,7 +192,7 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
     public partial class QualFqcInspectionMavalRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_fqc_inspection_maval` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_fqc_inspection_maval` /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `qual_fqc_inspection_maval` /**where**/ ";
         const string GetQualFqcInspectionMavalEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
@@ -198,6 +213,10 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `SFC`, `Qty`, `JudgmentResults`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `qual_fqc_inspection_maval`  WHERE Id IN @Ids ";
+
+        const string GetBySFCSql = @"SELECT  
+                               `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `SFC`, `Qty`, `JudgmentResults`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `qual_fqc_inspection_maval`  WHERE SFC = @SFC AND SiteId=@SiteId";
         #endregion
     }
 }

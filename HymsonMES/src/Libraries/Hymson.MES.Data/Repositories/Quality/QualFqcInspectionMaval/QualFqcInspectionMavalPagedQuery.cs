@@ -14,6 +14,10 @@ namespace Hymson.MES.Data.Repositories.QualFqcInspectionMaval
     /// </summary>
     public class QualFqcInspectionMavalPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; }
 
     }
 }

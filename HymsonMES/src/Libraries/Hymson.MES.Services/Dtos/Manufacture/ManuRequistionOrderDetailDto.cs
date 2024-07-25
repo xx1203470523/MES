@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Warehouse;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -50,7 +51,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 状态
         /// </summary>
-        public WhWarehouseRequistionStatusEnum? Status { get; set; }
+        public WhMaterialPickingStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 领料时间
