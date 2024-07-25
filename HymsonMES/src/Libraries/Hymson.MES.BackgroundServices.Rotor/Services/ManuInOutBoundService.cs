@@ -249,7 +249,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
             else
             {
-                startWaterMarkTime = DateTime.Parse("2024-07-14 01:01:01");
+                startWaterMarkTime = DateTime.Parse("2024-07-25 01:01:01");
             }
             DateTime start = startWaterMarkTime;
 
@@ -543,6 +543,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         {
                             continue;
                         }
+                        if(mesItem.ProcedureCode == "ROP130")
+                        {
+                            VAR_DEBUG = 3;
+                        }
                         barCodeList.Add(new ManuSfcDto()
                         {
                             WorkOrder = mesOrder,
@@ -597,7 +601,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             await InsertRawMaterialAsync(barCodeList, mesMaterialList);
             await OrderCompleteQtyChangeAsync(mesOrderList);
             await InsertOrUpdateRotorSfcAsync(addRotorList, updateRotorList);
-            await _manuProductParameterRepository.InsertRangeMavelAsync(manuParamList);
+            //await _manuProductParameterRepository.InsertRangeMavelAsync(manuParamList);
+            await _manuProductParameterRepository.InsertRangeAsync(manuParamList);
 
             trans.Complete();
         }
@@ -935,6 +940,16 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                     VAR_DEBUG = 3;
                 }
 
+                //临时做法，不然没法追溯
+                if(model.ProductId == 0)
+                {
+                    model.ProductId = 51558093782310912;
+                }
+                if(model.CirculationProductId == 0)
+                {
+                    model.CirculationProductId = 51558093782310912;
+                }
+
                 list.Add(model);
             }
 
@@ -1131,6 +1146,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             foreach (var item in commands)
             {
+                if(item.Sfc == "E3001124ADV29892002001H71400002")
+                {
+                    VAR_DEBUG = 3;
+                }
                 if (existSfcList.Contains(item.Sfc) == true)
                 {
                     continue;
@@ -1179,8 +1198,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 });
             }
 
-            await _manuSfcRepository.InsertRangeAsync(addSfcList);
-            await _manuSfcInfoRepository.InsertsAsync(addSfcInfoList);
+            int insertNum = await _manuSfcRepository.InsertRangeAsync(addSfcList);
+            int updateNum = await _manuSfcInfoRepository.InsertsAsync(addSfcInfoList);
 
             return addSfcList.Count;
         }
