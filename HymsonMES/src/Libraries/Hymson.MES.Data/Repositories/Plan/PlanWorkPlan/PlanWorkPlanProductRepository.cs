@@ -96,6 +96,8 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
+            if (pageQuery.WorkPlanIds != null && pageQuery.WorkPlanIds.Any()) sqlBuilder.Where("WorkPlanId IN @WorkPlanIds");
+
             if (!string.IsNullOrWhiteSpace(pageQuery.ProductCode))
             {
                 pageQuery.ProductCode = $"%{pageQuery.ProductCode}%";
