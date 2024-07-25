@@ -28,8 +28,11 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
 
-namespace Hymson.MES.SystemServices.Services.Warehouse
+namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
 {
+    /// <summary>
+    /// 退料单
+    /// </summary>
     public class WhMaterialReturnService : IWhMaterialReturnService
     {
         /// <summary>
