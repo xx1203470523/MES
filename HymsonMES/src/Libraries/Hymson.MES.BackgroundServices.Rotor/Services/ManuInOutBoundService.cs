@@ -128,6 +128,16 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly IManuRotorSfcRepository _manuRotorSfcRepository;
 
         /// <summary>
+        /// 仓储接口（产品不良录入）
+        /// </summary>
+        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+
+        /// <summary>
+        /// 仓储接口（产品NG记录表）
+        /// </summary>
+        private readonly IManuProductNgRecordRepository _manuProductNgRecordRepository;
+
+        /// <summary>
         /// 转子线操作人
         /// </summary>
         private readonly string OperationBy = "RotorLMSJOB";
@@ -182,7 +192,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             IManuSfcInfoRepository manuSfcInfoRepository,
             Data.Repositories.Parameter.IManuProductParameterRepository manuProductParameterRepository,
             IProcParameterRepository procParameterRepository,
-            IManuRotorSfcRepository manuRotorSfcRepository)
+            IManuRotorSfcRepository manuRotorSfcRepository,
+            IManuProductBadRecordRepository manuProductBadRecordRepository,
+            IManuProductNgRecordRepository manuProductNgRecordRepository)
         {
             _workItemInfoRepository = workItemInfoRepository;
             _workProcessDataRepository = workProcessDataRepository;
@@ -201,6 +213,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             _manuProductParameterRepository = manuProductParameterRepository;
             _procParameterRepository = procParameterRepository;
             _manuRotorSfcRepository = manuRotorSfcRepository;
+            _manuProductBadRecordRepository = manuProductBadRecordRepository;
+            _manuProductNgRecordRepository = manuProductNgRecordRepository;
         }
 
         /// <summary>
@@ -356,6 +370,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     procedureCode = "OP060";
                 }
+                //上铁芯码
                 if(item.ProcedureCode == "OP720")
                 {
                     procedureCode = "OP070";
@@ -455,6 +470,12 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     mesDto.Type = 2;
                     mesDto.ParamToNgList();
+
+                    // 插入不良记录
+                    //_manuProductBadRecordRepository.InsertRangeAsync(data.ProductBadRecordEntities),
+
+                    // 插入NG记录
+                    //_manuProductNgRecordRepository.InsertRangeAsync(data.ProductNgRecordEntities),
                 }
                 //正常出站
                 if ((curWorkPos.WorkPosType & 2) == 2 && item.ProductStatus == ProductStatus_Out && mesDto.IsPassed == true)
@@ -475,6 +496,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             List<ManuSfcDto> barCodeList = new List<ManuSfcDto>(); //原材料条码写条码表，条码信息表
             List<ManuRotorSfcEntity> addRotorList = new List<ManuRotorSfcEntity>();
             List<ManuRotorSfcEntity> updateRotorList = new List<ManuRotorSfcEntity>();
+            List<ManuProductBadRecordEntity> badRecordList = new List<ManuProductBadRecordEntity>();
+            List<ManuProductNgRecordEntity> ngRecordList = new List<ManuProductNgRecordEntity>();
 
             #region 整理成MES表结构数据
 
@@ -582,6 +605,60 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         GetParamList(mesItem.ParamList, stepId, mesItem.Sfc, procedureId, mesParamList);
                     manuParamList.AddRange(addParamList);
                 }
+                if(mesItem.IsPassed == false)
+                {
+                    ManuProductBadRecordEntity bdModel = new ManuProductBadRecordEntity();
+                    bdModel.Id = IdGenProvider.Instance.CreateId();
+                    bdModel.SiteId = SiteID;
+                    bdModel.FoundBadOperationId = procedureId;
+                    bdModel.OutflowOperationId = procedureId;
+                    bdModel.UnqualifiedId = 0;
+                    bdModel.SFC = mesItem.Sfc;
+                    bdModel.SfcInfoId = 0;
+                    bdModel.SfcStepId = stepId;
+                    bdModel.Qty = 1;
+                    bdModel.Status = Core.Enums.Manufacture.ProductBadRecordStatusEnum.Open;
+                    bdModel.Source = Core.Enums.Manufacture.ProductBadRecordSourceEnum.EquipmentReBad;
+                    bdModel.Remark = "";
+                    bdModel.CreatedBy = OperationBy;
+                    bdModel.CreatedOn = HymsonClock.Now();
+                    bdModel.UpdatedBy = OperationBy;
+                    bdModel.UpdatedOn = bdModel.CreatedOn;
+                    badRecordList.Add(bdModel);
+
+                    if(mesItem.NgList == null || mesItem.NgList.Count == 0)
+                    {
+                        ManuProductNgRecordEntity ngModel = new ManuProductNgRecordEntity();
+                        ngModel.Id = IdGenProvider.Instance.CreateId();
+                        ngModel.SiteId = SiteID;
+                        ngModel.BadRecordId = bdModel.Id;
+                        ngModel.UnqualifiedId = 0;
+                        ngModel.NGCode = "未知";
+                        ngModel.CreatedBy = OperationBy;
+                        ngModel.CreatedOn = HymsonClock.Now();
+                        ngModel.UpdatedBy = OperationBy;
+                        ngModel.UpdatedOn = bdModel.CreatedOn;
+                        ngRecordList.Add(ngModel);
+                    }
+                    else
+                    {
+                        foreach(var item in mesItem.NgList)
+                        {
+                            ManuProductNgRecordEntity ngModel = new ManuProductNgRecordEntity();
+                            ngModel.Id = IdGenProvider.Instance.CreateId();
+                            ngModel.SiteId = SiteID;
+                            ngModel.BadRecordId = bdModel.Id;
+                            ngModel.UnqualifiedId = 0;
+                            ngModel.NGCode = item;
+                            ngModel.CreatedBy = OperationBy;
+                            ngModel.CreatedOn = HymsonClock.Now();
+                            ngModel.UpdatedBy = OperationBy;
+                            ngModel.UpdatedOn = bdModel.CreatedOn;
+                            ngRecordList.Add(ngModel);
+                        }
+                    }
+
+                }
             }
 
             #endregion
@@ -593,16 +670,35 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //MES数据入库
             using var trans = TransactionHelper.GetTransactionScope();
 
-            await _manuSfcCirculationRepository.InsertRangeAsync(circulaList);
-            //await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
-            await _manuSfcStepRepository.InsertRangeAsync(stepList);
-            await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
-            await InsertOrUpdateAsync(sfcUpdateList);
-            await InsertRawMaterialAsync(barCodeList, mesMaterialList);
-            await OrderCompleteQtyChangeAsync(mesOrderList);
-            await InsertOrUpdateRotorSfcAsync(addRotorList, updateRotorList);
-            //await _manuProductParameterRepository.InsertRangeMavelAsync(manuParamList);
-            await _manuProductParameterRepository.InsertRangeAsync(manuParamList);
+            List<Task<int>> tasks = new()
+            {
+                 _manuSfcCirculationRepository.InsertRangeAsync(circulaList),
+                 //await _manuSfcStepRepository.InsertRangeMavleAsync(stepList),
+                 _manuSfcStepRepository.InsertRangeAsync(stepList),
+                 _waterMarkService.RecordWaterMarkAsync(busKey, timestamp),
+                 InsertOrUpdateAsync(sfcUpdateList),
+                 InsertRawMaterialAsync(barCodeList, mesMaterialList),
+                 OrderCompleteQtyChangeAsync(mesOrderList),
+                 InsertOrUpdateRotorSfcAsync(addRotorList, updateRotorList),
+                 //await _manuProductParameterRepository.InsertRangeMavelAsync(manuParamList),
+                 _manuProductBadRecordRepository.InsertRangeAsync(badRecordList),
+                 _manuProductNgRecordRepository.InsertRangeAsync(ngRecordList),
+                 _manuProductParameterRepository.InsertRangeAsync(manuParamList),
+            };
+            var rowArray = await Task.WhenAll(tasks);
+
+            //await _manuSfcCirculationRepository.InsertRangeAsync(circulaList);
+            ////await _manuSfcStepRepository.InsertRangeMavleAsync(stepList);
+            //await _manuSfcStepRepository.InsertRangeAsync(stepList);
+            //await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
+            //await InsertOrUpdateAsync(sfcUpdateList);
+            //await InsertRawMaterialAsync(barCodeList, mesMaterialList);
+            //await OrderCompleteQtyChangeAsync(mesOrderList);
+            //await InsertOrUpdateRotorSfcAsync(addRotorList, updateRotorList);
+            ////await _manuProductParameterRepository.InsertRangeMavelAsync(manuParamList);
+            //await _manuProductBadRecordRepository.InsertRangeAsync(badRecordList);
+            //await _manuProductNgRecordRepository.InsertRangeAsync(ngRecordList);
+            //await _manuProductParameterRepository.InsertRangeAsync(manuParamList);
 
             trans.Complete();
         }

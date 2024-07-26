@@ -13,6 +13,7 @@ using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
@@ -22,6 +23,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 using Newtonsoft.Json;
+using System.Security.Policy;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -89,6 +91,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// 追溯条码
         /// </summary>
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
+
+        /// <summary>
+        /// 领料单条码明细
+        /// </summary>
+        private readonly IManuRequistionOrderReceiveRepository _manuRequistionOrderReceiveRepository;
 
         /// <summary>
         /// 操作员账号
@@ -160,7 +167,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcMaterialRepository procMaterialRepository,
             IManuRotorSfcRepository manuRotorSfcRepository,
-            IManuSfcCirculationRepository manuSfcCirculationRepository)
+            IManuSfcCirculationRepository manuSfcCirculationRepository,
+            IManuRequistionOrderReceiveRepository manuRequistionOrderReceiveRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -175,6 +183,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _procMaterialRepository = procMaterialRepository;
             _manuRotorSfcRepository = manuRotorSfcRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
+            _manuRequistionOrderReceiveRepository = manuRequistionOrderReceiveRepository;
 
             BASE_CONFIG_LIST = new List<string>() { NIO_ROTOR_CONFIG, NIO_STATOR_CONFIG };
         }
@@ -320,6 +329,9 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //工单
             List<long> orderIdList = stepList.Where(m => m.WorkOrderId != 0).Select(m => m.WorkOrderId).Distinct().ToList();
             IEnumerable<PlanWorkOrderEntity> orderList = await _planWorkOrderRepository.GetByIdsAsync(orderIdList);
+            //获取批次信息
+            List<string> sfcList = stepList.Select(m => m.SFC).Distinct().ToList();
+            List<SfcBatchDto> sfcBatchList = await GetSfcBatchListAsync(siteId, sfcList);
 
             var dtos = new List<ProductionDto> { };
             foreach (var item in stepList)
@@ -345,6 +357,13 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 {
                     curOrderCode = curOrder.OrderCode;
                 }
+                //条码批次
+                string sfcBatch = string.Empty;
+                var sfcBatchModel = sfcBatchList.Where(m => m.Sfc == item.SFC).FirstOrDefault();
+                if(sfcBatchModel != null)
+                {
+                    sfcBatch = sfcBatchModel.Batch;
+                }
 
                 ProductionDto model = new ProductionDto();
                 model.PlantId = curConfig.PlantId;
@@ -356,7 +375,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.VendorProductSn = item.SFC;
                 model.VendorProductTempSn = item.SFC;
                 model.VendorProductCode = curConfig.VendorProductCode;
-                model.VendorProductBatch = curConfig.VendorProductCode;
+                model.VendorProductBatch = sfcBatch;
                 model.WorkorderId = curOrderCode;
                 model.OperatorId = NIO_USER_ID;
                 model.OperatorName = NIO_USER_NAME;
@@ -1143,5 +1162,31 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             return localDateTime;
         }
 
+        /// <summary>
+        /// 获取条码批次信息
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="sfcList"></param>
+        /// <returns></returns>
+        private async Task<List<SfcBatchDto>> GetSfcBatchListAsync(long siteId,List<string> sfcList)
+        {
+            List<SfcBatchDto> resultList = new List<SfcBatchDto>();
+
+            //获取条码对应批次码
+            ManuRequistionOrderReceiveQuery matQuery = new ManuRequistionOrderReceiveQuery();
+            matQuery.SiteId = siteId;
+            matQuery.MaterialBarCodeList = sfcList;
+            var barCodeBatchList = await _manuRequistionOrderReceiveRepository.GetEntitiesAsync(matQuery);
+            if(barCodeBatchList != null && barCodeBatchList.Count() > 0)
+            {
+                resultList.AddRange(barCodeBatchList.Select(m => new SfcBatchDto()
+                {
+                    Sfc = m.MaterialBarCode,
+                    Batch = m.Batch
+                }));
+            }
+
+            return resultList;
+        }
     }
 }
