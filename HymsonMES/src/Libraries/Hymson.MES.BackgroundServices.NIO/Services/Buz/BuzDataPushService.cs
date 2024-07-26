@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor;
+using Hymson.MES.Data.Repositories.Mavel.Rotor.ManuRotorSfc.Query;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -152,6 +153,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// 基础配置
         /// </summary>
         private List<string> BASE_CONFIG_LIST { get; set; } = new List<string>();
+
+        /// <summary>
+        /// 转子线推送包含NIO码的工序
+        /// </summary>
+        private readonly List<string> ROTOR_NIOSN_OP = new List<string>() { "ROP130", "ROP140", "ROP150" };
 
         /// <summary>
         /// 构造函数
@@ -332,6 +338,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取批次信息
             List<string> sfcList = stepList.Select(m => m.SFC).Distinct().ToList();
             List<SfcBatchDto> sfcBatchList = await GetSfcBatchListAsync(siteId, sfcList);
+            //成品码信息
+            ZSfcQuery zSfcQuery = new ZSfcQuery();
+            zSfcQuery.SiteId = siteId;
+            zSfcQuery.SfcList = sfcList;
+            var nioSfcList = await _manuRotorSfcRepository.GetListByZSfcsAsync(zSfcQuery);
 
             var dtos = new List<ProductionDto> { };
             foreach (var item in stepList)
@@ -364,6 +375,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 {
                     sfcBatch = sfcBatchModel.Batch;
                 }
+                //总成码,指定工序才有总成码
+                string nioSfc = string.Empty;
+                if(ROTOR_NIOSN_OP.Contains(procedureCode) == true && nioSfcList != null)
+                {
+                    var curNio = nioSfcList.Where(m => m.ZSfc == item.SFC).FirstOrDefault();
+                    if(curNio != null)
+                    {
+                        nioSfc = curNio.Sfc;
+                    }
+                }
 
                 ProductionDto model = new ProductionDto();
                 model.PlantId = curConfig.PlantId;
@@ -372,7 +393,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.StationId = procedureCode;
                 model.VendorProductNum = curConfig.VendorProductCode;
                 model.VendorProductName = curConfig.VendorProductName;
-                model.VendorProductSn = item.SFC;
+                model.VendorProductSn = string.IsNullOrEmpty(nioSfc) ? item.SFC : nioSfc;
                 model.VendorProductTempSn = item.SFC;
                 model.VendorProductCode = curConfig.VendorProductCode;
                 model.VendorProductBatch = sfcBatch;
