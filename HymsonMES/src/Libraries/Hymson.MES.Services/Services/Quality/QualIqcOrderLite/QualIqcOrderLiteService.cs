@@ -857,7 +857,7 @@ namespace Hymson.MES.Services.Services.Quality
                     MaterialCode = receiptDetailEntity.MaterialBatchCode,
                     PlanQty = receiptDetailEntity.PlanQty,
                     Qty = receiptDetailEntity.Qty,
-                    IsQualified = item.IsQualified ?? TrueOrFalseEnum.No,
+                    IsQualified = (item.IsQualified ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes ? 1 : 0,
                     BarCode = receiptDetailEntity.BarCode,
                     SyncId = receiptDetailEntity.SyncId,
                     WarehouseCode = GetWarehouseCode(configEntities, item.IsQualified)

@@ -1262,6 +1262,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         {
             return number != Math.Truncate(number);
         }
+
         /// <summary>
         /// 派工单领料
         /// </summary>
@@ -1459,7 +1460,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             });
             if (request.Items.Any())
             {
-                
+
                 var Sfcs = request.Items.Select(m => m.Sfc);
                 var manuProductReceipts = await _manuProductReceiptOrderDetailRepository.GetListAsync(new QueryManuProductReceiptOrderDetail
                 {
@@ -1469,10 +1470,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                 var sfcList = manuProductReceipts.Select(x => x.Sfc).ToArray();
                 if (manuProductReceipts.Any())
                 {
-                   // var sfcStrings = sfcList.Except(request.Items.Select(x => x.Sfc));
+                    // var sfcStrings = sfcList.Except(request.Items.Select(x => x.Sfc));
                     throw new CustomerValidationException(nameof(ErrorCode.MES17754));
                 }
-                  
+
             }
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryEntities.Select(b => b.MaterialId).Distinct().ToArray());
             var returnMaterialDtos = new List<HttpClients.Requests.ProductReceiptItemDto>();
