@@ -215,6 +215,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                     SiteId = siteId,
                     BarCodes = barCodes
                 });
+                whMaterialInventories = whMaterialInventories.Where(x => x.QuantityResidue > 0);
                 if (whMaterialInventories != null && whMaterialInventories.Any())
                 {
                     var existsBarCodes = whMaterialInventories.Select(x => x.MaterialBarCode);
