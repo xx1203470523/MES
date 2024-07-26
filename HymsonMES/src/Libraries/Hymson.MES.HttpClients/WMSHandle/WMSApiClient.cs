@@ -2,7 +2,11 @@
 using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.WMS;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
+using Hymson.Utils;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MySqlX.XDevAPI.Common;
+using Polly.Caching;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -16,6 +20,10 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 
         /// </summary>
+        private readonly ILogger<WMSOptions> _logger;
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly IOptions<WMSOptions> _options;
         /// <summary>
         /// 
@@ -25,10 +33,12 @@ namespace Hymson.MES.HttpClients
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="options"></param>
         /// <param name="httpClient"></param>
-        public WMSApiClient(IOptions<WMSOptions> options, HttpClient httpClient)
+        public WMSApiClient(ILogger<WMSOptions> logger, IOptions<WMSOptions> options, HttpClient httpClient)
         {
+            _logger = logger;
             _options = options;
 
             _httpClient = httpClient;
@@ -44,10 +54,21 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         public async Task<bool> IQCReceiptCallBackAsync(IQCReceiptResultDto dto)
         {
+            _logger.LogDebug($"IQCReceiptCallBackAsync -> Request: {dto.ToSerialize()}");
+
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReceiptRoute, dto);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
-            return httpResponse.IsSuccessStatusCode;
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"IQCReceiptCallBackAsync -> Response: {jsonResponse}");
+
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                var result = jsonResponse.ToDeserialize<ResultDto>();
+                return result?.Code == 0;
+            }
+
+            return false;
         }
 
         /// <summary>

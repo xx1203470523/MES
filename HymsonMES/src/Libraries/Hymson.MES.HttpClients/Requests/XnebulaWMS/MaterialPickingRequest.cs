@@ -37,9 +37,12 @@ namespace Hymson.MES.HttpClients.Requests
         [JsonPropertyName("details")]
         public List<ProductionPickMaterialDto> Details { get; set; }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public record MaterialPickingRequestDto
     {
-        
         /// <summary>
         /// 同步单号
         /// </summary>
@@ -53,6 +56,7 @@ namespace Hymson.MES.HttpClients.Requests
         /// </summary>
         public List<ProductionPickMaterialDto> details { get; set; }
     }
+
     internal record MaterialPickingCancel
     {
         /// <summary>
@@ -72,7 +76,7 @@ namespace Hymson.MES.HttpClients.Requests
         /// </summary>
         [JsonPropertyName("sendOn")]
         public string SendOn { get; set; }
-        
+
     }
     public record MaterialPickingCancelDto
     {
@@ -130,5 +134,5 @@ namespace Hymson.MES.HttpClients.Requests
         public long? ProductionOrderComponentID { get; set; }
 
     }
-   
+
 }
