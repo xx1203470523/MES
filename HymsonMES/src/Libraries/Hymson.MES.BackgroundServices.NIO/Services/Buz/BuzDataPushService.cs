@@ -739,6 +739,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
         /// <summary>
         /// 业务数据（工位一次合格率）
+        /// NIO说不需要
         /// </summary>
         /// <returns></returns>
         public async Task PassrateStationAsync()
@@ -931,6 +932,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 else
                 {
                     curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(GetStatorConfig(baseConfigList));
+                }
+                if(curConfig == null)
+                {
+                    continue;
                 }
 
                 IssueDto model = new IssueDto();
