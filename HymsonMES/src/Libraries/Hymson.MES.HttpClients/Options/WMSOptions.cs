@@ -1,7 +1,7 @@
 ﻿namespace Hymson.MES.HttpClients.Options
 {
     /// <summary>
-    /// wms操作配置
+    /// WMS操作配置
     /// </summary>
     public class WMSOptions
     {
@@ -54,18 +54,29 @@
         /// 取消成品入库操作配置
         /// </summary>
         public WMSBusinessOptions ProductReceiptCancel { get; set; }
+
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class WMSBusinessOptions
     {
         /// <summary>
+        /// 单据类型
+        /// </summary>
+        public int Type { get; set; }
+
+        /// <summary>
         /// 仓库编码
         /// </summary>
-        public string WarehouseCode { get; set; }
+        public string WarehouseCode { get; set; } = "";
 
         /// <summary>
         /// 路由信息
         /// </summary>
-        public string RoutePath { get; set; }
+        public string Route { get; set; } = "";
+
     }
+
 }

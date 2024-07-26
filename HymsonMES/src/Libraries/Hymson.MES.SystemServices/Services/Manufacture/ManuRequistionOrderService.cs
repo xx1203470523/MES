@@ -610,7 +610,7 @@ namespace Hymson.MES.SystemServices.Services
         /// <param name="productionPickDto"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task ProductReceiptCallBackAsync(ProductionReturnCallBackDto productionPickDto)
+        public async Task<ResponseOutputDto> ProductReceiptCallBackAsync(ProductionReturnCallBackDto productionPickDto)
         {
             //根据结果 标记这个单据是否创建成功
             if (productionPickDto == null)
@@ -677,6 +677,11 @@ namespace Hymson.MES.SystemServices.Services
             {
                 await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
             }
+            return new ResponseOutputDto
+            {
+                status = true,
+                msg = "Success"
+            };
         }
     }
 }
