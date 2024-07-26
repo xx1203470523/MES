@@ -98,6 +98,21 @@ namespace Hymson.MES.SystemServices.Dtos
         /// </summary>
         public DateTime ExpirationDate { get; set; }
     }
+    /// <summary>
+    /// 响应体
+    /// </summary>
+    public record ResponseOutputDto
+    {
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public bool status { get; set; }
+
+        /// <summary>
+        /// 消息
+        /// </summary>
+        public string msg { get; set; }
+    }
     public record RotorCrossingStationData: BaseEntityDto
     {
 
