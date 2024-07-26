@@ -838,6 +838,9 @@ namespace Hymson.MES.Services.Services.Quality
             // 读取供应商
             var supplierEntity = await _whSupplierRepository.GetByIdAsync(orderEntity.SupplierId.Value);
 
+            // 读取物料
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(receiptDetailEntities.Select(x => x.MaterialId));
+
             // 仓库编码配置
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.WarehouseCode });
             if (configEntities == null || !configEntities.Any())
@@ -851,10 +854,12 @@ namespace Hymson.MES.Services.Services.Quality
                 var receiptDetailEntity = receiptDetailEntities.FirstOrDefault(f => f.Id == item.MaterialReceiptDetailId);
                 if (receiptDetailEntity == null) continue;
 
+                var materialEntity = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
+
                 details.Add(new IQCReceiptMaterialResultDto
                 {
                     ReceiptDetailId = receiptDetailEntity.Id,
-                    MaterialCode = receiptDetailEntity.MaterialBatchCode,
+                    MaterialCode = materialEntity?.MaterialCode ?? "",
                     PlanQty = receiptDetailEntity.PlanQty,
                     Qty = receiptDetailEntity.Qty,
                     IsQualified = (item.IsQualified ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes ? 1 : 0,
