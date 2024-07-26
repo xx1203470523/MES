@@ -866,8 +866,9 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     Type = BillBusinessTypeEnum.WorkOrderMaterialReturnForm,
                     IsAutoExecute = returnEntity.Type == ManuReturnTypeEnum.WorkOrderBorrow,
+                    SyncCode= returnEntity.ReturnOrderCode,
                     CreatedBy = _currentUser.UserName,
-                    WarehouseCode = isQualified == TrueOrFalseEnum.Yes ? configEntities.FirstOrDefault().Value.Split("|")[0] : configEntities.FirstOrDefault().Value.Split("|")[1],
+                    WarehouseCode = isQualified == TrueOrFalseEnum.Yes ? configEntities.FirstOrDefault()?.Value.Split("|")[0] : configEntities.FirstOrDefault()?.Value.Split("|")[1],
                     Remark = returnEntity.Remark,
                 };
 
