@@ -646,7 +646,7 @@ namespace Hymson.MES.SystemServices.Services
                 default:
                     break;
             }
-
+            var rows = 0;
             if (returnOrderEntity.Status == ProductReceiptStatusEnum.ApprovalingSuccess)
             {
                 long[] array = new long[] { long.Parse(id) };
@@ -658,30 +658,36 @@ namespace Hymson.MES.SystemServices.Services
                 });
                 var productReceiptOrderDetailEntities = await _manuProductReceiptOrderDetailRepository.GetByProductReceiptIdsAsync(array);
                 returnOrderEntity.Status = ProductReceiptStatusEnum.Receipt;
-               
+
                 using (TransactionScope ts = TransactionHelper.GetTransactionScope())
                 {
                     // 更新完工数量
-                    await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
+                    rows += await _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
                     {
                         UpdatedOn = DateTime.UtcNow,
                         WorkOrderId = planWorkOrderEntity.Id,
                         Qty = productReceiptOrderDetailEntities.Count(),
                     });
-                    await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
+                    rows += await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
                     ts.Complete();
                 }
-
             }
             else
             {
-                await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
+                rows += await _manuProductReceiptOrderRepository.UpdateAsync(returnOrderEntity);
             }
-            return new ResponseOutputDto
+            ResponseOutputDto responseOutputDto = new ResponseOutputDto();
+            if (rows > 0)
             {
-                status = true,
-                msg = "Success"
-            };
+                responseOutputDto.Status = true;
+                responseOutputDto.Msg = "Success";
+            }
+            else
+            {
+                responseOutputDto.Status = false;
+                responseOutputDto.Msg = "Fail";
+            }
+            return responseOutputDto;
         }
     }
 }
