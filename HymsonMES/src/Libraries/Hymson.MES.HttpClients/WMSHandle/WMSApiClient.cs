@@ -98,7 +98,7 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<bool> WarehousingDeliveryRequestAsync(DeliveryDto request)
+        public async Task<BaseResponse> WarehousingDeliveryRequestAsync(DeliveryDto request)
         {
             DeliveryRequest deliveryRequest = new()
             {
@@ -118,7 +118,7 @@ namespace Hymson.MES.HttpClients
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.Delivery.Route, deliveryRequest);
 
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
-            return httpResponse.IsSuccessStatusCode;
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse>();
         }
 
 

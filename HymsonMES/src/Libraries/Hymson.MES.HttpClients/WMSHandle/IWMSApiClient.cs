@@ -35,7 +35,7 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<bool> WarehousingDeliveryRequestAsync(DeliveryDto request);
+        Task<BaseResponse> WarehousingDeliveryRequestAsync(DeliveryDto request);
 
 
 

@@ -27,6 +27,7 @@ using Hymson.MES.HttpClients.Options;
 using Microsoft.Extensions.Options;
 using Hymson.MES.HttpClients;
 using Hymson.MES.Data.Repositories.Process;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
 {
@@ -183,10 +184,11 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             {
                 await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
                 await _manuRequistionOrderDetailRepository.InsertsAsync(manuRequistionOrderDetailEntities);
-                var response = await _wmsRequest.WarehousingDeliveryRequestAsync(deliveryDto);
-                if (!response)
+           
+                var response = await  _wmsRequest.WarehousingDeliveryRequestAsync(deliveryDto);
+                if (response.Code != 0)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15152)).WithData("System", "WMS");
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15152)).WithData("System", "WMS").WithData("Msg", response.Message);
                 }
                 trans.Complete();
             }
