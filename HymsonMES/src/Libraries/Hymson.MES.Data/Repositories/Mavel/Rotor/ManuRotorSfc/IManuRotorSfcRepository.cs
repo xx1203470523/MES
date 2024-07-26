@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Mavel.Rotor;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Mavel.Rotor.ManuRotorSfc.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,5 +34,12 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuRotorSfcEntity>> GetListAsync(EntityByWaterMarkTimeQuery query);
+
+        /// <summary>
+        /// 根据轴码获取信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuRotorSfcEntity>> GetListByZSfcsAsync(ZSfcQuery query);
     }
 }

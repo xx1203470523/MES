@@ -366,11 +366,11 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                     await _qualIqcOrderReturnDetailRepository.InsertRangeAsync(qualIqcOrderReturnDetailEntities);
                 }
 
-                var response = await _wmsRequest.WarehousingEntryRequestAsync(warehousingEntryDto);
-                if (!response)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS");
-                }
+                //var response = await _wmsRequest.WarehousingEntryRequestAsync(warehousingEntryDto);
+                //if (!response)
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS");
+                //}
                 trans.Complete();
             }
         }

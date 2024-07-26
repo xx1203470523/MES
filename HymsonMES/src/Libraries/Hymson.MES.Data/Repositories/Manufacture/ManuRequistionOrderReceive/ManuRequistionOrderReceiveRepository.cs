@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Microsoft.Extensions.Options;
 
@@ -116,6 +117,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Select("*");
+            if (query.MaterialBarCodeList != null && query.MaterialBarCodeList.Any())
+            {
+                sqlBuilder.Where("MaterialBarCode IN @MaterialBarCodeList");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuRequistionOrderReceiveEntity>(template.RawSql, query);
         }

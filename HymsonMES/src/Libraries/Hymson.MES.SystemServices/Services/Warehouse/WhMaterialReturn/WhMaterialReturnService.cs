@@ -27,6 +27,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using OfficeOpenXml.Drawing.Slicer.Style;
 
 namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
 {
@@ -180,7 +181,8 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
             var updateManuReturnOrderStatusByIdCommand = new UpdateManuReturnOrderStatusByIdCommand
             {
                 Id = manuReturnOrderEntity.Id,
-                Status = GetManuReturnOrderStatus(param.ReceiptResult),
+                Status = GetManuReturnOrderStatus(param.ReceiptResult, manuReturnOrderEntity.CompleteCount??0),
+                CompleteCount = WhWarehouseRequistionResultEnum.Completed== param.ReceiptResult? manuReturnOrderEntity.CompleteCount-1: manuReturnOrderEntity.CompleteCount,
                 UpdatedBy = userName,
                 UpdatedOn = HymsonClock.Now()
             };
@@ -352,8 +354,9 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
         /// 退料单状态装换
         /// </summary>
         /// <param name="ReceiptResult"></param>
+        /// <param name="CompleteCount"></param>
         /// <returns></returns>
-        private WhWarehouseMaterialReturnStatusEnum GetManuReturnOrderStatus(WhWarehouseRequistionResultEnum ReceiptResult)
+        private WhWarehouseMaterialReturnStatusEnum GetManuReturnOrderStatus(WhWarehouseRequistionResultEnum ReceiptResult,int CompleteCount)
         {
             var status = WhWarehouseMaterialReturnStatusEnum.PendingStorage;
             switch (ReceiptResult)
@@ -362,7 +365,14 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                     status = WhWarehouseMaterialReturnStatusEnum.InStorage;
                     break;
                 case WhWarehouseRequistionResultEnum.Completed:
-                    status = WhWarehouseMaterialReturnStatusEnum.Completed;
+                    if (CompleteCount == 1)
+                    {
+                        status = WhWarehouseMaterialReturnStatusEnum.Completed;
+                    }
+                    else
+                    {
+                        status = WhWarehouseMaterialReturnStatusEnum.InStorage;
+                    }
                     break;
                 case WhWarehouseRequistionResultEnum.CancelMaterialReceipt:
                     status = WhWarehouseMaterialReturnStatusEnum.CancelMaterialReturn;
