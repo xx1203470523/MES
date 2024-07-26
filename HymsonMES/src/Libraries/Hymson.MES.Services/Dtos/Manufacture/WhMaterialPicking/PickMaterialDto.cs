@@ -26,10 +26,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking
         /// <summary>
         /// 领料数量
         /// </summary>
-        public List<PickBomDetail> Details { get; set; }
+        public List<PickBomDetailDto> Details { get; set; }
     }
 
-    public class PickBomDetail
+    public class PickBomDetailDto
     {
         /// <summary>
         /// 物料Id

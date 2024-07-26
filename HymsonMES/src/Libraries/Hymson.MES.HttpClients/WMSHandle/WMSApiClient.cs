@@ -69,7 +69,7 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<bool> WarehousingEntryRequestAsync(WarehousingEntryDto request)
+        public async Task<BaseResponse> WarehousingEntryRequestAsync(WarehousingEntryDto request)
         {
             WarehousingEntryRequest materialReturnRequest = new WarehousingEntryRequest()
             {
@@ -90,7 +90,7 @@ namespace Hymson.MES.HttpClients
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.Receipt.Route, materialReturnRequest);
 
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
-            return httpResponse.IsSuccessStatusCode;
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse>();
         }
 
         /// <summary>

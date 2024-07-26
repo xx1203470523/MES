@@ -887,7 +887,7 @@ namespace Hymson.MES.Services.Services.Quality
                     {
                         ProductionOrderNumber = workOrderEntity?.OrderCode,
                         SyncId = item.Id,
-                        MaterialCode = item.MaterialBarCode,
+                        MaterialCode = materialEntity.MaterialCode,
                         LotCode = whMaterialInventoryEntity.Batch,
                         UnitCode = materialEntity?.Unit,
                         UniqueCode = item.MaterialBarCode,
@@ -901,9 +901,9 @@ namespace Hymson.MES.Services.Services.Quality
             foreach (var item in warehousingEntries)
             {
                 var response = await _wmsApiClient.WarehousingEntryRequestAsync(item);
-                if (!response)
+                if (response.Code!=0)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS");
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS").WithData("Msg", response.Message);
                 }
             }
 
