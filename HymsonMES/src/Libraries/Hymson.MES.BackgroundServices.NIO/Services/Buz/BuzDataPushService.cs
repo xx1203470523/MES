@@ -466,6 +466,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             {
                 return;
             }
+            List<string> nioSfcList = rotorSfcList.Select(m => m.Sfc).ToList();
 
             //获取铁芯码和轴码
             List<string> txSfcList = rotorSfcList.Select(m => m.TxSfc).ToList();
@@ -499,6 +500,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //查询上料物料信息
             List<long> upMatIdList = cirSfcList.Select(m => m.CirculationProductId).Distinct().ToList();
             var upMaterialList = await _procMaterialRepository.GetByIdsAsync(upMatIdList);
+            //获取批次信息
+            List<string> batchSfcList = new List<string>();
+            batchSfcList.AddRange(allSfcList);
+            batchSfcList.AddRange(nioSfcList);
+            List<SfcBatchDto> sfcBatchList = await GetSfcBatchListAsync(siteId, batchSfcList);
 
             // TODO: 替换为实际数据
             var dtos = new List<MaterialDto> { };
@@ -507,10 +513,13 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             {
                 string sfc = item.Sfc;
                 var sfcMaterial = materialList.Where(m => m.MaterialCode == item.SfcMaterialCode).FirstOrDefault();
+                var sfcBatch = sfcBatchList.Where(m => m.Sfc == sfc).FirstOrDefault();
                 string txSfc = item.TxSfc;
                 var txSfcMaterial = materialList.Where(m => m.MaterialCode == item.TxSfcMaterialCode).FirstOrDefault();
+                var txSfcBatch = sfcBatchList.Where(m => m.Sfc == txSfc).FirstOrDefault();
                 string zSfc = item.ZSfc;
                 var zSfcMaterial = materialList.Where(m => m.MaterialCode == item.ZSfcMaterialCode).FirstOrDefault();
+                var zSfcBatch = sfcBatchList.Where(m => m.Sfc == zSfc).FirstOrDefault();
 
                 MaterialDto materialDto = new MaterialDto();
 
@@ -519,18 +528,18 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.VendorProductName = sfcMaterial?.MaterialName;
                 model.VendorProductSn = sfc;
                 model.VendorProductCode = model.VendorProductNum;
-                model.VendorProductBatch = model.VendorProductNum;
+                model.VendorProductBatch = sfcBatch.Batch;
 
                 model.ParentCode = txSfcMaterial?.MaterialCode;
                 model.ParentName = txSfcMaterial?.MaterialName;
-                model.ParentBatch = txSfcMaterial.MaterialCode;
+                model.ParentBatch = txSfcBatch.Batch;
                 model.ParentNum = txSfcMaterial.MaterialCode;
                 model.ParentSn = txSfc;
                 model.ParentHardwareRevision = "1.0";
                 model.ParentSoftwareRevision = "1.0";
 
                 model.ChildCode = zSfcMaterial?.MaterialCode;
-                model.ChildBatch = zSfcMaterial?.MaterialCode;
+                model.ChildBatch = zSfcBatch?.Batch;
                 model.ChildName = txSfcMaterial?.MaterialName;
                 model.ChildCode = txSfcMaterial?.MaterialCode;
                 model.ChildSn = zSfc;
