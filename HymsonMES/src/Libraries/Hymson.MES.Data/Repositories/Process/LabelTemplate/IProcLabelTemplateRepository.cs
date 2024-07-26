@@ -78,5 +78,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLabelTemplatePagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcLabelTemplateEntity>> GetPagedInfoAsync(ProcLabelTemplatePagedQuery procLabelTemplatePagedQuery);
+
+        /// <summary>
+        /// 查询模板类型
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcLabelTemplateEntity> GetByTemplateTypeAsync(ProcLabelTemplateByTemplateTypeQuery query);
     }
 }

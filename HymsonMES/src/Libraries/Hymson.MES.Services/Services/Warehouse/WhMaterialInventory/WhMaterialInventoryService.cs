@@ -1534,7 +1534,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
                 Details = returnMaterialDtos
             });
-            if (response)
+            if (response.Code != 1)
             {
                 using (var trans = TransactionHelper.GetTransactionScope())
                 {
@@ -1545,7 +1545,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
             else
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16051)).WithData("msg", "请求发送失败");
+                throw new CustomerValidationException(nameof(ErrorCode.MES16056)).WithData("msg", response.Message);
             }
         }
 

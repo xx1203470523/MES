@@ -1,4 +1,5 @@
 ﻿using Hymson.EventBus.Abstractions;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Dtos.Process.LabelTemplate.Utility;
 
 namespace Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents
@@ -40,5 +41,10 @@ namespace Hymson.MES.CoreServices.Events.ProcessEvents.PrintEvents
         /// 用户
         /// </summary>
         public string UserName { get; set; }
+
+        /// <summary>
+        /// 模板通用类型
+        /// </summary>
+        public CurrencyTemplateTypeEnum? CurrencyTemplateType { get; set; }
     }
 }

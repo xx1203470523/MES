@@ -85,5 +85,14 @@ namespace Hymson.MES.Api.Controllers.Plan
         {
             return await _planSfcPrintService.GetPagedListAsync(pagedQueryDto);
         }
+
+        [HttpPost]
+        [Route("materialPrint")]
+        [LogDescription("物料库存条码打印", BusinessType.INSERT)]
+        [PermissionDescription("plan:sfcPrint:materialPrint")]
+        public async Task WhMaterialPrintAsync([FromBody] WhMaterialInventoryPrintCreatePrintDto createDto)
+        {
+            await _planSfcPrintService.WhMaterialPrintAsync(createDto);
+        }
     }
 }

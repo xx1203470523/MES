@@ -172,7 +172,8 @@
 
         public const string MES10379 = "IP设定不符合规范!";
         public const string MES10390 = "资源【{ResourceCode}】未找到打印机!";
-        public const string MES10391 = "工序【{ResourceCode}】未配置物料【{MaterialCode}】的模版!";
+        public const string MES10391 = "工序【{ProcedureCode}】未配置物料【{MaterialCode}】的打印模版!";
+        public const string MES10392 = "模板类型【{CurrencyTemplateType}】已经存在!";
         #endregion
 
         #region 工序 10400
@@ -966,7 +967,7 @@
         public const string MES15136 = "物料条码全部不存在";
         public const string MES15137 = "库存有修改，请刷新后再操作！";
         public const string MES15138 = "物料条码【{MaterialCode}】不存在";
-        public const string MES15139 = "申请【{System}】退料单失败";
+        public const string MES15139 = "申请【{System}】退料单失败,错误信息:{Msg}";
         public const string MES15140 = "退料单号生成失败：退料单类型编码规则未维护！";
         public const string MES15141 = "退料单号生成失败，同时存在多条退料单类型编码规则！";
         public const string MES15142 = "入库仓库不存在，请检查系统配置！";
@@ -1247,11 +1248,12 @@
         public const string MES16049 = "领料单申请失败,错误原因：【{msg}】。";
         public const string MES16050 = "领料单未找到,发送的请求标识为：【{orderId}】。";
         public const string MES16051 = "退料单申请失败,错误原因：【{msg}】。";
-
+       
         public const string MES16052 = "指定生产计划未找到,工单编码为：【{WorkOrder}】。";
         public const string MES16053 = "生产工单编码出现重复，请检查！";
         public const string MES16054 = "子工单总数量已超过生产计划计划数量，请检查！";
         public const string MES16055 = "子工单的计划时间超出生产计划的时间范围，请检查！";
+        public const string MES16056 = "成品出入库失败,错误原因：【{msg}】。";
         #endregion
 
         #region 条码接收 16100
