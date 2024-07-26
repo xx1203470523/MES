@@ -102,6 +102,7 @@
         public const string MES10250 = "BOM物料Id【{MaterialId}】所属物料不存在！";
         public const string MES10251 = "物料【{Code}】不存在！";
         public const string MES10252 = "存在未匹配的BOM，请检查！";
+        public const string MES10253 = "【{Status}】状态的数据，不允许当前操作！";
         #endregion
 
         #region 资源 10300

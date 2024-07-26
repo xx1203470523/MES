@@ -276,7 +276,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                         RequirementNumber = planDto.RequirementNumber,
                         PlanStartTime = firstProductDto.StartTime ?? SqlDateTime.MinValue.Value,
                         PlanEndTime = firstProductDto.EndTime ?? SqlDateTime.MaxValue.Value,
-                        
+
                         // TODO: 这里的字段需要确认
                         OverScale = 0,
                         Type = planDto.Type,
@@ -297,17 +297,19 @@ namespace Hymson.MES.SystemServices.Services.Plan
                 // 之前已存在的生产计划
                 else
                 {
-                    // 如果不是"未开始"的生产计划，不允许修改
-                    if (planEntity.Status != PlanWorkPlanStatusEnum.NotStarted)
+                    // "已派发"的生产计划，不允许修改
+                    if (planEntity.Status == PlanWorkPlanStatusEnum.Distributed)
                     {
                         // 这里应该提示当前的生产计划状态不允许修改
-                        throw new CustomerValidationException(nameof(ErrorCode.MES10247)).WithData("Status", PlanWorkPlanStatusEnum.NotStarted.GetDescription());
+                        throw new CustomerValidationException(nameof(ErrorCode.MES10253))
+                            .WithData("Status", PlanWorkPlanStatusEnum.Distributed.GetDescription());
                     }
 
                     // 除了数量/时间，好像什么都不能随便改
                     planEntity.PlanStartTime = firstProductDto.StartTime ?? SqlDateTime.MinValue.Value;
                     planEntity.PlanEndTime = firstProductDto.EndTime ?? SqlDateTime.MaxValue.Value;
 
+                    planEntity.Status = PlanWorkPlanStatusEnum.NotStarted;
                     planEntity.Type = planDto.Type;
                     planEntity.UpdatedBy = currentBo.User;
                     planEntity.UpdatedOn = currentBo.Time;
