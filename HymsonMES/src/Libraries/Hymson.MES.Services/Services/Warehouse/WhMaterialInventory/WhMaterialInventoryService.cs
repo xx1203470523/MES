@@ -31,7 +31,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using System.Linq;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -92,7 +91,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
         private readonly IManuReturnOrderRepository _manuReturnOrderRepository;
         private readonly IManuReturnOrderDetailRepository _manuReturnOrderDetailRepository;
-        private readonly IXnebulaWMSApiClient _wmsRequest;
+        private readonly IWMSApiClient _wmsRequest;
         private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
         private readonly IPlanWorkPlanProductRepository _planWorkPlanProductRepository;
         private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
@@ -160,7 +159,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IManuSfcProduceRepository sfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
-            IXnebulaWMSApiClient wMSRequest,
+            IWMSApiClient wMSRequest,
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,

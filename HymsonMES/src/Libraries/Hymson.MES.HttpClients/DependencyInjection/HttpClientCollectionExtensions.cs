@@ -1,10 +1,8 @@
-﻿
-using Hymson.MES.HttpClients;
+﻿using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.RotorHandle;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -21,23 +19,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddHttpClientService(this IServiceCollection services, IConfiguration configuration)
         {
-            
-
-            //var printOptions = new PrintOptions();
-            //configuration.GetSection("PrintOptions").Bind(printOptions);
-            //services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
-            //{
-            //    httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
-            //});
-
-            var xnebulaWMSOption = new XnebulaWMSOptions();
-            configuration.GetSection("XnebulaWMSOptions").Bind(xnebulaWMSOption);
-            services.AddHttpClient<IXnebulaWMSApiClient, XnebulaWMSApiClient>().ConfigureHttpClient(httpClient =>
-            {
-                httpClient.BaseAddress = new Uri(xnebulaWMSOption.BaseAddressUri);
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", xnebulaWMSOption.SysToken);
-            });
-
             var rotorOptions = new RotorOption();
             configuration.GetSection("RotorOption").Bind(rotorOptions);
             services.AddHttpClient<IRotorApiClient, RotorApiClient>().ConfigureHttpClient(httpClient =>
@@ -67,11 +48,9 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddHttpClientConfig(IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<PrintOptions>(configuration.GetSection(nameof(PrintOptions)));
-            services.Configure<XnebulaWMSOptions>(configuration.GetSection(nameof(XnebulaWMSOptions)));
             services.Configure<WMSOptions>(configuration.GetSection(nameof(WMSOptions)));
             return services;
         }
-
 
     }
 }
