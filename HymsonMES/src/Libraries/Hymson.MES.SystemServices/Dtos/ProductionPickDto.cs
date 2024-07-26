@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Hymson.MES.SystemServices.Dtos
@@ -106,12 +107,14 @@ namespace Hymson.MES.SystemServices.Dtos
         /// <summary>
         /// 状态
         /// </summary>
-        public bool status { get; set; }
+        [JsonPropertyName("status")]
+        public bool Status { get; set; }
 
         /// <summary>
         /// 消息
         /// </summary>
-        public string msg { get; set; }
+        [JsonPropertyName("msg")]
+        public string Msg { get; set; }
     }
     public record RotorCrossingStationData: BaseEntityDto
     {
