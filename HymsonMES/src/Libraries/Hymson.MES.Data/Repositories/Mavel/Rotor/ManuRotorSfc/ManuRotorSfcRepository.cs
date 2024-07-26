@@ -5,6 +5,7 @@ using Hymson.MES.Core.Domain.Mavel.Rotor;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Mavel.Rotor.ManuRotorSfc.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Microsoft.Extensions.Options;
 using System;
@@ -76,6 +77,18 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuRotorSfcEntity>(sql, query);
         }
+
+        /// <summary>
+        /// 根据轴码获取信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuRotorSfcEntity>> GetListByZSfcsAsync(ZSfcQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuRotorSfcEntity>(ZSfcQuerySql, query);
+        }
+
     }
 
     public partial class ManuRotorSfcRepository
@@ -90,6 +103,13 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor
             update manu_rotor_sfc
             set sfc = @sfc,updatedBy = @updatedBy,updatedOn = @updatedOn,IsFinish=@IsFinish,ZSfcMaterialCode=@ZSfcMaterialCode
             where zsfc = @zsfc;
+        ";
+
+        const string ZSfcQuerySql = $@"
+            select * 
+            from manu_rotor_sfc  
+            where SiteId  = @SiteId
+            and ZSfc in @SfcList
         ";
     }
 }

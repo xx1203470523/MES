@@ -158,6 +158,17 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(UpdatesSql, procLabelTemplateEntitys);
         }
 
+        /// <summary>
+        /// 查询模板类型
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcLabelTemplateEntity> GetByTemplateTypeAsync(ProcLabelTemplateByTemplateTypeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcLabelTemplateEntity>(GetByTemplateTypeSql, query);
+        }
+
     }
 
     public partial class ProcLabelTemplateRepository
@@ -183,5 +194,9 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetBynameSql = @"SELECT 
                                `Id`, `Name`, `Path`, `Content`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `proc_label_template`  WHERE Name = @Name and IsDeleted=0 and SiteId=@SiteId";
+
+        const string GetByTemplateTypeSql = @"SELECT 
+                               `Id`, `Name`, `Path`, `Content`, `Remark`, `CurrencyTemplateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                            FROM `proc_label_template`  WHERE CurrencyTemplateType = @CurrencyTemplateType and IsDeleted=0 and SiteId=@SiteId";
     }
 }
