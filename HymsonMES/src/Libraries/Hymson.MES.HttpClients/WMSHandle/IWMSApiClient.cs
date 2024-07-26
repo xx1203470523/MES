@@ -71,7 +71,7 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<bool> ProductReceiptRequestAsync(ProductReceiptRequestDto request);
+        Task<BaseResponse> ProductReceiptRequestAsync(ProductReceiptRequestDto request);
 
         /// <summary>
         /// 取消入库

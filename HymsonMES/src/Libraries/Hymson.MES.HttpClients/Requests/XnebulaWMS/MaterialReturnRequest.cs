@@ -42,12 +42,12 @@ namespace Hymson.MES.HttpClients.Requests
     }
     public record MaterialReturnRequestDto
     {
- 
+
         public string SyncCode { get; set; }
-        
-       
+
+
         public string SendOn { get; set; }
-        
+
         public List<ProductionReturnMaterialItemDto> Details { get; set; }
     }
     /// <summary>
@@ -256,4 +256,14 @@ namespace Hymson.MES.HttpClients.Requests
         public string? BoxCode { get; set; }
 
     }
+
+    public class BaseResponse
+    {
+        [JsonPropertyName("code")]
+        public int Code { get; set; }
+
+        [JsonPropertyName("msg")]
+        public string Message { get; set; } = "";
+    }
+
 }
