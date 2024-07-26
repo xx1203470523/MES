@@ -1315,7 +1315,7 @@
 
         #region 生产通用 MES16300
         public const string MES16300 = "生产中异常！";
-        public const string MES16301 = "工单不存在！";
+        public const string MES16301 = "【{orderCode}】工单不存在！";
         public const string MES16302 = "工单{ordercode}已经被锁定，无法继续生产。";
         public const string MES16303 = "工单{ordercode}状态不为已下达|生产中|已完工，无法继续生产。";
         public const string MES16304 = "获取首工序失败。";

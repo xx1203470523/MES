@@ -653,9 +653,13 @@ namespace Hymson.MES.SystemServices.Services
                 string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
                 var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
                 {
-                    SiteId = _currentSystem.SiteId,
+                    SiteId = returnOrderEntity.SiteId,
                     OrderCode = orderCode,
                 });
+                if(planWorkOrderEntity == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16301)).WithData("orderCode", orderCode);
+                }
                 var productReceiptOrderDetailEntities = await _manuProductReceiptOrderDetailRepository.GetByProductReceiptIdsAsync(array);
                 returnOrderEntity.Status = ProductReceiptStatusEnum.Receipt;
 
