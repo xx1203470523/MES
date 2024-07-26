@@ -276,8 +276,8 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                         if (manuReturnOrderDetailEntity.IsReceived == YesOrNoEnum.Yes)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES15150))
-                       .WithData("ReturnOrderCode", param.ReturnOrderCode)
-                       .WithData("MaterialCode", param.ReturnOrderCode);
+                                      .WithData("ReturnOrderCode", param.ReturnOrderCode)
+                                      .WithData("MaterialCode", param.ReturnOrderCode);
                         }
                         if (manuReturnOrderDetailEntity.Qty != item.Qty)
                         {
@@ -285,8 +285,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                                      .WithData("ReturnOrderCode", param.ReturnOrderCode)
                                      .WithData("MaterialCode", param.ReturnOrderCode)
                                      .WithData("PlanQty", manuReturnOrderDetailEntity.Qty)
-                                     .WithData("Qty", item.Qty)
-                                     ;
+                                     .WithData("Qty", item.Qty) ;
                         }
 
                         updateManuReturnOrderDetailIsReceivedByIdCommands.Add(new UpdateManuReturnOrderDetailIsReceivedByIdCommand

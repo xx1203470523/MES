@@ -25,7 +25,7 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// <summary>
         /// 退料单仓库收料详情
         /// </summary>
-        public IEnumerable<MaterialReturnReceiptDetails>? Details { set; get; }
+        public IEnumerable<MaterialReturnReceiptDetailDto>? Details { set; get; }
 
         /// <summary>
         /// 备注
@@ -41,7 +41,7 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
     /// <summary>
     /// 退料
     /// </summary>
-    public class MaterialReturnReceiptDetails
+    public class MaterialReturnReceiptDetailDto
     {
         /// <summary>
         /// 物料条码
