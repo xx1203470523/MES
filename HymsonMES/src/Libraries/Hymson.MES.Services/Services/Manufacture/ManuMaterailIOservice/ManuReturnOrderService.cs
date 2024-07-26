@@ -308,7 +308,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     MaterialName = material?.MaterialName ?? "",
                     Version = material?.Version ?? "",
                     MaterialBarCode = item.MaterialBarCode,
-                    Batch = item.Batch,
+                    Batch = item.Batch??"",
                     Qty = item.Qty,
                     ReturnTime = retrurnOrder?.CreatedOn ?? item.CreatedOn,
                     Status = retrurnOrder?.Status

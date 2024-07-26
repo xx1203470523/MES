@@ -159,6 +159,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15161)).WithData("ReqOrderCode", param.RequistionOrderCode);
             }
+
             //2. 校验物料明细
             if (param.Details == null || param.Details.Count() == 0)
             {
@@ -177,6 +178,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                     .WithData("ReqOrderCode", param.RequistionOrderCode)
                     .WithData("MaterialCodes", materialCodeList);
             }
+
             //2.2 查询供应商ID
             List<string> supCodeList = param.Details.Where(m => string.IsNullOrEmpty(m.SupplierCode))
                 .Select(m => m.SupplierCode).Distinct().ToList();
@@ -184,6 +186,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             supQuery.SiteId = siteId;
             supQuery.Codes = supCodeList;
             var supList = await _whSupplierRepository.GetByCodesAsync(supQuery);
+
             //3. 校验领料单和物料明细是否已经存在系统中
             ManuRequistionOrderDetailQuery orderDetailQuery = new ManuRequistionOrderDetailQuery();
             orderDetailQuery.SiteId = siteId;
@@ -193,6 +196,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15164)).WithData("ReqOrderCode", param.RequistionOrderCode);
             }
+
             //3.1 校验传输过来的物料是否都在领料单物料明细中
             foreach (var item in param.Details)
             {
@@ -205,6 +209,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                        .WithData("MaterialCodes", materialCodeList);
                 }
             }
+
             //4.1 更新领料单状态
             if (param.ReceiptResult == WhMaterialPickingReceiveResultEnum.Receiving)
             {
@@ -214,8 +219,11 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             {
                 reqOrder.Status = WhMaterialPickingStatusEnum.Completed;
             }
-            reqOrder.UpdatedBy = param.OperateBy;
-            reqOrder.UpdatedOn = HymsonClock.Now();
+            var userId= param.OperateBy;
+            var createOn = HymsonClock.Now();
+
+            reqOrder.UpdatedBy = userId;
+            reqOrder.UpdatedOn = createOn;
             //4.2 新增领料单接收明细，台账明细，库存表
             //manu_requistion_order_receive
             List<ManuRequistionOrderReceiveEntity> receiveList = new List<ManuRequistionOrderReceiveEntity>();
@@ -224,7 +232,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             foreach (var item in param.Details)
             {
                 var curMatModel = materialList.Where(m => m.MaterialCode == item.MaterialCode).FirstOrDefault();
-                long curMatId = curMatModel.Id;
+                long curMatId = curMatModel?.Id??0;
                 var curSupModel = supList.Where(m => m.Code == item.SupplierCode).FirstOrDefault();
                 long curSupId = curSupModel == null ? 0 : curSupModel.Id;
                 //接收明细
@@ -235,7 +243,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 model.MaterialBarCode = item.MaterialBarCode;
                 model.Qty = item.Qty;
                 model.WarehouseId = 0;
-                model.Remark = param.Remark;
+                model.Remark = param.Remark??"";
                 model.SiteId = siteId;
                 model.CreatedBy = param.OperateBy;
                 model.UpdatedBy = param.OperateBy;
@@ -247,11 +255,11 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 //台账明细
                 WhMaterialStandingbookEntity bookModel = new WhMaterialStandingbookEntity();
                 bookModel.Id = IdGenProvider.Instance.CreateId();
-                bookModel.MaterialCode = curMatModel.MaterialCode;
-                bookModel.MaterialName = curMatModel.MaterialName;
-                bookModel.MaterialVersion = curMatModel.Version ?? "";
+                bookModel.MaterialCode = curMatModel?.MaterialCode??"";
+                bookModel.MaterialName = curMatModel?.MaterialName??"";
+                bookModel.MaterialVersion = curMatModel?.Version ?? "";
                 bookModel.MaterialBarCode = item.MaterialBarCode;
-                bookModel.Unit = curMatModel.Unit ?? "";
+                bookModel.Unit = curMatModel?.Unit ?? "";
                 bookModel.Quantity = item.Qty;
                 bookModel.Remark = param.Remark;
                 bookModel.Type = WhMaterialInventoryTypeEnum.MaterialReceiving;
@@ -265,23 +273,25 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 bookModel.Batch = item.Batch ?? "";
                 bookList.Add(bookModel);
                 //库存明细
-                WhMaterialInventoryEntity whModel = new WhMaterialInventoryEntity();
-                whModel.Id = IdGenProvider.Instance.CreateId();
-                whModel.SupplierId = curSupId;
-                whModel.MaterialId = curMatId;
-                whModel.MaterialBarCode = item.MaterialBarCode;
-                whModel.QuantityResidue = item.Qty;
-                whModel.ReceivedQty = item.Qty;
-                whModel.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
-                whModel.Source = MaterialInventorySourceEnum.WMS;
-                whModel.SiteId = siteId;
-                whModel.MaterialType = MaterialInventoryMaterialTypeEnum.PurchaseParts;
-                whModel.Batch = item.Batch ?? "";
-                whModel.WorkOrderId = reqOrder.WorkOrderId;
-                whModel.CreatedBy = param.OperateBy;
-                whModel.UpdatedBy = param.OperateBy;
-                whModel.CreatedOn = HymsonClock.Now();
-                whModel.UpdatedOn = whModel.CreatedOn;
+                WhMaterialInventoryEntity whModel = new WhMaterialInventoryEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SupplierId = curSupId,
+                    MaterialId = curMatId,
+                    MaterialBarCode = item.MaterialBarCode,
+                    QuantityResidue = item.Qty,
+                    ReceivedQty = item.Qty,
+                    Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                    Source = MaterialInventorySourceEnum.WMS,
+                    SiteId = siteId,
+                    MaterialType = MaterialInventoryMaterialTypeEnum.PurchaseParts,
+                    Batch = item.Batch ?? "",
+                    WorkOrderId = reqOrder.WorkOrderId,
+                    CreatedBy = param.OperateBy,
+                    UpdatedBy = param.OperateBy,
+                    CreatedOn = createOn,
+                    UpdatedOn=createOn
+                };
                 whList.Add(whModel);
             }
             //4.3 更新领料单明细中数量
