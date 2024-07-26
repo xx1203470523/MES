@@ -5,6 +5,7 @@ using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 
 namespace Hymson.MES.HttpClients
 {
@@ -203,7 +204,7 @@ namespace Hymson.MES.HttpClients
             return httpResponse.IsSuccessStatusCode;
         }
 
-        public async Task<bool> ProductReceiptRequestAsync(ProductReceiptRequestDto request)
+        public async Task<BaseResponse> ProductReceiptRequestAsync(ProductReceiptRequestDto request)
         {
             ProductReceiptRequest materialReturnRequest = new()
             {
@@ -215,12 +216,15 @@ namespace Hymson.MES.HttpClients
             };
 
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.ProductReceipt.Route, materialReturnRequest);
-
-            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
-            return httpResponse.IsSuccessStatusCode;
+            return await httpResponse.Content.ReadFromJsonAsync<BaseResponse>();
+            //if (result?.Code == 1)
+            //    return false;
+            //else
+            //{
+            //    return true;
+            //}
         }
 
-
-
+       
     }
 }

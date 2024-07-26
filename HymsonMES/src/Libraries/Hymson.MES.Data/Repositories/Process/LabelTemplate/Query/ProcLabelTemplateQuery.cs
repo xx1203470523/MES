@@ -6,6 +6,7 @@
  *build datetime: 2023-03-09 02:51:26
  */
 
+using Hymson.MES.Core.Enums.Process;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public string Name { get; set; }
     }
 
-    public class ProcLabelTemplateByNameQuery 
+    public class ProcLabelTemplateByNameQuery
     {
         /// <summary>
         /// 站点id
@@ -42,4 +43,18 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public string Name { get; set; }
     }
+
+    public class ProcLabelTemplateByTemplateTypeQuery
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 模板类型
+        /// </summary>
+        public CurrencyTemplateTypeEnum CurrencyTemplateType { get; set; }
+    }
+
 }
