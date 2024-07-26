@@ -6,11 +6,16 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
@@ -18,8 +23,11 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Requests.WMS;
+using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
@@ -98,6 +106,16 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IWMSApiClient _wmsApiClient;
 
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly ISysConfigRepository _sysConfigRepository;
+
+        /// <summary>
+        /// 物料库存仓储
+        /// </summary>
+        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -124,7 +142,9 @@ namespace Hymson.MES.Services.Services.Quality
             IPlanWorkOrderRepository planWorkOrderRepository,
             IInteAttachmentRepository inteAttachmentRepository,
             IIQCOrderCreateService iqcOrderCreateService,
-            IWMSApiClient wmsApiClient)
+            IWMSApiClient wmsApiClient,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            ISysConfigRepository sysConfigRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -139,6 +159,8 @@ namespace Hymson.MES.Services.Services.Quality
             _inteAttachmentRepository = inteAttachmentRepository;
             _iqcOrderCreateService = iqcOrderCreateService;
             _wmsApiClient = wmsApiClient;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _sysConfigRepository = sysConfigRepository;
         }
 
 
@@ -362,10 +384,12 @@ namespace Hymson.MES.Services.Services.Quality
                 returnEntity.Status = Core.Enums.Warehouse.WhWarehouseMaterialReturnStatusEnum.PendingStorage;
                 returnEntity.UpdatedBy = user;
                 returnEntity.UpdatedOn = time;
+                returnEntity.CompleteCount = updateDetailEntities.Select(x => x.IsQualified).Distinct().Count();
             }
 
             // 更新检验单状态
             orderEntity.Status = IQCLiteStatusEnum.Completed;
+
             orderEntity.UpdatedBy = user;
             orderEntity.UpdatedOn = time;
 
@@ -811,31 +835,99 @@ namespace Hymson.MES.Services.Services.Quality
             if (returnEntity == null) return;
             if (!orderEntity.WorkOrderId.HasValue) return;
 
-            // 读取工单
-            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderEntity.WorkOrderId.Value);
-
-            List<IQCReturnMaterialResultDto> details = new();
-            foreach (var item in updateDetailEntities)
+            // 仓库编码配置
+            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.WarehouseCode });
+            if (configEntities == null || !configEntities.Any())
             {
-                var returnDetailEntity = returnDetailEntities.FirstOrDefault(f => f.Id == item.ReturnOrderDetailId);
-                if (returnDetailEntity == null) continue;
-
-                details.Add(new IQCReturnMaterialResultDto
-                {
-                    MaterialCode = returnDetailEntity.MaterialBarCode,
-                    PlanQty = returnDetailEntity.Qty,
-                    Qty = returnDetailEntity.Qty,
-                    IsQualified = item.IsQualified ?? TrueOrFalseEnum.No
-                });
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.WarehouseCode.GetDescription());
             }
 
-            // 将结果推送给WMS
-            await _wmsApiClient.IQCReturnCallBackAsync(new IQCReturnResultDto
+            // 读取工单
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderEntity.WorkOrderId.Value);
+            var materialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
-                ReturnOrderCode = returnEntity.ReturnOrderCode,
-                WorkOrderCode = workOrderEntity?.OrderCode ?? "",
-                Details = details
+                SiteId = _currentSite.SiteId ?? 0,
+                BarCodes = returnDetailEntities.Select(x => x.MaterialBarCode)
             });
+
+            if (materialInventoryEntities == null || !materialInventoryEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15124));
+            }
+
+            //查询到物料信息
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialInventoryEntities.Select(x => x.MaterialId));
+
+            var warehousingEntries = new List<WarehousingEntryDto>();
+
+            foreach (var isQualified in updateDetailEntities.Select(x => x.IsQualified).Distinct())
+            {
+                var warehousingEntryDto = new WarehousingEntryDto()
+                {
+                    Type = BillBusinessTypeEnum.WorkOrderMaterialReturnForm,
+                    IsAutoExecute = returnEntity.Type == ManuReturnTypeEnum.WorkOrderBorrow,
+                    CreatedBy = _currentUser.UserName,
+                    WarehouseCode = isQualified == TrueOrFalseEnum.Yes ? configEntities.FirstOrDefault().Value.Split("|")[0] : configEntities.FirstOrDefault().Value.Split("|")[1],
+                    Remark = returnEntity.Remark,
+                };
+
+                var warehousingEntryDetails = new List<ReceiptDetailDto>();
+
+                foreach (var item in returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified && o.BarCode == x.MaterialBarCode)))
+                {
+                    var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode);
+
+                    if (whMaterialInventoryEntity == null)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", item.MaterialBarCode);
+                    }
+                    var materialEntity = materialEntities.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
+                    warehousingEntryDetails.Add(new ReceiptDetailDto
+                    {
+                        ProductionOrderNumber = workOrderEntity?.OrderCode,
+                        SyncId = item.Id,
+                        MaterialCode = item.MaterialBarCode,
+                        LotCode = whMaterialInventoryEntity.Batch,
+                        UnitCode = materialEntity?.Unit,
+                        UniqueCode = item.MaterialBarCode,
+                        Quantity = item.Qty
+                    });
+                    warehousingEntryDto.Details = warehousingEntryDetails;
+                    warehousingEntries.Add(warehousingEntryDto);
+                }
+            }
+
+            foreach (var item in warehousingEntries)
+            {
+                var response = await _wmsApiClient.WarehousingEntryRequestAsync(item);
+                if (!response)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS");
+                }
+            }
+
+            //List<IQCReturnMaterialResultDto> details = new();
+            //foreach (var item in updateDetailEntities)
+            //{
+            //    var returnDetailEntity = returnDetailEntities.FirstOrDefault(f => f.Id == item.ReturnOrderDetailId);
+            //    if (returnDetailEntity == null) continue;
+
+            //    details.Add(new IQCReturnMaterialResultDto
+            //    {
+            //        MaterialCode = returnDetailEntity.MaterialBarCode,
+            //        PlanQty = returnDetailEntity.Qty,
+            //        Qty = returnDetailEntity.Qty,
+            //        IsQualified = item.IsQualified ?? TrueOrFalseEnum.No
+            //    });
+            //}
+
+            //// 将结果推送给WMS
+            //await _wmsApiClient.IQCReturnCallBackAsync(new IQCReturnResultDto
+            //{
+            //    ReturnOrderCode = returnEntity.ReturnOrderCode,
+            //    WorkOrderCode = workOrderEntity?.OrderCode ?? "",
+            //    Details = details
+            //});
         }
         #endregion
 

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Hymson.MES.SystemServices.Dtos
@@ -97,6 +98,23 @@ namespace Hymson.MES.SystemServices.Dtos
         /// 物料的有效期（截止日期）
         /// </summary>
         public DateTime ExpirationDate { get; set; }
+    }
+    /// <summary>
+    /// 响应体
+    /// </summary>
+    public record ResponseOutputDto
+    {
+        /// <summary>
+        /// 状态
+        /// </summary>
+        [JsonPropertyName("status")]
+        public bool Status { get; set; }
+
+        /// <summary>
+        /// 消息
+        /// </summary>
+        [JsonPropertyName("msg")]
+        public string Msg { get; set; }
     }
     public record RotorCrossingStationData: BaseEntityDto
     {

@@ -95,6 +95,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
 
             if (pageQuery.WorkPlanIds != null) sqlBuilder.Where("WorkPlanId IN @WorkPlanIds");
 
@@ -137,6 +138,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<PlanWorkPlanProductEntity>(GetByIdSql, new { Id = id });
         }
+
     }
 
 

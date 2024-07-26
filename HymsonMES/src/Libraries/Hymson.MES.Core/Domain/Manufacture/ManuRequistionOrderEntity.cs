@@ -55,7 +55,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 物料描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 站点Id

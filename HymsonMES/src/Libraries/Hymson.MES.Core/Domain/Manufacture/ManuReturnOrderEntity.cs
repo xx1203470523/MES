@@ -51,5 +51,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 接收仓库id
         /// </summary>
         public long? ReceiveWarehouseId { get; set; }
+
+        /// <summary>
+        /// 完成次数
+        /// </summary>
+        public int? CompleteCount { get; set; }
     }
 }

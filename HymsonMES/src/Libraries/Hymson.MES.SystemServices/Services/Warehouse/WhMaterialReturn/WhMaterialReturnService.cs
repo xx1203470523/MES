@@ -27,6 +27,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using OfficeOpenXml.Drawing.Slicer.Style;
 
 namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
 {
@@ -180,7 +181,8 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
             var updateManuReturnOrderStatusByIdCommand = new UpdateManuReturnOrderStatusByIdCommand
             {
                 Id = manuReturnOrderEntity.Id,
-                Status = GetManuReturnOrderStatus(param.ReceiptResult),
+                Status = GetManuReturnOrderStatus(param.ReceiptResult, manuReturnOrderEntity.CompleteCount??0),
+                CompleteCount = WhWarehouseRequistionResultEnum.Completed== param.ReceiptResult? manuReturnOrderEntity.CompleteCount-1: manuReturnOrderEntity.CompleteCount,
                 UpdatedBy = userName,
                 UpdatedOn = HymsonClock.Now()
             };
@@ -253,18 +255,17 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
             {
                 if (param.Details != null && param.Details.Any())
                 {
-
                     var materialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
                     {
-                        SiteId = _currentSystem.SiteId,
+                        SiteId = siteId,
                         BarCodes = param.Details.Select(x => x.MaterialBarCode)
                     });
                     //查询到物料信息
                     var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialInventoryEntities.Select(x => x.MaterialId));
 
-                    foreach (var item in param.Details)
+                    foreach (var detailItem in param.Details)
                     {
-                        var manuReturnOrderDetailEntity = manuReturnOrderDetails.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode);
+                        var manuReturnOrderDetailEntity = manuReturnOrderDetails.FirstOrDefault(x => x.MaterialBarCode == detailItem.MaterialBarCode);
 
                         if (manuReturnOrderDetailEntity == null)
                         {
@@ -276,16 +277,17 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                         if (manuReturnOrderDetailEntity.IsReceived == YesOrNoEnum.Yes)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES15150))
-                                      .WithData("ReturnOrderCode", param.ReturnOrderCode)
-                                      .WithData("MaterialCode", param.ReturnOrderCode);
+                                .WithData("ReturnOrderCode", param.ReturnOrderCode)
+                                .WithData("MaterialCode", param.ReturnOrderCode);
                         }
-                        if (manuReturnOrderDetailEntity.Qty != item.Qty)
+
+                        if (manuReturnOrderDetailEntity.Qty != detailItem.Qty)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES15149))
-                                     .WithData("ReturnOrderCode", param.ReturnOrderCode)
-                                     .WithData("MaterialCode", param.ReturnOrderCode)
-                                     .WithData("PlanQty", manuReturnOrderDetailEntity.Qty)
-                                     .WithData("Qty", item.Qty) ;
+                                .WithData("ReturnOrderCode", param.ReturnOrderCode)
+                                .WithData("MaterialCode", param.ReturnOrderCode)
+                                .WithData("PlanQty", manuReturnOrderDetailEntity.Qty)
+                                .WithData("Qty", detailItem.Qty);
                         }
 
                         updateManuReturnOrderDetailIsReceivedByIdCommands.Add(new UpdateManuReturnOrderDetailIsReceivedByIdCommand
@@ -295,11 +297,11 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                             UpdatedBy = userName,
                             UpdatedOn = HymsonClock.Now()
                         });
-                        var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode);
 
+                        var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == detailItem.MaterialBarCode);
                         if (whMaterialInventoryEntity == null)
                         {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", item.MaterialBarCode);
+                            throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", detailItem.MaterialBarCode);
                         }
 
                         var materialEntity = materialEntities.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
@@ -352,8 +354,9 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
         /// 退料单状态装换
         /// </summary>
         /// <param name="ReceiptResult"></param>
+        /// <param name="CompleteCount"></param>
         /// <returns></returns>
-        private WhWarehouseMaterialReturnStatusEnum GetManuReturnOrderStatus(WhWarehouseRequistionResultEnum ReceiptResult)
+        private WhWarehouseMaterialReturnStatusEnum GetManuReturnOrderStatus(WhWarehouseRequistionResultEnum ReceiptResult,int CompleteCount)
         {
             var status = WhWarehouseMaterialReturnStatusEnum.PendingStorage;
             switch (ReceiptResult)
@@ -362,7 +365,14 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                     status = WhWarehouseMaterialReturnStatusEnum.InStorage;
                     break;
                 case WhWarehouseRequistionResultEnum.Completed:
-                    status = WhWarehouseMaterialReturnStatusEnum.Completed;
+                    if (CompleteCount == 1)
+                    {
+                        status = WhWarehouseMaterialReturnStatusEnum.Completed;
+                    }
+                    else
+                    {
+                        status = WhWarehouseMaterialReturnStatusEnum.InStorage;
+                    }
                     break;
                 case WhWarehouseRequistionResultEnum.CancelMaterialReceipt:
                     status = WhWarehouseMaterialReturnStatusEnum.CancelMaterialReturn;

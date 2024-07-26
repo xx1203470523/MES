@@ -19,5 +19,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuReturnOrder.Command
         /// ID（物料）
         /// </summary>
         public WhWarehouseMaterialReturnStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 完成次数
+        /// </summary>
+        public int? CompleteCount { get; set; }
     }
 }

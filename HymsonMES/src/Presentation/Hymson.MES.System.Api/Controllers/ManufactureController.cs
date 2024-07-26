@@ -26,8 +26,8 @@ namespace Hymson.MES.System.Api.Controllers
         /// 构造函数, IManuRotorService manuRotorService
         /// </summary>
         public ManufactureController(IManuRequistionOrderService manuRequistionOrderService
-            ) 
-        { 
+            )
+        {
             _manuRequistionOrderService = manuRequistionOrderService;
             // _manuRotorService = manuRotorService;
         }
@@ -40,7 +40,7 @@ namespace Hymson.MES.System.Api.Controllers
         [Route("PickMaterials")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("接收生产领料信息", BusinessType.INSERT)]
-        public async Task SavePickMaterialsAsync([FromBody]ProductionPickDto productionPickDto)
+        public async Task SavePickMaterialsAsync([FromBody] ProductionPickDto productionPickDto)
         {
             await _manuRequistionOrderService.SavePickMaterialsAsync(productionPickDto);
         }
@@ -93,9 +93,9 @@ namespace Hymson.MES.System.Api.Controllers
         [Route("ProductReceiptCallBack")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("成品入库单结果反馈", BusinessType.INSERT)]
-        public async Task ProductReceiptCallBackAsync([FromBody] ProductionReturnCallBackDto callBackDto)
+        public async Task<ResponseOutputDto> ProductReceiptCallBackAsync([FromBody] ProductionReturnCallBackDto callBackDto)
         {
-            await _manuRequistionOrderService.ProductReceiptCallBackAsync(callBackDto);
+            return await _manuRequistionOrderService.ProductReceiptCallBackAsync(callBackDto);
         }
     }
 }
