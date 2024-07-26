@@ -191,14 +191,14 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             // 检验单明细
             List<QualIqcOrderReturnDetailEntity> qualIqcOrderReturnDetailEntities = new();
 
-            var warehousingEntryDto = new WarehousingEntryDto()
-            {
-                Type = BillBusinessTypeEnum.WorkOrderMaterialReturnForm,
-                IsAutoExecute = param.Type == ManuReturnTypeEnum.WorkOrderBorrow,
-                CreatedBy = _currentUser.UserName,
-                WarehouseCode = _options.Value.Receipt.WarehouseCode,
-                Remark = param.Remark,
-            };
+            //var warehousingEntryDto = new WarehousingEntryDto()
+            //{
+            //    Type = BillBusinessTypeEnum.WorkOrderMaterialReturnForm,
+            //    IsAutoExecute = param.Type == ManuReturnTypeEnum.WorkOrderBorrow,
+            //    CreatedBy = _currentUser.UserName,
+            //    WarehouseCode = _options.Value.Receipt.WarehouseCode,
+            //    Remark = param.Remark,
+            //};
 
             var warehousingEntryDetails = new List<ReceiptDetailDto>();
 
@@ -336,18 +336,18 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                     qualIqcOrderReturnDetailEntities.Add(qualIqcOrderReturnDetailEntity);
                 }
 
-                warehousingEntryDetails.Add(new ReceiptDetailDto
-                {
-                    ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
-                    SyncId = manuReturnOrderDetailEntity.Id,
-                    MaterialCode = materialEntity.MaterialCode,
-                    LotCode = whMaterialInventoryEntity.Batch,
-                    UnitCode = materialEntity.Unit,
-                    UniqueCode = materialBarCode,
-                    Quantity = whMaterialInventoryEntity.QuantityResidue
-                });
+                //warehousingEntryDetails.Add(new ReceiptDetailDto
+                //{
+                //    ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
+                //    SyncId = manuReturnOrderDetailEntity.Id,
+                //    MaterialCode = materialEntity.MaterialCode,
+                //    LotCode = whMaterialInventoryEntity.Batch,
+                //    UnitCode = materialEntity.Unit,
+                //    UniqueCode = materialBarCode,
+                //    Quantity = whMaterialInventoryEntity.QuantityResidue
+                //});
             }
-            warehousingEntryDto.Details = warehousingEntryDetails;
+            //warehousingEntryDto.Details = warehousingEntryDetails;
 
             using (var trans = TransactionHelper.GetTransactionScope())
             {

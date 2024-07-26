@@ -93,7 +93,7 @@ namespace Hymson.MES.HttpClients.Requests.WMS
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public TrueOrFalseEnum IsQualified { get; set; }
+        public int IsQualified { get; set; }
 
         /// <summary>
         /// 条码（唯一码）
