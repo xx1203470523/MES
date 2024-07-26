@@ -99,6 +99,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly IManuRequistionOrderReceiveRepository _manuRequistionOrderReceiveRepository;
 
         /// <summary>
+        /// 仓储接口（工单完工入库明细）
+        /// </summary>
+        private readonly IManuProductReceiptOrderDetailRepository _manuProductReceiptOrderDetailRepository;
+
+        /// <summary>
         /// 操作员账号
         /// </summary>
         private readonly string NIO_USER_ID = "LMS001";
@@ -174,7 +179,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             IProcMaterialRepository procMaterialRepository,
             IManuRotorSfcRepository manuRotorSfcRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
-            IManuRequistionOrderReceiveRepository manuRequistionOrderReceiveRepository)
+            IManuRequistionOrderReceiveRepository manuRequistionOrderReceiveRepository,
+            IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -190,6 +196,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _manuRotorSfcRepository = manuRotorSfcRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _manuRequistionOrderReceiveRepository = manuRequistionOrderReceiveRepository;
+            _manuProductReceiptOrderDetailRepository = manuProductReceiptOrderDetailRepository;
 
             BASE_CONFIG_LIST = new List<string>() { NIO_ROTOR_CONFIG, NIO_STATOR_CONFIG };
         }
@@ -1193,7 +1200,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             List<SfcBatchDto> resultList = new List<SfcBatchDto>();
 
-            //获取条码对应批次码
+            //获取条码对应批次码-(铁芯，轴码)
             ManuRequistionOrderReceiveQuery matQuery = new ManuRequistionOrderReceiveQuery();
             matQuery.SiteId = siteId;
             matQuery.MaterialBarCodeList = sfcList;
@@ -1203,6 +1210,19 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 resultList.AddRange(barCodeBatchList.Select(m => new SfcBatchDto()
                 {
                     Sfc = m.MaterialBarCode,
+                    Batch = m.Batch
+                }));
+            }
+            //获取条码对应批次码-(成品码)
+            QueryManuProductReceiptOrderDetail detailQuery = new QueryManuProductReceiptOrderDetail();
+            detailQuery.SiteId = siteId;
+            detailQuery.SFCs = sfcList;
+            var snList = await _manuProductReceiptOrderDetailRepository.GetListAsync(detailQuery);
+            if(snList != null && snList.Count() > 0)
+            {
+                resultList.AddRange(snList.Select(m => new SfcBatchDto()
+                {
+                    Sfc = m.Sfc,
                     Batch = m.Batch
                 }));
             }
