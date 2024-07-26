@@ -46,7 +46,7 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// <summary>
         /// 物料条码
         /// </summary>
-        public string MaterialBarCode { set; get; }
+        public string MaterialBarCode { set; get; } = "";
 
         /// <summary>
         /// 数量
@@ -56,7 +56,7 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// <summary>
         /// 供应商编码
         /// </summary>
-        public string SupplierCode { get; set; }
+        public string SupplierCode { get; set; } = "";
 
         /// <summary>
         /// 物料的有效期（过期时间)
@@ -66,16 +66,16 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// <summary>
         /// 物料版本
         /// </summary>
-        public string Version { get; set; }
+        public string Version { get; set; } = "";
 
         /// <summary>
         /// 物料编码
         /// </summary>
-        public string MaterialCode { get; set; }
+        public string MaterialCode { get; set; } = "";
 
         /// <summary>
         /// 物料批次
         /// </summary>
-        public string Batch { get; set; }
+        public string Batch { get; set; } = "";
     }
 }

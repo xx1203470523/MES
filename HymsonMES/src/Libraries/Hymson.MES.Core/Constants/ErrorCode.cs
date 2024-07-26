@@ -989,6 +989,7 @@
         public const string MES15163 = "领料单【{ReqOrderCode}】收料中存在物料编码【{MaterialCodes}】在系统不存在！";
         public const string MES15164 = "领料单【{ReqOrderCode}】收料在系统中没有物料明细！";
         public const string MES15165 = "领料单【{ReqOrderCode}】收料中存在物料编码【{MaterialCodes}】在系统领料单明细中不存在！";
+        public const string MES15166 = "领料单【{ReqOrderCode}】收料中存在物料条码【{BarCodes}】在系统中已存在！";
         #endregion
 
         #region 物料台账 15200
