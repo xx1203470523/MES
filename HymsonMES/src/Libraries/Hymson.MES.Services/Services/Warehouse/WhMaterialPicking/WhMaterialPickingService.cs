@@ -146,7 +146,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                 Type = BillBusinessTypeEnum.WorkOrderMaterialRequestForm,
                 IsAutoExecute = param.Type == ManuRequistionTypeEnum.WorkOrderReplenishment,
                 CreatedBy = _currentUser.UserName,
-                WarehouseCode = _options.Value.Delivery.WarehouseCode,
+                WarehouseCode = param.Type == ManuRequistionTypeEnum.WorkOrderReplenishment ? _options.Value.Delivery.VirtuallyWarehouseCode : _options.Value.Delivery.RawWarehouseCode,
                 SyncCode = requistionOrderCode,
             };
 
@@ -184,8 +184,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             {
                 await _manuRequistionOrderRepository.InsertAsync(manuRequistionOrderEntity);
                 await _manuRequistionOrderDetailRepository.InsertsAsync(manuRequistionOrderDetailEntities);
-           
-                var response = await  _wmsRequest.WarehousingDeliveryRequestAsync(deliveryDto);
+
+                var response = await _wmsRequest.WarehousingDeliveryRequestAsync(deliveryDto);
                 if (response.Code != 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15152)).WithData("System", "WMS").WithData("Msg", response.Message);
