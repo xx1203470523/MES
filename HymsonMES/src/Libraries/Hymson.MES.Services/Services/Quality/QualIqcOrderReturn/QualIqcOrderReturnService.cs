@@ -26,6 +26,7 @@ using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests.WMS;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -33,6 +34,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -115,6 +117,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
+
+        private readonly IOptions<WMSOptions> _options;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -144,7 +149,8 @@ namespace Hymson.MES.Services.Services.Quality
             IIQCOrderCreateService iqcOrderCreateService,
             IWMSApiClient wmsApiClient,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            ISysConfigRepository sysConfigRepository)
+            ISysConfigRepository sysConfigRepository,
+            IOptions<WMSOptions> options)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -161,6 +167,7 @@ namespace Hymson.MES.Services.Services.Quality
             _wmsApiClient = wmsApiClient;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _sysConfigRepository = sysConfigRepository;
+            _options= options;
         }
 
 

@@ -77,6 +77,20 @@
         /// </summary>
         public string Route { get; set; } = "";
 
+        /// <summary>
+        /// 原材料仓库
+        /// </summary>
+        public string RawWarehouseCode { get; set; }
+
+        /// <summary>
+        /// 虚拟仓库
+        /// </summary>
+        public string VirtuallyWarehouseCode { get; set; }
+
+        /// <summary>
+        /// 待检线边仓
+        /// </summary>
+        public string PendInspection { get; set; }
     }
 
 }

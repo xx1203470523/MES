@@ -263,7 +263,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                     //查询到物料信息
                     var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialInventoryEntities.Select(x => x.MaterialId));
 
-                    foreach (var detailItem in param.Details)
+                    foreach (var detailItem in manuReturnOrderDetails)//没有唯一码情况
                     {
                         var manuReturnOrderDetailEntity = manuReturnOrderDetails.FirstOrDefault(x => x.MaterialBarCode == detailItem.MaterialBarCode);
 
