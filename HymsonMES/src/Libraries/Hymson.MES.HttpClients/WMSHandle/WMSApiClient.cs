@@ -53,8 +53,10 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<bool> IQCReceiptCallBackAsync(IQCReceiptResultDto dto)
+        public async Task<BaseResponse> IQCReceiptCallBackAsync(IQCReceiptResultDto dto)
         {
+            var responseDto = new BaseResponse { Code = -1, Message = "未知的错误" };
+
             _logger.LogDebug($"IQCReceiptCallBackAsync -> Request: {dto.ToSerialize()}");
 
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReceiptRoute, dto);
@@ -65,11 +67,15 @@ namespace Hymson.MES.HttpClients
 
             if (httpResponse.IsSuccessStatusCode)
             {
-                var result = jsonResponse.ToDeserialize<ResultDto>();
-                return result?.Code == 0;
+                var result = jsonResponse.ToDeserialize<BaseResponse>();
+                if (result != null)
+                {
+                    responseDto.Code = result.Code;
+                    responseDto.Message = result.Message;
+                }
             }
 
-            return false;
+            return responseDto;
         }
 
         /// <summary>
@@ -246,6 +252,6 @@ namespace Hymson.MES.HttpClients
             //}
         }
 
-       
+
     }
 }

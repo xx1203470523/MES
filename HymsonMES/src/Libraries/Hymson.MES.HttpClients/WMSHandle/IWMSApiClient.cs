@@ -14,7 +14,7 @@ namespace Hymson.MES.HttpClients
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<bool> IQCReceiptCallBackAsync(IQCReceiptResultDto request);
+        Task<BaseResponse> IQCReceiptCallBackAsync(IQCReceiptResultDto request);
 
         /// <summary>
         /// 回调（退料IQC）
