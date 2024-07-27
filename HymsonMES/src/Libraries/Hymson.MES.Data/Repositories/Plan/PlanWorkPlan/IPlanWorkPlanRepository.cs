@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkPlan.View;
 using Hymson.MES.Data.Repositories.Plan.Query;
 
 namespace Hymson.MES.Data.Repositories.Plan
@@ -65,6 +66,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<PlanWorkPlanEntity>> GetEntitiesAsync(PlanWorkPlanQuery query);
+
+        /// <summary>
+        /// 获取ERP产品ID
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PlanWorkPorductView> GetProductAsync(PlanWorkPlanQuery query);
 
     }
 }
