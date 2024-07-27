@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkPlan.View;
 using Hymson.MES.Data.Repositories.Plan.Query;
 using Microsoft.Extensions.Options;
 
@@ -164,6 +165,16 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.QueryAsync<PlanWorkPlanEntity>(template.RawSql, template.Parameters);
         }
 
+        /// <summary>
+        /// 获取产品ID
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkPorductView> GetProductAsync(PlanWorkPlanQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkPorductView>(GetProductSql, query);
+        }
     }
 
 
@@ -185,5 +196,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByIdSql = "SELECT * FROM plan_work_plan WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM plan_work_plan WHERE Id IN @ids ";
 
+        const string GetProductSql = $@"
+            select t1.* ,t2.Id as ErpProductId
+            from plan_work_plan t1
+            inner join plan_work_plan_product t2 on t1.Id  = t2.WorkPlanId and t2.IsDeleted = 0
+            where t1.IsDeleted  = 0
+            and t1.WorkPlanCode  = @WorkPlanCode
+        ";
     }
 }

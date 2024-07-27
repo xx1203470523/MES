@@ -21,6 +21,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
@@ -1464,6 +1465,18 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SiteId = _currentSite.SiteId ?? 0,
                 WorkOrderId = planWorkOrderEntity.Id
             });
+            //工单ERP订单信息
+            List<string> orderItem = request.WorkCode.Split('-').ToList();
+            string erpOrder = orderItem[0] + "-" + orderItem[1];
+            PlanWorkPlanQuery planQuery = new PlanWorkPlanQuery();
+            planQuery.WorkPlanCode = erpOrder;
+            var erpInfo = await _planWorkPlanRepository.GetProductAsync(planQuery);
+            if(erpInfo == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17756))
+                    .WithData("orderCode", erpOrder);
+            }
+
             if (request.Items.Any())
             {
 
@@ -1502,6 +1515,8 @@ namespace Hymson.MES.Services.Services.Warehouse
 
                 HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
                 {
+                    ProductionOrderNumber = erpOrder,
+                    ProductionOrderDetailID = erpInfo.ErpProductId,
                     BoxCode = item.BoxCode,
                     LotCode = item.Batch,
                     MaterialCode = request.MaterialCode,
@@ -1542,6 +1557,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17755)).WithData("msg", string.Join(",", whCodeList));
             }
+            //特殊处理。。。
             string whName = whCodeList[0];
             string whCode = string.Empty;
             if(whName == "成品仓" || whName == "待检验仓") //不是不良品仓
