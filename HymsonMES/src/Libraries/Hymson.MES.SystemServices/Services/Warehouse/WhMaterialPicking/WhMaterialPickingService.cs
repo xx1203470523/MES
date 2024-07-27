@@ -2,7 +2,6 @@
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
@@ -16,23 +15,17 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
-using Hymson.MES.Data.Repositories.Manufacture.ManuReturnOrder.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuReturnOrderDetail.Command;
-using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Data.Repositories.WhWareHouse;
 using Hymson.MES.SystemServices.Dtos.Warehouse;
-using Hymson.MES.SystemServices.Services.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using System.Linq;
 
 namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
 {
@@ -148,65 +141,64 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 
-            var siteId = long.Parse(configEntities.FirstOrDefault()?.Value ?? "0"); //30654441397841920;//
+            var siteId = long.Parse(configEntities.FirstOrDefault()?.Value ?? "0");
             var userName = param.OperateBy;
 
-            //1. 当前领料单状态
-            ManuRequistionOrderQuery reqQuery = new ManuRequistionOrderQuery();
-            reqQuery.SiteId = siteId;
-            reqQuery.ReqOrderCode = param.RequistionOrderCode;
-            var reqOrder = await _manuRequistionOrderRepository.GetByCodeAsync(reqQuery);
-            if (reqOrder == null)
+            // 1. 当前领料单状态
+            var reqOrder = await _manuRequistionOrderRepository.GetByCodeAsync(new ManuRequistionOrderQuery
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15160)).WithData("ReqOrderCode", param.RequistionOrderCode);
-            }
+                SiteId = siteId,
+                ReqOrderCode = param.RequistionOrderCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15160)).WithData("ReqOrderCode", param.RequistionOrderCode);
+
+            // 发料单状态校验（收料状态已完成，不能领料）
             if (reqOrder.Status == WhMaterialPickingStatusEnum.Completed)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15161)).WithData("ReqOrderCode", param.RequistionOrderCode);
             }
 
-            //2. 校验物料明细
-            if (param.Details == null || param.Details.Count() == 0)
+            // 2. 校验物料明细
+            if (param.Details == null || !param.Details.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15162)).WithData("ReqOrderCode", param.RequistionOrderCode);
             }
 
-            //2.1 查询物料是否在系统中存在
-            List<string> materialCodeList = param.Details.Select(m => m.MaterialCode).Distinct().ToList();
+            // 2.1 查询物料是否在系统中存在
+            var materialCodeList = param.Details.Select(m => m.MaterialCode).Distinct();
             var matQuery = new ProcMaterialsByCodeQuery
             {
                 SiteId = siteId,
                 MaterialCodes = materialCodeList
             };
             var materialList = await _procMaterialRepository.GetByCodesAsync(matQuery);
-            if (materialList == null || materialList.Count() != materialCodeList.Count)
+            if (materialList == null || materialList.Count() != materialCodeList.Count())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15163))
                     .WithData("ReqOrderCode", param.RequistionOrderCode)
                     .WithData("MaterialCodes", materialCodeList);
             }
 
-            //2.2 查询供应商ID
-            List<string> supCodeList = param.Details.Where(m => string.IsNullOrEmpty(m.SupplierCode))
-                .Select(m => m.SupplierCode).Distinct().ToList();
-            var supQuery = new WhSuppliersByCodeQuery
+            // 2.2 查询供应商ID
+            var supplierCodes = param.Details.Where(w => !string.IsNullOrWhiteSpace(w.SupplierCode)).Select(s => s.SupplierCode ?? "");
+            var supplierEntities = await _whSupplierRepository.GetByCodesAsync(new WhSuppliersByCodeQuery
             {
                 SiteId = siteId,
-                Codes = supCodeList
-            };
-            var supList = await _whSupplierRepository.GetByCodesAsync(supQuery);
+                Codes = supplierCodes
+            });
 
-            //3. 校验领料单和物料明细是否已经存在系统中
-            ManuRequistionOrderDetailQuery orderDetailQuery = new ManuRequistionOrderDetailQuery();
-            orderDetailQuery.SiteId = siteId;
-            orderDetailQuery.RequistionOrderIds = new long[] { reqOrder.Id };
+            // 3. 校验领料单和物料明细是否已经存在系统中
+            var orderDetailQuery = new ManuRequistionOrderDetailQuery
+            {
+                SiteId = siteId,
+                RequistionOrderIds = new long[] { reqOrder.Id }
+            };
             var orderDetailList = await _manuRequistionOrderDetailRepository.GetManuRequistionOrderDetailEntitiesAsync(orderDetailQuery);
-            if (orderDetailList == null || orderDetailList.Count() == 0)
+            if (orderDetailList == null || !orderDetailList.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15164)).WithData("ReqOrderCode", param.RequistionOrderCode);
             }
 
-            //验证条码是否在系统中已经存在，存在报错
+            // 验证条码是否在系统中已经存在，存在报错
             var barCodes = param.Details.Where(x => !string.IsNullOrWhiteSpace(x.MaterialBarCode)).Select(x => x.MaterialBarCode);
             if (barCodes != null && barCodes.Any())
             {
@@ -220,16 +212,16 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 {
                     var existsBarCodes = whMaterialInventories.Select(x => x.MaterialBarCode);
                     throw new CustomerValidationException(nameof(ErrorCode.MES15166))
-                     .WithData("ReqOrderCode", param.RequistionOrderCode)
-                     .WithData("BarCodes", string.Join(",", existsBarCodes));
+                        .WithData("ReqOrderCode", param.RequistionOrderCode)
+                        .WithData("BarCodes", string.Join(",", existsBarCodes));
                 }
             }
 
             //3.1 校验传输过来的物料是否都在领料单物料明细中
             foreach (var item in param.Details)
             {
-                long curMatId = materialList.FirstOrDefault(m => m.MaterialCode == item.MaterialCode&&m.Version==item.Version)!.Id;
-                List<long> orderDetailIdList = orderDetailList.Select(m => m.MaterialId).Distinct().ToList();
+                long curMatId = materialList.FirstOrDefault(m => m.MaterialCode == item.MaterialCode)?.Id ?? 0;
+                var orderDetailIdList = orderDetailList.Select(m => m.MaterialId).Distinct();
                 if (orderDetailIdList.Contains(curMatId) == false)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15165))
@@ -254,23 +246,23 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             reqOrder.UpdatedOn = createOn;
             //4.2 新增领料单接收明细，台账明细，库存表
             //manu_requistion_order_receive
-            List<ManuRequistionOrderReceiveEntity> receiveList = new List<ManuRequistionOrderReceiveEntity>();
-            List<WhMaterialStandingbookEntity> bookList = new List<WhMaterialStandingbookEntity>();
-            List<WhMaterialInventoryEntity> whList = new List<WhMaterialInventoryEntity>();
+            List<ManuRequistionOrderReceiveEntity> receiveList = new();
+            List<WhMaterialStandingbookEntity> bookList = new();
+            List<WhMaterialInventoryEntity> whList = new();
             foreach (var item in param.Details)
             {
-                var curMatModel = materialList.FirstOrDefault(m => m.MaterialCode == item.MaterialCode&&m.Version==item.Version);
-                if(string.IsNullOrWhiteSpace(item.MaterialBarCode)&&curMatModel != null)
+                var curMatModel = materialList.FirstOrDefault(m => m.MaterialCode == item.MaterialCode && m.Version == item.Version);
+                if (string.IsNullOrWhiteSpace(item.MaterialBarCode) && curMatModel != null)
                 {
                     item.MaterialBarCode = await GenerateOrderCodeAsync(curMatModel.Id, curMatModel.MaterialCode, siteId, userName);
-                }       
+                }
 
                 long curMatId = curMatModel?.Id ?? 0;
-                var curSupModel = supList.FirstOrDefault(m => m.Code == item.SupplierCode);
+                var curSupModel = supplierEntities.FirstOrDefault(m => m.Code == item.SupplierCode);
                 long curSupId = curSupModel == null ? 0 : curSupModel.Id;
 
-                //接收明细
-                ManuRequistionOrderReceiveEntity model = new ManuRequistionOrderReceiveEntity
+                // 接收明细
+                var model = new ManuRequistionOrderReceiveEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     RequistionOrderId = reqOrder.Id,
@@ -289,8 +281,8 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 };
                 receiveList.Add(model);
 
-                //台账明细
-                WhMaterialStandingbookEntity bookModel = new WhMaterialStandingbookEntity
+                // 台账明细
+                var bookModel = new WhMaterialStandingbookEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     MaterialCode = curMatModel?.MaterialCode ?? "",
@@ -312,7 +304,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 };
                 bookList.Add(bookModel);
 
-                //库存明细
+                // 库存明细
                 WhMaterialInventoryEntity whModel = new WhMaterialInventoryEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -349,15 +341,13 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 }
             }
 
-            using (var trans = TransactionHelper.GetTransactionScope())
-            {
-                await _whMaterialInventoryRepository.InsertsAsync(whList);
-                await _whMaterialStandingbookRepository.InsertsAsync(bookList);
-                await _manuRequistionOrderReceiveRepository.InsertRangeAsync(receiveList);
-                await _manuRequistionOrderRepository.UpdateAsync(reqOrder);
-                await _manuRequistionOrderDetailRepository.UpdatesAsync(updateOrderDetailList);
-                trans.Complete();
-            }
+            using var trans = TransactionHelper.GetTransactionScope();
+            await _whMaterialInventoryRepository.InsertsAsync(whList);
+            await _whMaterialStandingbookRepository.InsertsAsync(bookList);
+            await _manuRequistionOrderReceiveRepository.InsertRangeAsync(receiveList);
+            await _manuRequistionOrderRepository.UpdateAsync(reqOrder);
+            await _manuRequistionOrderDetailRepository.UpdatesAsync(updateOrderDetailList);
+            trans.Complete();
 
             #region 
             //2. 插入明细   manu_requistion_order_detail
@@ -601,7 +591,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
         /// <param name="siteId"></param>
         /// <param name="userName"></param>
         /// <returns></returns>
-        private async Task<string> GenerateOrderCodeAsync(long productId,string materialCode,long siteId, string userName)
+        private async Task<string> GenerateOrderCodeAsync(long productId, string materialCode, long siteId, string userName)
         {
             var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(new InteCodeRulesByProductQuery
             {

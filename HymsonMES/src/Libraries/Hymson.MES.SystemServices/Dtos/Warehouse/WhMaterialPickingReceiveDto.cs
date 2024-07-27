@@ -1,21 +1,16 @@
 ﻿using Hymson.MES.Core.Enums.Warehouse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.SystemServices.Dtos.Warehouse
 {
     /// <summary>
     /// 领料单收料实体
     /// </summary>
-    public  class WhMaterialPickingReceiveDto
-    { 
+    public class WhMaterialPickingReceiveDto
+    {
         /// <summary>
         /// 领料单号
         /// </summary>
-        public string RequistionOrderCode { set; get; }
+        public string RequistionOrderCode { set; get; } = "";
 
         /// <summary>
         /// 领料单结果
@@ -35,7 +30,8 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// <summary>
         /// 操作人
         /// </summary>
-        public string OperateBy { set; get; }
+        public string OperateBy { set; get; } = "";
+
     }
 
     /// <summary>
@@ -56,7 +52,7 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// <summary>
         /// 供应商编码
         /// </summary>
-        public string SupplierCode { get; set; } = "";
+        public string? SupplierCode { get; set; } = "";
 
         /// <summary>
         /// 物料的有效期（过期时间)
@@ -77,5 +73,7 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// 物料批次
         /// </summary>
         public string Batch { get; set; } = "";
+
     }
+
 }

@@ -5,11 +5,8 @@ using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MySqlX.XDevAPI.Common;
-using Polly.Caching;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text.Json.Serialization;
 
 namespace Hymson.MES.HttpClients
 {
@@ -67,7 +64,7 @@ namespace Hymson.MES.HttpClients
 
             if (httpResponse.IsSuccessStatusCode)
             {
-                var result = jsonResponse.ToDeserialize<BaseResponse>();
+                var result = jsonResponse.ToDeserialize<BaseResponse>(); 
                 if (result != null)
                 {
                     responseDto.Code = result.Code;
