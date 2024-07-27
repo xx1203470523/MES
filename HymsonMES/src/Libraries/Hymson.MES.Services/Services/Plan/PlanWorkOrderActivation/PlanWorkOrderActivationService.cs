@@ -31,6 +31,8 @@ using System.Transactions;
 using Hymson.MES.HttpClients.RotorHandle;
 using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.Data.Repositories.Common;
+using Newtonsoft.Json;
+using Hymson.MES.Core.Domain.Mavel.Rotor;
 
 namespace Hymson.MES.Services.Services.Plan;
 
@@ -328,7 +330,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         if (line.IsMixLine!.Value)
         {
             //混线
-            await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto);
+            await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto, line.Code);
         }
         else
         {
@@ -341,7 +343,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
                 throw new CustomerValidationException(nameof(ErrorCode.MES16409)).WithData("orderCode", activationWorkOrder.OrderCode);
             }
 
-            await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto);
+            await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto, line.Code);
         }
     }
 
@@ -384,12 +386,39 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
     }
 
     /// <summary>
+    /// 获取转子线线体编码
+    /// </summary>
+    /// <returns></returns>
+    private async Task<string> GetLmsRotorLineCode()
+    {
+        //基础数据配置
+        SysConfigQuery configQuery = new SysConfigQuery();
+        configQuery.Type = SysConfigEnum.NioBaseConfig;
+        configQuery.Codes = new List<string>() { "NioRotorConfig" };
+        var baseConfigList = await _sysConfigRepository.GetEntitiesAsync(configQuery);
+        if (baseConfigList == null || !baseConfigList.Any())
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", "NioRotorConfig");
+        }
+
+        string configValue = baseConfigList.ElementAt(0).Value;
+        var curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(configValue);
+        if (curConfig == null)
+        {
+            return "";
+        }
+        return curConfig.ProductionLineId;
+    }
+
+    /// <summary>
     /// 激活工单
     /// </summary>
     /// <param name="workOrder"></param>
     /// <param name="activationWorkOrderDto"></param>
+    /// <param name="lineCode"></param>
     /// <returns></returns>
-    private async Task DoActivationWorkOrderAsync(PlanWorkOrderEntity workOrder, ActivationWorkOrderDto activationWorkOrderDto)
+    private async Task DoActivationWorkOrderAsync(PlanWorkOrderEntity workOrder, ActivationWorkOrderDto activationWorkOrderDto,
+        string lineCode = "")
     {
         if (workOrder.Status == PlanWorkOrderStatusEnum.Pending)
         {
@@ -492,13 +521,17 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
             bool orderSwitch = await GetOrderSynSwtich();
             if (orderSwitch == true)
             {
-                PlanWorkOrderMavelView order = await _planWorkOrderRepository.GetByIdMavelAsync(activationWorkOrderDto.Id);
-                RotorWorkOrderRequest lmsOrder = LmsOrderChange(order);
-                var lmsResult = await _rotorApiClient.WorkOrderAsync(lmsOrder);
-                if (lmsResult.IsSuccess == false)
+                string rotorLineCode = await GetLmsRotorLineCode();
+                if(rotorLineCode == lineCode)
                 {
-                    ts.Dispose();
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16418)).WithData("msg", lmsResult.Message);
+                    PlanWorkOrderMavelView order = await _planWorkOrderRepository.GetByIdMavelAsync(activationWorkOrderDto.Id);
+                    RotorWorkOrderRequest lmsOrder = LmsOrderChange(order);
+                    var lmsResult = await _rotorApiClient.WorkOrderAsync(lmsOrder);
+                    if (lmsResult.IsSuccess == false)
+                    {
+                        ts.Dispose();
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16418)).WithData("msg", lmsResult.Message);
+                    }
                 }
             }
 
