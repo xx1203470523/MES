@@ -870,7 +870,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 将结果推送给WMS
-            await _wmsApiClient.IQCReceiptCallBackAsync(new IQCReceiptResultDto
+            var response = await _wmsApiClient.IQCReceiptCallBackAsync(new IQCReceiptResultDto
             {
                 ReceiptNum = receiptEntity.ReceiptNum,
                 SupplierCode = supplierEntity?.Code ?? "",
@@ -878,6 +878,8 @@ namespace Hymson.MES.Services.Services.Quality
                 SyncId = receiptEntity.SyncId,
                 Details = details
             });
+
+            if (response.Code != 0) throw new CustomerValidationException(nameof(ErrorCode.MES15500)).WithData("Message", response.Message);
         }
 
         /// <summary>

@@ -1118,6 +1118,7 @@
         #endregion
 
         #region 物料加载 15500
+        public const string MES15500 = "{Message}";
         public const string MES15501 = "当前线体无激活工单，请先激活工单！";
         public const string MES15502 = "条码{Code}已被使用！";
         public const string MES15503 = "条码{Code}不存在！";
@@ -1248,7 +1249,7 @@
         public const string MES16049 = "领料单申请失败,错误原因：【{msg}】。";
         public const string MES16050 = "领料单未找到,发送的请求标识为：【{orderId}】。";
         public const string MES16051 = "退料单申请失败,错误原因：【{msg}】。";
-       
+
         public const string MES16052 = "指定生产计划未找到,工单编码为：【{WorkOrder}】。";
         public const string MES16053 = "生产工单编码出现重复，请检查！";
         public const string MES16054 = "子工单总数量已超过生产计划计划数量，请检查！";
