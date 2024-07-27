@@ -249,16 +249,16 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             List<ManuRequistionOrderReceiveEntity> receiveList = new();
             List<WhMaterialStandingbookEntity> bookList = new();
             List<WhMaterialInventoryEntity> whList = new();
-            foreach (var item in param.Details)
+            foreach (var detailDto in param.Details)
             {
-                var curMatModel = materialList.FirstOrDefault(m => m.MaterialCode == item.MaterialCode && m.Version == item.Version);
-                if (string.IsNullOrWhiteSpace(item.MaterialBarCode) && curMatModel != null)
+                var curMatModel = materialList.FirstOrDefault(m => m.MaterialCode == detailDto.MaterialCode);
+                if (string.IsNullOrWhiteSpace(detailDto.MaterialBarCode) && curMatModel != null)
                 {
-                    item.MaterialBarCode = await GenerateOrderCodeAsync(curMatModel.Id, curMatModel.MaterialCode, siteId, userName);
+                    detailDto.MaterialBarCode = await GenerateOrderCodeAsync(curMatModel.Id, curMatModel.MaterialCode, siteId, userName);
                 }
 
                 long curMatId = curMatModel?.Id ?? 0;
-                var curSupModel = supplierEntities.FirstOrDefault(m => m.Code == item.SupplierCode);
+                var curSupModel = supplierEntities.FirstOrDefault(m => m.Code == detailDto.SupplierCode);
                 long curSupId = curSupModel == null ? 0 : curSupModel.Id;
 
                 // 接收明细
@@ -267,8 +267,8 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                     Id = IdGenProvider.Instance.CreateId(),
                     RequistionOrderId = reqOrder.Id,
                     MaterialId = curMatId,
-                    MaterialBarCode = item.MaterialBarCode,
-                    Qty = item.Qty,
+                    MaterialBarCode = detailDto.MaterialBarCode,
+                    Qty = detailDto.Qty,
                     WarehouseId = 0,
                     Remark = param.Remark ?? "",
                     SiteId = siteId,
@@ -277,7 +277,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                     CreatedOn = createOn,
                     UpdatedOn = createOn,
                     SupplierId = curSupId,
-                    Batch = item.Batch ?? ""
+                    Batch = detailDto.Batch ?? ""
                 };
                 receiveList.Add(model);
 
@@ -288,9 +288,9 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                     MaterialCode = curMatModel?.MaterialCode ?? "",
                     MaterialName = curMatModel?.MaterialName ?? "",
                     MaterialVersion = curMatModel?.Version ?? "",
-                    MaterialBarCode = item.MaterialBarCode,
+                    MaterialBarCode = detailDto.MaterialBarCode,
                     Unit = curMatModel?.Unit ?? "",
-                    Quantity = item.Qty,
+                    Quantity = detailDto.Qty,
                     Remark = param.Remark,
                     Type = WhMaterialInventoryTypeEnum.MaterialReceiving,
                     Source = MaterialInventorySourceEnum.WMS,
@@ -300,7 +300,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                     UpdatedBy = param.OperateBy,
                     CreatedOn = createOn,
                     UpdatedOn = createOn,
-                    Batch = item.Batch ?? ""
+                    Batch = detailDto.Batch ?? ""
                 };
                 bookList.Add(bookModel);
 
@@ -310,14 +310,14 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                     Id = IdGenProvider.Instance.CreateId(),
                     SupplierId = curSupId,
                     MaterialId = curMatId,
-                    MaterialBarCode = item.MaterialBarCode,
-                    QuantityResidue = item.Qty,
-                    ReceivedQty = item.Qty,
+                    MaterialBarCode = detailDto.MaterialBarCode,
+                    QuantityResidue = detailDto.Qty,
+                    ReceivedQty = detailDto.Qty,
                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                     Source = MaterialInventorySourceEnum.WMS,
                     SiteId = siteId,
                     MaterialType = MaterialInventoryMaterialTypeEnum.PurchaseParts,
-                    Batch = item.Batch ?? "",
+                    Batch = detailDto.Batch ?? "",
                     WorkOrderId = reqOrder.WorkOrderId,
                     CreatedBy = param.OperateBy,
                     UpdatedBy = param.OperateBy,

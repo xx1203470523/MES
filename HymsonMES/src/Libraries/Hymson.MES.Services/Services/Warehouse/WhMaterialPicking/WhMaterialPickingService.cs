@@ -100,19 +100,16 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
         /// <returns></returns>
         public async Task<string> PickMaterialsRequestAsync(PickMaterialDto param)
         {
-            //派工单校验
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(param.OrderId);
-            if (planWorkOrderEntity == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15151));
-            }
+            // 派工单校验
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(param.OrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES15151));
 
             if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Finish)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16048)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
             }
 
-            //查询生产计划
+            // 查询生产计划
             var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
 
@@ -168,15 +165,21 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                     UpdatedOn = HymsonClock.Now()
                 });
                 var procMaterialEntity = procMaterialEntities.FirstOrDefault(x => x.Id == item.MaterialId);
-                warehousingDeliveryDetails.Add(new DeliveryDetailDto
+
+                // 2024.07.27 TODO: 临时处理
+                var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId);
+                if (planWorkPlanMaterialEntity != null)
                 {
-                    ProductionOrder = planWorkPlanEntity.WorkPlanCode,
-                    ProductionOrderDetailID = planWorkOrderEntity.WorkPlanProductId,
-                    ProductionOrderComponentID = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId)?.Id,
-                    MaterialCode = procMaterialEntity?.MaterialCode,
-                    UnitCode = procMaterialEntity?.Unit,
-                    Quantity = item.Qty
-                });
+                    warehousingDeliveryDetails.Add(new DeliveryDetailDto
+                    {
+                        ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                        ProductionOrderDetailID = planWorkOrderEntity.WorkPlanProductId,
+                        ProductionOrderComponentID = planWorkPlanMaterialEntity.Id, //planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId)?.Id,
+                        MaterialCode = procMaterialEntity?.MaterialCode,
+                        UnitCode = procMaterialEntity?.Unit,
+                        Quantity = item.Qty
+                    });
+                }
             }
 
             deliveryDto.Details = warehousingDeliveryDetails;

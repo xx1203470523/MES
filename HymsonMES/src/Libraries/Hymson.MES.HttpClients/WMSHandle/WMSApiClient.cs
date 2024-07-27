@@ -54,17 +54,17 @@ namespace Hymson.MES.HttpClients
         {
             var responseDto = new BaseResponse { Code = -1, Message = "未知的错误" };
 
-            _logger.LogDebug($"IQCReceiptCallBackAsync -> Request: {dto.ToSerialize()}");
+            _logger.LogDebug($"来料IQC -> Request: {dto.ToSerialize()}");
 
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReceiptRoute, dto);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
-            _logger.LogDebug($"IQCReceiptCallBackAsync -> Response: {jsonResponse}");
+            _logger.LogDebug($"来料IQC -> Response: {jsonResponse}");
 
             if (httpResponse.IsSuccessStatusCode)
             {
-                var result = jsonResponse.ToDeserialize<BaseResponse>(); 
+                var result = jsonResponse.ToDeserialize<BaseResponse>();
                 if (result != null)
                 {
                     responseDto.Code = result.Code;
@@ -124,6 +124,8 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         public async Task<BaseResponse> WarehousingDeliveryRequestAsync(DeliveryDto request)
         {
+            _logger.LogDebug($"领料出库 -> Request: {request.ToSerialize()}");
+
             DeliveryRequest deliveryRequest = new()
             {
                 Type = request.Type,
@@ -140,8 +142,11 @@ namespace Hymson.MES.HttpClients
             };
 
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.Delivery.Route, deliveryRequest);
-
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"领料出库 -> Response: {jsonResponse}");
+
             return await httpResponse.Content.ReadFromJsonAsync<BaseResponse>();
         }
 
