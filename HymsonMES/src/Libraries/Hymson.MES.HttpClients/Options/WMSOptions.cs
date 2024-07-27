@@ -91,6 +91,16 @@
         /// 待检线边仓
         /// </summary>
         public string PendInspection { get; set; }
+
+        /// <summary>
+        /// 成品仓
+        /// </summary>
+        public string FinishWarehouseCode { get; set; }
+
+        /// <summary>
+        /// 不良品仓
+        /// </summary>
+        public string NgWarehouseCode { get; set; }
     }
 
 }

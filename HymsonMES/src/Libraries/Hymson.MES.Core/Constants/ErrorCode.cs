@@ -2354,6 +2354,7 @@
         public const string MES17752 = "子步骤不存在！";
         public const string MES17753 = "子步骤已被分配给工序，不允许删除！";
         public const string MES17754 = "成品码已提交完工入库 ！";
+        public const string MES17755 = "成品完工入库中存在不同的仓库【{msg}】 ！";
         #endregion
     }
 }

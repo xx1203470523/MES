@@ -14,10 +14,12 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.PackList;
 using Hymson.MES.Data.Repositories.QualFqcInspectionMaval;
+using Hymson.MES.HttpClients.Options;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -49,17 +51,16 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         private readonly IQualFqcInspectionMavalRepository _qualFqcInspectionMavalRepository;
 
+        private readonly IOptions<WMSOptions> _wmsOptions;
+
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="validationSaveRules"></param>
-        /// <param name="manuRotorPackListRepository"></param>
-        /// <param name="sequenceService"></param>
-        /// <param name="qualFqcInspectionMavalRepository"></param>
         public ManuRotorPackListService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuRotorPackListSaveDto> validationSaveRules,
-            IManuRotorPackListRepository manuRotorPackListRepository, ISequenceService sequenceService, IQualFqcInspectionMavalRepository qualFqcInspectionMavalRepository)
+            IManuRotorPackListRepository manuRotorPackListRepository, ISequenceService sequenceService, 
+            IQualFqcInspectionMavalRepository qualFqcInspectionMavalRepository,
+            IOptions<WMSOptions> wmsOptions
+            )
         {
             _sequenceService = sequenceService;
             _currentUser = currentUser;
@@ -67,6 +68,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationSaveRules = validationSaveRules;
             _manuRotorPackListRepository = manuRotorPackListRepository;
             _qualFqcInspectionMavalRepository = qualFqcInspectionMavalRepository;
+            _wmsOptions = wmsOptions;
         }
 
 
@@ -199,18 +201,22 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var InspectionOrder = $"{query.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
                 var qualFqc = qualFqcs.FirstOrDefault(x => x.SFC == item.ProductCode);
                 var type = ProductReceiptQualifiedStatusEnum.ToBeBnspected;
-                var WarehouseCode = "待检验仓";
+                var WarehouseCode = "成品仓";
+                var whCode = _wmsOptions.Value.ProductReceipt.FinishWarehouseCode;
+                type = ProductReceiptQualifiedStatusEnum.Qualified;
                 if (qualFqc != null)
                 {
                     if (qualFqc.JudgmentResults== FqcJudgmentResultsEnum.Unqualified)
                     {
                         WarehouseCode = "不良品仓";
                         type = ProductReceiptQualifiedStatusEnum.Unqualified;
+                        whCode = _wmsOptions.Value.ProductReceipt.NgWarehouseCode;
                     }
                     if (qualFqc.JudgmentResults == FqcJudgmentResultsEnum.Qualified)
                     {
                         WarehouseCode = "成品仓";
                         type = ProductReceiptQualifiedStatusEnum.Qualified;
+                        whCode = _wmsOptions.Value.ProductReceipt.FinishWarehouseCode;
                     }
                 }
                 var manuRotorPackView = new ManuRotorPackViewDto
@@ -222,6 +228,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Qty = 1,
                     WarehouseCode = WarehouseCode,
                     Batch = InspectionOrder,
+                    WhCode = whCode,
                 };
                 manuRotors.Add(manuRotorPackView);
             };

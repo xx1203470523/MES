@@ -26,11 +26,13 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Options;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using Microsoft.Extensions.Options;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -103,6 +105,8 @@ namespace Hymson.MES.Services.Services.Warehouse
 
         private readonly IManuProductReceiptOrderDetailRepository _manuProductReceiptOrderDetailRepository;
 
+        private readonly IOptions<WMSOptions> _wmsOptions;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -170,7 +174,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             IManuBarCodeRelationRepository manuBarCodeRelationRepository,
             IManuProductReceiptOrderRepository manuProductReceiptOrderRepository,
             ICurrentSystem currentSystem,
-            IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository)
+            IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository,
+            IOptions<WMSOptions> wmsOptions)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -205,6 +210,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _manuProductReceiptOrderRepository = manuProductReceiptOrderRepository;
             _currentSystem = currentSystem;
             _manuProductReceiptOrderDetailRepository = manuProductReceiptOrderDetailRepository;
+            _wmsOptions = wmsOptions;
         }
 
 
@@ -1527,9 +1533,29 @@ namespace Hymson.MES.Services.Services.Warehouse
             //    await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
             //    await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
             //    trans.Complete();
-            //}
+            //}0
+            //校验仓库是否是一样的
+            List<string> whCodeList = request.Items
+                .Where(m => string.IsNullOrEmpty(m.WarehouseCode) == false)
+                .Select(m => m.WarehouseCode!).Distinct().ToList();
+            if(whCodeList.Count > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17755)).WithData("msg", string.Join(",", whCodeList));
+            }
+            string whName = whCodeList[0];
+            string whCode = string.Empty;
+            if(whName == "成品仓" || whName == "待检验仓") //不是不良品仓
+            {
+                whCode = _wmsOptions.Value.ProductReceipt.FinishWarehouseCode;
+            }
+            else
+            {
+                whCode = _wmsOptions.Value.ProductReceipt.NgWarehouseCode;
+            }
+
             var response = await _wmsRequest.ProductReceiptRequestAsync(new HttpClients.Requests.ProductReceiptRequestDto
             {
+                WarehouseCode = whCode,
                 SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
                 SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
                 Details = returnMaterialDtos

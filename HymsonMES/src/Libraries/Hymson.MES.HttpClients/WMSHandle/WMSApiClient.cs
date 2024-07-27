@@ -233,7 +233,7 @@ namespace Hymson.MES.HttpClients
                 SyncCode = request.SyncCode,
                 Details = request.Details,
                 Type = _options.Value.ProductReceipt.Type,
-                WarehouseCode = _options.Value.ProductReceipt.WarehouseCode
+                WarehouseCode = request.WarehouseCode //_options.Value.ProductReceipt.WarehouseCode
             };
 
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.ProductReceipt.Route, materialReturnRequest);

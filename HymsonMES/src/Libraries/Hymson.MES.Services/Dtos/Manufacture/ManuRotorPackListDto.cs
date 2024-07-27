@@ -155,6 +155,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 仓库
         /// </summary>
         public string WarehouseCode { get; set; }
+
+        /// <summary>
+        /// 仓库编码
+        /// </summary>
+        public string WhCode { get; set; }
     }
 
     /// <summary>

@@ -209,6 +209,8 @@ namespace Hymson.MES.HttpClients.Requests
 
         public string SendOn { get; set; }
 
+        public string WarehouseCode { get; set; }
+
         public List<ProductReceiptItemDto> Details { get; set; }
     }
     /// <summary>
