@@ -1,9 +1,4 @@
 ﻿using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.HttpClients.Requests.XnebulaWMS
 {
@@ -127,8 +122,17 @@ namespace Hymson.MES.HttpClients.Requests.XnebulaWMS
         /// 数量
         /// </summary>
         public decimal Quantity { get; set; }
+
+        /// <summary>
+        /// 批次号（领料时，WMS传过来的值，要求MES必须返回）
+        /// </summary>
+        public string Batch { get; set; } = "";
+
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public record WarehousingEntryDto
     {
         /// <summary>

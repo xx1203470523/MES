@@ -30,15 +30,16 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         }
 
         /// <summary>
-        /// 物料退料
+        /// 提交物料退料申请
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [LogDescription("物料退料", BusinessType.INSERT)]
+        [LogDescription("提交物料退料申请", BusinessType.INSERT)]
         public async Task MaterialReturnAsync([FromBody] MaterialReturnDto parm)
         {
             await _whMaterialReturnService.MaterialReturnAsync(parm);
         }
+
     }
 }

@@ -36,8 +36,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("materialReturnConfirm")]
+        [HttpPost("materialReturnConfirm")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("生产退料确认", BusinessType.INSERT)]
         public async Task WhMaterialReturnConfirmAsync([FromBody] WhMaterialReturnConfirmDto param)
@@ -50,8 +49,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("materialPickingReceive")]
+        [HttpPost("materialPickingReceive")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         [LogDescription("领料单物料接收", BusinessType.INSERT)]
         public async Task MaterialPickingReceiveAsync([FromBody] WhMaterialPickingReceiveDto param)

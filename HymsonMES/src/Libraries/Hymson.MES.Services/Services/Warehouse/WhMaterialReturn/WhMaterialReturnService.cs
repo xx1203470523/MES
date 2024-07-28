@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Core.Enums.Warehouse;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Quality;
@@ -150,24 +151,32 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             _planWorkOrderRepository = planWorkOrderRepository;
         }
 
+
         /// <summary>
         /// 物料退料
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task MaterialReturnAsync(MaterialReturnDto param)
+        public async Task MaterialReturnAsync(MaterialReturnDto requestDto)
         {
-            var whWarehouseEntity = await _whWarehouseRepository.GetOneAsync(new Data.Repositories.WhWareHouse.Query.WhWarehouseQuery
+            // 初始化
+            var baseBo = new BaseBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
+                User = _currentUser.UserName,
+                Time = HymsonClock.Now()
+            };
+
+            var whWarehouseEntity = await _whWarehouseRepository.GetOneAsync(new Data.Repositories.WhWareHouse.Query.WhWarehouseQuery
+            {
+                SiteId = baseBo.SiteId,
                 Code = _options.Value.Receipt.WarehouseCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15142)).WithData("Code", _options.Value.Receipt.WarehouseCode);
 
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(param.WorkOrderId);
             var materialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
-                BarCodes = param.MaterialBarCodes
+                SiteId = baseBo.SiteId,
+                BarCodes = requestDto.MaterialBarCodes
             });
 
             if (materialInventoryEntities == null || !materialInventoryEntities.Any())
@@ -177,10 +186,11 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
 
             // 查询到物料信息
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialInventoryEntities.Select(x => x.MaterialId));
-            var whMaterialStandingbookEntities = new List<WhMaterialStandingbookEntity>();
-            var updateAndCheckStatusByIdCommands = new List<UpdateAndCheckStatusByIdCommand>();
+            List<WhMaterialStandingbookEntity> whMaterialStandingbookEntities = new();
+            List<UpdateAndCheckStatusByIdCommand> updateAndCheckStatusByIdCommands = new();
 
-            var manuReturnOrderDetailEntities = new List<ManuReturnOrderDetailEntity>();
+            // 退料单明细
+            List<ManuReturnOrderDetailEntity> manuReturnOrderDetailEntities = new();
 
             // 检验单
             QualIqcOrderReturnEntity qualIqcOrderReturnEntity = new();
@@ -190,66 +200,66 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             var warehousingEntryDto = new WarehousingEntryDto()
             {
                 Type = BillBusinessTypeEnum.WorkOrderMaterialReturnForm,
-                IsAutoExecute = param.Type == ManuReturnTypeEnum.WorkOrderBorrow,
-                CreatedBy = _currentUser.UserName,
+                IsAutoExecute = requestDto.Type == ManuReturnTypeEnum.WorkOrderBorrow,
+                CreatedBy = baseBo.User,
                 WarehouseCode = _options.Value.Receipt.VirtuallyWarehouseCode,
-                Remark = param.Remark,
+                Remark = requestDto.Remark,
             };
 
             var warehousingEntryDetails = new List<ReceiptDetailDto>();
+            var returnOrderCode = await GenerateMaintenanceOrderCodeAsync(baseBo.SiteId, baseBo.User);
 
-            var returnOrderCode = await GenerateMaintenanceOrderCodeAsync(_currentSite.SiteId ?? 0, _currentUser.UserName);
-
-            //创建领料申请单
-            ManuReturnOrderEntity manuReturnOrderEntity = new ManuReturnOrderEntity
+            // 创建领料申请单
+            var manuReturnOrderEntity = new ManuReturnOrderEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = baseBo.SiteId,
                 ReturnOrderCode = returnOrderCode,
-                WorkOrderId = param.WorkOrderId,
+                WorkOrderId = requestDto.WorkOrderId,
                 Status = WhWarehouseMaterialReturnStatusEnum.PendingStorage,
                 ReceiveWarehouseId = whWarehouseEntity.Id,
-                Type = param.Type,
-                Remark = param.Remark,
-                CreatedBy = _currentUser.UserName,
-                UpdatedBy = _currentUser.UserName,
-                CreatedOn = HymsonClock.Now(),
-                UpdatedOn = HymsonClock.Now()
+                Type = requestDto.Type,
+                Remark = requestDto.Remark,
+                CreatedBy = baseBo.User,
+                UpdatedBy = baseBo.User,
+                CreatedOn = baseBo.Time,
+                UpdatedOn = baseBo.Time
             };
 
-            if (param.Type == ManuReturnTypeEnum.WorkOrderReturn)
+            // 实物退料
+            if (requestDto.Type == ManuReturnTypeEnum.WorkOrderReturn)
             {
                 // 生成检验单号
                 var inspectionOrder = await _iqcOrderCreateService.GenerateCommonIQCOrderCodeAsync(new CoreServices.Bos.Common.BaseBo
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
-                    User = _currentUser.UserName,
+                    SiteId = baseBo.SiteId,
+                    User = baseBo.User,
                 });
 
                 qualIqcOrderReturnEntity = new QualIqcOrderReturnEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = baseBo.SiteId,
                     InspectionOrder = inspectionOrder,
                     ReturnOrderId = manuReturnOrderEntity.Id,
                     WorkOrderId = materialInventoryEntities.FirstOrDefault()?.WorkOrderId,
                     Status = IQCLiteStatusEnum.WaitInspect,
                     IsQualified = null,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedOn = HymsonClock.Now()
+                    CreatedBy = baseBo.User,
+                    UpdatedBy = baseBo.User,
+                    CreatedOn = baseBo.Time,
+                    UpdatedOn = baseBo.Time
                 };
             }
 
-            foreach (var materialBarCode in param.MaterialBarCodes)
-            {
-                var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == materialBarCode);
+            // 查询工单信息
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.WorkOrderId);
 
-                if (whMaterialInventoryEntity == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", materialBarCode);
-                }
+            // 遍历提交退料的物料条码
+            foreach (var materialBarCode in requestDto.MaterialBarCodes)
+            {
+                var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == materialBarCode)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", materialBarCode);
 
                 if (whMaterialInventoryEntity.QuantityResidue == 0)
                 {
@@ -263,39 +273,40 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
 
                 updateAndCheckStatusByIdCommands.Add(new UpdateAndCheckStatusByIdCommand
                 {
-                    UpdatedBy = _currentUser.UserName,
-                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time,
                     Status = WhMaterialInventoryStatusEnum.InUse,
                     CurrentStatus = whMaterialInventoryEntity.Status,
                     Id = whMaterialInventoryEntity.Id
                 });
 
                 var materialEntity = materialEntities.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
-
                 whMaterialStandingbookEntities.Add(new WhMaterialStandingbookEntity
                 {
-                    MaterialCode = materialEntity.MaterialCode ?? "",
-                    MaterialName = materialEntity.MaterialName ?? "",
-                    MaterialVersion = materialEntity.Version ?? "",
-                    Unit = materialEntity.Unit ?? "",
+                    MaterialCode = materialEntity?.MaterialCode ?? "",
+                    MaterialName = materialEntity?.MaterialName ?? "",
+                    MaterialVersion = materialEntity?.Version ?? "",
+                    Unit = materialEntity?.Unit ?? "",
                     MaterialBarCode = whMaterialInventoryEntity.MaterialBarCode,
                     Type = WhMaterialInventoryTypeEnum.ReturnApplication,
                     Source = whMaterialInventoryEntity.Source,
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = baseBo.SiteId,
                     Batch = whMaterialInventoryEntity.Batch,
                     Quantity = whMaterialInventoryEntity.QuantityResidue,
                     SupplierId = whMaterialInventoryEntity.SupplierId,
                     Id = IdGenProvider.Instance.CreateId(),
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedOn = HymsonClock.Now()
+                    CreatedBy = baseBo.User,
+                    UpdatedBy = baseBo.User,
+                    CreatedOn = baseBo.Time,
+                    UpdatedOn = baseBo.Time
                 });
 
-                var manuReturnOrderDetailEntity = new ManuReturnOrderDetailEntity
+                // 退料单明细
+                var manuReturnOrderDetailId = IdGenProvider.Instance.CreateId();
+                manuReturnOrderDetailEntities.Add(new ManuReturnOrderDetailEntity
                 {
                     ReturnOrderId = manuReturnOrderEntity.Id,
-                    MaterialId = materialEntity.Id,
+                    MaterialId = materialEntity?.Id ?? 0,
                     WarehouseId = whWarehouseEntity.Id,
                     MaterialBarCode = materialBarCode,
                     Batch = whMaterialInventoryEntity.Batch,
@@ -303,74 +314,95 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                     SupplierId = whMaterialInventoryEntity.SupplierId,
                     ExpirationDate = whMaterialInventoryEntity.DueDate,
                     SiteId = whMaterialInventoryEntity.SiteId,
-                    Id = IdGenProvider.Instance.CreateId(),
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedOn = HymsonClock.Now()
-                };
+                    Id = manuReturnOrderDetailId,
+                    CreatedBy = baseBo.User,
+                    UpdatedBy = baseBo.User,
+                    CreatedOn = baseBo.Time,
+                    UpdatedOn = baseBo.Time
+                });
 
-                manuReturnOrderDetailEntities.Add(manuReturnOrderDetailEntity);
-
-                if (param.Type == ManuReturnTypeEnum.WorkOrderReturn)
+                if (requestDto.Type == ManuReturnTypeEnum.WorkOrderReturn)
                 {
-                    var qualIqcOrderReturnDetailEntity = new QualIqcOrderReturnDetailEntity
+                    qualIqcOrderReturnDetailEntities.Add(new QualIqcOrderReturnDetailEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = _currentSite.SiteId ?? 0,
+                        SiteId = baseBo.SiteId,
                         IQCOrderId = qualIqcOrderReturnEntity.Id,
-                        ReturnOrderDetailId = manuReturnOrderDetailEntity.Id,
+                        ReturnOrderDetailId = manuReturnOrderDetailId,
                         BarCode = materialBarCode,
                         MaterialId = whMaterialInventoryEntity.MaterialId,
                         IsQualified = null,
-                        CreatedBy = _currentUser.UserName,
-                        UpdatedBy = _currentUser.UserName,
-                        CreatedOn = HymsonClock.Now(),
-                        UpdatedOn = HymsonClock.Now()
-                    };
-
-                    qualIqcOrderReturnDetailEntities.Add(qualIqcOrderReturnDetailEntity);
+                        CreatedBy = baseBo.User,
+                        UpdatedBy = baseBo.User,
+                        CreatedOn = baseBo.Time,
+                        UpdatedOn = baseBo.Time
+                    });
                 }
 
                 warehousingEntryDetails.Add(new ReceiptDetailDto
                 {
                     ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
-                    SyncId = manuReturnOrderDetailEntity.Id,
-                    MaterialCode = materialEntity.MaterialCode,
+                    SyncId = manuReturnOrderDetailId,
+                    MaterialCode = materialEntity?.MaterialCode,
                     LotCode = whMaterialInventoryEntity.Batch,
-                    UnitCode = materialEntity.Unit,
+                    UnitCode = materialEntity?.Unit,
                     UniqueCode = materialBarCode,
-                    Quantity = whMaterialInventoryEntity.QuantityResidue
+                    Quantity = whMaterialInventoryEntity.QuantityResidue,
+                    Batch = whMaterialInventoryEntity.Batch ?? ""
                 });
             }
             warehousingEntryDto.Details = warehousingEntryDetails;
 
-            using (var trans = TransactionHelper.GetTransactionScope())
+            using var trans = TransactionHelper.GetTransactionScope();
+            var row = await _whMaterialInventoryRepository.UpdateAndCheckStatusByIdAsync(updateAndCheckStatusByIdCommands);
+            if (row != materialInventoryEntities.Count())
             {
-                var row = await _whMaterialInventoryRepository.UpdateAndCheckStatusByIdAsync(updateAndCheckStatusByIdCommands);
-                if (row != materialInventoryEntities.Count())
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15137));
-                }
-                await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
-                await _manuReturnOrderRepository.InsertAsync(manuReturnOrderEntity);
-                await _manuReturnOrderDetailRepository.InsertRangeAsync(manuReturnOrderDetailEntities);
-
-                if (param.Type == ManuReturnTypeEnum.WorkOrderReturn)
-                {
-                    await _qualIqcOrderReturnRepository.InsertAsync(qualIqcOrderReturnEntity);
-                    await _qualIqcOrderReturnDetailRepository.InsertRangeAsync(qualIqcOrderReturnDetailEntities);
-                }
-                if (param.Type == ManuReturnTypeEnum.WorkOrderBorrow)
-                {
-                    var response = await _wmsRequest.WarehousingEntryRequestAsync(warehousingEntryDto);
-                    if (response.Code == 0)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS").WithData("Msg", response.Message);
-                    }
-                }
-                trans.Complete();
+                throw new CustomerValidationException(nameof(ErrorCode.MES15137));
             }
+
+            await _whMaterialStandingbookRepository.InsertsAsync(whMaterialStandingbookEntities);
+            await _manuReturnOrderRepository.InsertAsync(manuReturnOrderEntity);
+            await _manuReturnOrderDetailRepository.InsertRangeAsync(manuReturnOrderDetailEntities);
+
+            // 退实物
+            if (requestDto.Type == ManuReturnTypeEnum.WorkOrderReturn)
+            {
+                await _qualIqcOrderReturnRepository.InsertAsync(qualIqcOrderReturnEntity);
+                await _qualIqcOrderReturnDetailRepository.InsertRangeAsync(qualIqcOrderReturnDetailEntities);
+            }
+
+            // 退虚拟库
+            if (requestDto.Type == ManuReturnTypeEnum.WorkOrderBorrow)
+            {
+                var response = await _wmsRequest.WarehousingEntryRequestAsync(warehousingEntryDto);
+                if (response.Code == 0)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS").WithData("Msg", response.Message);
+                }
+            }
+            trans.Complete();
+        }
+
+        /// <summary>
+        /// 退料（实物）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task ReturnPhysicalAsync(MaterialReturnDto requestDto)
+        {
+            // TODO: Implement this method
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 退料（虚拟）
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        public async Task ReturnVirtualAsync(MaterialReturnDto requestDto)
+        {
+            // TODO: Implement this method
+            await Task.CompletedTask;
         }
 
         /// <summary>

@@ -878,10 +878,11 @@ namespace Hymson.MES.Services.Services.Quality
                     {
                         ProductionOrderNumber = workOrderEntity?.OrderCode,
                         SyncId = item.Id,
-                        MaterialCode = materialEntity.MaterialCode,
+                        MaterialCode = materialEntity?.MaterialCode,
                         LotCode = whMaterialInventoryEntity.Batch,
                         UnitCode = materialEntity?.Unit,
                         UniqueCode = item.MaterialBarCode,
+                        Batch = whMaterialInventoryEntity.Batch ?? "",
                         Quantity = item.Qty
                     });
                     warehousingEntryDto.Details = warehousingEntryDetails;
