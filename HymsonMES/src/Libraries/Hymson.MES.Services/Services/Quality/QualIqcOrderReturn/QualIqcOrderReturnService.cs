@@ -167,7 +167,7 @@ namespace Hymson.MES.Services.Services.Quality
             _wmsApiClient = wmsApiClient;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _sysConfigRepository = sysConfigRepository;
-            _options= options;
+            _options = options;
         }
 
 
@@ -873,7 +873,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     Type = BillBusinessTypeEnum.WorkOrderMaterialReturnForm,
                     IsAutoExecute = returnEntity.Type == ManuReturnTypeEnum.WorkOrderBorrow,
-                    SyncCode= returnEntity.ReturnOrderCode,
+                    SyncCode = returnEntity.ReturnOrderCode,
                     CreatedBy = _currentUser.UserName,
                     WarehouseCode = isQualified == TrueOrFalseEnum.Yes ? configEntities.FirstOrDefault()?.Value.Split("|")[0] : configEntities.FirstOrDefault()?.Value.Split("|")[1],
                     Remark = returnEntity.Remark,
@@ -908,7 +908,7 @@ namespace Hymson.MES.Services.Services.Quality
             foreach (var item in warehousingEntries)
             {
                 var response = await _wmsApiClient.WarehousingEntryRequestAsync(item);
-                if (response.Code!=0)
+                if (response.Code != 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS").WithData("Msg", response.Message);
                 }
