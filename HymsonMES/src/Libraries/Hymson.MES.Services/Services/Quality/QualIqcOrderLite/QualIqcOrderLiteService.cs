@@ -5,15 +5,12 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
-using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
@@ -23,12 +20,14 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.WHMaterialReceipt;
 using Hymson.MES.Data.Repositories.WhMaterialReceiptDetail;
 using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Options;
 using Hymson.MES.HttpClients.Requests.WMS;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -47,9 +46,14 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 系统配置
+        /// WMS配置
         /// </summary>
-        private readonly ISysConfigRepository _sysConfigRepository;
+        private readonly IOptions<WMSOptions> _wmsOptions;
+
+        /// <summary>
+        /// 服务接口（WMS）
+        /// </summary>
+        private readonly IWMSApiClient _wmsApiClient;
 
         /// <summary>
         /// 仓储接口（iqc检验单）
@@ -101,17 +105,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IIQCOrderCreateService _iqcOrderCreateService;
 
-        /// <summary>
-        /// 服务接口（WMS）
-        /// </summary>
-        private readonly IWMSApiClient _wmsApiClient;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="sysConfigRepository"></param>
+        /// <param name="wmsOptions"></param>
+        /// <param name="wmsApiClient"></param>
         /// <param name="qualIqcOrderLiteRepository"></param>
         /// <param name="qualIqcOrderLiteDetailRepository"></param>
         /// <param name="qualIqcOrderOperateRepository"></param>
@@ -122,9 +123,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="whSupplierRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="iqcOrderCreateService"></param>
-        /// <param name="wmsApiClient"></param>
         public QualIqcOrderLiteService(ICurrentUser currentUser, ICurrentSite currentSite,
-            ISysConfigRepository sysConfigRepository,
+            IOptions<WMSOptions> wmsOptions,
+            IWMSApiClient wmsApiClient,
             IQualIqcOrderLiteRepository qualIqcOrderLiteRepository,
             IQualIqcOrderLiteDetailRepository qualIqcOrderLiteDetailRepository,
             IQualIqcOrderOperateRepository qualIqcOrderOperateRepository,
@@ -134,12 +135,12 @@ namespace Hymson.MES.Services.Services.Quality
             IProcMaterialRepository procMaterialRepository,
             IWhSupplierRepository whSupplierRepository,
             IInteAttachmentRepository inteAttachmentRepository,
-            IIQCOrderCreateService iqcOrderCreateService,
-            IWMSApiClient wmsApiClient)
+            IIQCOrderCreateService iqcOrderCreateService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _sysConfigRepository = sysConfigRepository;
+            _wmsOptions = wmsOptions;
+            _wmsApiClient = wmsApiClient;
             _qualIqcOrderLiteRepository = qualIqcOrderLiteRepository;
             _qualIqcOrderLiteDetailRepository = qualIqcOrderLiteDetailRepository;
             _qualIqcOrderOperateRepository = qualIqcOrderOperateRepository;
@@ -150,7 +151,6 @@ namespace Hymson.MES.Services.Services.Quality
             _whSupplierRepository = whSupplierRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _iqcOrderCreateService = iqcOrderCreateService;
-            _wmsApiClient = wmsApiClient;
         }
 
 
@@ -841,13 +841,6 @@ namespace Hymson.MES.Services.Services.Quality
             // 读取物料
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(receiptDetailEntities.Select(x => x.MaterialId));
 
-            // 仓库编码配置
-            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.WarehouseCode });
-            if (configEntities == null || !configEntities.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.WarehouseCode.GetDescription());
-            }
-
             List<IQCReceiptMaterialResultDto> details = new();
             foreach (var item in updateDetailEntities)
             {
@@ -865,7 +858,7 @@ namespace Hymson.MES.Services.Services.Quality
                     IsQualified = (item.IsQualified ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes ? 1 : 0,
                     BarCode = receiptDetailEntity.BarCode,
                     SyncId = receiptDetailEntity.SyncId,
-                    WarehouseCode = GetWarehouseCode(configEntities, item.IsQualified)
+                    WarehouseCode = GetWarehouseCode(item.IsQualified)
                 });
             }
 
@@ -885,20 +878,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 获取仓库编码
         /// </summary>
-        /// <param name="configEntities"></param>
         /// <param name="isQualified"></param>
         /// <returns></returns>
-        private static string GetWarehouseCode(IEnumerable<SysConfigEntity> configEntities, TrueOrFalseEnum? isQualified)
+        private string GetWarehouseCode(TrueOrFalseEnum? isQualified)
         {
-            var configEntity = configEntities.FirstOrDefault();
+            if (_wmsOptions == null || _wmsOptions.Value == null || _wmsOptions.Value.IQCReceipt == null) return "no configured value";
+            if (isQualified == null) return _wmsOptions.Value.IQCReceipt.WarehouseCode;
 
-            if (configEntity == null) return "not configured";
-            if (isQualified == null) return "no result";
-
-            if (string.IsNullOrWhiteSpace(configEntity?.Value)) return "no configured value";
-
-            var valueArray = configEntity.Value.Split('|');
-            return isQualified == TrueOrFalseEnum.Yes ? valueArray[0] : valueArray[1];
+            return isQualified == TrueOrFalseEnum.Yes ? _wmsOptions.Value.IQCReceipt.FinishWarehouseCode : _wmsOptions.Value.IQCReceipt.NgWarehouseCode;
         }
         #endregion
 

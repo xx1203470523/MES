@@ -56,7 +56,7 @@ namespace Hymson.MES.HttpClients
 
             _logger.LogDebug($"来料IQC -> Request: {dto.ToSerialize()}");
 
-            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReceiptRoute, dto);
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReceipt.Route, dto);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
             string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
@@ -73,19 +73,6 @@ namespace Hymson.MES.HttpClients
             }
 
             return responseDto;
-        }
-
-        /// <summary>
-        /// 回调（退料IQC）
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        public async Task<bool> IQCReturnCallBackAsync(IQCReturnResultDto dto)
-        {
-            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReturnRoute, dto);
-            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
-
-            return httpResponse.IsSuccessStatusCode;
         }
 
         /// <summary>

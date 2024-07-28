@@ -970,7 +970,7 @@
         public const string MES15139 = "申请【{System}】退料单失败,错误信息:{Msg}";
         public const string MES15140 = "退料单号生成失败：退料单类型编码规则未维护！";
         public const string MES15141 = "退料单号生成失败，同时存在多条退料单类型编码规则！";
-        public const string MES15142 = "入库仓库不存在，请检查系统配置！";
+        public const string MES15142 = "仓库编码【{Code}】不存在，请检查【仓库维护】！";
         public const string MES15143 = "物料条码【{MaterialCode}】状态不为待使用";
 
         public const string MES15144 = "退料单【{ReturnOrderCode}】不存在";

@@ -7,15 +7,11 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Quality;
-using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
-using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
@@ -27,7 +23,6 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Options;
-using Hymson.MES.HttpClients.Requests.WMS;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
@@ -51,6 +46,16 @@ namespace Hymson.MES.Services.Services.Quality
         /// 当前站点
         /// </summary>
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// WMS配置
+        /// </summary>
+        private readonly IOptions<WMSOptions> _wmsOptions;
+
+        /// <summary>
+        /// 服务接口（WMS）
+        /// </summary>
+        private readonly IWMSApiClient _wmsApiClient;
 
         /// <summary>
         /// 仓储接口（iqc检验单）
@@ -103,28 +108,18 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IIQCOrderCreateService _iqcOrderCreateService;
 
         /// <summary>
-        /// 服务接口（WMS）
-        /// </summary>
-        private readonly IWMSApiClient _wmsApiClient;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly ISysConfigRepository _sysConfigRepository;
-
-        /// <summary>
         /// 物料库存仓储
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
-
-        private readonly IOptions<WMSOptions> _options;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="wmsOptions"></param>
+        /// <param name="wmsApiClient"></param>
         /// <param name="qualIqcOrderReturnRepository"></param>
         /// <param name="qualIqcOrderReturnDetailRepository"></param>
         /// <param name="qualIqcOrderOperateRepository"></param>
@@ -135,8 +130,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="iqcOrderCreateService"></param>
-        /// <param name="wmsApiClient"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
         public QualIqcOrderReturnService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IOptions<WMSOptions> wmsOptions,
+            IWMSApiClient wmsApiClient,
             IQualIqcOrderReturnRepository qualIqcOrderReturnRepository,
             IQualIqcOrderReturnDetailRepository qualIqcOrderReturnDetailRepository,
             IQualIqcOrderOperateRepository qualIqcOrderOperateRepository,
@@ -147,13 +144,12 @@ namespace Hymson.MES.Services.Services.Quality
             IPlanWorkOrderRepository planWorkOrderRepository,
             IInteAttachmentRepository inteAttachmentRepository,
             IIQCOrderCreateService iqcOrderCreateService,
-            IWMSApiClient wmsApiClient,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            ISysConfigRepository sysConfigRepository,
-            IOptions<WMSOptions> options)
+            IWhMaterialInventoryRepository whMaterialInventoryRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _wmsOptions = wmsOptions;
+            _wmsApiClient = wmsApiClient;
             _qualIqcOrderReturnRepository = qualIqcOrderReturnRepository;
             _qualIqcOrderReturnDetailRepository = qualIqcOrderReturnDetailRepository;
             _qualIqcOrderOperateRepository = qualIqcOrderOperateRepository;
@@ -164,10 +160,7 @@ namespace Hymson.MES.Services.Services.Quality
             _planWorkOrderRepository = planWorkOrderRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _iqcOrderCreateService = iqcOrderCreateService;
-            _wmsApiClient = wmsApiClient;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _sysConfigRepository = sysConfigRepository;
-            _options = options;
         }
 
 
@@ -842,13 +835,6 @@ namespace Hymson.MES.Services.Services.Quality
             if (returnEntity == null) return;
             if (!orderEntity.WorkOrderId.HasValue) return;
 
-            // 仓库编码配置
-            var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.WarehouseCode });
-            if (configEntities == null || !configEntities.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.WarehouseCode.GetDescription());
-            }
-
             // 读取工单
             var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderEntity.WorkOrderId.Value);
             var materialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
@@ -862,11 +848,12 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES15124));
             }
 
-            //查询到物料信息
+            // 查询到物料信息
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialInventoryEntities.Select(x => x.MaterialId));
 
-            var warehousingEntries = new List<WarehousingEntryDto>();
+            List<WarehousingEntryDto> warehousingEntries = new();
 
+            // 根据检验合格结果分组
             foreach (var isQualified in updateDetailEntities.Select(x => x.IsQualified).Distinct())
             {
                 var warehousingEntryDto = new WarehousingEntryDto()
@@ -875,20 +862,17 @@ namespace Hymson.MES.Services.Services.Quality
                     IsAutoExecute = returnEntity.Type == ManuReturnTypeEnum.WorkOrderBorrow,
                     SyncCode = returnEntity.ReturnOrderCode,
                     CreatedBy = _currentUser.UserName,
-                    WarehouseCode = isQualified == TrueOrFalseEnum.Yes ? configEntities.FirstOrDefault()?.Value.Split("|")[0] : configEntities.FirstOrDefault()?.Value.Split("|")[1],
+                    WarehouseCode = GetWarehouseCode(isQualified, returnEntity.Type),
                     Remark = returnEntity.Remark,
                 };
 
-                var warehousingEntryDetails = new List<ReceiptDetailDto>();
-
+                // 遍历退料明细
+                List<ReceiptDetailDto> warehousingEntryDetails = new();
                 foreach (var item in returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified && o.BarCode == x.MaterialBarCode)))
                 {
-                    var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode);
+                    var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", item.MaterialBarCode);
 
-                    if (whMaterialInventoryEntity == null)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", item.MaterialBarCode);
-                    }
                     var materialEntity = materialEntities.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
                     warehousingEntryDetails.Add(new ReceiptDetailDto
                     {
@@ -936,6 +920,32 @@ namespace Hymson.MES.Services.Services.Quality
             //    WorkOrderCode = workOrderEntity?.OrderCode ?? "",
             //    Details = details
             //});
+        }
+
+        /// <summary>
+        /// 获取仓库编码
+        /// </summary>
+        /// <param name="isQualified"></param>
+        /// <param name="manuReturnType"></param>
+        /// <returns></returns>
+        private string GetWarehouseCode(TrueOrFalseEnum? isQualified, ManuReturnTypeEnum manuReturnType)
+        {
+            if (_wmsOptions == null || _wmsOptions.Value == null || _wmsOptions.Value.Receipt == null) return "no configured value";
+            if (isQualified == null) return _wmsOptions.Value.Receipt.WarehouseCode;
+
+            // 虚仓
+            if (manuReturnType == ManuReturnTypeEnum.WorkOrderBorrow)
+            {
+                return _wmsOptions.Value.Receipt.VirtuallyWarehouseCode;
+            }
+
+            // 实仓
+            if (manuReturnType == ManuReturnTypeEnum.WorkOrderReturn)
+            {
+                return isQualified == TrueOrFalseEnum.Yes ? _wmsOptions.Value.Receipt.RawWarehouseCode : _wmsOptions.Value.Receipt.NgWarehouseCode;
+            }
+
+            return _wmsOptions.Value.Receipt.WarehouseCode;
         }
         #endregion
 

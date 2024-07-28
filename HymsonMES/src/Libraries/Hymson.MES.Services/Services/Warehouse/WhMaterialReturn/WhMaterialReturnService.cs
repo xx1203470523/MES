@@ -161,12 +161,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 Code = _options.Value.Receipt.WarehouseCode
-            });
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15142)).WithData("Code", _options.Value.Receipt.WarehouseCode);
 
-            if (whWarehouseEntity == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15142));
-            }
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(param.WorkOrderId);
             var materialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
@@ -179,14 +175,14 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                 throw new CustomerValidationException(nameof(ErrorCode.MES15124));
             }
 
-            //查询到物料信息
+            // 查询到物料信息
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialInventoryEntities.Select(x => x.MaterialId));
             var whMaterialStandingbookEntities = new List<WhMaterialStandingbookEntity>();
             var updateAndCheckStatusByIdCommands = new List<UpdateAndCheckStatusByIdCommand>();
 
             var manuReturnOrderDetailEntities = new List<ManuReturnOrderDetailEntity>();
 
-            //检验单
+            // 检验单
             QualIqcOrderReturnEntity qualIqcOrderReturnEntity = new();
             // 检验单明细
             List<QualIqcOrderReturnDetailEntity> qualIqcOrderReturnDetailEntities = new();

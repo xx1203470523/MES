@@ -18,12 +18,7 @@
         /// <summary>
         /// WMS回调路径（来料）
         /// </summary>
-        public string IQCReceiptRoute { get; set; } = "";
-
-        /// <summary>
-        /// WMS回调路径（退料）
-        /// </summary>
-        public string IQCReturnRoute { get; set; } = "";
+        public WMSBusinessOptions IQCReceipt { get; set; }
 
         /// <summary>
         /// 出库操作配置
@@ -68,7 +63,7 @@
         public int Type { get; set; }
 
         /// <summary>
-        /// 仓库编码
+        /// 默认仓库
         /// </summary>
         public string WarehouseCode { get; set; } = "";
 
@@ -80,27 +75,28 @@
         /// <summary>
         /// 原材料仓库
         /// </summary>
-        public string RawWarehouseCode { get; set; }
+        public string RawWarehouseCode { get; set; } = "";
 
         /// <summary>
         /// 虚拟仓库
         /// </summary>
-        public string VirtuallyWarehouseCode { get; set; }
+        public string VirtuallyWarehouseCode { get; set; } = "";
 
         /// <summary>
         /// 待检线边仓
         /// </summary>
-        public string PendInspection { get; set; }
+        public string PendInspection { get; set; } = "";
 
         /// <summary>
         /// 成品仓
         /// </summary>
-        public string FinishWarehouseCode { get; set; }
+        public string FinishWarehouseCode { get; set; } = "";
 
         /// <summary>
         /// 不良品仓
         /// </summary>
-        public string NgWarehouseCode { get; set; }
+        public string NgWarehouseCode { get; set; } = "";
+
     }
 
 }

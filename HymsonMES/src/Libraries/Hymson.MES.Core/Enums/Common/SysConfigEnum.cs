@@ -67,11 +67,9 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("RotorPassrateStation")]
         RotorPassrateStation = 13,
-        /// <summary>
-        /// 仓库编码
-        /// </summary>
-        [Description("WarehouseCode")]
-        WarehouseCode = 14,
+
+        // TODO: 14
+
         /// <summary>
         /// 工艺路线编码
         /// </summary>
