@@ -140,6 +140,11 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
         /// <returns></returns>
         public async Task<string> WhMaterialReturnConfirmAsync(WhMaterialReturnConfirmDto param)
         {
+            if (param.ReceiptResult == WhWarehouseRequistionResultEnum.CancelMaterialReceipt)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10254));
+            }
+
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 
