@@ -1566,6 +1566,13 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17755)).WithData("msg", string.Join(",", whCodeList));
             }
+            //校验成品码是否是一样的
+            var SfcList = request.Items.GroupBy(p => p.Sfc)
+                                         .Any(g => g.Count() > 1);
+            if (SfcList)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17757));
+            }
             //特殊处理。。。
             string whName = whCodeList[0];
             string whCode = string.Empty;
