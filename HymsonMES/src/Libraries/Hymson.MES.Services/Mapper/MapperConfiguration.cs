@@ -104,6 +104,10 @@ using Hymson.MES.Services.Dtos.Equipment.EquMaintenance;
 using Hymson.MES.Core.Domain.EquRepairOrder;
 using Hymson.MES.Data.Repositories.EquRepairOrder;
 using Hymson.MES.Services.Dtos.EquRepairOrder;
+using Hymson.MES.Core.Domain.EquSparepartRecord;
+using Hymson.MES.Data.Repositories.EquSparepartRecord;
+using Hymson.MES.Services.Dtos.EquSparepartRecord;
+using Hymson.MES.Data.Repositories.Equipment.View;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -248,6 +252,20 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            #region EquToolingType
+            CreateMap<EquToolsTypePagedQueryDto, EquToolsTypePagedQuery>();
+            CreateMap<EquToolsTypeEntity, EquToolsTypeDto>();
+            CreateMap<EquToolsTypeSaveDto, EquToolsTypeEntity>();
+            #endregion
+
+            #region EquToolsManage
+            CreateMap<EquToolingManagePagedQueryDto, IEquToolingManagePagedQuery>();
+            CreateMap<EquToolingManageView, EquToolingManageViewDto>();
+            CreateMap<AddEquToolingManageDto, EquToolsEntity>();
+            CreateMap<EquToolingManageModifyDto, EquToolsEntity>();
+
+            #endregion
+
             #region EquSparePartsType
             CreateMap<EquSparePartsGroupPagedQueryDto, EquSparePartsGroupPagedQuery>();
             CreateMap<EquSparePartsGroupEntity, EquSparePartsGroupDto>();
@@ -323,6 +341,26 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquRepairOrderPageView, EquRepairOrderDto>();
 
             CreateMap<EquRepairOrderDto, EquRepairOrderEntity>();
+            #endregion
+
+            #region EquSparepartRecord
+            CreateMap<EquSparepartRecordPagedQueryDto, EquSparepartRecordPagedQuery>();
+            CreateMap<EquSparepartRecordEntity, EquSparepartRecordDto>();
+            CreateMap<EquSparepartRecordPagedView, EquSparepartRecordPagedViewDto>();
+
+            CreateMap<EquSparepartRecordDto, EquSparepartRecordEntity>();
+            #endregion
+
+            #region  EquSparepartEquipmentBindRecord
+            CreateMap<EquSparepartEquipmentBindRecordPagedQueryDto, EquSparepartEquipmentBindRecordPagedQuery>();
+            CreateMap<EquSparepartEquipmentBindRecordView, EquSparepartEquipmentBindRecordViewDto>();
+            CreateMap<EquSparepartEquipmentBindRecordEntity, EquSparepartEquipmentBindRecordDto>();
+            #endregion
+
+            #region  EquToolsEquipmentBindRecord
+            CreateMap<EquToolsEquipmentBindRecordPagedQueryDto, EquToolsEquipmentBindRecordPagedQuery>();
+            CreateMap<EquToolsEquipmentBindRecordView, EquToolsEquipmentBindRecordViewDto>();
+            CreateMap<EquToolsEquipmentBindRecordEntity, EquToolsEquipmentBindRecordDto>();
             #endregion
         }
 

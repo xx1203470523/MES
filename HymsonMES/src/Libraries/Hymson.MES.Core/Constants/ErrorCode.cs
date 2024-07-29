@@ -835,6 +835,32 @@
 
         #endregion
 
+        #region 工具维护 13500
+        public const string MES13501 = "工具维护失败";
+        public const string MES13502 = "新增工具失败";
+        public const string MES13503 = "工具类型{ToolTypeCode}不存在";
+        public const string MES13504 = "工具编码{ToolCode}已经存在";
+        public const string MES13505 = "编码不可为空";
+        public const string MES13506 = "编码长度为50.";
+        public const string MES13507 = "名称不可为空";
+        public const string MES13508 = "名称长度不可超过50.";
+        public const string MES13509 = "状态不可为空";
+        public const string MES13510 = "工具类型不可为空";
+        public const string MES13511 = "额定寿命不可为空";
+        public const string MES13512 = "是否校准不可为空";
+        public const string MES13513 = "需要校准时校准周期不可为空";
+        public const string MES13514 = "需要校准时校准周期单位不可为空";
+        public const string MES13515 = "需要校准时最后校验时间不可为空";
+        public const string MES13516 = "工具类型已被工具引用,不能删除!";
+        public const string MES13517 = "工具{ToolCode}重复";
+        public const string MES13518 = "需要校准时校准周期为正整数";
+        public const string MES13519 = "工具类型关联的设备组不存在";
+        public const string MES13520 = "工具类型关联的物料不存在";
+        public const string MES13521 = "需要校准不可为空";
+        public const string MES13522 = "工具类型{toolTypeCode}已经存在";
+        public const string MES13523 = "工具类型{toolTypeCode}无需校准";
+        #endregion
+
         #region 环境检验 13600
 
         public const string MES13600 = "是否不合格不能为空！";
@@ -1628,6 +1654,28 @@
         public const string MES17425 = "产品序列码【{SFC}】不符合物料【MaterialName】掩码规则，具体请查看【物料维护】";
         public const string MES17426 = "产品序列码【{SFC}】不为活动中状态，具体请查看【产品序列码报告】。";
         public const string MES17427 = "产品序列码【{SFC}】包含不合格信息，无法进行半成品入库，请检查传入参数。";
+        #endregion
+
+        #region 备件安装卸载 17600
+        public const string MES17601 = "备件不存在!";
+        public const string MES17602 = "备件已绑定设备,位置{position}!";
+        public const string MES17603 = "备件没有设置备件类型!";
+        public const string MES17604 = "待安装的设备不在备件类型所关联的设备组中!";
+        public const string MES17605 = "备件对应的备件类型没有关联设备组!";
+        public const string MES17606 = "备件关联的设备组不包含当前设备!";
+        public const string MES17607 = "备件在设备上的安装数量不能超过备件注册数量!";
+        #endregion
+
+        #region 工具安装卸载 17700
+        public const string MES17701 = "工具不存在!";
+        public const string MES17702 = "工具{code}不可使用!";
+        public const string MES17703 = "工具{code}已在设备{position}位置安装!";
+        public const string MES17704 = "设备{code}位置{position}已安装工具，请卸载后再进行操作!";
+        public const string MES17705 = "工具无剩余寿命，不可使用!";
+        public const string MES17706 = "工具本次使用寿命需大于0";
+        public const string MES17707 = "工具{toolCode}不允许在设备{equipmentCode}使用!";
+        public const string MES17708 = "工具{toolCode}不允许对产品使用!";
+        public const string MES17709 = "工具{toolCode}不允许对产品{productCode}使用!";
         #endregion
 
         #region 设备维修 17950 
