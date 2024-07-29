@@ -395,6 +395,7 @@
         public const string MES11204 = "不合格组名称超过最大长度，不合格代码名称最大长度为60";
         public const string MES11205 = "说明超过最大长度，不合格代码备注最大长度为255";
         public const string MES11206 = "不合格组编码{code}已经存在";
+        public const string MES11207 = "设备故障类型编码{code}已经存在";
         #endregion
 
         #region 分选规则  11300
