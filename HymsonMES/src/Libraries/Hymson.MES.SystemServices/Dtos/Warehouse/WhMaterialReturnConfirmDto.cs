@@ -41,7 +41,7 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// <summary>
         /// 物料条码
         /// </summary>
-        public string MaterialBarCode { set; get; } = "";
+        public string? MaterialBarCode { set; get; } = "";
 
         /// <summary>
         /// 物料编码
