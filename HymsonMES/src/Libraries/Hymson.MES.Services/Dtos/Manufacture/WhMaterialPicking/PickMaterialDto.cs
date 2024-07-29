@@ -40,5 +40,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking
         /// 数量
         /// </summary>
         public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 最小批次数量
+        /// </summary>
+        public decimal Batch { get; set; }
     }
 }

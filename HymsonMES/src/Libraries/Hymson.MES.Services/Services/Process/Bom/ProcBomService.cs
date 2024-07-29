@@ -740,16 +740,17 @@ namespace Hymson.MES.Services.Services.Process
             {
                 var mainMaterials = mainBomDetails.Where(x => x.MaterialId == material.Id);
                 var replaceMaterials = replaceBomDetails.Where(x => x.ReplaceMaterialId == material.Id);
-                var needQty = (mainMaterials.Sum(x => x.Usages + x.Loss)+ replaceMaterials.Sum(x=>x.Usages+x.Loss))??0;
+                var needQty = (mainMaterials.Sum(x => x.Usages + x.Loss) + replaceMaterials.Sum(x => x.Usages + x.Loss)) ?? 0;
 
-                var receiveQty = requistionOrderDetailEntities.Where(x => x.MaterialId == material.Id).Sum(x=>x.Qty);
+                var receiveQty = requistionOrderDetailEntities.Where(x => x.MaterialId == material.Id).Sum(x => x.Qty);
                 procBomDetailViews.Add(new ProcOrderBomDetailDto
                 {
                     MaterialId = material.Id,
                     MaterialCode = material.MaterialCode,
                     MaterialName = material.MaterialName,
                     Version = material.Version ?? "",
-                    Usages= needQty* orderNumber- receiveQty
+                    Usages = needQty * orderNumber - receiveQty,
+                    Batch = material.Batch ?? 0
                 });
             }
 
