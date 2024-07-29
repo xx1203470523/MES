@@ -1576,11 +1576,11 @@ namespace Hymson.MES.Services.Services.Warehouse
             //特殊处理。。。
             string whName = whCodeList[0];
             string whCode = string.Empty;
-            if(whName == "成品仓") //不是不良品仓
+            if (whName == "成品仓") //不是不良品仓
             {
                 whCode = _wmsOptions.Value.ProductReceipt.FinishWarehouseCode;
             }
-            if (whName == "待检验仓") //待检验仓
+            else if (whName == "待检验仓") //待检验仓
             {
                 whCode = _wmsOptions.Value.ProductReceipt.PendInspection;
             }
