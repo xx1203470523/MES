@@ -772,6 +772,7 @@
         public const string MES12839 = "产品序列码【{sfc}】带有NG标识，不允许操作!";
         public const string MES12840 = "产品序列码【{sfc}】没有指定工序的流转记录，合并失败!";
         public const string MES12841 = "产品序列码【{sfc1}】与产品序列码【{sfc2}】合并流转记录不一致，合并失败!";
+        public const string MES12842 = "{Msg}";
         #endregion
 
         #region 故障现象 12900
