@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Mavel.Rotor;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -18,6 +19,9 @@ using Hymson.MES.Data.Repositories.Mavel.Rotor;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
+using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -138,6 +142,21 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         private readonly IManuProductNgRecordRepository _manuProductNgRecordRepository;
 
         /// <summary>
+        /// ERP工单表
+        /// </summary>
+        private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
+
+        /// <summary>
+        /// ERP工单BOM
+        /// </summary>
+        private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
+
+        /// <summary>
+        /// 库存
+        /// </summary>
+        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+
+        /// <summary>
         /// 转子线操作人
         /// </summary>
         private readonly string OperationBy = "RotorLMSJOB";
@@ -194,7 +213,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             IProcParameterRepository procParameterRepository,
             IManuRotorSfcRepository manuRotorSfcRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
-            IManuProductNgRecordRepository manuProductNgRecordRepository)
+            IManuProductNgRecordRepository manuProductNgRecordRepository,
+            IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository)
         {
             _workItemInfoRepository = workItemInfoRepository;
             _workProcessDataRepository = workProcessDataRepository;
@@ -215,6 +237,9 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             _manuRotorSfcRepository = manuRotorSfcRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _manuProductNgRecordRepository = manuProductNgRecordRepository;
+            _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
         }
 
         /// <summary>
@@ -325,7 +350,12 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //转子线接收MES的工单后，会生成两个工单，一个带FX的工单，是铁芯工单，还有一个正常的工单是压轴主线 
             foreach(var item in allLmsOrderList)
             {
-                lmsOrderList.Add(LmsOrderFxChange(item));
+                var tmpOrderCode = LmsOrderFxChange(item);
+                //if (tmpOrderCode == "T240722")
+                //{
+                //    tmpOrderCode = "MO-20240729001-6";
+                //}
+                lmsOrderList.Add(tmpOrderCode);
             }
             #endregion
 
@@ -519,7 +549,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 string productCode = string.Empty;
                 //工单
                 PlanWorkOrderEntity? mesOrder = mesOrderList.Where(m => m.OrderCode == LmsOrderFxChange(mesItem.OrderCode)).FirstOrDefault();
-                if(mesOrder != null)
+                if (mesOrder != null)
                 {
                     var mesOrderMat = mesMaterialList.Where(m => m.Id == mesOrder.ProductId).FirstOrDefault();
                     productCode = mesOrderMat == null ? "" : mesOrderMat.MaterialCode;
@@ -528,6 +558,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     VAR_DEBUG = 3;
                 }
+
                 //工序
                 long procedureId = 0;
                 ProcProcedureEntity ?mesProcedure = mesProcedureList.Where(m => m.Code == mesItem.ProcedureCode).FirstOrDefault();
@@ -1324,8 +1355,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 return 0;
             }
 
-            //整理要更新的工单
+            //要更新的工单
             List<PlanWorkOrderEntity> updateList = new List<PlanWorkOrderEntity>();
+            //要更新的库存
+            List<UpdateQuantityResidueBySfcsMavelCommand> whUpdateList = new List<UpdateQuantityResidueBySfcsMavelCommand>();
             foreach(var item in mesOrderList)
             {
                 var curOrderView = orderViewQty.Where(m => m.WorkOrderId == item.Id).FirstOrDefault();
@@ -1337,9 +1370,64 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 item.UpdatedBy = OperationBy;
                 item.UpdatedOn = HymsonClock.Now();
                 updateList.Add(item);
+
+                long orderId = item.Id;
+                //orderId = 51779354903695360;
+
+                // 查询生产计划 1000000021
+                var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(item.WorkPlanId ?? 0);
+                if(planWorkPlanEntity == null)
+                {
+                    continue;
+                }
+
+                // 查询生产计划物料 1000000022
+                var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+                {
+                    SiteId = item.SiteId,
+                    PlanId = planWorkPlanEntity.Id,
+                    PlanProductId = item.WorkPlanProductId ?? 0
+                });
+                if(planWorkPlanMaterialEntities == null || planWorkPlanMaterialEntities.Count() == 0) 
+                {
+                    continue;
+                }
+                //查询库存
+                WhMaterialInventoryWorkOrderIdQuery whQuery = new WhMaterialInventoryWorkOrderIdQuery();
+                whQuery.SiteId = item.SiteId;
+                whQuery.WorkOrderId = orderId;
+                var dbWhList = await _whMaterialInventoryRepository.GetByWorkOrderIdAsync(whQuery);
+                if(dbWhList == null || dbWhList.Count() == 0)
+                {
+                    continue;
+                }
+                foreach(var whItem in dbWhList)
+                {
+                    var curPlan = planWorkPlanMaterialEntities.Where(m => m.MaterialId == whItem.MaterialId).FirstOrDefault();
+                    if(curPlan == null)
+                    {
+                        continue;
+                    }
+
+                    UpdateQuantityResidueBySfcsMavelCommand whUpdateModel = new UpdateQuantityResidueBySfcsMavelCommand();
+                    whUpdateModel.Id = whItem.Id;
+                    whUpdateModel.UpdatedOn = HymsonClock.Now();
+                    whUpdateModel.UpdatedBy = OperationBy;
+                    whUpdateModel.QuantityResidue -= (item.Qty * (curPlan.Usages + curPlan.Loss));
+                    if(whUpdateModel.QuantityResidue < 0)
+                    {
+                        whUpdateModel.QuantityResidue = 0;
+                    }
+                    whUpdateList.Add(whUpdateModel);
+                }
             }
 
-            return await _planWorkOrderRepository.UpdatesCompleteQtyMavleAsync(updateList);
+            int result = 0;
+            //更新工单物料库存数量
+            result += await _planWorkOrderRepository.UpdatesCompleteQtyMavleAsync(updateList);
+            result += await _whMaterialInventoryRepository.UpdateQuantityResidueRangeMavelAsync(whUpdateList);
+
+            return result;
         }
                
         /// <summary>
