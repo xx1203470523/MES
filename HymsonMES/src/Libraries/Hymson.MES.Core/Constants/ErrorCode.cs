@@ -2228,8 +2228,6 @@
         public const string MES17505 = "物料条码已录入不良且未进行不良处置!";
         #endregion
 
-
-
         #region 备件出入库管理 17900
         public const string MES17901 = "未查询到备件信息";
         public const string MES17902 = "备件{Code}没有库存信息";
@@ -2243,6 +2241,7 @@
         public const string MES17910 = "备件{Code}库存不足";
         public const string MES17911 = "未查询到备件库存信息";
         public const string MES17912 = "库存不足";
+        #endregion
 
         #region 设备维修 17950 
         public const string MES17950 = "设备{Code}不存在！";
@@ -2257,13 +2256,7 @@
         public const string MES17959 = "{Code}非待维修状态不允许删除";
         public const string MES17960 = "{Code}已维修过的单据不允许删除";
         public const string MES17961 = "附件上传失败，未获取到维修单，请刷新后重试";
-
-
-
         #endregion
-
-        #endregion
-
 
         #region 备件安装卸载 17600
         public const string MES17601 = "备件不存在!";

@@ -100,6 +100,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquToolingTypeEntity>> GetEntitiesAsync(EquToolingManageQuery query);
+        Task<IEnumerable<EquToolsEntity>> GetEntitiesAsync(EquToolingManageQuery query);
     }
 }
