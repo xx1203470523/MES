@@ -201,9 +201,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var InspectionOrder = $"{query.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
                 var qualFqc = qualFqcs.FirstOrDefault(x => x.SFC == item.ProductCode);
                 var type = ProductReceiptQualifiedStatusEnum.ToBeBnspected;
-                var WarehouseCode = "成品仓";
-                var whCode = _wmsOptions.Value.ProductReceipt.FinishWarehouseCode;
-                type = ProductReceiptQualifiedStatusEnum.Qualified;
+                var WarehouseCode = "待检验仓";
+                var whCode = _wmsOptions.Value.ProductReceipt.PendInspection;
+                // type = ProductReceiptQualifiedStatusEnum.Qualified;
                 if (qualFqc != null)
                 {
                     if (qualFqc.JudgmentResults== FqcJudgmentResultsEnum.Unqualified)

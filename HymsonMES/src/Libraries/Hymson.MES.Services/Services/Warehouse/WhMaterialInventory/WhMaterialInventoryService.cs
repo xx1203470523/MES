@@ -1471,7 +1471,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             PlanWorkPlanQuery planQuery = new PlanWorkPlanQuery();
             planQuery.WorkPlanCode = erpOrder;
             var erpInfo = await _planWorkPlanRepository.GetProductAsync(planQuery);
-            if(erpInfo == null)
+            if (erpInfo == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17756))
                     .WithData("orderCode", erpOrder);
@@ -1534,7 +1534,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialName = request.MaterialName,
                     Qty = item.Qty,
                     ContaineCode = item.BoxCode,
-                    Status = item.Status ?? 0,
+                    Status = item.Type ?? 0,
                     SiteId = _currentSite.SiteId ?? 0,
                     Unit = item.Unit,
                     CreatedBy = _currentSystem.Name,
