@@ -230,7 +230,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateSql = "UPDATE manu_return_order SET ReturnOrderCode = @ReturnOrderCode, WorkOrderId = @WorkOrderId, Type = @Type, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, ReturnWarehouseId = @ReturnWarehouseId, ReceiveWarehouseId = @ReceiveWarehouseId, CompleteCount = @CompleteCount WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE manu_return_order SET ReturnOrderCode = @ReturnOrderCode, WorkOrderId = @WorkOrderId, Type = @Type, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId, ReturnWarehouseId = @ReturnWarehouseId, ReceiveWarehouseId = @ReceiveWarehouseId , CompleteCount = @CompleteCount WHERE Id = @Id ";
-        const string UpdateManuReturnOrderStatusByIdSql = "UPDATE manu_return_order SET Status = @Status,CompleteCount=@CompleteCount UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateManuReturnOrderStatusByIdSql = "UPDATE manu_return_order SET Status = @Status, CompleteCount = @CompleteCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE manu_return_order SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE manu_return_order SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
