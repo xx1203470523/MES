@@ -1678,6 +1678,21 @@
         public const string MES17709 = "工具{toolCode}不允许对产品{productCode}使用!";
         #endregion
 
+        #region 备件出入库管理 17900
+        public const string MES17901 = "未查询到备件信息";
+        public const string MES17902 = "备件{Code}没有库存信息";
+        public const string MES17903 = "不存在{Code}备件";
+        public const string MES17904 = "类型{OperationType}不存在";
+        public const string MES17905 = "请选择备件";
+        public const string MES17906 = "请正确填写数量";
+        public const string MES17907 = "备件{Code}不存在或未启用";
+        public const string MES17908 = "备件编码{Code}无可入库数量";
+        public const string MES17909 = "库存总数量不允许大于备件注册数量";
+        public const string MES17910 = "备件{Code}库存不足";
+        public const string MES17911 = "未查询到备件库存信息";
+        public const string MES17912 = "库存不足";
+        #endregion
+
         #region 设备维修 17950 
         public const string MES17950 = "设备{Code}不存在！";
         public const string MES17951 = "数据已更新,请刷新后重试";

@@ -18,7 +18,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(EquSparePartsEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -32,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquSparePartsEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -41,12 +41,19 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> UpdateRangeAsync(IEnumerable<EquSparePartsEntity> entities);
 
         /// <summary>
+        /// 根据IDs获取数据（批量）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquSparePartsEntity>> GetByReIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
         /// 软删除  
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -60,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquSparePartsEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -116,6 +123,21 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> CleanTypeAsync(UpdateSparePartsTypeEntity entity);
+
+
+        /// <summary>
+        /// 更新（数量）
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateAddQtyAsync(UpdateSparePartsQtyEntity entity);
+
+        /// <summary>
+        /// 更新（数量）
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns> 
+        Task<int> UpdateMinusQtyAsync(UpdateSparePartsQtyEntity entity);
 
     }
 }

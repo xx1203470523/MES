@@ -65,14 +65,45 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
+        /// 更新（数量）
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateAddQtyAsync(UpdateSparePartsQtyEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateAddQtySql, entity);
+        }
+
+        /// <summary>
+        /// 更新（数量）
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns> 
+        public async Task<int> UpdateMinusQtyAsync(UpdateSparePartsQtyEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateMinusQtySql, entity);
+        }
+
+        /// <summary>
         /// 更新（清空备件关联备件类型）
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         public async Task<int> CleanTypeAsync(UpdateSparePartsTypeEntity entity)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(CleanTypeSql, entity);
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.ExecuteAsync(CleanTypeSql, entity);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
 
         /// <summary>
@@ -135,6 +166,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
+        public async Task<IEnumerable<EquSparePartsEntity>> GetByReIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquSparePartsEntity>(GetByReIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 根据IDs获取数据（批量）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<EquSparePartsEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
@@ -148,8 +190,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<IEnumerable<EquSparePartsEntity>> GetSparePartsGroupRelationAsync(long Id)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquSparePartsEntity>(GetSparePartsGroupRelationSqlTemplate, new { Id = Id });
+            try
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<EquSparePartsEntity>(GetSparePartsGroupRelationSqlTemplate, new { Id = Id });
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
         }
 
         /// <summary>
@@ -175,10 +226,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("esp.Id,ESP.`Code`,ESP.`Name`,ESP.`Status`,ESPG.`Code` AS sparePartsGroup,esp.Remark,esp.CreatedBy,esp.CreatedOn,esp.UpdatedOn,esp.UpdatedBy");
+            sqlBuilder.Select("esp.Id,esp.Qty,ESP.`Code`,ESP.`Name`,ESP.`Status`, ESP.`Manufacturer`, est.`Code` AS sparePartsGroup,ws.`Code` AS supplier, ESP.`SparePartTypeId`, ESP.`DrawCode`, ESP.`Specifications`, ESP.`Position`, ESP.`IsCritical`, ESP.`IsStandard`, esp.Remark,esp.CreatedBy,esp.CreatedOn,esp.UpdatedOn,esp.UpdatedBy");
             sqlBuilder.Where("esp.SiteId = @SiteId");
             sqlBuilder.Where("esp.IsDeleted = 0");
-            sqlBuilder.LeftJoin("equ_spare_parts_group espg ON espg.Id = esp.SparePartsGroupId");
+            sqlBuilder.LeftJoin("equ_sparepart_type est ON est.Id = esp.SparePartTypeId");
+            sqlBuilder.LeftJoin("wh_supplier  ws ON ws.Id = esp.SupplierId");
             sqlBuilder.OrderBy("esp.UpdatedOn DESC");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
@@ -198,7 +250,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             if (!string.IsNullOrWhiteSpace(pagedQuery.SparePartsGroup))
             {
                 pagedQuery.SparePartsGroup = $"%{pagedQuery.SparePartsGroup}%";
-                sqlBuilder.Where("espg.`Code` LIKE @SparePartsGroup");
+                sqlBuilder.Where("est.`Code` LIKE @SparePartsGroup");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
@@ -230,12 +282,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
             if (pagedQuery.Status.HasValue)
             {
-                sqlBuilder.Where("esp.Status = @Status");
+                sqlBuilder.Where("NOT (esp.STATUS = 0 AND esp.SparePartTypeId IS NULL)");
             }
 
             sqlBuilder.Where("esp.IsDeleted = 0");
 
-            sqlBuilder.Where("(esp.SparePartsGroupId is null Or esp.SparePartsGroupId=0 Or esp.SparePartsGroupId=@Id)");
+            sqlBuilder.Where("(esp.SparePartTypeId is null Or esp.SparePartTypeId=0 Or esp.SparePartTypeId=@Id)");
 
             sqlBuilder.OrderBy("esp.UpdatedOn DESC");
 
@@ -260,41 +312,45 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>a
     public partial class EquSparePartsRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spare_parts` esp /**innerjoin**/ /**join**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spare_parts` esp /**innerjoin**/ /**join**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_sparepart` esp /**innerjoin**/ /**join**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_sparepart` esp /**innerjoin**/ /**join**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEquSparePartsEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `equ_spare_parts` /**where**/  ";
+                                           FROM `equ_sparepart` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_spare_parts`(  `Id`, `SiteId`, `Code`, `Name`, `Manufacturer`, `Supplier`, `Status`, `SparePartsGroupId`, `DrawCode`, `Model`, `Position`, `IsAssociatedDevice`, `IsStandardPart`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Manufacturer, @Supplier, @Status, @SparePartsGroupId, @DrawCode, @Model, @Position, @IsAssociatedDevice, @IsStandardPart, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `equ_spare_parts`(  `Id`, `SiteId`, `Code`, `Name`, `Manufacturer`, `Supplier`, `Status`, `SparePartsGroupId`, `DrawCode`, `Model`, `Position`, `IsAssociatedDevice`, `IsStandardPart`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Manufacturer, @Supplier, @Status, @SparePartsGroupId, @DrawCode, @Model, @Position, @IsAssociatedDevice, @IsStandardPart, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `equ_sparepart` ( `Id`, `Code`, `Name`, `Status`, `SparePartTypeId`, `SupplierId`, `Manufacturer`, `DrawCode`, `Specifications`, `Position`, `IsCritical`, `IsStandard`, `Qty`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId` ) VALUES (  @Id, @Code, @Name, @Status, @SparePartTypeId, @SupplierId, @Manufacturer, @DrawCode, @Specifications, @Position, @IsCritical, @IsStandard, @Qty, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )";
+        const string InsertsSql = "INSERT INTO `equ_sparepart`( `Id`, `Code`, `Name`, `Status`, `SparePartTypeId`, `SupplierId`, `Manufacturer`, `DrawCode`, `Specifications`, `Position`, `IsCritical`, `IsStandard`, `Qty`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId` ) VALUES (  @Id, @Code, @Name, @Status, @SparePartTypeId, @SupplierId, @Manufacturer, @DrawCode, @Specifications, @Position, @IsCritical, @IsStandard, @Qty, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId ) ";
 
-        const string UpdateSql = "UPDATE `equ_spare_parts` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Manufacturer = @Manufacturer, Supplier = @Supplier, Status = @Status, SparePartsGroupId = @SparePartsGroupId, DrawCode = @DrawCode, Model = @Model, Position = @Position, IsAssociatedDevice = @IsAssociatedDevice, IsStandardPart = @IsStandardPart, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_spare_parts` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Manufacturer = @Manufacturer, Supplier = @Supplier, Status = @Status, SparePartsGroupId = @SparePartsGroupId, DrawCode = @DrawCode, Model = @Model, Position = @Position, IsAssociatedDevice = @IsAssociatedDevice, IsStandardPart = @IsStandardPart, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdateTypeSql = "UPDATE `equ_spare_parts` SET  SparePartsGroupId = @Id, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @SparePartIds ";
-        const string CleanTypeSql = "UPDATE equ_spare_parts SET SparePartsGroupId=0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn where SparePartsGroupId in @SparePartGroupIds";
+        const string UpdateSql = "UPDATE `equ_sparepart`  SET   SiteId = @SiteId, Code = @Code, Name = @Name, Manufacturer = @Manufacturer, SupplierId = @SupplierId, Status = @Status, SparePartTypeId = @SparePartTypeId, DrawCode = @DrawCode, Specifications = @Specifications, Position = @Position, IsCritical = @IsCritical, IsStandard = @IsStandard, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Qty = @Qty WHERE Id = @Id";
+        const string UpdatesSql = "UPDATE `equ_sparepart` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Manufacturer = @Manufacturer, Supplier = @Supplier, Status = @Status, SparePartId = @SparePartId, DrawCode = @DrawCode, Model = @Model, Position = @Position, IsAssociatedDevice = @IsAssociatedDevice, IsStandardPart = @IsStandardPart, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Qty = @Qty  WHERE Id = @Id ";
+        const string UpdateTypeSql = "UPDATE `equ_sparepart` SET  SparePartTypeId = @Id, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @SparePartIds ";
+        const string UpdateAddQtySql = "UPDATE `equ_sparepart` SET  Qty=Qty+@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @SparePartIds ";
+        const string UpdateMinusQtySql = "UPDATE `equ_sparepart` SET  Qty=Qty-@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @SparePartIds ";
+        const string CleanTypeSql = "UPDATE equ_sparepart SET SparePartTypeId=0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn where SparePartTypeId in @SparePartGroupIds";
 
-        const string DeleteSql = "UPDATE `equ_spare_parts` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `equ_spare_parts` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteSql = "UPDATE `equ_sparepart` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `equ_sparepart` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM `equ_spare_parts`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM `equ_spare_parts`  WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT esp.Id, esp.Qty, ESP.`Code`, ESP.`Name`, ESP.`Status`, ESP.`Manufacturer`, est.`Code` AS sparePartsGroup, ws.`Code` AS supplier, ESP.`SparePartTypeId`, ESP.`DrawCode`, ESP.`Specifications`, ESP.`Position`, ESP.`IsCritical`, ESP.`IsStandard`, esp.Remark, esp.CreatedBy, esp.CreatedOn, esp.UpdatedOn, esp.UpdatedBy  FROM `equ_sparepart` esp LEFT JOIN equ_sparepart_type est ON est.Id = esp.SparePartTypeId LEFT JOIN wh_supplier ws ON ws.Id = esp.SupplierId  WHERE esp.Id = @Id ";
+        const string GetByReIdsSql = @"SELECT esp.Id, esp.Qty, ESP.`Code`, ESP.`Name`, ESP.`Status`, ESP.`Manufacturer`, est.`Code` AS sparePartsGroup, ws.`Code` AS supplier, ESP.`SparePartTypeId`, ESP.`DrawCode`, ESP.`Specifications`, ESP.`Position`, ESP.`IsCritical`, ESP.`IsStandard`, esp.Remark, esp.CreatedBy, esp.CreatedOn, esp.UpdatedOn, esp.UpdatedBy  FROM `equ_sparepart` esp LEFT JOIN equ_sparepart_type est ON est.Id = esp.SparePartTypeId LEFT JOIN wh_supplier ws ON ws.Id = esp.SupplierId  WHERE esp.Id IN @Ids ";
 
-        const string GetByCodeSql = "SELECT * FROM `equ_spare_parts` WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
+        const string GetByIdsSql = @"SELECT * FROM `equ_sparepart`  WHERE Id IN @Ids ";
+
+        const string GetByCodeSql = "SELECT * FROM `equ_sparepart` WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
 
         const string GetSparePartsGroupRelationSqlTemplate = @"SELECT
 	                                                                       Id,
 	                                                                       Code,
 	                                                                       Name,
-	                                                                       SparePartsGroupId,
+	                                                                       SparePartTypeId,
                                                                            IsDeleted,
 	                                                                       CreatedBy,
 	                                                                       CreatedOn
                                                                         FROM
-	                                                                        equ_spare_parts 
+	                                                                        equ_sparepart 
 
                                                                         WHERE
-	                                                                        SparePartsGroupId = @Id 
+	                                                                        SparePartTypeId = @Id 
 	                                                                        AND IsDeleted = 0";
 
     }
