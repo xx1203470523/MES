@@ -37,6 +37,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
         /// 当前系统
         /// </summary>
         private readonly ICurrentSystem _currentSystem;
+
         /// <summary>
         /// 
         /// </summary>
@@ -190,7 +191,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialReturn
                     SiteId = _currentSystem.SiteId,
                     BarCodes = manuReturnOrderDetails.Select(x => x.MaterialBarCode)
                 });
-                //查询到物料信息
+                // 查询到物料信息
                 var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialInventoryEntities.Select(x => x.MaterialId));
                 foreach (var item in manuReturnOrderDetails)
                 {
