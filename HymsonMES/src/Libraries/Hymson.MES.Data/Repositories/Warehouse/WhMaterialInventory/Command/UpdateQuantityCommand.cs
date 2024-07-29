@@ -57,4 +57,26 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command
         public IEnumerable<string> Sfcs { get; set; }
 
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class UpdateQuantityResidueBySfcsMavelCommand : UpdateCommand
+    {
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 剩余数量
+        /// </summary>
+        public decimal QuantityResidue { get; set; }
+
+        /// <summary>
+        /// 条码集合
+        /// </summary>
+        public long Id { get; set; }
+
+    }
 }

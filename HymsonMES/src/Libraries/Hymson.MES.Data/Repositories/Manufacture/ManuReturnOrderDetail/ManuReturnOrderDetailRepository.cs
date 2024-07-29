@@ -126,6 +126,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where(" ReturnOrderId = @ReturnOrderId ");
             }
+            if (query.ReturnOrderIds != null && query.ReturnOrderIds.Count() > 0)
+            {
+                sqlBuilder.Where(" ReturnOrderId in @ReturnOrderIds ");
+            }
 
             sqlBuilder.AddParameters(query);
 
