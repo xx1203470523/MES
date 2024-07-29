@@ -878,7 +878,8 @@ namespace Hymson.MES.Services.Services.Quality
             List<WarehousingEntryDto> warehousingEntries = new();
 
             // 根据检验合格结果分组
-            foreach (var isQualified in updateDetailEntities.Select(x => x.IsQualified).Distinct())
+            var isQualifiedDict = updateDetailEntities.Select(x => x.IsQualified).Distinct();
+            foreach (var isQualified in isQualifiedDict)
             {
                 var warehousingEntryDto = new WarehousingEntryDto()
                 {
@@ -891,8 +892,8 @@ namespace Hymson.MES.Services.Services.Quality
                 };
 
                 // 遍历退料明细
-                List<ReceiptDetailDto> warehousingEntryDetails = new();
-                foreach (var item in returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified && o.BarCode == x.MaterialBarCode)))
+                var itemDetails = returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified && o.BarCode == x.MaterialBarCode));
+                foreach (var item in itemDetails)
                 {
                     var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", item.MaterialBarCode);
@@ -902,23 +903,25 @@ namespace Hymson.MES.Services.Services.Quality
                     var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId);
                     if (planWorkPlanMaterialEntity != null)
                     {
-                        warehousingEntryDetails.Add(new ReceiptDetailDto
+                        warehousingEntryDto.Details = new List<ReceiptDetailDto>
                         {
-                            ProductionOrder = planWorkPlanEntity.WorkPlanCode,
-                            ProductionOrderDetailID = planWorkOrderEntity?.WorkPlanProductId,
-                            ProductionOrderComponentID = planWorkPlanMaterialEntity.Id,
+                            new ReceiptDetailDto
+                            {
+                                ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                                ProductionOrderDetailID = planWorkOrderEntity?.WorkPlanProductId,
+                                ProductionOrderComponentID = planWorkPlanMaterialEntity.Id,
 
-                            ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
-                            SyncId = item.Id,
-                            MaterialCode = materialEntity?.MaterialCode,
-                            LotCode = whMaterialInventoryEntity.Batch,
-                            UnitCode = materialEntity?.Unit,
-                            UniqueCode = item.MaterialBarCode,
-                            Batch = whMaterialInventoryEntity.Batch ?? "",
-                            Quantity = item.Qty
-                        });
+                                ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
+                                SyncId = item.Id,
+                                MaterialCode = materialEntity?.MaterialCode,
+                                LotCode = whMaterialInventoryEntity.Batch,
+                                UnitCode = materialEntity?.Unit,
+                                UniqueCode = item.MaterialBarCode,
+                                Batch = whMaterialInventoryEntity.Batch ?? "",
+                                Quantity = item.Qty
+                            }
+                        };
                     }
-                    warehousingEntryDto.Details = warehousingEntryDetails;
                     warehousingEntries.Add(warehousingEntryDto);
                 }
             }
