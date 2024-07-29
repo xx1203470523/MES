@@ -776,7 +776,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 品检状态
         /// </summary>
-        public ProductReceiptQualifiedStatusEnum? Status { get; set; }
+        public ProductReceiptQualifiedStatusEnum? Type { get; set; }
 
         /// <summary>
         /// 仓库编号
