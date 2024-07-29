@@ -101,6 +101,9 @@ using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
 using Hymson.MES.Services.Dtos.EquMaintenanceTemplate;
 using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem.Query;
 using Hymson.MES.Services.Dtos.Equipment.EquMaintenance;
+using Hymson.MES.Core.Domain.EquRepairOrder;
+using Hymson.MES.Data.Repositories.EquRepairOrder;
+using Hymson.MES.Services.Dtos.EquRepairOrder;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -310,6 +313,16 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<EquMaintenancePlanDto, EquMaintenancePlanEntity>();
             CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
+            #endregion
+
+            #region EquRepairOrder
+            CreateMap<EquRepairOrderCreateDto, EquRepairOrderEntity>();
+            CreateMap<EquRepairOrderModifyDto, EquRepairOrderEntity>();
+            CreateMap<EquRepairOrderPagedQueryDto, EquRepairOrderPagedQuery>();
+            CreateMap<EquRepairOrderEntity, EquRepairOrderDto>();
+            CreateMap<EquRepairOrderPageView, EquRepairOrderDto>();
+
+            CreateMap<EquRepairOrderDto, EquRepairOrderEntity>();
             #endregion
         }
 
