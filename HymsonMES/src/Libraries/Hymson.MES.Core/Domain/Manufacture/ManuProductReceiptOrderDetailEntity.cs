@@ -81,6 +81,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 仓库
         /// </summary>
         public string WarehouseCode { get; set; }
+
+        /// <summary>
+        /// 完工单号
+        /// </summary>
+        public string CompletionOrderCode { get; set; }
     }
 
     public class QueryManuProductReceiptOrderDetail
