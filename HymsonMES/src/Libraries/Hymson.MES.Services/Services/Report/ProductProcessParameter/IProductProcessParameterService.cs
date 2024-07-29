@@ -16,5 +16,12 @@ namespace Hymson.MES.Services.Services.Report.ProductProcessParameter
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<ProductProcessParameterReportDto>> GetPageListAsync(ProductProcessParameterReportPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 根据查询条件导出数据
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<ProductProcessParameterExportResultDto> ExprotProductProcessParameterListAsync(ProductProcessParameterReportPagedQueryDto pagedQueryDto);
     }
 }

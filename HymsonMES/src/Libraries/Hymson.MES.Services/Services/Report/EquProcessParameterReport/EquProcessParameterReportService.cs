@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Services.Report
                 ParameterId = pagedQueryDto.ParameterId,
                 EquipmentId = pagedQueryDto.EquipmentId,
                 PageIndex = pagedQueryDto.PageIndex,
-                PageSize = 1000
+                PageSize = 10000
             };
             var pagedInfo = await _equipmentParameterRepository.GetParametesByEqumentIdEntitiesAsync(parameterQuery);
 

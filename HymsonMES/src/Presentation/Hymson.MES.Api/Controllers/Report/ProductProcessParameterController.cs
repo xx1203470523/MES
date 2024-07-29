@@ -42,5 +42,17 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _processParameterService.GetPageListAsync(queryDto);
         }
+
+        /// <summary>
+        /// 导出产品过程参数
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        public async Task<ProductProcessParameterExportResultDto> ExprotEquProcessParameterListAsync([FromQuery] ProductProcessParameterReportPagedQueryDto param)
+        {
+            return await _processParameterService.ExprotProductProcessParameterListAsync(param);
+        }
     }
 }
