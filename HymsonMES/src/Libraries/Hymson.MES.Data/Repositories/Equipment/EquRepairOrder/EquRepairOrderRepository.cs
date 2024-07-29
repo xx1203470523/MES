@@ -139,29 +139,54 @@ namespace Hymson.MES.Data.Repositories.EquRepairOrder
             }
 
 
-            if (equRepairOrderPagedQuery.CreatedOn != null && equRepairOrderPagedQuery.CreatedOn.Length >= 2)
+            if (equRepairOrderPagedQuery.CreatedOn != null && equRepairOrderPagedQuery.CreatedOn.Length >= 1)
             {
-                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.CreatedOn[0], EndTime = equRepairOrderPagedQuery.CreatedOn[1].AddDays(1) });
+                var endtime = equRepairOrderPagedQuery.CreatedOn[0].AddDays(1);
+                if (equRepairOrderPagedQuery.CreatedOn.Length >= 2)
+                {
+                    endtime = equRepairOrderPagedQuery.CreatedOn[1].AddDays(1);
+                }
+                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.CreatedOn[0], EndTime = endtime });
                 sqlBuilder.Where("ero.CreatedOn >= @StartTime AND ero.CreatedOn <= @EndTime");
             }
-            if (equRepairOrderPagedQuery.FaultTime != null && equRepairOrderPagedQuery.FaultTime.Length >= 2)
+            if (equRepairOrderPagedQuery.FaultTime != null && equRepairOrderPagedQuery.FaultTime.Length >=1)
             {
-                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.FaultTime[0], EndTime = equRepairOrderPagedQuery.FaultTime[1].AddDays(1) });
+                var endtime = equRepairOrderPagedQuery.FaultTime[0].AddDays(1);
+                if (equRepairOrderPagedQuery.FaultTime.Length >=2)
+                {
+                    endtime = equRepairOrderPagedQuery.FaultTime[1].AddDays(1);
+                }
+                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.FaultTime[0], EndTime = endtime });
                 sqlBuilder.Where("ero.FaultTime >= @StartTime AND ero.FaultTime <= @EndTime");
             }
             if (equRepairOrderPagedQuery.RepairStartTime != null && equRepairOrderPagedQuery.RepairStartTime.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.RepairStartTime[0], EndTime = equRepairOrderPagedQuery.RepairStartTime[1].AddDays(1) });
+                var endtime = equRepairOrderPagedQuery.RepairStartTime[0].AddDays(1);
+                if (equRepairOrderPagedQuery.RepairStartTime.Length >= 2)
+                {
+                    endtime = equRepairOrderPagedQuery.RepairStartTime[1].AddDays(1);
+                }
+                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.RepairStartTime[0], EndTime = endtime });
                 sqlBuilder.Where("err.RepairStartTime >= @StartTime AND err.RepairStartTime <= @EndTime");
             }
             if (equRepairOrderPagedQuery.RepairEndTime != null && equRepairOrderPagedQuery.RepairEndTime.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.RepairEndTime[0], EndTime = equRepairOrderPagedQuery.RepairEndTime[1].AddDays(1) });
+                var endtime = equRepairOrderPagedQuery.RepairEndTime[0].AddDays(1);
+                if (equRepairOrderPagedQuery.RepairEndTime.Length >= 2)
+                {
+                    endtime = equRepairOrderPagedQuery.RepairEndTime[1].AddDays(1);
+                }
+                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.RepairEndTime[0], EndTime = endtime });
                 sqlBuilder.Where("err.RepairEndTime >= @StartTime AND err.RepairEndTime <= @EndTime");
             }
             if (equRepairOrderPagedQuery.ConfirmOn != null && equRepairOrderPagedQuery.ConfirmOn.Length >= 2)
             {
-                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.ConfirmOn[0], EndTime = equRepairOrderPagedQuery.ConfirmOn[1].AddDays(1) });
+                var endtime = equRepairOrderPagedQuery.ConfirmOn[0].AddDays(1);
+                if (equRepairOrderPagedQuery.ConfirmOn.Length >= 2)
+                {
+                    endtime = equRepairOrderPagedQuery.ConfirmOn[1].AddDays(1);
+                }
+                sqlBuilder.AddParameters(new { StartTime = equRepairOrderPagedQuery.ConfirmOn[0], EndTime = endtime });
                 sqlBuilder.Where("err.ConfirmOn >= @StartTime AND err.ConfirmOn <= @EndTime");
             }
 
