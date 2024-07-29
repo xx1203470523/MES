@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
@@ -29,6 +30,7 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Options;
 using Hymson.MES.Services.Dtos.Warehouse;
+using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -107,6 +109,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly IManuProductReceiptOrderDetailRepository _manuProductReceiptOrderDetailRepository;
 
         private readonly IOptions<WMSOptions> _wmsOptions;
+        private readonly ISequenceService _sequenceService;
 
         /// <summary>
         /// 构造函数
@@ -144,6 +147,8 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="manuProductReceiptOrderRepository"></param>
         /// <param name="currentSystem"></param>
         /// <param name="manuProductReceiptOrderDetailRepository"></param>
+        /// <param name="wmsOptions"></param>
+        /// <param name="sequenceService"></param>
         public WhMaterialInventoryService(ICurrentUser currentUser, ICurrentSite currentSite,
             ILocalizationService localizationService,
             IProcMaterialRepository procMaterialRepository,
@@ -176,7 +181,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             IManuProductReceiptOrderRepository manuProductReceiptOrderRepository,
             ICurrentSystem currentSystem,
             IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository,
-            IOptions<WMSOptions> wmsOptions)
+            IOptions<WMSOptions> wmsOptions,
+            ISequenceService sequenceService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -212,6 +218,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _currentSystem = currentSystem;
             _manuProductReceiptOrderDetailRepository = manuProductReceiptOrderDetailRepository;
             _wmsOptions = wmsOptions;
+            _sequenceService = sequenceService;
         }
 
 
@@ -1471,7 +1478,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             PlanWorkPlanQuery planQuery = new PlanWorkPlanQuery();
             planQuery.WorkPlanCode = erpOrder;
             var erpInfo = await _planWorkPlanRepository.GetProductAsync(planQuery);
-            if(erpInfo == null)
+            if (erpInfo == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17756))
                     .WithData("orderCode", erpOrder);
@@ -1510,7 +1517,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             };
             foreach (var item in request.Items)
             {
-
+                var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
+                var CompletionOrderCode = $"{"WG"}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
                 // var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
 
                 HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
@@ -1534,9 +1542,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialName = request.MaterialName,
                     Qty = item.Qty,
                     ContaineCode = item.BoxCode,
-                    Status = item.Status ?? 0,
+                    Status = item.Type ?? 0,
                     SiteId = _currentSite.SiteId ?? 0,
                     Unit = item.Unit,
+                    CompletionOrderCode= CompletionOrderCode,
                     CreatedBy = _currentSystem.Name,
                     UpdatedBy = _currentSystem.Name,
                 };
@@ -1557,12 +1566,23 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17755)).WithData("msg", string.Join(",", whCodeList));
             }
+            //校验成品码是否是一样的
+            var SfcList = request.Items.GroupBy(p => p.Sfc)
+                                         .Any(g => g.Count() > 1);
+            if (SfcList)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17757));
+            }
             //特殊处理。。。
             string whName = whCodeList[0];
             string whCode = string.Empty;
-            if(whName == "成品仓" || whName == "待检验仓") //不是不良品仓
+            if (whName == "成品仓") //不是不良品仓
             {
                 whCode = _wmsOptions.Value.ProductReceipt.FinishWarehouseCode;
+            }
+            else if (whName == "待检验仓") //待检验仓
+            {
+                whCode = _wmsOptions.Value.ProductReceipt.PendInspection;
             }
             else
             {

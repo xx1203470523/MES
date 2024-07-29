@@ -191,6 +191,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 创建时间
         /// </summary>
         public DateTime CreateDate { get; set; }
+
+        /// <summary>
+        /// 完工单号
+        /// </summary>
+        public string CompletionOrderCode {  get; set; }
     }
 
     /// <summary>

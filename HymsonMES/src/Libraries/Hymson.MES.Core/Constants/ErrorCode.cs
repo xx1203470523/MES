@@ -2358,6 +2358,7 @@
         public const string MES17754 = "成品码已提交完工入库 ！";
         public const string MES17755 = "成品完工入库中存在不同的仓库【{msg}】 ！";
         public const string MES17756 = "成品完工入库中ERP工单信息不存在【{orderCode}】 ！";
+        public const string MES17757 = "成品完工入库中存在相同的产品码！";
         #endregion
     }
 }

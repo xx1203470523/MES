@@ -30,6 +30,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
 {
@@ -93,8 +94,12 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
 
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
+        private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
+
+        private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
+
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
@@ -114,6 +119,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
         /// <param name="manuGenerateBarcodeService"></param>
         /// <param name="whWarehouseRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="planWorkPlanRepository"></param>
+        /// <param name="planWorkPlanMaterialRepository"></param>
         public WhMaterialReturnService(ICurrentUser currentUser, ICurrentSite currentSite,
             ILocalizationService localizationService,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
@@ -123,13 +130,16 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
             IWhSupplierRepository whSupplierRepository,
             IIQCOrderCreateService iQCOrderCreateService,
-            IOptions<WMSOptions> options, IWMSApiClient xnebulaWMSApiClient,
+            IOptions<WMSOptions> options,
+            IWMSApiClient xnebulaWMSApiClient,
             IQualIqcOrderReturnRepository qualIqcOrderReturnRepository,
             IQualIqcOrderReturnDetailRepository qualIqcOrderReturnDetailRepository,
             IInteCodeRulesRepository inteCodeRulesRepository,
             IManuGenerateBarcodeService manuGenerateBarcodeService,
             IWhWarehouseRepository whWarehouseRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -149,6 +159,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
             _whWarehouseRepository = whWarehouseRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
         }
 
 
@@ -255,6 +267,18 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             // 查询工单信息
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(requestDto.WorkOrderId);
 
+            // 查询生产计划
+            var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+
+            // 查询生产物料
+            var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                PlanId = planWorkPlanEntity.Id,
+                PlanProductId = planWorkOrderEntity.WorkPlanProductId ?? 0
+            });
+
             // 遍历提交退料的物料条码
             foreach (var materialBarCode in requestDto.MaterialBarCodes)
             {
@@ -339,17 +363,27 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                     });
                 }
 
-                warehousingEntryDetails.Add(new ReceiptDetailDto
+                // 2024.07.27 TODO: 临时处理
+                var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == materialEntity?.Id);
+                if (planWorkPlanMaterialEntity != null)
                 {
-                    ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
-                    SyncId = manuReturnOrderDetailId,
-                    MaterialCode = materialEntity?.MaterialCode,
-                    LotCode = whMaterialInventoryEntity.Batch,
-                    UnitCode = materialEntity?.Unit,
-                    UniqueCode = materialBarCode,
-                    Quantity = whMaterialInventoryEntity.QuantityResidue,
-                    Batch = whMaterialInventoryEntity.Batch ?? ""
-                });
+                    warehousingEntryDetails.Add(new ReceiptDetailDto
+                    {
+                        ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                        ProductionOrderDetailID = planWorkOrderEntity?.WorkPlanProductId,
+                        ProductionOrderComponentID = planWorkPlanMaterialEntity.Id,
+
+                        ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
+                        SyncId = manuReturnOrderDetailId,
+                        MaterialBarCode = materialBarCode,
+                        MaterialCode = materialEntity?.MaterialCode,
+                        LotCode = whMaterialInventoryEntity.Batch,
+                        UnitCode = materialEntity?.Unit,
+                        UniqueCode = materialBarCode,
+                        Quantity = whMaterialInventoryEntity.QuantityResidue,
+                        Batch = whMaterialInventoryEntity.Batch ?? ""
+                    });
+                }
             }
             warehousingEntryDto.Details = warehousingEntryDetails;
 
