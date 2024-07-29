@@ -98,5 +98,42 @@ namespace Hymson.MES.Services
             return AutoMapperConfiguration.Mapper.Map<TEntity>(baseEntity);
         }
 
+        /// <summary>
+        /// 深度复制
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static TEntity ToCopy<TEntity>(this TEntity source) where TEntity : class
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            return AutoMapperConfiguration.Mapper.Map<TEntity>(source);
+        }
+
+        /// <summary>
+        /// 两实体合并映射
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static TDestination ToCombineMap<TSource, TDestination>(this TSource source, TDestination destination)
+        where TSource : class
+        where TDestination : class
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            return AutoMapperConfiguration.Mapper.Map(source, destination);
+        }
+
     }
 }

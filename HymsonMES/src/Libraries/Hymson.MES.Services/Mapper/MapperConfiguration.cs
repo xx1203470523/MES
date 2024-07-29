@@ -92,6 +92,15 @@ using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
 using Hymson.MES.Services.Dtos.Marking;
+using Hymson.MES.Core.Domain.Equipment.EquMaintenance;
+using Hymson.MES.Data.Repositories.EquMaintenancePlan;
+using Hymson.MES.Core.Domain.Equipment.EquSpotcheck;
+using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
+using Hymson.MES.Data.Repositories.EquSpotcheckPlan;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
+using Hymson.MES.Services.Dtos.EquMaintenanceTemplate;
+using Hymson.MES.Data.Repositories.Equipment.EquMaintenance.EquMaintenanceItem.Query;
+using Hymson.MES.Services.Dtos.Equipment.EquMaintenance;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -248,6 +257,60 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSparePartsEntity, EquSparePartsDto>();
             #endregion
 
+
+            #region 设备保养
+            CreateMap<EquMaintenanceItemSaveDto, EquMaintenanceItemEntity>();
+            CreateMap<EquMaintenanceItemPagedQueryDto, EquMaintenanceItemPagedQuery>();
+
+            CreateMap<EquMaintenanceItemEntity, EquMaintenanceItemDto>();
+            CreateMap<EquMaintenanceItemUpdateDto, EquMaintenanceItemEntity>();
+
+            //task index
+            CreateMap<EquMaintenanceTaskPagedQueryDto, EquMaintenanceTaskPagedQuery>();
+            CreateMap<EquMaintenanceTaskUnionPlanEntity, EquMaintenanceTaskDto>();
+            //item
+            CreateMap<EquMaintenanceTaskSnapshotItemEntity, EquMaintenanceTaskItemUnionSnapshotView>();
+            CreateMap<EquMaintenanceTaskItemEntity, EquMaintenanceTaskItemUnionSnapshotView>();
+
+            #endregion
+
+            //#region EquSpotcheckTemplate
+            //CreateMap<EquSpotcheckTemplateCreateDto, EquSpotcheckTemplateEntity>();
+            //CreateMap<EquSpotcheckTemplateModifyDto, EquSpotcheckTemplateEntity>();
+            //CreateMap<EquSpotcheckTemplatePagedQueryDto, EquSpotcheckTemplatePagedQuery>();
+            //CreateMap<EquSpotcheckTemplateEntity, EquSpotcheckTemplateDto>();
+
+            //CreateMap<EquSpotcheckTemplateDto, EquSpotcheckTemplateEntity>();
+            //#endregion
+
+            //#region EquSpotcheckPlan
+            //CreateMap<EquSpotcheckPlanCreateDto, EquSpotcheckPlanEntity>();
+            //CreateMap<EquSpotcheckPlanModifyDto, EquSpotcheckPlanEntity>();
+            //CreateMap<EquSpotcheckPlanPagedQueryDto, EquSpotcheckPlanPagedQuery>();
+            //CreateMap<EquSpotcheckPlanEntity, EquSpotcheckPlanDto>();
+
+            //CreateMap<EquSpotcheckPlanDto, EquSpotcheckPlanEntity>();
+            //CreateMap<EquSpotcheckPlanEntity, EquSpotcheckPlanDto>();
+            //#endregion
+
+            #region EquMaintenanceTemplate
+            CreateMap<EquMaintenanceTemplateCreateDto, EquMaintenanceTemplateEntity>();
+            CreateMap<EquMaintenanceTemplateModifyDto, EquMaintenanceTemplateEntity>();
+            CreateMap<EquMaintenanceTemplatePagedQueryDto, EquMaintenanceTemplatePagedQuery>();
+            CreateMap<EquMaintenanceTemplateEntity, EquMaintenanceTemplateDto>();
+
+            CreateMap<EquMaintenanceTemplateDto, EquMaintenanceTemplateEntity>();
+            #endregion
+
+            #region EquMaintenancePlan
+            CreateMap<EquMaintenancePlanCreateDto, EquMaintenancePlanEntity>();
+            CreateMap<EquMaintenancePlanModifyDto, EquMaintenancePlanEntity>();
+            CreateMap<EquMaintenancePlanPagedQueryDto, EquMaintenancePlanPagedQuery>();
+            CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
+
+            CreateMap<EquMaintenancePlanDto, EquMaintenancePlanEntity>();
+            CreateMap<EquMaintenancePlanEntity, EquMaintenancePlanDto>();
+            #endregion
         }
 
         /// <summary>
