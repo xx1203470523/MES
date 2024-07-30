@@ -74,6 +74,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             //查询水位
             long waterMarkId = await _waterMarkService.GetWaterMarkAsync(busKey);
             DateTime startWaterMarkTime = HymsonClock.Now();
+            if(waterMarkId == 333)
+            {
+                return 0;
+            }
             if (waterMarkId != 0)
             {
                 startWaterMarkTime = UnixTimestampMillisToDateTime(waterMarkId);
