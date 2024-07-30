@@ -164,22 +164,22 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <summary>
         /// 轴码和铁芯码绑定工序
         /// </summary>
-        private readonly string PRODUCRE_Z_TX = "ROP070";
+        private readonly string PRODUCRE_Z_TX = "R01OP070";
 
         /// <summary>
         /// 成品和轴码绑定东旭
         /// </summary>
-        private readonly string PRODUCRE_CP_Z = "ROP130";
+        private readonly string PRODUCRE_CP_Z = "R01OP130";
 
         /// <summary>
         /// 末工序
         /// </summary>
-        private readonly string PRODUCRE_END = "ROP150";
+        private readonly string PRODUCRE_END = "R01OP150";
 
         /// <summary>
         /// 工序前缀
         /// </summary>
-        private readonly string PRODUCRE_PREFIX = "R";
+        private readonly string PRODUCRE_PREFIX = "R01";
 
         /// <summary>
         /// 站点ID
@@ -597,7 +597,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         {
                             continue;
                         }
-                        if(mesItem.ProcedureCode == "ROP130")
+                        if(mesItem.ProcedureCode == "R01OP130")
                         {
                             VAR_DEBUG = 3;
                         }
@@ -1348,7 +1348,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             WorkOrderQtyQuery query = new WorkOrderQtyQuery();
             query.SiteId = mesOrderList[0].SiteId;
             query.OrderIdList = orderIdList;
-            var orderViewQty = await _manuSfcInfoRepository.GetWorkOrderQtyMavelAsync(query);
+            var orderViewQty = await _manuSfcInfoRepository.GetWorkOrderQtyMavelAsync(query,PRODUCRE_END);
             List<long> dbOrderId = orderViewQty.Select(m => m.WorkOrderId).ToList();
             if(dbOrderId.Count == 0)
             {
