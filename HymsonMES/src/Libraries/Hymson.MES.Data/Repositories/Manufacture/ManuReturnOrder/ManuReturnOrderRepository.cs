@@ -1,6 +1,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuReturnOrder.Command;
@@ -118,17 +119,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where("WorkOrderId = @WorkOrderId");
+            }
             if (!string.IsNullOrWhiteSpace(query.ReturnOrderCode))
             {
                 query.ReturnOrderCode = $"%{query.ReturnOrderCode}%";
                 sqlBuilder.Where("ReturnOrderCode LIKE @ReturnOrderCode");
             }
-            if (query.WorkOrderId.HasValue)
-            {
-                sqlBuilder.Where("WorkOrderId=@WorkOrderId");
-            }
-            sqlBuilder.AddParameters(query);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuReturnOrderEntity>(template.RawSql, query);
         }
@@ -224,6 +226,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM manu_return_order /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_return_order /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_return_order /**where**/  ";
+
         const string GetSingleEntitySqlTemplate = @"SELECT /**select**/ FROM manu_return_order /**where**/ LIMIT 1 ";
         const string InsertSql = "INSERT INTO manu_return_order(  `Id`, `ReturnOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, ReturnWarehouseId, `ReceiveWarehouseId`) VALUES (  @Id, @ReturnOrderCode, @WorkOrderId, @Type, @Status,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ReturnWarehouseId, @ReceiveWarehouseId) ";
         const string InsertsSql = "INSERT INTO manu_return_order(  `Id`, `ReturnOrderCode`, `WorkOrderId`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, ReturnWarehouseId, `ReceiveWarehouseId`) VALUES (  @Id, @ReturnOrderCode, @WorkOrderId, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @ReturnWarehouseId, @ReceiveWarehouseId) ";
