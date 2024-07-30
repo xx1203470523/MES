@@ -49,5 +49,18 @@ namespace Hymson.MES.Services.Services.Report
         /// <returns></returns>
         Task<IEnumerable<ManuProductBadRecordLogReportResponseDto>> GetLogPageDetailListAsync(ManuProductBadRecordLogReportRequestDto request);
 
+        /// <summary>
+        /// 导出不良报告查询数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<ManuProductBadRecordReportExportResultDto> ExprotListAsync(BadRecordReportDto param);
+
+        /// <summary>
+        /// 根据查询条件获取不良日志报表分页数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<ManuProductBadRecordLogReportExportResultDto> ExprotLogListAsync(ManuProductBadRecordLogReportPagedQueryDto param);
     }
 }
