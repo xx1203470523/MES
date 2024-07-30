@@ -55,7 +55,7 @@ namespace Hymson.MES.Api.Controllers.Report
         [HttpGet("ProcedureSources/{sfc}")]
         public async Task<IEnumerable<ProcedureSourceDto>> GetProcedureSourcesAsync(string sfc)
         {
-            return await _tracingSFCService.GetProcedureSourcesAsync(sfc);
+            return await _tracingSFCService.GetOldProcedureSourcesAsync(sfc);
         }
         /// <summary>
         /// 查询此条码所有的作业日志

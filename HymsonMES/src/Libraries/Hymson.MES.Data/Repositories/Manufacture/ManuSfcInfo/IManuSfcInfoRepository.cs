@@ -161,5 +161,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="sfc"></param>
         /// <returns></returns>
         Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc);
+
+        Task<IEnumerable<ManuSfcInfoEntity>> GetBySFCAsync(string sfc);
     }
 }
