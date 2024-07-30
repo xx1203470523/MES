@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Constants.Manufacture;
+﻿using Google.Protobuf.WellKnownTypes;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -93,10 +94,15 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.TracingSourceSFC);
 
             // 获取流转表数据（因为这张表的数据会有更新操作，所以不能用常规水位）
-            DateTime startWaterMarkTime = UnixTimestampMillisToDateTime(waterMarkId);
-            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
+            //DateTime startWaterMarkTime = UnixTimestampMillisToDateTime(waterMarkId);
+            //var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
+            //{
+            //    StartWaterMarkTime = startWaterMarkTime,
+            //    Rows = limitCount
+            //});
+            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
             {
-                StartWaterMarkTime = startWaterMarkTime,
+                StartWaterMarkId = waterMarkId,
                 Rows = limitCount
             });
 
@@ -246,12 +252,14 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             rows += await _manuSFCNodeDestinationRepository.InsertRangeAsync(nodeDestinationEntities);
 
             // 更新水位
-            var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
-            if (maxUpdateWaterMarkUpdatedOn.HasValue)
-            {
-                long timestamp = GetTimestampInMilliseconds(maxUpdateWaterMarkUpdatedOn.Value);
-                rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
-            }
+            var maxWaterMarkId = manuSfcCirculationList.Max(m => m.Id);
+            rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, maxWaterMarkId);
+            //var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
+            //if (maxUpdateWaterMarkUpdatedOn.HasValue)
+            //{
+            //    long timestamp = GetTimestampInMilliseconds(maxUpdateWaterMarkUpdatedOn.Value);
+            //    rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
+            //}
             trans.Complete();
 
         }
