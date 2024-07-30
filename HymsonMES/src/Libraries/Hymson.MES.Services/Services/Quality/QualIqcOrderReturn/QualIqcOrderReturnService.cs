@@ -894,13 +894,14 @@ namespace Hymson.MES.Services.Services.Quality
                 };
 
                 // 退料明细
-                var itemDetails = returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified.Key));
-
                 List<ReceiptDetailDto> details = new();
-                foreach (var item in itemDetails)
+                foreach (var item in isQualified.Value)
                 {
-                    var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode)
-                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", item.MaterialBarCode);
+                    var returnOrderDetail = returnDetailEntities.FirstOrDefault(f => f.Id == item.ReturnOrderDetailId);
+                    if (returnOrderDetail == null) continue;
+
+                    var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == returnOrderDetail.MaterialBarCode)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", returnOrderDetail.MaterialBarCode);
 
                     var materialEntity = materialEntities.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
 
@@ -917,8 +918,8 @@ namespace Hymson.MES.Services.Services.Quality
                             WorkOrderCode = planWorkOrderEntity?.OrderCode,
 
                             SyncId = item.Id,
-                            UniqueCode = item.MaterialBarCode,
-                            Quantity = item.Qty,
+                            UniqueCode = returnOrderDetail.MaterialBarCode,
+                            Quantity = returnOrderDetail.Qty,
                             MaterialCode = materialEntity?.MaterialCode,
                             UnitCode = materialEntity?.Unit,
                             LotCode = whMaterialInventoryEntity.Batch,
