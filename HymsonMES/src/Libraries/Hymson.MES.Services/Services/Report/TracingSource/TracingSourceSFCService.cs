@@ -182,8 +182,8 @@ namespace Hymson.MES.Services.Services
                 if (procMaterialEntity == null) continue;
                 var materialSourceDto = new MaterialSourceDto();
                 materialSourceDto.CirculationQty = manuSfcCirculationEntity.CirculationQty ?? 0;
-                materialSourceDto.CirculationBarCode = manuSfcCirculationEntity.SFC;
-                materialSourceDto.Sfc = manuSfcCirculationEntity.CirculationBarCode;
+                materialSourceDto.CirculationBarCode = manuSfcCirculationEntity.CirculationBarCode;
+                materialSourceDto.Sfc = manuSfcCirculationEntity.SFC; 
 
                 var procProcedureEntity = await _masterDataService.GetProcProcedureEntityAsync(_currentSite.SiteId ?? 0, manuSfcCirculationEntity.ProcedureId);
                 materialSourceDto.ProcedureCode = procProcedureEntity == null ? "" : procProcedureEntity.Code;
