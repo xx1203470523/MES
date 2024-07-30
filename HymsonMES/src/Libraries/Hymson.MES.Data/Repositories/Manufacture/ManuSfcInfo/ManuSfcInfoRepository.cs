@@ -224,14 +224,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WorkOrderQtyView>> GetWorkOrderQtyMavelAsync(WorkOrderQtyQuery query)
+        public async Task<IEnumerable<WorkOrderQtyView>> GetWorkOrderQtyMavelAsync(WorkOrderQtyQuery query, string endOp)
         {
             string sql = $@"
                 select WorkOrderId ,count(*) Qty
                 from manu_sfc_step mss 
                 where SiteId  = {query.SiteId}
                 and WorkOrderId in ({string.Join(",",query.OrderIdList)})
-                and Remark  = 'ROP150'
+                and Remark  = '{endOp}'
                 group by WorkOrderId 
             ";
 
