@@ -30,7 +30,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
-using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
 {
@@ -209,17 +208,18 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             // 检验单明细
             List<QualIqcOrderReturnDetailEntity> qualIqcOrderReturnDetailEntities = new();
 
+            var warehousingEntryDetails = new List<ReceiptDetailDto>();
+            var returnOrderCode = await GenerateMaintenanceOrderCodeAsync(baseBo.SiteId, baseBo.User);
+
             var warehousingEntryDto = new WarehousingEntryDto()
             {
                 Type = BillBusinessTypeEnum.WorkOrderMaterialReturnForm,
                 IsAutoExecute = requestDto.Type == ManuReturnTypeEnum.WorkOrderBorrow,
+                SyncCode = returnOrderCode,
                 CreatedBy = baseBo.User,
                 WarehouseCode = _options.Value.Receipt.VirtuallyWarehouseCode,
                 Remark = requestDto.Remark,
             };
-
-            var warehousingEntryDetails = new List<ReceiptDetailDto>();
-            var returnOrderCode = await GenerateMaintenanceOrderCodeAsync(baseBo.SiteId, baseBo.User);
 
             // 创建领料申请单
             var manuReturnOrderEntity = new ManuReturnOrderEntity
@@ -242,7 +242,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             if (requestDto.Type == ManuReturnTypeEnum.WorkOrderReturn)
             {
                 // 生成检验单号
-                var inspectionOrder = await _iqcOrderCreateService.GenerateCommonIQCOrderCodeAsync(new CoreServices.Bos.Common.BaseBo
+                var inspectionOrder = await _iqcOrderCreateService.GenerateCommonIQCOrderCodeAsync(new BaseBo
                 {
                     SiteId = baseBo.SiteId,
                     User = baseBo.User,
@@ -411,7 +411,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
             if (requestDto.Type == ManuReturnTypeEnum.WorkOrderBorrow)
             {
                 var response = await _wmsRequest.WarehousingEntryRequestAsync(warehousingEntryDto);
-                if (response.Code == 0)
+                if (response.Code != 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS").WithData("Msg", response.Message);
                 }
