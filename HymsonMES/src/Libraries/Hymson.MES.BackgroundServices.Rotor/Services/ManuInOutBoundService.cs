@@ -361,6 +361,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 //}
                 lmsOrderList.Add(tmpOrderCode);
             }
+            lmsOrderList = lmsOrderList.Distinct().ToList();
             #endregion
 
             #region 获取MES数据
@@ -570,6 +571,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 {
                     procedureId = mesProcedure.Id;
                 }
+                else
+                {
+                    VAR_DEBUG = 3;
+                }
 
                 //写入到步骤表
                 if (mesItem.Type == 2)
@@ -601,7 +606,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                         {
                             continue;
                         }
-                        if(mesItem.ProcedureCode == "R01OP130")
+                        if(mesItem.ProcedureCode == PRODUCRE_CP_Z)
                         {
                             VAR_DEBUG = 3;
                         }
