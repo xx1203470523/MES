@@ -447,6 +447,18 @@
         public const string MES11501 = "不能删除启用状态的数据";
         #endregion
 
+        #region 基础数据导入 11600
+
+        public const string MES11601 = "导入的数据中设备编码重复！";
+        public const string MES11602 = "设备编码不能为空！";
+        public const string MES11603 = "设备名称不能为空！";
+        public const string MES11604 = "存放位置不能为空！";
+        public const string MES11605 = "使用状态不能为空！";
+        public const string MES11606 = "导入的数据中资源编码重复！";
+        public const string MES11607 = "导入的数据中工序编码重复！";
+        public const string MES11608 = "导入数据为空！";
+        #endregion
+
         #region FQC检验任务 11700
 
         public const string MES11700 = "参数错误，条码产出数据不存在！";
@@ -896,6 +908,30 @@
         public const string MES13702 = "工具类型{codes}已经存在";
         #endregion
 
+        #region 备件维护 13800
+        public const string MES13801 = "联副产品收货失败";
+        public const string MES13802 = "收货数量超出工单的已下达数量,不予生成!";
+        #endregion
+
+        #region 跨时间管控 13900
+        public const string MES13900 = "时间管控编号不能为空";
+        public const string MES13901 = "时间管控编号最大长度为50";
+        public const string MES13902 = "名称不能为空";
+        public const string MES13903 = "名称最大长度为60";
+        public const string MES13904 = "描述最大长度为255";
+        public const string MES13905 = "此时间管控编号{code}在系统已经存在！";
+        public const string MES13906 = "同产品、同起始工序、同结束工不能重复录入!";
+        public const string MES13907 = "起始工序不能与到达工序为同一工序!";
+        public const string MES13908 = "起始工序不属于到达工序的前工序!";
+        public const string MES13909 = "上限时间不可小于下限时间!";
+        public const string MES13910 = "上限时间和下限时间不可相等!";
+        public const string MES13911 = "上限时间需大于0";
+        public const string MES13912 = "下限时间需大于0";
+        public const string MES13913 = "此跨工序时间管控信息不存在!";
+        public const string MES13914 = "选择的产品不存在！";
+        public const string MES13915 = "托盘内产品没有维护产品工序时间，不允许进站!";
+        #endregion
+
         #region  14000段项目使用 平台请勿使用
 
         #endregion
@@ -1142,6 +1178,48 @@
         public const string MES15728 = "设置编码【{code}】在当前操作中不允许重复！";
         public const string MES15729 = "配方操作不允许重复！";
         public const string MES15730 = "步骤第{line}行下限不能大于上限";
+        #endregion
+
+        #region 设备点检 15800
+        //公共
+        public const string MES15801 = "此设备点检项目{code}在系统中已经存在!";
+        public const string MES15802 = "此设备点检任务{code}在系统中已经存在!";
+        public const string MES15803 = "设备点检任务不存在！";
+        public const string MES15804 = "点检任务的执行月份不是当前月份,不能生成设备点检录入！";
+        public const string MES15805 = "请先录入点检任务结果！";
+        public const string MES15806 = "点检任务中,重复配置点检项目！";
+        public const string MES15807 = "只能删除待检验状态的数据";
+        #endregion
+
+        #region 设备点检执行 15900
+        //保养
+        public const string MES15901 = "不良已关闭，不允许删除!";
+        public const string MES15902 = "待处理状态的保养任务，数据需要先保存后点击完成！";
+        public const string MES15903 = "没有找到相应的保养快照项！请检查生成是否遇到问题";
+        public const string MES15904 = "保养单据状态为检验中、待审核、已关闭的单据，删除失败!";
+        public const string MES15905 = "数值类型的检验值请输入不为数值！";
+        public const string MES15906 = "当前时间,未到保养计划开始时间{time}";
+        public const string MES15907 = "当前时间,已超过保养计划结束时间{time}";
+        public const string MES15908 = "未找到保养计划数据";
+        public const string MES15909 = "当前时间无需延期，当前时间未超过计划开始时间{time}";
+
+        //点检
+        public const string MES15910 = "保存时，未找到点检单!请联系管理员";
+        public const string MES15911 = "含有数值类型，需要先保存才能执行完成";
+        public const string MES15912 = "当前时间,未到点检计划开始时间{time}";
+        public const string MES15913 = "当前时间,已超过点检计划结束时间{time}";
+        public const string MES15914 = "项目编码{Code},合格状态不能为无！";
+        public const string MES15915 = "项目编码{Code},数值类型不能为空！";
+
+
+        //点检保养项目
+        public const string MES15920 = "已被设备保养模板{Code}引用！";
+        public const string MES15921 = "已被设备点检模板{Code}引用！";
+        public const string MES15922 = "延期时间不允许为空";
+        public const string MES15923 = "延期失败,计划结束时间需大于当前时间，请将开始时间设置于{time}之后！";
+        public const string MES15924 = "单位编码{Code}不存在，请选择或输入正确单位编码";
+
+
         #endregion
 
         #region 工单 16000
@@ -1640,6 +1718,92 @@
         public const string MES17427 = "产品序列码【{SFC}】包含不合格信息，无法进行半成品入库，请检查传入参数。";
         #endregion
 
+        #region 设备点检 车间物料不良录入 17500
+        public const string MES17501 = "不良已关闭，不允许删除!";
+
+        public const string MES17502 = "物料条码不存在!";
+        public const string MES17503 = "物料条码不可用!";
+        public const string MES17504 = "物料条码库存数量为0!";
+        public const string MES17505 = "物料条码已录入不良且未进行不良处置!";
+        #endregion
+
+        #region 备件安装卸载 17600
+        public const string MES17601 = "备件不存在!";
+        public const string MES17602 = "备件已绑定设备,位置{position}!";
+        public const string MES17603 = "备件没有设置备件类型!";
+        public const string MES17604 = "待安装的设备不在备件类型所关联的设备组中!";
+        public const string MES17605 = "备件对应的备件类型没有关联设备组!";
+        public const string MES17606 = "备件关联的设备组不包含当前设备!";
+        public const string MES17607 = "备件在设备上的安装数量不能超过备件注册数量!";
+        #endregion
+
+        #region 工具安装卸载 17700
+        public const string MES17701 = "工具不存在!";
+        public const string MES17702 = "工具{code}不可使用!";
+        public const string MES17703 = "工具{code}已在设备{position}位置安装!";
+        public const string MES17704 = "设备{code}位置{position}已安装工具，请卸载后再进行操作!";
+        public const string MES17705 = "工具无剩余寿命，不可使用!";
+        public const string MES17706 = "工具本次使用寿命需大于0";
+        public const string MES17707 = "工具{toolCode}不允许在设备{equipmentCode}使用!";
+        public const string MES17708 = "工具{toolCode}不允许对产品使用!";
+        public const string MES17709 = "工具{toolCode}不允许对产品{productCode}使用!";
+        #endregion
+
+        #region 子步骤管理 17750
+        public const string MES17751 = "子步骤{code}已经存在";
+        public const string MES17752 = "子步骤不存在！";
+        public const string MES17753 = "子步骤已被分配给工序，不允许删除！";
+        #endregion
+
+        #region OQC检验项目 17800
+
+        public const string MES17800 = "出货单暂无数据!";
+        public const string MES17801 = "出货单详情暂无数据!";
+        public const string MES17802 = "出货单详情物料,暂无数据!";
+        public const string MES17803 = "样品条码【{barcode}】不存在出货单中！";
+        public const string MES17804 = "检验单数据为空！";
+        public const string MES17805 = "OQC检验参数组明细数据为空！";
+        public const string MES17806 = "保存OQC样品数据失败！";
+        public const string MES17807 = "OQC检验单【{code}】状态必须为待检验！";
+        public const string MES17808 = "完成OQC检验单失败！";
+        public const string MES17809 = "执行检验失败！";
+        public const string MES17810 = "检验单附件上传失败！";
+        public const string MES17811 = "修改已检验数据失败！";
+        public const string MES17812 = "不合格处理保存失败！";
+        public const string MES17813 = "检验单状态必须为检验中或待检验！";
+
+        #endregion
+
+        #region 备件出入库管理 17900
+        public const string MES17901 = "未查询到备件信息";
+        public const string MES17902 = "备件{Code}没有库存信息";
+        public const string MES17903 = "不存在{Code}备件";
+        public const string MES17904 = "类型{OperationType}不存在";
+        public const string MES17905 = "请选择备件";
+        public const string MES17906 = "请正确填写数量";
+        public const string MES17907 = "备件{Code}不存在或未启用";
+        public const string MES17908 = "备件编码{Code}无可入库数量";
+        public const string MES17909 = "库存总数量不允许大于备件注册数量";
+        public const string MES17910 = "备件{Code}库存不足";
+        public const string MES17911 = "未查询到备件库存信息";
+        public const string MES17912 = "库存不足";
+        #endregion
+
+        #region 设备维修 17950 
+        public const string MES17950 = "设备{Code}不存在！";
+        public const string MES17951 = "数据已更新,请刷新后重试";
+        public const string MES17952 = "设备维修单{Code}未查询到故障明细,请刷新后重试";
+        public const string MES17953 = "设备维修单{Code}不是待维修状态不能维修";
+        public const string MES17954 = "设备维修单{Code}不是已维修状态不能确认";
+        public const string MES17955 = "设备维修单号生成失败：编码规则错误，不允许同时存在多条设备维修类型编码规则！";
+        public const string MES17956 = "设备维修单号生成失败：设备维修类型编码规则未维护！";
+        public const string MES17957 = "维修开始时间不能大于结束时间";
+        public const string MES17958 = "请选择故障原因";
+        public const string MES17959 = "{Code}非待维修状态不允许删除";
+        public const string MES17960 = "{Code}已维修过的单据不允许删除";
+        public const string MES17961 = "附件上传失败，未获取到维修单，请刷新后重试";
+        #endregion
+
         #region 在制品步骤控制 MES18000
 
         public const string MES18001 = "条码信息不存在";
@@ -1859,7 +2023,7 @@
         public const string MES18904 = "工序与设备组对应关系不唯一";
         #endregion
 
-        #region 设备对接错误
+        #region 设备对接错误 MES19100
 
         #region 设备对接公用
         public const string MES19001 = "设备编码不能为空";
@@ -2041,6 +2205,19 @@
         public const string MES19423 = "检验类型列表不能为空！";
         #endregion
 
+        #region 班制 19500
+        public const string MES19501 = "班制编码为空";
+        public const string MES19502 = "班制名称为空";
+        public const string MES19503 = "班制开始时间为空";
+        public const string MES19504 = "班制结束时间为空";
+        public const string MES19505 = "班制编码已存在,请重新输入!";
+        public const string MES19506 = "班次类型不允许重复";
+        public const string MES19507 = "未跨天班次的结束时间必须大于开始时间！";
+        public const string MES19508 = "没有添加任何班次数据";
+        public const string MES19509 = "班制类型为空";
+        public const string MES19510 = "{type}开始时间与结束时间不能相同";
+        #endregion
+
         #region 数据字段定义 19600
         public const string MES19424 = "一个列表只能有一个缺省标签！";
         public const string MES19425 = "数据字段已被分配,不能删除！";
@@ -2053,39 +2230,13 @@
         public const string MES19432 = "数据字段：{code}不符合掩码规则，请检查配置";
         public const string MES19433 = "数据字段已被分配，不允许删除!";
         public const string MES19434 = "列表字段存在非法字符，只能输入数字,大写字母,下划线";
-        public const string MES19441 = "数据字段已存在,不允许重复创建！";
-        #endregion
-
-        #region 数据字段定义 19600
         public const string MES19435 = "分配类型存在非法字符，只能输入数字,大写字母,下划线！";
+        public const string MES19441 = "数据字段已存在,不允许重复创建！";
         public const string MES19436 = "分配类型已存在！";
         public const string MES19437 = "分配类型不能为空！";
         public const string MES19438 = "序号必须为正整数";
         public const string MES19439 = "序号不能重复！";
         public const string MES19440 = "数据字段不能重复！";
-        #endregion
-        #endregion
-
-        #region 系统执行出错 业务逻辑出错
-
-
-        #endregion
-
-        #region 调用第三方服务出错
-
-        #endregion
-
-        #region 计划
-        public const string MES19501 = "班制编码为空";
-        public const string MES19502 = "班制名称为空";
-        public const string MES19503 = "班制开始时间为空";
-        public const string MES19504 = "班制结束时间为空";
-        public const string MES19505 = "班制编码已存在,请重新输入!";
-        public const string MES19506 = "班次类型不允许重复";
-        public const string MES19507 = "未跨天班次的结束时间必须大于开始时间！";
-        public const string MES19508 = "没有添加任何班次数据";
-        public const string MES19509 = "班制类型为空";
-        public const string MES19510 = "{type}开始时间与结束时间不能相同";
         #endregion
 
         #region Marking标识 19700
@@ -2104,15 +2255,14 @@
         public const string MES19713 = "产品序列码【{sfc}】在工序【{produceCode}】拦截不合格代码【{unqualifiedCode}】!";
         #endregion
 
-        #region 生产日历
-
+        #region 生产日历 19800
         public const string MES19801 = "生产日历新增失败，可能存在相同年月的生产日历！";
         public const string MES19802 = "必须填写年份！";
         public const string MES19803 = "必须填写月份！";
         public const string MES19804 = "日历{Dates}已启用无法被删除！";
         #endregion
 
-        #region IQC/OQC检验项目
+        #region IQC/OQC检验项目 19900
 
         public const string MES19901 = "IQC检验项目编码重复，或物料重复";
         public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
@@ -2131,159 +2281,24 @@
         public const string MES19954 = "检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19955 = "检验项目编码重复，数据新增失败";
         public const string MES19956 = "客户{customCode}物料{materialCode}检验项目版本{version}已存在，不允许重复添加！";
-        #endregion 
-
-
-        #region OQC检验项目 17800
-
-        public const string MES17800 = "出货单暂无数据!";
-        public const string MES17801 = "出货单详情暂无数据!";
-        public const string MES17802 = "出货单详情物料,暂无数据!";
-        public const string MES17803 = "样品条码【{barcode}】不存在出货单中！";
-        public const string MES17804 = "检验单数据为空！";
-        public const string MES17805 = "OQC检验参数组明细数据为空！";
-        public const string MES17806 = "保存OQC样品数据失败！";
-        public const string MES17807 = "OQC检验单【{code}】状态必须为待检验！";
-        public const string MES17808 = "完成OQC检验单失败！";
-        public const string MES17809 = "执行检验失败！";
-        public const string MES17810 = "检验单附件上传失败！";
-        public const string MES17811 = "修改已检验数据失败！";
-        public const string MES17812 = "不合格处理保存失败！";
-        public const string MES17813 = "检验单状态必须为检验中或待检验！";
-
         #endregion
-
 
         #region FQC检验项目 19982
         public const string MES19982 = "物料{materialCode}物料版本{materialversion}检验项目版本{version}已存在，不允许重复添加！";
         public const string MES19983 = "已启用状态的检验单不允许被删除！";
-
-
         public const string MES19987 = "非新建状态不允许删除！";
         public const string MES19988 = "当前物料已存在启用的检验项目！";
         #endregion
 
-
-        #region 基础数据导入 11600
-
-        public const string MES11601 = "导入的数据中设备编码重复！";
-        public const string MES11602 = "设备编码不能为空！";
-        public const string MES11603 = "设备名称不能为空！";
-        public const string MES11604 = "存放位置不能为空！";
-        public const string MES11605 = "使用状态不能为空！";
-        public const string MES11606 = "导入的数据中资源编码重复！";
-        public const string MES11607 = "导入的数据中工序编码重复！";
-        public const string MES11608 = "导入数据为空！";
         #endregion
 
-
-        #region 设备点检 15800
-        //公共
-        public const string MES15801 = "此设备点检项目{code}在系统中已经存在!";
-        public const string MES15802 = "此设备点检任务{code}在系统中已经存在!";
-        public const string MES15803 = "设备点检任务不存在！";
-        public const string MES15804 = "点检任务的执行月份不是当前月份,不能生成设备点检录入！";
-        public const string MES15805 = "请先录入点检任务结果！";
-        public const string MES15806 = "点检任务中,重复配置点检项目！";
-        public const string MES15807 = "只能删除待检验状态的数据";
-        #endregion
-
-        #region 设备点检执行 15900
-        //保养
-        public const string MES15901 = "不良已关闭，不允许删除!";
-        public const string MES15902 = "待处理状态的保养任务，数据需要先保存后点击完成！";
-        public const string MES15903 = "没有找到相应的保养快照项！请检查生成是否遇到问题";
-        public const string MES15904 = "保养单据状态为检验中、待审核、已关闭的单据，删除失败!";
-        public const string MES15905 = "数值类型的检验值请输入不为数值！";
-        public const string MES15906 = "当前时间,未到保养计划开始时间{time}";
-        public const string MES15907 = "当前时间,已超过保养计划结束时间{time}";
-        public const string MES15908 = "未找到保养计划数据";
-        public const string MES15909 = "当前时间无需延期，当前时间未超过计划开始时间{time}";
-
-        //点检
-        public const string MES15910 = "保存时，未找到点检单!请联系管理员";
-        public const string MES15911 = "含有数值类型，需要先保存才能执行完成";
-        public const string MES15912 = "当前时间,未到点检计划开始时间{time}";
-        public const string MES15913 = "当前时间,已超过点检计划结束时间{time}";
-        public const string MES15914 = "项目编码{Code},合格状态不能为无！";
-        public const string MES15915 = "项目编码{Code},数值类型不能为空！";
-
-
-        //点检保养项目
-        public const string MES15920 = "已被设备保养模板{Code}引用！";
-        public const string MES15921 = "已被设备点检模板{Code}引用！";
-        public const string MES15922 = "延期时间不允许为空";
-        public const string MES15923 = "延期失败,计划结束时间需大于当前时间，请将开始时间设置于{time}之后！";
-        public const string MES15924 = "单位编码{Code}不存在，请选择或输入正确单位编码";
+        #region 系统执行出错 业务逻辑出错
 
 
         #endregion
 
-        #region 设备点检 车间物料不良录入 17500
-        public const string MES17501 = "不良已关闭，不允许删除!";
+        #region 调用第三方服务出错
 
-        public const string MES17502 = "物料条码不存在!";
-        public const string MES17503 = "物料条码不可用!";
-        public const string MES17504 = "物料条码库存数量为0!";
-        public const string MES17505 = "物料条码已录入不良且未进行不良处置!";
-        #endregion
-
-        #region 备件出入库管理 17900
-        public const string MES17901 = "未查询到备件信息";
-        public const string MES17902 = "备件{Code}没有库存信息";
-        public const string MES17903 = "不存在{Code}备件";
-        public const string MES17904 = "类型{OperationType}不存在";
-        public const string MES17905 = "请选择备件";
-        public const string MES17906 = "请正确填写数量";
-        public const string MES17907 = "备件{Code}不存在或未启用";
-        public const string MES17908 = "备件编码{Code}无可入库数量";
-        public const string MES17909 = "库存总数量不允许大于备件注册数量";
-        public const string MES17910 = "备件{Code}库存不足";
-        public const string MES17911 = "未查询到备件库存信息";
-        public const string MES17912 = "库存不足";
-        #endregion
-
-        #region 设备维修 17950 
-        public const string MES17950 = "设备{Code}不存在！";
-        public const string MES17951 = "数据已更新,请刷新后重试";
-        public const string MES17952 = "设备维修单{Code}未查询到故障明细,请刷新后重试";
-        public const string MES17953 = "设备维修单{Code}不是待维修状态不能维修";
-        public const string MES17954 = "设备维修单{Code}不是已维修状态不能确认";
-        public const string MES17955 = "设备维修单号生成失败：编码规则错误，不允许同时存在多条设备维修类型编码规则！";
-        public const string MES17956 = "设备维修单号生成失败：设备维修类型编码规则未维护！";
-        public const string MES17957 = "维修开始时间不能大于结束时间";
-        public const string MES17958 = "请选择故障原因";
-        public const string MES17959 = "{Code}非待维修状态不允许删除";
-        public const string MES17960 = "{Code}已维修过的单据不允许删除";
-        public const string MES17961 = "附件上传失败，未获取到维修单，请刷新后重试";
-        #endregion
-
-        #region 备件安装卸载 17600
-        public const string MES17601 = "备件不存在!";
-        public const string MES17602 = "备件已绑定设备,位置{position}!";
-        public const string MES17603 = "备件没有设置备件类型!";
-        public const string MES17604 = "待安装的设备不在备件类型所关联的设备组中!";
-        public const string MES17605 = "备件对应的备件类型没有关联设备组!";
-        public const string MES17606 = "备件关联的设备组不包含当前设备!";
-        public const string MES17607 = "备件在设备上的安装数量不能超过备件注册数量!";
-        #endregion
-
-        #region 工具安装卸载 17700
-        public const string MES17701 = "工具不存在!";
-        public const string MES17702 = "工具{code}不可使用!";
-        public const string MES17703 = "工具{code}已在设备{position}位置安装!";
-        public const string MES17704 = "设备{code}位置{position}已安装工具，请卸载后再进行操作!";
-        public const string MES17705 = "工具无剩余寿命，不可使用!";
-        public const string MES17706 = "工具本次使用寿命需大于0";
-        public const string MES17707 = "工具{toolCode}不允许在设备{equipmentCode}使用!";
-        public const string MES17708 = "工具{toolCode}不允许对产品使用!";
-        public const string MES17709 = "工具{toolCode}不允许对产品{productCode}使用!";
-        #endregion
-
-        #region 子步骤管理 17750
-        public const string MES17751 = "子步骤{code}已经存在";
-        public const string MES17752 = "子步骤不存在！";
-        public const string MES17753 = "子步骤已被分配给工序，不允许删除！";
         #endregion
     }
 }

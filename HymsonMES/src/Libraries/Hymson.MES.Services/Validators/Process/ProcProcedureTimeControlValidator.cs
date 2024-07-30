@@ -20,7 +20,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Code).Matches("^[^`~!@#$%^&*()+<>?:\\\"\\'{},.\\/;\\[\\]\\\\]+$").WithErrorCode(nameof(ErrorCode.MES10132));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCode.MES10116);
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(ErrorCode.MES10110);
-            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES14204));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES13904));
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES10230);
         }
     }
@@ -37,7 +37,7 @@ namespace Hymson.MES.Services.Validators.Process
         {
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCode.MES10116);
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(ErrorCode.MES10110);
-            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES14204));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES13904));
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES10230);
         }
     }

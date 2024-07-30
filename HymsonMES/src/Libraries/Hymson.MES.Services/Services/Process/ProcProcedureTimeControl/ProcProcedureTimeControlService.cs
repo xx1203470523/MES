@@ -112,10 +112,10 @@ namespace Hymson.MES.Services.Services.Process
             await _validationCreateRules.ValidateAndThrowAsync(createDto);
 
             // 验证时间上下限：上限时间是否大于下限时间;上限时间与下限时间是否相等
-            if (createDto.UpperLimitMinute == 0) throw new CustomerValidationException(nameof(ErrorCode.MES14211));
-            if (createDto.LowerLimitMinute == 0) throw new CustomerValidationException(nameof(ErrorCode.MES14212));
-            if (createDto.UpperLimitMinute < createDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES14209));
-            if (createDto.UpperLimitMinute == createDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES14210));
+            if (createDto.UpperLimitMinute == 0) throw new CustomerValidationException(nameof(ErrorCode.MES13911));
+            if (createDto.LowerLimitMinute == 0) throw new CustomerValidationException(nameof(ErrorCode.MES13912));
+            if (createDto.UpperLimitMinute < createDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES13909));
+            if (createDto.UpperLimitMinute == createDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES13910));
 
             /*
             // 验证工序：起始工序是否与到达工序为同一工序,	起始工序是否为到达工序的前工序
@@ -157,20 +157,20 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (timeControlEntities != null && timeControlEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES14206));
+                throw new CustomerValidationException(nameof(ErrorCode.MES13906));
             }
 
             // 当起始和结束为不同工序时，验证起始工序是否在结束工序之前
             if (createDto.FromProcedureId != createDto.ToProcedureId)
             {
                 var procMaterial = await _procMaterialRepository.GetByIdAsync(entity.ProductId)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES14214));
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES13914));
 
                 // 根据设备查工艺路线验证工序是否在工艺路线上，验证到达工序是否在起始工序之前
                 if (procMaterial.ProcessRouteId.HasValue)
                 {
                     var isProcessStartBeforeEnd = await _manuCommonOldService.IsProcessStartBeforeEndAsync(procMaterial.ProcessRouteId.Value, entity.FromProcedureId, entity.ToProcedureId);
-                    if (!isProcessStartBeforeEnd) throw new CustomerValidationException(nameof(ErrorCode.MES14208));
+                    if (!isProcessStartBeforeEnd) throw new CustomerValidationException(nameof(ErrorCode.MES13908));
                 }
             }
 
@@ -191,10 +191,10 @@ namespace Hymson.MES.Services.Services.Process
             await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
 
             // 验证时间上下限：上限时间是否大于下限时间;上限时间与下限时间是否相等
-            if (modifyDto.UpperLimitMinute == 0) throw new CustomerValidationException(nameof(ErrorCode.MES14211));
-            if (modifyDto.LowerLimitMinute == 0) throw new CustomerValidationException(nameof(ErrorCode.MES14212));
-            if (modifyDto.UpperLimitMinute < modifyDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES14209));
-            if (modifyDto.UpperLimitMinute == modifyDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES14210));
+            if (modifyDto.UpperLimitMinute == 0) throw new CustomerValidationException(nameof(ErrorCode.MES13911));
+            if (modifyDto.LowerLimitMinute == 0) throw new CustomerValidationException(nameof(ErrorCode.MES13912));
+            if (modifyDto.UpperLimitMinute < modifyDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES13909));
+            if (modifyDto.UpperLimitMinute == modifyDto.LowerLimitMinute) throw new CustomerValidationException(nameof(ErrorCode.MES13910));
 
             /*
             // 验证工序：起始工序是否与到达工序为同一工序,	起始工序是否为到达工序的前工序
@@ -214,7 +214,7 @@ namespace Hymson.MES.Services.Services.Process
             entity.UpdatedOn = updatedOn;
 
             var modelOrigin = await _procProcedureTimeControlRepository.GetByIdAsync(entity.Id)
-                ?? throw new NotFoundException(nameof(ErrorCode.MES14213));
+                ?? throw new NotFoundException(nameof(ErrorCode.MES13913));
 
             if (modelOrigin.Status != SysDataStatusEnum.Build && entity.Status == SysDataStatusEnum.Build)
             {
@@ -231,20 +231,20 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (timeControlEntities != null && timeControlEntities.Any(a => a.Id != entity.Id))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES14206));
+                throw new CustomerValidationException(nameof(ErrorCode.MES13906));
             }
 
             // 当起始和结束为不同工序时，验证起始工序是否在结束工序之前
             if (modifyDto.FromProcedureId != modifyDto.ToProcedureId)
             {
                 var procMaterial = await _procMaterialRepository.GetByIdAsync(entity.ProductId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES14214));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES13914));
 
                 // 根据设备查工艺路线验证工序是否在工艺路线上，验证到达工序是否在起始工序之前
                 if (procMaterial.ProcessRouteId.HasValue)
                 {
                     var isProcessStartBeforeEnd = await _manuCommonOldService.IsProcessStartBeforeEndAsync(procMaterial.ProcessRouteId.Value, entity.FromProcedureId, entity.ToProcedureId);
-                    if (!isProcessStartBeforeEnd) throw new CustomerValidationException(nameof(ErrorCode.MES14208));
+                    if (!isProcessStartBeforeEnd) throw new CustomerValidationException(nameof(ErrorCode.MES13908));
                 }
             }
 

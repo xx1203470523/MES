@@ -1711,7 +1711,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (excelImportDtos == null || !excelImportDtos.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES14908));
+                throw new CustomerValidationException(nameof(ErrorCode.MES13908));
             }
 
             #region 验证数据
