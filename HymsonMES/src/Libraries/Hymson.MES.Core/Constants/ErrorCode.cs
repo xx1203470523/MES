@@ -287,6 +287,7 @@
         public const string MES10538 = "工序编码【{Code}】不存在！";
         public const string MES10539 = "工艺设备组编码【{Code}】不存在！";
         public const string MES10540 = "工艺设备组编码不能为空！";
+        public const string MES10541 = "【{Code}】工作中心不能为空并且工作中心线体编码不能为空！";
         #endregion
 
         #region Bom 10600
