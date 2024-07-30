@@ -81,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -103,7 +103,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuReturnOrderDetailEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuReturnOrderDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuReturnOrderDetailEntity>(GetByIdsSql, new { Ids = ids });
@@ -126,6 +126,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where(" ReturnOrderId = @ReturnOrderId ");
             }
+
+            if (!string.IsNullOrWhiteSpace(query.MaterialBarCode))
+            {
+                sqlBuilder.Where(" MaterialBarCode = @MaterialBarCode ");
+            }
+
             if (query.ReturnOrderIds != null && query.ReturnOrderIds.Count() > 0)
             {
                 sqlBuilder.Where(" ReturnOrderId in @ReturnOrderIds ");
