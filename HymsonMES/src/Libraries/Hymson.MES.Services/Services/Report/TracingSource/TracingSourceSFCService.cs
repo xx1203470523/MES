@@ -178,9 +178,12 @@ namespace Hymson.MES.Services.Services
 
             foreach (var manuSfcCirculationEntity in manuSfcCirculationEntities)
             {
+                
                 var procMaterialEntity = await _masterDataService.GetProcMaterialEntityAsync(_currentSite.SiteId ?? 0, manuSfcCirculationEntity.ProductId);
                 if (procMaterialEntity == null) continue;
                 var materialSourceDto = new MaterialSourceDto();
+                materialSourceDto.MaterialCode = procMaterialEntity.MaterialCode;
+                materialSourceDto.MaterialName= procMaterialEntity.MaterialName;
                 materialSourceDto.CirculationQty = manuSfcCirculationEntity.CirculationQty ?? 0;
                 materialSourceDto.CirculationBarCode = manuSfcCirculationEntity.CirculationBarCode;
                 materialSourceDto.Sfc = manuSfcCirculationEntity.SFC; 
@@ -212,6 +215,8 @@ namespace Hymson.MES.Services.Services
                 var procMaterialEntity = await _masterDataService.GetProcMaterialEntityAsync(_currentSite.SiteId??0, manuBarCodeRelationEntity.InputBarCodeMaterialId);
                 if (procMaterialEntity == null) continue;
                 var materialSourceDto = manuBarCodeRelationEntity.ToModel<MaterialSourceDto>();
+                materialSourceDto.MaterialCode = procMaterialEntity.MaterialCode;
+                materialSourceDto.MaterialName = procMaterialEntity.MaterialName;
                 materialSourceDto.CirculationQty= manuBarCodeRelationEntity.InputQty;
                 materialSourceDto.CirculationBarCode = manuBarCodeRelationEntity.InputBarCode;
                 materialSourceDto.Sfc = manuBarCodeRelationEntity.OutputBarCode;
