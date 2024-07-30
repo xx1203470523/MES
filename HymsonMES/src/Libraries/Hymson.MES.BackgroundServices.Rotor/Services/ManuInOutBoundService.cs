@@ -281,6 +281,10 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             string busKey = "MavelRatorTotal";
             long waterMarkId = await _waterMarkService.GetWaterMarkAsync(busKey);
+            if(waterMarkId == 333)
+            {
+                return;
+            }
             DateTime startWaterMarkTime = DateTime.Now;
             if(waterMarkId != 0)
             {
