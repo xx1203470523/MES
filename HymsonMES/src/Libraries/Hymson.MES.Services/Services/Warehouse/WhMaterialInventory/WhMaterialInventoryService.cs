@@ -1737,7 +1737,10 @@ namespace Hymson.MES.Services.Services.Warehouse
                     MaterialCode = materialEntity.MaterialCode,
                     Quantity = item.Usages.ToString(),
                     UnitCode = materialEntity.Unit,
+
                     ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                    WorkOrderCode = planWorkOrderEntity.OrderCode,
+
                     ProductionOrderComponentID = planWorkPlanMaterialEntity.Id,
                     ProductionOrderDetailID = planWorkPlanProductEntity.Id
 

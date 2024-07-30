@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
@@ -31,6 +32,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -878,21 +880,58 @@ namespace Hymson.MES.Services.Services.Quality
             List<WarehousingEntryDto> warehousingEntries = new();
 
             // 根据检验合格结果分组
-            var isQualifiedDict = updateDetailEntities.Select(x => x.IsQualified).Distinct();
+            var isQualifiedDict = updateDetailEntities.ToLookup(x => x.IsQualified!.Value).ToDictionary(d => d.Key, d => d);
             foreach (var isQualified in isQualifiedDict)
             {
-                var warehousingEntryDto = new WarehousingEntryDto()
+                var warehousingEntryDto = new WarehousingEntryDto
                 {
                     Type = BillBusinessTypeEnum.WorkOrderMaterialReturnForm,
                     IsAutoExecute = returnEntity.Type == ManuReturnTypeEnum.WorkOrderBorrow,
                     SyncCode = returnEntity.ReturnOrderCode,
                     CreatedBy = _currentUser.UserName,
-                    WarehouseCode = GetWarehouseCode(isQualified, returnEntity.Type),
+                    WarehouseCode = GetWarehouseCode(isQualified.Key, returnEntity.Type),
                     Remark = returnEntity.Remark,
                 };
 
+                // 退料明细
+                var itemDetails = returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified.Key));
+
+                List<ReceiptDetailDto> details = new();
+                foreach (var item in itemDetails)
+                {
+                    var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", item.MaterialBarCode);
+
+                    var materialEntity = materialEntities.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
+
+                    var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId);
+                    if (planWorkPlanMaterialEntity != null)
+                    {
+                        details.Add(new ReceiptDetailDto
+                        {
+                            ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                            ProductionOrderDetailID = planWorkOrderEntity?.WorkPlanProductId,
+                            ProductionOrderComponentID = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId)?.Id,
+
+                            ProductionOrderNumber = planWorkPlanEntity.WorkPlanCode,
+                            WorkOrderCode = planWorkOrderEntity?.OrderCode,
+
+                            SyncId = item.Id,
+                            UniqueCode = item.MaterialBarCode,
+                            Quantity = item.Qty,
+                            MaterialCode = materialEntity?.MaterialCode,
+                            UnitCode = materialEntity?.Unit,
+                            LotCode = whMaterialInventoryEntity.Batch,
+                            Batch = whMaterialInventoryEntity.Batch ?? ""
+                        });
+                    }
+                }
+                warehousingEntryDto.Details = details;
+                warehousingEntries.Add(warehousingEntryDto);
+
+                /*
                 // 遍历退料明细
-                var itemDetails = returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified && o.BarCode == x.MaterialBarCode));
+                var itemDetails = returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified.Key && o.BarCode == x.MaterialBarCode));
                 foreach (var item in itemDetails)
                 {
                     var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode)
@@ -924,6 +963,8 @@ namespace Hymson.MES.Services.Services.Quality
                     }
                     warehousingEntries.Add(warehousingEntryDto);
                 }
+                */
+
             }
 
             foreach (var item in warehousingEntries)

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Security.Principal;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace Hymson.MES.HttpClients.Requests
 {
@@ -88,48 +81,50 @@ namespace Hymson.MES.HttpClients.Requests
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProductionPickMaterialDto
     {
         /// <summary>
         /// 物料编码
         /// </summary>
-        /// 
         [JsonPropertyName("materialCode")]
         public string MaterialCode { get; set; }
 
         /// <summary>
         /// 单位编号
         /// </summary>
-        /// 
         [JsonPropertyName("unitCode")]
         public string UnitCode { get; set; }
 
         /// <summary>
         /// 物料条码
         /// </summary>
-        /// 
         [JsonPropertyName("quantity")]
         public string Quantity { get; set; }
-
 
         /// <summary>
         /// 生产订单号
         /// </summary>
-        /// 
         [JsonPropertyName("productionOrder")]
         public string? ProductionOrder { get; set; }
 
         /// <summary>
+        /// 子工单号
+        /// </summary>
+        [JsonPropertyName("workOrderCode")]
+        public string? WorkOrderCode { get; set; }
+
+        /// <summary>
         /// 生产订单子表ID
         /// </summary>
-        /// 
         [JsonPropertyName("productionOrderDetailID")]
         public long? ProductionOrderDetailID { get; set; }
 
         /// <summary>
         /// 生产订单子件ID
         /// </summary>
-        /// 
         [JsonPropertyName("productionOrderComponentID")]
         public long? ProductionOrderComponentID { get; set; }
 

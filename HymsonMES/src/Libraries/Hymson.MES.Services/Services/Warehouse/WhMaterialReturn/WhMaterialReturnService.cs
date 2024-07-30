@@ -373,7 +373,9 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialReturn
                         ProductionOrderDetailID = planWorkOrderEntity?.WorkPlanProductId,
                         ProductionOrderComponentID = planWorkPlanMaterialEntity.Id,
 
-                        ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
+                        ProductionOrderNumber = planWorkPlanEntity.WorkPlanCode,
+                        WorkOrderCode = planWorkOrderEntity?.OrderCode,
+
                         SyncId = manuReturnOrderDetailId,
                         MaterialBarCode = materialBarCode,
                         MaterialCode = materialEntity?.MaterialCode,

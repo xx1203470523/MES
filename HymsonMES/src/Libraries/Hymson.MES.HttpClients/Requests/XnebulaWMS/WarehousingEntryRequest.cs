@@ -89,9 +89,14 @@ namespace Hymson.MES.HttpClients.Requests.XnebulaWMS
         public long? ProductionOrderComponentID { get; set; }
 
         /// <summary>
-        /// 生产订单号
+        /// 生产订单号（大工单）
         /// </summary>
         public string? ProductionOrderNumber { get; set; }
+
+        /// <summary>
+        /// 子工单号
+        /// </summary>
+        public string? WorkOrderCode { get; set; }
 
         /// <summary>
         /// 同步明细ID
@@ -204,7 +209,7 @@ namespace Hymson.MES.HttpClients.Requests.XnebulaWMS
         /// 制单人
         /// </summary>
         public string? CreatedBy { get; set; }
-        
+
         /// <summary>
         /// 备注
         /// </summary>

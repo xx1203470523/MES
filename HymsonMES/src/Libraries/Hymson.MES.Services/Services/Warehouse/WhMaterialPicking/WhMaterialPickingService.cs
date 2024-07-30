@@ -139,7 +139,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             };
             var manuRequistionOrderDetailEntities = new List<ManuRequistionOrderDetailEntity>();
 
-            var deliveryDto = new DeliveryDto()
+            var deliveryDto = new DeliveryDto
             {
                 Type = BillBusinessTypeEnum.WorkOrderMaterialRequestForm,
                 IsAutoExecute = param.Type == ManuRequistionTypeEnum.WorkOrderReplenishment,
@@ -175,6 +175,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                     warehousingDeliveryDetails.Add(new DeliveryDetailDto
                     {
                         ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                        WorkOrderCode = planWorkOrderEntity.OrderCode,
+
                         ProductionOrderDetailID = planWorkOrderEntity.WorkPlanProductId,
                         ProductionOrderComponentID = planWorkPlanMaterialEntity.Id, //planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId)?.Id,
                         MaterialCode = procMaterialEntity?.MaterialCode,
@@ -194,7 +196,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                     batchErrMsg += $"{procMaterialEntity?.MaterialCode}物料不能按最小包装数量{item.Batch}去领{item.Qty}用量;";
                 }
             }
-            if(string.IsNullOrEmpty(batchErrMsg) == false)
+            if (string.IsNullOrEmpty(batchErrMsg) == false)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15167)).WithData("Msg", batchErrMsg);
             }
