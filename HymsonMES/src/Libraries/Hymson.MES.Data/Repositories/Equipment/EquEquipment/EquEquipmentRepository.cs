@@ -264,6 +264,84 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             return new PagedInfo<EquEquipmentPageView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// pagedQuery(点检计划)
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<GetEquSpotcheckPlanEquipmentRelationPageView>> GetEquSpotcheckPlanEquipmentRelationListAsync(EquEquipmentSpotcheckRelationPagedQuery pagedQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountCOUNTSqlTemplate);
+            sqlBuilder.LeftJoin("proc_resource_equipment_bind preb ON preb.EquipmentId = EE.Id AND preb.IsDeleted = 0");
+            sqlBuilder.LeftJoin("inte_work_center_resource_relation iwcrr ON iwcrr.ResourceId = preb.ResourceId AND iwcrr.IsDeleted = 0");
+            sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = iwcrr.WorkCenterId AND IWC.IsDeleted = 0");
+            sqlBuilder.LeftJoin("equ_equipment_group eeg ON eeg.Id = EE.EquipmentGroupId AND eeg.IsDeleted = 0");
+
+
+            if (pagedQuery.EopType == 1)
+            {
+                sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id AND eop.IsDeleted = 0 AND eop.Type=1");
+            }
+            else if (pagedQuery.EopType == 2)
+            {
+                sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id  AND eop.IsDeleted = 0 AND eop.Type=2");
+            }
+            else
+            {
+                sqlBuilder.LeftJoin($"equ_operation_permissions eop ON eop.EquipmentId = EE.Id");
+            }
+
+            sqlBuilder.Select(" EE.Id, EE.EquipmentCode, EE.EquipmentName,EE.Location,EE.UpdatedBy, EE.UpdatedOn,EE.Id as EquipmentId,EE.EquipmentGroupId,IWC.Name as WorkCenterShopName,IWC.Code as WorkCenterCode,eeg.EquipmentGroupCode,eop.ExecutorIds,eop.LeaderIds");
+            sqlBuilder.Where("EE.IsDeleted = 0");
+            sqlBuilder.Where("EE.SiteId = @SiteId");
+            sqlBuilder.OrderBy("EE.UpdatedOn DESC");
+            sqlBuilder.GroupBy("EE.Id, EE.EquipmentCode, EE.EquipmentName,EE.Location,EE.UpdatedBy, EE.UpdatedOn,EE.EquipmentGroupId,IWC.Name,IWC.Code,eeg.EquipmentGroupCode,eop.ExecutorIds,eop.LeaderIds");
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
+            {
+                sqlBuilder.Where("EE.EquipmentCode = @EquipmentCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentName))
+            {
+                pagedQuery.EquipmentName = $"%{pagedQuery.EquipmentName}%";
+                sqlBuilder.Where("EE.EquipmentName LIKE @EquipmentName");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterCode))
+            {
+                sqlBuilder.Where("IWC.Code = @WorkCenterCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Location))
+            {
+                pagedQuery.Location = $"%{pagedQuery.Location}%";
+                sqlBuilder.Where("EE.Location LIKE @Location");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentGroupCode))
+            {
+                sqlBuilder.Where("eeg.EquipmentGroupCode = @EquipmentGroupCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterCode))
+            {
+                sqlBuilder.Where("IWC.Code = @WorkCenterCode");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
+
+            using var conn = GetMESDbConnection();
+            var entities = await conn.QueryAsync<GetEquSpotcheckPlanEquipmentRelationPageView>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+
+            return new PagedInfo<GetEquSpotcheckPlanEquipmentRelationPageView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+        }
+
     }
 
     /// <summary>
@@ -291,5 +369,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         const string UpdateEquipmentGroupIdSql = "UPDATE `equ_equipment` SET EquipmentGroupId = @EquipmentGroupId WHERE Id IN @EquipmentIds ";
         const string ClearEquipmentGroupIdSql = "UPDATE `equ_equipment` SET EquipmentGroupId = 0 WHERE EquipmentGroupId = @equipmentGroupId ";
+        const string GetPagedInfoCountCOUNTSqlTemplate = "SELECT COUNT(*) FROM (SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/  /**groupby**/  /**orderby**/)x";
     }
 }

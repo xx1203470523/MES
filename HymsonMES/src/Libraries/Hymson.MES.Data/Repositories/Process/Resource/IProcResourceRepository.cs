@@ -213,6 +213,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procResourceQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcResourceEntity>> GetEntitiesAsync(ProcResourceQuery procResourceQuery);
-
+        
+        Task<IEnumerable<ProcResourceEntity>> GetBySiteIdAsync(long siteId);
     }
 }

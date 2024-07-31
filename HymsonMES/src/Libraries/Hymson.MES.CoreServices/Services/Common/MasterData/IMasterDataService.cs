@@ -340,5 +340,16 @@ namespace Hymson.MES.CoreServices.Services.Common
         /// <returns></returns>
         Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery);
 
+        Task<PlanWorkOrderEntity?> GetPlanWorkOrderEntityAsync(long siteId, long id);
+
+        Task<ProcProcedureEntity?> GetProcProcedureEntityAsync(long siteId, long id);
+
+        Task<ProcMaterialEntity?> GetProcMaterialEntityAsync(long siteId, long id);
+
+        Task<ProcParameterEntity?> GetProcParameterEntityAsync(long siteId, long id);
+
+        Task<EquEquipmentEntity?> GetEquEquipmentEntityAsync(long siteId, long id);
+
+        Task<ProcResourceEntity?> GetProcResourceEntityAsync(long siteId, long id);
     }
 }

@@ -86,5 +86,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procParameterPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcParameterEntity>> GetPagedListAsync(ProcParameterPagedQuery procParameterPagedQuery);
+
+        Task<IEnumerable<ProcParameterEntity>> GetBySiteIdAsync(long siteId);
     }
 }

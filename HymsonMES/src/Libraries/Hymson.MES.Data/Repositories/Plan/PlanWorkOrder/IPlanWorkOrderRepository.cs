@@ -200,5 +200,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderView>> GetWorkOrderDataAsync(PlanWorkOrderPagedQuery query);
+        Task<IEnumerable<PlanWorkOrderEntity>> GetBySiteIdAsync(long siteId);
     }
 }

@@ -588,6 +588,17 @@ namespace Hymson.MES.Data.Repositories.Process
             var procResourceEntities = await conn.QueryAsync<ProcResourceEntity>(template.RawSql, procResourceQuery);
             return procResourceEntities;
         }
+
+        public async Task<IEnumerable<ProcResourceEntity>> GetBySiteIdAsync(long siteId)
+        {
+            var cachedKey = $"{CachedTables.PROC_RESOURCE}&SiteId={siteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(cachedKey, async (cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<ProcResourceEntity>(GetBySiteIdSql, new { SiteId = siteId });
+            });
+
+        }
     }
 
     /// <summary>
@@ -644,5 +655,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateStatusSql = "UPDATE `proc_resource` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
         const string GetEntitiesSqlTemplate = "SELECT * FROM `proc_resource` /**where**/ ";
+        const string GetBySiteIdSql = "select * from proc_resource  WHERE SiteId = @SiteId AND IsDeleted=0";
     }
 }

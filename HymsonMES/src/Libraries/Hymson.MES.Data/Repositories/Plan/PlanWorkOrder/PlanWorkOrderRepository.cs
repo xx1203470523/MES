@@ -6,6 +6,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -16,13 +17,16 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public partial class PlanWorkOrderRepository : BaseRepository, IPlanWorkOrderRepository
     {
+        private readonly IMemoryCache _memoryCache;
+
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -454,6 +458,16 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.ExecuteAsync(stringBuilder.ToString());
         }
 
+        public async Task<IEnumerable<PlanWorkOrderEntity>> GetBySiteIdAsync(long siteId)
+        {
+            var cachedKey = $"{CachedTables.PLAN_WORK_ORDER}&SiteId&{siteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(cachedKey, async (cacheEntity) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<PlanWorkOrderEntity>(GetBySiteIdSql, new { SiteId = siteId });
+            });
+        }
+
         #region 工单记录表
 
         /// <summary>
@@ -600,5 +614,6 @@ namespace Hymson.MES.Data.Repositories.Plan
 
         const string GetActivationWorkOrderDataSqlTemplate = "SELECT PWO.*,PWOA.LineId,PWOR.PassDownQuantity FROM plan_work_order_activation PWOA LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId LEFT JOIN plan_work_order_record PWOR ON PWO.ID = PWOR.WorkOrderId /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetWorkOrderDataSqlTemplate = "SELECT * FROM plan_work_order /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
+        const string GetBySiteIdSql = @"SELECT * FROM `plan_work_order` WHERE SiteId=@SiteId AND IsDeleted = 0";
     }
 }

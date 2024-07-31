@@ -362,6 +362,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryFirstOrDefaultAsync<ManuSfcStepEntity>(GetBarcodeBindingStepSql, query);
         }
 
+        /// <summary>
+        /// 获取SFC的进站步骤
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetStepsBySFCAsync(EntityBySFCQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetStepBySFCSql, PrepareTableName(query.SiteId, query.SFC, false)), query);
+        }
+
         #region private
         /// <summary>
         /// 模板表名称
@@ -484,6 +495,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         const string GetSfcsMergeOrSliptAddStepSql = @"SELECT * FROM  manu_sfc_step WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype in (39,42) AND sfc = @Sfc ";
         const string GetBarcodeBindingStepSql = @"SELECT * FROM  manu_sfc_step WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype = 27 AND sfc = @Sfc ";
+        const string GetStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId  AND SFC = @SFC ORDER BY Id ASC ";
     }
 
 }

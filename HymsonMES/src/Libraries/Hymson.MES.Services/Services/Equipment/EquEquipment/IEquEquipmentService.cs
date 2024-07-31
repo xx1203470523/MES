@@ -45,6 +45,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         Task<IEnumerable<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync();
 
         /// <summary>
+        /// 分页查询列表（设备注册）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<GetEquSpotcheckPlanEquipmentRelationListDto>> GetEquSpotcheckPlanEquipmentRelationListAsync(EquEquipmentSpotcheckRelationPagedQueryDto pagedQueryDto);
+
+        /// <summary>
         /// 查询详情（设备注册）
         /// </summary>
         /// <param name="id"></param>

@@ -420,6 +420,16 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcProcedureEntity>(GetProcProcedureByResourceIdSql, new { ResourceTypeId = resourceTypeId });
         }
+
+        public async Task<IEnumerable<ProcProcedureEntity>> GetBySiteIdAsync(long siteId)
+        {
+            var cachedKey = $"{CachedTables.PROC_PROCEDURE}&SiteId={siteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(cachedKey, async (cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<ProcProcedureEntity>(GetBySiteIdSql, new { SiteId = siteId });
+            });
+        }
     }
 
     /// <summary>
@@ -449,5 +459,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string GetEntitiesSqlTemplate = "SELECT * FROM `proc_procedure` /**where**/ ";
         const string GetProcProcedureByResourceIdSql = "SELECT * FROM proc_procedure WHERE IsDeleted = 0 AND ResourceTypeId = @ResourceTypeId";
+        const string GetBySiteIdSql = @"SELECT * FROM `proc_procedure`  WHERE SiteId = @SiteId AND IsDeleted=0";
     }
 }
