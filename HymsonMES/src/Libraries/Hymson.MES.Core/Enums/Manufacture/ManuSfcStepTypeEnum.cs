@@ -294,12 +294,18 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("参数采集")]
         [ManuSfcStepOperationTypeAttrribute("Product_Parameters_Collection", JobOrAssemblyNameEnum.ParameterCollect)]
-        ParameterCollect = 48,
+        ParameterCollect = 49,
 
         /// <summary>
         /// 库存维护
         /// </summary>
         [Description("库存维护")]
-        InventoryModify = 49
+        InventoryModify = 50,
+
+        /// <summary>
+        /// 入库存
+        /// </summary>
+        [Description("入库存")]
+        Storeup = 48
     }
 }
