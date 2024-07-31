@@ -115,10 +115,10 @@
         /// </summary>
         public string UnitCn { get; set; }
 
-        ///// <summary>
-        ///// 单位(英文)
-        ///// </summary>
-        //public string UnitEn { get; set; }
+        /// <summary>
+        /// 单位(英文)
+        /// </summary>
+        public string UnitEn { get; set; }
 
         ///// <summary>
         ///// 检测方式

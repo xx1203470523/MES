@@ -388,6 +388,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.VendorFieldName = param.ParameterName;
                 model.UpdateTime = GetTimestamp(param.CreatedOn, param.UpdatedOn);
                 model.UnitCn = string.IsNullOrEmpty(param.ParameterUnit) == true ? "待维护" : param.ParameterUnit;
+                model.UnitEn = model.UnitCn;
                 if (param.DataType == 2)
                 {
                     model.ValueType = "decimal";
