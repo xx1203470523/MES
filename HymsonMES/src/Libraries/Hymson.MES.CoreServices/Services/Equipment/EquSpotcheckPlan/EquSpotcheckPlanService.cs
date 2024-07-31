@@ -186,6 +186,7 @@ namespace Hymson.MES.CoreServices.Services.EquSpotcheckPlan
 
                 EquSpotcheckTaskEntity equSpotcheckTask = new()
                 {
+                    EquipmentId = item.EquipmentId,
                     Code = await GenerateSpotcheckOrderCodeAsync(param.SiteId, param.UserName),
                     Name = equSpotcheckPlanEntity.Name,
                     //BeginTime = HymsonClock.Now(),
