@@ -128,5 +128,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 用量
         /// </summary>
         public decimal Usages { get; set; }
+
+        /// <summary>
+        /// 批次大小
+        /// </summary>
+        public decimal Batch { get; set; }
     }
 }

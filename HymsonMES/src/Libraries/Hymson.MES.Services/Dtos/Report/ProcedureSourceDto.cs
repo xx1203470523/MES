@@ -42,7 +42,20 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public DateTime? EndOn { get; set; }
 
-        
+        /// <summary>
+        /// 描述 :物料编码 
+        /// 空值 : false  
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 描述 :物料名称 
+        /// 空值 : false  
+        /// </summary>
+        public string MaterialName { get; set; }
+
+
+
 
     }
 }

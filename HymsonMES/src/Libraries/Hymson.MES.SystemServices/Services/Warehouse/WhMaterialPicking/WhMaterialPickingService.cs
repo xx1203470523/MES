@@ -138,6 +138,11 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
         /// <returns></returns>
         public async Task<string> MaterialPickingReceiveAsync(WhMaterialPickingReceiveDto param)
         {
+            if (param.ReceiptResult == WhMaterialPickingReceiveResultEnum.CancelMaterialReceipt)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10254));
+            }
+
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 

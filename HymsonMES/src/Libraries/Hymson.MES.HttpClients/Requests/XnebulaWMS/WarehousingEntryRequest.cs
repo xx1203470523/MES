@@ -76,12 +76,37 @@ namespace Hymson.MES.HttpClients.Requests.XnebulaWMS
         /// <summary>
         /// 生产订单号
         /// </summary>
+        public string? ProductionOrder { get; set; }
+
+        /// <summary>
+        /// 生产订单子表ID
+        /// </summary>
+        public long? ProductionOrderDetailID { get; set; }
+
+        /// <summary>
+        /// 生产订单子件ID
+        /// </summary>
+        public long? ProductionOrderComponentID { get; set; }
+
+        /// <summary>
+        /// 生产订单号（大工单）
+        /// </summary>
         public string? ProductionOrderNumber { get; set; }
+
+        /// <summary>
+        /// 子工单号
+        /// </summary>
+        public string? WorkOrderCode { get; set; }
 
         /// <summary>
         /// 同步明细ID
         /// </summary>
         public long? SyncId { get; set; }
+
+        /// <summary>
+        /// 物料条码
+        /// </summary>
+        public string? MaterialBarCode { get; set; }
 
         /// <summary>
         /// 物料编号
@@ -194,5 +219,6 @@ namespace Hymson.MES.HttpClients.Requests.XnebulaWMS
         /// 明细集
         /// </summary>
         public IEnumerable<ReceiptDetailDto>? Details { get; set; }
+
     }
 }

@@ -29,7 +29,12 @@ namespace Hymson.MES.Services.Services
         /// <returns></returns>
         Task<IEnumerable<ProcedureSourceDto>> GetProcedureSourcesAsync(string sfc);
 
-
+        /// <summary>
+        /// 查询此条码所有经过的工序相关信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcedureSourceDto>> GetOldProcedureSourcesAsync(string sfc);
         /// <summary>
         /// 查询此条码所有的作业日志
         /// </summary>

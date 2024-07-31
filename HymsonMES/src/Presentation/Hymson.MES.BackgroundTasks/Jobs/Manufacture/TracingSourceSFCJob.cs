@@ -1,5 +1,7 @@
 ﻿using Hymson.Logging.Services;
 using Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC;
+using Hymson.SqlActuator.Services;
+using Microsoft.Extensions.Logging;
 using Quartz;
 
 namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
@@ -10,6 +12,10 @@ namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
     [DisallowConcurrentExecution]
     internal class TracingSourceSFCJob : IJob
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILogger<TracingSourceSFCJob> _logger;
         private readonly IAlarmLogService _alarmLogService;
         private readonly ITracingSourceSFCService _tracingSourceSFCService;
 
@@ -17,10 +23,13 @@ namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="alarmLogService"></param>
         /// <param name="tracingSourceSFCService"></param>
-        public TracingSourceSFCJob(IAlarmLogService alarmLogService,
+        public TracingSourceSFCJob(ILogger<TracingSourceSFCJob> logger,
+            IAlarmLogService alarmLogService,
             ITracingSourceSFCService tracingSourceSFCService)
         {
+            _logger = logger;
             _alarmLogService = alarmLogService;
             _tracingSourceSFCService = tracingSourceSFCService;
         }
@@ -34,7 +43,8 @@ namespace Hymson.MES.BackgroundTasks.Jobs.Manufacture
         {
             try
             {
-                await _tracingSourceSFCService.ExecuteAsync(1000);
+                _logger.LogDebug("条码追溯开始");
+                await _tracingSourceSFCService.ExecuteAsync(500);
             }
             catch (Exception ex)
             {

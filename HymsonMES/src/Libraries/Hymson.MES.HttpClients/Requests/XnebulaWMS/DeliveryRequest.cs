@@ -1,12 +1,8 @@
-﻿using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.HttpClients.Requests.XnebulaWMS
+﻿namespace Hymson.MES.HttpClients.Requests.XnebulaWMS
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public  class DeliveryDetailDto
     {
         /// <summary>
@@ -18,6 +14,11 @@ namespace Hymson.MES.HttpClients.Requests.XnebulaWMS
         /// 生产订单号
         /// </summary>
         public string? ProductionOrder { get; set; }
+
+        /// <summary>
+        /// 子工单号
+        /// </summary>
+        public string? WorkOrderCode { get; set; }
 
         /// <summary>
         /// 生产订单子表ID

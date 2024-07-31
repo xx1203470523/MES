@@ -79,6 +79,11 @@ namespace Hymson.MES.Core.Enums
         /// 工作中心编码
         /// </summary>
         [Description("WorkCenterCode")]
-        WorkCenterCode = 16
+        WorkCenterCode = 16,
+        /// <summary>
+        /// 转子LMS物料同步同步开关
+        /// </summary>
+        [Description("RotorLmsMaterialSwitch")]
+        RotorLmsMaterialSwitch = 17
     }
 }

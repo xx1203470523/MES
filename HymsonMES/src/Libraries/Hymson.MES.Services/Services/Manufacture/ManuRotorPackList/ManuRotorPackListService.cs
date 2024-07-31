@@ -10,6 +10,8 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Mavel.Rotor;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.PackList;
@@ -53,13 +55,16 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         private readonly IOptions<WMSOptions> _wmsOptions;
 
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
         public ManuRotorPackListService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuRotorPackListSaveDto> validationSaveRules,
             IManuRotorPackListRepository manuRotorPackListRepository, ISequenceService sequenceService, 
             IQualFqcInspectionMavalRepository qualFqcInspectionMavalRepository,
-            IOptions<WMSOptions> wmsOptions
+            IOptions<WMSOptions> wmsOptions,
+            IInteWorkCenterRepository inteWorkCenterRepository
             )
         {
             _sequenceService = sequenceService;
@@ -69,6 +74,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuRotorPackListRepository = manuRotorPackListRepository;
             _qualFqcInspectionMavalRepository = qualFqcInspectionMavalRepository;
             _wmsOptions = wmsOptions;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
         }
 
 
@@ -195,10 +201,37 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 SFCs = sfcs,
             });
+
+
+            //获取工作中心编码
+            EntityByCodeQuery workQuery = new EntityByCodeQuery();
+            workQuery.Site = _currentSite.SiteId;
+            workQuery.Code = query.WorkCenterCode;
+            var workCenterModel = await _inteWorkCenterRepository.GetByCodeAsync(workQuery);
+            if(workQuery == null || string.IsNullOrEmpty(workCenterModel.LineCoding) == true)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10541)).WithData("Code",query.WorkCenterCode);
+            }
+            string lineBrevityCode = workCenterModel.LineCoding!;
+
+            string inspectionOrder = string.Empty;
+            string dateStr = HymsonClock.Now().ToString("yyyyMMdd");
+            string serialNumKey = $"{dateStr}{query.OrderCode}FAI";
+            int curKeyNum = await _sequenceService.GetCurrentValueAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay,serialNumKey);
+            if(curKeyNum == 0)
+            {
+                var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, serialNumKey);
+                inspectionOrder = $"{lineBrevityCode}{dateStr}{sequence.ToString().PadLeft(3, '0')}";
+            }
+            else
+            {
+                inspectionOrder = $"{lineBrevityCode}{dateStr}{curKeyNum.ToString().PadLeft(3, '0')}";
+            }
+
             foreach (var item in manuRotorPackListEntity)
             {
-                var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
-                var InspectionOrder = $"{query.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
+                //var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
+                //var InspectionOrder = $"{query.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
                 var qualFqc = qualFqcs.FirstOrDefault(x => x.SFC == item.ProductCode);
                 var type = ProductReceiptQualifiedStatusEnum.ToBeBnspected;
                 var WarehouseCode = "待检验仓";
@@ -227,7 +260,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Unit = "个",
                     Qty = 1,
                     WarehouseCode = WarehouseCode,
-                    Batch = InspectionOrder,
+                    Batch = inspectionOrder,
                     WhCode = whCode,
                 };
                 manuRotors.Add(manuRotorPackView);

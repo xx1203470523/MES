@@ -224,14 +224,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WorkOrderQtyView>> GetWorkOrderQtyMavelAsync(WorkOrderQtyQuery query)
+        public async Task<IEnumerable<WorkOrderQtyView>> GetWorkOrderQtyMavelAsync(WorkOrderQtyQuery query, string endOp)
         {
             string sql = $@"
                 select WorkOrderId ,count(*) Qty
                 from manu_sfc_step mss 
                 where SiteId  = {query.SiteId}
                 and WorkOrderId in ({string.Join(",",query.OrderIdList)})
-                and Remark  = 'ROP150'
+                and Remark  = '{endOp}'
                 group by WorkOrderId 
             ";
 
@@ -399,6 +399,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetUsedBySFC, new { sfc });
         }
+
+        public async Task<IEnumerable<ManuSfcInfoEntity>> GetBySFCAsync(string sfc)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcInfoEntity>(GetBySFC, new { sfc });
+        }
     }
 
     /// <summary>
@@ -473,6 +479,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                                Left join manu_sfc s on s.id=si.SfcId
                                                where si.IsDeleted=0 and si.IsUsed=1 
                                                and s.sfc=@sfc ";
+
+        const string GetBySFC = @"select si.* 
+                                               from manu_sfc_info  si
+                                               Left join manu_sfc s on s.id=si.SfcId
+                                               where si.IsDeleted=0 and s.sfc=@sfc ";
 
         const string GetPagedInfoWorkshopJobControlReportOptimizeDataSqlTemplate = @"
                         select 

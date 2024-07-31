@@ -18,5 +18,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         public string WorkCenterCode {  get; set; }
 
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string OrderCode { get; set; }
     }
 }

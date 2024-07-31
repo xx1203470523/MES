@@ -7,7 +7,9 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
@@ -30,6 +32,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
+using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -97,6 +100,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
+        private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
+
+        private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
+
         /// <summary>
         /// 仓储接口（附件维护）
         /// </summary>
@@ -128,6 +135,8 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="manuReturnOrderDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="planWorkPlanRepository"></param>
+        /// <param name="planWorkPlanMaterialRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="iqcOrderCreateService"></param>
         /// <param name="whMaterialInventoryRepository"></param>
@@ -142,6 +151,8 @@ namespace Hymson.MES.Services.Services.Quality
             IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository,
             IInteAttachmentRepository inteAttachmentRepository,
             IIQCOrderCreateService iqcOrderCreateService,
             IWhMaterialInventoryRepository whMaterialInventoryRepository)
@@ -158,6 +169,8 @@ namespace Hymson.MES.Services.Services.Quality
             _manuReturnOrderDetailRepository = manuReturnOrderDetailRepository;
             _procMaterialRepository = procMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _iqcOrderCreateService = iqcOrderCreateService;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
@@ -836,7 +849,20 @@ namespace Hymson.MES.Services.Services.Quality
             if (!orderEntity.WorkOrderId.HasValue) return;
 
             // 读取工单
-            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderEntity.WorkOrderId.Value);
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderEntity.WorkOrderId.Value);
+
+            // 查询生产计划
+            var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+
+            // 查询生产物料
+            var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                PlanId = planWorkPlanEntity.Id,
+                PlanProductId = planWorkOrderEntity.WorkPlanProductId ?? 0
+            });
+
             var materialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
@@ -854,40 +880,92 @@ namespace Hymson.MES.Services.Services.Quality
             List<WarehousingEntryDto> warehousingEntries = new();
 
             // 根据检验合格结果分组
-            foreach (var isQualified in updateDetailEntities.Select(x => x.IsQualified).Distinct())
+            var isQualifiedDict = updateDetailEntities.ToLookup(x => x.IsQualified!.Value).ToDictionary(d => d.Key, d => d);
+            foreach (var isQualified in isQualifiedDict)
             {
-                var warehousingEntryDto = new WarehousingEntryDto()
+                var warehousingEntryDto = new WarehousingEntryDto
                 {
                     Type = BillBusinessTypeEnum.WorkOrderMaterialReturnForm,
                     IsAutoExecute = returnEntity.Type == ManuReturnTypeEnum.WorkOrderBorrow,
                     SyncCode = returnEntity.ReturnOrderCode,
                     CreatedBy = _currentUser.UserName,
-                    WarehouseCode = GetWarehouseCode(isQualified, returnEntity.Type),
+                    WarehouseCode = GetWarehouseCode(isQualified.Key, returnEntity.Type),
                     Remark = returnEntity.Remark,
                 };
 
+                // 退料明细
+                List<ReceiptDetailDto> details = new();
+                foreach (var item in isQualified.Value)
+                {
+                    var returnOrderDetail = returnDetailEntities.FirstOrDefault(f => f.Id == item.ReturnOrderDetailId);
+                    if (returnOrderDetail == null) continue;
+
+                    var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == returnOrderDetail.MaterialBarCode)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", returnOrderDetail.MaterialBarCode);
+
+                    var materialEntity = materialEntities.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
+
+                    var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId);
+                    if (planWorkPlanMaterialEntity != null)
+                    {
+                        details.Add(new ReceiptDetailDto
+                        {
+                            ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                            ProductionOrderDetailID = planWorkOrderEntity?.WorkPlanProductId,
+                            ProductionOrderComponentID = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId)?.Id,
+
+                            ProductionOrderNumber = planWorkPlanEntity.WorkPlanCode,
+                            WorkOrderCode = planWorkOrderEntity?.OrderCode,
+
+                            SyncId = item.Id,
+                            UniqueCode = returnOrderDetail.MaterialBarCode,
+                            Quantity = returnOrderDetail.Qty,
+                            MaterialCode = materialEntity?.MaterialCode,
+                            UnitCode = materialEntity?.Unit,
+                            LotCode = whMaterialInventoryEntity.Batch,
+                            Batch = whMaterialInventoryEntity.Batch ?? ""
+                        });
+                    }
+                }
+                warehousingEntryDto.Details = details;
+                warehousingEntries.Add(warehousingEntryDto);
+
+                /*
                 // 遍历退料明细
-                List<ReceiptDetailDto> warehousingEntryDetails = new();
-                foreach (var item in returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified && o.BarCode == x.MaterialBarCode)))
+                var itemDetails = returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified.Key && o.BarCode == x.MaterialBarCode));
+                foreach (var item in itemDetails)
                 {
                     var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", item.MaterialBarCode);
 
                     var materialEntity = materialEntities.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
-                    warehousingEntryDetails.Add(new ReceiptDetailDto
+
+                    var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId);
+                    if (planWorkPlanMaterialEntity != null)
                     {
-                        ProductionOrderNumber = workOrderEntity?.OrderCode,
-                        SyncId = item.Id,
-                        MaterialCode = materialEntity?.MaterialCode,
-                        LotCode = whMaterialInventoryEntity.Batch,
-                        UnitCode = materialEntity?.Unit,
-                        UniqueCode = item.MaterialBarCode,
-                        Batch = whMaterialInventoryEntity.Batch ?? "",
-                        Quantity = item.Qty
-                    });
-                    warehousingEntryDto.Details = warehousingEntryDetails;
+                        warehousingEntryDto.Details = new List<ReceiptDetailDto>
+                        {
+                            new ReceiptDetailDto
+                            {
+                                ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                                ProductionOrderDetailID = planWorkOrderEntity?.WorkPlanProductId,
+                                ProductionOrderComponentID = planWorkPlanMaterialEntity.Id,
+
+                                ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
+                                SyncId = item.Id,
+                                MaterialCode = materialEntity?.MaterialCode,
+                                LotCode = whMaterialInventoryEntity.Batch,
+                                UnitCode = materialEntity?.Unit,
+                                UniqueCode = item.MaterialBarCode,
+                                Batch = whMaterialInventoryEntity.Batch ?? "",
+                                Quantity = item.Qty
+                            }
+                        };
+                    }
                     warehousingEntries.Add(warehousingEntryDto);
                 }
+                */
+
             }
 
             foreach (var item in warehousingEntries)

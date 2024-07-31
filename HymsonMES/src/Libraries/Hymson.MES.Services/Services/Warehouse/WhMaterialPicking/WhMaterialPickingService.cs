@@ -28,6 +28,7 @@ using Microsoft.Extensions.Options;
 using Hymson.MES.HttpClients;
 using Hymson.MES.Data.Repositories.Process;
 using Minio.DataModel;
+using Azure;
 
 namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
 {
@@ -138,7 +139,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             };
             var manuRequistionOrderDetailEntities = new List<ManuRequistionOrderDetailEntity>();
 
-            var deliveryDto = new DeliveryDto()
+            var deliveryDto = new DeliveryDto
             {
                 Type = BillBusinessTypeEnum.WorkOrderMaterialRequestForm,
                 IsAutoExecute = param.Type == ManuRequistionTypeEnum.WorkOrderReplenishment,
@@ -149,6 +150,7 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
 
             var warehousingDeliveryDetails = new List<DeliveryDetailDto>();
             var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(param.Details.Select(x => x.MaterialId));
+            string batchErrMsg = string.Empty;
             //咱不验证数量 TODO by王克明
             foreach (var item in param.Details)
             {
@@ -173,6 +175,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                     warehousingDeliveryDetails.Add(new DeliveryDetailDto
                     {
                         ProductionOrder = planWorkPlanEntity.WorkPlanCode,
+                        WorkOrderCode = planWorkOrderEntity.OrderCode,
+
                         ProductionOrderDetailID = planWorkOrderEntity.WorkPlanProductId,
                         ProductionOrderComponentID = planWorkPlanMaterialEntity.Id, //planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId)?.Id,
                         MaterialCode = procMaterialEntity?.MaterialCode,
@@ -180,6 +184,21 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                         Quantity = item.Qty
                     });
                 }
+
+                // 校验是否是最小包装量
+                int batchPlacesNum = CountDecimalPlaces(item.Batch); //批次数量小数
+                int qtyPlacesNum = CountDecimalPlaces(item.Qty); //用量数量小数
+                int maxPlacesNum = Math.Max(batchPlacesNum, qtyPlacesNum); //最大数量小数
+                int qtyNum = (int)(item.Qty * (int)Math.Pow(10, maxPlacesNum)); //转成整数
+                int batchNum = (int)(item.Batch * (int)Math.Pow(10, maxPlacesNum)); //转成整数
+                if (batchNum != 0 && qtyNum % batchNum != 0)
+                {
+                    batchErrMsg += $"{procMaterialEntity?.MaterialCode}物料不能按最小包装数量{item.Batch}去领{item.Qty}用量;";
+                }
+            }
+            if (string.IsNullOrEmpty(batchErrMsg) == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15167)).WithData("Msg", batchErrMsg);
             }
 
             deliveryDto.Details = warehousingDeliveryDetails;
@@ -196,6 +215,22 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                 trans.Complete();
             }
             return requistionOrderCode;
+
+            //计算decimal小数位数
+            int CountDecimalPlaces(decimal number)
+            {
+                // 将数字转换为字符串  
+                string numberAsString = number.ToString();
+
+                // 找到小数点位置  
+                int decimalPointIndex = numberAsString.IndexOf('.');
+
+                // 如果没有小数点，返回0  
+                if (decimalPointIndex < 0) return 0;
+
+                // 计算小数位数  
+                return numberAsString.Length - decimalPointIndex - 1;
+            }
         }
 
         /// <summary>

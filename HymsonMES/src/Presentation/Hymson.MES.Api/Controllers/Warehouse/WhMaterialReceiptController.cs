@@ -44,8 +44,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("create")]
+        [HttpPost("create")]
         [LogDescription("物料收货表", BusinessType.INSERT)]
         public async Task AddAsync([FromBody] WhMaterialReceiptSaveDto saveDto)
         {
@@ -57,8 +56,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("update")]
+        [HttpPut("update")]
         [LogDescription("物料收货表", BusinessType.UPDATE)]
         public async Task UpdateAsync([FromBody] WhMaterialReceiptSaveDto saveDto)
         {
@@ -70,8 +68,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpDelete]
-        [Route("delete")]
+        [HttpDelete("delete")]
         [LogDescription("物料收货表", BusinessType.DELETE)]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
@@ -94,8 +91,7 @@ namespace Hymson.MES.Api.Controllers.WHMaterialReceipt
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("pagelist")]
+        [HttpGet("pagelist")]
         public async Task<PagedInfo<WhMaterialReceiptDto>> QueryPagedListAsync([FromQuery] WhMaterialReceiptPagedQueryDto pagedQueryDto)
         {
             return await _whMaterialReceiptService.GetPagedListAsync(pagedQueryDto);

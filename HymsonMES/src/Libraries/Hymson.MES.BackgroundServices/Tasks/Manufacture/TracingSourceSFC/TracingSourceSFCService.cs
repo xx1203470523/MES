@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Constants.Manufacture;
+﻿using Google.Protobuf.WellKnownTypes;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -7,6 +8,8 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
+using Microsoft.Extensions.Logging;
+using Quartz.Logging;
 
 namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
 {
@@ -15,6 +18,10 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
     /// </summary>
     public class TracingSourceSFCService : ITracingSourceSFCService
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILogger<TracingSourceSFCService> _logger;
         /// <summary>
         /// 服务接口（水位）
         /// </summary>
@@ -58,12 +65,17 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="waterMarkService"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
-        public TracingSourceSFCService(IWaterMarkService waterMarkService,
+        /// <param name="manuSFCNodeRepository"></param>
+        /// <param name="manuSFCNodeSourceRepository"></param>
+        /// <param name="manuSFCNodeDestinationRepository"></param>
+        public TracingSourceSFCService(ILogger<TracingSourceSFCService> logger,
+            IWaterMarkService waterMarkService,
             IProcMaterialRepository procMaterialRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
@@ -72,6 +84,7 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             IManuSFCNodeSourceRepository manuSFCNodeSourceRepository,
             IManuSFCNodeDestinationRepository manuSFCNodeDestinationRepository)
         {
+            _logger = logger;
             _waterMarkService = waterMarkService;
             _procMaterialRepository = procMaterialRepository;
             _manuSfcRepository = manuSfcRepository;
@@ -88,19 +101,28 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
         /// </summary>
         /// <param name="limitCount"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(int limitCount = 1000)
+        public async Task ExecuteAsync(int limitCount = 500)
         {
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.TracingSourceSFC);
 
             // 获取流转表数据（因为这张表的数据会有更新操作，所以不能用常规水位）
-            DateTime startWaterMarkTime = UnixTimestampMillisToDateTime(waterMarkId);
-            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
+            //DateTime startWaterMarkTime = UnixTimestampMillisToDateTime(waterMarkId);
+            //var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
+            //{
+            //    StartWaterMarkTime = startWaterMarkTime,
+            //    Rows = limitCount
+            //});
+            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
             {
-                StartWaterMarkTime = startWaterMarkTime,
+                StartWaterMarkId = waterMarkId,
                 Rows = limitCount
             });
 
-            if (manuSfcCirculationList == null || !manuSfcCirculationList.Any()) return;
+            if (manuSfcCirculationList == null || !manuSfcCirculationList.Any())
+            {
+                _logger.LogDebug("没有要执行的追溯任务");
+                return;
+            }
 
             var user = $"{BusinessKey.TracingSourceSFC}作业";
 
@@ -246,12 +268,14 @@ namespace Hymson.MES.BackgroundServices.Tasks.Manufacture.TracingSourceSFC
             rows += await _manuSFCNodeDestinationRepository.InsertRangeAsync(nodeDestinationEntities);
 
             // 更新水位
-            var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
-            if (maxUpdateWaterMarkUpdatedOn.HasValue)
-            {
-                long timestamp = GetTimestampInMilliseconds(maxUpdateWaterMarkUpdatedOn.Value);
-                rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
-            }
+            var maxWaterMarkId = manuSfcCirculationList.Max(m => m.Id);
+            rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, maxWaterMarkId);
+            //var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
+            //if (maxUpdateWaterMarkUpdatedOn.HasValue)
+            //{
+            //    long timestamp = GetTimestampInMilliseconds(maxUpdateWaterMarkUpdatedOn.Value);
+            //    rows += await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
+            //}
             trans.Complete();
 
         }

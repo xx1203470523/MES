@@ -1,21 +1,16 @@
-﻿using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Warehouse;
-using Hymson.MES.CoreServices.Services.Job;
-using Microsoft.Identity.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.MES.Core.Enums.Warehouse;
 
 namespace Hymson.MES.SystemServices.Dtos.Warehouse
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class WhMaterialReturnConfirmDto
     {
         /// <summary>
         /// 退料单号
         /// </summary>
-        public string ReturnOrderCode { set; get; }
+        public string ReturnOrderCode { set; get; } = "";
 
         /// <summary>
         /// 退料单结果
@@ -35,7 +30,7 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// <summary>
         /// 操作人
         /// </summary>
-        public string OperateBy { set; get; }
+        public string OperateBy { set; get; } = "";
     }
 
     /// <summary>
@@ -46,7 +41,12 @@ namespace Hymson.MES.SystemServices.Dtos.Warehouse
         /// <summary>
         /// 物料条码
         /// </summary>
-        public string MaterialBarCode { set; get; }
+        public string? MaterialBarCode { set; get; } = "";
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { set; get; } = "";
 
         /// <summary>
         /// 数量

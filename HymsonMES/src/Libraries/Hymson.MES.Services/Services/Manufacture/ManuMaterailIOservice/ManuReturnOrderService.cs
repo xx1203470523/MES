@@ -280,7 +280,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var returnOrderEntities = await _manuReturnOrderRepository.GetEntitiesAsync(new ManuReturnOrderQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = planWorkOrderEntity.SiteId,
                 WorkOrderId = workOrderId
             });
             if (returnOrderEntities == null || !returnOrderEntities.Any())
@@ -291,7 +291,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var returnOrderIds = returnOrderEntities.Select(x => x.Id).ToArray();
             var returnOrderDetailEntities = await _manuReturnOrderDetailRepository.GetEntitiesAsync(new ManuReturnOrderDetailQuery
             {
-                SiteId = _currentSite.SiteId ?? 0,
+                SiteId = planWorkOrderEntity.SiteId,
                 ReturnOrderIds = returnOrderIds
             });
 
@@ -304,11 +304,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 details.Add(new OrderManuReturnDetailDto
                 {
                     ReturnOrderCode = retrurnOrder?.ReturnOrderCode ?? "",
-                    MaterialCode = material?.MaterialCode??"",
+                    MaterialCode = material?.MaterialCode ?? "",
                     MaterialName = material?.MaterialName ?? "",
                     Version = material?.Version ?? "",
                     MaterialBarCode = item.MaterialBarCode,
-                    Batch = item.Batch??"",
+                    Batch = item.Batch ?? "",
                     Qty = item.Qty,
                     ReturnTime = retrurnOrder?.CreatedOn ?? item.CreatedOn,
                     Status = retrurnOrder?.Status

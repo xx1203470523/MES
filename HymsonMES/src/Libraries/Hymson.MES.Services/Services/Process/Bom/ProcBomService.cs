@@ -64,6 +64,10 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
 
+        private readonly IPlanWorkPlanRepository _planWorkPlanRepository;
+
+        private readonly IPlanWorkPlanMaterialRepository _planWorkPlanMaterialRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -72,13 +76,19 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procBomRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
+        /// <param name="validationImportRules"></param>
         /// <param name="procBomDetailRepository"></param>
-        /// <param name="procBomDetailReplaceMaterialRepository"></param>
-        /// <param name="localizationService"></param>
         /// <param name="excelService"></param>
         /// <param name="minioService"></param>
-        /// <param name="validationImportRules"></param>
+        /// <param name="procBomDetailReplaceMaterialRepository"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="manuRequistionOrderDetailRepository"></param>
+        /// <param name="manuRequistionOrderRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="planWorkPlanRepository"></param>
+        /// <param name="planWorkPlanMaterialRepository"></param>
         public ProcBomService(ICurrentSite currentSite, ICurrentUser currentUser,
             IProcBomRepository procBomRepository,
             AbstractValidator<ProcBomCreateDto> validationCreateRules,
@@ -92,7 +102,10 @@ namespace Hymson.MES.Services.Services.Process
             IManuRequistionOrderDetailRepository manuRequistionOrderDetailRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
-            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, IProcMaterialRepository procMaterialRepository)
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IPlanWorkPlanRepository planWorkPlanRepository,
+            IPlanWorkPlanMaterialRepository planWorkPlanMaterialRepository)
         {
             _currentSite = currentSite;
             _currentUser = currentUser;
@@ -111,6 +124,8 @@ namespace Hymson.MES.Services.Services.Process
             _manuRequistionOrderRepository = manuRequistionOrderRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procMaterialRepository = procMaterialRepository;
+            _planWorkPlanRepository = planWorkPlanRepository;
+            _planWorkPlanMaterialRepository = planWorkPlanMaterialRepository;
         }
 
         /// <summary>
@@ -701,31 +716,53 @@ namespace Hymson.MES.Services.Services.Process
             return procBomDetailViews;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
         public async Task<List<ProcOrderBomDetailDto>> GetOrderBomMaterialAsync(long orderId)
         {
             var procBomDetailViews = new List<ProcOrderBomDetailDto>();
 
-            //工单信息
+            /*
+            // 工单信息
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderId);
-            //工单Bom主物料信息
+            // 工单Bom主物料信息
             var mainBomDetails = await _procBomDetailRepository.GetByBomIdAsync(planWorkOrderEntity.ProductBOMId);
-            //工单Bom替代物料信息
+            // 工单Bom替代物料信息
             var replaceBomDetails = await _procBomDetailReplaceMaterialRepository.GetByBomIdAsync(planWorkOrderEntity.ProductBOMId);
 
             var materialIds = new List<long>();
             materialIds.AddRange(mainBomDetails.Select(x => x.MaterialId));
             materialIds.AddRange(replaceBomDetails.Select(x => x.ReplaceMaterialId));
             materialIds = materialIds.Distinct().ToList();
-            if (!materialIds.Any())
-            {
-                return procBomDetailViews;
-            }
+            if (!materialIds.Any()) return procBomDetailViews;
 
             var orderNumber = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100);
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(materialIds);
+            */
+
+            // 查询工单信息
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderId);
+
+            // 查询生产计划
+            var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16052)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
+
+            // 查询生产计划物料
+            var planWorkPlanMaterialEntities = await _planWorkPlanMaterialRepository.GetEntitiesByPlanIdAsync(new Data.Repositories.Plan.Query.PlanWorkPlanByPlanIdQuery
+            {
+                SiteId = planWorkOrderEntity.SiteId,
+                PlanId = planWorkPlanEntity.Id,
+                PlanProductId = planWorkOrderEntity.WorkPlanProductId ?? 0
+            });
+
+            // 查询物料
+            var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkPlanMaterialEntities.Select(x => x.MaterialId));
 
             IEnumerable<ManuRequistionOrderDetailEntity> requistionOrderDetailEntities = new List<ManuRequistionOrderDetailEntity>();
-            //查找领料单集合
+            // 查找领料单集合
             var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.Id, planWorkOrderEntity.SiteId);
             if (requistionOrderEntities.Any())
             {
@@ -736,20 +773,25 @@ namespace Hymson.MES.Services.Services.Process
                 });
             }
 
-            foreach (var material in procMaterials)
+            // 遍历生产计划物料
+            foreach (var planMaterial in planWorkPlanMaterialEntities)
             {
-                var mainMaterials = mainBomDetails.Where(x => x.MaterialId == material.Id);
-                var replaceMaterials = replaceBomDetails.Where(x => x.ReplaceMaterialId == material.Id);
-                var needQty = (mainMaterials.Sum(x => x.Usages + x.Loss)+ replaceMaterials.Sum(x=>x.Usages+x.Loss))??0;
+                //var mainMaterials = mainBomDetails.Where(x => x.MaterialId == material.Id);
+                //var replaceMaterials = replaceBomDetails.Where(x => x.ReplaceMaterialId == material.Id);
+                var procMaterialEntity = procMaterialEntities.FirstOrDefault(f => f.Id == planMaterial.MaterialId);
+                if (procMaterialEntity == null) continue;
 
-                var receiveQty = requistionOrderDetailEntities.Where(x => x.MaterialId == material.Id).Sum(x=>x.Qty);
+                var needQty = planMaterial.Usages * planWorkOrderEntity.Qty;
+
+                var receiveQty = requistionOrderDetailEntities.Where(x => x.MaterialId == planMaterial.Id).Sum(x => x.Qty);
                 procBomDetailViews.Add(new ProcOrderBomDetailDto
                 {
-                    MaterialId = material.Id,
-                    MaterialCode = material.MaterialCode,
-                    MaterialName = material.MaterialName,
-                    Version = material.Version ?? "",
-                    Usages= needQty* orderNumber- receiveQty
+                    MaterialId = procMaterialEntity.Id,
+                    MaterialCode = procMaterialEntity.MaterialCode,
+                    MaterialName = procMaterialEntity.MaterialName,
+                    Version = procMaterialEntity.Version ?? "",
+                    Usages = needQty - receiveQty,
+                    Batch = procMaterialEntity.Batch ?? 0
                 });
             }
 

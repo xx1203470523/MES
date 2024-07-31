@@ -472,6 +472,16 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             return await conn.ExecuteAsync(UpdateQuantityResidueRangeSql, updateQuantityCommand);
         }
 
+        /// <summary>
+        /// 批更新 按实际传入更新
+        /// </summary>
+        /// <param name="updateList"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQuantityResidueRangeMavelAsync(IEnumerable<UpdateQuantityResidueBySfcsMavelCommand> updateList)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateQuantityResidueRangeMavelSql, updateList);
+        }
 
         /// <summary>
         /// 更新库存数量(减少库存)
@@ -625,6 +635,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// 按实际传入
         /// </summary>
         const string UpdateQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=@QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpdateQuantityResidueRangeMavelSql = "UPDATE wh_material_inventory SET QuantityResidue=@QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id; ";
+
 #endif
 
 

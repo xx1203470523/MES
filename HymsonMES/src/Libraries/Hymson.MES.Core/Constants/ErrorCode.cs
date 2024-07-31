@@ -103,6 +103,7 @@
         public const string MES10251 = "物料【{Code}】不存在！";
         public const string MES10252 = "存在未匹配的BOM，请检查！";
         public const string MES10253 = "【{Status}】状态的数据，不允许当前操作！";
+        public const string MES10254 = "当前操作，暂不支持取消！";
         #endregion
 
         #region 资源 10300
@@ -286,6 +287,7 @@
         public const string MES10538 = "工序编码【{Code}】不存在！";
         public const string MES10539 = "工艺设备组编码【{Code}】不存在！";
         public const string MES10540 = "工艺设备组编码不能为空！";
+        public const string MES10541 = "【{Code}】工作中心不能为空并且工作中心线体编码不能为空！";
         #endregion
 
         #region Bom 10600
@@ -772,6 +774,7 @@
         public const string MES12839 = "产品序列码【{sfc}】带有NG标识，不允许操作!";
         public const string MES12840 = "产品序列码【{sfc}】没有指定工序的流转记录，合并失败!";
         public const string MES12841 = "产品序列码【{sfc1}】与产品序列码【{sfc2}】合并流转记录不一致，合并失败!";
+        public const string MES12842 = "{Msg}";
         #endregion
 
         #region 故障现象 12900
@@ -992,6 +995,7 @@
         public const string MES15164 = "领料单【{ReqOrderCode}】收料在系统中没有物料明细！";
         public const string MES15165 = "领料单【{ReqOrderCode}】收料中存在物料编码【{MaterialCodes}】在系统领料单明细中不存在！";
         public const string MES15166 = "领料单【{ReqOrderCode}】收料中存在物料条码【{BarCodes}】在系统中已存在！";
+        public const string MES15167 = "领料异常：{Msg}";
         #endregion
 
         #region 物料台账 15200

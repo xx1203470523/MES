@@ -786,10 +786,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         private async Task<bool> GetOrderSynSwtich()
         {
-            var nioMatList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorLmsSwitch });
+            var nioMatList = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.RotorLmsMaterialSwitch });
             if (nioMatList == null || !nioMatList.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.RotorLmsSwitch.ToString());
+                throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.RotorLmsMaterialSwitch.ToString());
             }
             string nioMatConfigValue = nioMatList.ElementAt(0).Value;
             if (nioMatConfigValue == "1")
