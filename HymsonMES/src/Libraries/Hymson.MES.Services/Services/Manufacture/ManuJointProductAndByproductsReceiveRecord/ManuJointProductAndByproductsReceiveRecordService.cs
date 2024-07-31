@@ -1,4 +1,3 @@
-using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -6,9 +5,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
@@ -26,13 +23,9 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Report;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
-using System.Security.Policy;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Transactions;
 
@@ -378,7 +371,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuJointProductAndByproducts
                 var receivedQuantity = jointProductAndByproductsReceiveRecords.Sum(x => x.Qty);
                 if (saveDto.Qty + receivedQuantity > workOrderRecordEntity.PassDownQuantity)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES14603));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES13802));
                 }
             }
             // 判断数量限制

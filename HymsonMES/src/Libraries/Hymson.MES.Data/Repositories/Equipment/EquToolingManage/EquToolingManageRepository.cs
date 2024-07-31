@@ -42,8 +42,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-                using var conn = GetMESDbConnection();
-                return await conn.ExecuteAsync(DeletesSql, param);
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeletesSql, param);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquToolingTypeEntity>> GetEntitiesAsync(EquToolingManageQuery query)
+        public async Task<IEnumerable<EquToolsEntity>> GetEntitiesAsync(EquToolingManageQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
@@ -149,7 +149,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
                 sqlBuilder.Where("ToolsId IN @ToolTypeIds");
             }
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquToolingTypeEntity>(template.RawSql, query);
+            return await conn.QueryAsync<EquToolsEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string UpdateSql = "UPDATE `equ_tools` SET NAME = @NAME, STATUS = @STATUS, ToolsId = @ToolsId, RatedLife = @RatedLife, RatedLifeUnit = @RatedLifeUnit, IsCalibrated = @IsCalibrated, CalibrationCycle = @CalibrationCycle, CalibrationCycleUnit = @CalibrationCycleUnit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
         const string UpdatesSql = "UPDATE `equ_tools` SET NAME = @NAME, STATUS = @STATUS, ToolsId = @ToolsId, RatedLife = @RatedLife, RatedLifeUnit = @RatedLifeUnit, IsCalibrated = @IsCalibrated, CalibrationCycle = @CalibrationCycle, CalibrationCycleUnit = @CalibrationCycleUnit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
-        const string DeleteSql = "UPDATE `proc_product_process_conversion_factor` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `equ_tools` SET IsDeleted = Id WHERE Id = @Id ";
         const string CalibrationUpdateSql = "UPDATE `equ_tools` SET LastVerificationTime = @LastVerificationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
         const string DeletesSql = "UPDATE `equ_tools` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         const string GetByIdSql = @"SELECT A.Id, A.Code,A.Name,A.RatedLife,A.RatedLifeUnit,A.CumulativeUsedLife,A.CurrentUsedLife,A.LastVerificationTime,A.IsCalibrated, A.CalibrationCycle,A.CalibrationCycleUnit, A.Status, A.Remark, A.CreatedOn, A.CreatedBy, A.UpdatedBy, A.UpdatedOn, B.Code AS ToolsTypeCode,B.Name AS ToolsTypeName,B.Id AS ToolsId  from equ_tools A JOIN equ_tools_type B ON A.ToolsId = B.Id  WHERE A.Id = @Id ";

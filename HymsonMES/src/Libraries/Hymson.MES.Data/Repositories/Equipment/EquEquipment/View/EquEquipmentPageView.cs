@@ -24,7 +24,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 
     }
 
-
     /// <summary>
     /// 设备注册 View
     /// </summary>
