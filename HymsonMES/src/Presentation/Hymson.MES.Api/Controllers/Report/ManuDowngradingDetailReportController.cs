@@ -49,5 +49,17 @@ namespace Hymson.MES.Api.Controllers.Report
             return await _manuDowngradingDetailReportService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 导出查询列表
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        public async Task<WorkOrderControlExportResultDto> ExprotListAsync([FromQuery] ManuDowngradingDetailReportPagedQueryDto param)
+        {
+            return await _manuDowngradingDetailReportService.ExprotListAsync(param);
+        }
+
     }
 }

@@ -36,5 +36,17 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _palletUnbindingRecordService.GetVehicleFreightRecorPageListAsync(parm);
         }
+
+        /// <summary>
+        /// 导出托盘解绑记录
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        public async Task<VehicleFreightRecordExportResultDto> ExprotListAsync([FromQuery] VehicleFreightRecordQueryDto param)
+        {
+            return await _palletUnbindingRecordService.ExprotListAsync(param);
+        }
     }
 }

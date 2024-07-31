@@ -66,5 +66,17 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _workshopJobControlReportService.GetSFCStepsBySFCPageListAsync(param);
         }
+
+        /// <summary>
+        /// 导出车间作业控制报告
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        public async Task<WorkshopJobControlResultDto> ExprotListAsync([FromQuery] WorkshopJobControlReportOptimizePagedQueryDto param)
+        {
+            return await _workshopJobControlReportService.ExprotListAsync(param);
+        }
     }
 }

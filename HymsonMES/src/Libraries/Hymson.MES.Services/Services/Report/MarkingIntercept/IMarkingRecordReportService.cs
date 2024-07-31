@@ -15,5 +15,12 @@ namespace Hymson.MES.Services.Services.Marking
         /// <returns></returns>
         Task<PagedInfo<MarkingRecordReportDto>> GetPagedListAsync(MarkingInterceptReportPagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 导出查询数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<MarkingRecordExportResultDto> ExprotListAsync(MarkingInterceptReportPagedQueryDto param);
+
     }
 }

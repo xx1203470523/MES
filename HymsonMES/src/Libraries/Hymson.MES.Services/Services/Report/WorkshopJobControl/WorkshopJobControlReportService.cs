@@ -2,9 +2,11 @@ using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
@@ -14,6 +16,8 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Minio;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -36,21 +40,21 @@ namespace Hymson.MES.Services.Services.Report
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IProcProcessRouteRepository _procProcessRouteRepository;
         private readonly IProcBomRepository _procBomRepository;
+        private readonly ILocalizationService _localizationService;
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="manuSfcInfoRepository"></param>
-        /// <param name="procProcedureRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
-        /// <param name="procMaterialRepository"></param>
-        /// <param name="procProcessRouteRepository"></param>
-        /// <param name="procBomRepository"></param>
 
-        public WorkshopJobControlReportService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository, IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository, IProcBomRepository procBomRepository)
+        public WorkshopJobControlReportService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository,
+            IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository,
+            IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository,
+            IProcBomRepository procBomRepository, ILocalizationService localizationService,
+            IExcelService excelService,
+            IMinioService minioService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -62,6 +66,9 @@ namespace Hymson.MES.Services.Services.Report
             _procMaterialRepository = procMaterialRepository;
             _procProcessRouteRepository = procProcessRouteRepository;
             _procBomRepository = procBomRepository;
+            _localizationService = localizationService;
+            _excelService = excelService;
+            _minioService = minioService;
         }
 
         ///// <summary>
@@ -295,6 +302,103 @@ namespace Hymson.MES.Services.Services.Report
             // 因为job合并执行的时候，时间会一样，所以加上类型排序
             var dtoOrdered = listDto.OrderBy(o => o.Id).AsEnumerable();
             return new PagedInfo<ManuSfcStepBySfcViewDto>(dtoOrdered, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        ///// <summary>
+        ///// 根据查询条件获取车间作业控制报表分页数据
+        ///// </summary>
+        ///// <param name="param"></param>
+        ///// <returns></returns>
+        //public async Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportPagedQueryDto param)
+        //{
+        //    var pagedQuery = param.ToQuery<WorkshopJobControlReportPagedQuery>();
+        //    pagedQuery.SiteId = _currentSite.SiteId;
+        //    var pagedInfo = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportAsync(pagedQuery);
+
+        //    List<WorkshopJobControlReportViewDto> listDto = new List<WorkshopJobControlReportViewDto>();
+        //    foreach (var item in pagedInfo.Data)
+        //    {
+        //        listDto.Add(item.ToModel<WorkshopJobControlReportViewDto>());
+        //    }
+
+        //    return new PagedInfo<WorkshopJobControlReportViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        //}
+
+        /// <summary>
+        /// 导出车间作业报告
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<WorkshopJobControlResultDto> ExprotListAsync(WorkshopJobControlReportOptimizePagedQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<WorkshopJobControlReportOptimizePagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.PageSize = 10000;
+            var pagedInfo = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportOptimizeAsync(pagedQuery);
+
+            List<WorkshopJobControlExportDto> listDto = new List<WorkshopJobControlExportDto>();
+            if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkshopJobControl"), _localizationService.GetResource("WorkshopJobControl"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new WorkshopJobControlResultDto
+                {
+                    FileName = _localizationService.GetResource("WorkshopJobControl"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+
+            // 查询工单
+            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.WorkOrderId));
+
+            // 查询bom
+            var procBomsTask = _procBomRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductBOMId));
+
+            // 查询物料
+            var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId));
+
+            // 查询工序
+            var procProceduresTask = _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProcedureId));
+
+            var procBoms = await procBomsTask;
+            var materials = await materialsTask;
+            var procProcedures = await procProceduresTask;
+
+            foreach (var item in pagedInfo.Data)
+            {
+                var material = materials.FirstOrDefault(x => x.Id == item.ProductId);
+                var workOrder = workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId);
+                var procedure = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId);
+                var bom = procBoms.FirstOrDefault(x => x.Id == item.ProductBOMId);
+
+                listDto.Add(new WorkshopJobControlExportDto
+                {
+                    SFC = item.SFC,
+                    SFCStatus = item.SFCStatus.GetDescription(),
+                    //SFCProduceStatus = item.SFCStatus,
+                    Qty = item.Qty,
+                    MaterialCodeVersion = material != null ? material.MaterialCode + "/" + material.Version : "",
+                    MaterialName = material?.MaterialName ?? "",
+                    OrderCode = workOrder?.OrderCode ?? "",
+                    OrderType = workOrder?.Type.GetDescription(),
+                    ProcedureCode = procedure?.Code ?? "",
+                    ProcedureName = procedure?.Name ?? "",
+                    BomCodeVersion = bom != null ? bom.BomCode + "/" + bom.Version : "",
+                    BomName = bom != null ? bom.BomName : ""
+                });
+            }
+
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkshopJobControl"), _localizationService.GetResource("WorkshopJobControl"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new WorkshopJobControlResultDto
+            {
+                FileName = _localizationService.GetResource("WorkshopJobControl"),
+                Path = uploadResult.AbsoluteUrl,
+            };
         }
     }
 }

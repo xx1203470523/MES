@@ -38,5 +38,17 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _workOrderControlReportService.GetWorkOrderControlPageListAsync(param);
         }
+
+        /// <summary>
+        /// 导出工单报告
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        public async Task<WorkOrderControlExportResultDto> ExprotListAsync([FromQuery] WorkOrderControlReportOptimizePagedQueryDto param)
+        {
+            return await _workOrderControlReportService.ExprotListAsync(param);
+        }
     }
 }

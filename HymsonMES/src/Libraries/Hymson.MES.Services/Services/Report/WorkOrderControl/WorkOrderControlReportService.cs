@@ -2,9 +2,12 @@ using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
@@ -15,6 +18,8 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Minio;
+using Hymson.Utils;
 using IdGen;
 
 namespace Hymson.MES.Services.Services.Report
@@ -38,21 +43,32 @@ namespace Hymson.MES.Services.Services.Report
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IProcProcessRouteRepository _procProcessRouteRepository;
         private readonly IProcBomRepository _procBomRepository;
+        private readonly ILocalizationService _localizationService;
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuSfcInfoRepository"></param>
-        /// <param name="procProcedureRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
+        /// <param name="procProcedureRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="procBomRepository"></param>
-
-        public WorkOrderControlReportService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository, IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository, IProcBomRepository procBomRepository)
+        /// <param name="localizationService"></param>
+        /// <param name="excelService"></param>
+        /// <param name="minioService"></param>
+        public WorkOrderControlReportService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository,
+            IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository,
+            IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository,
+            IProcBomRepository procBomRepository, ILocalizationService localizationService,
+            IExcelService excelService,
+            IMinioService minioService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -64,6 +80,10 @@ namespace Hymson.MES.Services.Services.Report
             _procMaterialRepository = procMaterialRepository;
             _procProcessRouteRepository = procProcessRouteRepository;
             _procBomRepository = procBomRepository;
+
+            _localizationService = localizationService;
+            _excelService = excelService;
+            _minioService = minioService;
         }
 
         /// <summary>
@@ -115,6 +135,62 @@ namespace Hymson.MES.Services.Services.Report
 
             }
             return new PagedInfo<WorkOrderControlReportViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 导出工单报告
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<WorkOrderControlExportResultDto> ExprotListAsync(WorkOrderControlReportOptimizePagedQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<PlanWorkOrderPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.PageSize = 10000;
+            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
+
+            List<WorkOrderControlExportDto> listDto = new List<WorkOrderControlExportDto>();
+            if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkOrderControl"), _localizationService.GetResource("WorkOrderControl"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new WorkOrderControlExportResultDto
+                {
+                    FileName = _localizationService.GetResource("WorkOrderControl"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            // 查询物料
+            var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId));
+            var materials = await materialsTask;
+            foreach (var item in pagedInfo.Data)
+            {
+                var material = materials.FirstOrDefault(x => x.Id == item.ProductId);
+                listDto.Add(new WorkOrderControlExportDto
+                {
+                    Status = item.Status.GetDescription(),
+                    Qty = item.Qty,
+                    MaterialCode = material != null ? material.MaterialCode + "/" + material.Version : "",
+                    WorkCenterId = item.WorkCenterCode ?? "",
+                    OrderCode = item?.OrderCode ?? "",
+                    Type = item?.Type.GetDescription(),
+                    PassDownQuantity = item?.PassDownQuantity ?? 0,
+                    ProcessDownQuantity = item?.PassDownQuantity ?? 0 - item?.UnQualifiedQuantity ?? 0 - item?.FinishProductQuantity ?? 0,
+                    UnQualifiedQuantity = item?.UnQualifiedQuantity ?? 0,
+                    FinishProductQuantity = item?.FinishProductQuantity ?? 0,
+                });
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WorkOrderControl"), _localizationService.GetResource("WorkOrderControl"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new WorkOrderControlExportResultDto
+            {
+                FileName = _localizationService.GetResource("WorkOrderControl"),
+                Path = uploadResult.AbsoluteUrl,
+            };
         }
     }
 }

@@ -198,12 +198,12 @@ namespace Hymson.MES.Services.Services.Report
             List<ManuProductBadRecordReportExportDto> listDto = new List<ManuProductBadRecordReportExportDto>();
             if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecord"), _localizationService.GetResource("BadRecord"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecordReport"), _localizationService.GetResource("BadRecordReport"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new ManuProductBadRecordReportExportResultDto
                 {
-                    FileName = _localizationService.GetResource("BadRecord"),
+                    FileName = _localizationService.GetResource("BadRecordReport"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -223,12 +223,12 @@ namespace Hymson.MES.Services.Services.Report
                 });
             }
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecord"), _localizationService.GetResource("BadRecord"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecordReport"), _localizationService.GetResource("BadRecordReport"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new ManuProductBadRecordReportExportResultDto
             {
-                FileName = _localizationService.GetResource("BadRecord"),
+                FileName = _localizationService.GetResource("BadRecordReport"),
                 Path = uploadResult.AbsoluteUrl,
             };
         }
@@ -248,12 +248,12 @@ namespace Hymson.MES.Services.Services.Report
             List<ManuProductBadRecordLogReportExportDto> listDto = new List<ManuProductBadRecordLogReportExportDto>();
             if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecordLog"), _localizationService.GetResource("BadRecordLog"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecordLogReport"), _localizationService.GetResource("BadRecordLogReport"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new ManuProductBadRecordLogReportExportResultDto
                 {
-                    FileName = _localizationService.GetResource("BadRecordLog"),
+                    FileName = _localizationService.GetResource("BadRecordLogReport"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }

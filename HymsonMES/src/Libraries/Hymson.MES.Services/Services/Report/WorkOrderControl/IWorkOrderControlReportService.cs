@@ -29,5 +29,12 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="param"></param>
         /// <returns></returns>
         Task<PagedInfo<WorkOrderControlReportViewDto>> GetWorkOrderControlPageListAsync(WorkOrderControlReportOptimizePagedQueryDto param);
+
+        /// <summary>
+        /// 导出工单报告
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<WorkOrderControlExportResultDto> ExprotListAsync(WorkOrderControlReportOptimizePagedQueryDto param);
     }
 }

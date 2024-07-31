@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -287,5 +288,89 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 工单
         /// </summary>
         public string OrderCode { get; set; }
+    }
+
+    public class WorkshopJobControlResultDto
+    {
+        public string Path { get; set; }
+
+        public string FileName { get; set; }
+    }
+
+    /// <summary>
+    /// 导出实体
+    /// </summary>
+    public record WorkshopJobControlExportDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 产品序列码
+        /// </summary>
+        [EpplusTableColumn(Header = "产品序列码", Order = 1)]
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        [EpplusTableColumn(Header = "状态", Order = 2)]
+        public string SFCStatus { get; set; }
+
+        /// <summary>
+        /// 物料编码/版本
+        /// </summary>
+        [EpplusTableColumn(Header = "产品编码/版本", Order = 3)]
+        public string MaterialCodeVersion { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        [EpplusTableColumn(Header = "产品名称", Order = 4)]
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        [EpplusTableColumn(Header = "工单", Order = 5)]
+        public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 工单类型
+        /// </summary>
+        [EpplusTableColumn(Header = "工单类型", Order = 6)]
+        public string? OrderType { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        [EpplusTableColumn(Header = "工序编码", Order = 7)]
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        [EpplusTableColumn(Header = "工序名称", Order = 8)]
+        public string ProcedureName { get; set; }
+
+        /// <summary>
+        /// Bom编码/版本
+        /// </summary>
+        [EpplusTableColumn(Header = "Bom编码/版本", Order = 9)]
+        public string BomCodeVersion { get; set; }
+
+        /// <summary>
+        /// bom名称
+        /// </summary>
+        [EpplusTableColumn(Header = "Bom名称", Order = 10)]
+        public string BomName { get; set; }
+
+        /// <summary>
+        /// 条码数量
+        /// </summary>
+        [EpplusTableColumn(Header = "数量", Order = 11)]
+        public decimal Qty { get; set; }
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public SfcStatusEnum SFCProduceStatus { get; set; }
     }
 }

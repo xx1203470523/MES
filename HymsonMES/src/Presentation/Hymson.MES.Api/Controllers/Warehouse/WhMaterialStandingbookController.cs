@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.Web.Framework.Attributes;
@@ -93,6 +94,18 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         public async Task DeleteWhMaterialStandingbookAsync(string ids)
         {
             await _whMaterialStandingbookService.DeletesWhMaterialStandingbookAsync(ids);
+        }
+
+        /// <summary>
+        /// 导出物料台账
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        public async Task<WhMaterialStandingbookExportResultDto> ExprotListAsync([FromQuery] WhMaterialStandingbookPagedQueryDto param)
+        {
+            return await _whMaterialStandingbookService.ExprotListAsync(param);
         }
 
     }

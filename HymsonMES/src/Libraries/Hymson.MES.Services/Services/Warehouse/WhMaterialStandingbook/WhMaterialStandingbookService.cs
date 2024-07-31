@@ -5,18 +5,25 @@
  *builder:  pengxin
  *build datetime: 2023-03-13 10:03:29
  */
+using Elastic.Clients.Elasticsearch.Core.Reindex;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
+using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Reactive;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -39,8 +46,18 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly AbstractValidator<WhMaterialStandingbookModifyDto> _validationModifyRules;
 
         private readonly IWhSupplierRepository _whSupplierRepository;
+        private readonly ILocalizationService _localizationService;
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
 
-        public WhMaterialStandingbookService(ICurrentUser currentUser, ICurrentSite currentSite, IWhMaterialStandingbookRepository whMaterialStandingbookRepository, AbstractValidator<WhMaterialStandingbookCreateDto> validationCreateRules, AbstractValidator<WhMaterialStandingbookModifyDto> validationModifyRules, IWhSupplierRepository whSupplierRepository)
+        public WhMaterialStandingbookService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+            AbstractValidator<WhMaterialStandingbookCreateDto> validationCreateRules,
+            AbstractValidator<WhMaterialStandingbookModifyDto> validationModifyRules,
+            IWhSupplierRepository whSupplierRepository,
+            ILocalizationService localizationService,
+            IExcelService excelService,
+            IMinioService minioService)
         {
             _currentUser = currentUser;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
@@ -48,6 +65,9 @@ namespace Hymson.MES.Services.Services.Warehouse
             _validationModifyRules = validationModifyRules;
             _currentSite = currentSite;
             _whSupplierRepository = whSupplierRepository;
+            _localizationService = localizationService;
+            _excelService = excelService;
+            _minioService = minioService;
         }
 
         /// <summary>
@@ -105,19 +125,19 @@ namespace Hymson.MES.Services.Services.Warehouse
             var pagedInfo = await _whMaterialStandingbookRepository.GetPagedInfoAsync(whMaterialStandingbookPagedQuery);
 
             //查询供应商
-            var suppliers= await _whSupplierRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.SupplierId).ToArray());
+            var suppliers = await _whSupplierRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.SupplierId).ToArray());
 
             //实体到DTO转换 装载数据
             List<WhMaterialStandingbookDto> whMaterialStandingbookDtos = PrepareWhMaterialStandingbookDtos(pagedInfo);
 
             foreach (var item in whMaterialStandingbookDtos)
             {
-                if (item.SupplierId > 0) 
+                if (item.SupplierId > 0)
                 {
-                    item.SupplierCode = suppliers.FirstOrDefault(x => x.Id == item.SupplierId)?.Code??"";
+                    item.SupplierCode = suppliers.FirstOrDefault(x => x.Id == item.SupplierId)?.Code ?? "";
                 }
             }
-            
+
             return new PagedInfo<WhMaterialStandingbookDto>(whMaterialStandingbookDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -169,6 +189,70 @@ namespace Hymson.MES.Services.Services.Warehouse
                 return whMaterialStandingbookEntity.ToModel<WhMaterialStandingbookDto>();
             }
             return new WhMaterialStandingbookDto();
+        }
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
+        /// <param name="whMaterialStandingbookPagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<WhMaterialStandingbookExportResultDto> ExprotListAsync(WhMaterialStandingbookPagedQueryDto whMaterialStandingbookPagedQueryDto)
+        {
+            var whMaterialStandingbookPagedQuery = whMaterialStandingbookPagedQueryDto.ToQuery<WhMaterialStandingbookPagedQuery>();
+            whMaterialStandingbookPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            whMaterialStandingbookPagedQuery.PageSize = 10000;
+            var pagedInfo = await _whMaterialStandingbookRepository.GetPagedInfoAsync(whMaterialStandingbookPagedQuery);
+
+            List<WhMaterialStandingbookExportDto> listDto = new List<WhMaterialStandingbookExportDto>();
+            if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WhMaterialStandingbook"), _localizationService.GetResource("WhMaterialStandingbook"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new WhMaterialStandingbookExportResultDto
+                {
+                    FileName = _localizationService.GetResource("WhMaterialStandingbook"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            //查询供应商
+            var suppliers = await _whSupplierRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.SupplierId).ToArray());
+
+            //实体到DTO转换 装载数据
+            List<WhMaterialStandingbookDto> whMaterialStandingbookDtos = PrepareWhMaterialStandingbookDtos(pagedInfo);
+
+            foreach (var item in whMaterialStandingbookDtos)
+            {
+                if (item.SupplierId > 0)
+                {
+                    item.SupplierCode = suppliers.FirstOrDefault(x => x.Id == item.SupplierId)?.Code ?? "";
+                }
+                listDto.Add(new WhMaterialStandingbookExportDto
+                {
+                    MaterialBarCode=item.MaterialBarCode,
+                    Batch=item.Batch,
+                    Quantity=item.Quantity,
+                    Unit = item.Unit,
+                    MaterialName = item.MaterialName,
+                    MaterialCode = item.MaterialCode,
+                    MaterialVersion = item.MaterialVersion,
+                    Type = item.Type,
+                    Source=item.Source,
+                    SupplierCode= suppliers.FirstOrDefault(x => x.Id == item.SupplierId)?.Code ?? "",
+                    CreatedBy=item.CreatedBy,
+                    CreatedOn=item.CreatedOn
+                });
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("WhMaterialStandingbook"), _localizationService.GetResource("WhMaterialStandingbook"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new WhMaterialStandingbookExportResultDto
+            {
+                FileName = _localizationService.GetResource("WhMaterialStandingbook"),
+                Path = uploadResult.AbsoluteUrl,
+            };
         }
     }
 }
