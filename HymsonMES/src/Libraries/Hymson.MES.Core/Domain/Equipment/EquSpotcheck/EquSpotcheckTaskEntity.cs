@@ -16,6 +16,11 @@ namespace Hymson.MES.Core.Domain.Equipment.EquSpotcheck
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
+        
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long EquipmentId { get; set; } 
 
         /// <summary>
         /// 点检任务编码
