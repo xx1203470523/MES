@@ -12,6 +12,12 @@ namespace Hymson.MES.Core.Domain.Equipment
     /// </summary>
     public class EquMaintenanceTaskEntity : BaseEntity
     {
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long EquipmentId { get; set; }
+
         /// <summary>
         /// 任务编码
         /// </summary>
