@@ -1,5 +1,4 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -19,11 +18,12 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddBackgroundServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddCoreService(configuration);
+            services.AddInfrastructure();
+            services.AddData(configuration);
+            services.AddWaterMarkService(configuration);
+
+
             AddConfig(services, configuration);
-
-            AddEventBusServices(services);
-
             AddServices(services);
             AddRepository(services);
 
@@ -39,15 +39,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
             return services;
-        }
-
-        /// <summary>
-        /// 订阅
-        /// </summary>
-        /// <param name="services"></param>
-        static void AddEventBusServices(IServiceCollection services)
-        {
-            // TODO: Add event handlers
         }
 
         /// <summary>
