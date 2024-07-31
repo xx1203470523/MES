@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: nio-back
+  name: nio-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nio-back
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nio-back
+    spec:
+      containers:
+      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks.nio:20240725114912
+        name: nio-back
+        volumeMounts:
+          - mountPath: /logs
+            name: nio-back-volume
+        env:
+        - name: DOTNET_ENVIRONMENT
+          value: "Production"
+        resources: {}
+      volumes:
+      - name: nio-back-volume
+        # 挂载 /data/foo，但仅当该目录已经存在时
+        hostPath:
+          path: /data/logs # 主机上的目录位置
+          type: DirectoryOrCreate # 此字段可选
+status: {}
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: rotor-back
+  name: rotor-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rotor-back
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: rotor-back
+    spec:
+      containers:
+      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks.rotor:20240725114912
+        name: rotor-back
+        volumeMounts:
+          - mountPath: /logs
+            name: rotor-back-volume
+        env:
+        - name: DOTNET_ENVIRONMENT
+          value: "Production"
+        resources: {}
+      volumes:
+      - name: rotor-back-volume
+        # 挂载 /data/foo，但仅当该目录已经存在时
+        hostPath:
+          path: /data/logs # 主机上的目录位置
+          type: DirectoryOrCreate # 此字段可选
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: stator-back
+  name: stator-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stator-back
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: stator-back
+    spec:
+      containers:
+      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks.stator:20240725114912
+        name: stator-back
+        volumeMounts:
+          - mountPath: /logs
+            name: stator-back-volume
+        env:
+        - name: DOTNET_ENVIRONMENT
+          value: "Production"
+        resources: {}
+      volumes:
+      - name: stator-back-volume
+        # 挂载 /data/foo，但仅当该目录已经存在时
+        hostPath:
+          path: /data/logs # 主机上的目录位置
+          type: DirectoryOrCreate # 此字段可选
+status: {}

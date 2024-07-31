@@ -159,6 +159,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuProductReceiptOrderEntity>(GetByWorkOrderIdsSql, new { Id = id });
         }
+
+        /// <summary>
+        /// 根据完工单号获取数据（批量）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<ManuProductReceiptOrderEntity> GetByCompletionOrderCodeSqlAsync(string CompletionOrderCode)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuProductReceiptOrderEntity>(GetByIdSql, new { CompletionOrderCode = CompletionOrderCode });
+        }
+        
     }
 
 
@@ -171,8 +183,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_product_receipt_order /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_product_receipt_order /**where**/  ";
 
-        const string InsertSql = "INSERT INTO manu_product_receipt_order(  `Id`, `WarehouseOrderCode`, `WorkOrderCode`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @WarehouseOrderCode, @WorkOrderCode, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
-        const string InsertsSql = "INSERT INTO manu_product_receipt_order(  `Id`, `WarehouseOrderCode`, `WorkOrderCode`,`Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @WarehouseOrderCode, @WorkOrderCode, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertSql = "INSERT INTO manu_product_receipt_order(  `Id`, `WarehouseOrderCode`, `WorkOrderCode`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `CompletionOrderCode`) VALUES (  @Id, @WarehouseOrderCode, @WorkOrderCode, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId,@CompletionOrderCode) ";
+        const string InsertsSql = "INSERT INTO manu_product_receipt_order(  `Id`, `WarehouseOrderCode`, `WorkOrderCode`,`Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `CompletionOrderCode`) VALUES (  @Id, @WarehouseOrderCode, @WorkOrderCode, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId,@CompletionOrderCode) ";
 
         const string UpdateSql = "UPDATE manu_product_receipt_order SET   WarehouseOrderCode = @WarehouseOrderCode, WorkOrderCode = @WorkOrderCode,Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE manu_product_receipt_order SET   WarehouseOrderCode = @WarehouseOrderCode, WorkOrderCode = @WorkOrderCode, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
@@ -185,5 +197,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetByWorkOrderIdsSql = @"SELECT * FROM manu_product_receipt_order WHERE WorkOrderCode = @Id ";
 
+        const string GetByCompletionOrderCodeSql = @"SELECT * FROM manu_product_receipt_order WHERE CompletionOrderCode = @CompletionOrderCode ";
     }
 }

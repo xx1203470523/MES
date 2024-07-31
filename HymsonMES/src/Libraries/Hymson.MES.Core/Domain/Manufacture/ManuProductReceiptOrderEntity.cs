@@ -16,31 +16,34 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string WarehouseOrderCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工单id
         /// </summary>
         public long WorkOrderCode { get; set; }
 
-       ///// <summary>
-       // /// 箱号编码
-       // /// </summary>
-       // public string ContaineCode { get; set; }
+        ///// <summary>
+        // /// 箱号编码
+        // /// </summary>
+        // public string ContaineCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态0:审批中，1：审批失败，2：审批成功3.已退料
         /// </summary>
         public ProductReceiptStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料描述
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+        /// <summary>
+        /// 完工入库单
+        /// </summary>
+        public string CompletionOrderCode { get; set; }
     }
 }
