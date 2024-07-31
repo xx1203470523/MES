@@ -75,7 +75,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             var TIMESTAMP = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
             var NONCE = $"{Guid.NewGuid()}".Replace("-", "");
-            var METHOD = $"{config.Method}".ToUpper();
+            var METHOD = $"{(Method)config.Method}".ToUpper();
 
             // 组装数据
             var dataObj = new NIORequestBo<T>
@@ -116,7 +116,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
             var TIMESTAMP = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
             var NONCE = $"{Guid.NewGuid()}".Replace("-", "");
-            var METHOD = $"{config.Method}".ToUpper();
+            var METHOD = $"{(Method)config.Method}".ToUpper();
 
             var SIGN = NIOOpenApiSignUtil.Sign(APP_KEY, APP_SECRET, TIMESTAMP, NONCE, METHOD, path, null, null, body);
 
