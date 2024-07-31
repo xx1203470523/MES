@@ -301,7 +301,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
 
                 dtos.Add(model);
             }
-            if(dtos == null || dtos.Count == 0)
+            if (dtos == null || dtos.Count == 0)
             {
                 return;
             }
@@ -378,16 +378,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 //条码批次
                 string sfcBatch = string.Empty;
                 var sfcBatchModel = sfcBatchList.Where(m => m.Sfc == item.SFC).FirstOrDefault();
-                if(sfcBatchModel != null)
+                if (sfcBatchModel != null)
                 {
                     sfcBatch = sfcBatchModel.Batch;
                 }
                 //总成码,指定工序才有总成码
                 string nioSfc = string.Empty;
-                if(ROTOR_NIOSN_OP.Contains(procedureCode) == true && nioSfcList != null)
+                if (ROTOR_NIOSN_OP.Contains(procedureCode) == true && nioSfcList != null)
                 {
                     var curNio = nioSfcList.Where(m => m.ZSfc == item.SFC).FirstOrDefault();
-                    if(curNio != null)
+                    if (curNio != null)
                     {
                         nioSfc = curNio.Sfc;
                     }
@@ -479,7 +479,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             cirQuery.SiteId = siteId;
             cirQuery.Sfc = allSfcList;
             var cirSfcList = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(cirQuery);
-            if(cirSfcList == null || cirSfcList.Count() == 0)
+            if (cirSfcList == null || cirSfcList.Count() == 0)
             {
                 return;
             }
@@ -650,7 +650,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 #endregion
             }
 
-            DateTime ?maxUpdateTime = rotorSfcList.Max(x => x.UpdatedOn);
+            DateTime? maxUpdateTime = rotorSfcList.Max(x => x.UpdatedOn);
             long timestamp = GetTimestampInMilliseconds(maxUpdateTime);
 
             //MES数据入库
@@ -685,9 +685,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取当前水位
             var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioPassrateProduct);
             //获取步骤数据
-            EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery() 
-                { Rows = WATER_ALL_ROWS, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
+            EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery()
+            { Rows = WATER_ALL_ROWS, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
             var stepList = await _manuSfcStepRepository.GetSfcStepMavelAsync(stepQuery);
+            if (stepList == null || !stepList.Any()) return;
+
             //型号
             List<long> materialIdList = stepList.Where(m => m.ProductId != 0).Select(m => m.ProductId).Distinct().ToList();
             IEnumerable<ProcMaterialEntity> materialList = await _procMaterialRepository.GetByIdsAsync(materialIdList);
@@ -697,18 +699,18 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //数据预处理
             stepList = stepList.Where(m => m.ProductId != 0).ToList();
             List<long> productIdList = stepList.Select(m => m.ProductId).Distinct().ToList();
-            foreach(var item in productIdList)
+            foreach (var item in productIdList)
             {
                 //物料是否存在系统中
-                ProcMaterialEntity ?curMat = materialList.Where(m => m.Id == item).FirstOrDefault();
-                if(curMat == null)
+                ProcMaterialEntity? curMat = materialList.Where(m => m.Id == item).FirstOrDefault();
+                if (curMat == null)
                 {
                     continue;
                 }
                 //物料是否在当前配置的型号
                 string materialCode = curMat.MaterialCode;
                 NIOConfigBaseDto? curConfig = baseDataList.Where(m => m.VendorProductCode == materialCode).FirstOrDefault();
-                if(curConfig == null)
+                if (curConfig == null)
                 {
                     continue;
                 }
@@ -768,9 +770,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取当前水位
             var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.NioPassrateProcedure);
             //获取步骤数据
-            EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery() 
-                { Rows = WATER_ALL_ROWS, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
+            EntityByWaterSiteIdQuery stepQuery = new EntityByWaterSiteIdQuery()
+            { Rows = WATER_ALL_ROWS, SiteId = siteId, StartWaterMarkId = startWaterMarkId };
             var stepList = await _manuSfcStepRepository.GetSfcStepMavelAsync(stepQuery);
+            if (stepList == null || !stepList.Any()) return;
+
             //获取工序
             ProcProcedureQuery procedureQuery = new ProcProcedureQuery() { SiteId = siteId };
             var procedureList = await _procProcedureRepository.GetEntitiesAsync(procedureQuery);
@@ -781,7 +785,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             foreach (var item in procedureList)
             {
                 var curStepList = stepList.Where(m => m.ProcedureId == item.Id).ToList();
-                if(curStepList == null || curStepList.Any() == false)
+                if (curStepList == null || curStepList.Any() == false)
                 {
                     continue;
                 }
@@ -821,16 +825,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             decimal GetPassrateStation(string configValue, string procedureCode)
             {
                 decimal result = 0.9m;
-                if(string.IsNullOrEmpty(configValue) == true)
+                if (string.IsNullOrEmpty(configValue) == true)
                 {
                     return result;
                 }
 
                 List<string> list = configValue.Split('&').ToList();
-                foreach(var  item in list)
+                foreach (var item in list)
                 {
                     List<string> itemList = item.Split('=').ToList();
-                    if(itemList.Count != 2)
+                    if (itemList.Count != 2)
                     {
                         return result;
                     }
@@ -902,7 +906,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //处理数据
             var dtos = new List<IssueDto> { };
 
-            foreach(var item in paramList)
+            foreach (var item in paramList)
             {
                 //标准参数
                 var curBaseParam = baseParamList.Where(m => m.Id == item.ParameterId).FirstOrDefault();
@@ -933,7 +937,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 {
                     curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(GetStatorConfig(baseConfigList));
                 }
-                if(curConfig == null)
+                if (curConfig == null)
                 {
                     continue;
                 }
@@ -988,15 +992,15 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var planOrderList = await _planWorkOrderRepository.GetWorkOrderMavelAsync(siteId);
             //处理数据
             var dtos = new List<WorkOrderDto> { };
-            foreach(var item in planOrderList)
+            foreach (var item in planOrderList)
             {
                 var curConfig = baseDataList.Where(m => m.VendorProductCode == item.MaterialCode).FirstOrDefault();
-                if(curConfig == null)
+                if (curConfig == null)
                 {
                     continue;
                 }
 
-                if(item.FinishProductQuantity <= 0)
+                if (item.FinishProductQuantity <= 0)
                 {
                     continue;
                 }
@@ -1126,7 +1130,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             List<NIOConfigBaseDto> resultList = new List<NIOConfigBaseDto>();
 
             //基础数据配置
-            foreach(var item in list)
+            foreach (var item in list)
             {
                 NIOConfigBaseDto model = JsonConvert.DeserializeObject<NIOConfigBaseDto>(item.Value);
                 resultList.Add(model);
@@ -1150,14 +1154,14 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             //获取NG条码是否有重复，并且第一条是NG的
             int firstOkNg = 0; //第一次OK后续NG
             var ngStepList = stepList.Where(m => ngSfcList.Contains(m.SFC) == true).ToList();
-            foreach(var item in ngSfcList)
+            foreach (var item in ngSfcList)
             {
                 var curNgStepList = ngStepList.Where(m => m.SFC == item).ToList();
-                if(curNgStepList.Count > 1)
+                if (curNgStepList.Count > 1)
                 {
                     //查找最早一个
                     var maxEarNg = curNgStepList.OrderBy(m => m.CreatedOn).FirstOrDefault();
-                    if(maxEarNg!.ScrapQty > 0)
+                    if (maxEarNg!.ScrapQty > 0)
                     {
                         ++firstOkNg;
                     }
@@ -1210,7 +1214,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <param name="siteId"></param>
         /// <param name="sfcList"></param>
         /// <returns></returns>
-        private async Task<List<SfcBatchDto>> GetSfcBatchListAsync(long siteId,List<string> sfcList)
+        private async Task<List<SfcBatchDto>> GetSfcBatchListAsync(long siteId, List<string> sfcList)
         {
             List<SfcBatchDto> resultList = new List<SfcBatchDto>();
 
@@ -1219,7 +1223,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             matQuery.SiteId = siteId;
             matQuery.MaterialBarCodeList = sfcList;
             var barCodeBatchList = await _manuRequistionOrderReceiveRepository.GetEntitiesAsync(matQuery);
-            if(barCodeBatchList != null && barCodeBatchList.Count() > 0)
+            if (barCodeBatchList != null && barCodeBatchList.Count() > 0)
             {
                 resultList.AddRange(barCodeBatchList.Select(m => new SfcBatchDto()
                 {
@@ -1232,7 +1236,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             detailQuery.SiteId = siteId;
             detailQuery.SFCs = sfcList;
             var snList = await _manuProductReceiptOrderDetailRepository.GetListAsync(detailQuery);
-            if(snList != null && snList.Count() > 0)
+            if (snList != null && snList.Count() > 0)
             {
                 resultList.AddRange(snList.Select(m => new SfcBatchDto()
                 {
