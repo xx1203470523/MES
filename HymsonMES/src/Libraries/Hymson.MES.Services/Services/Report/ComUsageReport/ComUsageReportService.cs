@@ -113,7 +113,7 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<ComUsageExportResultDto> ExprotComUsagePageListAsync(ComUsageReportPagedQueryDto param)
         {
             var pagedQuery = param.ToQuery<ComUsageReportPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId.Value;
+            pagedQuery.SiteId = _currentSite.SiteId??0;
             pagedQuery.PageSize = 1000;
             var pagedInfo = await _circulationRepository.GetReportPagedInfoAsync(pagedQuery);
 
