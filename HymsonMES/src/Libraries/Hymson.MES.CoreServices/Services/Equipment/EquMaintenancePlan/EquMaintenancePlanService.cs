@@ -186,6 +186,7 @@ namespace Hymson.MES.CoreServices.Services.EquMaintenancePlan
                 var equMaintenanceTaskId = IdGenProvider.Instance.CreateId();
                 EquMaintenanceTaskEntity EquMaintenanceTask = new()
                 {
+                    EquipmentId = item.EquipmentId,
                     Code = await GenerateMaintenanceOrderCodeAsync(param.SiteId, param.UserName),
                     Name = equMaintenancePlanEntity.Name,
                     //BeginTime = HymsonClock.Now(),
