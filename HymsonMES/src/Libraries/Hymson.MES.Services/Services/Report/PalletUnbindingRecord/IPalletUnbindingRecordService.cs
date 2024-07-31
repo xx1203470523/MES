@@ -16,5 +16,12 @@ namespace Hymson.MES.Services.Services.Report.PalletUnbindingRecord
         /// <param name="param"></param>
         /// <returns></returns>
         Task<PagedInfo<VehicleFreightRecordDto>> GetVehicleFreightRecorPageListAsync(VehicleFreightRecordQueryDto param);
+
+        /// <summary>
+        /// 导出查询数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<VehicleFreightRecordExportResultDto> ExprotListAsync(VehicleFreightRecordQueryDto param);
     }
 }

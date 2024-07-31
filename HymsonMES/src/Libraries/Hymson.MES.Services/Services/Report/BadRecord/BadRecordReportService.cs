@@ -1,10 +1,16 @@
+using Elastic.Clients.Elasticsearch.Core.Search;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Minio;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -31,18 +37,17 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// /// <param name="manuProductBadRecordRepository"></param>
-        /// <param name="manuProductNgRecordRepository"></param>
-        /// /// <param name="qualUnqualifiedCodeRepository"></param>
+        private readonly ILocalizationService _localizationService;
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
+
         public BadRecordReportService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
             IManuProductNgRecordRepository manuProductNgRecordRepository,
-            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+            ILocalizationService localizationService,
+            IExcelService excelService,
+            IMinioService minioService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -50,6 +55,10 @@ namespace Hymson.MES.Services.Services.Report
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _manuProductNgRecordRepository = manuProductNgRecordRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
+
+            _localizationService = localizationService;
+            _excelService = excelService;
+            _minioService = minioService;
         }
 
         /// <summary>
@@ -138,7 +147,7 @@ namespace Hymson.MES.Services.Services.Report
         }
 
         /// <summary>
-        /// 询不合格代码列表（不良报告日志）
+        /// 不合格代码列表（不良报告日志）
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -172,6 +181,110 @@ namespace Hymson.MES.Services.Services.Report
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// 根据查询条件获取不良报表分页数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<ManuProductBadRecordReportExportResultDto> ExprotListAsync(BadRecordReportDto param)
+        {
+            var pagedQuery = param.ToQuery<ManuProductBadRecordReportPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.PageSize = 10000;
+            var pagedInfo = await _manuProductBadRecordRepository.GetPagedInfoReportAsync(pagedQuery);
+
+            List<ManuProductBadRecordReportExportDto> listDto = new List<ManuProductBadRecordReportExportDto>();
+            if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecordReport"), _localizationService.GetResource("BadRecordReport"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new ManuProductBadRecordReportExportResultDto
+                {
+                    FileName = _localizationService.GetResource("BadRecordReport"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            var unqualifiedIds = pagedInfo.Data.Select(x => x.UnqualifiedId).ToArray();
+            var unqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(unqualifiedIds);
+
+            foreach (var item in pagedInfo.Data)
+            {
+                var unqualifiedCodeEntitie = unqualifiedCodeEntities.FirstOrDefault(y => y.Id == item.UnqualifiedId);
+
+                listDto.Add(new ManuProductBadRecordReportExportDto
+                {
+                    Num = item.Num,
+                    UnqualifiedCode = unqualifiedCodeEntitie?.UnqualifiedCode ?? "",
+                    UnqualifiedCodeName = unqualifiedCodeEntitie?.UnqualifiedCodeName ?? ""
+                });
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecordReport"), _localizationService.GetResource("BadRecordReport"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new ManuProductBadRecordReportExportResultDto
+            {
+                FileName = _localizationService.GetResource("BadRecordReport"),
+                Path = uploadResult.AbsoluteUrl,
+            };
+        }
+
+        /// <summary>
+        /// 根据查询条件获取不良日志报表分页数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<ManuProductBadRecordLogReportExportResultDto> ExprotLogListAsync(ManuProductBadRecordLogReportPagedQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<ManuProductBadRecordLogReportPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.PageSize = 10000;
+            var pagedInfo = await _manuProductBadRecordRepository.GetPagedInfoLogReportAsync(pagedQuery);
+
+            List<ManuProductBadRecordLogReportExportDto> listDto = new List<ManuProductBadRecordLogReportExportDto>();
+            if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecordLogReport"), _localizationService.GetResource("BadRecordLogReport"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new ManuProductBadRecordLogReportExportResultDto
+                {
+                    FileName = _localizationService.GetResource("BadRecordLogReport"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            foreach (var item in pagedInfo.Data)
+            {
+                listDto.Add(new ManuProductBadRecordLogReportExportDto
+                {
+                    SFC=item.SFC,
+                    MaterialCode=item.MaterialCode,
+                    MaterialName=item.MaterialName,
+                    OrderCode = item.OrderCode,
+                    ProcedureCode=item.ProcedureCode,
+                    ResCode = item.ResCode,
+                    UnqualifiedCode = item.UnqualifiedCode,
+                    UnqualifiedType = item.UnqualifiedType,
+                    BadRecordStatus = item.BadRecordStatus,
+                    Qty = item.Qty,
+                    CreatedBy = item.CreatedBy,
+                    CreatedOn = item.CreatedOn
+                });
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BadRecordLog"), _localizationService.GetResource("BadRecordLog"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new ManuProductBadRecordLogReportExportResultDto
+            {
+                FileName = _localizationService.GetResource("BadRecordLog"),
+                Path = uploadResult.AbsoluteUrl,
+            };
         }
 
     }

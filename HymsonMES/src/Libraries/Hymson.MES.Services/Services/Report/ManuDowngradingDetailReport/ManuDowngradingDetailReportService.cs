@@ -1,13 +1,17 @@
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Report;
 using Hymson.MES.Data.Repositories.Report.Query;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Minio;
+using Hymson.Utils;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -49,6 +53,9 @@ namespace Hymson.MES.Services.Services.Report
         /// 降级规则仓储
         /// </summary>
         private readonly IManuDowngradingRuleRepository _manuDowngradingRuleRepository;
+        private readonly ILocalizationService _localizationService;
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
 
         /// <summary>
         /// 构造函数
@@ -60,12 +67,18 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="procProcedureRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="manuDowngradingRuleRepository"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="excelService"></param>
+        /// <param name="minioService"></param>
         public ManuDowngradingDetailReportService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuDowngradingDetailReportRepository manuDowngradingDetailReportRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcMaterialRepository procMaterialRepository,
-            IManuDowngradingRuleRepository manuDowngradingRuleRepository)
+            IManuDowngradingRuleRepository manuDowngradingRuleRepository,
+            ILocalizationService localizationService,
+            IExcelService excelService,
+            IMinioService minioService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -74,6 +87,10 @@ namespace Hymson.MES.Services.Services.Report
             _procProcedureRepository = procProcedureRepository;
             _procMaterialRepository = procMaterialRepository;
             _manuDowngradingRuleRepository = manuDowngradingRuleRepository;
+
+            _localizationService = localizationService;
+            _excelService = excelService;
+            _minioService = minioService;
         }
 
         /// <summary>
@@ -136,5 +153,79 @@ namespace Hymson.MES.Services.Services.Report
             return new PagedInfo<ManuDowngradingDetailReportDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+        /// <summary>
+        /// 导出查询列表
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<WorkOrderControlExportResultDto> ExprotListAsync(ManuDowngradingDetailReportPagedQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<ManuDowngradingDetailReportPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.PageSize = 10000;
+            var pagedInfo = await _manuDowngradingDetailReportRepository.GetPagedInfoAsync(pagedQuery);
+
+            List<ManuDowngradingDetailExportDto> listDto = new List<ManuDowngradingDetailExportDto>();
+            if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuDowngradingDetailRepor"), _localizationService.GetResource("ManuDowngradingDetailRepor"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new WorkOrderControlExportResultDto
+                {
+                    FileName = _localizationService.GetResource("ManuDowngradingDetailRepor"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            //工序
+            var procedureIds = pagedInfo.Data.Select(x => x.ProcedureId.GetValueOrDefault()).Distinct().ToArray();
+            var procedureInfosTask = _procProcedureRepository.GetByIdsAsync(procedureIds);
+            //产品
+            var productIds = pagedInfo.Data.Select(x => x.ProductId).Distinct().ToArray();
+            var productInfosTask = _procMaterialRepository.GetByIdsAsync(productIds);
+            //工作中心
+            var workCenterIds = pagedInfo.Data.Select(x => x.WorkCenterId.GetValueOrDefault()).Distinct().ToArray();
+            var workCenterInfosTask = _inteWorkCenterRepository.GetByIdsAsync(workCenterIds);
+
+            var procedureInfos = await procedureInfosTask;
+            var productInfos = await productInfosTask;
+            var workCenterInfos = await workCenterInfosTask;
+
+            foreach (var item in pagedInfo.Data)
+            {
+                var procedureInfo = procedureInfos.FirstOrDefault(y => y.Id == item.ProcedureId);
+                var productInfo = productInfos.FirstOrDefault(y => y.Id == item.ProductId);
+                var workCenterInfo = workCenterInfos.FirstOrDefault(y => y.Id == item.WorkCenterId);
+
+                var downgradingRuleInfo = await _manuDowngradingRuleRepository.GetByCodeAsync(new ManuDowngradingRuleCodeQuery() { Code = item.Grade ?? "", SiteId = (long)_currentSite.SiteId! });
+                //添加数据
+                listDto.Add(new ManuDowngradingDetailExportDto
+                {
+                    WorkCenterCode = workCenterInfo?.Code ?? "",
+                    SFC = item.SFC,
+                    ProductCode = productInfo?.MaterialCode ?? "",
+                    ProductName = productInfo?.MaterialName ?? "",
+                    DowngradingCode = item.Grade,
+                    DowngradingName = downgradingRuleInfo?.Name ?? "",
+                    DowngradingRemark = item.Remark,
+                    UpdatedBy = item.EntryPersonnel,
+                    UpdatedOn = item.EntryTime,
+                    OrderCode = item.OrderCode,
+                    OrderType = item.OrderType.GetDescription(),
+                    ProcedureCode = procedureInfo?.Code ?? "",
+                    ProcedureName = procedureInfo?.Name ?? "",
+                });
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("ManuDowngradingDetailRepor"), _localizationService.GetResource("ManuDowngradingDetailRepor"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new WorkOrderControlExportResultDto
+            {
+                FileName = _localizationService.GetResource("ManuDowngradingDetailRepor"),
+                Path = uploadResult.AbsoluteUrl,
+            };
+        }
     }
 }

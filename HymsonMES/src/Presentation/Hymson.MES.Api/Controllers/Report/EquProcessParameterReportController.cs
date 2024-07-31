@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Report;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,6 +49,18 @@ namespace Hymson.MES.Api.Controllers.Report
         public async Task<PagedInfo<EquProcessParameterReportDto>> QueryPagedEquipmentProcessParameterReportAsync([FromQuery] EquProcessParameterReportPagedQueryDto pagedQueryDto)
         {
             return await _equipmentProcessParameterReportService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 导出设备过程参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        public async Task<EquProcessParameterExportResultDto> ExprotEquProcessParameterListAsync([FromQuery] EquProcessParameterReportPagedQueryDto param)
+        {
+            return await _equipmentProcessParameterReportService.ExprotEquProcessParameterListAsync(param);
         }
 
     }

@@ -47,8 +47,8 @@ namespace Hymson.MES.Data.Repositories.Parameter
             List<Task<int>> tasks = new();
             foreach (var dicItem in dic)
             {
-                var insertPartSql = $"INSERT INTO {dicItem.Key}(`Id`, `SiteId`, `EquipmentId`, `Location`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ";
-                var valuePartSql = "(@Id, @SiteId,@EquipmentId, @Location, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
+                var insertPartSql = $"INSERT INTO {dicItem.Key}(`Id`, `SiteId`, `EquipmentId`,`ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ";
+                var valuePartSql = "(@Id, @SiteId,@EquipmentId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
 
                 var (sql, parameters) = SqlHelper.JoinInsertSql(insertPartSql, valuePartSql, dicItem.Value);
                 tasks.Add(conn.ExecuteAsync(sql, parameters));
@@ -96,7 +96,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
 
             var sqlBuilder = new SqlBuilder();
             // WHERE EquipmentId=@EquipmentId  AND SiteId=@SiteId AND IsDeleted=0
-            string getByEquipmentSql = $"SELECT Id, SiteId, EquipmentId, Location, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted FROM {tableName} /**where**/ order by Id DESC LIMIT @Offset,@Rows ";
+            string getByEquipmentSql = $"SELECT Id, SiteId, EquipmentId,ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted FROM {tableName} /**where**/ order by Id DESC LIMIT @Offset,@Rows ";
             string getByEquipmentCountSql = $"select count(1) from {tableName} /**where**/";
             var templateData = sqlBuilder.AddTemplate(getByEquipmentSql);
             var templateCount = sqlBuilder.AddTemplate(getByEquipmentCountSql);

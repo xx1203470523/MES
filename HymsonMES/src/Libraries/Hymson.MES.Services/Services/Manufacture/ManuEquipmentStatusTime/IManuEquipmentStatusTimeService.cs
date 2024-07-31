@@ -14,5 +14,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuEquipmentStatusReportViewDto>> GetPageListAsync(ManuEquipmentStatusTimePagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 设备状态监控报表分页查询
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<ManuEquipmentStatusExportResultDto> ExprotListAsync(ManuEquipmentStatusTimePagedQueryDto param);
     }
 }

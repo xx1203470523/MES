@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -155,5 +156,80 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 创建时间  数组 ：时间范围 
         /// </summary>
         public DateTime[]? CreatedOn { get; set; }
+    }
+
+    public class WorkOrderControlExportResultDto
+    {
+        public string Path { get; set; }
+
+        public string FileName { get; set; }
+    }
+
+    public record WorkOrderControlExportDto : BaseExcelDto
+    {
+        ///// <summary>
+        ///// 工单id
+        ///// </summary>
+        //public long Id { get; set; }
+
+        /// <summary>
+        /// 物料编码/版本
+        /// </summary>
+        [EpplusTableColumn(Header = "物料编码", Order = 1)]
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        [EpplusTableColumn(Header = "工单号", Order = 2)]
+        public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 工作中心
+        /// </summary>
+        [EpplusTableColumn(Header = "工作中心", Order = 3)]
+        public string WorkCenterId { get; set; }
+
+        /// <summary>
+        /// 工单数量
+        /// </summary>
+        [EpplusTableColumn(Header = "工单数量", Order = 4)]
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 工单类型
+        /// </summary>
+        [EpplusTableColumn(Header = "工单类型", Order = 5)]
+        public string? Type { get; set; }
+
+        /// <summary>
+        /// 工单状态
+        /// </summary>
+        [EpplusTableColumn(Header = "工单状态", Order = 6)]
+        public string? Status { get; set; }
+
+        /// <summary>
+        /// 条码下达数量
+        /// </summary>
+        [EpplusTableColumn(Header = "条码下达数量", Order = 7)]
+        public decimal PassDownQuantity { get; set; }
+
+        /// <summary>
+        /// 在制数量
+        /// </summary>
+        [EpplusTableColumn(Header = "排队/在制数量", Order = 8)]
+        public decimal ProcessDownQuantity { get; set; }
+
+        /// <summary>
+        /// 报废数量
+        /// </summary>
+        [EpplusTableColumn(Header = "报废数量", Order = 9)]
+        public decimal UnQualifiedQuantity { get; set; }
+
+        /// <summary>
+        /// 已完成数量
+        /// </summary>
+        [EpplusTableColumn(Header = "已完成数量", Order = 10)]
+        public decimal FinishProductQuantity { get; set; }
     }
 }

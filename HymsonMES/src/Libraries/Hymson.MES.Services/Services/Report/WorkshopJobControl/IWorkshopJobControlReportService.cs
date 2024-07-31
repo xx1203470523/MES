@@ -43,5 +43,12 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="queryParam"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcStepBySfcViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySfcPagedQueryDto queryParam);
+
+        /// <summary>
+        /// 导出车间作业报告
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<WorkshopJobControlResultDto> ExprotListAsync(WorkshopJobControlReportOptimizePagedQueryDto param);
     }
 }

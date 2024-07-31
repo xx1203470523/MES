@@ -5,6 +5,7 @@ using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Report;
 using Microsoft.AspNetCore.Mvc;
+using Minio.DataModel;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
 {
@@ -42,6 +43,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<PagedInfo<ManuEquipmentStatusReportViewDto>> QueryPagedBadRecordReportAsync([FromQuery] ManuEquipmentStatusTimePagedQueryDto parm)
         {
             return await _equipmentStatusTimeService.GetPageListAsync(parm);
+        }
+
+        /// <summary>
+        /// 设备状态监控报表分页查询
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        public async Task<ManuEquipmentStatusExportResultDto> ExprotListAsync([FromQuery] ManuEquipmentStatusTimePagedQueryDto param)
+        {
+            return await _equipmentStatusTimeService.ExprotListAsync(param);
         }
     }
 }

@@ -73,9 +73,9 @@ namespace Hymson.MES.Services.Dtos.Report
     public record ComUsageReportExcelExportDto : BaseExcelDto
     {
         /// <summary>
-        /// 车间作业控制
+        /// 产品序列码
         /// </summary>
-        [EpplusTableColumn(Header = "车间作业控制", Order = 1)]
+        [EpplusTableColumn(Header = "产品序列码", Order = 1)]
         public string SFC { get; set; }
 
 

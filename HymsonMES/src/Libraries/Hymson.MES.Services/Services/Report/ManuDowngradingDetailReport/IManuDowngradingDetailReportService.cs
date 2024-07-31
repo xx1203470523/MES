@@ -14,5 +14,12 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuDowngradingDetailReportDto>> GetPagedListAsync(ManuDowngradingDetailReportPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 导出查询列表
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<WorkOrderControlExportResultDto> ExprotListAsync(ManuDowngradingDetailReportPagedQueryDto param);
     }
 }

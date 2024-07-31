@@ -47,5 +47,16 @@ namespace Hymson.MES.Api.Controllers.Marking
             return await _markingInterceptReportService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 导出查询数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        public async Task<MarkingRecordExportResultDto> ExprotListAsync([FromQuery] MarkingInterceptReportPagedQueryDto param)
+        {
+            return await _markingInterceptReportService.ExprotListAsync(param);
+        }
     }
 }

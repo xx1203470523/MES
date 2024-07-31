@@ -1,7 +1,9 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -9,6 +11,9 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Minio;
+using Hymson.Utils;
+using System.Reflection.Emit;
 
 namespace Hymson.MES.Services.Services.Report.PalletUnbindingRecord
 {
@@ -27,7 +32,18 @@ namespace Hymson.MES.Services.Services.Report.PalletUnbindingRecord
         private readonly IInteVehicleRepository _inteVehicleRepository;
         private readonly IInteVehicleFreightRepository _inteVehicleFreightRepository;
         private readonly IProcResourceRepository _procResourceRepository;
-        public PalletUnbindingRecordService(IProcResourceRepository procResourceRepository, IInteVehicleFreightRepository inteVehicleFreightRepository, IInteVehicleRepository inteVehicleRepository, IInteWorkCenterRepository inteWorkCenterRepository, IPlanWorkOrderRepository planWorkOrderRepository, IEquEquipmentRepository equEquipmentRepository, IProcProcedureRepository procProcedureRepository, ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository)
+        private readonly ILocalizationService _localizationService;
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
+
+        public PalletUnbindingRecordService(IProcResourceRepository procResourceRepository,
+            IInteVehicleFreightRepository inteVehicleFreightRepository, IInteVehicleRepository inteVehicleRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository, IPlanWorkOrderRepository planWorkOrderRepository,
+            IEquEquipmentRepository equEquipmentRepository, IProcProcedureRepository procProcedureRepository,
+            ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository,
+            ILocalizationService localizationService,
+            IExcelService excelService,
+            IMinioService minioService)
         {
             _procResourceRepository = procResourceRepository;
             _inteVehicleFreightRepository = inteVehicleFreightRepository;
@@ -39,6 +55,10 @@ namespace Hymson.MES.Services.Services.Report.PalletUnbindingRecord
             _currentUser = currentUser;
             _currentSite = currentSite;
             _inteVehicleFreightRecordRepository = inteVehicleFreightRecordRepository;
+
+            _localizationService = localizationService;
+            _excelService = excelService;
+            _minioService = minioService;
         }
 
         /// <summary>
@@ -104,6 +124,86 @@ namespace Hymson.MES.Services.Services.Report.PalletUnbindingRecord
                 listDto.Add(vehicleFreightRecord);
             }
             return new PagedInfo<VehicleFreightRecordDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 导出查询数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<VehicleFreightRecordExportResultDto> ExprotListAsync(VehicleFreightRecordQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<InteVehicleFreightRecordPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.PageSize = 10000;
+            var pagedInfo = await _inteVehicleFreightRecordRepository.GetPagedInfoAsync(pagedQuery);
+
+            List<VehicleFreightRecordExportDto> listDto = new List<VehicleFreightRecordExportDto>();
+            if (pagedInfo == null || pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("VehicleFreightRecord"), _localizationService.GetResource("VehicleFreightRecord"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new VehicleFreightRecordExportResultDto
+                {
+                    FileName = _localizationService.GetResource("VehicleFreightRecord"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+
+            var pageInfoData = pagedInfo.Data;
+            var procedureIds = pageInfoData.Select(x => x.ProcedureId).Distinct().ToList();
+            var procProceduresList = await _procProcedureRepository.GetByIdsAsync(procedureIds);
+            var equipmentIds = pageInfoData.Select(x => x.EquipmentId).Distinct().ToList();
+            var equipmentList = await _equipmentRepository.GetByIdAsync(equipmentIds);
+            var workCenterIds = pageInfoData.Select(x => x.WorkCenterId).Distinct().ToArray();
+            var workCenterList = await _inteWorkCenterRepository.GetByIdsAsync(workCenterIds);
+            var workOrderIds = pageInfoData.Select(x => x.WorkOrderId).Distinct().ToArray();
+            var workOrderList = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+            var vehicleIds = pageInfoData.Select(x => x.VehicleId).Distinct().ToArray();
+            var vehicleList = await _inteVehicleRepository.GetByIdsAsync(vehicleIds);
+            var locationIds = pageInfoData.Select(x => x.LocationId).Distinct().ToArray();
+            var locationList = await _inteVehicleFreightRepository.GetByIdsAsync(locationIds);
+            var resourceIds = pageInfoData.Select(x => x.ResourceId).Distinct().ToArray();
+            var resourceList = await _procResourceRepository.GetListByIdsAsync(resourceIds);
+
+            foreach (var pageInfo in pageInfoData)
+            {
+                var proceduresInfo = procProceduresList.FirstOrDefault(item => item.Id == pageInfo.ProcedureId);
+                var equipmentInfo = equipmentList.FirstOrDefault(item => item.Id == pageInfo.EquipmentId);
+                var workCenterInfo = workCenterList.FirstOrDefault(item => item.Id == pageInfo.WorkCenterId);
+                var workOrderInfo = workOrderList.FirstOrDefault(item => item.Id == pageInfo.WorkOrderId);
+                var vehicleInfo = vehicleList.FirstOrDefault(item => item.Id == pageInfo.VehicleId);
+                var locatioInfo = locationList.FirstOrDefault(item => item.Id == pageInfo.LocationId);
+                var resourceInfo = resourceList.FirstOrDefault(item => item.Id == pageInfo.ResourceId);
+                VehicleFreightRecordExportDto vehicleFreightRecord = new VehicleFreightRecordExportDto
+                {
+                    ProcedureCode = proceduresInfo?.Code ?? "",
+                    ProcedureName = proceduresInfo?.Name ?? "",
+                    EquipmentCode = equipmentInfo?.EquipmentCode ?? "",
+                    WorkCenterCode = workCenterInfo?.Code ?? "",
+                    OrderCode = workOrderInfo?.OrderCode ?? "",
+                    VehicleCode = vehicleInfo?.Code ?? "",
+                    BarCode = pageInfo.BarCode,
+                    Location = locatioInfo?.Location ?? "",
+                    ResourceCode = resourceInfo?.ResCode ?? "",
+                    OperateType = pageInfo.OperateType == (int)VehicleOperationEnum.Bind ? VehicleOperationEnum.Bind.GetDescription() : VehicleOperationEnum.Unbind.GetDescription(),
+                    BindAndUnbindTime = pageInfo.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss"),
+                    CreateBy = pageInfo.CreatedBy
+
+                };
+                listDto.Add(vehicleFreightRecord);
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("VehicleFreightRecord"), _localizationService.GetResource("VehicleFreightRecord"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new VehicleFreightRecordExportResultDto
+            {
+                FileName = _localizationService.GetResource("VehicleFreightRecord"),
+                Path = uploadResult.AbsoluteUrl,
+            };
         }
     }
 }
