@@ -108,6 +108,9 @@ using Hymson.MES.Core.Domain.EquSparepartRecord;
 using Hymson.MES.Data.Repositories.EquSparepartRecord;
 using Hymson.MES.Services.Dtos.EquSparepartRecord;
 using Hymson.MES.Data.Repositories.Equipment.View;
+using Hymson.MES.Core.Domain.EquSparepartInventory;
+using Hymson.MES.Data.Repositories.EquSparepartInventory;
+using Hymson.MES.Services.Dtos.EquSparepartInventory;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -153,10 +156,12 @@ namespace Hymson.MES.Services.Mapper
             #region EquEquipment
             CreateMap<EquEquipmentSaveDto, EquEquipmentEntity>();
             CreateMap<EquEquipmentPagedQueryDto, EquEquipmentPagedQuery>();
+            CreateMap<EquEquipmentSpotcheckRelationPagedQueryDto, EquEquipmentSpotcheckRelationPagedQuery>();
 
             CreateMap<EquEquipmentEntity, EquEquipmentDto>();
             CreateMap<EquEquipmentEntity, EquEquipmentListDto>();
             CreateMap<EquEquipmentPageView, EquEquipmentListDto>();
+            CreateMap<GetEquSpotcheckPlanEquipmentRelationPageView, GetEquSpotcheckPlanEquipmentRelationListDto>();
 
             CreateMap<EquInspectionItemPagedQueryDto, EquInspectionItemPagedQuery>();
             CreateMap<EquInspectionItemSaveDto, EquInspectionItemEntity>();
@@ -278,6 +283,16 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSparePartsEntity, EquSparePartsDto>();
             #endregion
 
+            #region EquSparepartInventory
+            CreateMap<EquSparepartInventoryCreateDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparepartInventoryModifyDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparepartInventoryPagedQueryDto, EquSparepartInventoryPagedQuery>();
+            CreateMap<EquSparepartInventoryEntity, EquSparepartInventoryDto>();
+            CreateMap<EquSparepartInventoryPageView, EquSparepartInventoryPageDto>();
+
+            CreateMap<EquSparepartInventoryDto, EquSparepartInventoryEntity>();
+            CreateMap<EquSparePartEntity, EquSparepartRecordEntity>();
+            #endregion
 
             #region 设备保养
             CreateMap<EquMaintenanceItemSaveDto, EquMaintenanceItemEntity>();

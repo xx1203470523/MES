@@ -118,6 +118,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         Task<PagedInfo<EquEquipmentPageView>> GetPagedListAsync(EquEquipmentPagedQuery pagedQuery);
 
+        /// <summary>
+        /// pagedQuery(点检计划)
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<GetEquSpotcheckPlanEquipmentRelationPageView>> GetEquSpotcheckPlanEquipmentRelationListAsync(EquEquipmentSpotcheckRelationPagedQuery pagedQuery);
+
         #region 顷刻项目
 
         /// <summary>

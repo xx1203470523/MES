@@ -89,5 +89,10 @@
         /// 资源维护表
         /// </summary>
         public const string PROC_RESOURCE= "proc_resource";
+
+        /// <summary>
+        /// 工单表
+        /// </summary>
+        public const string PLAN_WORK_ORDER = "plan_work_order";
     }
 }

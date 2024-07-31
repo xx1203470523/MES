@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -214,6 +215,18 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, parameterEntities);
         }
+
+        public async Task<IEnumerable<ProcParameterEntity>> GetBySiteIdAsync(long siteId)
+        {
+            var cachedKey = $"{CachedTables.PROC_PARAMETER}&SiteId={siteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(cachedKey, async (cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<ProcParameterEntity>(GetBySiteIdSql, new { SiteId = siteId });
+            });
+        }
+
+    
     }
 
     /// <summary>
@@ -233,6 +246,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = @"SELECT * FROM `proc_parameter` WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_parameter` WHERE Id IN @ids AND IsDeleted=0 ";
         const string GetByCodesSql = @"SELECT * FROM `proc_parameter` WHERE ParameterCode IN @Codes AND SiteId= @SiteId  AND IsDeleted=0 ";
+        const string GetBySiteIdSql = @"SELECT * FROM `proc_parameter` WHERE SiteId= @SiteId  AND IsDeleted=0 ";
     }
 
 }

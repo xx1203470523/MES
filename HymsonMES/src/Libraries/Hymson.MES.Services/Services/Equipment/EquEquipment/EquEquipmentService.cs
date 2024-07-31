@@ -14,6 +14,10 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.EquMaintenanceTemplate;
+using Hymson.MES.Data.Repositories.EquMaintenanceTemplateEquipmentGroupRelation;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplate;
+using Hymson.MES.Data.Repositories.EquSpotcheckTemplateEquipmentGroupRelation;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
@@ -70,32 +74,41 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         private readonly IEquEquipmentVerifyRepository _equEquipmentVerifyRepository;
 
         private readonly IProcResourceRepository _procResourceRepository;
-
+        private readonly IEquSpotcheckTemplateEquipmentGroupRelationRepository _equSpotcheckTemplateEquipmentGroupRelationRepository;
+        private readonly IEquSpotcheckTemplateRepository _equSpotcheckTemplateRepository;
+        private readonly IEquMaintenanceTemplateEquipmentGroupRelationRepository _equMaintenanceTemplateEquipmentGroupRelationRepository;
+        private readonly IEquMaintenanceTemplateRepository _equMaintenanceTemplateRepository;
         /// <summary>
         /// 验证器
         /// </summary>
         private readonly AbstractValidator<EquEquipmentVerifyCreateDto> _verifyValidationRules;
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="currentSite"></param>
-        /// <param name="currentUser"></param>
-        /// <param name="validationSaveRules"></param>
-        /// <param name="equEquipmentRepository"></param>
-        /// <param name="equEquipmentLinkApiRepository"></param>
-        /// <param name="equEquipmentLinkHardwareRepository"></param>
-        /// <param name="equEquipmentTokenRepository"></param>
-        /// <param name="jwtOptions"></param>
-        /// <param name="equEquipmentVerifyRepository"></param>
-        /// <param name="verifyValidationRules"></param>
-        /// <param name="procResourceRepository"></param>
-        public EquEquipmentService(ICurrentUser currentUser, ICurrentSite currentSite,
-            AbstractValidator<EquEquipmentSaveDto> validationSaveRules,
-            IEquEquipmentRepository equEquipmentRepository,
-            IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
-            IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository,
-            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, AbstractValidator<EquEquipmentVerifyCreateDto> verifyValidationRules, IProcResourceRepository procResourceRepository)
+  
+       /// <summary>
+       /// 
+       /// </summary>
+       /// <param name="currentUser"></param>
+       /// <param name="currentSite"></param>
+       /// <param name="validationSaveRules"></param>
+       /// <param name="equEquipmentRepository"></param>
+       /// <param name="equEquipmentLinkApiRepository"></param>
+       /// <param name="equEquipmentLinkHardwareRepository"></param>
+       /// <param name="equEquipmentTokenRepository"></param>
+       /// <param name="jwtOptions"></param>
+       /// <param name="equEquipmentVerifyRepository"></param>
+       /// <param name="procResourceRepository"></param>
+       /// <param name="equSpotcheckTemplateEquipmentGroupRelationRepository"></param>
+       /// <param name="equSpotcheckTemplateRepository"></param>
+       /// <param name="equMaintenanceTemplateEquipmentGroupRelationRepository"></param>
+       /// <param name="equMaintenanceTemplateRepository"></param>
+        public EquEquipmentService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquEquipmentSaveDto> validationSaveRules, 
+            IEquEquipmentRepository equEquipmentRepository, IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
+            IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository, IEquEquipmentTokenRepository equEquipmentTokenRepository,
+            IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, IProcResourceRepository procResourceRepository, 
+            IEquSpotcheckTemplateEquipmentGroupRelationRepository equSpotcheckTemplateEquipmentGroupRelationRepository, 
+            IEquSpotcheckTemplateRepository equSpotcheckTemplateRepository,
+            IEquMaintenanceTemplateEquipmentGroupRelationRepository equMaintenanceTemplateEquipmentGroupRelationRepository,
+            IEquMaintenanceTemplateRepository equMaintenanceTemplateRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -106,8 +119,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             _equEquipmentTokenRepository = equEquipmentTokenRepository;
             _jwtOptions = jwtOptions.Value;
             _equEquipmentVerifyRepository = equEquipmentVerifyRepository;
-            _verifyValidationRules = verifyValidationRules;
             _procResourceRepository = procResourceRepository;
+            _equSpotcheckTemplateEquipmentGroupRelationRepository = equSpotcheckTemplateEquipmentGroupRelationRepository;
+            _equSpotcheckTemplateRepository = equSpotcheckTemplateRepository;
+            _equMaintenanceTemplateEquipmentGroupRelationRepository = equMaintenanceTemplateEquipmentGroupRelationRepository;
+            _equMaintenanceTemplateRepository = equMaintenanceTemplateRepository;
         }
 
 
@@ -386,6 +402,92 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
             return dics;
         }
+
+        /// <summary>
+        /// 分页查询列表（设备注册）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns> 
+        public async Task<PagedInfo<GetEquSpotcheckPlanEquipmentRelationListDto>> GetEquSpotcheckPlanEquipmentRelationListAsync(EquEquipmentSpotcheckRelationPagedQueryDto pagedQueryDto)
+        {
+            var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentSpotcheckRelationPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _equEquipmentRepository.GetEquSpotcheckPlanEquipmentRelationListAsync(pagedQuery);
+            if (pagedInfo != null && pagedInfo.Data != null && pagedInfo.Data.Any())
+            {
+                var equipmentGroupIds = pagedInfo.Data.Where(it => it.EquipmentGroupId != 0).Select(it => it.EquipmentGroupId).Distinct().ToArray();
+
+                if (pagedQuery.EopType == 1)
+                {
+                    var squSpotcheckTemplateEquipmentGroupRelations = await _equSpotcheckTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equipmentGroupIds);
+                    if (squSpotcheckTemplateEquipmentGroupRelations != null && squSpotcheckTemplateEquipmentGroupRelations.Any())
+                    {
+                        var SpotcheckTemplateIds = squSpotcheckTemplateEquipmentGroupRelations.Select(it => it.SpotCheckTemplateId).ToArray();
+                        var equSpotcheckTemplates = await _equSpotcheckTemplateRepository.GetByIdsAsync(SpotcheckTemplateIds);
+                        if (equSpotcheckTemplates != null && equSpotcheckTemplates.Any())
+                        {
+                            foreach (var item in pagedInfo.Data)
+                            {
+                                if (item.EquipmentGroupId == 0)
+                                {
+                                    continue;
+                                }
+
+                                var squSpotcheckTemplateEquipmentGroupRelation = squSpotcheckTemplateEquipmentGroupRelations.Where(it => it.EquipmentGroupId == item.EquipmentGroupId).FirstOrDefault();
+                                if (squSpotcheckTemplateEquipmentGroupRelation != null)
+                                {
+                                    var equSpotcheckTemplate = equSpotcheckTemplates.Where(it => it.Id == squSpotcheckTemplateEquipmentGroupRelation.SpotCheckTemplateId).FirstOrDefault();
+                                    if (equSpotcheckTemplate != null)
+                                    {
+                                        item.TemplateId = equSpotcheckTemplate.Id;
+                                        item.TemplateCode = equSpotcheckTemplate.Code;
+                                        item.TemplateVersion = equSpotcheckTemplate.Version;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+                else if (pagedQuery.EopType == 2)
+                {
+                    var squMaintenanceTemplateEquipmentGroupRelations = await _equMaintenanceTemplateEquipmentGroupRelationRepository.GetByGroupIdAsync(equipmentGroupIds);
+                    if (squMaintenanceTemplateEquipmentGroupRelations != null && squMaintenanceTemplateEquipmentGroupRelations.Any())
+                    {
+                        var maintenanceTemplateIds = squMaintenanceTemplateEquipmentGroupRelations.Select(it => it.MaintenanceTemplateId).ToArray();
+                        var equMaintenanceTemplates = await _equMaintenanceTemplateRepository.GetByIdsAsync(maintenanceTemplateIds);
+                        if (equMaintenanceTemplates != null && equMaintenanceTemplates.Any())
+                        {
+                            foreach (var item in pagedInfo.Data)
+                            {
+                                if (item.EquipmentGroupId == 0)
+                                {
+                                    continue;
+                                }
+
+                                var squMaintenanceTemplateEquipmentGroupRelation = squMaintenanceTemplateEquipmentGroupRelations.Where(it => it.EquipmentGroupId == item.EquipmentGroupId).FirstOrDefault();
+                                if (squMaintenanceTemplateEquipmentGroupRelation != null)
+                                {
+                                    var equMaintenanceTemplate = equMaintenanceTemplates.Where(it => it.Id == squMaintenanceTemplateEquipmentGroupRelation.MaintenanceTemplateId).FirstOrDefault();
+                                    if (equMaintenanceTemplate != null)
+                                    {
+                                        item.TemplateId = equMaintenanceTemplate.Id;
+                                        item.TemplateCode = equMaintenanceTemplate.Code;
+                                        item.TemplateVersion = equMaintenanceTemplate.Version;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<GetEquSpotcheckPlanEquipmentRelationListDto>());
+
+            return new PagedInfo<GetEquSpotcheckPlanEquipmentRelationListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
 
         /// <summary>
         /// 查询详情（设备注册）

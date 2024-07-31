@@ -146,5 +146,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<ManuSfcStepEntity> GetSfcMergeOrSplitAddStepAsync(SfcMergeOrSplitAddStepQuery query);
 
         Task<ManuSfcStepEntity> GetBarcodeBindingStepAsync(SfcMergeOrSplitAddStepQuery query);
+
+        Task<IEnumerable<ManuSfcStepEntity>> GetStepsBySFCAsync(EntityBySFCQuery query);
     }
 }
