@@ -528,12 +528,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.VendorProductName = sfcMaterial?.MaterialName;
                 model.VendorProductSn = sfc;
                 model.VendorProductCode = model.VendorProductNum;
-                model.VendorProductBatch = sfcBatch.Batch;
+                model.VendorProductBatch = sfcBatch?.Batch;
 
                 model.ParentCode = txSfcMaterial?.MaterialCode;
                 model.ParentName = txSfcMaterial?.MaterialName;
-                model.ParentBatch = txSfcBatch.Batch;
-                model.ParentNum = txSfcMaterial.MaterialCode;
+                model.ParentBatch = txSfcBatch?.Batch;
+                model.ParentNum = txSfcMaterial?.MaterialCode;
                 model.ParentSn = txSfc;
                 model.ParentHardwareRevision = "1.0";
                 model.ParentSoftwareRevision = "1.0";
