@@ -10,13 +10,18 @@ namespace Hymson.MES.BackgroundServices.NIO.Dtos
         /// <summary>
         /// 是否已投产, true/false
         /// </summary>
-        public bool Debug { get; set; } = true;
+        [JsonIgnore]
+        public bool Debug_MES { get; set; } = true;
 
         /// <summary>
         /// 更改的时间, Unix 时间戳, 以秒为单位
         /// </summary>
         public long UpdateTime { get; set; }
 
+        /// <summary>
+        /// 数据归属
+        /// </summary>
+        public string Owner { get; set; } = "EDS";
     }
 
     /// <summary>
@@ -119,5 +124,20 @@ namespace Hymson.MES.BackgroundServices.NIO.Dtos
         /// 产品一次良率
         /// </summary>
         public string PassRateTarget { get; set; }
+
+        /// <summary>
+        /// 硬件版本
+        /// </summary>
+        public string NioHardwareRevision { get; set; }
+
+        /// <summary>
+        /// 是否量产
+        /// </summary>
+        public bool Launched { get; set; }
+
+        /// <summary>
+        /// 项目名
+        /// </summary>
+        public string NioProjectName { get; set; }
     }
 }

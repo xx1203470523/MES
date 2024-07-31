@@ -75,5 +75,15 @@ namespace Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Param.View
         /// 数据类型
         /// </summary>
         public int DataType { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string ParameterUnit { get; set; }
     }
 }

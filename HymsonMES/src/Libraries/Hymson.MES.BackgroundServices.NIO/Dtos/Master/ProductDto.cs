@@ -33,12 +33,12 @@
         /// <summary>
         /// NIO软件版本号, max length 64.
         /// </summary>
-        public string NioSoftwareRevision { get; set; }
+        //public string NioSoftwareRevision { get; set; }
 
         /// <summary>
         /// NIO 车型, max length 32.
         /// </summary>
-        public string NioModel { get; set; }
+        //public string NioModel { get; set; }
 
         /// <summary>
         /// NIO项目名称, max length 64
@@ -50,5 +50,14 @@
         /// </summary>
         public bool Launched { get; set; }
 
+        /// <summary>
+        /// 合作伙伴工厂编码
+        /// </summary>
+        public string VendorFactoryCode { get; set; }
+
+        /// <summary>
+        /// 马威零件版本
+        /// </summary>
+        public string VendorHardwareRevision { get; set; }
     }
 }
