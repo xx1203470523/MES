@@ -8,7 +8,6 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Presentation/Hymson.MES.BackgroundTasks.NIO/Hymson.MES.BackgroundTasks.NIO.csproj", "src/Presentation/Hymson.MES.BackgroundTasks.NIO/"]
 COPY ["src/Libraries/Hymson.MES.BackgroundServices.NIO/Hymson.MES.BackgroundServices.NIO.csproj", "src/Libraries/Hymson.MES.BackgroundServices.NIO/"]
-COPY ["src/Libraries/Hymson.MES.CoreServices/Hymson.MES.CoreServices.csproj", "src/Libraries/Hymson.MES.CoreServices/"]
 COPY ["src/Libraries/Hymson.MES.Data/Hymson.MES.Data.csproj", "src/Libraries/Hymson.MES.Data/"]
 COPY ["src/Libraries/Hymson.MES.Core/Hymson.MES.Core.csproj", "src/Libraries/Hymson.MES.Core/"]
 COPY ["src/Libraries/Hymson.MES.HttpClients/Hymson.MES.HttpClients.csproj", "src/Libraries/Hymson.MES.HttpClients/"]
