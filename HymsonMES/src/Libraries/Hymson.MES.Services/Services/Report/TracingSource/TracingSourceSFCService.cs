@@ -244,7 +244,7 @@ namespace Hymson.MES.Services.Services
             //获取此条码所经过的工序
            var procedureIds = manuSfcSummaryEntities.Select(x=>x.ProcedureId);
 
-            var pagedInfo = await _manuEquipmentParameterRepository.GetParametesByEqumentIdEntitiesAsync(new Data.Repositories.Parameter.Query.ManuEquipmentParameterPagedQuery
+            var pagedInfo = await _manuEquipmentParameterRepository.GetParametesByEqumentIdEntitiesAsync(new ManuEquipmentParameterPagedQuery
             {
                 EquipmentId = 1
             });
