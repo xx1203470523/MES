@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuProductReceiptOrderEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuProductReceiptOrderEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuProductReceiptOrderEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -72,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuProductReceiptOrderEntity>> GetEntitiesAsync(ManuProductReceiptOrderQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -87,5 +87,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<IEnumerable<ManuProductReceiptOrderEntity>> GetByWorkOrderIdsSqlAsync(long id);
 
+        /// <summary>
+        /// 根据完工单号获取数据
+        /// </summary>
+        /// <param name="CompletionOrderCode"></param>
+        /// <returns></returns>
+        Task<ManuProductReceiptOrderEntity> GetByCompletionOrderCodeSqlAsync(string CompletionOrderCode);
     }
 }

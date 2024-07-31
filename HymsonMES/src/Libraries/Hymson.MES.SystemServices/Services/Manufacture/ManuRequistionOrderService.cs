@@ -617,9 +617,9 @@ namespace Hymson.MES.SystemServices.Services
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            var id = productionPickDto.RequistionId.Split
-                ('_')[1];
-            var returnOrderEntity = await _manuProductReceiptOrderRepository.GetByIdAsync(long.Parse(id));
+            //根据完工单号获取数据
+            var CompletionOrderCode = productionPickDto.RequistionId;
+            var returnOrderEntity = await _manuProductReceiptOrderRepository.GetByCompletionOrderCodeSqlAsync(CompletionOrderCode);
             if (returnOrderEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16050)).WithData("orderId", productionPickDto.RequistionId);
@@ -649,16 +649,12 @@ namespace Hymson.MES.SystemServices.Services
             var rows = 0;
             if (returnOrderEntity.Status == ProductReceiptStatusEnum.ApprovalingSuccess)
             {
-                long[] array = new long[] { long.Parse(id) };
-                string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
-                var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
+                long[] array = new long[] { returnOrderEntity.Id };
+                //string orderCode = productionPickDto.RequistionId.Split('_')[0];// 获取派工单编码
+                var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(returnOrderEntity.WorkOrderCode);
+                if (planWorkOrderEntity == null)
                 {
-                    SiteId = returnOrderEntity.SiteId,
-                    OrderCode = orderCode,
-                });
-                if(planWorkOrderEntity == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16301)).WithData("orderCode", orderCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16301)).WithData("orderCode", returnOrderEntity.WorkOrderCode);
                 }
                 var productReceiptOrderDetailEntities = await _manuProductReceiptOrderDetailRepository.GetByProductReceiptIdsAsync(array);
                 returnOrderEntity.Status = ProductReceiptStatusEnum.Receipt;

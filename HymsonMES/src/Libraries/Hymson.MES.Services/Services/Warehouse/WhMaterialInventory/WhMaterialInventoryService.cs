@@ -1515,6 +1515,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             var materialEntities = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryEntities.Select(b => b.MaterialId).Distinct().ToArray());
             var returnMaterialDtos = new List<HttpClients.Requests.ProductReceiptItemDto>();
             var manuProductReceiptOrderDetails = new List<ManuProductReceiptOrderDetailEntity>();
+            var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
+            var CompletionOrderCode = $"{"WG"}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
             //创建入库申请单
             ManuProductReceiptOrderEntity manuProductReceiptOrderEntity = new ManuProductReceiptOrderEntity
             {
@@ -1522,14 +1524,13 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SiteId = _currentSite.SiteId ?? 0,
                 Status = ProductReceiptStatusEnum.Approvaling,
                 WorkOrderCode = request.OrderCodeId,
+                CompletionOrderCode = CompletionOrderCode,
                 WarehouseOrderCode = request.WorkCode,
                 CreatedBy = _currentSystem.Name,
                 UpdatedBy = _currentSystem.Name,
             };
             foreach (var item in request.Items)
             {
-                var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
-                var CompletionOrderCode = $"{"WG"}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
                 // var materialEntity = materialEntities.FirstOrDefault(m => m.Id == item.MaterialId);
 
                 HttpClients.Requests.ProductReceiptItemDto returnMaterialDto = new HttpClients.Requests.ProductReceiptItemDto
@@ -1556,7 +1557,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                     Status = item.Type ?? 0,
                     SiteId = _currentSite.SiteId ?? 0,
                     Unit = item.Unit,
-                    CompletionOrderCode = CompletionOrderCode,
                     CreatedBy = _currentSystem.Name,
                     UpdatedBy = _currentSystem.Name,
                 };
@@ -1603,7 +1603,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             var response = await _wmsRequest.ProductReceiptRequestAsync(new HttpClients.Requests.ProductReceiptRequestDto
             {
                 WarehouseCode = whCode,
-                SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
+                // SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
+                SyncCode = CompletionOrderCode,
                 SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
                 Details = returnMaterialDtos
             });
