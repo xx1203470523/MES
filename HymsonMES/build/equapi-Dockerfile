@@ -2,5 +2,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 80
-COPY ["/app/equapi", "."]
+COPY /app/equapi/* .
 ENTRYPOINT ["dotnet", "Hymson.MES.Equipment.Api.dll"]

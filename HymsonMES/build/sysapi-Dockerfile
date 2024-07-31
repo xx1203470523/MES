@@ -3,5 +3,5 @@ ARG PublishEnvironment
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 80
-COPY ["/app/sysapi", "."]
+COPY /app/sysapi/* .
 ENTRYPOINT ["dotnet", "Hymson.MES.System.Api.dll"]

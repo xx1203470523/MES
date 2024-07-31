@@ -3,5 +3,5 @@
 ARG PublishEnvironment
 FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
 WORKDIR /app
-COPY ["/app/mesback", "."]
+COPY /app/mesback/* .
 ENTRYPOINT ["dotnet", "Hymson.MES.BackgroundTasks.dll"]
