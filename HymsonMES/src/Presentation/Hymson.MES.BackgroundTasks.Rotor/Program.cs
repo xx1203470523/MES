@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using Quartz;
-using System.Reflection;
 
 try
 {
@@ -52,6 +51,7 @@ Host.CreateDefaultBuilder(args)
            q.AddJobAndTrigger<ManuDataJob>(hostContext.Configuration);
            q.AddJobAndTrigger<PackListJob>(hostContext.Configuration);
 
+           /*
            q.UsePersistentStore((persistentStoreOptions) =>
            {
                persistentStoreOptions.UseProperties = true;
@@ -63,6 +63,7 @@ Host.CreateDefaultBuilder(args)
                persistentStoreOptions.SetProperty("quartz.scheduler.instanceId", assemblyName + hostContext.HostingEnvironment.EnvironmentName + programName);
                persistentStoreOptions.UseMySql(mySqlConnection);
            });
+           */
        });
 
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
