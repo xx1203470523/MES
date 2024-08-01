@@ -5,7 +5,6 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
-using Hymson.Localization.Domain.Query;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
@@ -26,13 +25,11 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.Resource;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Scriban.Runtime.Accessors;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -183,7 +180,7 @@ namespace Hymson.MES.Services.Services.Process
             _procMaterialRepository = procMaterialRepository;
             _procProductSetRepository = procProductSetRepository;
             _equEquipmentRepository = equEquipmentRepository;
-            _inteQualificationAuthenticationRepository=inteQualificationAuthenticationRepository;
+            _inteQualificationAuthenticationRepository = inteQualificationAuthenticationRepository;
             _authenticationRelationRepository = authenticationRelationRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -576,7 +573,7 @@ namespace Hymson.MES.Services.Services.Process
                     throw new CustomerValidationException(nameof(ErrorCode.MES10314));
                 }
 
-                var ismianCount = param.EquList.Where(a => a.IsMain).ToList().Count;
+                var ismianCount = param.EquList.Where(a => a.IsMain == TrueOrFalseEnum.Yes).ToList().Count;
                 if (ismianCount > 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10307));
@@ -973,7 +970,7 @@ namespace Hymson.MES.Services.Services.Process
                 //判断打印机是否重复配置  数据库中 已经存储的情况
                 var parmEquIds = param.EquList.Select(x => x.EquipmentId).ToArray();
 
-                var ismianList = param.EquList.Where(a => a.IsMain).ToList();
+                var ismianList = param.EquList.Where(a => a.IsMain == TrueOrFalseEnum.Yes).ToList();
                 if (ismianList.Count > 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10307));

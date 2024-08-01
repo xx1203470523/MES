@@ -453,7 +453,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     }
                 }
 
-                var isMain = false;
+                var isMain = TrueOrFalseEnum.No;
                 errorMessage.ToString().TrimEnd(',');
                 if (!validFlag)
                 {

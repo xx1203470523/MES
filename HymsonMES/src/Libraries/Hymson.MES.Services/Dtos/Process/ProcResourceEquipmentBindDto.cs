@@ -1,18 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 资源设备绑定表    Dto | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-02-10 11:20:47
- */
-
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -26,53 +13,53 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 所属资源ID
         /// </summary>
         public long ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备ID
         /// </summary>
         public long EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否主设备
         /// </summary>
-        public bool? IsMain { get; set; }
+        public TrueOrFalseEnum? IsMain { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
     }
 
-    public record ProcResourceEquipmentBindViewDto: ProcResourceEquipmentBindDto
+    public record ProcResourceEquipmentBindViewDto : ProcResourceEquipmentBindDto
     {
         /// <summary>
         /// 设备编号
@@ -95,7 +82,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcResourceEquipmentBindCreateDto : BaseEntityDto
     {
-       /// <summary>
+        /// <summary>
         /// 设备ID
         /// </summary>
         public long EquipmentId { get; set; }
@@ -103,7 +90,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 是否主设备
         /// </summary>
-        public bool IsMain { get; set; } = false;
+        public TrueOrFalseEnum IsMain { get; set; } = TrueOrFalseEnum.No;
 
         /// <summary>
         /// Id
@@ -124,7 +111,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 是否主设备
         /// </summary>
-        public bool IsMain { get; set; }=false;
+        public TrueOrFalseEnum IsMain { get; set; } = TrueOrFalseEnum.No;
 
         /// <summary>
         /// Id
