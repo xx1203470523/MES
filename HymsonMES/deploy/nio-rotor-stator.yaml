@@ -64,6 +64,8 @@ spec:
         env:
         - name: DOTNET_ENVIRONMENT
           value: "Production"
+        - name: TZ
+          value: "Asia/Shanghai"
         resources: {}
       volumes:
       - name: rotor-back-volume

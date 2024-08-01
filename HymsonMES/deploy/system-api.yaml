@@ -26,6 +26,8 @@ spec:
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Production"
+        - name: TZ
+          value: "Asia/Shanghai"
         resources: {}
         ports: 
           - name: sys-api-svc        #端口的名称
