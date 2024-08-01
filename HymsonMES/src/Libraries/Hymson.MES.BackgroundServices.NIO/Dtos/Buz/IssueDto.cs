@@ -1,6 +1,6 @@
 ﻿namespace Hymson.MES.BackgroundServices.NIO.Dtos.Buz
 {
-    public class IssueDto
+    public class IssueDto : BaseDto
     {
         /// <summary>  
         /// 工厂唯一标识，最大长度64  
@@ -27,15 +27,15 @@
         /// </summary>  
         public string VendorProductNum { get; set; }
 
-        /// <summary>  
-        /// 合作伙伴产品名称，最大长度64  
-        /// </summary>  
-        public string VendorProductName { get; set; }
+        ///// <summary>  
+        ///// 合作伙伴产品名称，最大长度64  
+        ///// </summary>  
+        //public string VendorProductName { get; set; }
 
-        /// <summary>  
-        /// 合作伙伴总成电子条码，最大长度64  
-        /// </summary>  
-        public string VendorProductCode { get; set; }
+        ///// <summary>  
+        ///// 合作伙伴总成电子条码，最大长度64  
+        ///// </summary>  
+        //public string VendorProductCode { get; set; }
 
         /// <summary>  
         /// 合作伙伴总成序列号，最大长度64  
@@ -56,15 +56,5 @@
         /// 合作伙伴定义的缺陷名字，最大长度50  
         /// </summary>  
         public string VendorIssueName { get; set; }
-
-        /// <summary>  
-        /// 工单更改的时间，Unix时间戳，以秒为单位  
-        /// </summary>  
-        public long UpdateTime { get; set; }
-
-        /// <summary>  
-        /// 调试标志  
-        /// </summary>  
-        public bool Debug { get; set; }
     }
 }

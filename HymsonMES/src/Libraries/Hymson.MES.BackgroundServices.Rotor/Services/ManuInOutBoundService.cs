@@ -713,7 +713,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             List<Task<int>> tasks = new()
             {
                  _manuSfcCirculationRepository.InsertRangeAsync(circulaList),
-                 //await _manuSfcStepRepository.InsertRangeMavleAsync(stepList),
+                 //_manuSfcStepRepository.InsertRangeMavleAsync(stepList),
                  _manuSfcStepRepository.InsertRangeAsync(stepList),
                  _waterMarkService.RecordWaterMarkAsync(busKey, timestamp),
                  InsertOrUpdateAsync(sfcUpdateList),
