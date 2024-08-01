@@ -1472,6 +1472,10 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task ProductReceiptRequestAsync(ProductReceiptRequest request)
         {
+            if(request.Items == null || request.Items.Count() == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17758));
+            }
             //获取派工单对象
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new PlanWorkOrderQuery
             {
