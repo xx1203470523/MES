@@ -3,7 +3,7 @@
     /// <summary>  
     /// 产品一次合格率  
     /// </summary>  
-    public class PassrateProductDto
+    public class PassrateProductDto : BaseDto
     {
         /// <summary>  
         /// 工厂唯一标识  
@@ -39,15 +39,5 @@
         /// 合格率目标（百分比形式，例如：98）  
         /// </summary>  
         public decimal PassRateTarget { get; set; }
-
-        /// <summary>  
-        /// 更新时间（Unix时间戳，秒）  
-        /// </summary>  
-        public long UpdateTime { get; set; }
-
-        /// <summary>  
-        /// 调试标志  
-        /// </summary>  
-        public bool Debug { get; set; }
     }
 }

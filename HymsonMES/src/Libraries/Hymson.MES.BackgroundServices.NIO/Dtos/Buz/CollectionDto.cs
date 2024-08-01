@@ -3,7 +3,7 @@
     /// <summary>
     /// 控制项
     /// </summary>
-    public class CollectionDto
+    public class CollectionDto : BaseDto
     {
         /// <summary>
         /// 工厂唯一标识，最大长度64
@@ -28,7 +28,7 @@
         /// <summary>
         /// 采集设备唯一编码，最大长度64
         /// </summary>
-        public string DeviceId { get; set; }
+        //public string DeviceId { get; set; }
 
         /// <summary>
         /// 对应控制项主数据中的字段 code，最大长度32
@@ -95,7 +95,7 @@
         /// <summary>
         /// NIO 产品电子条码，最大长度64
         /// </summary>
-        public string NioProductCode { get; set; }
+        //public string NioProductCode { get; set; }
 
         /// <summary>
         /// NIO 产品名称，最大长度64
@@ -107,7 +107,7 @@
         /// NIO 车型，最大长度32
         /// 例如：ES8, ET7
         /// </summary>
-        public string NioModel { get; set; }
+        //public string NioModel { get; set; }
 
         /// <summary>
         /// 操作员账号，最大长度64
@@ -138,11 +138,6 @@
         /// 合作伙伴自定义的本条数据的通过状态
         /// </summary>
         public string VendorValueStatus { get; set; }
-
-        /// <summary>
-        /// 采集时间，Unix 时间戳，单位：秒
-        /// </summary>
-        public long UpdateTime { get; set; }
 
         ///// <summary>
         ///// 关联部件01的电子条码，最大长度64
@@ -197,6 +192,6 @@
         /// <summary>
         /// 是否调试
         /// </summary>
-        public bool Debug { get; set; }
+        //public bool Debug { get; set; }
     }
 }

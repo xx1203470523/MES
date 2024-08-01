@@ -3,7 +3,7 @@
     /// <summary>
     /// 生产业务
     /// </summary>
-    public class ProductionDto
+    public class ProductionDto : BaseDto
     {
         /// <summary>
         /// 工厂唯一标识，最大长度64
@@ -41,15 +41,15 @@
         /// </summary>
         public string VendorProductSn { get; set; }
 
-        /// <summary>
-        /// 合作伙伴总成电子条码，最大长度64
-        /// </summary>
-        public string VendorProductCode { get; set; }
+        ///// <summary>
+        ///// 合作伙伴总成电子条码，最大长度64
+        ///// </summary>
+        //public string VendorProductCode { get; set; }
 
-        /// <summary>
-        /// 合作伙伴总成批次号，最大长度64
-        /// </summary>
-        public string VendorProductBatch { get; set; }
+        ///// <summary>
+        ///// 合作伙伴总成批次号，最大长度64
+        ///// </summary>
+        //public string VendorProductBatch { get; set; }
 
         /// <summary>
         /// 合作伙伴总成临时序列号，最大长度64
@@ -81,24 +81,19 @@
         /// </summary>
         public long OutputTime { get; set; }
 
-        /// <summary>
-        /// 设备判定的质量状态，如果设备可以自动判定质量状态，则此字段有效
-        /// </summary>
-        public bool? DeviceDeterminedStatus { get; set; }
+        ///// <summary>
+        ///// 设备判定的质量状态，如果设备可以自动判定质量状态，则此字段有效
+        ///// </summary>
+        //public bool? DeviceDeterminedStatus { get; set; }
 
-        /// <summary>
-        /// 人工判定的质量状态，如果需要人工判定质量状态，则此字段有效
-        /// </summary>
-        public bool? ManualDeterminedStatus { get; set; }
+        ///// <summary>
+        ///// 人工判定的质量状态，如果需要人工判定质量状态，则此字段有效
+        ///// </summary>
+        //public bool? ManualDeterminedStatus { get; set; }
 
         /// <summary>
         /// 最终质量状态，根据设备判定和人工判定综合得出
         /// </summary>
         public bool DeterminedStatus { get; set; }
-
-        /// <summary>
-        /// 采集时间，Unix时间戳，单位：秒
-        /// </summary>
-        public long UpdateTime { get; set; }
     }
 }
