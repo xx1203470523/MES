@@ -15,6 +15,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
+using Hymson.MES.CoreServices.Extension;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.WhMaterialInventory;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -1382,7 +1383,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             var response = await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.MaterialPickingRequestDto
             {
                 SyncCode = $"{request.WorkCode}_{manuRequistionOrderEntity.Id}",
-                SendOn = HymsonClock.Now().ToString(),
+                SendOn = HymsonClock.Now().ToDateTime(),
                 details = productionPickMaterialDtos
             });
             if (response)
@@ -1400,7 +1401,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             //{
             //    var response = await _wmsRequest.MaterialPickingCancelAsync(new HttpClients.Requests.MaterialPickingCancelDto
             //    {
-            //        SendOn = HymsonClock.Now().ToString(),
+            //        SendOn = HymsonClock.Now().ToDateTime(),
             //        SyncCode = $"{request.WorkCode}_{request.RequistionOrderId}",
             //    });
             //    return response;
@@ -1454,7 +1455,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
 
                 SyncCode = $"{request.WorkCode}_{manuReturnOrderEntity.Id}",
-                SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
+                SendOn = HymsonClock.Now().ToDateTime(),//TODO：这个信息需要调研
                 Details = returnMaterialDtos
             });
             if (response)
@@ -1609,7 +1610,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 WarehouseCode = whCode,
                 // SyncCode = $"{request.WorkCode}_{manuProductReceiptOrderEntity.Id}",
                 SyncCode = CompletionOrderCode,
-                SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
+                SendOn = HymsonClock.Now().ToDateTime(),//TODO：这个信息需要调研
                 Details = returnMaterialDtos
             });
             if (response.Code == 0)
@@ -1637,7 +1638,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 var response = await _wmsRequest.ProductReceiptCancelAsync(new HttpClients.Requests.ProductReceiptCancelDto
                 {
-                    SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
+                    SendOn = HymsonClock.Now().ToDateTime(),//TODO：这个信息需要调研
                     SyncCode = $"{request.WorkCode}_{request.ReturnOrderId}",
                 });
                 return response;
@@ -1655,7 +1656,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 var response = await _wmsRequest.MaterialReturnCancelAsync(new HttpClients.Requests.MaterialReturnCancelDto
                 {
-                    SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
+                    SendOn = HymsonClock.Now().ToDateTime(),//TODO：这个信息需要调研
                     SyncCode = $"{request.WorkCode}_{request.ReturnOrderId}",
                 });
                 return response;
@@ -1758,7 +1759,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             var response = await _wmsRequest.MaterialPickingRequestAsync(new HttpClients.Requests.MaterialPickingRequestDto
             {
                 SyncCode = $"{planWorkOrderEntity.OrderCode}_{manuRequistionOrderEntity.Id}",
-                SendOn = HymsonClock.Now().ToString(),
+                SendOn = HymsonClock.Now().ToDateTime(),
                 details = productionPickMaterialDtos
             });
             if (response)
