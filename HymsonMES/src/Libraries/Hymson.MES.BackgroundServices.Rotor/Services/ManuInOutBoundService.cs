@@ -720,7 +720,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                  InsertRawMaterialAsync(barCodeList, mesMaterialList),
                  OrderCompleteQtyChangeAsync(mesOrderList),
                  InsertOrUpdateRotorSfcAsync(addRotorList, updateRotorList),
-                 //await _manuProductParameterRepository.InsertRangeMavelAsync(manuParamList),
+                 _manuProductParameterRepository.InsertRangeMavelAsync(manuParamList),
                  _manuProductBadRecordRepository.InsertRangeAsync(badRecordList),
                  _manuProductNgRecordRepository.InsertRangeAsync(ngRecordList),
                  _manuProductParameterRepository.InsertRangeAsync(manuParamList),

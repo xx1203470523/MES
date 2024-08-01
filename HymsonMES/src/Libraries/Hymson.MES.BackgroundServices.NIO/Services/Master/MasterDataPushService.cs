@@ -254,7 +254,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             {
                 return;
             }
-            paramList = paramList.Take(3);
+            //paramList = paramList.Take(3);
             //基础数据配置
             var baseConfigList = await GetBaseConfig();
 

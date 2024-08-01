@@ -25,7 +25,7 @@ namespace Hymson.MES.BackgroundTasks.Rotor.Jobs
         {
             try
             {
-                await _manuInOutBoundService.InOutBoundAsync(100);
+                await _manuInOutBoundService.InOutBoundAsync(50);
             }
             catch (Exception ex)
             {
