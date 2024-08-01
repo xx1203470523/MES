@@ -3,7 +3,6 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.BackgroundTasks.Stator;
 using Hymson.MES.BackgroundTasks.Stator.Extensions;
-using Hymson.MES.BackgroundTasks.Stator.HostedServices;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +33,6 @@ Host.CreateDefaultBuilder(args)
        //services.Configure<PrintOptions>(hostContext.Configuration.GetSection(nameof(PrintOptions)));
        services.AddLocalization();
       
-       services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
        //services.AddPrintBackgroundService(hostContext.Configuration);

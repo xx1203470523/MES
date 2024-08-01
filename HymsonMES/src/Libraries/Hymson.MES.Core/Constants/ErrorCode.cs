@@ -2232,7 +2232,6 @@
 
 
         #region 基础数据导入 11600
-
         public const string MES11601 = "导入的数据中设备编码重复！";
         public const string MES11602 = "设备编码不能为空！";
         public const string MES11603 = "设备名称不能为空！";
@@ -2241,6 +2240,7 @@
         public const string MES11606 = "导入的数据中资源编码重复！";
         public const string MES11607 = "导入的数据中工序编码重复！";
         public const string MES11608 = "导入数据为空！";
+        public const string MES11609 = "扩展名无效,请上传有效的类型:{Extensions}";
         #endregion
 
 

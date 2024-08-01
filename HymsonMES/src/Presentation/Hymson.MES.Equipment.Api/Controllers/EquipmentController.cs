@@ -52,7 +52,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="manufactureService"></param>
+        /// <param name="equCommonService"></param>
+        /// <param name="equipmentCollectService"></param>
         /// <param name="sfcBindingService"></param>
+        /// <param name="manuInOutBoundService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
             IManufactureService manufactureService,
             IEquCommonService equCommonService,
@@ -68,13 +71,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _mavel = manuInOutBoundService;
         }
 
+
         /// <summary>
         /// 马威测试
         /// </summary>
         /// <returns></returns>
         [HttpPost("mavel")]
         [AllowAnonymous]
-        public async Task EquipmentHeartbeatAsync()
+        public async Task TestAsync()
         {
             DateTime beginDate = DateTime.Parse("2024-05-17 11:49:09.340");
             //DateTime endDate = DateTime.Parse("2024-05-22 13:08:20.273");
@@ -277,7 +281,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("CCD文件上传完成006", BusinessType.OTHER, "006", ReceiverTypeEnum.MES)]
         public async Task CcdFileUploadCompleteAsync(CCDFileUploadCompleteDto dto)
         {
-
             await _equCommonService.CcdFileUploadCompleteAsync(dto);
             //TODO
             //1. 新增表 ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格

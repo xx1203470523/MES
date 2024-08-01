@@ -2,7 +2,6 @@
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.BackgroundTasks.Rotor.Extensions;
-using Hymson.MES.BackgroundTasks.Rotor.HostedServices;
 using Hymson.MES.BackgroundTasks.Rotor.Jobs;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Microsoft.Extensions.Configuration;

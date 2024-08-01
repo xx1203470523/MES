@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
+﻿namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
 {
     /// <summary>
     /// CCD文件上传完成

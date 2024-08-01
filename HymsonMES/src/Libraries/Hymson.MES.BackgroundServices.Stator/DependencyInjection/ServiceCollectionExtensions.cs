@@ -1,6 +1,4 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.BackgroundServices.Stator;
-using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -20,10 +18,11 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddBackgroundServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddCoreService(configuration);
+            services.AddInfrastructure();
+            services.AddData(configuration);
+            services.AddWaterMarkService(configuration);
 
-            AddEventBusServices(services);
-
+            AddConfig(services, configuration);
             AddServices(services);
             AddRepository(services);
 
@@ -31,12 +30,14 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         }
 
         /// <summary>
-        /// 订阅
+        /// 添加配置
         /// </summary>
         /// <param name="services"></param>
-        static void AddEventBusServices(IServiceCollection services)
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            // TODO: Add event handlers
+            return services;
         }
 
         /// <summary>
@@ -60,8 +61,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddRepository(this IServiceCollection services)
         {
-            services.AddSingleton(typeof(IOPRepository<>), typeof(OPRepository<>));
-
             var typeFinder = Singleton<ITypeFinder>.Instance;
             var keyValuePairs = typeFinder.GetInterfaceImplPairs("Repository");
             foreach (var keyValuePair in keyValuePairs)
