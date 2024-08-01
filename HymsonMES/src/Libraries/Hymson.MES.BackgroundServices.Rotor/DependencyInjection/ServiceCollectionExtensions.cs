@@ -18,24 +18,26 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddBackgroundServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddCoreService(configuration);
+            services.AddInfrastructure();
+            services.AddData(configuration);
+            services.AddWaterMarkService(configuration);
 
-            AddEventBusServices(services);
-
+            AddConfig(services, configuration);
             AddServices(services);
             AddRepository(services);
 
             return services;
         }
 
-
         /// <summary>
-        /// 订阅
+        /// 添加配置
         /// </summary>
         /// <param name="services"></param>
-        static void AddEventBusServices(IServiceCollection services)
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            // TODO: Add event handlers
+            return services;
         }
 
         /// <summary>

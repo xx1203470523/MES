@@ -22,7 +22,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddData(configuration);
             services.AddWaterMarkService(configuration);
 
-
             AddConfig(services, configuration);
             AddServices(services);
             AddRepository(services);
