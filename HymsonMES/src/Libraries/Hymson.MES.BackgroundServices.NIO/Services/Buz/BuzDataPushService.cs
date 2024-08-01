@@ -455,7 +455,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
             else
             {
-                startWaterMarkTime = DateTime.Parse("2024-07-14 01:01:01");
+                startWaterMarkTime = DateTime.Parse("2024-08-01 01:01:01");
             }
             //获取已经走完的追溯记录
             EntityByWaterMarkTimeQuery rotorQuery = new EntityByWaterMarkTimeQuery();

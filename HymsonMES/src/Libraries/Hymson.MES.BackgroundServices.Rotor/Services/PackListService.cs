@@ -84,7 +84,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
             else
             {
-                startWaterMarkTime = DateTime.Parse("2024-07-14 01:01:01");
+                startWaterMarkTime = DateTime.Parse("2024-08-01 01:01:01");
             }
             //获取站点
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });

@@ -292,7 +292,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
             else
             {
-                startWaterMarkTime = DateTime.Parse("2024-07-25 01:01:01");
+                startWaterMarkTime = DateTime.Parse("2024-08-01 00:00:01");
             }
             DateTime start = startWaterMarkTime;
 
