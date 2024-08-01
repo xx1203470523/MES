@@ -70,7 +70,7 @@ Host.CreateDefaultBuilder(args)
        });
 
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-       services.AddHostedService<SubHostedService>();
+       //services.AddHostedService<SubHostedService>();
        //services.AddSqlExecuteTaskService(hostContext.Configuration);
        services.AddNLog(hostContext.Configuration);
        //services.AddEventBusRabbitMQService(hostContext.Configuration);
