@@ -19,6 +19,16 @@
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://*:11701"
+    },
+    "Hymson.MES.Api【Production】": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://*:11701"
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json"

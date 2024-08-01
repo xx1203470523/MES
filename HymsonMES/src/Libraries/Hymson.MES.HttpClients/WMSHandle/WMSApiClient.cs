@@ -227,6 +227,8 @@ namespace Hymson.MES.HttpClients
 
         public async Task<BaseResponse> ProductReceiptRequestAsync(ProductReceiptRequestDto request)
         {
+            _logger.LogDebug($"成品入库 -> Request: {request.ToSerialize()}");
+
             ProductReceiptRequest materialReturnRequest = new()
             {
                 SendOn = request.SendOn,
@@ -237,13 +239,12 @@ namespace Hymson.MES.HttpClients
             };
 
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.ProductReceipt.Route, materialReturnRequest);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"成品入库 -> Response: {jsonResponse}");
+
             return await httpResponse.Content.ReadFromJsonAsync<BaseResponse>();
-            //if (result?.Code == 1)
-            //    return false;
-            //else
-            //{
-            //    return true;
-            //}
         }
 
 

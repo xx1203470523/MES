@@ -1472,7 +1472,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task ProductReceiptRequestAsync(ProductReceiptRequest request)
         {
-            if(request.Items == null || request.Items.Count() == 0)
+            if (request.Items == null || request.Items.Count() == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17758));
             }
@@ -1612,14 +1612,12 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SendOn = HymsonClock.Now().ToString(),//TODO：这个信息需要调研
                 Details = returnMaterialDtos
             });
-            if (response.Code != 1)
+            if (response.Code == 0)
             {
-                using (var trans = TransactionHelper.GetTransactionScope())
-                {
-                    await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
-                    await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
-                    trans.Complete();
-                }
+                using var trans = TransactionHelper.GetTransactionScope();
+                await _manuProductReceiptOrderRepository.InsertAsync(manuProductReceiptOrderEntity);
+                await _manuProductReceiptOrderDetailRepository.InsertRangeAsync(manuProductReceiptOrderDetails);
+                trans.Complete();
             }
             else
             {
