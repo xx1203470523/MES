@@ -135,6 +135,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="pageQuery"></param>
         /// <returns></returns>
+        Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoWithPickAsync(PlanWorkOrderPagedQuery pageQuery);
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
         Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoAsyncCode(PlanWorkOrderPagedQuery pageQuery);
 
         /// <summary>

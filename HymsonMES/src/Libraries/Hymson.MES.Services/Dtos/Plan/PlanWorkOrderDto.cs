@@ -110,7 +110,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         public string? Remark { get; set; }
     }
 
-
     /// <summary>
     /// 工单信息表新增Dto
     /// </summary>
@@ -297,6 +296,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
         /// </summary>
         public IEnumerable<PlanWorkOrderStatusEnum>? InStatus { get; set; }
+
         /// <summary>
         /// 领料状态 1：未领料；2：已领料；3：部分领料
         /// </summary>
@@ -316,6 +316,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 物料版本
         /// </summary>
         public string? MaterialVersion { get; set; }
+
     }
 
     /// <summary>
@@ -518,6 +519,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
         /// </summary>
         public PlanWorkOrderStatusEnum Status { get; set; }
+
         /// <summary>
         /// 领料状态 0：未领料；1：已领料；2：部分领料
         /// </summary>
@@ -656,6 +658,9 @@ namespace Hymson.MES.Services.Dtos.Plan
         public PlanWorkOrderStatusEnum Status { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public record PlanWorkOrderLockedDto
     {
         /// <summary>
@@ -671,4 +676,5 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public YesOrNoEnum IsLocked { get; set; }
     }
+
 }

@@ -523,20 +523,18 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         {
             var pagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
-
-            // TODO 这个应该在这里组装，不应该的DB查询全部数据，再直接转（看到了，但没时间改 -。-）
-
-
+            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoWithPickAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<PlanWorkOrderListDetailViewDto>());
+
             // 根据工单查找领料记录，汇总已领料数量，根据已领料数量和工单数量 计算出领料状态
             var manuRequistionOrderEntities = await _manuRequistionOrderRepository.GetManuRequistionOrderEntitiesAsync(new ManuRequistionQueryByWorkOrders
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                WorkOrderIds = dtos.Select(d => d.Id).Distinct().ToArray(),
+                WorkOrderIds = dtos.Select(d => d.Id).Distinct(),
             });
+
             //var requistiongroup = manuRequistionOrderEntities.Where(m => m.Type == Core.Domain.Manufacture.ManuRequistionTypeEnum.WorkOrderPicking
             //&& (m.Status != WhWarehouseRequistionStatusEnum.ApprovalingFailed
             //|| m.Status != WhWarehouseRequistionStatusEnum.Failed)).GroupBy(m => m.WorkOrderId);
@@ -548,16 +546,23 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             //    : qty == d.Qty ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.PartPicked;
             //    d.PassDownQuantity = d.Qty;
             //});
+
+            // TODO: 由于工单没有领料状态字段，所以根据领料记录判断工单领料状态。。。
             dtolist.ForEach(d =>
             {
                 // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
                 //var qty = requistiongroup.FirstOrDefault(r => r.Key == d.Id)?.Count() ?? 0;
-                d.PickStatus = manuRequistionOrderEntities.Any(x=>x.Status!= WhMaterialPickingStatusEnum.CancelMaterialReturn&&x.WorkOrderId==d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked ;
-
+                d.PickStatus = manuRequistionOrderEntities.Any(x => x.Status != WhMaterialPickingStatusEnum.CancelMaterialReturn && x.WorkOrderId == d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked;
                 d.PassDownQuantity = d.Qty;
             });
+
+            /*
             if (planWorkOrderPagedQueryDto.PickStatus != null)
+            {
                 dtolist = dtos.Where(d => d.PickStatus == planWorkOrderPagedQueryDto.PickStatus).ToList();
+            }
+            */
+
             return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtolist, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -684,18 +689,18 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 RequistionOrderIds = requistionOrderIds
             });
 
-            var materialIds= manuRequistionOrderDetails.Select(x=>x.MaterialId).ToArray();
-            var procMaterials=await _procMaterialRepository.GetByIdsAsync(materialIds);
+            var materialIds = manuRequistionOrderDetails.Select(x => x.MaterialId).ToArray();
+            var procMaterials = await _procMaterialRepository.GetByIdsAsync(materialIds);
             foreach (var item in manuRequistionOrderDetails)
             {
                 var requistionOrder = requistionOrderEntities.FirstOrDefault(x => x.Id == item.RequistionOrderId);
-                var material= procMaterials.FirstOrDefault(x=>x.Id == item.MaterialId);
+                var material = procMaterials.FirstOrDefault(x => x.Id == item.MaterialId);
                 details.Add(new ManuRequistionOrderDetailDto
                 {
                     ReqOrderCode = requistionOrder?.ReqOrderCode ?? "",
-                    MaterialCode = material?.MaterialCode??"",
-                    Version = material?.Version??"",
-                    MaterialName = material?.MaterialName??"",
+                    MaterialCode = material?.MaterialCode ?? "",
+                    Version = material?.Version ?? "",
+                    MaterialName = material?.MaterialName ?? "",
                     //MaterialBarCode = material?.MaterialBarCode??"",
                     //Batch = item.Batch,
                     Qty = item.Qty,

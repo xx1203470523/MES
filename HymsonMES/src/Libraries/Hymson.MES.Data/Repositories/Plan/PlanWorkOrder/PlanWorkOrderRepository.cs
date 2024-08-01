@@ -317,6 +317,100 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<PlanWorkOrderListDetailView>> GetPagedInfoWithPickAsync(PlanWorkOrderPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("wo.IsDeleted = 0");
+            sqlBuilder.Where("wo.SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(pageQuery.OrderCode))
+            {
+                pageQuery.OrderCode = $"%{pageQuery.OrderCode}%";
+                sqlBuilder.Where("wo.OrderCode LIKE @OrderCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pageQuery.MaterialCode))
+            {
+                pageQuery.MaterialCode = $"%{pageQuery.MaterialCode}%";
+                sqlBuilder.Where("m.MaterialCode LIKE @MaterialCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pageQuery.MaterialVersion))
+            {
+                pageQuery.MaterialVersion = $"%{pageQuery.MaterialVersion}%";
+                sqlBuilder.Where("m.Version LIKE @MaterialVersion");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pageQuery.WorkCenterCode))
+            {
+                pageQuery.WorkCenterCode = $"%{pageQuery.WorkCenterCode}%";
+                sqlBuilder.Where("wc.Code LIKE @WorkCenterCode");
+            }
+
+            if (pageQuery.Type.HasValue)
+            {
+                sqlBuilder.Where("wo.Type = @Type ");
+            }
+
+            if (pageQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("wo.Status = @Status");
+            }
+
+            if (pageQuery.PlanStartTime != null && pageQuery.PlanStartTime.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { PlanStartTimeStart = pageQuery.PlanStartTime[0], PlanStartTimeEnd = pageQuery.PlanStartTime[1].AddDays(1) });
+                sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
+            }
+
+            if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length > 0 && pageQuery.CreatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where(" wo.CreatedOn >= @CreatedOnStart AND  wo.CreatedOn < @CreatedOnEnd ");
+
+                //sqlBuilder.AddParameters(new { StartId = IdGenProvider.GenerateStartId(pageQuery.CreatedOn[0]), EndId = IdGenProvider.GenerateEndId(pageQuery.CreatedOn[1].AddDays(1),false) });
+                //sqlBuilder.Where(" rbr.Id >= @StartId AND  rbr.Id < @EndId");
+            }
+
+            if (pageQuery.Statuss != null && pageQuery.Statuss.Any())
+            {
+                sqlBuilder.Where("wo.Status IN @Statuss");
+            }
+
+            // 是否领料
+            if (pageQuery.PickStatus.HasValue)
+            {
+                // 未领料
+                if (pageQuery.PickStatus.Value == Core.Enums.PlanWorkOrderPickStatusEnum.NotPicked)
+                {
+                    sqlBuilder.Where("wo.Id NOT IN (SELECT WorkOrderId FROM manu_requistion_order WHERE Status IN (0, 1, 2, 3)) ");
+                }
+
+                // 已领料
+                if (pageQuery.PickStatus.Value == Core.Enums.PlanWorkOrderPickStatusEnum.FinishPicked)
+                {
+                    sqlBuilder.Where("wo.Id IN (SELECT WorkOrderId FROM manu_requistion_order WHERE Status IN (0, 1, 2, 3)) ");
+                }
+            }
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = GetMESDbConnection();
+            var entities = await conn.QueryAsync<PlanWorkOrderListDetailView>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            return new PagedInfo<PlanWorkOrderListDetailView>(entities, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
+
+        /// <summary>
         /// ID编码查询
         /// </summary>
         /// <param name="pageQuery"></param>

@@ -50,16 +50,20 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("未领料")]
         NotPicked = 0,
+
         /// <summary>
         /// 已领料
         /// </summary>
         [Description("已领料")]
         FinishPicked = 1,
+
+        /*
         /// <summary>
         /// 部分领料
         /// </summary>
         [Description("部分领料")]
         PartPicked = 2
-        
+        */
+
     }
 }
