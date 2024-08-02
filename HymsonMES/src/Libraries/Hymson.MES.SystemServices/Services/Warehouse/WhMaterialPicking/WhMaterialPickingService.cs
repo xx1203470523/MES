@@ -397,6 +397,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                     Qty = whMaterialInventoryEntity.QuantityResidue,
                     IsUsed = YesOrNoEnum.No,
                     Status = SfcStatusEnum.Complete,
+                    Type = Core.Enums.Manufacture.SfcTypeEnum.NoProduce,
                     SiteId = siteId,
                     CreatedBy = param.OperateBy,
                     UpdatedBy = param.OperateBy,
