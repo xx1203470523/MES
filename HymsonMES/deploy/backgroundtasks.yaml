@@ -18,7 +18,7 @@ spec:
         app: mes-back
     spec:
       containers:
-      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks:20240802194849
+      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks:20240802203610
         name: mes-back
         volumeMounts:
           - mountPath: /logs
