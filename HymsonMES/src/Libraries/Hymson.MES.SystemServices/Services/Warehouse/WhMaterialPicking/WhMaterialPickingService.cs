@@ -89,6 +89,10 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
 
         private readonly ISysConfigRepository _sysConfigRepository;
 
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
 
         private readonly IManuRequistionOrderDetailRepository _manuRequistionOrderDetailRepository;
@@ -98,18 +102,49 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
         /// <summary>
         /// 构造函数
         /// </summary>
-        public WhMaterialPickingService(
-            ILocalizationService localizationService, IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            IWhMaterialStandingbookRepository whMaterialStandingbookRepository, IProcMaterialRepository procMaterialRepository,
-            IManuReturnOrderRepository manuReturnOrderRepository, IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
-            IWhSupplierRepository whSupplierRepository, IIQCOrderCreateService iqcOrderCreateService, IQualIqcOrderReturnRepository qualIqcOrderReturnRepository,
-            IQualIqcOrderReturnDetailRepository qualIqcOrderReturnDetailRepository, IInteCodeRulesRepository inteCodeRulesRepository, IManuGenerateBarcodeService manuGenerateBarcodeService,
-            IWhWarehouseRepository whWarehouseRepository, IPlanWorkOrderRepository planWorkOrderRepository, ICurrentSystem currentSystem, ISysConfigRepository sysConfigRepository,
+        /// <param name="localizationService"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="whMaterialStandingbookRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="manuReturnOrderRepository"></param>
+        /// <param name="manuReturnOrderDetailRepository"></param>
+        /// <param name="whSupplierRepository"></param>
+        /// <param name="iqcOrderCreateService"></param>
+        /// <param name="qualIqcOrderReturnRepository"></param>
+        /// <param name="qualIqcOrderReturnDetailRepository"></param>
+        /// <param name="inteCodeRulesRepository"></param>
+        /// <param name="manuGenerateBarcodeService"></param>
+        /// <param name="whWarehouseRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="currentSystem"></param>
+        /// <param name="sysConfigRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuRequistionOrderRepository"></param>
+        /// <param name="manuRequistionOrderDetailRepository"></param>
+        /// <param name="manuRequistionOrderReceiveRepository"></param>
+        public WhMaterialPickingService(ILocalizationService localizationService,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IManuReturnOrderRepository manuReturnOrderRepository,
+            IManuReturnOrderDetailRepository manuReturnOrderDetailRepository,
+            IWhSupplierRepository whSupplierRepository,
+            IIQCOrderCreateService iqcOrderCreateService,
+            IQualIqcOrderReturnRepository qualIqcOrderReturnRepository,
+            IQualIqcOrderReturnDetailRepository qualIqcOrderReturnDetailRepository,
+            IInteCodeRulesRepository inteCodeRulesRepository,
+            IManuGenerateBarcodeService manuGenerateBarcodeService,
+            IWhWarehouseRepository whWarehouseRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            ICurrentSystem currentSystem,
+            ISysConfigRepository sysConfigRepository,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
             IManuRequistionOrderRepository manuRequistionOrderRepository,
             IManuRequistionOrderDetailRepository manuRequistionOrderDetailRepository,
             IManuRequistionOrderReceiveRepository manuRequistionOrderReceiveRepository)
         {
-
             _localizationService = localizationService;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
@@ -126,6 +161,8 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
             _planWorkOrderRepository = planWorkOrderRepository;
             _currentSystem = currentSystem;
             _sysConfigRepository = sysConfigRepository;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuRequistionOrderRepository = manuRequistionOrderRepository;
             _manuRequistionOrderDetailRepository = manuRequistionOrderDetailRepository;
             _manuRequistionOrderReceiveRepository = manuRequistionOrderReceiveRepository;
@@ -346,7 +383,45 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 }
             }
 
+            List<ManuSfcEntity> sfcEntities = new();
+            List<ManuSfcInfoEntity> sfcInfoEntities = new();
+            foreach (var whMaterialInventoryEntity in whList)
+            {
+                var sfcId = IdGenProvider.Instance.CreateId();
+
+                // 插入生产条码信息
+                sfcEntities.Add(new ManuSfcEntity
+                {
+                    Id = sfcId,
+                    SFC = whMaterialInventoryEntity.MaterialBarCode,
+                    Qty = whMaterialInventoryEntity.QuantityResidue,
+                    IsUsed = YesOrNoEnum.No,
+                    Status = SfcStatusEnum.Complete,
+                    SiteId = siteId,
+                    CreatedBy = param.OperateBy,
+                    UpdatedBy = param.OperateBy,
+                    CreatedOn = createOn,
+                    UpdatedOn = createOn
+                });
+
+                sfcInfoEntities.Add(new ManuSfcInfoEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    WorkOrderId = whMaterialInventoryEntity.WorkOrderId,
+                    ProductId = whMaterialInventoryEntity?.MaterialId ?? 0,
+                    SfcId = sfcId,
+                    IsUsed = true,
+                    SiteId = siteId,
+                    CreatedBy = param.OperateBy,
+                    UpdatedBy = param.OperateBy,
+                    CreatedOn = createOn,
+                    UpdatedOn = createOn
+                });
+            }
+
             using var trans = TransactionHelper.GetTransactionScope();
+            await _manuSfcRepository.InsertRangeAsync(sfcEntities);
+            await _manuSfcInfoRepository.InsertsAsync(sfcInfoEntities);
             await _whMaterialInventoryRepository.InsertsAsync(whList);
             await _whMaterialStandingbookRepository.InsertsAsync(bookList);
             await _manuRequistionOrderReceiveRepository.InsertRangeAsync(receiveList);

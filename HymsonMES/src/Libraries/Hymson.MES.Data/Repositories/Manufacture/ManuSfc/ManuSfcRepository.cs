@@ -3,7 +3,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Microsoft.Extensions.Options;
-using System.Text;
 using ConnectionOptions = Hymson.MES.Data.Options.ConnectionOptions;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -336,9 +335,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (param.Sfcs != null && param.Sfcs.Any())
             {
                 sqlBuilder.Where("sfc.SFC in @Sfcs");
-        }
+            }
             if (param.Statuss != null && param.Statuss.Any())
-        {
+            {
                 sqlBuilder.Where("sfc.Status in @Statuss");
             }
             using var conn = GetMESDbConnection();
@@ -370,6 +369,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var list = await conn.QueryAsync<ManuSfcView>(template.RawSql, param);
             return list;
         }
+
         /// <summary>
         /// 新增
         /// </summary>
@@ -602,7 +602,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> PartialScrapmanuSFCByIdAsync(IEnumerable<ManuSFCPartialScrapByIdCommand>  commands)
+        public async Task<int> PartialScrapmanuSFCByIdAsync(IEnumerable<ManuSFCPartialScrapByIdCommand> commands)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(manuSFCPartialScrapByIdSql, commands);
@@ -752,7 +752,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (query.Id.HasValue)
             {
                 sqlBuilder.Where("Id = @Id");
-}
+            }
 
             if (query.Ids != null && query.Ids.Any())
             {

@@ -54,6 +54,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IManuCommonService _manuCommonService;
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
