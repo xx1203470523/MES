@@ -764,6 +764,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = newSplitSFC,
                     IsUsed = YesOrNoEnum.No,
+                    Type = manuSfcEntity.Type,
                     Qty = adjustDto.Qty,
                     SiteId = _currentSite.SiteId ?? 0,
                     Status = manuSfcEntity.Status,

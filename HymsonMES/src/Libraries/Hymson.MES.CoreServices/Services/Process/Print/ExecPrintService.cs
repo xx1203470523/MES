@@ -178,7 +178,7 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
         {
             long? printId = null;
             //一般情况下是单台打印机
-            if (@event.PrintId.HasValue )
+            if (@event.PrintId.HasValue)
             {
                 printId = @event.PrintId.Value;
             }
@@ -209,7 +209,11 @@ namespace Hymson.MES.CoreServices.Services.Process.Print
                 UserName = @event.UserName
             };
             var groups = @event.BarCodes.GroupBy(x => x.MateriaId);
-            var procLabelTemplateTypeEnties = await _procLabelTemplateRepository.GetByTemplateTypeAsync(new ProcLabelTemplateByTemplateTypeQuery() { SiteId = @event.SiteId, CurrencyTemplateType = @event.CurrencyTemplateType ?? 0 });
+            var procLabelTemplateTypeEnties = await _procLabelTemplateRepository.GetByTemplateTypeAsync(new ProcLabelTemplateByTemplateTypeQuery()
+            {
+                SiteId = @event.SiteId,
+                CurrencyTemplateType = @event.CurrencyTemplateType ?? 0
+            });
 
             var batchBarcodeList = new List<PrintStructDto<BatchBarcodeDto>>();
             var productionBarcodeList = new List<PrintStructDto<ProductionBarcodeDto>>();
