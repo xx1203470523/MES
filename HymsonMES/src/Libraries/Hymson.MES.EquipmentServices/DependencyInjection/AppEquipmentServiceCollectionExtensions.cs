@@ -21,6 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddWebFrameworkService(configuration);
             services.AddCoreService(configuration);
+            services.AddMinioService(configuration);
             AddConfig(services, configuration);
 
             AddServices(services);
