@@ -18,7 +18,7 @@ spec:
         app: equ-api
     spec:
       containers:
-      - image: nuget.czhipu.com/xnebula/hymson.mes.equipment.api:20240802222824
+      - image: nuget.czhipu.com/xnebula/hymson.mes.equipment.api:20240803172822
         name: equ-api
         volumeMounts:
           - mountPath: /logs
