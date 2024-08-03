@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.EquipmentServices.Upload;
 using Hymson.MES.EquipmentServices.Uploads;
-using Microsoft.AspNetCore.Authorization;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Equipment.Api.Controllers
@@ -32,6 +32,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost, Route("uploadImg")]
+        [RequestSizeLimit(104857600)]
         public async Task<UploadResultDto> UploadImg(IFormFile file)
         {
             return await _uploadService.UploadPicAsync(file);
@@ -44,10 +45,21 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost, Route("uploadFile")]
         [RequestSizeLimit(104857600)]
-        [AllowAnonymous]
-        public async Task<UploadResultDto> UploadFile(IFormFile file)
+        public async Task<UploadResultDto> UploadFileAsync(IFormFile file)
         {
             return await _uploadService.UploadFileAsync(file);
+        }
+
+        /// <summary>
+        /// 文件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("uploadFileWithInfo")]
+        [LogDescription("文件上传", BusinessType.OTHER, "Upload", ReceiverTypeEnum.MES)]
+        public async Task<UploadResultDto> UploadFileAsync([FromForm] UploadFileRequestDto dto)
+        {
+            return await _uploadService.UploadFileAsync(dto);
         }
 
     }

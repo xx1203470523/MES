@@ -13,13 +13,21 @@ namespace Hymson.MES.EquipmentServices.Upload
         /// </summary>
         /// <param name="formFile"></param>
         /// <returns></returns>
-        Task<UploadResultDto> UploadPicAsync(IFormFile  formFile);
+        Task<UploadResultDto> UploadPicAsync(IFormFile formFile);
 
         /// <summary>
         /// 上传文件
         /// </summary>
         /// <param name="formFile"></param>
         /// <returns></returns>
-        Task<UploadResultDto> UploadFileAsync(IFormFile  formFile);
+        Task<UploadResultDto> UploadFileAsync(IFormFile formFile);
+
+        /// <summary>
+        /// 上传文件
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<UploadResultDto> UploadFileAsync(UploadFileRequestDto dto);
+
     }
 }
