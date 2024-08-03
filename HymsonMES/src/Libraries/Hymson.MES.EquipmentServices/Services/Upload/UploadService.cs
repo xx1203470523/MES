@@ -1,10 +1,7 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using Hymson.MES.EquipmentServices.Uploads;
-using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
 using Hymson.Minio;
-using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.AspNetCore.Http;
 
@@ -62,47 +59,37 @@ namespace Hymson.MES.EquipmentServices.Upload
         }
 
         /// <summary>
-        /// 文件上传
+        /// 多上传文件（带信息）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<UploadResultDto> UploadFileAsync(UploadFileRequestDto dto)
+        public async Task<IEnumerable<UploadResultDto>> UploadFileAsync(UploadFileRequestDto dto)
         {
-            await Task.CompletedTask;
-            return default;
-            /*
             // 文件列表
             var fileList = dto.FormCollection.Files;
-            if (fileList == null || !fileList.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES45290));
+            if (fileList == null || !fileList.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES11600));
 
-            List<CcdFileUploadCompleteRecordSaveDto> saveDtoList = new();
+            List<UploadResultDto> uploadResultDtos = new();
             foreach (var file in fileList)
             {
-                var fileDir = $"{dto.ProcedureCode}/{HymsonClock.Now():yyyyMMdd}/{equResModel.EquipmentCode}/{dto.Sfc}";
+                var fileDir = $"{dto.PostionCode}/{HymsonClock.Now():yyyyMMdd}/{dto.BarCode}";
 
                 // 上传
                 using var stream = file.OpenReadStream();
                 var uploadResult = await _minioService.PutObjectAsync(file.FileName, stream, file.ContentType, fileDir);
 
-                saveDtoList.Add(new CcdFileUploadCompleteRecordSaveDto
+                var fileExt = Path.GetExtension(file.FileName).ToLowerInvariant();
+                uploadResultDtos.Add(new UploadResultDto
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = equResModel.SiteId,
-                    EquipmentId = equResModel.EquipmentId,
-                    Sfc = dto.Sfc,
-                    SfcIsPassed = dto.Passed,
-                    Uri = uploadResult.AbsoluteUrl,
-                    UriIsPassed = dto.Passed,
-                    CreatedBy = equResModel.EquipmentCode,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedBy = equResModel.EquipmentCode,
-                    UpdatedOn = HymsonClock.Now()
+                    FileExt = fileExt,
+                    FileType = file.ContentType,
+                    OriginalName = file.FileName,
+                    FileSize = file.Length,
+                    FileUrl = uploadResult.AbsoluteUrl
                 });
             }
 
-            //保存
-            await _ccdFileUploadCompleteRecordService.AddMultAsync(saveDtoList);
-            */
+            return uploadResultDtos;
         }
 
         /// <summary>

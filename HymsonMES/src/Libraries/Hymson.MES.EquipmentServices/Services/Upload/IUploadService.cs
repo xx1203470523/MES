@@ -23,11 +23,11 @@ namespace Hymson.MES.EquipmentServices.Upload
         Task<UploadResultDto> UploadFileAsync(IFormFile formFile);
 
         /// <summary>
-        /// 上传文件
+        /// 多上传文件（带信息）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<UploadResultDto> UploadFileAsync(UploadFileRequestDto dto);
+        Task<IEnumerable<UploadResultDto>> UploadFileAsync(UploadFileRequestDto dto);
 
     }
 }
