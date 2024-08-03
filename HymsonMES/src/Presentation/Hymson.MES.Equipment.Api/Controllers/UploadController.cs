@@ -51,13 +51,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// 文件上传
+        /// 多上传文件（带信息）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("uploadFileWithInfo")]
         [LogDescription("文件上传", BusinessType.OTHER, "Upload", ReceiverTypeEnum.MES)]
-        public async Task<UploadResultDto> UploadFileAsync([FromForm] UploadFileRequestDto dto)
+        public async Task<IEnumerable<UploadResultDto>> UploadFileAsync([FromForm] UploadFileRequestDto dto)
         {
             return await _uploadService.UploadFileAsync(dto);
         }

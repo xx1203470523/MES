@@ -2232,6 +2232,7 @@
 
 
         #region 基础数据导入 11600
+        public const string MES11600 = "上传文件信息不存在！";
         public const string MES11601 = "导入的数据中设备编码重复！";
         public const string MES11602 = "设备编码不能为空！";
         public const string MES11603 = "设备名称不能为空！";
