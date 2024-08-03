@@ -5,6 +5,7 @@ using Hymson.MES.Core.NIO;
 using Hymson.MES.CoreServices.Bos.NIO;
 using Hymson.MES.CoreServices.Extension;
 using Hymson.MES.Data.NIO;
+using Hymson.MES.Data.Repositories.NioPushSwitch;
 using Hymson.Snowflake;
 using Hymson.Utils;
 

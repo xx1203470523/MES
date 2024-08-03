@@ -16,6 +16,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.ManuRotorSfc.Query;
+using Hymson.MES.Data.Repositories.NioPushSwitch;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -239,6 +240,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             ProcProcedureQuery procedureQuery = new ProcProcedureQuery() { SiteId = siteId };
             var procedureList = await _procProcedureRepository.GetEntitiesAsync(procedureQuery);
             if (procedureList == null || procedureList.Any() == false) return;
+            //成品码信息
+            ZSfcQuery zSfcQuery = new ZSfcQuery();
+            zSfcQuery.SiteId = siteId;
+            zSfcQuery.SfcList = paramList.Select(m => m.SFC).Distinct().ToList();
+            var nioSfcList = await _manuRotorSfcRepository.GetListByZSfcsAsync(zSfcQuery);
 
             var dtos = new List<CollectionDto>();
             // TODO: 替换为实际数据
@@ -263,6 +269,16 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 {
                     procedure = curProcedure.Code;
                 }
+                //总成码,指定工序才有总成码
+                string nioSfc = item.SFC;
+                if (ROTOR_NIOSN_OP.Contains(procedure) == true && nioSfcList != null)
+                {
+                    var curNio = nioSfcList.Where(m => m.ZSfc == item.SFC).FirstOrDefault();
+                    if (curNio != null)
+                    {
+                        nioSfc = curNio.Sfc;
+                    }
+                }
 
                 NIOConfigBaseDto curConfig = new NIOConfigBaseDto();
                 if (firstChar == ROTOR_CHAR)
@@ -281,8 +297,25 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.StationId = procedure;
                 //model.DeviceId = "无";
                 model.VendorFieldCode = paramCode;
-                model.DecimalValue = 0;
-                model.StringValue = item.ParameterValue;
+                if(curBaseParam.DataType == DataTypeEnum.Numeric) //数字类型
+                {
+                    decimal tmpDecValue = 0;
+                    if (decimal.TryParse(item.ParameterValue, out tmpDecValue) == true) //能转成decimal
+                    {
+                        model.DecimalValue = tmpDecValue;
+                        model.StringValue = "";
+                    }
+                    else
+                    {
+                        model.DecimalValue = 0;
+                        model.StringValue = item.ParameterValue;
+                    }
+                }
+                else
+                {
+                    model.DecimalValue = 0;
+                    model.StringValue = item.ParameterValue;
+                }
                 model.BooleanValue = false;
                 model.ProcessType = "final";
                 //model.NioProductCode = curConfig.NioProductCode;
@@ -291,10 +324,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 //model.NioModel = "ES8";
                 model.VendorProductNum = curConfig.VendorProductCode;
                 model.VendorProductName = curConfig.VendorProductName;
-                model.VendorProductSn = item.SFC;
+                model.VendorProductSn = nioSfc;
                 model.VendorProductTempSn = item.SFC;
-                model.VendorProductCode = item.SFC;
-                model.VendorProductBatch = item.SFC;
+                //model.VendorProductCode = item.SFC;
+                //model.VendorProductBatch = item.SFC;
                 model.OperatorAccount = item.CreatedBy;
                 model.InputTime = GetTimestamp(HymsonClock.Now());
                 model.OutputTime = model.InputTime;
@@ -1111,7 +1144,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         private long GetTimestamp(DateTime date)
         {
-            return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            return (long)((DateTime)date - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local)).TotalSeconds;
         }
 
         /// <summary>
@@ -1181,7 +1214,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             // 首先将本地时间转换为UTC时间  
             DateTime utcDateTime = ((DateTime)dateTime).ToUniversalTime();
             // 然后计算UTC时间与Unix纪元（1970年1月1日UTC）之间的差值  
-            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Local);
             TimeSpan timeSpan = utcDateTime - epoch;
             return (long)timeSpan.TotalMilliseconds;
         }

@@ -2364,5 +2364,11 @@
         public const string MES17757 = "成品完工入库中存在相同的产品码！";
         public const string MES17758 = "成品完工入库中明细不能为空！";
         #endregion
+
+        #region NIO MES17770
+
+        public const string MES17770 = "启动状态不能修改，请先修改状态";
+
+        #endregion
     }
 }

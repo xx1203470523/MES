@@ -2,8 +2,9 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.NIO;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.NioPushSwitch.Query;
 
-namespace Hymson.MES.Data.NIO
+namespace Hymson.MES.Data.Repositories.NioPushSwitch
 {
     /// <summary>
     /// 仓储接口（蔚来推送开关）
@@ -16,7 +17,7 @@ namespace Hymson.MES.Data.NIO
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(NioPushSwitchEntity entity);
-
+        
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -32,6 +33,13 @@ namespace Hymson.MES.Data.NIO
         Task<int> UpdateAsync(NioPushSwitchEntity entity);
 
         /// <summary>
+        /// 更新是否启用
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateEnableAsync(NioPushSwitchEntity entity);
+
+        /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
@@ -44,7 +52,7 @@ namespace Hymson.MES.Data.NIO
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-
+        
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -65,7 +73,7 @@ namespace Hymson.MES.Data.NIO
         /// <param name="id"></param>
         /// <returns></returns>
         Task<NioPushSwitchEntity> GetByIdAsync(long id);
-
+    
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -79,7 +87,7 @@ namespace Hymson.MES.Data.NIO
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<NioPushSwitchEntity>> GetEntitiesAsync(NioPushSwitchQuery query);
-
+        
         /// <summary>
         /// 分页查询
         /// </summary>

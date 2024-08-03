@@ -25,6 +25,7 @@ using Hymson.MES.Core.Domain.WhWareHouse;
 using Hymson.MES.Core.Domain.WhWarehouseLocation;
 using Hymson.MES.Core.Domain.WhWarehouseRegion;
 using Hymson.MES.Core.Domain.WhWarehouseShelf;
+using Hymson.MES.Core.NIO;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.Data.Repositories.EquEquipmentRecord;
@@ -59,6 +60,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Marking;
 using Hymson.MES.Data.Repositories.Marking.Query;
+using Hymson.MES.Data.Repositories.NioPushSwitch.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Plan.Query;
@@ -106,6 +108,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
 using Hymson.MES.Services.Dtos.Marking;
+using Hymson.MES.Services.Dtos.NioPushSwitch;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Qual;
@@ -144,6 +147,7 @@ namespace Hymson.MES.Services.Mapper
             CreatePlanMaps();
             CreateManufactureMaps();
             CreateReportMaps();
+            CreateNioMaps();
         }
 
         /// <summary>
@@ -1633,6 +1637,17 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuBarCodeRelationEntity, MaterialSourceDto>();
             CreateMap<ManuSfcStepEntity, StepSourceDto>();
             #endregion
+        }
+
+        /// <summary>
+        /// nio
+        /// </summary>
+        protected virtual void CreateNioMaps()
+        {
+            CreateMap<NioPushSwitchPagedQueryDto, NioPushSwitchPagedQuery>();
+            CreateMap<NioPushSwitchEntity, NioPushSwitchDto>();
+            CreateMap<NioPushSwitchDto, NioPushSwitchEntity>();
+            CreateMap<NioPushSwitchSaveDto, NioPushSwitchEntity>();
         }
 
         /// <summary>

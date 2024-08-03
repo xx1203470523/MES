@@ -6,6 +6,8 @@ using Hymson.MES.Core.NIO;
 using Hymson.MES.CoreServices.Extension;
 using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.NioPushSwitch;
+using Hymson.MES.Data.Repositories.NioPushSwitch.Query;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;

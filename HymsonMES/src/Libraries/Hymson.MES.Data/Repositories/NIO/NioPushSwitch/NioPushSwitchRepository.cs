@@ -3,11 +3,11 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.NIO;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.NioPushSwitch.Query;
 using Microsoft.Extensions.Options;
 
-namespace Hymson.MES.Data.NIO
+namespace Hymson.MES.Data.Repositories.NioPushSwitch
 {
     /// <summary>
     /// 仓储（蔚来推送开关）
@@ -54,6 +54,17 @@ namespace Hymson.MES.Data.NIO
         }
 
         /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateEnableAsync(NioPushSwitchEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateEnableSql, entity);
+        }
+
+        /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
@@ -80,7 +91,7 @@ namespace Hymson.MES.Data.NIO
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command)
+        public async Task<int> DeletesAsync(DeleteCommand command) 
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -113,7 +124,7 @@ namespace Hymson.MES.Data.NIO
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<NioPushSwitchEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<NioPushSwitchEntity>> GetByIdsAsync(long[] ids) 
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<NioPushSwitchEntity>(GetByIdsSql, new { Ids = ids });
@@ -128,9 +139,6 @@ namespace Hymson.MES.Data.NIO
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.Where("IsDeleted = 0");
-
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<NioPushSwitchEntity>(template.RawSql, query);
         }
@@ -148,7 +156,15 @@ namespace Hymson.MES.Data.NIO
             sqlBuilder.Select("*");
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            //sqlBuilder.Where("SiteId = @SiteId");
+            if(pagedQuery.BuzScene != null)
+            {
+                sqlBuilder.Where($"BuzScene = @BuzScene");
+            }
+            if(pagedQuery.IsEnabled != null)
+            {
+                sqlBuilder.Where($"IsEnabled = @BuzScene");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -175,18 +191,21 @@ namespace Hymson.MES.Data.NIO
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM nio_push_switch /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM nio_push_switch /**where**/  ";
 
-        const string InsertSql = "INSERT INTO nio_push_switch(  `Id`, `SchemaCode`, `Path`, `BuzScene`, `IsEnabled`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SchemaCode, @Path, @BuzScene, @IsEnabled, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO nio_push_switch(  `Id`, `SchemaCode`, `Path`, `BuzScene`, `IsEnabled`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SchemaCode, @Path, @BuzScene, @IsEnabled, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO nio_push_switch(  `Id`, `SchemaCode`, `Path`, `Method`, `BuzScene`, `IsEnabled`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SchemaCode, @Path, @Method, @BuzScene, @IsEnabled, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO nio_push_switch(  `Id`, `SchemaCode`, `Path`, `Method`, `BuzScene`, `IsEnabled`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SchemaCode, @Path, @Method, @BuzScene, @IsEnabled, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE nio_push_switch SET   SchemaCode = @SchemaCode, Path = @Path, BuzScene = @BuzScene, IsEnabled = @IsEnabled, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE nio_push_switch SET   SchemaCode = @SchemaCode, Path = @Path, BuzScene = @BuzScene, IsEnabled = @IsEnabled, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE nio_push_switch SET   SchemaCode = @SchemaCode, Path = @Path, Method = @Method, BuzScene = @BuzScene, IsEnabled = @IsEnabled, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE nio_push_switch SET   SchemaCode = @SchemaCode, Path = @Path, Method = @Method, BuzScene = @BuzScene, IsEnabled = @IsEnabled, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE nio_push_switch SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE nio_push_switch SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM nio_push_switch WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM nio_push_switch WHERE Id IN @Ids ";
+
         const string GetBySceneSql = @"SELECT * FROM nio_push_switch WHERE BuzScene = @BuzScene";
+
+        const string UpdateEnableSql = "UPDATE nio_push_switch SET IsEnabled = @IsEnabled, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
     }
 }
