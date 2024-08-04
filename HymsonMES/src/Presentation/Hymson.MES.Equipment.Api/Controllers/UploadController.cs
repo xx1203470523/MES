@@ -56,6 +56,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("uploadFileWithInfo")]
+        [RequestSizeLimit(104857600)]
         [LogDescription("文件上传", BusinessType.OTHER, "Upload", ReceiverTypeEnum.MES)]
         public async Task<IEnumerable<UploadResultDto>> UploadFileAsync([FromForm] UploadFileRequestDto dto)
         {
