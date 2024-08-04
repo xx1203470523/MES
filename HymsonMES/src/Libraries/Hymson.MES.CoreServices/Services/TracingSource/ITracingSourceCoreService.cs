@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSFCNode.View;
 
 namespace Hymson.MES.CoreServices.Services
 {
@@ -29,6 +30,13 @@ namespace Hymson.MES.CoreServices.Services
         /// <param name="query"></param>
         /// <returns></returns>
         Task<NodeSourceBo> DestinationAsync(EntityBySFCQuery query);
+
+        /// <summary>
+        /// 条码追溯（正向） 平铺列表数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSFCNodeView>> DestinationListAsync(EntityBySFCQuery query);
 
     }
 }

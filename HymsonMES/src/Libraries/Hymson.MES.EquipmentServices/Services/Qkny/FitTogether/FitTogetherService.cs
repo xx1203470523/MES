@@ -380,7 +380,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
             var outStationRequestBo = new OutStationRequestBo
             {
                 SFC = dto.Sfc,
-                IsQualified = dto.Passed == 1
+                IsQualified = dto.Passed == 1,
+                BindSfcs = jzSfcList
             };
             // 消耗条码
             if (dto.BindFeedingCodeList != null && dto.BindFeedingCodeList.Any())
@@ -409,14 +410,14 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.FitTogether
                 // 消耗条码
                 if (dto.BindFeedingCodeList != null && dto.BindFeedingCodeList.Any())
                 {
-                    outStationRequestBo.ConsumeList = dto.BindFeedingCodeList.Select(s => new OutStationConsumeBo { BarCode = s });
+                    jzOutStationRequestBo.ConsumeList = dto.BindFeedingCodeList.Select(s => new OutStationConsumeBo { BarCode = s });
                 }
                 // 不合格代码，电芯极组认为一样
                 if (dto.NgList != null && dto.NgList.Any())
                 {
-                    outStationRequestBo.OutStationUnqualifiedList = dto.NgList.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s });
+                    jzOutStationRequestBo.OutStationUnqualifiedList = dto.NgList.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s });
                 }
-                outStationRequestBos.Add(outStationRequestBo);
+                outStationRequestBos.Add(jzOutStationRequestBo);
             }
 
             outBo.OutStationRequestBos = outStationRequestBos;

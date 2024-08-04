@@ -1,16 +1,7 @@
 ﻿using Dapper;
-using Hymson.DbConnection.Abstractions;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 {
@@ -24,7 +15,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentResAllView> GetEquResAllAsync(EquResAllQuery query)
+        public async Task<EquEquipmentResAllView?> GetEquResAllAsync(EquResAllQuery query)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquEquipmentResAllView>(GetEquResAllSql, query);
@@ -46,18 +37,18 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentResAllView> GetEquResAsync(EquResAllQuery query)
+        public async Task<EquEquipmentResAllView?> GetEquResAsync(EquResAllQuery query)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquEquipmentResAllView>(GetEquResSql, query);
         }
 
         /// <summary>
-        /// 根据设备编码+资源编码查询 设备，资源
+        /// 根据设备编码+资源编码查询 设备，资源，线体
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentResAllView> GetEquResLineAsync(EquResAllQuery query)
+        public async Task<EquEquipmentResAllView?> GetEquResLineAsync(EquResAllQuery query)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquEquipmentResAllView>(GetEquResLineSql, query);
@@ -68,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentResAllView> GetEquResProcedureAsync(EquResAllQuery query)
+        public async Task<EquEquipmentResAllView?> GetEquResProcedureAsync(EquResAllQuery query)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquEquipmentResAllView>(GetEquResProcedureSql, query);

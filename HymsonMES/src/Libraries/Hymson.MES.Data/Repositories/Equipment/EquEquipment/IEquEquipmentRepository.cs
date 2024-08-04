@@ -125,7 +125,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<EquEquipmentResAllView> GetEquResAllAsync(EquResAllQuery query);
+        Task<EquEquipmentResAllView?> GetEquResAllAsync(EquResAllQuery query);
 
         /// <summary>
         /// 查多个-根据设备编码+资源编码查询 设备，资源，资源类型，工序，线体，车间 基础信息
@@ -139,21 +139,21 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<EquEquipmentResAllView> GetEquResAsync(EquResAllQuery query);
+        Task<EquEquipmentResAllView?> GetEquResAsync(EquResAllQuery query);
 
         /// <summary>
         /// 根据设备编码+资源编码查询 设备，资源，线体
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<EquEquipmentResAllView> GetEquResLineAsync(EquResAllQuery query);
+        Task<EquEquipmentResAllView?> GetEquResLineAsync(EquResAllQuery query);
 
         /// <summary>
         /// 根据设备编码+资源编码查询 设备，资源，工序
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<EquEquipmentResAllView> GetEquResProcedureAsync(EquResAllQuery param);
+        Task<EquEquipmentResAllView?> GetEquResProcedureAsync(EquResAllQuery param);
 
         /// <summary>
         /// 获取设备列表
