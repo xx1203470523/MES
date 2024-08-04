@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Mavel;
 
 namespace Hymson.MES.Data.Repositories.NioPushSwitch.Query
 {
