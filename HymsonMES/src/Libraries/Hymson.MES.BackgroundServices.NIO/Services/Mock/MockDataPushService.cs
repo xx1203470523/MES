@@ -2,6 +2,7 @@
 using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.CoreServices.Extension;
 using Hymson.MES.Data.NIO;
+using Hymson.MES.Data.Repositories.NioPushSwitch;
 using RestSharp;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services

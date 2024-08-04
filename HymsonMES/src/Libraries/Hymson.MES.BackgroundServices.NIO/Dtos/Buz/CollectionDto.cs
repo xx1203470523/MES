@@ -56,15 +56,15 @@
         /// </summary>
         public string VendorProductTempSn { get; set; }
 
-        /// <summary>
-        /// 合作伙伴总成电子条码，最大长度64
-        /// </summary>
-        public string VendorProductCode { get; set; }
+        ///// <summary>
+        ///// 合作伙伴总成电子条码，最大长度64
+        ///// </summary>
+        //public string VendorProductCode { get; set; }
 
-        /// <summary>
-        /// 合作伙伴总成批次号，最大长度64
-        /// </summary>
-        public string VendorProductBatch { get; set; }
+        ///// <summary>
+        ///// 合作伙伴总成批次号，最大长度64
+        ///// </summary>
+        //public string VendorProductBatch { get; set; }
 
         /// <summary>
         /// 值的作用类型，用于生产过程中可能采集多次的数据，默认为final。可选值：inprocess - 过程中的数据；final - 最终采用的数据。

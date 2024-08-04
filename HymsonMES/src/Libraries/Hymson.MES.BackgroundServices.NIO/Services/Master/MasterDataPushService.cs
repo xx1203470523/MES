@@ -14,6 +14,7 @@ using Hymson.MES.Core.NIO;
 using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.NioPushSwitch;
 using Hymson.Utils;
 using Newtonsoft.Json;
 

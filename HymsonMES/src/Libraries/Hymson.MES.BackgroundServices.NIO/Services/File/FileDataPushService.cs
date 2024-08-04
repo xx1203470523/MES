@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Enums.Mavel;
 using Hymson.MES.Data.NIO;
+using Hymson.MES.Data.Repositories.NioPushSwitch;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
