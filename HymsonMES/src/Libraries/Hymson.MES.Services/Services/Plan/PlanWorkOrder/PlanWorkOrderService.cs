@@ -52,6 +52,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         private readonly AbstractValidator<PlanWorkOrderChangeStatusDto> _validationChangeStatusRules;
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
         private readonly IManuRequistionOrderDetailRepository _manuRequistionOrderDetailRepository;
+        private readonly Data.Repositories.Manufacture.IManuReturnOrderRepository _manuReturnOrderRepository;
 
         /// <summary>
         /// 构造函数
@@ -70,6 +71,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         /// <param name="planWorkOrderActivationRecordRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="manuRequistionOrderDetailRepository"></param>
+        /// <param name="manuReturnOrderRepository"></param>
         /// <param name="validationChangeStatusRules"></param>
         public PlanWorkOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<PlanWorkOrderCreateDto> validationCreateRules,
@@ -84,6 +86,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             IPlanWorkOrderActivationRecordRepository planWorkOrderActivationRecordRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IManuRequistionOrderDetailRepository manuRequistionOrderDetailRepository,
+            Data.Repositories.Manufacture.IManuReturnOrderRepository manuReturnOrderRepository,
             AbstractValidator<PlanWorkOrderChangeStatusDto> validationChangeStatusRules)
         {
             _currentUser = currentUser;
@@ -102,6 +105,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             _validationChangeStatusRules = validationChangeStatusRules;
             _manuRequistionOrderRepository = manuRequistionOrderRepository;
             _manuRequistionOrderDetailRepository = manuRequistionOrderDetailRepository;
+            _manuReturnOrderRepository = manuReturnOrderRepository;
         }
 
 
@@ -525,19 +529,36 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             List<PlanWorkOrderListDetailViewDto> viewDtos = new List<PlanWorkOrderListDetailViewDto>();
             IEnumerable<ManuRequistionOrderEntity> requistionOrderEntities = new List<ManuRequistionOrderEntity>();
 
+            var siteId = _currentSite.SiteId ?? 0;
             if (!string.IsNullOrWhiteSpace(planWorkOrderPagedQueryDto.PickCode))
             {
-                // 根据工单查找领料记录，汇总已领料数量，根据已领料数量和工单数量 计算出领料状态
+                //PickCode可能是领料单或者退料单，先查询领料单,查不到就去查退料单
+                var pickCode = planWorkOrderPagedQueryDto.PickCode.Trim();
+                var orderIds = new List<long>();
+
                 requistionOrderEntities = await _manuRequistionOrderRepository.GetManuRequistionOrderEntitiesAsync(new ManuRequistionQueryByWorkOrders
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
-                    ReqOrderCode = planWorkOrderPagedQueryDto.PickCode
+                    SiteId = siteId,
+                    ReqOrderCode = pickCode,
                 });
                 if (requistionOrderEntities == null || !requistionOrderEntities.Any())
                 {
-                    return new PagedInfo<PlanWorkOrderListDetailViewDto>(viewDtos, planWorkOrderPagedQueryDto.PageIndex, planWorkOrderPagedQueryDto.PageSize, 0);
+                    var returnOrderEntities = await _manuReturnOrderRepository.GetEntitiesAsync(new Data.Repositories.Manufacture.Query.ManuReturnOrderQuery
+                    {
+                        SiteId = siteId,
+                        ReturnOrderCodeValue = pickCode
+                    });
+                    if (returnOrderEntities == null || !returnOrderEntities.Any())
+                    {
+                        return new PagedInfo<PlanWorkOrderListDetailViewDto>(viewDtos, planWorkOrderPagedQueryDto.PageIndex, planWorkOrderPagedQueryDto.PageSize, 0);
+                    }
+                    orderIds = returnOrderEntities.Select(x => x.WorkOrderId).ToList();
                 }
-                var orderIds = requistionOrderEntities.Select(x => x.WorkOrderId).ToList();
+                else
+                {
+                    orderIds = requistionOrderEntities.Select(x => x.WorkOrderId).ToList();
+                }
+
                 var pagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
                 pagedQuery.SiteId = _currentSite.SiteId;
                 pagedQuery.WorkOrderIds = orderIds.Distinct().ToList();
@@ -551,7 +572,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 dtolist.ForEach(d =>
                 {
                     // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
-                    d.PickStatus = requistionOrderEntities.Any(x => x.Status != WhMaterialPickingStatusEnum.CancelMaterialReturn && x.WorkOrderId == d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked;
+                    d.PickStatus = requistionOrderEntities!=null&& requistionOrderEntities.Any(x => x.Status != WhMaterialPickingStatusEnum.CancelMaterialReturn && x.WorkOrderId == d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked;
                     d.PassDownQuantity = d.Qty;
                 });
                 return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtolist, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);

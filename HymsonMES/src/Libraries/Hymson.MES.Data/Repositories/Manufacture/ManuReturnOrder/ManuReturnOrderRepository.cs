@@ -131,6 +131,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 query.ReturnOrderCode = $"%{query.ReturnOrderCode}%";
                 sqlBuilder.Where("ReturnOrderCode LIKE @ReturnOrderCode");
             }
+            if (!string.IsNullOrWhiteSpace(query.ReturnOrderCodeValue))
+            {
+                sqlBuilder.Where("ReturnOrderCode= @ReturnOrderCodeValue");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuReturnOrderEntity>(template.RawSql, query);
         }
