@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -179,7 +180,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
         /// <summary>
-        /// Marking拦截
+        /// Marking仓储
+        /// </summary>
+        private readonly IManuSfcMarkingExecuteRepository _manuSfcMarkingExecuteRepository;
+
+        /// <summary>
+        /// Marking拦截Service
         /// </summary>
         private readonly IManuSfcMarkingCoreService _manuSfcMarkingCoreService;
 
@@ -211,6 +217,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IProcMaterialRepository procMaterialRepository,
             IManuSfcGradeRepository manuSfcGradeRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
+            IManuSfcMarkingExecuteRepository manuSfcMarkingExecuteRepository,
             IManuSfcMarkingCoreService manuSfcMarkingCoreService)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -239,6 +246,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuProductParameterService = manuProductParameterService;
             _manuSfcGradeRepository = manuSfcGradeRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
+            _manuSfcMarkingExecuteRepository = manuSfcMarkingExecuteRepository;
             _manuSfcMarkingCoreService = manuSfcMarkingCoreService;
         }
 
@@ -989,6 +997,25 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             }
 
             //查询Marking信息
+            var markingEntities = await _manuSfcMarkingExecuteRepository.GetEntitiesAsync(new ManuSfcMarkingExecuteQuery
+            {
+                SiteId = equResModel.SiteId,
+                SFCs = dto.SfcList
+            });
+            if (markingEntities != null && markingEntities.Any())
+            {
+                foreach (var item in markingEntities)
+                {
+                    //Marking与降级都存在时，Marking优先
+                    var index = sfcList.FindIndex(x => x.SFC == item.SFC);
+                    if (index >= 0)
+                    {
+                        sfcList[index].Grade = "2";
+                        continue;
+                    }
+                    sfcList.Add(new SortingSfcInfo { SFC = item.SFC, Grade = "2" });
+                }
+            }
 
             return sfcList;
         }
