@@ -62,16 +62,24 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <param name="config"></param>
         /// <param name="buzSceneEnum"></param>
         /// <param name="data"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task AddToPushQueueAsync<T>(NioPushSwitchEntity config, BuzSceneEnum buzSceneEnum, IEnumerable<T> data)
+        public async Task AddToPushQueueAsync<T>(NioPushSwitchEntity config, BuzSceneEnum buzSceneEnum, IEnumerable<T> data,
+            long id = 0)
         {
             var user = "AddToPushQueue";
             var time = HymsonClock.Now();
 
+            long curId = id;
+            if(curId == 0)
+            {
+                curId = IdGenProvider.Instance.CreateId();
+            }
+
             // 保存
             await _nioPushRepository.InsertAsync(new NioPushEntity
             {
-                Id = IdGenProvider.Instance.CreateId(),
+                Id = curId,
                 SchemaCode = config.SchemaCode,
                 BuzScene = buzSceneEnum,
                 Status = PushStatusEnum.Wait,

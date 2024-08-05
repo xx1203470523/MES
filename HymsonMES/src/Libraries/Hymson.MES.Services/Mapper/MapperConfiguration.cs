@@ -10,6 +10,7 @@ using Hymson.MES.Core.Domain.EquSparepartRecord;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Mavel.Rotor;
+using Hymson.MES.Core.Domain.NioPushCollection;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Qual;
@@ -60,6 +61,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Marking;
 using Hymson.MES.Data.Repositories.Marking.Query;
+using Hymson.MES.Data.Repositories.NioPushCollection.Query;
 using Hymson.MES.Data.Repositories.NioPushSwitch.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
@@ -108,6 +110,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuSfcOperateDto;
 using Hymson.MES.Services.Dtos.Marking;
+using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.MES.Services.Dtos.NioPushSwitch;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
@@ -1648,6 +1651,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<NioPushSwitchEntity, NioPushSwitchDto>();
             CreateMap<NioPushSwitchDto, NioPushSwitchEntity>();
             CreateMap<NioPushSwitchSaveDto, NioPushSwitchEntity>();
+
+            CreateMap<NioPushCollectionPagedQueryDto, NioPushCollectionPagedQuery>();
+            CreateMap<NioPushCollectionEntity, NioPushCollectionDto>();
+            CreateMap<NioPushCollectionDto, NioPushCollectionEntity>();
+            CreateMap<NioPushCollectionSaveDto, NioPushCollectionEntity>();
         }
 
         /// <summary>

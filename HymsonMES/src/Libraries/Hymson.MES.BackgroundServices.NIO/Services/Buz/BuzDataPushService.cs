@@ -5,6 +5,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Common;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.NioPushCollection;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
@@ -16,11 +17,13 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.ManuRotorSfc.Query;
+using Hymson.MES.Data.Repositories.NioPushCollection;
 using Hymson.MES.Data.Repositories.NioPushSwitch;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
+using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
@@ -105,6 +108,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly IManuProductReceiptOrderDetailRepository _manuProductReceiptOrderDetailRepository;
 
         /// <summary>
+        /// NIO推送参数
+        /// </summary>
+        private readonly INioPushCollectionRepository _nioPushCollectionRepository;
+
+        /// <summary>
         /// 操作员账号
         /// </summary>
         private readonly string NIO_USER_ID = "LMS001";
@@ -186,7 +194,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             IManuRotorSfcRepository manuRotorSfcRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuRequistionOrderReceiveRepository manuRequistionOrderReceiveRepository,
-            IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository)
+            IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository,
+            INioPushCollectionRepository nioPushCollectionRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -203,6 +212,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _manuRequistionOrderReceiveRepository = manuRequistionOrderReceiveRepository;
             _manuProductReceiptOrderDetailRepository = manuProductReceiptOrderDetailRepository;
+            _nioPushCollectionRepository = nioPushCollectionRepository;
 
             BASE_CONFIG_LIST = new List<string>() { NIO_ROTOR_CONFIG, NIO_STATOR_CONFIG };
         }
@@ -247,6 +257,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             var nioSfcList = await _manuRotorSfcRepository.GetListByZSfcsAsync(zSfcQuery);
 
             var dtos = new List<CollectionDto>();
+            List<NioPushCollectionEntity> nioList = new List<NioPushCollectionEntity>();
             // TODO: 替换为实际数据
             foreach (var item in paramList)
             {
@@ -280,17 +291,19 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     }
                 }
 
+                CollectionDto model = new CollectionDto();
                 NIOConfigBaseDto curConfig = new NIOConfigBaseDto();
                 if (firstChar == ROTOR_CHAR)
                 {
                     curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(GetRotorConfig(baseConfigList));
+                    model.DataType = 1;
                 }
                 else
                 {
                     curConfig = JsonConvert.DeserializeObject<NIOConfigBaseDto>(GetStatorConfig(baseConfigList));
+                    model.DataType = 2;
                 }
 
-                CollectionDto model = new CollectionDto();
                 model.PlantId = curConfig.PlantId;
                 model.WorkshopId = curConfig.WorkshopId;
                 model.ProductionLineId = curConfig.ProductionLineId;
@@ -338,16 +351,29 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.UpdateTime = GetTimestamp(HymsonClock.Now());
 
                 dtos.Add(model);
+
+                var tmpStr = JsonConvert.SerializeObject(model);
+                NioPushCollectionEntity nioModel = JsonConvert.DeserializeObject<NioPushCollectionEntity>(tmpStr);
+                nioModel.Id = IdGenProvider.Instance.CreateId();
+                nioModel.CreatedOn = HymsonClock.Now();
+                nioModel.UpdatedOn = nioModel.CreatedOn;
+                nioModel.CreatedBy = NIO_USER_ID;
+                nioModel.UpdatedBy = NIO_USER_ID;
+                nioList.Add(nioModel);
             }
             if (dtos == null || dtos.Count == 0)
             {
                 return;
             }
 
+            long nioId = IdGenProvider.Instance.CreateId();
+            nioList.ForEach(m => m.NioPushId = nioId);
+
             //MES数据入库
             using var trans = TransactionHelper.GetTransactionScope();
 
-            await AddToPushQueueAsync(config, buzScene, dtos);
+            await AddToPushQueueAsync(config, buzScene, dtos, nioId);
+            await _nioPushCollectionRepository.InsertRangeAsync(nioList);
             await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioParam, paramList.Max(x => x.Id));
 
             trans.Complete();
