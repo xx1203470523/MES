@@ -1,5 +1,4 @@
-﻿using Azure;
-using Hymson.MES.Core.Domain.Manufacture;
+﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Extension;
@@ -14,25 +13,23 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 using Microsoft.Extensions.Logging;
-using System.Data;
-using System.Security.Policy;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
     /// <summary>
     /// 服务
     /// </summary>
-    public class OP010Service : BaseService, IOP010Service
+    public class OP070Service : BaseService, IOP070Service
     {
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<OP010Service> _logger;
+        private readonly ILogger<OP070Service> _logger;
 
         /// <summary>
         /// 仓储接口（工序）
         /// </summary>
-        private readonly IOPRepository<OP010> _opRepository;
+        private readonly IOPRepository<OP070> _opRepository;
 
         /// <summary>
         /// 服务接口（水位）
@@ -103,8 +100,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
-        public OP010Service(ILogger<OP010Service> logger,
-            IOPRepository<OP010> opRepository,
+        public OP070Service(ILogger<OP070Service> logger,
+            IOPRepository<OP070> opRepository,
             IWaterMarkService waterMarkService,
             ISysConfigRepository sysConfigRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
@@ -136,16 +133,43 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <returns></returns>
         public async Task<int> ExecuteAsync(int limitCount)
         {
-            var producreCode = $"{typeof(OP010).Name}";
-            var buzKey = $"Stator-{producreCode}";
-            var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
+            var producreCode = $"{typeof(OP070).Name}";
+            var buzKey_1 = $"Stator-{producreCode}_1";
+            var buzKey_2 = $"Stator-{producreCode}_2";
+            var buzKey_3 = $"Stator-{producreCode}_3";
+
+            var waterMarkId_1 = await _waterMarkService.GetWaterMarkAsync(buzKey_1);
+            var waterMarkId_2 = await _waterMarkService.GetWaterMarkAsync(buzKey_2);
+            var waterMarkId_3 = await _waterMarkService.GetWaterMarkAsync(buzKey_3);
 
             // 根据水位读取数据
-            var opList = await _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            List<Task<IEnumerable<OP070>>> readTasks = new()
             {
-                StartWaterMarkId = waterMarkId,
-                Rows = limitCount
-            });
+                _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+                {
+                    StartWaterMarkId = waterMarkId_1,
+                    Rows = limitCount
+                }, "op070_1"),
+                _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+                {
+                    StartWaterMarkId = waterMarkId_2,
+                    Rows = limitCount
+                }, "op070_2"),
+                _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+                {
+                    StartWaterMarkId = waterMarkId_3,
+                    Rows = limitCount
+                }, "op070_3")
+            };
+
+            var opArray = await Task.WhenAll(readTasks);
+            var opList = opArray.SelectMany(s => s);
+
+            if (opList == null || !opList.Any())
+            {
+                _logger.LogDebug($"没有要拉取的数据 -> {producreCode}");
+                return 0;
+            }
 
             // 初始化对象
             var baseBo = await GetStatorBaseConfigAsync();
@@ -280,9 +304,141 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 });
             }
 
+
+            /*
+            // 遍历记录
+            var user = "LMS";
+            var qty = 1;
+            var waterLevel = 0;
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                var dr = dataTable.Rows[i];
+                var index = dr["index"].ParseToInt();
+                var time = dr["RDate"].ToTime();
+                var barCode = $"{dr["wire1_barcode"]}";
+
+                // 更新水位
+                waterLevel = index > waterLevel ? index : waterLevel;
+
+                if (barCode == "-") continue;
+
+                // 条码ID
+                var manuSFCId = IdGenProvider.Instance.CreateId();
+                var manuSFCInfoId = IdGenProvider.Instance.CreateId();
+                var manuSFCStepId = IdGenProvider.Instance.CreateId();
+                var manuBadRecordId = IdGenProvider.Instance.CreateId();
+
+                // 插入条码
+                summaryBo.ManuSFCEntities.Add(new ManuSfcEntity
+                {
+                    Id = manuSFCId,
+                    Qty = qty,
+                    SFC = barCode,
+                    IsUsed = YesOrNoEnum.No,
+                    Type = SfcTypeEnum.NoProduce,
+                    Status = SfcStatusEnum.Complete,
+
+                    SiteId = baseBo.SiteId,
+                    CreatedBy = user,
+                    CreatedOn = time,
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time
+                });
+
+                // 插入条码信息
+                summaryBo.ManuSFCInfoEntities.Add(new ManuSfcInfoEntity
+                {
+                    Id = manuSFCInfoId,
+                    SfcId = manuSFCId,
+                    WorkOrderId = baseBo.WorkOrderId,
+                    ProductId = baseBo.ProductId,
+                    ProductBOMId = baseBo.ProductBOMId,
+                    ProcessRouteId = baseBo.ProcessRouteId,
+                    IsUsed = false,
+
+                    SiteId = baseBo.SiteId,
+                    CreatedBy = user,
+                    CreatedOn = time,
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time
+                });
+
+                // 插入步骤表
+                summaryBo.ManuSfcStepEntities.Add(new ManuSfcStepEntity
+                {
+                    Id = manuSFCStepId,
+                    Operatetype = ManuSfcStepTypeEnum.OutStock,
+                    CurrentStatus = SfcStatusEnum.lineUp,
+                    SFC = barCode,
+                    ProductId = baseBo.ProductId,
+                    WorkOrderId = baseBo.WorkOrderId,
+                    WorkCenterId = baseBo.WorkLineId,
+                    ProductBOMId = baseBo.ProductBOMId,
+                    ProcessRouteId = baseBo.ProcessRouteId,
+                    SFCInfoId = manuSFCInfoId,
+                    Qty = qty,
+                    VehicleCode = "",
+                    ProcedureId = baseBo.ProcedureId,
+                    ResourceId = null,
+                    EquipmentId = null,
+                    OperationProcedureId = baseBo.ProcedureId,
+                    OperationResourceId = null,
+                    OperationEquipmentId = null,
+
+                    SiteId = baseBo.SiteId,
+                    CreatedBy = user,
+                    CreatedOn = time,
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time
+                });
+
+                // 如果是不合格
+                var isOk = $"{dr["Result"]}" == "OK";
+                if (isOk) continue;
+
+                // 插入不良记录
+                summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
+                {
+                    Id = manuBadRecordId,
+                    FoundBadOperationId = baseBo.ProcedureId,
+                    OutflowOperationId = baseBo.ProcedureId,
+                    UnqualifiedId = 0,
+                    SFC = barCode,
+                    SfcInfoId = 0,
+                    SfcStepId = manuSFCStepId,
+                    Qty = 1,
+                    Status = ProductBadRecordStatusEnum.Open,
+                    Source = ProductBadRecordSourceEnum.EquipmentReBad,
+                    Remark = "",
+
+                    SiteId = baseBo.SiteId,
+                    CreatedBy = user,
+                    CreatedOn = time,
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time
+                });
+
+                // 插入NG记录
+                summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    BadRecordId = manuBadRecordId,
+                    UnqualifiedId = 0,
+                    NGCode = "未知",
+
+                    SiteId = baseBo.SiteId,
+                    CreatedBy = user,
+                    CreatedOn = time,
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time
+                });
+            }
+            */
+
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
 
+            /*
             List<Task<int>> saveTasks = new()
             {
                 _manuSfcRepository.ReplaceRangeAsync(summaryBo.ManuSFCEntities),
@@ -291,11 +447,14 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 _manuSfcCirculationRepository.InsertRangeAsync(summaryBo.ManuSfcCirculationEntities),
                 _manuProductBadRecordRepository.InsertRangeAsync(summaryBo.ManuProductBadRecordEntities),
                 _manuProductNgRecordRepository.InsertRangeAsync(summaryBo.ManuProductNgRecordEntities),
-                _waterMarkService.RecordWaterMarkAsync(buzKey, waterLevel)
+                _waterMarkService.RecordWaterMarkAsync(buzKey_1, waterLevel),
+                _waterMarkService.RecordWaterMarkAsync(buzKey_2, waterLevel),
+                _waterMarkService.RecordWaterMarkAsync(buzKey_3, waterLevel),
             };
 
             var rowArray = await Task.WhenAll(saveTasks);
             rows += rowArray.Sum();
+            */
 
             trans.Complete();
             return rows;

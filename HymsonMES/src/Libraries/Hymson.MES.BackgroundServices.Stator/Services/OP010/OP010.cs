@@ -71,4 +71,5 @@
         public string FormingLowerRHXSpeed { get; set; }
 
     }
+
 }

@@ -12,7 +12,7 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// <summary>
         /// 水位查询SQL
         /// </summary>
-        const string QuerySql = @"SELECT * FROM {0} WHERE `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
+        const string QuerySql = @"SELECT * FROM `{0}` WHERE `index` > @StartWaterMarkId ORDER BY `index` ASC LIMIT @Rows";
 
         /// <summary>
         /// 构造函数
@@ -29,6 +29,18 @@ namespace Hymson.MES.BackgroundServices.Stator
         {
             using var conn = GetStatorDbConnection();
             return await conn.QueryAsync<TEntity>(string.Format(QuerySql, typeof(TEntity).Name), query);
+        }
+
+        /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<TEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query, string tableName)
+        {
+            using var conn = GetStatorDbConnection();
+            return await conn.QueryAsync<TEntity>(string.Format(QuerySql, tableName), query);
         }
 
         /// <summary>

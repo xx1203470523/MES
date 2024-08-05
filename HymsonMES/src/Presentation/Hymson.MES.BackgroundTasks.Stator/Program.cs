@@ -49,6 +49,7 @@ Host.CreateDefaultBuilder(args)
 
            #region jobs
            q.AddJobAndTrigger<OP010Job>(hostContext.Configuration);
+           q.AddJobAndTrigger<OP070Job>(hostContext.Configuration);
            #endregion
 
            /*
