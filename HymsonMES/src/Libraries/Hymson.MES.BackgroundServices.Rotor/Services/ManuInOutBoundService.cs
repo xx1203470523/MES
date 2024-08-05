@@ -979,6 +979,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
             else
             {
+                step.ProductId = 51558093782310912;
                 VAR_DEBUG = 3;
             }
 
