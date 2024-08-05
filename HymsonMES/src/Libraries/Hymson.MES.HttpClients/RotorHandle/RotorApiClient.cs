@@ -110,14 +110,19 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
-        public async Task<bool> WorkOrderStopAsync(string workOrderCode)
+        public async Task<RotorResponse> WorkOrderStopAsync(string workOrderCode)
         {
             await InitAsync();
 
             var httpResponse = await _httpClient.GetAsync($"{_options.SetWorkOrderStatusRoute}?WorkNo={workOrderCode}&status=T");
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
 
-            return httpResponse.IsSuccessStatusCode;
+            httpResponse.EnsureSuccessStatusCode();
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            RotorResponse result = JsonConvert.DeserializeObject<RotorResponse>(jsonResponse);
+
+            return result;
         }
 
         /// <summary>
