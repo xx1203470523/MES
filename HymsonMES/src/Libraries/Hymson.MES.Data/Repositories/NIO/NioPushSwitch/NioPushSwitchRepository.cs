@@ -163,7 +163,7 @@ namespace Hymson.MES.Data.Repositories.NioPushSwitch
             }
             if(pagedQuery.IsEnabled != null)
             {
-                sqlBuilder.Where($"IsEnabled = @BuzScene");
+                sqlBuilder.Where($"IsEnabled = @IsEnabled");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
