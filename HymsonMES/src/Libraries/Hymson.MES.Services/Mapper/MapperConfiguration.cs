@@ -172,6 +172,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquInspectionTaskSaveDto, EquInspectionTaskEntity>();
             CreateMap<EquInspectionTaskEntity, EquInspectionTaskDto>();
 
+            CreateMap<EquOperationPermissionsQueryDto, EquOperationPermissionsQuery>();
+            CreateMap<EquOperationPermissionsQueryDto, EquOperationPermissionsPagedQuery>();
+            CreateMap<EquOperationPermissionsSaveDto, EquOperationPermissionsEntity>();
+            CreateMap<EquOperationPermissionsEntity, EquOperationPermissionsDto>();
+
             CreateMap<EquInspectionRecordPagedQueryDto, EquInspectionRecordPagedQuery>();
             CreateMap<EquInspectionRecordView, EquInspectionRecordDto>();
             #endregion
@@ -281,6 +286,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquSparePartsSaveDto, EquSparePartsEntity>();
             CreateMap<EquSparePartsPagedQueryDto, EquSparePartsPagedQuery>();
             CreateMap<EquSparePartsEntity, EquSparePartsDto>();
+            #endregion
+
+            #region EquipmentFaultType
+            CreateMap<EquEquipmentFaultTypeEntity, EquipmentFaultTypeDto>();
+            CreateMap<EQualUnqualifiedGroupCreateDto, EquEquipmentFaultTypeEntity>();
+            CreateMap<EQualUnqualifiedGroupModifyDto, EquEquipmentFaultTypeEntity>();
+            CreateMap<EquipmentFaultTypePagedQueryDto, EquipmentFaultTypePagedQuery>();
             #endregion
 
             #region EquSparepartInventory
@@ -1479,6 +1491,11 @@ namespace Hymson.MES.Services.Mapper
             #region MarkingInterceptReport
             CreateMap<MarkingInterceptReportPagedQueryDto, MarkingReportReportPagedQuery>();
             CreateMap<MarkingRecordQueryReportView, MarkingRecordReportDto>();
+            #endregion
+
+            #region 追溯
+            CreateMap<ManuSfcSummaryEntity, ProcedureSourceDto>();
+            CreateMap<ManuSfcStepEntity, StepSourceDto>();
             #endregion
         }
 
