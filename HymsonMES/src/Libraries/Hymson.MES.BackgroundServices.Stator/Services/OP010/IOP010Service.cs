@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="limitCount"></param>
         /// <returns></returns>
-        Task ExecuteAsync(int limitCount = 1000);
+        Task<int> ExecuteAsync(int limitCount = 1000);
 
     }
 }

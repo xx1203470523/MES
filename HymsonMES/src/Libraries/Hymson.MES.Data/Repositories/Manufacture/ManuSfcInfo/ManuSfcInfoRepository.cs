@@ -174,6 +174,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="ManuSfcInfoEntities"></param>
+        /// <returns></returns>
+        public async Task<int> ReplaceRangeAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntities)
+        {
+            if (ManuSfcInfoEntities == null || !ManuSfcInfoEntities.Any()) return 0;
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(ReplaceSql, ManuSfcInfoEntities);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="ManuSfcInfoEntity"></param>
@@ -421,6 +434,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string InsertSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `ProcessRouteId`,`ProductBOMId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcId, @WorkOrderId, @ProductId, @ProcessRouteId, @ProductBOMId, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `ProcessRouteId`,`ProductBOMId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcId, @WorkOrderId, @ProductId, @ProcessRouteId, @ProductBOMId, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string ReplaceSql = "REPLACE INTO `manu_sfc_info`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `ProcessRouteId`,`ProductBOMId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcId, @WorkOrderId, @ProductId, @ProcessRouteId, @ProductBOMId, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `manu_sfc_info` SET   SiteId = @SiteId, SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_sfc_info` SET   SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
