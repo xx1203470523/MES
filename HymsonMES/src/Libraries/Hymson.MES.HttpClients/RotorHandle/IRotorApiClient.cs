@@ -33,7 +33,7 @@ namespace Hymson.MES.HttpClients.RotorHandle
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
-        Task<bool> WorkOrderStopAsync(string workOrderCode);
+        Task<RotorResponse> WorkOrderStopAsync(string workOrderCode);
 
         /// <summary>
         /// 物料同步

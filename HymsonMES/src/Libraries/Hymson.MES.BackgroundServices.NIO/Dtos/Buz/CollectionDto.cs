@@ -139,6 +139,11 @@
         /// </summary>
         public string VendorValueStatus { get; set; }
 
+        /// <summary>
+        /// 数据类型 1-转子 2-定子
+        /// </summary>
+        public int DataType { get; set; }
+
         ///// <summary>
         ///// 关联部件01的电子条码，最大长度64
         ///// </summary>

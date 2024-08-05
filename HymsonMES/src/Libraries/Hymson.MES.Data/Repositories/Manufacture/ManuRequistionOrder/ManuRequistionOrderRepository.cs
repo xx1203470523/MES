@@ -124,6 +124,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
             {
                 sqlBuilder.Where("WorkOrderId IN @WorkOrderIds");
             }
+            if (!string.IsNullOrWhiteSpace(manuRequistionOrderQuery.ReqOrderCode))
+            {
+                sqlBuilder.Where("ReqOrderCode=@ReqOrderCode");
+            }
             sqlBuilder.AddParameters(manuRequistionOrderQuery);
             using var conn = GetMESDbConnection();
             var manuRequistionOrderEntities = await conn.QueryAsync<ManuRequistionOrderEntity>(template.RawSql, manuRequistionOrderQuery);

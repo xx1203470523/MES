@@ -322,6 +322,21 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
                     ActivateType = PlanWorkOrderActivateTypeEnum.CancelActivate
                 });
 
+                bool orderSwitch = await GetOrderSynSwtich();
+                if (orderSwitch == true)
+                {
+                    string rotorLineCode = await GetLmsRotorLineCode();
+                    if (rotorLineCode == line.Code)
+                    {
+                        var lmsResult = await _rotorApiClient.WorkOrderStopAsync(workOrder.OrderCode);
+                        if (lmsResult.IsSuccess == false)
+                        {
+                            ts.Dispose();
+                            throw new CustomerValidationException(nameof(ErrorCode.MES16418)).WithData("msg", lmsResult.Message);
+                        }
+                    }
+                }
+
                 ts.Complete();
             }
             return;

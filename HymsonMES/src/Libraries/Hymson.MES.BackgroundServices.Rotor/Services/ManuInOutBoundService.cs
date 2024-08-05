@@ -979,6 +979,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             }
             else
             {
+                step.ProductId = 51558093782310912;
                 VAR_DEBUG = 3;
             }
 
@@ -1269,6 +1270,11 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
         /// <returns></returns>
         private async Task<int> InsertRawMaterialAsync(List<ManuSfcDto> commands, List<ProcMaterialEntity> mesMaterialList)
         {
+            if(commands == null || commands.Count == 0)
+            {
+                return 0;
+            }
+
             List<string> sfcList = commands.Select(m => m.Sfc).Distinct().ToList();
             List<string> existSfcList = new List<string>();
             List<ManuSfcEntity> addSfcList = new List<ManuSfcEntity>();
