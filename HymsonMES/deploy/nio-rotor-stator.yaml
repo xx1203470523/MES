@@ -56,7 +56,7 @@ spec:
         app: rotor-back
     spec:
       containers:
-      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks.rotor:20240805192441
+      - image: nuget.czhipu.com/xnebula/hymson.mes.backgroundtasks.rotor:20240805193240
         name: rotor-back
         volumeMounts:
           - mountPath: /logs
