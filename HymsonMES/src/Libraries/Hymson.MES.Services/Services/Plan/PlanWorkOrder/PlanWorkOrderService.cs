@@ -22,6 +22,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
@@ -521,49 +522,66 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         /// <returns></returns>
         public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto planWorkOrderPagedQueryDto)
         {
-            var pagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId;
-            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoWithPickAsync(pagedQuery);
+            List<PlanWorkOrderListDetailViewDto> viewDtos = new List<PlanWorkOrderListDetailViewDto>();
+            IEnumerable<ManuRequistionOrderEntity> requistionOrderEntities = new List<ManuRequistionOrderEntity>();
 
-            // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<PlanWorkOrderListDetailViewDto>());
-
-            // 根据工单查找领料记录，汇总已领料数量，根据已领料数量和工单数量 计算出领料状态
-            var manuRequistionOrderEntities = await _manuRequistionOrderRepository.GetManuRequistionOrderEntitiesAsync(new ManuRequistionQueryByWorkOrders
+            if (!string.IsNullOrWhiteSpace(planWorkOrderPagedQueryDto.PickCode))
             {
-                SiteId = _currentSite.SiteId ?? 0,
-                WorkOrderIds = dtos.Select(d => d.Id).Distinct(),
-            });
+                // 根据工单查找领料记录，汇总已领料数量，根据已领料数量和工单数量 计算出领料状态
+                requistionOrderEntities = await _manuRequistionOrderRepository.GetManuRequistionOrderEntitiesAsync(new ManuRequistionQueryByWorkOrders
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    ReqOrderCode = planWorkOrderPagedQueryDto.PickCode
+                });
+                if (requistionOrderEntities == null || !requistionOrderEntities.Any())
+                {
+                    return new PagedInfo<PlanWorkOrderListDetailViewDto>(viewDtos, planWorkOrderPagedQueryDto.PageIndex, planWorkOrderPagedQueryDto.PageSize, 0);
+                }
+                var orderIds = requistionOrderEntities.Select(x => x.WorkOrderId).ToList();
+                var pagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
+                pagedQuery.SiteId = _currentSite.SiteId;
+                pagedQuery.WorkOrderIds = orderIds.Distinct().ToList();
+                var pagedInfo = await _planWorkOrderRepository.GetPagedInfoWithPickAsync(pagedQuery);
 
-            //var requistiongroup = manuRequistionOrderEntities.Where(m => m.Type == Core.Domain.Manufacture.ManuRequistionTypeEnum.WorkOrderPicking
-            //&& (m.Status != WhWarehouseRequistionStatusEnum.ApprovalingFailed
-            //|| m.Status != WhWarehouseRequistionStatusEnum.Failed)).GroupBy(m => m.WorkOrderId);
-            List<PlanWorkOrderListDetailViewDto> dtolist = dtos.ToList();
-            //dtolist.ForEach(d =>
-            //{
-            //    var qty = requistiongroup.FirstOrDefault(r => r.Key == d.OrderCode)?.Sum(r => r.Qty)??0;
-            //    d.PickStatus = qty == 0 ? PlanWorkOrderPickStatusEnum.NotPicked
-            //    : qty == d.Qty ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.PartPicked;
-            //    d.PassDownQuantity = d.Qty;
-            //});
+                // 实体到DTO转换 装载数据
+                var dtos = pagedInfo.Data.Select(s => s.ToModel<PlanWorkOrderListDetailViewDto>());
 
-            // TODO: 由于工单没有领料状态字段，所以根据领料记录判断工单领料状态。。。
-            dtolist.ForEach(d =>
-            {
-                // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
-                //var qty = requistiongroup.FirstOrDefault(r => r.Key == d.Id)?.Count() ?? 0;
-                d.PickStatus = manuRequistionOrderEntities.Any(x => x.Status != WhMaterialPickingStatusEnum.CancelMaterialReturn && x.WorkOrderId == d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked;
-                d.PassDownQuantity = d.Qty;
-            });
-
-            /*
-            if (planWorkOrderPagedQueryDto.PickStatus != null)
-            {
-                dtolist = dtos.Where(d => d.PickStatus == planWorkOrderPagedQueryDto.PickStatus).ToList();
+                List<PlanWorkOrderListDetailViewDto> dtolist = dtos.ToList();
+                // TODO: 由于工单没有领料状态字段，所以根据领料记录判断工单领料状态。。。
+                dtolist.ForEach(d =>
+                {
+                    // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
+                    d.PickStatus = requistionOrderEntities.Any(x => x.Status != WhMaterialPickingStatusEnum.CancelMaterialReturn && x.WorkOrderId == d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked;
+                    d.PassDownQuantity = d.Qty;
+                });
+                return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtolist, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
             }
-            */
+            else
+            {
+                var pagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
+                pagedQuery.SiteId = _currentSite.SiteId;
+                var pagedInfo = await _planWorkOrderRepository.GetPagedInfoWithPickAsync(pagedQuery);
 
-            return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtolist, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+                // 实体到DTO转换 装载数据
+                var dtos = pagedInfo.Data.Select(s => s.ToModel<PlanWorkOrderListDetailViewDto>());
+                // 根据工单查找领料记录，汇总已领料数量，根据已领料数量和工单数量 计算出领料状态
+                requistionOrderEntities = await _manuRequistionOrderRepository.GetManuRequistionOrderEntitiesAsync(new ManuRequistionQueryByWorkOrders
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    WorkOrderIds = dtos.Select(d => d.Id).Distinct(),
+                });
+
+                List<PlanWorkOrderListDetailViewDto> dtolist = dtos.ToList();
+                // TODO: 由于工单没有领料状态字段，所以根据领料记录判断工单领料状态。。。
+                dtolist.ForEach(d =>
+                {
+                    // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
+                    //var qty = requistiongroup.FirstOrDefault(r => r.Key == d.Id)?.Count() ?? 0;
+                    d.PickStatus = requistionOrderEntities.Any(x => x.Status != WhMaterialPickingStatusEnum.CancelMaterialReturn && x.WorkOrderId == d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked;
+                    d.PassDownQuantity = d.Qty;
+                });
+                return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtolist, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            }
         }
 
         /// <summary>

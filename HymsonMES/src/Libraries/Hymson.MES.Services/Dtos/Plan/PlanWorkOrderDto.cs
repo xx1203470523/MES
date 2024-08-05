@@ -317,6 +317,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public string? MaterialVersion { get; set; }
 
+        /// <summary>
+        /// 同步单号
+        /// </summary>
+        public string? PickCode { get; set; }
+
     }
 
     /// <summary>

@@ -76,5 +76,10 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         /// 创建时间  数组 ：时间范围 
         /// </summary>
         public DateTime[]? CreatedOn { get; set; }
+
+        /// <summary>
+        /// 工单Id列表
+        /// </summary>
+        public IEnumerable<long>? WorkOrderIds { get; set; }
     }
 }

@@ -383,6 +383,11 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("wo.Status IN @Statuss");
             }
 
+            if (pageQuery.WorkOrderIds != null && pageQuery.WorkOrderIds.Any())
+            {
+                sqlBuilder.Where("wo.Id IN @WorkOrderIds");
+            }
+
             // 是否领料
             if (pageQuery.PickStatus.HasValue)
             {

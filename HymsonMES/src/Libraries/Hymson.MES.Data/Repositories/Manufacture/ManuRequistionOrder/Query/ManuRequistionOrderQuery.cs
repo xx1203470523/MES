@@ -29,12 +29,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder
     /// </summary>
     public class ManuRequistionQueryByWorkOrders
     {
-       
-
         /// <summary>
         /// 工厂
         /// </summary>
         public long SiteId { get; set; }
         public IEnumerable<long>? WorkOrderIds { get; set; }
+
+        /// <summary>
+        /// 领料的同步单号
+        /// </summary>
+        public string? ReqOrderCode { get; set; }
     }
 }
