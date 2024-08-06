@@ -299,6 +299,10 @@ namespace Hymson.MES.Services.Services.Quality
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
+            // 不合格数量不能小于0
+            var isLessThanZero = requestDto.Details.Any(a => a.UnQualifiedQty.HasValue && a.UnQualifiedQty.Value < 0);
+            if (isLessThanZero) throw new CustomerValidationException(nameof(ErrorCode.MES11916));
+
             // IQC检验单
             var orderEntity = await _qualIqcOrderLiteRepository.GetByIdAsync(requestDto.IQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
