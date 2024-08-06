@@ -329,7 +329,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     model.DecimalValue = 0;
                     model.StringValue = item.ParameterValue;
                 }
-                model.BooleanValue = false;
+                model.BooleanValue = null;
                 model.ProcessType = "final";
                 //model.NioProductCode = curConfig.NioProductCode;
                 model.NioProductNum = curConfig.NioProductCode;
