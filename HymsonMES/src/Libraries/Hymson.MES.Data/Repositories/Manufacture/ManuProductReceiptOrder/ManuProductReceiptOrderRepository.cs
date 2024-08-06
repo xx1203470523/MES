@@ -168,7 +168,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuProductReceiptOrderEntity> GetByCompletionOrderCodeSqlAsync(string CompletionOrderCode)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuProductReceiptOrderEntity>(GetByIdSql, new { CompletionOrderCode = CompletionOrderCode });
+            return await conn.QueryFirstOrDefaultAsync<ManuProductReceiptOrderEntity>(GetByCompletionOrderCodeSql, new { CompletionOrderCode = CompletionOrderCode });
         }
         
     }

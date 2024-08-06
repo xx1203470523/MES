@@ -1,8 +1,6 @@
-﻿using Azure;
-using Hymson.MES.Core.Domain.Manufacture;
+﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Extension;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -10,19 +8,16 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
-using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 using Microsoft.Extensions.Logging;
-using System.Data;
-using System.Security.Policy;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
     /// <summary>
     /// 服务
     /// </summary>
-    public class OP010Service : BaseService, IOP010Service
+    public class OP010Service : IOP010Service
     {
         /// <summary>
         /// 日志接口
@@ -33,6 +28,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// 仓储接口（工序）
         /// </summary>
         private readonly IOPRepository<OP010> _opRepository;
+
+        /// <summary>
+        /// 服务接口（基础）
+        /// </summary>
+        public readonly IBaseService _baseService;
 
         /// <summary>
         /// 服务接口（水位）
@@ -94,6 +94,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="opRepository"></param>
+        /// <param name="baseService"></param>
         /// <param name="waterMarkService"></param>
         /// <param name="sysConfigRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
@@ -103,8 +104,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
+        /// <param name="manuProductBadRecordRepository"></param>
+        /// <param name="manuProductNgRecordRepository"></param>
         public OP010Service(ILogger<OP010Service> logger,
             IOPRepository<OP010> opRepository,
+            IBaseService baseService,
             IWaterMarkService waterMarkService,
             ISysConfigRepository sysConfigRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
@@ -115,10 +119,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
-            IManuProductNgRecordRepository manuProductNgRecordRepository) : base(sysConfigRepository, inteWorkCenterRepository, planWorkOrderRepository)
+            IManuProductNgRecordRepository manuProductNgRecordRepository)
         {
             _logger = logger;
             _opRepository = opRepository;
+            _baseService = baseService;
             _waterMarkService = waterMarkService;
             _procProcedureRepository = procProcedureRepository;
             _manuSfcRepository = manuSfcRepository;
@@ -148,14 +153,14 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             });
 
             // 初始化对象
-            var baseBo = await GetStatorBaseConfigAsync();
+            var baseBo = await _baseService.GetStatorBaseConfigAsync();
             var summaryBo = new StatorSummaryBo { };
 
             // 读取当前工序
             var procedureEntity = await _procProcedureRepository.GetByCodeAsync(new EntityByCodeQuery
             {
                 Site = baseBo.SiteId,
-                Code = $"{PRODUCRE_PREFIX}{producreCode}"
+                Code = $"{StatorConst.PRODUCRE_PREFIX}{producreCode}"
             });
             if (procedureEntity == null) return 0;
             baseBo.ProcedureId = procedureEntity.Id;
@@ -163,7 +168,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 遍历记录
             var user = "LMS";
             var qty = 1;
-            var waterLevel = 0;
             foreach (var opEntity in opList)
             {
                 if (opEntity.Barcode == "-") continue;
@@ -291,7 +295,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 _manuSfcCirculationRepository.InsertRangeAsync(summaryBo.ManuSfcCirculationEntities),
                 _manuProductBadRecordRepository.InsertRangeAsync(summaryBo.ManuProductBadRecordEntities),
                 _manuProductNgRecordRepository.InsertRangeAsync(summaryBo.ManuProductNgRecordEntities),
-                _waterMarkService.RecordWaterMarkAsync(buzKey, waterLevel)
+                _waterMarkService.RecordWaterMarkAsync(buzKey, opList.Max(m => m.index))
             };
 
             var rowArray = await Task.WhenAll(saveTasks);
