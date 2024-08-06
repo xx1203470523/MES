@@ -33,11 +33,11 @@ namespace Hymson.MES.BackgroundTasks.Stator
         {
             try
             {
-                await _op010Service.ExecuteAsync();
+                _ = await _op010Service.ExecuteAsync(500);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "TODO :");
+                _logger.LogError(ex, "OP010Job :");
             }
         }
 

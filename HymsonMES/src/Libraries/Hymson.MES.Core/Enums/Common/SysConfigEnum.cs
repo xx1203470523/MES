@@ -43,7 +43,7 @@ namespace Hymson.MES.Core.Enums
         [Description("NioOneYield")]
         NioOneYield = 7,
         /// <summary>
-        /// NIO转子线主配置
+        /// NIO主配置（转子线/定子线）
         /// </summary>
         [Description("NioBaseConfig")]
         NioBaseConfig = 8,

@@ -19,6 +19,14 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// 根据水位批量获取数据
         /// </summary>
         /// <param name="query"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query, string tableName);
+
+        /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
         /// <returns></returns>
         Task<DataTable> GetDataTableByStartWaterMarkIdAsync(EntityByWaterMarkQuery query);
 

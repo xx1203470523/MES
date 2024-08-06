@@ -3,7 +3,7 @@
 namespace Hymson.MES.CoreServices.Extension
 {
     /// <summary>
-    /// 
+    /// 扩展方法
     /// </summary>
     public static class ExtensionsJson
     {
