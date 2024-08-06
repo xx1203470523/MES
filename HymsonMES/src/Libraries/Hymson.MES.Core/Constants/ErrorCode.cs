@@ -104,6 +104,8 @@
         public const string MES10252 = "存在未匹配的BOM，请检查！";
         public const string MES10253 = "【{Status}】状态的数据，不允许当前操作！";
         public const string MES10254 = "当前操作，暂不支持取消！";
+        public const string MES10255 = "开启状态与当前一致，请刷新页面后重试！";
+        public const string MES10256 = "当前计划已存在进行中的工单，无法更改开启状态！";
         #endregion
 
         #region 资源 10300

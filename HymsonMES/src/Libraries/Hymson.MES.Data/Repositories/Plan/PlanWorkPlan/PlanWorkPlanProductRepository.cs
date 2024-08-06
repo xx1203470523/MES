@@ -35,6 +35,19 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateAsync(PlanWorkPlanProductEntity entity)
+        {
+            if (entity == null) return 0;
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSql, entity);
+        }
+
+        /// <summary>
         /// 批量删除（软删除）
         /// </summary>
         /// <param name="param"></param>
@@ -152,6 +165,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM plan_work_plan_product /**where**/  ";
 
         const string InsertsSql = "INSERT INTO plan_work_plan_product(Id, WorkPlanId, ProductCode, ProductVersion, ProductId, BomCode, BomVersion, BomId, Qty, OverScale, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (@Id, @WorkPlanId, @ProductCode, @ProductVersion, @ProductId, @BomCode, @BomVersion, @BomId, @Qty, @OverScale, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId); ";
+
+        const string UpdateSql = "UPDATE plan_work_plan_product SET IsOpen = @IsOpen, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeletesSql = "UPDATE plan_work_plan_product SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @ids ";
         //const string DeleteByParentIdsSql = "UPDATE plan_work_plan_product SET IsDeleted = Id , UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE WorkPlanId IN @ParentIds";

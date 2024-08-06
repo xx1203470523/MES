@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Plan
 {
@@ -63,6 +64,11 @@ namespace Hymson.MES.Core.Domain.Plan
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 是否打开
+        /// </summary>
+        public TrueOrFalseEnum IsOpen { get; set; } = TrueOrFalseEnum.Yes;
 
     }
 }

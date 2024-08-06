@@ -18,6 +18,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<int> InsertsAsync(IEnumerable<PlanWorkPlanProductEntity> entities);
 
         /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateAsync(PlanWorkPlanProductEntity entity);
+
+        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="param"></param>
@@ -42,7 +49,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<PlanWorkPlanProductEntity> GetByPlanIdAndProductIdAsync(long id,long productId);
+        Task<PlanWorkPlanProductEntity> GetByPlanIdAndProductIdAsync(long id, long productId);
 
         /// <summary>
         /// 根据IDs批量获取数据

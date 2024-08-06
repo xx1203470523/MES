@@ -53,6 +53,11 @@ namespace Hymson.MES.Core.Domain.Plan
         public PlanWorkPlanStatusEnum Status { get; set; }
 
         /// <summary>
+        /// 是否打开
+        /// </summary>
+        public TrueOrFalseEnum IsOpen { get; set; } = TrueOrFalseEnum.Yes;
+
+        /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例
         /// </summary>
         public decimal OverScale { get; set; } = 0;

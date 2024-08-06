@@ -19,7 +19,8 @@ using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Query;
+using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Requests.ERP;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -34,6 +35,11 @@ namespace Hymson.MES.Services.Services.Plan
     {
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 服务接口（ERP）
+        /// </summary>
+        private readonly IERPApiClient _erpApiClient;
 
         /// <summary>
         /// 系统配置
@@ -85,6 +91,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="erpApiClient"></param>
         /// <param name="sysConfigRepository"></param>
         /// <param name="planWorkPlanRepository"></param>
         /// <param name="planWorkPlanProductRepository"></param>
@@ -95,6 +102,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="procMaterialRepository"></param>
         /// <param name="procProcessRouteRepository"></param>
         public PlanWorkPlanService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IERPApiClient erpApiClient,
             ISysConfigRepository sysConfigRepository,
             IPlanWorkPlanRepository planWorkPlanRepository,
             IPlanWorkPlanProductRepository planWorkPlanProductRepository,
@@ -107,6 +115,7 @@ namespace Hymson.MES.Services.Services.Plan
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _erpApiClient = erpApiClient;
             _sysConfigRepository = sysConfigRepository;
             _planWorkPlanRepository = planWorkPlanRepository;
             _planWorkPlanProductRepository = planWorkPlanProductRepository;
@@ -305,6 +314,62 @@ namespace Hymson.MES.Services.Services.Plan
             rows += await _planWorkOrderRepository.InsertsAsync(workOrderEntites);
             trans.Complete();
             return rows;
+        }
+
+        /// <summary>
+        /// 修改子工单
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateAsync(PlanWorkPlanUpdateDto dto)
+        {
+            // 检查生产计划是否存在
+            var workPlanProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(dto.WorkPlanProductId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16018));
+
+            // 检查生产计划是否存在
+            var workPlanEntity = await _planWorkPlanRepository.GetByIdAsync(workPlanProductEntity.WorkPlanId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16018));
+
+            // 检查生产计划的状态
+            if (workPlanProductEntity.IsOpen == dto.IsOpen)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10255));
+            }
+
+            workPlanProductEntity.IsOpen = dto.IsOpen;
+            workPlanProductEntity.UpdatedBy = _currentUser.UserName;
+            workPlanProductEntity.UpdatedOn = HymsonClock.Now();
+
+            // 检查下面的工单是否存在已使用的工单
+            var workOrderEntities = await _planWorkOrderRepository.GetByPlanProductIdAsync(workPlanProductEntity.Id);
+            if (workOrderEntities != null && workOrderEntities.Any(a => a.Status != PlanWorkOrderStatusEnum.NotStarted))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10256));
+            }
+
+            // 将结果推送给ERP
+            var state = dto.IsOpen == TrueOrFalseEnum.Yes ? 1 : 0;
+            var response = await _erpApiClient.EnabledPlanAsync(new PlanRequestDto
+            {
+                type = 1,
+                moid = workPlanEntity.Id,
+                mostate = state,
+                Deteils = new List<PlanProductRequestDto>
+                {
+                    new PlanProductRequestDto
+                    {
+                         modid = workPlanProductEntity.Id,
+                         modstate = state
+                    }
+                }
+            });
+            if (!response.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12842)).WithData("Msg", $"调用【ERP接口】失败：{response.Message}");
+            }
+
+            return await _planWorkPlanProductRepository.UpdateAsync(workPlanProductEntity);
         }
 
         /// <summary>

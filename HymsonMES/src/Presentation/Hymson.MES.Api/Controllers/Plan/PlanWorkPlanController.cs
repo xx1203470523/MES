@@ -104,6 +104,18 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
+        /// 修改（生产计划）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("update")]
+        [PermissionDescription("plan:workPlan:update")]
+        public async Task<int> UpdateAsync([FromBody] PlanWorkPlanUpdateDto dto)
+        {
+            return await _planWorkPlanService.UpdateAsync(dto);
+        }
+
+        /// <summary>
         /// 删除（生产计划）
         /// </summary>
         /// <param name="ids"></param>

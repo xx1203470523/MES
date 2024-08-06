@@ -40,6 +40,7 @@ namespace Hymson.MES.Core.Enums
         [Description("暂停中")]
         Pending = 6,
     }
+
     /// <summary>
     /// 工单领料状态
     /// </summary>

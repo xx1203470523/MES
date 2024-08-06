@@ -34,6 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
             });
 
+            services.AddSingleton<IERPApiClient, ERPApiClient>();
             services.AddSingleton<IWMSApiClient, WMSApiClient>();
             AddHttpClientConfig(services, configuration);
             return services;
@@ -48,6 +49,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddHttpClientConfig(IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<PrintOptions>(configuration.GetSection(nameof(PrintOptions)));
+            services.Configure<ERPOptions>(configuration.GetSection(nameof(ERPOptions)));
             services.Configure<WMSOptions>(configuration.GetSection(nameof(WMSOptions)));
             return services;
         }

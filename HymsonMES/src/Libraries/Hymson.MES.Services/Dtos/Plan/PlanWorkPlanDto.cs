@@ -216,6 +216,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         public PlanWorkPlanStatusEnum Status { get; set; }
 
         /// <summary>
+        /// 是否打开
+        /// </summary>
+        public TrueOrFalseEnum IsOpen { get; set; } = TrueOrFalseEnum.Yes;
+
+        /// <summary>
         /// 计划开始时间
         /// </summary>
         public DateTime? PlanStartTime { get; set; }
@@ -281,6 +286,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public new string Status { get; set; }
 
+        /// <summary>
+        /// 是否打开
+        /// </summary>
+        public string IsOpen { get; set; }
+
     }
 
     /// <summary>
@@ -339,6 +349,23 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工单明细
         /// </summary>
         public IEnumerable<PlanWorkPlanDetailSaveDto>? Details { get; set; }
+
+    }
+
+    /// <summary>
+    /// 保存对象（生产计划）
+    /// </summary>
+    public record PlanWorkPlanUpdateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 生产计划产品Id
+        /// </summary>
+        public long WorkPlanProductId { get; set; }
+
+        /// <summary>
+        /// 是否打开
+        /// </summary>
+        public TrueOrFalseEnum IsOpen { get; set; } = TrueOrFalseEnum.Yes;
 
     }
 
