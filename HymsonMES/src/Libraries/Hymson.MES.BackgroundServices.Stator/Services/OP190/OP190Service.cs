@@ -4,6 +4,7 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 using Microsoft.Extensions.Logging;
 
@@ -147,7 +148,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 Rows = limitCount
             });
 
-            return await _baseService.SaveConvertDataAsync<OP190>(entities);
+            // 获取转换数据
+            var summaryBo = await _baseService.ConvertDataAsync(entities);
+
+            // 保存数据
+            return await _baseService.SaveDataAsync(buzKey, entities.Max(m => m.index), summaryBo);
         }
 
     }

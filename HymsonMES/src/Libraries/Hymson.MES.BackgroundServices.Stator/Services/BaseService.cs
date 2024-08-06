@@ -189,11 +189,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> SaveConvertDataAsync<T>(IEnumerable<BaseOPEntity> entities)
+        public async Task<StatorSummaryBo> ConvertDataAsync<T>(IEnumerable<T> entities) where T : BaseOPEntity
         {
             var producreCode = $"{typeof(T).Name}";
-            var buzKey = $"Stator-{producreCode}";
-            var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
             // 初始化对象
             var baseBo = await GetStatorBaseConfigAsync();
@@ -205,7 +203,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 Site = baseBo.SiteId,
                 Code = $"{StatorConst.PRODUCRE_PREFIX}{producreCode}"
             });
-            if (procedureEntity == null) return 0;
+            if (procedureEntity == null) return summaryBo;
             baseBo.ProcedureId = procedureEntity.Id;
 
             // 遍历记录
@@ -327,6 +325,18 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 });
             }
 
+            return summaryBo;
+        }
+
+        /// <summary>
+        /// 保存数据
+        /// </summary>
+        /// <param name="buzKey"></param>
+        /// <param name="waterLevel"></param>
+        /// <param name="summaryBo"></param>
+        /// <returns></returns>
+        public async Task<int> SaveDataAsync(string buzKey, long waterLevel, StatorSummaryBo summaryBo)
+        {
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
 
@@ -338,7 +348,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 _manuSfcCirculationRepository.InsertRangeAsync(summaryBo.ManuSfcCirculationEntities),
                 _manuProductBadRecordRepository.InsertRangeAsync(summaryBo.ManuProductBadRecordEntities),
                 _manuProductNgRecordRepository.InsertRangeAsync(summaryBo.ManuProductNgRecordEntities),
-                _waterMarkService.RecordWaterMarkAsync(buzKey, entities.Max(m => m.index))
+                _waterMarkService.RecordWaterMarkAsync(buzKey, waterLevel)
             };
 
             var rowArray = await Task.WhenAll(saveTasks);

@@ -546,6 +546,7 @@
         public const string MES11912 = "只有【{Before}】状态的检验单才允许【{After}】！";
         public const string MES11913 = "检验单号【{Code}】已经执行过操作【{Operation}】！";
         public const string MES11914 = "【{Status}】状态的检验单不允许执行检验操作！";
+        public const string MES11915 = "不合格数量【{UnQualifiedQty}】不能大于收货数量【{Qty}】！";
         #endregion
 
         #region 作业12000

@@ -49,6 +49,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long Id { get; set; }
 
         /// <summary>
+        /// 不合格数量
+        /// </summary>
+        public decimal? UnQualifiedQty { get; set; }
+
+        /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
         public TrueOrFalseEnum IsQualified { get; set; }
@@ -303,6 +308,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 数量
         /// </summary>
         public decimal? Qty { get; set; }
+
+        /// <summary>
+        /// 不合格数量
+        /// </summary>
+        public decimal? UnQualifiedQty { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭

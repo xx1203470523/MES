@@ -57,5 +57,10 @@ namespace Hymson.MES.Core.Domain.Quality
         /// </summary>
         public string Remark { get; set; }
 
+        /// <summary>
+        /// 不合格数量
+        /// </summary>
+        public decimal UnQualifiedQty { get; set; } = 0;
+
     }
 }

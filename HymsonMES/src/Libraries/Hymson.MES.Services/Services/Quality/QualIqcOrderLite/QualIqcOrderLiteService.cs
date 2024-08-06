@@ -303,7 +303,7 @@ namespace Hymson.MES.Services.Services.Quality
             var orderEntity = await _qualIqcOrderLiteRepository.GetByIdAsync(requestDto.IQCOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
 
-            // 检验单明细
+            // IQC检验单明细
             var detailEntities = await _qualIqcOrderLiteDetailRepository.GetEntitiesAsync(new QualIqcOrderLiteDetailQuery
             {
                 SiteId = orderEntity.SiteId,
@@ -313,6 +313,13 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11994)).WithData("Code", orderEntity.InspectionOrder);
             }
+
+            // 读取收货单明细
+            var receiptDetailEntities = await _whMaterialReceiptDetailRepository.GetEntitiesAsync(new WhMaterialReceiptDetailQuery
+            {
+                SiteId = orderEntity.SiteId,
+                MaterialReceiptId = orderEntity.MaterialReceiptId
+            });
 
             // 更新时间
             var user = _currentUser.UserName;
@@ -328,7 +335,17 @@ namespace Hymson.MES.Services.Services.Quality
                 var dto = requestDto.Details.FirstOrDefault(f => f.Id == detailEntity.Id);
                 if (dto == null) continue;
 
+                // 是否存在不合格数大于收货数
+                var receiptDetailEntity = receiptDetailEntities.FirstOrDefault(f => f.Id == detailEntity.MaterialReceiptDetailId);
+                if (receiptDetailEntity != null && receiptDetailEntity.Qty < dto.UnQualifiedQty)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES11915))
+                        .WithData("UnQualifiedQty", dto.UnQualifiedQty)
+                        .WithData("Qty", receiptDetailEntity.Qty);
+                }
+
                 detailEntity.IsQualified = dto.IsQualified;
+                detailEntity.UnQualifiedQty = dto.UnQualifiedQty ?? 0;
                 detailEntity.Remark = dto.Remark ?? "";
                 detailEntity.HandMethod = dto.HandMethod;
                 detailEntity.ProcessedBy = user;
@@ -849,17 +866,54 @@ namespace Hymson.MES.Services.Services.Quality
 
                 var materialEntity = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
 
-                details.Add(new IQCReceiptMaterialResultDto
+                // 如果有设置不合格的数量
+                if (item.UnQualifiedQty > 0)
                 {
-                    ReceiptDetailId = receiptDetailEntity.Id,
-                    MaterialCode = materialEntity?.MaterialCode ?? "",
-                    PlanQty = receiptDetailEntity.PlanQty,
-                    Qty = receiptDetailEntity.Qty,
-                    IsQualified = (item.IsQualified ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes ? 1 : 0,
-                    BarCode = receiptDetailEntity.BarCode,
-                    SyncId = receiptDetailEntity.SyncId,
-                    WarehouseCode = GetWarehouseCode(item.IsQualified)
-                });
+                    var qualifiedQty = receiptDetailEntity.Qty - item.UnQualifiedQty;
+
+                    // 添加合格
+                    if (qualifiedQty > 0)
+                    {
+                        details.Add(new IQCReceiptMaterialResultDto
+                        {
+                            ReceiptDetailId = receiptDetailEntity.Id,
+                            MaterialCode = materialEntity?.MaterialCode ?? "",
+                            PlanQty = receiptDetailEntity.PlanQty,
+                            Qty = qualifiedQty, // 合格数量
+                            IsQualified = 1,
+                            BarCode = receiptDetailEntity.BarCode,
+                            SyncId = receiptDetailEntity.SyncId,
+                            WarehouseCode = GetWarehouseCode(TrueOrFalseEnum.Yes)
+                        });
+                    }
+
+                    // 添加不合格
+                    details.Add(new IQCReceiptMaterialResultDto
+                    {
+                        ReceiptDetailId = receiptDetailEntity.Id,
+                        MaterialCode = materialEntity?.MaterialCode ?? "",
+                        PlanQty = receiptDetailEntity.PlanQty,
+                        Qty = item.UnQualifiedQty,
+                        IsQualified = 0, // 不合格数量
+                        BarCode = receiptDetailEntity.BarCode,
+                        SyncId = receiptDetailEntity.SyncId,
+                        WarehouseCode = GetWarehouseCode(TrueOrFalseEnum.No)
+                    });
+                }
+                else
+                {
+                    details.Add(new IQCReceiptMaterialResultDto
+                    {
+                        ReceiptDetailId = receiptDetailEntity.Id,
+                        MaterialCode = materialEntity?.MaterialCode ?? "",
+                        PlanQty = receiptDetailEntity.PlanQty,
+                        Qty = receiptDetailEntity.Qty,
+                        IsQualified = (item.IsQualified ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes ? 1 : 0,
+                        BarCode = receiptDetailEntity.BarCode,
+                        SyncId = receiptDetailEntity.SyncId,
+                        WarehouseCode = GetWarehouseCode(item.IsQualified)
+                    });
+                }
             }
 
             // 将结果推送给WMS

@@ -37,8 +37,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<QualIqcOrderLiteDetailEntity> entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(InsertSql, entities);
         }
 
         /// <summary>
@@ -60,7 +62,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         public async Task<int> UpdateRangeAsync(IEnumerable<QualIqcOrderLiteDetailEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdateSql, entities);
         }
 
         /// <summary>
@@ -169,11 +171,9 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_order_lite_detail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_order_lite_detail /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_iqc_order_lite_detail(`Id`, `SiteId`, `IQCOrderId`, `MaterialId`, `MaterialReceiptDetailId`, `IsQualified`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @IQCOrderId, @MaterialId, @MaterialReceiptDetailId, @IsQualified, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_iqc_order_lite_detail(`Id`, `SiteId`, `IQCOrderId`, `MaterialId`, `MaterialReceiptDetailId`, `IsQualified`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @IQCOrderId, @MaterialId, @MaterialReceiptDetailId, @IsQualified, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_iqc_order_lite_detail(`Id`, `SiteId`, `IQCOrderId`, `MaterialId`, `MaterialReceiptDetailId`, `IsQualified`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, UnQualifiedQty) VALUES (@Id, @SiteId, @IQCOrderId, @MaterialId, @MaterialReceiptDetailId, @IsQualified, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @UnQualifiedQty) ";
 
-        const string UpdateSql = "UPDATE qual_iqc_order_lite_detail SET IsQualified = @IsQualified, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_iqc_order_lite_detail SET IsQualified = @IsQualified, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_iqc_order_lite_detail SET UnQualifiedQty = @UnQualifiedQty, IsQualified = @IsQualified, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_iqc_order_lite_detail SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_iqc_order_lite_detail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

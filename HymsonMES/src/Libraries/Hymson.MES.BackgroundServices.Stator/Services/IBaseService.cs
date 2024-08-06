@@ -16,7 +16,16 @@
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> SaveConvertDataAsync<T>(IEnumerable<BaseOPEntity> entities);
+        Task<StatorSummaryBo> ConvertDataAsync<T>(IEnumerable<T> entities) where T : BaseOPEntity;
+
+        /// <summary>
+        /// 保存数据
+        /// </summary>
+        /// <param name="buzKey"></param>
+        /// <param name="waterLevel"></param>
+        /// <param name="summaryBo"></param>
+        /// <returns></returns>
+        Task<int> SaveDataAsync(string buzKey, long waterLevel, StatorSummaryBo summaryBo);
 
     }
 }
