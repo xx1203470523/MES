@@ -32,13 +32,13 @@ Host.CreateDefaultBuilder(args)
    {
        //services.Configure<PrintOptions>(hostContext.Configuration.GetSection(nameof(PrintOptions)));
        services.AddLocalization();
-      
+
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
        //services.AddPrintBackgroundService(hostContext.Configuration);
        services.AddClearCacheService(hostContext.Configuration);
        //services.AddPrintService(hostContext.Configuration);
-       
+
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
        var programName = hostContext.Configuration.GetSection("Quartz").GetValue<string>("ProgramName");
        // Add the required Quartz.NET services
@@ -50,6 +50,7 @@ Host.CreateDefaultBuilder(args)
            #region jobs
            q.AddJobAndTrigger<OP010Job>(hostContext.Configuration);
            q.AddJobAndTrigger<OP070Job>(hostContext.Configuration);
+           q.AddJobAndTrigger<OP190Job>(hostContext.Configuration);
            #endregion
 
            /*
@@ -77,27 +78,27 @@ Host.CreateDefaultBuilder(args)
 
    });
 
-         static void AddAutoMapper()
+static void AddAutoMapper()
+{
+    //find mapper configurations provided by other assemblies
+    var typeFinder = Singleton<ITypeFinder>.Instance;
+    var mapperConfigurations = typeFinder.FindClassesOfType<IOrderedMapperProfile>();
+
+    //create and sort instances of mapper configurations
+    var instances = mapperConfigurations
+        .Select(mapperConfiguration => (IOrderedMapperProfile)Activator.CreateInstance(mapperConfiguration))
+        .OrderBy(mapperConfiguration => mapperConfiguration.Order);
+
+    //create AutoMapper configuration
+    var config = new MapperConfiguration(cfg =>
+    {
+        foreach (var instance in instances)
         {
-            //find mapper configurations provided by other assemblies
-            var typeFinder = Singleton<ITypeFinder>.Instance;
-            var mapperConfigurations = typeFinder.FindClassesOfType<IOrderedMapperProfile>();
-
-            //create and sort instances of mapper configurations
-            var instances = mapperConfigurations
-                .Select(mapperConfiguration => (IOrderedMapperProfile)Activator.CreateInstance(mapperConfiguration))
-                .OrderBy(mapperConfiguration => mapperConfiguration.Order);
-
-            //create AutoMapper configuration
-            var config = new MapperConfiguration(cfg =>
-            {
-                foreach (var instance in instances)
-                {
-                    cfg.AddProfile(instance.GetType());
-                }
-            });
-
-            //register
-            AutoMapperConfiguration.Init(config);
+            cfg.AddProfile(instance.GetType());
         }
+    });
+
+    //register
+    AutoMapperConfiguration.Init(config);
+}
 
