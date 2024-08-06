@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.BackgroundServices.Stator;
+using Hymson.MES.BackgroundServices.Stator.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -47,6 +48,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <param name="services"></param>
         static void AddServices(IServiceCollection services)
         {
+            services.AddSingleton(typeof(IBaseService<>), typeof(BaseService<>));
             var typeFinder = Singleton<ITypeFinder>.Instance;
             var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
             foreach (var keyValuePair in keyValuePairs)

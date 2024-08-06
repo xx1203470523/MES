@@ -1,23 +1,27 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Hymson.MES.BackgroundServices.Stator.Services;
+using Microsoft.Extensions.Logging;
 using Quartz;
 
 namespace Hymson.MES.BackgroundTasks.Stator
 {
     /// <summary>
-    /// 工序（OP080）
+    /// 工序（OP210）
     /// </summary>
     [DisallowConcurrentExecution]
-    internal class OP080Job : IJob
+    internal class OP210Job : IJob
     {
-        private readonly ILogger<OP080Job> _logger;
+        private readonly ILogger<OP210Job> _logger;
+        private readonly IOP210Service _opService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
-        public OP080Job(ILogger<OP080Job> logger)
+        /// <param name="opService"></param>
+        public OP210Job(ILogger<OP210Job> logger, IOP210Service opService)
         {
             _logger = logger;
+            _opService = opService;
         }
 
         /// <summary>
@@ -29,12 +33,11 @@ namespace Hymson.MES.BackgroundTasks.Stator
         {
             try
             {
-                await Task.CompletedTask;
-                //await _masterDataPushService.ProductAsync();
+                _ = await _opService.ExecuteAsync(500);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "TODO :");
+                _logger.LogError(ex, "OP210Job :");
             }
         }
 

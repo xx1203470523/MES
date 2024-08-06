@@ -3,27 +3,22 @@
     /// <summary>
     /// 
     /// </summary>
-    public class OP040 : BaseOPEntity
+    public class OP210 : BaseOPEntity
     {
         /// <summary>
         /// 
         /// </summary>
-        public string wire9_pallet1 { get; set; }
+        public string wire_cart { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string wire9_pallet2 { get; set; }
+        public string wire1_barcode { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string wire9_id1 { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string wire9_id2 { get; set; }
+        public string wire2_barcode { get; set; }
 
     }
 }

@@ -213,6 +213,16 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             {
                 if (opEntity.Barcode == "-") continue;
 
+                // 条码
+                var barCode = opEntity.Barcode;
+                switch (producreCode)
+                {
+                    case "":
+                        break;
+                    default:
+                        break;
+                }
+
                 // 条码ID
                 var manuSFCId = IdGenProvider.Instance.CreateId();
                 var manuSFCInfoId = IdGenProvider.Instance.CreateId();
@@ -224,7 +234,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 {
                     Id = manuSFCId,
                     Qty = qty,
-                    SFC = opEntity.Barcode,
+                    SFC = barCode,
                     IsUsed = YesOrNoEnum.No,
                     Type = SfcTypeEnum.NoProduce,
                     Status = SfcStatusEnum.Complete,
@@ -260,7 +270,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     Id = manuSFCStepId,
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
                     CurrentStatus = SfcStatusEnum.lineUp,
-                    SFC = opEntity.Barcode,
+                    SFC = barCode,
                     ProductId = baseBo.ProductId,
                     WorkOrderId = baseBo.WorkOrderId,
                     WorkCenterId = baseBo.WorkLineId,
@@ -294,7 +304,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     FoundBadOperationId = baseBo.ProcedureId,
                     OutflowOperationId = baseBo.ProcedureId,
                     UnqualifiedId = 0,
-                    SFC = opEntity.Barcode,
+                    SFC = barCode,
                     SfcInfoId = 0,
                     SfcStepId = manuSFCStepId,
                     Qty = 1,
@@ -325,7 +335,161 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 });
             }
 
+            /*
+            // 遍历记录
+            var user = "LMS";
+            var qty = 1;
+            var waterLevel = 0;
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                var dr = dataTable.Rows[i];
+                var index = dr["index"].ParseToInt();
+                var time = dr["RDate"].ToTime();
+                var barCode = $"{dr["wire1_barcode"]}";
+
+                // 更新水位
+                waterLevel = index > waterLevel ? index : waterLevel;
+
+                if (barCode == "-") continue;
+
+                // 条码ID
+                var manuSFCId = IdGenProvider.Instance.CreateId();
+                var manuSFCInfoId = IdGenProvider.Instance.CreateId();
+                var manuSFCStepId = IdGenProvider.Instance.CreateId();
+                var manuBadRecordId = IdGenProvider.Instance.CreateId();
+
+                // 插入条码
+                summaryBo.ManuSFCEntities.Add(new ManuSfcEntity
+                {
+                    Id = manuSFCId,
+                    Qty = qty,
+                    SFC = barCode,
+                    IsUsed = YesOrNoEnum.No,
+                    Type = SfcTypeEnum.NoProduce,
+                    Status = SfcStatusEnum.Complete,
+
+                    SiteId = baseBo.SiteId,
+                    CreatedBy = user,
+                    CreatedOn = time,
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time
+                });
+
+                // 插入条码信息
+                summaryBo.ManuSFCInfoEntities.Add(new ManuSfcInfoEntity
+                {
+                    Id = manuSFCInfoId,
+                    SfcId = manuSFCId,
+                    WorkOrderId = baseBo.WorkOrderId,
+                    ProductId = baseBo.ProductId,
+                    ProductBOMId = baseBo.ProductBOMId,
+                    ProcessRouteId = baseBo.ProcessRouteId,
+                    IsUsed = false,
+
+                    SiteId = baseBo.SiteId,
+                    CreatedBy = user,
+                    CreatedOn = time,
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time
+                });
+
+                // 插入步骤表
+                summaryBo.ManuSfcStepEntities.Add(new ManuSfcStepEntity
+                {
+                    Id = manuSFCStepId,
+                    Operatetype = ManuSfcStepTypeEnum.OutStock,
+                    CurrentStatus = SfcStatusEnum.lineUp,
+                    SFC = barCode,
+                    ProductId = baseBo.ProductId,
+                    WorkOrderId = baseBo.WorkOrderId,
+                    WorkCenterId = baseBo.WorkLineId,
+                    ProductBOMId = baseBo.ProductBOMId,
+                    ProcessRouteId = baseBo.ProcessRouteId,
+                    SFCInfoId = manuSFCInfoId,
+                    Qty = qty,
+                    VehicleCode = "",
+                    ProcedureId = baseBo.ProcedureId,
+                    ResourceId = null,
+                    EquipmentId = null,
+                    OperationProcedureId = baseBo.ProcedureId,
+                    OperationResourceId = null,
+                    OperationEquipmentId = null,
+
+                    SiteId = baseBo.SiteId,
+                    CreatedBy = user,
+                    CreatedOn = time,
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time
+                });
+
+                // 如果是不合格
+                var isOk = $"{dr["Result"]}" == "OK";
+                if (isOk) continue;
+
+                // 插入不良记录
+                summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
+                {
+                    Id = manuBadRecordId,
+                    FoundBadOperationId = baseBo.ProcedureId,
+                    OutflowOperationId = baseBo.ProcedureId,
+                    UnqualifiedId = 0,
+                    SFC = barCode,
+                    SfcInfoId = 0,
+                    SfcStepId = manuSFCStepId,
+                    Qty = 1,
+                    Status = ProductBadRecordStatusEnum.Open,
+                    Source = ProductBadRecordSourceEnum.EquipmentReBad,
+                    Remark = "",
+
+                    SiteId = baseBo.SiteId,
+                    CreatedBy = user,
+                    CreatedOn = time,
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time
+                });
+
+                // 插入NG记录
+                summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    BadRecordId = manuBadRecordId,
+                    UnqualifiedId = 0,
+                    NGCode = "未知",
+
+                    SiteId = baseBo.SiteId,
+                    CreatedBy = user,
+                    CreatedOn = time,
+                    UpdatedBy = baseBo.User,
+                    UpdatedOn = baseBo.Time
+                });
+            }
+            */
+
             return summaryBo;
+        }
+
+        /// <summary>
+        /// 保存数据
+        /// </summary>
+        /// <param name="summaryBo"></param>
+        /// <returns></returns>
+        public async Task<int> SaveBaseDataAsync(StatorSummaryBo summaryBo)
+        {
+            var rows = 0;
+
+            List<Task<int>> saveTasks = new()
+            {
+                _manuSfcRepository.ReplaceRangeAsync(summaryBo.ManuSFCEntities),
+                _manuSfcInfoRepository.ReplaceRangeAsync(summaryBo.ManuSFCInfoEntities),
+                _manuSfcStepRepository.InsertRangeAsync(summaryBo.ManuSfcStepEntities),
+                _manuSfcCirculationRepository.InsertRangeAsync(summaryBo.ManuSfcCirculationEntities),
+                _manuProductBadRecordRepository.InsertRangeAsync(summaryBo.ManuProductBadRecordEntities),
+                _manuProductNgRecordRepository.InsertRangeAsync(summaryBo.ManuProductNgRecordEntities)
+            };
+
+            var rowArray = await Task.WhenAll(saveTasks);
+            rows += rowArray.Sum();
+            return rows;
         }
 
         /// <summary>
@@ -335,24 +499,13 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="waterLevel"></param>
         /// <param name="summaryBo"></param>
         /// <returns></returns>
-        public async Task<int> SaveDataAsync(string buzKey, long waterLevel, StatorSummaryBo summaryBo)
+        public async Task<int> SaveBaseDataWithCommitAsync(string buzKey, long waterLevel, StatorSummaryBo summaryBo)
         {
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
 
-            List<Task<int>> saveTasks = new()
-            {
-                _manuSfcRepository.ReplaceRangeAsync(summaryBo.ManuSFCEntities),
-                _manuSfcInfoRepository.ReplaceRangeAsync(summaryBo.ManuSFCInfoEntities),
-                _manuSfcStepRepository.InsertRangeAsync(summaryBo.ManuSfcStepEntities),
-                _manuSfcCirculationRepository.InsertRangeAsync(summaryBo.ManuSfcCirculationEntities),
-                _manuProductBadRecordRepository.InsertRangeAsync(summaryBo.ManuProductBadRecordEntities),
-                _manuProductNgRecordRepository.InsertRangeAsync(summaryBo.ManuProductNgRecordEntities),
-                _waterMarkService.RecordWaterMarkAsync(buzKey, waterLevel)
-            };
-
-            var rowArray = await Task.WhenAll(saveTasks);
-            rows += rowArray.Sum();
+            rows += await SaveBaseDataAsync(summaryBo);
+            rows += await _waterMarkService.RecordWaterMarkAsync(buzKey, waterLevel);
 
             trans.Complete();
             return rows;

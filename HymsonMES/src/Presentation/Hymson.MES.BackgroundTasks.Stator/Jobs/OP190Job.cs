@@ -11,17 +11,17 @@ namespace Hymson.MES.BackgroundTasks.Stator
     internal class OP190Job : IJob
     {
         private readonly ILogger<OP190Job> _logger;
-        private readonly IOP190Service _op190Service;
+        private readonly IOP190Service _opService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="op190Service"></param>
-        public OP190Job(ILogger<OP190Job> logger, IOP190Service op190Service)
+        /// <param name="opService"></param>
+        public OP190Job(ILogger<OP190Job> logger, IOP190Service opService)
         {
             _logger = logger;
-            _op190Service = op190Service;
+            _opService = opService;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Hymson.MES.BackgroundTasks.Stator
         {
             try
             {
-                _ = await _op190Service.ExecuteAsync(500);
+                _ = await _opService.ExecuteAsync(500);
             }
             catch (Exception ex)
             {

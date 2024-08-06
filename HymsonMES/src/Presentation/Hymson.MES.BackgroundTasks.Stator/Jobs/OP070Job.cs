@@ -11,17 +11,17 @@ namespace Hymson.MES.BackgroundTasks.Stator
     internal class OP070Job : IJob
     {
         private readonly ILogger<OP070Job> _logger;
-        private readonly IOP070Service _op070Service;
+        private readonly IOP070Service _opService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="op010Service"></param>
-        public OP070Job(ILogger<OP070Job> logger, IOP070Service op070Service)
+        public OP070Job(ILogger<OP070Job> logger, IOP070Service opService)
         {
             _logger = logger;
-            _op070Service = op070Service;
+            _opService = opService;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Hymson.MES.BackgroundTasks.Stator
         {
             try
             {
-                _ = await _op070Service.ExecuteAsync(500);
+                _ = await _opService.ExecuteAsync(500);
             }
             catch (Exception ex)
             {
