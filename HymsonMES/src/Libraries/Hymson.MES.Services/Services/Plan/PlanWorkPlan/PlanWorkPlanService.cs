@@ -281,6 +281,7 @@ namespace Hymson.MES.Services.Services.Plan
                 Code = processRouteCode
             });
 
+            // 工单
             List<PlanWorkOrderEntity> workOrderEntites = new();
             workOrderEntites.AddRange(dto.Details.Select(s => new PlanWorkOrderEntity
             {
@@ -308,10 +309,30 @@ namespace Hymson.MES.Services.Services.Plan
                 UpdatedOn = currentBo.Time
             }));
 
+            // 工单记录
+            List<PlanWorkOrderRecordEntity> workOrderRecordEntites = new();
+            workOrderRecordEntites.AddRange(workOrderEntites.Select(s => new PlanWorkOrderRecordEntity
+            {
+                WorkPlanId = s.WorkPlanId,
+                WorkOrderId = s.Id,
+                InputQty = 0,
+                UnqualifiedQuantity = 0,
+                FinishProductQuantity = 0,
+                PassDownQuantity = 0,
+
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = currentBo.SiteId,
+                CreatedBy = currentBo.User,
+                CreatedOn = currentBo.Time,
+                UpdatedBy = currentBo.User,
+                UpdatedOn = currentBo.Time
+            }));
+
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _planWorkPlanRepository.UpdateAsync(workPlanEntity);
             rows += await _planWorkOrderRepository.InsertsAsync(workOrderEntites);
+            rows += await _planWorkOrderRepository.InsertPlanWorkOrderRecordsAsync(workOrderRecordEntites);
             trans.Complete();
             return rows;
         }

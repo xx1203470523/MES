@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.CoreServices.Extension;
 using Hymson.Snowflake;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
@@ -77,7 +78,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 return 0;
             }
 
-            // 获取转换数据
+            // 获取转换数据（主数据）
             var summaryBo = await _baseService.ConvertDataAsync(entities);
 
             // 读取标准参数
@@ -90,32 +91,32 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var entity = entities.FirstOrDefault(f => $"{f.index}" == step.Remark);
                 if (entity == null) continue;
 
-                /*
-                // 参数
-                foreach (var param in collection)
+                // 遍历参数
+                foreach (var param in parameterEntities)
                 {
+                    // 指定对象获取值
+                    var paramValue = entity.GetType().GetProperty(param.ParameterCode)?.GetValue(entity);
 
+                    summaryBo.ManuProductParameterEntities.Add(new Core.Domain.Parameter.ManuProductParameterEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ProcedureId = step.ProcedureId ?? 0,
+                        SfcstepId = step.Id,
+                        SFC = step.SFC,
+
+                        ParameterId = param.Id,
+                        ParameterValue = $"{paramValue}",
+                        ParameterGroupId = entity.Result == "OK" ? 1 : 0,
+                        CollectionTime = entity.RDate ?? step.CreatedOn,
+
+                        SiteId = step.SiteId,
+                        CreatedBy = step.CreatedBy,
+                        CreatedOn = step.CreatedOn,
+                        UpdatedBy = step.UpdatedBy,
+                        UpdatedOn = step.UpdatedOn
+                    });
                 }
 
-                summaryBo.ManuProductParameterEntities.Add(new Core.Domain.Parameter.ManuProductParameterEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    ProcedureId = step.ProcedureId ?? 0,
-                    SfcstepId = step.Id,
-                    SFC = step.SFC,
-
-                    ParameterId = paramId,
-                    ParameterValue = item.ParamValue,
-                    ParameterGroupId = item.Result == true ? 1 : 0,
-                    CollectionTime = item.CreateOn,
-
-                    SiteId = step.SiteId,
-                    CreatedBy = step.CreatedBy,
-                    CreatedOn = step.CreatedOn,
-                    UpdatedBy = step.UpdatedBy,
-                    UpdatedOn = step.UpdatedOn
-                });
-                */
             }
 
             // 保存数据

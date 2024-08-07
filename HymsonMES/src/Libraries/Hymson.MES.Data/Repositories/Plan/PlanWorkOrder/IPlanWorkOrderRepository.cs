@@ -215,6 +215,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<int> InsertPlanWorkOrderRecordAsync(PlanWorkOrderRecordEntity param);
 
         /// <summary>
+        /// 新增工单记录表
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertPlanWorkOrderRecordsAsync(IEnumerable<PlanWorkOrderRecordEntity> entities);
+
+        /// <summary>
         /// 更新生产订单记录的实际开始时间
         /// </summary>
         /// <param name="command"></param>

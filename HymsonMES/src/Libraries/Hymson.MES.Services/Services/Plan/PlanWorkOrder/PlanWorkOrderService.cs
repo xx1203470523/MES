@@ -22,7 +22,6 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
@@ -116,7 +115,6 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         /// <returns></returns>
         public async Task<long> CreatePlanWorkOrderAsync(PlanWorkOrderCreateDto planWorkOrderCreateDto)
         {
-
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(planWorkOrderCreateDto);
 

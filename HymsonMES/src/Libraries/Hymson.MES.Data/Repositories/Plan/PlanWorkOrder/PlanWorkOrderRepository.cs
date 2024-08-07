@@ -638,7 +638,6 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         #region 工单记录表
-
         /// <summary>
         /// 新增工单记录表
         /// </summary>
@@ -648,6 +647,19 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertPlanWorkOrderRecordSql, param);
+        }
+
+        /// <summary>
+        /// 新增工单记录表
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertPlanWorkOrderRecordsAsync(IEnumerable<PlanWorkOrderRecordEntity> entities)
+        {
+            if (entities == null || !entities.Any()) return 0;
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertPlanWorkOrderRecordSql, entities);
         }
 
         /// <summary>
@@ -771,7 +783,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetPlanWorkOrderEntitiesSqlTemplate = @"SELECT /**select**/ FROM `plan_work_order` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `plan_work_order`(`Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkPlanId, WorkPlanProductId) VALUES (   @Id, @OrderCode, @ProductId, @WorkCenterType, @WorkCenterId, @ProcessRouteId, @ProductBOMId, @Type, @Qty, @Status, @OverScale, @PlanStartTime, @PlanEndTime, @IsLocked, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkPlanId, @WorkPlanProductId);  ";
-        const string InsertPlanWorkOrderRecordSql = "INSERT INTO `plan_work_order_record`(  `Id`, `RealStart`, `RealEnd`, `InputQty`, `UnqualifiedQuantity`, `FinishProductQuantity`, `PassDownQuantity`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `WorkOrderId`, `WorkPlanId`) VALUES (   @Id, @RealStart, @RealEnd, @InputQty, @UnqualifiedQuantity, @FinishProductQuantity, @PassDownQuantity, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId, @WorkPlanId )";
+        const string InsertPlanWorkOrderRecordSql = "INSERT INTO `plan_work_order_record`(`Id`, `RealStart`, `RealEnd`, `InputQty`, `UnqualifiedQuantity`, `FinishProductQuantity`, `PassDownQuantity`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `WorkOrderId`, `WorkPlanId`) VALUES (   @Id, @RealStart, @RealEnd, @InputQty, @UnqualifiedQuantity, @FinishProductQuantity, @PassDownQuantity, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId, @WorkPlanId )";
 
         const string UpdateSql = "UPDATE `plan_work_order` SET  ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `plan_work_order` SET   OrderCode = @OrderCode, ProductId = @ProductId, WorkCenterType = @WorkCenterType, WorkCenterId = @WorkCenterId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, Type = @Type, Qty = @Qty, Status = @Status, OverScale = @OverScale, PlanStartTime = @PlanStartTime, PlanEndTime = @PlanEndTime, IsLocked = @IsLocked, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
