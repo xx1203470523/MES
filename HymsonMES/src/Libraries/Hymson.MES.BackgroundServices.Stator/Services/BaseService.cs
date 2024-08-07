@@ -19,12 +19,12 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public class BaseService
+    public class BaseService : IBaseService
     {
         /// <summary>
         /// 服务接口（水位）
         /// </summary>
-        public readonly IWaterMarkService _waterMarkService;
+        private readonly IWaterMarkService _waterMarkService;
 
         /// <summary>
         /// 仓储接口（系统配置）
@@ -103,6 +103,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             IManuProductNgRecordRepository manuProductNgRecordRepository)
         {
             _waterMarkService = waterMarkService;
+            _sysConfigRepository = sysConfigRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
             _procProcedureRepository = procProcedureRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
@@ -111,6 +114,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _manuProductNgRecordRepository = manuProductNgRecordRepository;
         }
+
 
         /// <summary>
         /// 获取基础配置（定子）

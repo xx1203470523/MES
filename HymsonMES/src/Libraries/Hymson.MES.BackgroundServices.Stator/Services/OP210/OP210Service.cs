@@ -74,7 +74,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var summaryBo = await _baseService.ConvertDataAsync(entities);
 
             // 保存数据
-            return await _baseService.SaveDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
+            return await _baseService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
         }
 
     }

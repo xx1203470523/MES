@@ -32,7 +32,7 @@
         /// <param name="waterLevel"></param>
         /// <param name="summaryBo"></param>
         /// <returns></returns>
-        Task<int> SaveDataWithCommitAsync(string buzKey, long waterLevel, StatorSummaryBo summaryBo);
+        Task<int> SaveBaseDataWithCommitAsync(string buzKey, long waterLevel, StatorSummaryBo summaryBo);
 
     }
 }

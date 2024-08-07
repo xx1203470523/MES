@@ -48,7 +48,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <param name="services"></param>
         static void AddServices(IServiceCollection services)
         {
-            services.AddSingleton(typeof(IBaseService<>), typeof(BaseService<>));
             var typeFinder = Singleton<ITypeFinder>.Instance;
             var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
             foreach (var keyValuePair in keyValuePairs)

@@ -56,9 +56,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         public async Task<int> ExecuteAsync(int limitCount)
         {
             var producreCode = $"{typeof(OP070).Name}";
-            var buzKey_1 = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
-            var buzKey_2 = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
-            var buzKey_3 = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
+            var buzKey_1 = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}-1";
+            var buzKey_2 = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}-2";
+            var buzKey_3 = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}-3";
 
             var waterMarkId_1 = await _waterMarkService.GetWaterMarkAsync(buzKey_1);
             var waterMarkId_2 = await _waterMarkService.GetWaterMarkAsync(buzKey_2);
