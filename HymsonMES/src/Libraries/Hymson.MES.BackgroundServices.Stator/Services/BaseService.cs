@@ -10,6 +10,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
@@ -231,17 +232,25 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var qty = 1;
             foreach (var opEntity in entities)
             {
-                if (opEntity.Barcode == "-") continue;
-
                 // 条码
-                var barCode = opEntity.Barcode;
+                var barCode = "";
                 switch (producreCode)
                 {
-                    case "":
+                    case "OP010":
+                        barCode = $"{opEntity.GetType().GetProperty("wire1_barcode")?.GetValue(opEntity)}";
+                        break;
+                    case "OP070":
+                    case "OP190":
+                    case "OP210":
+                    case "OP340":
+                    case "OP490":
+                        barCode = opEntity.Barcode;
                         break;
                     default:
                         break;
                 }
+
+                if (barCode == "-" || string.IsNullOrWhiteSpace(barCode)) continue;
 
                 // 条码ID
                 var manuSFCId = IdGenProvider.Instance.CreateId();
@@ -531,9 +540,12 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             using var trans = TransactionHelper.GetTransactionScope();
 
             rows += await SaveBaseDataAsync(summaryBo);
-            rows += await _waterMarkService.RecordWaterMarkAsync(buzKey, waterLevel);
+            if (rows > 0)
+            {
+                rows += await _waterMarkService.RecordWaterMarkAsync(buzKey, waterLevel);
+                trans.Complete();
+            }
 
-            trans.Complete();
             return rows;
         }
 

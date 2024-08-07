@@ -33,7 +33,7 @@ namespace Hymson.MES.BackgroundTasks.Stator
         {
             try
             {
-                //_ = await _opService.ExecuteAsync(500);
+                _ = await _opService.ExecuteAsync(500);
             }
             catch (Exception ex)
             {
