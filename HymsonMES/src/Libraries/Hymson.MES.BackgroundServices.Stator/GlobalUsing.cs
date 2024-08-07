@@ -1,5 +1,10 @@
 ﻿global using Hymson.MES.Data.Options;
 global using Hymson.MES.Data.Repositories;
+global using Hymson.MES.Data.Repositories.Common.Query;
+global using Hymson.MES.Data.Repositories.Parameter;
+global using Hymson.MES.Data.Repositories.Process;
+global using Hymson.WaterMark;
+global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
 global using System;
 global using System.Collections.Generic;

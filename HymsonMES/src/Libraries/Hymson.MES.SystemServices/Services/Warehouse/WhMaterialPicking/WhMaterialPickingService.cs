@@ -376,7 +376,7 @@ namespace Hymson.MES.SystemServices.Services.Warehouse.WhMaterialPicking
                 var curOrderDetail = orderDetailList.Where(m => m.MaterialId == item.Id).FirstOrDefault();
                 if (curOrderDetail != null)
                 {
-                    curOrderDetail.Qty += sumQty;
+                    curOrderDetail.Qty = sumQty;
                     curOrderDetail.UpdatedBy = param.OperateBy;
                     curOrderDetail.UpdatedOn = HymsonClock.Now();
                     updateOrderDetailList.Add(curOrderDetail);

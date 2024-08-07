@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 
 namespace Hymson.MES.BackgroundServices.Stator
 {
@@ -7,6 +8,11 @@ namespace Hymson.MES.BackgroundServices.Stator
     /// </summary>
     public class StatorSummaryBo
     {
+        /// <summary>
+        /// 集合（条码）
+        /// </summary>
+        public BaseStatorBo StatorBo { get; set; } = new();
+
         /// <summary>
         /// 集合（条码）
         /// </summary>
@@ -36,6 +42,17 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// 集合（产品NG记录）
         /// </summary>
         public List<ManuProductNgRecordEntity> ManuProductNgRecordEntities { get; set; } = new();
+
+
+        /// <summary>
+        /// 集合（标准参数）
+        /// </summary>
+        public List<ProcParameterEntity> ProcParameterEntities { get; set; } = new();
+
+        /// <summary>
+        /// 集合（产品参数）
+        /// </summary>
+        public List<Core.Domain.Parameter.ManuProductParameterEntity> ManuProductParameterEntities { get; set; } = new();
 
     }
 

@@ -4,15 +4,12 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Hymson.WaterMark;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
@@ -47,6 +44,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         private readonly IProcProcedureRepository _procProcedureRepository;
 
         /// <summary>
+        /// 仓储接口（参数维护）
+        /// </summary>
+        private readonly IProcParameterRepository _procParameterRepository;
+
+        /// <summary>
         /// 仓储接口（条码）
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
@@ -77,6 +79,12 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         private readonly IManuProductNgRecordRepository _manuProductNgRecordRepository;
 
         /// <summary>
+        /// 仓储接口（产品参数）
+        /// </summary>
+        private readonly IManuProductParameterRepository _manuProductParameterRepository;
+
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="waterMarkService"></param>
@@ -84,35 +92,41 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procProcedureRepository"></param>
+        /// <param name="procParameterRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="manuProductBadRecordRepository"></param>
         /// <param name="manuProductNgRecordRepository"></param>
+        /// <param name="manuProductParameterRepository"></param>
         public BaseService(IWaterMarkService waterMarkService,
             ISysConfigRepository sysConfigRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcedureRepository procProcedureRepository,
+            IProcParameterRepository procParameterRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
-            IManuProductNgRecordRepository manuProductNgRecordRepository)
+            IManuProductNgRecordRepository manuProductNgRecordRepository,
+            IManuProductParameterRepository manuProductParameterRepository)
         {
             _waterMarkService = waterMarkService;
             _sysConfigRepository = sysConfigRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procProcedureRepository = procProcedureRepository;
+            _procParameterRepository = procParameterRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _manuProductNgRecordRepository = manuProductNgRecordRepository;
+            _manuProductParameterRepository = manuProductParameterRepository;
         }
 
 
@@ -198,17 +212,19 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var producreCode = $"{typeof(T).Name}";
 
             // 初始化对象
-            var baseBo = await GetStatorBaseConfigAsync();
-            var summaryBo = new StatorSummaryBo { };
+            var summaryBo = new StatorSummaryBo
+            {
+                StatorBo = await GetStatorBaseConfigAsync()
+            };
 
             // 读取当前工序
             var procedureEntity = await _procProcedureRepository.GetByCodeAsync(new EntityByCodeQuery
             {
-                Site = baseBo.SiteId,
+                Site = summaryBo.StatorBo.SiteId,
                 Code = $"{StatorConst.PRODUCRE_PREFIX}{producreCode}"
             });
             if (procedureEntity == null) return summaryBo;
-            baseBo.ProcedureId = procedureEntity.Id;
+            summaryBo.StatorBo.ProcedureId = procedureEntity.Id;
 
             // 遍历记录
             var user = "LMS";
@@ -243,9 +259,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     Type = SfcTypeEnum.NoProduce,
                     Status = SfcStatusEnum.Complete,
 
-                    SiteId = baseBo.SiteId,
-                    CreatedBy = baseBo.User,
-                    CreatedOn = baseBo.Time,
+                    SiteId = summaryBo.StatorBo.SiteId,
+                    CreatedBy = summaryBo.StatorBo.User,
+                    CreatedOn = summaryBo.StatorBo.Time,
                     UpdatedBy = user,
                     UpdatedOn = opEntity.RDate
                 });
@@ -255,15 +271,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 {
                     Id = manuSFCInfoId,
                     SfcId = manuSFCId,
-                    WorkOrderId = baseBo.WorkOrderId,
-                    ProductId = baseBo.ProductId,
-                    ProductBOMId = baseBo.ProductBOMId,
-                    ProcessRouteId = baseBo.ProcessRouteId,
+                    WorkOrderId = summaryBo.StatorBo.WorkOrderId,
+                    ProductId = summaryBo.StatorBo.ProductId,
+                    ProductBOMId = summaryBo.StatorBo.ProductBOMId,
+                    ProcessRouteId = summaryBo.StatorBo.ProcessRouteId,
                     IsUsed = false,
 
-                    SiteId = baseBo.SiteId,
-                    CreatedBy = baseBo.User,
-                    CreatedOn = baseBo.Time,
+                    SiteId = summaryBo.StatorBo.SiteId,
+                    CreatedBy = summaryBo.StatorBo.User,
+                    CreatedOn = summaryBo.StatorBo.Time,
                     UpdatedBy = user,
                     UpdatedOn = opEntity.RDate
                 });
@@ -275,24 +291,26 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
                     CurrentStatus = SfcStatusEnum.lineUp,
                     SFC = barCode,
-                    ProductId = baseBo.ProductId,
-                    WorkOrderId = baseBo.WorkOrderId,
-                    WorkCenterId = baseBo.WorkLineId,
-                    ProductBOMId = baseBo.ProductBOMId,
-                    ProcessRouteId = baseBo.ProcessRouteId,
+                    ProductId = summaryBo.StatorBo.ProductId,
+                    WorkOrderId = summaryBo.StatorBo.WorkOrderId,
+                    WorkCenterId = summaryBo.StatorBo.WorkLineId,
+                    ProductBOMId = summaryBo.StatorBo.ProductBOMId,
+                    ProcessRouteId = summaryBo.StatorBo.ProcessRouteId,
                     SFCInfoId = manuSFCInfoId,
                     Qty = qty,
                     VehicleCode = "",
-                    ProcedureId = baseBo.ProcedureId,
+                    ProcedureId = summaryBo.StatorBo.ProcedureId,
                     ResourceId = null,
                     EquipmentId = null,
-                    OperationProcedureId = baseBo.ProcedureId,
+                    OperationProcedureId = summaryBo.StatorBo.ProcedureId,
                     OperationResourceId = null,
                     OperationEquipmentId = null,
 
-                    SiteId = baseBo.SiteId,
-                    CreatedBy = baseBo.User,
-                    CreatedOn = baseBo.Time,
+                    Remark = $"{opEntity.index}",   // 这个ID是为了外层找到对应记录
+
+                    SiteId = summaryBo.StatorBo.SiteId,
+                    CreatedBy = summaryBo.StatorBo.User,
+                    CreatedOn = summaryBo.StatorBo.Time,
                     UpdatedBy = user,
                     UpdatedOn = opEntity.RDate
                 });
@@ -305,8 +323,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
                 {
                     Id = manuBadRecordId,
-                    FoundBadOperationId = baseBo.ProcedureId,
-                    OutflowOperationId = baseBo.ProcedureId,
+                    FoundBadOperationId = summaryBo.StatorBo.ProcedureId,
+                    OutflowOperationId = summaryBo.StatorBo.ProcedureId,
                     UnqualifiedId = 0,
                     SFC = barCode,
                     SfcInfoId = 0,
@@ -316,9 +334,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     Source = ProductBadRecordSourceEnum.EquipmentReBad,
                     Remark = "",
 
-                    SiteId = baseBo.SiteId,
-                    CreatedBy = baseBo.User,
-                    CreatedOn = baseBo.Time,
+                    SiteId = summaryBo.StatorBo.SiteId,
+                    CreatedBy = summaryBo.StatorBo.User,
+                    CreatedOn = summaryBo.StatorBo.Time,
                     UpdatedBy = user,
                     UpdatedOn = opEntity.RDate
                 });
@@ -331,9 +349,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     UnqualifiedId = 0,
                     NGCode = "未知",
 
-                    SiteId = baseBo.SiteId,
-                    CreatedBy = baseBo.User,
-                    CreatedOn = baseBo.Time,
+                    SiteId = summaryBo.StatorBo.SiteId,
+                    CreatedBy = summaryBo.StatorBo.User,
+                    CreatedOn = summaryBo.StatorBo.Time,
                     UpdatedBy = user,
                     UpdatedOn = opEntity.RDate
                 });
@@ -488,7 +506,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 _manuSfcStepRepository.InsertRangeAsync(summaryBo.ManuSfcStepEntities),
                 _manuSfcCirculationRepository.InsertRangeAsync(summaryBo.ManuSfcCirculationEntities),
                 _manuProductBadRecordRepository.InsertRangeAsync(summaryBo.ManuProductBadRecordEntities),
-                _manuProductNgRecordRepository.InsertRangeAsync(summaryBo.ManuProductNgRecordEntities)
+                _manuProductNgRecordRepository.InsertRangeAsync(summaryBo.ManuProductNgRecordEntities),
+
+                // 参数
+                _procParameterRepository.InsertsAsync(summaryBo.ProcParameterEntities),
+                _manuProductParameterRepository.InsertRangeMavelAsync(summaryBo.ManuProductParameterEntities)
             };
 
             var rowArray = await Task.WhenAll(saveTasks);

@@ -1,6 +1,5 @@
-﻿using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.WaterMark;
-using Microsoft.Extensions.Logging;
+﻿using Hymson.MES.Core.Domain.Process;
+using Hymson.Snowflake;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
@@ -30,21 +29,29 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         public readonly IWaterMarkService _waterMarkService;
 
         /// <summary>
+        /// 仓储接口（参数维护）
+        /// </summary>
+        private readonly IProcParameterRepository _procParameterRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="opRepository"></param>
         /// <param name="baseService"></param>
         /// <param name="waterMarkService"></param>
+        /// <param name="procParameterRepository"></param>
         public OP010Service(ILogger<OP010Service> logger,
             IOPRepository<OP010> opRepository,
             IBaseService baseService,
-            IWaterMarkService waterMarkService)
+            IWaterMarkService waterMarkService,
+            IProcParameterRepository procParameterRepository)
         {
             _logger = logger;
             _opRepository = opRepository;
             _baseService = baseService;
             _waterMarkService = waterMarkService;
+            _procParameterRepository = procParameterRepository;
         }
 
         /// <summary>
@@ -73,8 +80,95 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 获取转换数据
             var summaryBo = await _baseService.ConvertDataAsync(entities);
 
+            // 读取标准参数
+            var parameterEntities = await GetParameterEntitiesWithInitAsync(summaryBo.StatorBo);
+
+            // 填充参数
+            foreach (var step in summaryBo.ManuSfcStepEntities)
+            {
+                // 当前记录
+                var entity = entities.FirstOrDefault(f => $"{f.index}" == step.Remark);
+                if (entity == null) continue;
+
+                /*
+                // 参数
+                foreach (var param in collection)
+                {
+
+                }
+
+                summaryBo.ManuProductParameterEntities.Add(new Core.Domain.Parameter.ManuProductParameterEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    ProcedureId = step.ProcedureId ?? 0,
+                    SfcstepId = step.Id,
+                    SFC = step.SFC,
+
+                    ParameterId = paramId,
+                    ParameterValue = item.ParamValue,
+                    ParameterGroupId = item.Result == true ? 1 : 0,
+                    CollectionTime = item.CreateOn,
+
+                    SiteId = step.SiteId,
+                    CreatedBy = step.CreatedBy,
+                    CreatedOn = step.CreatedOn,
+                    UpdatedBy = step.UpdatedBy,
+                    UpdatedOn = step.UpdatedOn
+                });
+                */
+            }
+
             // 保存数据
             return await _baseService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
+        }
+
+        /// <summary>
+        /// 获取参数编码
+        /// </summary>
+        /// <param name="statorBo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcParameterEntity>> GetParameterEntitiesWithInitAsync(BaseStatorBo statorBo)
+        {
+            // 插入参数
+            var parameterCodes = new List<string> {
+                    "FormingLHZDistance",
+                    "FormingRHZDistance",
+                    "FormingUpperLHXDistance",
+                    "FormingUpperRHXDistance",
+                    "FormingLowerLHXDistance",
+                    "FormingLowerRHXDistance",
+                    "FormingLHZSpeed",
+                    "FormingRHZSpeed",
+                    "FormingUpperLHXSpeed",
+                    "FormingUpperRHXSpeed",
+                    "FormingLowerLHXSpeed",
+                    "FormingLowerRHXSpeed"
+                };
+
+            // 插入参数
+            await _procParameterRepository.InsertsAsync(parameterCodes.Select(s => new ProcParameterEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                ParameterUnit = "1",
+                ParameterCode = s,
+                ParameterName = s,
+                Remark = "LMS",
+
+                SiteId = statorBo.SiteId,
+                CreatedBy = statorBo.User,
+                CreatedOn = statorBo.Time,
+                UpdatedBy = statorBo.User,
+                UpdatedOn = statorBo.Time
+            }));
+
+            // 读取标准参数
+            var parameterEntities = await _procParameterRepository.GetByCodesAsync(new Data.Repositories.Process.Query.ProcParametersByCodeQuery
+            {
+                SiteId = statorBo.SiteId,
+                Codes = parameterCodes
+            });
+
+            return parameterEntities;
         }
 
     }

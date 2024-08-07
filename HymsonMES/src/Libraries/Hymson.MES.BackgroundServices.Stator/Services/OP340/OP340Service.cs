@@ -1,8 +1,4 @@
-﻿using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.WaterMark;
-using Microsoft.Extensions.Logging;
-
-namespace Hymson.MES.BackgroundServices.Stator.Services
+﻿namespace Hymson.MES.BackgroundServices.Stator.Services
 {
     /// <summary>
     /// 服务
