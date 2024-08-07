@@ -778,7 +778,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             }
 
             // 修改工单计划数
-            var rows = await _planWorkOrderRepository.UpdateWorkOrderPlantQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
+            var rows = await _planWorkOrderRepository.UpdateQtyAsync(new UpdateQtyByWorkOrderIdCommand
             {
                 UpdatedBy = _currentUser.UserName,
                 UpdatedOn = DateTime.UtcNow,

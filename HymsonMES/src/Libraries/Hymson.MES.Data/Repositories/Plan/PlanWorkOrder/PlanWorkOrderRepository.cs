@@ -640,13 +640,14 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <summary>
         /// 更新数量（工单计划数量）
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> UpdateWorkOrderPlantQuantityByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param)
+        public async Task<int> UpdateQtyAsync(UpdateQtyByWorkOrderIdCommand command)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateWorkOrderPlantQuantitySql, param);
+            return await conn.ExecuteAsync(UpdateQtySql, command);
         }
+
 
         #region 工单记录表
         /// <summary>
@@ -861,7 +862,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             "LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId " +
             "WHERE PWO.IsDeleted = 0 AND PWO.WorkCenterType = @WorkCenterType AND PWOA.LineId = @workLineId ";
 
-        const string UpdateWorkOrderStatusSql = @"UPDATE `plan_work_order` SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id  AND  Status=@BeforeStatus ";
+        const string UpdateWorkOrderStatusSql = @"UPDATE `plan_work_order` SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id  AND  Status=@BeforeStatus ";
         const string UpdateWorkOrderLockedSql = @"UPDATE `plan_work_order` SET Status = @Status, LockedStatus=@LockedStatus,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateRecordRealStartSql = "UPDATE plan_work_order_record SET RealStart = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND RealStart IS NULL AND WorkOrderId IN @WorkOrderIds; ";
         const string UpdateRecordRealEndSql = "UPDATE plan_work_order_record SET RealEnd = @UpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE WorkOrderId IN @WorkOrderIds AND IsDeleted = 0 ";
@@ -869,8 +870,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetActivationWorkOrderDataSqlTemplate = "SELECT PWO.*,PWOA.LineId,PWOR.PassDownQuantity FROM plan_work_order_activation PWOA LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId LEFT JOIN plan_work_order_record PWOR ON PWO.ID = PWOR.WorkOrderId /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetWorkOrderDataSqlTemplate = "SELECT * FROM plan_work_order /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
 
+        const string UpdateQtySql = "UPDATE plan_work_order SET Qty = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND Id = @WorkOrderId;";
+
         const string UpdateWorkOrderPlantQuantitySql = "UPDATE plan_work_order SET " +
             "Qty = (CASE WHEN Qty IS NULL THEN 0 ELSE Qty END) + @Qty, " +
-            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND id = @WorkOrderId;";
+            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND Id = @WorkOrderId;";
     }
 }

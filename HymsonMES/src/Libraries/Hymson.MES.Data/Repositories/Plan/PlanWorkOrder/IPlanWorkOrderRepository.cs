@@ -1,5 +1,4 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
@@ -257,11 +256,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<IEnumerable<PlanWorkOrderView>> GetWorkOrderDataAsync(PlanWorkOrderPagedQuery query);
 
         /// <summary>
-        /// 修改工单计划数量
+        /// 更新数量（工单计划数量）
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> UpdateWorkOrderPlantQuantityByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param);
+        Task<int> UpdateQtyAsync(UpdateQtyByWorkOrderIdCommand command);
+
 
         #region 马威
 
