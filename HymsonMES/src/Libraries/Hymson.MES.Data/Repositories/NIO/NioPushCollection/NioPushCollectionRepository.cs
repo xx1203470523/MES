@@ -7,6 +7,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.NIO.NioPushCollection.View;
 using Hymson.MES.Data.Repositories.NioPushCollection.Query;
 using Hymson.Utils.Tools;
+using IdGen;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.NioPushCollection
@@ -99,6 +100,17 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<NioPushCollectionEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据niopushID获取数据
+        /// </summary>
+        /// <param name="nioPushId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<NioPushCollectionEntity>> GetByPushIdAsync(long nioPushId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<NioPushCollectionEntity>(GetByNioPushIdSql, new { NioPushId = nioPushId });
         }
 
         /// <summary>
@@ -200,5 +212,6 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
         const string GetByIdSql = @"SELECT * FROM nio_push_collection WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM nio_push_collection WHERE Id IN @Ids ";
 
+        const string GetByNioPushIdSql = @"SELECT * FROM nio_push_collection WHERE NioPushId = @NioPushId ";
     }
 }

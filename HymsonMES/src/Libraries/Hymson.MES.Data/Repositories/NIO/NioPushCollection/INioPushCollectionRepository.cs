@@ -59,7 +59,14 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
         /// <param name="id"></param>
         /// <returns></returns>
         Task<NioPushCollectionEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 根据niopushID获取数据
+        /// </summary>
+        /// <param name="nioPushId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<NioPushCollectionEntity>> GetByPushIdAsync(long nioPushId);
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>

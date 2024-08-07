@@ -6,6 +6,8 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.NioPushCollection;
+using Hymson.MES.Core.NIO;
+using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.NIO.NioPushCollection.View;
 using Hymson.MES.Data.Repositories.NioPushCollection;
@@ -15,6 +17,8 @@ using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.NioPushCollection
 {
@@ -50,17 +54,24 @@ namespace Hymson.MES.Services.Services.NioPushCollection
         /// <summary>
         /// 
         /// </summary>
+        private readonly INioPushRepository _nioPushRepository;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public NioPushCollectionService(ICurrentUser currentUser, 
             ICurrentSite currentSite, 
             AbstractValidator<NioPushCollectionSaveDto> validationSaveRules, 
             INioPushCollectionRepository nioPushCollectionRepository,
-            IProcProductParameterGroupRepository procProductParameterGroupRepository)
+            IProcProductParameterGroupRepository procProductParameterGroupRepository,
+            INioPushRepository nioPushRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _nioPushCollectionRepository = nioPushCollectionRepository;
             _procProductParameterGroupRepository = procProductParameterGroupRepository;
+            _nioPushRepository = nioPushRepository;
         }
 
 
@@ -112,7 +123,26 @@ namespace Hymson.MES.Services.Services.NioPushCollection
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
-            return await _nioPushCollectionRepository.UpdateAsync(entity);
+            long nioPushId = entity.NioPushId;
+
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            int result = await _nioPushCollectionRepository.UpdateAsync(entity);
+            //同步修改NIO_PUSH
+            var pushItemList = await _nioPushCollectionRepository.GetByPushIdAsync(nioPushId);
+            string tmpPushContext = JsonConvert.SerializeObject(pushItemList);
+            List<NioCollectionDto> pushList = JsonConvert.DeserializeObject<List<NioCollectionDto>>(tmpPushContext);
+            string pushContext = JsonConvert.SerializeObject(pushList);
+            NioPushEntity updateEntity = new NioPushEntity();
+            updateEntity.Id = nioPushId;
+            updateEntity.UpdatedBy = _currentUser.UserName;
+            updateEntity.UpdatedOn = HymsonClock.Now();
+            updateEntity.Content = pushContext;
+            result += await _nioPushRepository.UpdateContentAsync(updateEntity);
+
+            trans.Complete();
+
+            return result;
         }
 
         /// <summary>

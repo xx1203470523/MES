@@ -32,6 +32,13 @@ namespace Hymson.MES.Data.NIO
         Task<int> UpdateAsync(NioPushEntity entity);
 
         /// <summary>
+        /// 更新内容
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateContentAsync(NioPushEntity entity);
+
+        /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
