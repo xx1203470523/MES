@@ -164,6 +164,8 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
 
             if (!string.IsNullOrWhiteSpace(query.CodeLike)) {
                 query.CodeLike = $"%{query.CodeLike}%";

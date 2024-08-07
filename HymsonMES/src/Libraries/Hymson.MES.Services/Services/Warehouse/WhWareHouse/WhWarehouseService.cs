@@ -1,3 +1,4 @@
+using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -6,6 +7,8 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.WhWareHouse;
+using Hymson.MES.Core.Domain.WhWarehouseRegion;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.WhWareHouse;
 using Hymson.MES.Data.Repositories.WhWareHouse.Query;
@@ -167,16 +170,31 @@ namespace Hymson.MES.Services.Services.WhWareHouse
         }
 
         /// <summary>
+        /// 查询所有仓库
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> GetWarehouseListAsync()
+        {
+            var lists = await _whWarehouseRepository.GetEntitiesAsync(new WhWarehouseQuery { SiteId = _currentSite.SiteId ?? 0 });
+            return lists.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Code}",
+                Label = $"【{s.Code}】 {s.Name}",
+                Value = $"{s.Code}"
+            });
+        }
+
+        /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<WhWarehouseDto?> QueryByIdAsync(long id) 
+        public async Task<WhWarehouseDto?> QueryByIdAsync(long id)
         {
-           var whWarehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Id = id,SiteId= _currentSite.SiteId ?? 0 });
-           if (whWarehouseEntity == null) return null;
-           
-           return whWarehouseEntity.ToModel<WhWarehouseDto>();
+            var whWarehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Id = id, SiteId = _currentSite.SiteId ?? 0 });
+            if (whWarehouseEntity == null) return null;
+
+            return whWarehouseEntity.ToModel<WhWarehouseDto>();
         }
 
         /// <summary>

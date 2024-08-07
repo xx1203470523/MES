@@ -682,4 +682,19 @@ namespace Hymson.MES.Services.Dtos.Plan
         public YesOrNoEnum IsLocked { get; set; }
     }
 
+    /// <summary>
+    /// 更改工单计划数
+    /// </summary>
+    public class EditPlanWorkOrderDto
+    {
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 修改的计划数量
+        /// </summary>
+        public decimal PlanQty {  get; set; }
+    }
 }

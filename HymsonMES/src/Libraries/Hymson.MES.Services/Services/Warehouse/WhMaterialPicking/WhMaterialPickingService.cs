@@ -105,6 +105,11 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(param.OrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES15151));
 
+            if (param.Type == ManuRequistionTypeEnum.WorkOrderPicking && string.IsNullOrEmpty(param.WarehouseCode))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16057));
+            }
+
             if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Finish)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16048)).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
@@ -144,7 +149,8 @@ namespace Hymson.MES.Services.Services.Warehouse.WhMaterialPicking
                 Type = BillBusinessTypeEnum.WorkOrderMaterialRequestForm,
                 IsAutoExecute = param.Type == ManuRequistionTypeEnum.WorkOrderReplenishment,
                 CreatedBy = _currentUser.UserName,
-                WarehouseCode = param.Type == ManuRequistionTypeEnum.WorkOrderReplenishment ? _options.Value.Delivery.VirtuallyWarehouseCode : _options.Value.Delivery.RawWarehouseCode,
+                // WarehouseCode = param.Type == ManuRequistionTypeEnum.WorkOrderReplenishment ? _options.Value.Delivery.VirtuallyWarehouseCode : _options.Value.Delivery.RawWarehouseCode
+                WarehouseCode = param.Type == ManuRequistionTypeEnum.WorkOrderReplenishment ? _options.Value.Delivery.VirtuallyWarehouseCode : param.WarehouseCode,
                 SyncCode = requistionOrderCode,
             };
 
