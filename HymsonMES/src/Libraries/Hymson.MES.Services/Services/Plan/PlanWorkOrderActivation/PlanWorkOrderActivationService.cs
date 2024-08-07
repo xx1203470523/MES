@@ -145,25 +145,8 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         planWorkOrderActivationEntity.UpdatedOn = HymsonClock.Now();
         planWorkOrderActivationEntity.SiteId = _currentSite.SiteId ?? 0;
 
-        // 添加工单记录
-        var planWorkOrderRecordEntity = new PlanWorkOrderRecordEntity()
-        {
-            Id = IdGenProvider.Instance.CreateId(),
-            UpdatedBy = _currentUser.UserName,
-            CreatedBy = _currentUser.UserName,
-            SiteId = _currentSite.SiteId ?? 0,
-            WorkOrderId = planWorkOrderActivationCreateDto.WorkOrderId,
-            InputQty = 0,
-            UnqualifiedQuantity = 0,
-            FinishProductQuantity = 0,
-            PassDownQuantity = 0
-        };
-
         // 保存
-        using var trans = TransactionHelper.GetTransactionScope();
         await _planWorkOrderActivationRepository.InsertAsync(planWorkOrderActivationEntity);
-        await _planWorkOrderRepository.InsertPlanWorkOrderRecordAsync(planWorkOrderRecordEntity);
-        trans.Complete();
     }
 
     /// <summary>
@@ -290,31 +273,26 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
     /// <returns></returns>
     public async Task ActivationWorkOrderAsync(ActivationWorkOrderDto activationWorkOrderDto)
     {
-        //查询当前线体
-        var line = await _inteWorkCenterRepository.GetByIdAsync(activationWorkOrderDto.LineId);
-        if (line == null)
-        {
-            throw new CustomerValidationException(nameof(ErrorCode.MES16402));
-        }
-        if (line.Type != WorkCenterTypeEnum.Line)
-        {
-            throw new CustomerValidationException(nameof(ErrorCode.MES16403));
-        }
+        // 查询当前线体
+        var line = await _inteWorkCenterRepository.GetByIdAsync(activationWorkOrderDto.LineId)
+            ?? throw new CustomerValidationException(nameof(ErrorCode.MES16402));
 
-        //查询当前工单信息
+        if (line.Type != WorkCenterTypeEnum.Line) throw new CustomerValidationException(nameof(ErrorCode.MES16403));
+
+        // 查询当前工单信息
         var workOrder = await _planWorkOrderRepository.GetByIdAsync(activationWorkOrderDto.Id);
         if (workOrder == null || workOrder.Id <= 0)
         {
             throw new CustomerValidationException(nameof(ErrorCode.MES16404));
         }
 
-        //查询是否被暂停
+        // 查询是否被暂停
         if (workOrder.Status == PlanWorkOrderStatusEnum.Pending)
         {
             throw new CustomerValidationException(nameof(ErrorCode.MES16415)).WithData("orderCode", workOrder.OrderCode);
         }
 
-        //查询当前工单是否已经被激活
+        // 查询当前工单是否已经被激活
         var workOrderActivation = (await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery()
         {
             WorkOrderId = workOrder.Id,
@@ -331,7 +309,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
             throw new CustomerValidationException(nameof(ErrorCode.MES16407)).WithData("orderCode", workOrder.OrderCode);
         }
 
-        //取消激活
+        // 取消激活
         if (!activationWorkOrderDto.IsNeedActivation)
         {
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -376,7 +354,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
 
         if (line.IsMixLine!.Value)
         {
-            //混线
+            // 混线
             await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto, line.Code);
         }
         else
@@ -391,6 +369,29 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
             }
 
             await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto, line.Code);
+        }
+
+        // 如果是激活工单，需要添加工单记录
+        if (activationWorkOrderDto.IsNeedActivation)
+        {
+            // 先查询工单是否已经有记录
+            var workOrderRecordEntity = await _planWorkOrderRepository.GetByWorkOrderIdAsync(workOrder.Id);
+            if (workOrderRecordEntity != null) return;
+
+            // 添加工单记录
+            await _planWorkOrderRepository.InsertPlanWorkOrderRecordAsync(new PlanWorkOrderRecordEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                UpdatedBy = _currentUser.UserName,
+                CreatedBy = _currentUser.UserName,
+                SiteId = _currentSite.SiteId ?? 0,
+                WorkPlanId = workOrder.WorkPlanId,
+                WorkOrderId = workOrder.Id,
+                InputQty = 0,
+                UnqualifiedQuantity = 0,
+                FinishProductQuantity = 0,
+                PassDownQuantity = 0
+            });
         }
     }
 
