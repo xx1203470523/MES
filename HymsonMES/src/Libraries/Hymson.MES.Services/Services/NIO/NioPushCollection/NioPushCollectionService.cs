@@ -6,12 +6,19 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.NioPushCollection;
+using Hymson.MES.Core.NIO;
+using Hymson.MES.Data.NIO;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.NIO.NioPushCollection.View;
 using Hymson.MES.Data.Repositories.NioPushCollection;
 using Hymson.MES.Data.Repositories.NioPushCollection.Query;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.NioPushCollection;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.NioPushCollection
 {
@@ -40,19 +47,31 @@ namespace Hymson.MES.Services.Services.NioPushCollection
         private readonly INioPushCollectionRepository _nioPushCollectionRepository;
 
         /// <summary>
-        /// 构造函数
+        /// 参数
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="validationSaveRules"></param>
-        /// <param name="nioPushCollectionRepository"></param>
-        public NioPushCollectionService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<NioPushCollectionSaveDto> validationSaveRules, 
-            INioPushCollectionRepository nioPushCollectionRepository)
+        private readonly IProcProductParameterGroupRepository _procProductParameterGroupRepository;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly INioPushRepository _nioPushRepository;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public NioPushCollectionService(ICurrentUser currentUser, 
+            ICurrentSite currentSite, 
+            AbstractValidator<NioPushCollectionSaveDto> validationSaveRules, 
+            INioPushCollectionRepository nioPushCollectionRepository,
+            IProcProductParameterGroupRepository procProductParameterGroupRepository,
+            INioPushRepository nioPushRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _nioPushCollectionRepository = nioPushCollectionRepository;
+            _procProductParameterGroupRepository = procProductParameterGroupRepository;
+            _nioPushRepository = nioPushRepository;
         }
 
 
@@ -104,7 +123,26 @@ namespace Hymson.MES.Services.Services.NioPushCollection
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
-            return await _nioPushCollectionRepository.UpdateAsync(entity);
+            long nioPushId = entity.NioPushId;
+
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            int result = await _nioPushCollectionRepository.UpdateAsync(entity);
+            //同步修改NIO_PUSH
+            var pushItemList = await _nioPushCollectionRepository.GetByPushIdAsync(nioPushId);
+            string tmpPushContext = JsonConvert.SerializeObject(pushItemList);
+            List<NioCollectionDto> pushList = JsonConvert.DeserializeObject<List<NioCollectionDto>>(tmpPushContext);
+            string pushContext = JsonConvert.SerializeObject(pushList);
+            NioPushEntity updateEntity = new NioPushEntity();
+            updateEntity.Id = nioPushId;
+            updateEntity.UpdatedBy = _currentUser.UserName;
+            updateEntity.UpdatedOn = HymsonClock.Now();
+            updateEntity.Content = pushContext;
+            result += await _nioPushRepository.UpdateContentAsync(updateEntity);
+
+            trans.Complete();
+
+            return result;
         }
 
         /// <summary>
@@ -153,12 +191,90 @@ namespace Hymson.MES.Services.Services.NioPushCollection
         public async Task<PagedInfo<NioPushCollectionDto>> GetPagedListAsync(NioPushCollectionPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<NioPushCollectionPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            //pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _nioPushCollectionRepository.GetPagedListAsync(pagedQuery);
+            var dtos = await CheckParamStatusAsync(pagedInfo);
+
+            // 实体到DTO转换 装载数据
+            //var dtos = pagedInfo.Data.Select(s => s.ToModel<NioPushCollectionDto>());
+            return new PagedInfo<NioPushCollectionDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 校验参数状态
+        /// </summary>
+        /// <param name="pagedInfo"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<NioPushCollectionDto>?> CheckParamStatusAsync(PagedInfo<NioPushCollectionStatusView> pagedInfo)
+        {
+            //判断参数是否合格
+            ProcedureParamQuery query = new ProcedureParamQuery();
+            query.SiteId = _currentSite.SiteId ?? 0;
+            var paramList = await _procProductParameterGroupRepository.GetParamListAsync(query);
+            foreach (var item in pagedInfo.Data)
+            {
+                var curParam = paramList.Where(m => m.ParameterCode == item.VendorFieldCode).FirstOrDefault();
+                if (curParam == null)
+                {
+                    continue;
+                }
+                item.LowerLimit = curParam.LowerLimit;
+                item.UpperLimit = curParam.UpperLimit;
+                item.CenterValue = curParam.CenterValue;
+                //不是数值则不校验
+                if (curParam.DataType != Core.Enums.DataTypeEnum.Numeric)
+                {
+                    continue;
+                }
+                //源数据没有数值不校验
+                if (item.DecimalValue == null)
+                {
+                    continue;
+                }
+                decimal curValue = (decimal)item.DecimalValue;
+                //上下限都存在
+                if (curParam.UpperLimit != null && curParam.LowerLimit != null)
+                {
+                    if (curValue > curParam.UpperLimit || curValue < curParam.LowerLimit)
+                    {
+                        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
+                        continue;
+                    }
+                }
+                //中心值存在
+                if (curParam.CenterValue != null)
+                {
+                    if (curValue != curParam.CenterValue)
+                    {
+                        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
+                        continue;
+                    }
+                }
+                //只存在上限值
+                if(curParam.UpperLimit != null)
+                {
+                    if (curValue > curParam.UpperLimit)
+                    {
+                        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
+                        continue;
+                    }
+                }
+                //只存在下限值
+                if (curParam.LowerLimit != null)
+                {
+                    if (curValue < curParam.LowerLimit)
+                    {
+                        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
+                        continue;
+                    }
+                }
+                item.IsOk = Core.Enums.TrueOrFalseEnum.Yes;
+            }
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<NioPushCollectionDto>());
-            return new PagedInfo<NioPushCollectionDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+
+            return dtos;
         }
 
     }

@@ -54,6 +54,17 @@ namespace Hymson.MES.Data.NIO
         }
 
         /// <summary>
+        /// 更新内容
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateContentAsync(NioPushEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateContentSql, entity);
+        }
+
+        /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
@@ -185,5 +196,6 @@ namespace Hymson.MES.Data.NIO
         const string GetByIdSql = @"SELECT * FROM nio_push WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM nio_push WHERE Id IN @Ids ";
 
+        const string UpdateContentSql = "UPDATE nio_push SET Content = @Content, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
     }
 }
