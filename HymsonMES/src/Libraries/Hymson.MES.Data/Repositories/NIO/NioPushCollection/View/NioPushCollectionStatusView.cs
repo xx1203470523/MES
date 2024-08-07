@@ -1,0 +1,42 @@
+﻿using Hymson.MES.Core.Domain.NioPushCollection;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Plan;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Hymson.MES.Data.Repositories.NIO.NioPushCollection.View
+{
+    /// <summary>
+    /// 推送参数+推送状态
+    /// </summary>
+    public class NioPushCollectionStatusView : NioPushCollectionEntity
+    {
+        /// <summary>
+        /// 推送状态;0：无需推送；1：待推送；2：已推送；3：推送失败；
+        /// </summary>
+        public PushStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public TrueOrFalseEnum IsOk { get; set; } = TrueOrFalseEnum.Yes;
+
+        /// <summary>  
+        /// 上限值，可能来自t2表  
+        /// </summary>  
+        public decimal? UpperLimit { get; set; } // 假设是数值类型，根据实际情况选择类型  
+
+        /// <summary>  
+        /// 中心值，可能来自t2表  
+        /// </summary>  
+        public decimal? CenterValue { get; set; } // 假设是数值类型，根据实际情况选择类型  
+
+        /// <summary>  
+        /// 下限值，可能来自t2表  
+        /// </summary>  
+        public decimal? LowerLimit { get; set; } // 假设是数值类型，根据实际情况选择类型  
+    }
+}

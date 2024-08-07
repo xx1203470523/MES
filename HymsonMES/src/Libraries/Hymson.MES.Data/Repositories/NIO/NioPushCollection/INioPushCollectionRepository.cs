@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.NioPushCollection;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.NIO.NioPushCollection.View;
 using Hymson.MES.Data.Repositories.NioPushCollection.Query;
 
 namespace Hymson.MES.Data.Repositories.NioPushCollection
@@ -78,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<NioPushCollectionEntity>> GetPagedListAsync(NioPushCollectionPagedQuery pagedQuery);
+        Task<PagedInfo<NioPushCollectionStatusView>> GetPagedListAsync(NioPushCollectionPagedQuery pagedQuery);
 
     }
 }

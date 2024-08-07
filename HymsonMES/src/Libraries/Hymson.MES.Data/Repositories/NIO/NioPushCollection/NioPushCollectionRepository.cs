@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.NioPushCollection;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.NIO.NioPushCollection.View;
 using Hymson.MES.Data.Repositories.NioPushCollection.Query;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
@@ -129,15 +130,36 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<NioPushCollectionEntity>> GetPagedListAsync(NioPushCollectionPagedQuery pagedQuery)
+        public async Task<PagedInfo<NioPushCollectionStatusView>> GetPagedListAsync(NioPushCollectionPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("t1.*,t2.Status");
+            sqlBuilder.OrderBy("t1.UpdatedOn DESC");
+            sqlBuilder.Where("t1.IsDeleted = 0");
+            sqlBuilder.InnerJoin("nio_push t2 on t1.NioPushId = t2.Id and t2.IsDeleted = 0");
+            //sqlBuilder.Where("SiteId = @SiteId");
+            if (string.IsNullOrEmpty(pagedQuery.VendorProductSn) == false)
+            {
+                sqlBuilder.Where("VendorProductSn = @VendorProductSn");
+            }
+            if (string.IsNullOrEmpty(pagedQuery.VendorProductTempSn) == false)
+            {
+                sqlBuilder.Where("VendorProductTempSn = @VendorProductTempSn");
+            }
+            if (string.IsNullOrEmpty(pagedQuery.StationId) == false)
+            {
+                sqlBuilder.Where("StationId = @StationId");
+            }
+            if(string.IsNullOrEmpty(pagedQuery.VendorFieldCode) == false)
+            {
+                sqlBuilder.Where("VendorFieldCode = @VendorFieldCode");
+            }
+            if(pagedQuery.Status != null)
+            {
+                sqlBuilder.Where("t2.Status = @Status");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -145,11 +167,11 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<NioPushCollectionEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<NioPushCollectionStatusView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<NioPushCollectionEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<NioPushCollectionStatusView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -160,8 +182,8 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection
     /// </summary>
     public partial class NioPushCollectionRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM nio_push_collection /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM nio_push_collection /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM nio_push_collection t1 /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM nio_push_collection t1 /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM nio_push_collection /**where**/  ";
 
         const string InsertSql = "INSERT INTO nio_push_collection(  `Id`, `NioPushId`, `PlantId`, `WorkshopId`, `ProductionLineId`, `StationId`, `VendorFieldCode`, `VendorProductNum`, `VendorProductName`, `VendorProductSn`, `VendorProductTempSn`, `ProcessType`, `DecimalValue`, `StringValue`, `BooleanValue`, `NioProductNum`, `NioProductName`, `OperatorAccount`, `InputTime`, `OutputTime`, `StationStatus`, `VendorStationStatus`, `VendorValueStatus`, `Owner`, `DataType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @NioPushId, @PlantId, @WorkshopId, @ProductionLineId, @StationId, @VendorFieldCode, @VendorProductNum, @VendorProductName, @VendorProductSn, @VendorProductTempSn, @ProcessType, @DecimalValue, @StringValue, @BooleanValue, @NioProductNum, @NioProductName, @OperatorAccount, @InputTime, @OutputTime, @StationStatus, @VendorStationStatus, @VendorValueStatus, @Owner, @DataType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";

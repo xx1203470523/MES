@@ -109,5 +109,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateSameMaterialIdProcedureIdToNoVersionAsync(ProcProductParameterGroupEntity entity);
+
+        /// <summary>
+        /// 查询参数列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcedureParamView>> GetParamListAsync(ProcedureParamQuery query);
     }
 }
