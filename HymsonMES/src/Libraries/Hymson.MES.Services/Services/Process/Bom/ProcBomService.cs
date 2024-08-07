@@ -719,9 +719,9 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<List<ProcOrderBomDetailDto>> GetOrderBomMaterialAsync(long orderId)
+        public async Task<List<ProcOrderBomDetailDto>> GetOrderBomMaterialAsync(PickQueryDto dto)
         {
             var procBomDetailViews = new List<ProcOrderBomDetailDto>();
 
@@ -744,7 +744,7 @@ namespace Hymson.MES.Services.Services.Process
             */
 
             // 查询工单信息
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(orderId);
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(dto.WorkId);
 
             // 查询生产计划
             var planWorkPlanEntity = await _planWorkPlanRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanId ?? 0)
@@ -781,7 +781,15 @@ namespace Hymson.MES.Services.Services.Process
                 var procMaterialEntity = procMaterialEntities.FirstOrDefault(f => f.Id == planMaterial.MaterialId);
                 if (procMaterialEntity == null) continue;
 
-                var needQty = planMaterial.Usages * planWorkOrderEntity.Qty;
+                var needQty = 0M;
+                if (dto.InputQty == 0)
+                {
+                    needQty = planMaterial.Usages * planWorkOrderEntity.Qty;
+                }
+                else
+                {
+                    needQty = planMaterial.Usages * dto.InputQty;
+                }
 
                 var receiveQty = requistionOrderDetailEntities.Where(x => x.MaterialId == planMaterial.Id).Sum(x => x.Qty);
                 procBomDetailViews.Add(new ProcOrderBomDetailDto

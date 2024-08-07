@@ -27,6 +27,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Security.Policy;
 
@@ -113,6 +114,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly INioPushCollectionRepository _nioPushCollectionRepository;
 
         /// <summary>
+        /// 日志
+        /// </summary>
+        private readonly ILogger<IBuzDataPushService> _logger;
+
+        /// <summary>
         /// 操作员账号
         /// </summary>
         private readonly string NIO_USER_ID = "LMS001";
@@ -195,7 +201,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuRequistionOrderReceiveRepository manuRequistionOrderReceiveRepository,
             IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository,
-            INioPushCollectionRepository nioPushCollectionRepository)
+            INioPushCollectionRepository nioPushCollectionRepository,
+            ILogger<IBuzDataPushService> logger)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -213,6 +220,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _manuRequistionOrderReceiveRepository = manuRequistionOrderReceiveRepository;
             _manuProductReceiptOrderDetailRepository = manuProductReceiptOrderDetailRepository;
             _nioPushCollectionRepository = nioPushCollectionRepository;
+            _logger = logger;
 
             BASE_CONFIG_LIST = new List<string>() { NIO_ROTOR_CONFIG, NIO_STATOR_CONFIG };
         }
@@ -223,6 +231,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task CollectionAsync()
         {
+            _logger.LogInformation($"业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             var buzScene = BuzSceneEnum.Buz_Collection;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
@@ -385,6 +395,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task ProductionAsync()
         {
+            _logger.LogInformation($"业务数据（生产业务）ProductionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             var buzScene = BuzSceneEnum.Buz_Production;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
@@ -501,6 +513,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task MaterialAsync()
         {
+            _logger.LogInformation($"业务数据（材料清单）MaterialAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             var buzScene = BuzSceneEnum.Buz_Material;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
@@ -721,6 +735,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task PassrateProductAsync()
         {
+            _logger.LogInformation($"业务数据（产品一次合格率）PassrateProductAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             var buzScene = BuzSceneEnum.Buz_PassrateProduct;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
@@ -930,6 +946,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task IssueAsync()
         {
+            _logger.LogInformation($"业务数据（缺陷业务）IssueAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             var buzScene = BuzSceneEnum.Buz_Issue;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
@@ -1026,6 +1044,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task WorkOrderAsync()
         {
+            _logger.LogInformation($"业务数据（工单业务）WorkOrderAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             var buzScene = BuzSceneEnum.Buz_WorkOrder;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;

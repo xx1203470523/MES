@@ -16,7 +16,9 @@ using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.NioPushSwitch;
 using Hymson.Utils;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Quartz.Logging;
 
 namespace Hymson.MES.BackgroundServices.NIO.Services
 {
@@ -56,6 +58,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly IProcProductParameterGroupMavelRepository _procProductParameterGroupMavelRepository;
 
         /// <summary>
+        /// 日志
+        /// </summary>
+        private readonly ILogger<IMasterDataPushService> _logger;
+
+        /// <summary>
         /// 转子工序标识
         /// </summary>
         private readonly string ROTOR_PRODUCRE_FLAG = "R";
@@ -78,7 +85,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             ISysConfigRepository sysConfigRepository,
             IProcMaterialMavelRepository procMaterialMavelRepository,
             IProcProcedureMavelRepository procProcedureMavelRepository,
-            IProcProductParameterGroupMavelRepository procProductParameterGroupMavelRepository)
+            IProcProductParameterGroupMavelRepository procProductParameterGroupMavelRepository,
+            ILogger<IMasterDataPushService> logger)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -87,6 +95,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _procMaterialMavelRepository = procMaterialMavelRepository;
             _procProcedureMavelRepository = procProcedureMavelRepository;
             _procProductParameterGroupMavelRepository = procProductParameterGroupMavelRepository;
+            _logger = logger;
         }
 
         /// <summary>
@@ -114,6 +123,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task ProductAsync()
         {
+            _logger.LogInformation($"主数据（产品）ProductAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             var buzScene = BuzSceneEnum.Master_Product;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
@@ -153,6 +164,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task StationAsync()
         {
+            _logger.LogInformation($"主数据（工序）StationAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             var buzScene = BuzSceneEnum.Master_Station;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
@@ -237,6 +250,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task FieldAsync()
         {
+            _logger.LogInformation($"主数据（控制项）FieldAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             var buzScene = BuzSceneEnum.Master_Field;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
@@ -445,6 +460,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task PassrateTargetAsync()
         {
+            _logger.LogInformation($"主数据（一次合格率目标）PassrateTargetAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+
             var buzScene = BuzSceneEnum.Master_PassrateTarget;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;

@@ -1,4 +1,7 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.WhWareHouse;
+using Hymson.MES.Core.Domain.WhWarehouseRegion;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.WhWareHouse;
 
 namespace Hymson.MES.Services.Services.WhWareHouse
@@ -56,5 +59,11 @@ namespace Hymson.MES.Services.Services.WhWareHouse
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<WhWarehouseDto>> GetPagedListCopyAsync(WhWarehousePagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 查询所有仓库信息
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> GetWarehouseListAsync();
     }
 }

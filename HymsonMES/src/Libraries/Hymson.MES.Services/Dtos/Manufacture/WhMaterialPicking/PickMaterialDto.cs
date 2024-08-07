@@ -24,6 +24,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture.WhMaterialPicking
         public ManuRequistionTypeEnum Type { get; set; }
 
         /// <summary>
+        /// 仓库编码
+        /// </summary>
+        public string WarehouseCode { get; set; }
+
+        /// <summary>
         /// 领料数量
         /// </summary>
         public List<PickBomDetailDto> Details { get; set; }

@@ -1,4 +1,7 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.WhWareHouse;
+using Hymson.MES.Core.Domain.WhWarehouseRegion;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Services.WhWareHouse;
 using Hymson.Web.Framework.Attributes;
@@ -86,6 +89,17 @@ namespace Hymson.MES.Api.Controllers.WhWareHouse
         public async Task<WhWarehouseDto?> QueryByIdAsync(long id)
         {
             return await _whWarehouseService.QueryByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询所有仓库信息（仓库）
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("warehouselist")]
+        public async Task<IEnumerable<SelectOptionDto>> GetWarehouseListAsync()
+        {
+            return await _whWarehouseService.GetWarehouseListAsync();
         }
 
         /// <summary>

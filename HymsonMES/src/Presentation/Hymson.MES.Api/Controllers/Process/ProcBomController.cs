@@ -82,12 +82,16 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <summary>
         /// 读取工单物料清单
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="workId"></param>
+        /// <param name="inputQty"></param>
         /// <returns></returns>
         [HttpGet("order/materialList")]
-        public async Task<List<ProcOrderBomDetailDto>> GetOrderBomMaterialAsync(long orderId)
+        public async Task<List<ProcOrderBomDetailDto>> GetOrderBomMaterialAsync(long workId, decimal inputQty)
         {
-            return await _procBomService.GetOrderBomMaterialAsync(orderId);
+            var dto = new PickQueryDto();
+            dto.InputQty = inputQty;
+            dto.WorkId = workId;
+            return await _procBomService.GetOrderBomMaterialAsync(dto);
         }
 
         /// <summary>

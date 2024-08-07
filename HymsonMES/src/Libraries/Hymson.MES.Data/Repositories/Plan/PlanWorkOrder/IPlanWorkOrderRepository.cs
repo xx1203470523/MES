@@ -256,6 +256,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderView>> GetWorkOrderDataAsync(PlanWorkOrderPagedQuery query);
 
+        /// <summary>
+        /// 修改工单计划数量
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<int> UpdateWorkOrderPlantQuantityByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param);
+
         #region 马威
 
         /// <summary>
