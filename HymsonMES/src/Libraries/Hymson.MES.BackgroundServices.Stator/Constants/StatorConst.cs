@@ -10,5 +10,10 @@
         /// </summary>
         public const string PRODUCRE_PREFIX = "S01";
 
+        /// <summary>
+        /// 工序前缀
+        /// </summary>
+        public const string BUZ_KEY_PREFIX = "Stator";
+
     }
 }

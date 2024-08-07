@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.BackgroundServices.Stator;
+using Hymson.MES.BackgroundServices.Stator.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

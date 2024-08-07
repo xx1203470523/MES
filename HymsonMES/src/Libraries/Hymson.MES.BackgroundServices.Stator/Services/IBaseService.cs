@@ -21,11 +21,18 @@
         /// <summary>
         /// 保存数据
         /// </summary>
+        /// <param name="summaryBo"></param>
+        /// <returns></returns>
+        Task<int> SaveBaseDataAsync(StatorSummaryBo summaryBo);
+
+        /// <summary>
+        /// 保存数据
+        /// </summary>
         /// <param name="buzKey"></param>
         /// <param name="waterLevel"></param>
         /// <param name="summaryBo"></param>
         /// <returns></returns>
-        Task<int> SaveDataAsync(string buzKey, long waterLevel, StatorSummaryBo summaryBo);
+        Task<int> SaveBaseDataWithCommitAsync(string buzKey, long waterLevel, StatorSummaryBo summaryBo);
 
     }
 }
