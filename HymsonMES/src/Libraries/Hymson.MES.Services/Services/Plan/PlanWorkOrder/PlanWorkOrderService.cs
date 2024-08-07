@@ -53,6 +53,10 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         private readonly IManuRequistionOrderRepository _manuRequistionOrderRepository;
         private readonly IManuRequistionOrderDetailRepository _manuRequistionOrderDetailRepository;
         private readonly Data.Repositories.Manufacture.IManuReturnOrderRepository _manuReturnOrderRepository;
+        /// <summary>
+        /// 仓储接口（生产计划产品）
+        /// </summary>
+        private readonly IPlanWorkPlanProductRepository _planWorkPlanProductRepository;
 
         /// <summary>
         /// 构造函数
@@ -73,6 +77,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         /// <param name="manuRequistionOrderDetailRepository"></param>
         /// <param name="manuReturnOrderRepository"></param>
         /// <param name="validationChangeStatusRules"></param>
+        /// <param name="planWorkPlanProductRepository"></param>
         public PlanWorkOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<PlanWorkOrderCreateDto> validationCreateRules,
             AbstractValidator<PlanWorkOrderModifyDto> validationModifyRules,
@@ -87,7 +92,8 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IManuRequistionOrderDetailRepository manuRequistionOrderDetailRepository,
             Data.Repositories.Manufacture.IManuReturnOrderRepository manuReturnOrderRepository,
-            AbstractValidator<PlanWorkOrderChangeStatusDto> validationChangeStatusRules)
+            AbstractValidator<PlanWorkOrderChangeStatusDto> validationChangeStatusRules, 
+            IPlanWorkPlanProductRepository planWorkPlanProductRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -106,6 +112,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             _manuRequistionOrderRepository = manuRequistionOrderRepository;
             _manuRequistionOrderDetailRepository = manuRequistionOrderDetailRepository;
             _manuReturnOrderRepository = manuReturnOrderRepository;
+            _planWorkPlanProductRepository = planWorkPlanProductRepository;
         }
 
 
@@ -572,7 +579,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 dtolist.ForEach(d =>
                 {
                     // 现在不按照工单生产数量进行领料，只标记未领料和已领料状态
-                    d.PickStatus = requistionOrderEntities!=null&& requistionOrderEntities.Any(x => x.Status != WhMaterialPickingStatusEnum.CancelMaterialReturn && x.WorkOrderId == d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked;
+                    d.PickStatus = requistionOrderEntities != null && requistionOrderEntities.Any(x => x.Status != WhMaterialPickingStatusEnum.CancelMaterialReturn && x.WorkOrderId == d.Id) ? PlanWorkOrderPickStatusEnum.FinishPicked : PlanWorkOrderPickStatusEnum.NotPicked;
                     d.PassDownQuantity = d.Qty;
                 });
                 return new PagedInfo<PlanWorkOrderListDetailViewDto>(dtolist, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -748,6 +755,48 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
                 });
             }
             return details;
+        }
+
+        /// <summary>
+        /// 根据工单id修改计划数
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<bool> EditWorderPlanQtyByIdAsync(EditPlanWorkOrderDto dto)
+        {
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(dto.Id);
+            if (planWorkOrderEntity != null)
+            {
+                var planProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanProductId ?? 0);
+                if (planProductEntity == null)
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16018));
+                var workOrderEntities = await _planWorkOrderRepository.GetByPlanProductIdAsync(planProductEntity.Id);
+                var sumWorkOrderNum = workOrderEntities.Sum(x => x.Qty);
+                if (dto.PlanQty + sumWorkOrderNum > planProductEntity.Qty)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16058));
+                }
+                else
+                {
+                    if (dto.PlanQty == 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16022));
+                    }
+                    //修改工单计划数
+                    var result = await _planWorkOrderRepository.UpdateWorkOrderPlantQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
+                    {
+                        UpdatedBy = _currentUser.UserName,
+                        UpdatedOn = DateTime.UtcNow,
+                        WorkOrderId = planWorkOrderEntity.Id,
+                        Qty = dto.PlanQty,
+                    });
+                    if (result > 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

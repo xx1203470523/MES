@@ -199,5 +199,17 @@ namespace Hymson.MES.Api.Controllers.Plan
         {
             return await _planWorkOrderService.GetPickDetailByOrderIdAsync(workOrderId);
         }
+
+        /// <summary>
+        /// 修改工单计划数
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("editWorderPlanQty")]
+        public async Task<bool> EditWorderPlanQtyByIdAsync(EditPlanWorkOrderDto parm)
+        {
+            return await _planWorkOrderService.EditWorderPlanQtyByIdAsync(parm);
+        }
     }
 }

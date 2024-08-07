@@ -289,6 +289,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
                 whWarehouseQuery.CodeLike = pagedQueryDto.WarehouseCode;
                 
             }
+            whWarehouseQuery.SiteId = _currentSite.SiteId ?? 0;
             var warehouseEntities = await _whWarehouseRepository.GetEntitiesAsync(whWarehouseQuery);
             if (warehouseEntities == null || !warehouseEntities.Any())
             {

@@ -637,6 +637,17 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, commands);
         }
 
+        /// <summary>
+        /// 更新数量（工单计划数量）
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateWorkOrderPlantQuantityByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateWorkOrderPlantQuantitySql, param);
+        }
+
         #region 工单记录表
 
         /// <summary>
@@ -845,5 +856,9 @@ namespace Hymson.MES.Data.Repositories.Plan
 
         const string GetActivationWorkOrderDataSqlTemplate = "SELECT PWO.*,PWOA.LineId,PWOR.PassDownQuantity FROM plan_work_order_activation PWOA LEFT JOIN plan_work_order PWO ON PWO.Id = PWOA.WorkOrderId LEFT JOIN plan_work_order_record PWOR ON PWO.ID = PWOR.WorkOrderId /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetWorkOrderDataSqlTemplate = "SELECT * FROM plan_work_order /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
+
+        const string UpdateWorkOrderPlantQuantitySql = "UPDATE plan_work_order SET " +
+            "Qty = (CASE WHEN Qty IS NULL THEN 0 ELSE Qty END) + @Qty, " +
+            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND id = @WorkOrderId;";
     }
 }

@@ -82,5 +82,12 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         /// <returns></returns>
         Task<List<ManuRequistionOrderDetailDto>> GetPickDetailByOrderIdAsync(long workOrderId);
 
+        /// <summary>
+        /// 修改工单计划数
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<bool> EditWorderPlanQtyByIdAsync(EditPlanWorkOrderDto dto);
+
     }
 }

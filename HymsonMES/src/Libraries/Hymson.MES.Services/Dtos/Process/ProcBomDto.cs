@@ -283,4 +283,16 @@ namespace Hymson.MES.Services.Dtos.Process
         public long WorkId { get; set; }
     }
 
+    /// <summary>
+    /// 领料Query
+    /// </summary>
+    public class PickQueryDto
+    {
+        /// <summary>
+        /// 成套领料数量
+        /// </summary>
+        public decimal InputQty { get; set; } = 0;
+
+        public long WorkId { get; set; }
+    }
 }

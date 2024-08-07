@@ -19,6 +19,7 @@ using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.WhWarehouseShelf
 {
@@ -221,6 +222,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
             {
                 wareHouseQuery.CodeLike = pagedQueryDto.WareHouseCode;
             }
+            wareHouseQuery.SiteId = _currentSite.SiteId ?? 0;
             var wareHouseEntities = await _whWarehouseRepository.GetEntitiesAsync(wareHouseQuery);
             if (wareHouseEntities == null || !wareHouseEntities.Any())
             {
