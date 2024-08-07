@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 工单激活    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-03-29 10:23:51
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -12,27 +5,27 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Mavel.Rotor;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.HttpClients.Requests;
+using Hymson.MES.HttpClients.RotorHandle;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Transactions;
-using Hymson.MES.HttpClients.RotorHandle;
-using Hymson.MES.HttpClients.Requests;
-using Hymson.MES.Data.Repositories.Common;
 using Newtonsoft.Json;
-using Hymson.MES.Core.Domain.Mavel.Rotor;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan;
 
@@ -50,7 +43,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
     private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
     private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
-    private readonly IPlanWorkOrderRepository _planWorkOrderRepository;    
+    private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
     private readonly IPlanWorkOrderActivationRecordRepository _planWorkOrderActivationRecordRepository;
     private readonly IPlanWorkOrderStatusRecordRepository _planWorkOrderStatusRecordRepository;
 
@@ -66,6 +59,27 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
     private readonly IRotorApiClient _rotorApiClient;
     private readonly ISysConfigRepository _sysConfigRepository;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="currentUser"></param>
+    /// <param name="currentSite"></param>
+    /// <param name="validationCreateRules"></param>
+    /// <param name="validationModifyRules"></param>
+    /// <param name="inteWorkCenterRepository"></param>
+    /// <param name="planWorkOrderActivationRepository"></param>
+    /// <param name="planWorkOrderRepository"></param>
+    /// <param name="planWorkOrderActivationRecordRepository"></param>
+    /// <param name="planWorkOrderStatusRecordRepository"></param>
+    /// <param name="equipmentRepository"></param>
+    /// <param name="procProcedureRepository"></param>
+    /// <param name="procProcessRouteDetailNodeRepository"></param>
+    /// <param name="procResourceEquipmentBindRepository"></param>
+    /// <param name="procMaterialRepository"></param>
+    /// <param name="procProcessRouteRepository"></param>
+    /// <param name="procResourceRepository"></param>
+    /// <param name="rotorApiClient"></param>
+    /// <param name="sysConfigRepository"></param>
     public PlanWorkOrderActivationService(
         ICurrentUser currentUser,
         ICurrentSite currentSite,
@@ -111,6 +125,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         _sysConfigRepository = sysConfigRepository;
     }
 
+
     /// <summary>
     /// 创建
     /// </summary>
@@ -118,10 +133,10 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
     /// <returns></returns>
     public async Task CreatePlanWorkOrderActivationAsync(PlanWorkOrderActivationCreateDto planWorkOrderActivationCreateDto)
     {
-        //验证DTO
+        // 验证DTO
         await _validationCreateRules.ValidateAndThrowAsync(planWorkOrderActivationCreateDto);
 
-        //DTO转换实体
+        // DTO转换实体
         var planWorkOrderActivationEntity = planWorkOrderActivationCreateDto.ToEntity<PlanWorkOrderActivationEntity>();
         planWorkOrderActivationEntity.Id = IdGenProvider.Instance.CreateId();
         planWorkOrderActivationEntity.CreatedBy = _currentUser.UserName;
@@ -130,8 +145,25 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         planWorkOrderActivationEntity.UpdatedOn = HymsonClock.Now();
         planWorkOrderActivationEntity.SiteId = _currentSite.SiteId ?? 0;
 
-        //入库
+        // 添加工单记录
+        var planWorkOrderRecordEntity = new PlanWorkOrderRecordEntity()
+        {
+            Id = IdGenProvider.Instance.CreateId(),
+            UpdatedBy = _currentUser.UserName,
+            CreatedBy = _currentUser.UserName,
+            SiteId = _currentSite.SiteId ?? 0,
+            WorkOrderId = planWorkOrderActivationCreateDto.WorkOrderId,
+            InputQty = 0,
+            UnqualifiedQuantity = 0,
+            FinishProductQuantity = 0,
+            PassDownQuantity = 0
+        };
+
+        // 保存
+        using var trans = TransactionHelper.GetTransactionScope();
         await _planWorkOrderActivationRepository.InsertAsync(planWorkOrderActivationEntity);
+        await _planWorkOrderRepository.InsertPlanWorkOrderRecordAsync(planWorkOrderRecordEntity);
+        trans.Complete();
     }
 
     /// <summary>
@@ -393,7 +425,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
             throw new CustomerValidationException(nameof(ErrorCode.MES10139)).WithData("name", SysConfigEnum.RotorLmsSwitch.ToString());
         }
         string nioMatConfigValue = nioMatList.ElementAt(0).Value;
-        if(nioMatConfigValue == "1")
+        if (nioMatConfigValue == "1")
         {
             return true;
         }
@@ -537,7 +569,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
             if (orderSwitch == true)
             {
                 string rotorLineCode = await GetLmsRotorLineCode();
-                if(rotorLineCode == lineCode)
+                if (rotorLineCode == lineCode)
                 {
                     PlanWorkOrderMavelView order = await _planWorkOrderRepository.GetByIdMavelAsync(activationWorkOrderDto.Id);
                     RotorWorkOrderRequest lmsOrder = LmsOrderChange(order);
@@ -668,7 +700,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         }
         wirebodyIds = wirebodyIds.Distinct();
         long id = 0;
-        var workCenterResourceRelationEntities = await _inteWorkCenterRepository.GetWorkCenterResourceRelationAsync(resourceIds,id);
+        var workCenterResourceRelationEntities = await _inteWorkCenterRepository.GetWorkCenterResourceRelationAsync(resourceIds, id);
         var wirebodyEntities = await _inteWorkCenterRepository.GetByIdsAsync(wirebodyIds);
         result.EquipmentLines = wirebodyEntities.Select(m =>
         {
@@ -798,7 +830,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
         {
             PageIndex = query.PageIndex,
             PageSize = query.PageSize,
-            WorkCenterIds = wirebodyIds,            
+            WorkCenterIds = wirebodyIds,
             SiteId = _currentSite.SiteId
         };
 
@@ -811,7 +843,7 @@ public class PlanWorkOrderActivationService : IPlanWorkOrderActivationService
             });
             var processRouteIds = processRouteDetailNodeEntities.Select(m => m.ProcessRouteId).Distinct();
             planWorkOrderPagedQuery.ProcessRouteIds = processRouteIds;
-        }        
+        }
 
         var activationWorkOrderViews = await _planWorkOrderRepository.GetActivationWorkOrderDataAsync(planWorkOrderPagedQuery);
         if (!activationWorkOrderViews.Any())

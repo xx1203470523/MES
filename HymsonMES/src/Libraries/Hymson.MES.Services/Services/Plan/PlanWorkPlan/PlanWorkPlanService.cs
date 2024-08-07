@@ -309,6 +309,7 @@ namespace Hymson.MES.Services.Services.Plan
                 UpdatedOn = currentBo.Time
             }));
 
+            /*
             // 工单记录
             List<PlanWorkOrderRecordEntity> workOrderRecordEntites = new();
             workOrderRecordEntites.AddRange(workOrderEntites.Select(s => new PlanWorkOrderRecordEntity
@@ -327,12 +328,15 @@ namespace Hymson.MES.Services.Services.Plan
                 UpdatedBy = currentBo.User,
                 UpdatedOn = currentBo.Time
             }));
+            */
 
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _planWorkPlanRepository.UpdateAsync(workPlanEntity);
             rows += await _planWorkOrderRepository.InsertsAsync(workOrderEntites);
-            rows += await _planWorkOrderRepository.InsertPlanWorkOrderRecordsAsync(workOrderRecordEntites);
+
+            // 改为在激活的时候才添加记录
+            //rows += await _planWorkOrderRepository.InsertPlanWorkOrderRecordsAsync(workOrderRecordEntites);
             trans.Complete();
             return rows;
         }

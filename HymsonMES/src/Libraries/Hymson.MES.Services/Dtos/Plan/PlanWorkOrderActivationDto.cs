@@ -9,11 +9,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Plan
 {
@@ -67,9 +62,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public long IsDeleted { get; set; }
 
-
     }
-
 
     /// <summary>
     /// 工单激活新增Dto
