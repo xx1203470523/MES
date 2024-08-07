@@ -91,7 +91,7 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IManuRequistionOrderDetailRepository manuRequistionOrderDetailRepository,
             Data.Repositories.Manufacture.IManuReturnOrderRepository manuReturnOrderRepository,
-            AbstractValidator<PlanWorkOrderChangeStatusDto> validationChangeStatusRules, 
+            AbstractValidator<PlanWorkOrderChangeStatusDto> validationChangeStatusRules,
             IPlanWorkPlanProductRepository planWorkPlanProductRepository)
         {
             _currentUser = currentUser;
@@ -762,39 +762,31 @@ namespace Hymson.MES.Services.Services.Plan.PlanWorkOrder
         /// <returns></returns>
         public async Task<bool> EditWorderPlanQtyByIdAsync(EditPlanWorkOrderDto dto)
         {
+            if (dto.PlanQty == 0) throw new CustomerValidationException(nameof(ErrorCode.MES16022));
+
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(dto.Id);
-            if (planWorkOrderEntity != null)
+            if (planWorkOrderEntity == null) return false;
+
+            var planProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanProductId ?? 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16018));
+
+            var workOrderEntities = await _planWorkOrderRepository.GetByPlanProductIdAsync(planProductEntity.Id);
+            var sumWorkOrderNum = workOrderEntities.Sum(x => x.Qty);
+            if ((dto.PlanQty + sumWorkOrderNum - planWorkOrderEntity.Qty) > planProductEntity.Qty)
             {
-                var planProductEntity = await _planWorkPlanProductRepository.GetByIdAsync(planWorkOrderEntity.WorkPlanProductId ?? 0);
-                if (planProductEntity == null)
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16018));
-                var workOrderEntities = await _planWorkOrderRepository.GetByPlanProductIdAsync(planProductEntity.Id);
-                var sumWorkOrderNum = workOrderEntities.Sum(x => x.Qty);
-                if (dto.PlanQty + sumWorkOrderNum > planProductEntity.Qty)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16058));
-                }
-                else
-                {
-                    if (dto.PlanQty == 0)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16022));
-                    }
-                    //修改工单计划数
-                    var result = await _planWorkOrderRepository.UpdateWorkOrderPlantQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
-                    {
-                        UpdatedBy = _currentUser.UserName,
-                        UpdatedOn = DateTime.UtcNow,
-                        WorkOrderId = planWorkOrderEntity.Id,
-                        Qty = dto.PlanQty,
-                    });
-                    if (result > 0)
-                    {
-                        return true;
-                    }
-                }
+                throw new CustomerValidationException(nameof(ErrorCode.MES16058));
             }
-            return false;
+
+            // 修改工单计划数
+            var rows = await _planWorkOrderRepository.UpdateWorkOrderPlantQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
+            {
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = DateTime.UtcNow,
+                WorkOrderId = planWorkOrderEntity.Id,
+                Qty = dto.PlanQty,
+            });
+
+            return rows > 0;
         }
     }
 }

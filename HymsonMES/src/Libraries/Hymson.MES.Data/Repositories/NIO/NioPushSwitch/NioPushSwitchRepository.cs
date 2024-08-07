@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.NioPushSwitch
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -124,7 +124,7 @@ namespace Hymson.MES.Data.Repositories.NioPushSwitch
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<NioPushSwitchEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<NioPushSwitchEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<NioPushSwitchEntity>(GetByIdsSql, new { Ids = ids });
@@ -139,6 +139,9 @@ namespace Hymson.MES.Data.Repositories.NioPushSwitch
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<NioPushSwitchEntity>(template.RawSql, query);
         }
@@ -157,11 +160,11 @@ namespace Hymson.MES.Data.Repositories.NioPushSwitch
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             //sqlBuilder.Where("SiteId = @SiteId");
-            if(pagedQuery.BuzScene != null)
+            if (pagedQuery.BuzScene != null)
             {
                 sqlBuilder.Where($"BuzScene = @BuzScene");
             }
-            if(pagedQuery.IsEnabled != null)
+            if (pagedQuery.IsEnabled != null)
             {
                 sqlBuilder.Where($"IsEnabled = @IsEnabled");
             }
