@@ -3,7 +3,7 @@
     /// <summary>
     /// 服务
     /// </summary>
-    public class OP190Service : IOP190Service
+    public partial class OP190Service : IOP190Service
     {
         /// <summary>
         /// 日志接口
@@ -62,14 +62,14 @@
             });
             if (entities == null || !entities.Any())
             {
-                _logger.LogDebug($"【{producreCode}】没有要拉取的数据 -> {producreCode}");
+                _logger.LogDebug($"【{producreCode}】没有要拉取的数据！");
                 return 0;
             }
 
             // 先定位条码位置
             var barCodes = entities.Select(s => s.Barcode);
 
-            // 获取转换数据
+            // 获取转换数据（基础数据）
             var summaryBo = await _baseService.ConvertDataAsync(entities, barCodes);
 
             // 保存数据

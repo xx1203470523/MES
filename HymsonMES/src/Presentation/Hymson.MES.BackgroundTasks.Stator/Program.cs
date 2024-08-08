@@ -48,12 +48,13 @@ Host.CreateDefaultBuilder(args)
            q.UseMicrosoftDependencyInjectionJobFactory();
 
            #region jobs
-           q.AddJobAndTrigger<OP010Job>(hostContext.Configuration);
-           q.AddJobAndTrigger<OP070Job>(hostContext.Configuration);
-           q.AddJobAndTrigger<OP190Job>(hostContext.Configuration);
-           q.AddJobAndTrigger<OP210Job>(hostContext.Configuration);
-           q.AddJobAndTrigger<OP340Job>(hostContext.Configuration);
-           q.AddJobAndTrigger<OP490Job>(hostContext.Configuration);
+           //q.AddJobAndTrigger<OP010Job>(hostContext.Configuration);
+           //q.AddJobAndTrigger<OP070Job>(hostContext.Configuration);
+           //q.AddJobAndTrigger<OP190Job>(hostContext.Configuration);
+           //q.AddJobAndTrigger<OP210Job>(hostContext.Configuration);
+           //q.AddJobAndTrigger<OP340Job>(hostContext.Configuration);
+           //q.AddJobAndTrigger<OP490Job>(hostContext.Configuration);
+           q.AddJobAndTrigger<OPMainJob>(hostContext.Configuration);
            #endregion
 
            /*

@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Extension;
@@ -251,28 +252,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 InnerIds = entities.Select(s => s.ID).Distinct()
             };
 
-            /*
-            switch (producreCode)
-            {
-                case "OP010":
-                    statorQuery.WireBarCodes = barCodes;
-                    break;
-                case "OP190":
-                    statorQuery.OuterBarCodes = barCodes;
-                    break;
-                case "OP340":
-                    statorQuery.BusBarCodes = barCodes;
-                    break;
-                case "OP490":
-                    statorQuery.ProductionCodes = barCodes;
-                    break;
-                case "OP070":
-                default:
-                    statorQuery.InnerBarCodes = barCodes;
-                    break;
-            }
-            */
-
             // 批量读取条码（定子）
             var statorSFCEntities = await _statorBarCodeRepository.GetEntitiesAsync(statorQuery);
 
@@ -480,139 +459,44 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     UpdatedBy = user,
                     UpdatedOn = opEntity.RDate
                 });
+
             }
-
-            /*
-            // 遍历记录
-            var user = "LMS";
-            var qty = 1;
-            var waterLevel = 0;
-            for (int i = 0; i < dataTable.Rows.Count; i++)
-            {
-                var dr = dataTable.Rows[i];
-                var index = dr["index"].ParseToInt();
-                var time = dr["RDate"].ToTime();
-                var barCode = $"{dr["wire1_barcode"]}";
-
-                // 更新水位
-                waterLevel = index > waterLevel ? index : waterLevel;
-
-                if (barCode == "-") continue;
-
-                // 条码ID
-                var manuSFCId = IdGenProvider.Instance.CreateId();
-                var manuSFCInfoId = IdGenProvider.Instance.CreateId();
-                var manuSFCStepId = IdGenProvider.Instance.CreateId();
-                var manuBadRecordId = IdGenProvider.Instance.CreateId();
-
-                // 插入条码
-                summaryBo.ManuSFCEntities.Add(new ManuSfcEntity
-                {
-                    Id = manuSFCId,
-                    Qty = qty,
-                    SFC = barCode,
-                    IsUsed = YesOrNoEnum.No,
-                    Type = SfcTypeEnum.NoProduce,
-                    Status = SfcStatusEnum.Complete,
-
-                    SiteId = baseBo.SiteId,
-                    CreatedBy = user,
-                    CreatedOn = time,
-                    UpdatedBy = baseBo.User,
-                    UpdatedOn = baseBo.Time
-                });
-
-                // 插入条码信息
-                summaryBo.ManuSFCInfoEntities.Add(new ManuSfcInfoEntity
-                {
-                    Id = manuSFCInfoId,
-                    SfcId = manuSFCId,
-                    WorkOrderId = baseBo.WorkOrderId,
-                    ProductId = baseBo.ProductId,
-                    ProductBOMId = baseBo.ProductBOMId,
-                    ProcessRouteId = baseBo.ProcessRouteId,
-                    IsUsed = false,
-
-                    SiteId = baseBo.SiteId,
-                    CreatedBy = user,
-                    CreatedOn = time,
-                    UpdatedBy = baseBo.User,
-                    UpdatedOn = baseBo.Time
-                });
-
-                // 插入步骤表
-                summaryBo.ManuSfcStepEntities.Add(new ManuSfcStepEntity
-                {
-                    Id = manuSFCStepId,
-                    Operatetype = ManuSfcStepTypeEnum.OutStock,
-                    CurrentStatus = SfcStatusEnum.lineUp,
-                    SFC = barCode,
-                    ProductId = baseBo.ProductId,
-                    WorkOrderId = baseBo.WorkOrderId,
-                    WorkCenterId = baseBo.WorkLineId,
-                    ProductBOMId = baseBo.ProductBOMId,
-                    ProcessRouteId = baseBo.ProcessRouteId,
-                    SFCInfoId = manuSFCInfoId,
-                    Qty = qty,
-                    VehicleCode = "",
-                    ProcedureId = baseBo.ProcedureId,
-                    ResourceId = null,
-                    EquipmentId = null,
-                    OperationProcedureId = baseBo.ProcedureId,
-                    OperationResourceId = null,
-                    OperationEquipmentId = null,
-
-                    SiteId = baseBo.SiteId,
-                    CreatedBy = user,
-                    CreatedOn = time,
-                    UpdatedBy = baseBo.User,
-                    UpdatedOn = baseBo.Time
-                });
-
-                // 如果是不合格
-                var isOk = $"{dr["Result"]}" == "OK";
-                if (isOk) continue;
-
-                // 插入不良记录
-                summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
-                {
-                    Id = manuBadRecordId,
-                    FoundBadOperationId = baseBo.ProcedureId,
-                    OutflowOperationId = baseBo.ProcedureId,
-                    UnqualifiedId = 0,
-                    SFC = barCode,
-                    SfcInfoId = 0,
-                    SfcStepId = manuSFCStepId,
-                    Qty = 1,
-                    Status = ProductBadRecordStatusEnum.Open,
-                    Source = ProductBadRecordSourceEnum.EquipmentReBad,
-                    Remark = "",
-
-                    SiteId = baseBo.SiteId,
-                    CreatedBy = user,
-                    CreatedOn = time,
-                    UpdatedBy = baseBo.User,
-                    UpdatedOn = baseBo.Time
-                });
-
-                // 插入NG记录
-                summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    BadRecordId = manuBadRecordId,
-                    UnqualifiedId = 0,
-                    NGCode = "未知",
-
-                    SiteId = baseBo.SiteId,
-                    CreatedBy = user,
-                    CreatedOn = time,
-                    UpdatedBy = baseBo.User,
-                    UpdatedOn = baseBo.Time
-                });
-            }
-            */
 
             return summaryBo;
+        }
+
+        /// <summary>
+        /// 获取参数编码
+        /// </summary>
+        /// <param name="parameterCodes"></param>
+        /// <param name="statorBo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcParameterEntity>> GetParameterEntitiesWithInitAsync(IEnumerable<string> parameterCodes, BaseStatorBo statorBo)
+        {
+            // 插入参数
+            await _procParameterRepository.InsertsAsync(parameterCodes.Select(s => new ProcParameterEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                ParameterUnit = "1",
+                ParameterCode = s,
+                ParameterName = s,
+                Remark = "LMS",
+
+                SiteId = statorBo.SiteId,
+                CreatedBy = statorBo.User,
+                CreatedOn = statorBo.Time,
+                UpdatedBy = statorBo.User,
+                UpdatedOn = statorBo.Time
+            }));
+
+            // 读取标准参数
+            var parameterEntities = await _procParameterRepository.GetByCodesAsync(new Data.Repositories.Process.Query.ProcParametersByCodeQuery
+            {
+                SiteId = statorBo.SiteId,
+                Codes = parameterCodes
+            });
+
+            return parameterEntities;
         }
 
         /// <summary>

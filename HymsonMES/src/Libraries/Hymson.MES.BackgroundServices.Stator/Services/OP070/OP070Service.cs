@@ -1,11 +1,12 @@
-﻿using Hymson.Utils.Tools;
+﻿using Hymson.Snowflake;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
     /// <summary>
     /// 服务
     /// </summary>
-    public class OP070Service : IOP070Service
+    public partial class OP070Service : IOP070Service
     {
         /// <summary>
         /// 日志接口
@@ -85,7 +86,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var entities = opArray.SelectMany(s => s);
             if (entities == null || !entities.Any())
             {
-                _logger.LogDebug($"【{producreCode}】没有要拉取的数据 -> {producreCode}");
+                _logger.LogDebug($"【{producreCode}】没有要拉取的数据！");
                 return 0;
             }
 
@@ -101,8 +102,46 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 先定位条码位置
             var barCodes = entities.Select(s => s.Barcode);
 
-            // 获取转换数据
+            // 获取转换数据（基础数据）
             var summaryBo = await _baseService.ConvertDataAsync(entities, barCodes);
+
+            // 读取标准参数
+            var parameterEntities = await _baseService.GetParameterEntitiesWithInitAsync(_parameterCodes, summaryBo.StatorBo);
+
+            // 填充参数
+            foreach (var step in summaryBo.ManuSfcStepEntities)
+            {
+                // 当前记录
+                var entity = entities.FirstOrDefault(f => $"{f.index}" == step.Remark);
+                if (entity == null) continue;
+
+                // 遍历参数
+                foreach (var param in parameterEntities)
+                {
+                    // 指定对象获取值
+                    var paramValue = entity.GetType().GetProperty(param.ParameterCode)?.GetValue(entity);
+
+                    summaryBo.ManuProductParameterEntities.Add(new Core.Domain.Parameter.ManuProductParameterEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ProcedureId = step.ProcedureId ?? 0,
+                        SfcstepId = step.Id,
+                        SFC = step.SFC,
+
+                        ParameterId = param.Id,
+                        ParameterValue = $"{paramValue}",
+                        ParameterGroupId = entity.Result == "OK" ? 1 : 0,
+                        CollectionTime = entity.RDate ?? step.CreatedOn,
+
+                        SiteId = step.SiteId,
+                        CreatedBy = step.CreatedBy,
+                        CreatedOn = step.CreatedOn,
+                        UpdatedBy = step.UpdatedBy,
+                        UpdatedOn = step.UpdatedOn
+                    });
+                }
+
+            }
 
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
@@ -118,5 +157,21 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             return rows;
         }
 
+    }
+
+    /// <summary>
+    /// 服务
+    /// </summary>
+    public partial class OP070Service
+    {
+        /// <summary>
+        /// 参数编码集合
+        /// </summary>
+        private static readonly List<string> _parameterCodes = new()
+        {
+            "inner_nutrunner_time",
+            "inner_nutrunner_torque",
+            "inner_tool"
+        };
     }
 }

@@ -7,7 +7,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public class OP010Service : IOP010Service
+    public partial class OP010Service : IOP010Service
     {
         /// <summary>
         /// 日志接口
@@ -74,18 +74,18 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             });
             if (entities == null || !entities.Any())
             {
-                _logger.LogDebug($"【{producreCode}】没有要拉取的数据 -> {producreCode}");
+                _logger.LogDebug($"【{producreCode}】没有要拉取的数据！");
                 return 0;
             }
 
             // 先定位条码位置
             var barCodes = entities.Select(s => s.wire1_barcode);
 
-            // 获取转换数据（主数据）
+            // 获取转换数据（基础数据）
             var summaryBo = await _baseService.ConvertDataAsync(entities, barCodes);
 
             // 读取标准参数
-            var parameterEntities = await GetParameterEntitiesWithInitAsync(summaryBo.StatorBo);
+            var parameterEntities = await _baseService.GetParameterEntitiesWithInitAsync(_parameterCodes, summaryBo.StatorBo);
 
             // 填充参数
             foreach (var step in summaryBo.ManuSfcStepEntities)
@@ -126,54 +126,30 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             return await _baseService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
         }
 
+    }
+
+    /// <summary>
+    /// 服务
+    /// </summary>
+    public partial class OP010Service
+    {
         /// <summary>
-        /// 获取参数编码
+        /// 参数编码集合
         /// </summary>
-        /// <param name="statorBo"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ProcParameterEntity>> GetParameterEntitiesWithInitAsync(BaseStatorBo statorBo)
+        private static readonly List<string> _parameterCodes = new()
         {
-            // 插入参数
-            var parameterCodes = new List<string> {
-                    "FormingLHZDistance",
-                    "FormingRHZDistance",
-                    "FormingUpperLHXDistance",
-                    "FormingUpperRHXDistance",
-                    "FormingLowerLHXDistance",
-                    "FormingLowerRHXDistance",
-                    "FormingLHZSpeed",
-                    "FormingRHZSpeed",
-                    "FormingUpperLHXSpeed",
-                    "FormingUpperRHXSpeed",
-                    "FormingLowerLHXSpeed",
-                    "FormingLowerRHXSpeed"
-                };
-
-            // 插入参数
-            await _procParameterRepository.InsertsAsync(parameterCodes.Select(s => new ProcParameterEntity
-            {
-                Id = IdGenProvider.Instance.CreateId(),
-                ParameterUnit = "1",
-                ParameterCode = s,
-                ParameterName = s,
-                Remark = "LMS",
-
-                SiteId = statorBo.SiteId,
-                CreatedBy = statorBo.User,
-                CreatedOn = statorBo.Time,
-                UpdatedBy = statorBo.User,
-                UpdatedOn = statorBo.Time
-            }));
-
-            // 读取标准参数
-            var parameterEntities = await _procParameterRepository.GetByCodesAsync(new Data.Repositories.Process.Query.ProcParametersByCodeQuery
-            {
-                SiteId = statorBo.SiteId,
-                Codes = parameterCodes
-            });
-
-            return parameterEntities;
-        }
-
+            "FormingLHZDistance",
+            "FormingRHZDistance",
+            "FormingUpperLHXDistance",
+            "FormingUpperRHXDistance",
+            "FormingLowerLHXDistance",
+            "FormingLowerRHXDistance",
+            "FormingLHZSpeed",
+            "FormingRHZSpeed",
+            "FormingUpperLHXSpeed",
+            "FormingUpperRHXSpeed",
+            "FormingLowerLHXSpeed",
+            "FormingLowerRHXSpeed"
+        };
     }
 }

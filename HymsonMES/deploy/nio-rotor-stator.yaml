@@ -26,6 +26,8 @@ spec:
         env:
         - name: DOTNET_ENVIRONMENT
           value: "Production"
+        - name: TZ
+          value: "Asia/Shanghai"
         resources: {}
       volumes:
       - name: nio-back-volume
@@ -103,6 +105,8 @@ spec:
         env:
         - name: DOTNET_ENVIRONMENT
           value: "Production"
+        - name: TZ
+          value: "Asia/Shanghai"
         resources: {}
       volumes:
       - name: stator-back-volume
