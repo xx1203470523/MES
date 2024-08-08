@@ -248,7 +248,7 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             string sql = $@"
                 select t1.Code ,t1.Name ,t1.Version ,t2.UpperLimit ,t2.CenterValue ,t2.LowerLimit ,t1.UpdatedOn ,
-	                t3.Code procedureCode,t3.Name procedureName,t4.ParameterName ,t4.ParameterCode,t4.DataType ,
+	                t3.id ProcedureId , t3.Code procedureCode,t3.Name ProcedureName,t4.id parameterId, t4.ParameterName ,t4.ParameterCode,t4.DataType ,
                     t4.Remark,t4.ParameterUnit  
                 from proc_product_parameter_group t1
                 inner join proc_product_parameter_group_detail t2 on t1.Id = t2.ParameterGroupId  and t2.IsDeleted  = 0

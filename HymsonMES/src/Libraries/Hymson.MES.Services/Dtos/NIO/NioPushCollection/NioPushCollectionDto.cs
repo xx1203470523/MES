@@ -341,6 +341,16 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// 下限值，可能来自t2表  
         /// </summary>  
         public decimal? LowerLimit { get; set; } // 假设是数值类型，根据实际情况选择类型  
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
     }
 
     /// <summary>
@@ -372,6 +382,11 @@ namespace Hymson.MES.Services.Dtos.NioPushCollection
         /// 推送状态;0：无需推送；1：待推送；2：已推送；3：推送失败；
         /// </summary>
         public PushStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public TrueOrFalseEnum? IsOk { get; set; }
     }
 
     /// <summary>

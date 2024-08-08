@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.BackgroundServices.NIO.Dtos.Buz
+﻿using Hymson.MES.Core.Enums;
+
+namespace Hymson.MES.BackgroundServices.NIO.Dtos.Buz
 {
     /// <summary>
     /// 控制项
@@ -143,6 +145,11 @@
         /// 数据类型 1-转子 2-定子
         /// </summary>
         public int DataType { get; set; }
+
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public TrueOrFalseEnum IsOk { get; set; } = TrueOrFalseEnum.Yes;
 
         ///// <summary>
         ///// 关联部件01的电子条码，最大长度64

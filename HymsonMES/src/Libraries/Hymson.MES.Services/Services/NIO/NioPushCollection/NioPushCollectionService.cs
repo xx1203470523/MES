@@ -221,54 +221,56 @@ namespace Hymson.MES.Services.Services.NioPushCollection
                 item.LowerLimit = curParam.LowerLimit;
                 item.UpperLimit = curParam.UpperLimit;
                 item.CenterValue = curParam.CenterValue;
-                //不是数值则不校验
-                if (curParam.DataType != Core.Enums.DataTypeEnum.Numeric)
-                {
-                    continue;
-                }
-                //源数据没有数值不校验
-                if (item.DecimalValue == null)
-                {
-                    continue;
-                }
-                decimal curValue = (decimal)item.DecimalValue;
-                //上下限都存在
-                if (curParam.UpperLimit != null && curParam.LowerLimit != null)
-                {
-                    if (curValue > curParam.UpperLimit || curValue < curParam.LowerLimit)
-                    {
-                        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
-                        continue;
-                    }
-                }
-                //中心值存在
-                if (curParam.CenterValue != null)
-                {
-                    if (curValue != curParam.CenterValue)
-                    {
-                        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
-                        continue;
-                    }
-                }
-                //只存在上限值
-                if(curParam.UpperLimit != null)
-                {
-                    if (curValue > curParam.UpperLimit)
-                    {
-                        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
-                        continue;
-                    }
-                }
-                //只存在下限值
-                if (curParam.LowerLimit != null)
-                {
-                    if (curValue < curParam.LowerLimit)
-                    {
-                        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
-                        continue;
-                    }
-                }
-                item.IsOk = Core.Enums.TrueOrFalseEnum.Yes;
+                item.ParameterName = curParam.ParameterName;
+                item.ProcedureName = curParam.ProcedureName;
+                ////不是数值则不校验
+                //if (curParam.DataType != Core.Enums.DataTypeEnum.Numeric)
+                //{
+                //    continue;
+                //}
+                ////源数据没有数值不校验
+                //if (item.DecimalValue == null)
+                //{
+                //    continue;
+                //}
+                //decimal curValue = (decimal)item.DecimalValue;
+                ////上下限都存在
+                //if (curParam.UpperLimit != null && curParam.LowerLimit != null)
+                //{
+                //    if (curValue > curParam.UpperLimit || curValue < curParam.LowerLimit)
+                //    {
+                //        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
+                //        continue;
+                //    }
+                //}
+                ////中心值存在
+                //if (curParam.CenterValue != null)
+                //{
+                //    if (curValue != curParam.CenterValue)
+                //    {
+                //        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
+                //        continue;
+                //    }
+                //}
+                ////只存在上限值
+                //if(curParam.UpperLimit != null)
+                //{
+                //    if (curValue > curParam.UpperLimit)
+                //    {
+                //        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
+                //        continue;
+                //    }
+                //}
+                ////只存在下限值
+                //if (curParam.LowerLimit != null)
+                //{
+                //    if (curValue < curParam.LowerLimit)
+                //    {
+                //        item.IsOk = Core.Enums.TrueOrFalseEnum.No;
+                //        continue;
+                //    }
+                //}
+                //item.IsOk = Core.Enums.TrueOrFalseEnum.Yes;
             }
 
             // 实体到DTO转换 装载数据

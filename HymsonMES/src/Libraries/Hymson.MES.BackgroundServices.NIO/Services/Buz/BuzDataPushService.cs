@@ -23,6 +23,7 @@ using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
+using Hymson.MES.Data.Repositories.Process.View;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -119,6 +120,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         private readonly ILogger<IBuzDataPushService> _logger;
 
         /// <summary>
+        /// 参数
+        /// </summary>
+        private readonly IProcProductParameterGroupRepository _procProductParameterGroupRepository;
+
+        /// <summary>
         /// 操作员账号
         /// </summary>
         private readonly string NIO_USER_ID = "LMS001";
@@ -202,7 +208,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             IManuRequistionOrderReceiveRepository manuRequistionOrderReceiveRepository,
             IManuProductReceiptOrderDetailRepository manuProductReceiptOrderDetailRepository,
             INioPushCollectionRepository nioPushCollectionRepository,
-            ILogger<IBuzDataPushService> logger)
+            ILogger<IBuzDataPushService> logger,
+            IProcProductParameterGroupRepository procProductParameterGroupRepository)
             : base(nioPushSwitchRepository, nioPushRepository)
         {
             _nioPushSwitchRepository = nioPushSwitchRepository;
@@ -221,6 +228,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _manuProductReceiptOrderDetailRepository = manuProductReceiptOrderDetailRepository;
             _nioPushCollectionRepository = nioPushCollectionRepository;
             _logger = logger;
+            _procProductParameterGroupRepository = procProductParameterGroupRepository;
 
             BASE_CONFIG_LIST = new List<string>() { NIO_ROTOR_CONFIG, NIO_STATOR_CONFIG };
         }
@@ -233,7 +241,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         {
             _logger.LogInformation($"业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
-            var buzScene = BuzSceneEnum.Buz_Collection;
+            var buzScene = BuzSceneEnum.Buz_Collection_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
             if (config == null) return;
 
@@ -256,10 +264,13 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             ProcParameterQuery paramQuery = new ProcParameterQuery() { SiteId = siteId };
             var baseParamList = await _procParameterRepository.GetProcParameterEntitiesAsync(paramQuery);
             if (baseParamList == null || baseParamList.Any() == false) return;
-            //获取工序
-            ProcProcedureQuery procedureQuery = new ProcProcedureQuery() { SiteId = siteId };
-            var procedureList = await _procProcedureRepository.GetEntitiesAsync(procedureQuery);
-            if (procedureList == null || procedureList.Any() == false) return;
+            //获取工序参数
+            //ProcProcedureQuery procedureQuery = new ProcProcedureQuery() { SiteId = siteId };
+            //var procedureList = await _procProcedureRepository.GetEntitiesAsync(procedureQuery);
+            //if (procedureList == null || procedureList.Any() == false) return;
+            ProcedureParamQuery query = new ProcedureParamQuery();
+            query.SiteId = siteId;
+            var procedureParamList = await _procProductParameterGroupRepository.GetParamListAsync(query);
             //成品码信息
             ZSfcQuery zSfcQuery = new ZSfcQuery();
             zSfcQuery.SiteId = siteId;
@@ -283,12 +294,12 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 {
                     continue;
                 }
-                //工序
+                //工序参数
                 string procedure = "未知";
-                var curProcedure = procedureList.Where(m => m.Id == item.ProcedureId).FirstOrDefault();
+                var curProcedure = procedureParamList.Where(m => m.ProcedureId == item.ProcedureId).FirstOrDefault();
                 if (curProcedure != null)
                 {
-                    procedure = curProcedure.Code;
+                    procedure = curProcedure.ProcedureCode;
                 }
                 //总成码,指定工序才有总成码
                 string nioSfc = item.SFC;
@@ -355,6 +366,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 model.InputTime = GetTimestamp(HymsonClock.Now());
                 model.OutputTime = model.InputTime;
                 model.StationStatus = "passed";
+                model.IsOk = CheckParam(curProcedure, item.ParameterValue);
                 model.VendorStationStatus = model.StationStatus;
                 model.VendorValueStatus = model.StationStatus;
                 //model.Debug = NIO_DEBUG;
@@ -387,6 +399,59 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioParam, paramList.Max(x => x.Id));
 
             trans.Complete();
+
+            TrueOrFalseEnum CheckParam(ProcedureParamView ?opParam,string paramValue)
+            {
+                TrueOrFalseEnum result = TrueOrFalseEnum.Yes;
+                if(opParam == null)
+                {
+                    return result;
+                }
+
+                decimal curValue = 0;
+                if (decimal.TryParse(paramValue, out curValue) == false) //不能转成decimal
+                {
+                    return result;
+                }
+                if(opParam.DataType != DataTypeEnum.Numeric)
+                {
+                    return result;
+                }
+                //上下限都存在
+                if (opParam.UpperLimit != null && opParam.LowerLimit != null)
+                {
+                    if (curValue > opParam.UpperLimit || curValue < opParam.LowerLimit)
+                    {
+                        return Core.Enums.TrueOrFalseEnum.No;
+                    }
+                }
+                //中心值存在
+                if (opParam.CenterValue != null)
+                {
+                    if (curValue != opParam.CenterValue)
+                    {
+                        return Core.Enums.TrueOrFalseEnum.No;
+                    }
+                }
+                //只存在上限值
+                if (opParam.UpperLimit != null)
+                {
+                    if (curValue > opParam.UpperLimit)
+                    {
+                        return Core.Enums.TrueOrFalseEnum.No;
+                    }
+                }
+                //只存在下限值
+                if (opParam.LowerLimit != null)
+                {
+                    if (curValue < opParam.LowerLimit)
+                    {
+                        return Core.Enums.TrueOrFalseEnum.No;
+                    }
+                }
+
+                return result;
+            }
         }
 
         /// <summary>
