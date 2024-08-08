@@ -79,6 +79,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                 Rows = 500
             });
 
+            if (manuSfcStepList == null || !manuSfcStepList.Any())
+            {
+                _logger.LogDebug($"生产统计 -> 没有新产生的的步骤数据！waterMarkId:{startWaterMarkId}");
+                return;
+            }
+
             if (manuSfcStepList != null && manuSfcStepList.Any())
             {
                 //条码工序统计最后一条数据
