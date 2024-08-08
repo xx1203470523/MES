@@ -22,7 +22,6 @@ namespace Hymson.MES.BackgroundTasks.NIO
         {
             _logger = logger;
             _pushNIOService = pushNIOService;
-
         }
 
         /// <summary>
