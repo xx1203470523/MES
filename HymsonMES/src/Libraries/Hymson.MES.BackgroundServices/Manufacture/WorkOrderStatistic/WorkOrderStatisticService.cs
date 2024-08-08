@@ -156,16 +156,8 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             // 保存工单条码记录
             var insertStationSteps = inStationSteps.Concat(outStationSteps);
 
-#if DM
-            var deleteSteps = insertStationSteps.Concat(completeSteps);
-            var insertSteps = insertStationSteps.Concat(completeSteps);
-
-            await _manuWorkOrderSFCRepository.DeleteRangeAsync(deleteSteps);
-            await _manuWorkOrderSFCRepository.InsertRangeAsync(insertSteps);
-#else
             await _manuWorkOrderSFCRepository.IgnoreRangeAsync(insertStationSteps);
             await _manuWorkOrderSFCRepository.RepalceRangeAsync(completeSteps);
-#endif
 
             await _manuWorkOrderSFCRepository.DeleteRangeAsync(deductionSteps);
 
