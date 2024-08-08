@@ -176,7 +176,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 if (codeRulesMaterialEntities != null && codeRulesMaterialEntities.Any())
                 {
                     var codeRulesEntities = await _inteCodeRulesRepository.GetByIdsAsync(codeRulesMaterialEntities.Select(x => x.CodeRulesId).Distinct().ToArray());
-                    if (codeRulesEntities != null && codeRulesEntities.Any(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode))
+                    if (codeRulesEntities != null && codeRulesEntities.Any(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode && x.IsDeleted == 0))
                     {
                         var codeRulesIds = codeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode).Select(x => x.Id);
                         var materialIds = codeRulesMaterialEntities.Where(x => codeRulesIds.Contains(x.CodeRulesId)).Select(x => x.MaterialId);

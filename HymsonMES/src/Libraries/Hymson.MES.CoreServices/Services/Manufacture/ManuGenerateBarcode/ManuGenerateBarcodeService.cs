@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.Sequences;
 using Hymson.Utils;
 using System.Data;
+using System.Globalization;
 using System.Text;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
@@ -283,6 +284,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                             break;
                         case GenerateBarcodeWildcard.EquipmentMappingCode:
                             rules.Add(new List<string> { await GenerateEquipmentMappingCode(bo) });
+                            break;
+                        case GenerateBarcodeWildcard.WeekOfYear:
+                            rules.Add(new List<string>
+                            {
+                                CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(now, CalendarWeekRule.FirstDay, DayOfWeek.Sunday).ToString().PadLeft(2, '0')
+                            });
                             break;
                         default:
                             throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);
