@@ -89,6 +89,7 @@
 	  <ProjectReference Include="..\..\Libraries\Hymson.MES.BackgroundServices.NIO\Hymson.MES.BackgroundServices.NIO.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Folder Include="HostedServices\" />
 	  <Folder Include="Jobs\ERP\" />
 	</ItemGroup>
 </Project>
