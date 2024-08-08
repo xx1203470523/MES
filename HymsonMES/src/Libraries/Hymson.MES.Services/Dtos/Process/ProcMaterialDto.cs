@@ -706,10 +706,10 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Version { get; set; }
 
         /// <summary>
-        /// 备注
+        /// 批次大小
         /// </summary>
-        [EpplusTableColumn(Header = "备注", Order = 4)]
-        public string? Remark { get; set; }
+        [EpplusTableColumn(Header = "批次大小(必填)", Order = 4)]
+        public decimal? Batch { get; set; } = 0;
 
         /// <summary>
         /// 采购类型
@@ -718,22 +718,22 @@ namespace Hymson.MES.Services.Dtos.Process
         public MaterialBuyTypeEnum? BuyType { get; set; }
 
         /// <summary>
+        /// 内/外序列号
+        /// </summary>
+        [EpplusTableColumn(Header = "数据收集方式(必填)", Order = 6)]
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+
+        /// <summary>
         /// 工艺路线
         /// </summary>
-        [EpplusTableColumn(Header = "工艺路线编码", Order = 6)]
+        [EpplusTableColumn(Header = "工艺路线编码", Order = 7)]
         public string? ProcessRouteCode { get; set; }
 
         /// <summary>
         /// Bom
         /// </summary>
-        [EpplusTableColumn(Header = "Bom编码", Order = 7)]
+        [EpplusTableColumn(Header = "Bom编码", Order = 8)]
         public string? BomCode { get; set; }
-
-        /// <summary>
-        /// 批次大小
-        /// </summary>
-        [EpplusTableColumn(Header = "批次大小(必填)", Order = 8)]
-        public decimal? Batch { get; set; } = 0;
 
         /// <summary>
         /// 标包数量
@@ -742,16 +742,16 @@ namespace Hymson.MES.Services.Dtos.Process
         public int? PackageNum { get; set; }
 
         /// <summary>
-        /// 计量单位(字典定义)
+        /// 物料描述
         /// </summary>
-        [EpplusTableColumn(Header = "计量单位", Order = 10)]
-        public string? Unit { get; set; }
+        [EpplusTableColumn(Header = "物料描述", Order = 10)]
+        public string? Remark { get; set; }
 
         /// <summary>
-        /// 内/外序列号
+        /// 计量单位(字典定义)
         /// </summary>
-        [EpplusTableColumn(Header = "数据收集方式(必填)", Order = 11)]
-        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+        [EpplusTableColumn(Header = "计量单位", Order = 11)]
+        public string? Unit { get; set; }
 
         /// <summary>
         /// 基于时间(字典定义)
@@ -769,7 +769,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否默认版本
         /// </summary>
         [EpplusTableColumn(Header = "是否默认版本(必填)", Order = 14)]
-        public YesOrNoEnum? DefaultVersion { get; set; }
+        public TrueOrFalseEnum? IsDefaultVersion { get; set; }
 
         /// <summary>
         /// 消耗系数
@@ -787,7 +787,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 有效天数
         /// </summary>
         [EpplusTableColumn(Header = "有效天数", Order = 17)]
-        public string? ValidTime { get; set; }
+        public int? ValidTime { get; set; }
 
     }
 

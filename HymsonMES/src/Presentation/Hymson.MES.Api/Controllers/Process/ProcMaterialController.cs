@@ -185,7 +185,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("import")]
-        [LogDescription("导入物料数据", BusinessType.EXPORT)]
+        [LogDescription("导入物料数据", BusinessType.IMPORT)]
         [PermissionDescription("proc:material:import")]
         public async Task ImportProcMaterialAsync([FromForm(Name = "file")] IFormFile formFile)
         {

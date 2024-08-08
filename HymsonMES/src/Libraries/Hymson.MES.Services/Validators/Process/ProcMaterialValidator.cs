@@ -60,7 +60,7 @@ namespace Hymson.MES.Services.Validators.Process
 
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(ErrorCode.MES10231);
             //是否默认版本(必填)
-            RuleFor(x => x.DefaultVersion).Must(it => it != null && Enum.IsDefined(typeof(YesOrNoEnum), it)).WithErrorCode(nameof(ErrorCode.MES10236));
+            RuleFor(x => x.IsDefaultVersion).Must(it => it != null && Enum.IsDefined(typeof(YesOrNoEnum), it)).WithErrorCode(nameof(ErrorCode.MES10236));
             //标包数量
             RuleFor(x => x.PackageNum).Must(it => it == null || it > 0).WithErrorCode(nameof(ErrorCode.MES10237));
             //基于时间
