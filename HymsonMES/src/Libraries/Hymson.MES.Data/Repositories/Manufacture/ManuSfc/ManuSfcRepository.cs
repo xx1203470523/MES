@@ -1,7 +1,9 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.NIO;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
+using Hymson.MES.Data.Repositories.NioPushSwitch.Query;
 using Microsoft.Extensions.Options;
 using ConnectionOptions = Hymson.MES.Data.Options.ConnectionOptions;
 
@@ -404,7 +406,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (manuSfcEntities == null || !manuSfcEntities.Any()) return 0;
 
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(ReplaceSql, manuSfcEntities);
+            return await conn.ExecuteAsync(InsertIgnoreSql, manuSfcEntities);
         }
 
         /// <summary>
@@ -662,6 +664,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
         #endregion
 
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcEntity>> GetEntitiesAsync(ManuSfcQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("ms.*");
+            sqlBuilder.Where("ms.IsDeleted = 0");
+            sqlBuilder.Where("ms.SiteId = @SiteId");
+
+            if (query.SFCs != null && query.SFCs.Any()) sqlBuilder.Where("ms.SFC IN @SFCs");
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcEntity>(template.RawSql, query);
+        }
+
         #region 顷刻
 
         /// <summary>
@@ -705,7 +726,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string InsertSql = "INSERT INTO `manu_sfc`(`Id`, `SiteId`, `SFC`, Type, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SFC, @Type, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `manu_sfc`(`Id`, `SiteId`, `SFC`, Type, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SFC, @Type, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string ReplaceSql = "REPLACE INTO `manu_sfc`(`Id`, `SiteId`, `SFC`, Type, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SFC, @Type, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertIgnoreSql = "INSERT IGNORE `manu_sfc`(`Id`, `SiteId`, `SFC`, Type, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SFC, @Type, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";

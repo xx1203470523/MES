@@ -207,8 +207,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// 保存转换数据
         /// </summary>
         /// <param name="entities"></param>
+        /// <param name="barCodes"></param>
         /// <returns></returns>
-        public async Task<StatorSummaryBo> ConvertDataAsync<T>(IEnumerable<T> entities) where T : BaseOPEntity
+        public async Task<StatorSummaryBo> ConvertDataAsync<T>(IEnumerable<T> entities, IEnumerable<string> barCodes) where T : BaseOPEntity
         {
             var producreCode = $"{typeof(T).Name}";
 
@@ -227,6 +228,13 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             if (procedureEntity == null) return summaryBo;
             summaryBo.StatorBo.ProcedureId = procedureEntity.Id;
 
+            // 批量读取条码
+            var manuSFCEntities = await _manuSfcRepository.GetEntitiesAsync(new ManuSfcQuery
+            {
+                SiteId = summaryBo.StatorBo.SiteId,
+                SFCs = barCodes
+            });
+
             // 遍历记录
             var user = "LMS";
             var qty = 1;
@@ -239,11 +247,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     case "OP010":
                         barCode = $"{opEntity.GetType().GetProperty("wire1_barcode")?.GetValue(opEntity)}";
                         break;
+                    case "OP340":
+                        barCode = $"{opEntity.GetType().GetProperty("busbar_barcode")?.GetValue(opEntity)}";
+                        break;
+                    case "OP490":
+                        barCode = $"{opEntity.GetType().GetProperty("LaserBarcode")?.GetValue(opEntity)}";
+                        break;
                     case "OP070":
                     case "OP190":
                     case "OP210":
-                    case "OP340":
-                    case "OP490":
                         barCode = opEntity.Barcode;
                         break;
                     default:
@@ -258,22 +270,31 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var manuSFCStepId = IdGenProvider.Instance.CreateId();
                 var manuBadRecordId = IdGenProvider.Instance.CreateId();
 
-                // 插入条码
-                summaryBo.ManuSFCEntities.Add(new ManuSfcEntity
+                var manuSFCEntity = manuSFCEntities.FirstOrDefault(f => f.SFC == barCode);
+                if (manuSFCEntity == null)
                 {
-                    Id = manuSFCId,
-                    Qty = qty,
-                    SFC = barCode,
-                    IsUsed = YesOrNoEnum.No,
-                    Type = SfcTypeEnum.NoProduce,
-                    Status = SfcStatusEnum.Complete,
+                    // 插入条码
+                    summaryBo.ManuSFCEntities.Add(new ManuSfcEntity
+                    {
+                        Id = manuSFCId,
+                        Qty = qty,
+                        SFC = barCode,
+                        IsUsed = YesOrNoEnum.No,
+                        Type = SfcTypeEnum.NoProduce,
+                        Status = SfcStatusEnum.Complete,
 
-                    SiteId = summaryBo.StatorBo.SiteId,
-                    CreatedBy = summaryBo.StatorBo.User,
-                    CreatedOn = summaryBo.StatorBo.Time,
-                    UpdatedBy = user,
-                    UpdatedOn = opEntity.RDate
-                });
+                        SiteId = summaryBo.StatorBo.SiteId,
+                        CreatedBy = summaryBo.StatorBo.User,
+                        CreatedOn = summaryBo.StatorBo.Time,
+                        UpdatedBy = user,
+                        UpdatedOn = opEntity.RDate
+                    });
+                }
+                else
+                {
+                    // 已存在条码
+                    manuSFCId = manuSFCEntity.Id;
+                }
 
                 // 插入条码信息
                 summaryBo.ManuSFCInfoEntities.Add(new ManuSfcInfoEntity

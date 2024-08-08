@@ -74,12 +74,15 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             });
             if (entities == null || !entities.Any())
             {
-                _logger.LogDebug($"没有要拉取的数据 -> {producreCode}");
+                _logger.LogDebug($"【{producreCode}】没有要拉取的数据 -> {producreCode}");
                 return 0;
             }
 
+            // 先定位条码位置
+            var barCodes = entities.Select(s => s.wire1_barcode);
+
             // 获取转换数据（主数据）
-            var summaryBo = await _baseService.ConvertDataAsync(entities);
+            var summaryBo = await _baseService.ConvertDataAsync(entities, barCodes);
 
             // 读取标准参数
             var parameterEntities = await GetParameterEntitiesWithInitAsync(summaryBo.StatorBo);

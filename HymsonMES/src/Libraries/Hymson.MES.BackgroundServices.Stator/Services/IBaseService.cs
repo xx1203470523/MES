@@ -15,8 +15,9 @@
         /// 保存转换数据
         /// </summary>
         /// <param name="entities"></param>
+        /// <param name="barCodes"></param>
         /// <returns></returns>
-        Task<StatorSummaryBo> ConvertDataAsync<T>(IEnumerable<T> entities) where T : BaseOPEntity;
+        Task<StatorSummaryBo> ConvertDataAsync<T>(IEnumerable<T> entities, IEnumerable<string> barCodes) where T : BaseOPEntity;
 
         /// <summary>
         /// 保存数据
