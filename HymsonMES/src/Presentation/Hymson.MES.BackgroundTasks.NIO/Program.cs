@@ -3,7 +3,6 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.BackgroundTasks.NIO;
 using Hymson.MES.BackgroundTasks.NIO.Extensions;
-using Hymson.MES.BackgroundTasks.NIO.HostedServices;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +36,7 @@ Host.CreateDefaultBuilder(args)
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
        //services.AddPrintBackgroundService(hostContext.Configuration);
-       services.AddClearCacheService(hostContext.Configuration);
+       //services.AddClearCacheService(hostContext.Configuration);
        //services.AddPrintService(hostContext.Configuration);
 
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
@@ -91,7 +90,7 @@ Host.CreateDefaultBuilder(args)
        });
 
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-       services.AddHostedService<SubHostedService>();
+       //services.AddHostedService<SubHostedService>();
        //services.AddSqlExecuteTaskService(hostContext.Configuration);
        services.AddNLog(hostContext.Configuration);
        //services.AddEventBusRabbitMQService(hostContext.Configuration);

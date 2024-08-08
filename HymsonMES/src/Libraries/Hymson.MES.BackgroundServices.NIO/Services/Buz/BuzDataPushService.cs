@@ -239,7 +239,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
         /// <returns></returns>
         public async Task CollectionAsync()
         {
-            _logger.LogInformation($"业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
+            _logger.LogError($"开始业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
             var buzScene = BuzSceneEnum.Buz_Collection_Summary;
             var config = await GetSwitchEntityAsync(buzScene);
@@ -386,7 +386,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             if (dtos == null || dtos.Count == 0)
             {
                 await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioParam, paramList.Max(x => x.Id));
-
+                _logger.LogError($"结束业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
                 return;
             }
 
@@ -401,6 +401,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioParam, paramList.Max(x => x.Id));
 
             trans.Complete();
+            _logger.LogError($"结束业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
             TrueOrFalseEnum CheckParam(ProcedureParamView ?opParam,string paramValue)
             {
