@@ -385,6 +385,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             }
             if (dtos == null || dtos.Count == 0)
             {
+                await _waterMarkService.RecordWaterMarkAsync(BusinessKey.NioParam, paramList.Max(x => x.Id));
+
                 return;
             }
 
