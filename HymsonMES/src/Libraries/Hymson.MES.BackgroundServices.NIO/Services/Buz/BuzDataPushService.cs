@@ -234,8 +234,8 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
             _logger.LogInformation($"业务数据（控制项）CollectionAsync {HymsonClock.Now().ToString("yyyyMMdd HH:mm:ss")}");
 
             var buzScene = BuzSceneEnum.Buz_Collection;
-            var config = await GetSwitchEntityAsync(buzScene);
-            if (config == null) return;
+            //var config = await GetSwitchEntityAsync(buzScene);
+            //if (config == null) return;
 
             //站点配置
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
