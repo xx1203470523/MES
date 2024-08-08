@@ -82,21 +82,27 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             };
 
             var opArray = await Task.WhenAll(readTasks);
-
-            // 最大序列号
-            var maxIndex_1 = opArray[0].Max(m => m.index);
-            var maxIndex_2 = opArray[0].Max(m => m.index);
-            var maxIndex_3 = opArray[0].Max(m => m.index);
-
             var entities = opArray.SelectMany(s => s);
             if (entities == null || !entities.Any())
             {
-                _logger.LogDebug($"没有要拉取的数据 -> {producreCode}");
+                _logger.LogDebug($"【{producreCode}】没有要拉取的数据 -> {producreCode}");
                 return 0;
             }
 
+            // 最大序列号
+            var maxIndex_1 = 0L;
+            var maxIndex_2 = 0L;
+            var maxIndex_3 = 0L;
+
+            if (opArray[0] != null && opArray[0].Any()) maxIndex_1 = opArray[0].Max(m => m.index);
+            if (opArray[1] != null && opArray[1].Any()) maxIndex_2 = opArray[1].Max(m => m.index);
+            if (opArray[2] != null && opArray[2].Any()) maxIndex_3 = opArray[2].Max(m => m.index);
+
+            // 先定位条码位置
+            var barCodes = entities.Select(s => s.Barcode);
+
             // 获取转换数据
-            var summaryBo = await _baseService.ConvertDataAsync(entities);
+            var summaryBo = await _baseService.ConvertDataAsync(entities, barCodes);
 
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
@@ -104,15 +110,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 保存基础数据
             rows += await _baseService.SaveBaseDataAsync(summaryBo);
 
-            List<Task<int>> saveTasks = new()
-            {
-                _waterMarkService.RecordWaterMarkAsync(buzKey_1, maxIndex_1),
-                _waterMarkService.RecordWaterMarkAsync(buzKey_2, maxIndex_2),
-                _waterMarkService.RecordWaterMarkAsync(buzKey_3, maxIndex_3),
-            };
-
-            var rowArray = await Task.WhenAll(saveTasks);
-            rows += rowArray.Sum();
+            if (maxIndex_1 > 0) rows += await _waterMarkService.RecordWaterMarkAsync(buzKey_1, maxIndex_1);
+            if (maxIndex_2 > 0) rows += await _waterMarkService.RecordWaterMarkAsync(buzKey_2, maxIndex_2);
+            if (maxIndex_3 > 0) rows += await _waterMarkService.RecordWaterMarkAsync(buzKey_3, maxIndex_3);
 
             trans.Complete();
             return rows;

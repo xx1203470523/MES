@@ -220,6 +220,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcEntity>> GetListAsync(ManuSfcQuery query);
         #endregion
 
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcEntity>> GetEntitiesAsync(ManuSfcQuery query);
+
         #region 顷刻
 
         /// <summary>
