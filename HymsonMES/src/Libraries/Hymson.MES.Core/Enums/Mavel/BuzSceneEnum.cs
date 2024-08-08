@@ -53,8 +53,13 @@ namespace Hymson.MES.Core.Enums.Mavel
         /// <summary>
         /// 业务数据（控制项）
         /// </summary> 
-        [Description("业务数据（控制项）")]
+        [Description("业务数据（控制项）推送")]
         Buz_Collection = 201,
+        /// <summary>
+        /// 业务数据（控制项）
+        /// </summary> 
+        [Description("业务数据（控制项）汇总")]
+        Buz_Collection_Summary = 2010,
         /// <summary>
         /// 业务数据（生产业务）
         /// </summary> 

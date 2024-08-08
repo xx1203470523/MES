@@ -38,5 +38,15 @@ namespace Hymson.MES.Data.Repositories.NIO.NioPushCollection.View
         /// 下限值，可能来自t2表  
         /// </summary>  
         public decimal? LowerLimit { get; set; } // 假设是数值类型，根据实际情况选择类型  
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
     }
 }

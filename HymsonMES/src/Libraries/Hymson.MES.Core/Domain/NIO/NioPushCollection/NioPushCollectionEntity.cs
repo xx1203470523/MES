@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.NioPushCollection
 {
@@ -128,6 +129,11 @@ namespace Hymson.MES.Core.Domain.NioPushCollection
         /// <summary>
         /// 数据类型 1-转子 2-定子
         /// </summary>
-        public int DataType { get; set; }     
+        public int DataType { get; set; }
+
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public TrueOrFalseEnum IsOk { get; set; } = TrueOrFalseEnum.Yes;
     }
 }

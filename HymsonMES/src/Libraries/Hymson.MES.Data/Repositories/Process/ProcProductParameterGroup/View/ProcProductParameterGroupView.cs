@@ -100,6 +100,11 @@ namespace Hymson.MES.Data.Repositories.Process.View
         /// </summary>  
         public decimal? LowerLimit { get; set; } // 假设是数值类型，根据实际情况选择类型  
 
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
         /// <summary>  
         /// 工序代码，可能来自t3表  
         /// </summary>  
@@ -109,6 +114,11 @@ namespace Hymson.MES.Data.Repositories.Process.View
         /// 工序名称，可能来自t3表  
         /// </summary>  
         public string ProcedureName { get; set; }
+
+        /// <summary>
+        /// 参数ID
+        /// </summary>
+        public long ParameterId { get; set; }
 
         /// <summary>  
         /// 参数名称，可能来自t4表  

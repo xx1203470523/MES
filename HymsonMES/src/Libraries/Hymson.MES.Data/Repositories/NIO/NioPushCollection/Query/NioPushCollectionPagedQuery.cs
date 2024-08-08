@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Plan;
 
 namespace Hymson.MES.Data.Repositories.NioPushCollection.Query
@@ -32,5 +33,10 @@ namespace Hymson.MES.Data.Repositories.NioPushCollection.Query
         /// 推送状态;0：无需推送；1：待推送；2：已推送；3：推送失败；
         /// </summary>
         public PushStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public TrueOrFalseEnum? IsOk { get; set; }
     }
 }
