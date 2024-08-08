@@ -15,5 +15,10 @@
         /// </summary>
         public const string BUZ_KEY_PREFIX = "Stator";
 
+        /// <summary>
+        /// 定子部件有效前缀
+        /// </summary>
+        public const string BARCODE_PREFIX = "CSCW188";
+
     }
 }

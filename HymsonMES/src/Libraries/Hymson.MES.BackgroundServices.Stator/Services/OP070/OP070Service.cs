@@ -55,11 +55,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var producreCode = $"{typeof(OP070).Name}";
             var buzKey_1 = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}-1";
             var buzKey_2 = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}-2";
-            var buzKey_3 = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}-3";
+            //var buzKey_3 = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}-3";
 
             var waterMarkId_1 = await _waterMarkService.GetWaterMarkAsync(buzKey_1);
             var waterMarkId_2 = await _waterMarkService.GetWaterMarkAsync(buzKey_2);
-            var waterMarkId_3 = await _waterMarkService.GetWaterMarkAsync(buzKey_3);
+            //var waterMarkId_3 = await _waterMarkService.GetWaterMarkAsync(buzKey_3);
 
             // 根据水位读取数据
             List<Task<IEnumerable<OP070>>> readTasks = new()
@@ -74,11 +74,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     StartWaterMarkId = waterMarkId_2,
                     Rows = limitCount
                 }, "op070_2"),
-                _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
-                {
-                    StartWaterMarkId = waterMarkId_3,
-                    Rows = limitCount
-                }, "op070_3")
+                //_opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+                //{
+                //    StartWaterMarkId = waterMarkId_3,
+                //    Rows = limitCount
+                //}, "op070_3")
             };
 
             var opArray = await Task.WhenAll(readTasks);
@@ -92,11 +92,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 最大序列号
             var maxIndex_1 = 0L;
             var maxIndex_2 = 0L;
-            var maxIndex_3 = 0L;
+            //var maxIndex_3 = 0L;
 
             if (opArray[0] != null && opArray[0].Any()) maxIndex_1 = opArray[0].Max(m => m.index);
             if (opArray[1] != null && opArray[1].Any()) maxIndex_2 = opArray[1].Max(m => m.index);
-            if (opArray[2] != null && opArray[2].Any()) maxIndex_3 = opArray[2].Max(m => m.index);
+            //if (opArray[2] != null && opArray[2].Any()) maxIndex_3 = opArray[2].Max(m => m.index);
 
             // 先定位条码位置
             var barCodes = entities.Select(s => s.Barcode);
@@ -112,7 +112,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
 
             if (maxIndex_1 > 0) rows += await _waterMarkService.RecordWaterMarkAsync(buzKey_1, maxIndex_1);
             if (maxIndex_2 > 0) rows += await _waterMarkService.RecordWaterMarkAsync(buzKey_2, maxIndex_2);
-            if (maxIndex_3 > 0) rows += await _waterMarkService.RecordWaterMarkAsync(buzKey_3, maxIndex_3);
+            //if (maxIndex_3 > 0) rows += await _waterMarkService.RecordWaterMarkAsync(buzKey_3, maxIndex_3);
 
             trans.Complete();
             return rows;

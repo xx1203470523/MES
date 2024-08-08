@@ -14,6 +14,17 @@ namespace Hymson.MES.BackgroundServices.Stator
         public BaseStatorBo StatorBo { get; set; } = new();
 
         /// <summary>
+        /// 集合（定子条码）
+        /// </summary>
+        public List<StatorBarCodeEntity> AddStatorBarCodeEntities { get; set; } = new();
+
+        /// <summary>
+        /// 集合（定子条码）
+        /// </summary>
+        public List<StatorBarCodeEntity> UpdateStatorBarCodeEntities { get; set; } = new();
+
+
+        /// <summary>
         /// 集合（条码）
         /// </summary>
         public List<ManuSfcEntity> ManuSFCEntities { get; set; } = new();
