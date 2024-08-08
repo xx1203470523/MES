@@ -113,19 +113,19 @@ namespace Hymson.MES.Services.Services.Marking
             var resourceIds = pagedInfoData.Select(x => x.ResourceId).Distinct().ToArray();
             var resourceInfos = await _procResourceRepository.GetListByIdsAsync(resourceIds);
 
-            var interceptWorkCenterIds = workOrderInfos?.Select(x => x.WorkCenterId.GetValueOrDefault()).Distinct().ToArray();
+            var interceptWorkCenterIds = workOrderInfos.Select(x => x.WorkCenterId.GetValueOrDefault()).Distinct().ToArray();
             var workCenterInfos = await _inteWorkCenterRepository.GetByIdsAsync(interceptWorkCenterIds);
 
             foreach (var item in pagedInfoData)
             {
                 var procMaterialInfo = procMaterialInfos.FirstOrDefault(x => x.Id == item.ProductId);
-                var workOrderInfo = workOrderInfos?.FirstOrDefault(x => x.Id == item.WorkOrderId);
+                var workOrderInfo = workOrderInfos.FirstOrDefault(x => x.Id == item.WorkOrderId);
                 var findProcedureInfo = procedureInfos.FirstOrDefault(x => x.Id == item.FindProcedureId);
                 var appointInterceptInfo = procedureInfos.FirstOrDefault(x => x.Id == item.AppointInterceptProcedureId);
                 var interceptProcedureInfo = procedureInfos.FirstOrDefault(x => x.Id == item.InterceptProcedureId);
                 var interceptEquipmentInfo = interceptEquipmentInfos.FirstOrDefault(x => x.Id == item.InterceptEquipmentId);
                 var resourceInfo = resourceInfos.FirstOrDefault(x => x.Id == item.ResourceId);
-                var workCenterInfo = workCenterInfos.FirstOrDefault(x => x.Id != null);
+                var workCenterInfo = workCenterInfos.FirstOrDefault(x => x.Id == (workOrderInfo?.WorkCenterId ?? 0));
 
                 // 实体到DTO转换 装载数据
                 listDto.Add(new MarkingRecordReportDto
@@ -135,7 +135,7 @@ namespace Hymson.MES.Services.Services.Marking
                     MaterialName = procMaterialInfo?.MaterialName ?? "",
                     OrderCode = workOrderInfo?.OrderCode ?? "",
                     WorkCenterName = workCenterInfo?.Name ?? "",
-                    OrderType = workOrderInfo!.Type,
+                    OrderType = workOrderInfo?.Type,
                     FindProcedureName = findProcedureInfo?.Name ?? "",
                     AppointInterceptProcedureName = appointInterceptInfo?.Name ?? "",
                     InterceptProcedureName = interceptProcedureInfo?.Name ?? "",
