@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Hymson.MES.Core.Enums.Mavel;
+using Hymson.MES.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -85,5 +87,30 @@ namespace Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Param.View
         /// 单位
         /// </summary>
         public string ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 是否是CC项
+        /// </summary>
+        public TrueOrFalseEnum? IsCc { get; set; }
+
+        /// <summary>
+        /// 是否是Sc项
+        /// </summary>
+        public TrueOrFalseEnum? IsSc { get; set; }
+
+        /// <summary>
+        /// 是否是SPC项目
+        /// </summary>
+        public TrueOrFalseEnum? IsSpc { get; set; }
+
+        /// <summary>
+        /// 未维护
+        /// </summary>
+        public Category01Enum? Category01 { get; set; }
+
+        /// <summary>
+        /// 是否推送
+        /// </summary>
+        public TrueOrFalseEnum? IsPush { get; set; }
     }
 }

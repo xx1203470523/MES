@@ -373,6 +373,10 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 {
                     continue;
                 }
+                if(param.IsPush != null && param.IsPush == TrueOrFalseEnum.No)
+                {
+                    continue;
+                }
                 string remark = param.Remark ?? "";
 
                 NIOConfigBaseDto curConfig = new NIOConfigBaseDto();
@@ -413,15 +417,15 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 {
                     model.ValueType = "string";
                 }
-                if (remark.Contains("cc") == true || remark.Contains("CC") == true)
+                if(param.IsCc != null && param.IsCc == TrueOrFalseEnum.Yes)
                 {
                     model.Cc = true;
                 }
-                if (remark.Contains("SC") == true || remark.Contains("sc") == true)
+                if(param.IsSc != null && param.IsSc == TrueOrFalseEnum.Yes)
                 {
                     model.Sc = true;
                 }
-                if (remark.Contains("SPC") == true || remark.Contains("spc") == true)
+                if(param.IsSpc != null && param.IsSpc == TrueOrFalseEnum.Yes)
                 {
                     model.Spc = true;
                 }
@@ -438,13 +442,9 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                     model.StdValue = (decimal)param.CenterValue;
                 }
                 model.Category01 = "未维护";
-                if (remark.Contains("测试项") == true)
+                if(param.Category01 != null)
                 {
-                    model.Category01 = "测试项";
-                }
-                if(remark.Contains("工艺参数") == true)
-                {
-                    model.Category01 = "工艺参数";
+                    model.Category01 = param.Category01.GetDescription();
                 }
                 dtos.Add(model);
             }

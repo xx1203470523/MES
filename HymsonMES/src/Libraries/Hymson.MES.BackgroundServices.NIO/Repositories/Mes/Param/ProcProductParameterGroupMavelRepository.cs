@@ -33,7 +33,7 @@ namespace Hymson.MES.BackgroundServices.NIO.Repositories.Mes.Param
             string sql = $@"
                 select t1.Code ,t1.Name ,t1.Version ,t2.UpperLimit ,t2.CenterValue ,t2.LowerLimit ,t1.UpdatedOn ,
 	                t3.Code procedureCode,t3.Name procedureName,t4.ParameterName ,t4.ParameterCode,t4.DataType ,
-                    t4.Remark,t4.ParameterUnit  
+                    t4.Remark,t4.ParameterUnit, t4.IsCc ,t4.IsSc ,t4.IsSpc ,t4.IsPush ,t4.Category01  
                 from proc_product_parameter_group t1
                 inner join proc_product_parameter_group_detail t2 on t1.Id = t2.ParameterGroupId  and t2.IsDeleted  = 0
                 inner join proc_procedure t3 on t3.Id  = t1.ProcedureId and t3.IsDeleted = 0

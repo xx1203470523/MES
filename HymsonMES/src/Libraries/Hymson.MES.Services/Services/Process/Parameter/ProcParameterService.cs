@@ -227,7 +227,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             var siteId = _currentSite.SiteId;
 
-            var procParameterEntity = await _procParameterRepository.GetByIdAsync(id);
+            ProcParameterEntity? procParameterEntity = await _procParameterRepository.GetByIdAsync(id);
             if (procParameterEntity != null)
             {
                 var dto = procParameterEntity.ToModel<CustomProcParameterDto>();
