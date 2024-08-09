@@ -294,6 +294,11 @@ namespace Hymson.MES.BackgroundServices.NIO.Services
                 {
                     continue;
                 }
+                if(curBaseParam.IsPush == TrueOrFalseEnum.No)
+                {
+                    continue;
+                }
+
                 //工序参数
                 string procedure = "未知";
                 var curProcedure = procedureParamList.Where(m => m.ProcedureId == item.ProcedureId).FirstOrDefault();

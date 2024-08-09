@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Mavel;
 using MimeKit;
 
 using OfficeOpenXml.Attributes;
@@ -51,6 +52,30 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
+        /// <summary>
+        /// 是否是CC项
+        /// </summary>
+        public TrueOrFalseEnum IsCc { get; set; } = TrueOrFalseEnum.No;
+
+        /// <summary>
+        /// 是否是Sc项
+        /// </summary>
+        public TrueOrFalseEnum IsSc { get; set; } = TrueOrFalseEnum.No;
+
+        /// <summary>
+        /// 是否是SPC项目
+        /// </summary>
+        public TrueOrFalseEnum IsSpc { get; set; } = TrueOrFalseEnum.No;
+
+        /// <summary>
+        /// 未维护
+        /// </summary>
+        public Category01Enum Category01 { get; set; } = Category01Enum.No;
+
+        /// <summary>
+        /// 是否推送
+        /// </summary>
+        public TrueOrFalseEnum IsPush { get; set; } = TrueOrFalseEnum.No;
     }
 
     /// <summary>
@@ -122,6 +147,30 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? Remark { get; set; } = "";
 
+        /// <summary>
+        /// 是否是CC项
+        /// </summary>
+        public TrueOrFalseEnum IsCc { get; set; } = TrueOrFalseEnum.No;
+
+        /// <summary>
+        /// 是否是Sc项
+        /// </summary>
+        public TrueOrFalseEnum IsSc { get; set; } = TrueOrFalseEnum.No;
+
+        /// <summary>
+        /// 是否是SPC项目
+        /// </summary>
+        public TrueOrFalseEnum IsSpc { get; set; } = TrueOrFalseEnum.No;
+
+        /// <summary>
+        /// 未维护
+        /// </summary>
+        public Category01Enum Category01 { get; set; } = Category01Enum.No;
+
+        /// <summary>
+        /// 是否推送
+        /// </summary>
+        public TrueOrFalseEnum IsPush { get; set; } = TrueOrFalseEnum.No;
     }
 
     /// <summary>
