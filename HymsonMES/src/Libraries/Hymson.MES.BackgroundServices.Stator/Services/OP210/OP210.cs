@@ -8,17 +8,27 @@
         /// <summary>
         /// 
         /// </summary>
-        public string wire_cart { get; set; }
+        public string PeakPressure { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string wire1_barcode { get; set; }
+        public string EndPressure { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string wire2_barcode { get; set; }
+        public string EndPosition { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string WaitTime { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string PressTemp { get; set; }
 
     }
 }

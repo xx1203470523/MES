@@ -1,19 +1,22 @@
-﻿namespace Hymson.MES.BackgroundServices.Stator.Services
+﻿using Hymson.Utils;
+using System.Data;
+
+namespace Hymson.MES.BackgroundServices.Stator.Services
 {
     /// <summary>
     /// 服务
     /// </summary>
-    public partial class OP190Service : IOP190Service
+    public partial class OP120Service : IOP120Service
     {
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<OP190Service> _logger;
+        private readonly ILogger<OP120Service> _logger;
 
         /// <summary>
         /// 仓储接口（工序）
         /// </summary>
-        private readonly IOPRepository<OP190> _opRepository;
+        private readonly IOPRepository<OP120> _opRepository;
 
         /// <summary>
         /// 服务接口（基础）
@@ -32,8 +35,8 @@
         /// <param name="opRepository"></param>
         /// <param name="baseService"></param>
         /// <param name="waterMarkService"></param>
-        public OP190Service(ILogger<OP190Service> logger,
-            IOPRepository<OP190> opRepository,
+        public OP120Service(ILogger<OP120Service> logger,
+            IOPRepository<OP120> opRepository,
             IBaseService baseService,
             IWaterMarkService waterMarkService)
         {
@@ -50,31 +53,50 @@
         /// <returns></returns>
         public async Task<int> ExecuteAsync(int limitCount)
         {
-            var producreCode = $"{typeof(OP190).Name}";
+            var producreCode = $"{typeof(OP120).Name}";
             var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
             // 根据水位读取数据
-            var entities = await _opRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            var dataTable = await _opRepository.GetDataTableByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
             {
                 StartWaterMarkId = waterMarkId,
                 Rows = limitCount
             });
-            if (entities == null || !entities.Any())
+            if (dataTable == null || dataTable.Rows.Count == 0)
             {
                 _logger.LogDebug($"【{producreCode}】没有要拉取的数据！");
                 return 0;
             }
 
-            // 先定位条码位置
-            var barCodes = entities.Select(s => s.Barcode);
-
             // 获取转换数据（基础数据）
-            var summaryBo = await _baseService.ConvertDataListAsync(entities, barCodes);
+            var summaryBo = await _baseService.ConvertDataTableAsync(dataTable, producreCode, _parameterCodes);
 
             // 保存数据
-            return await _baseService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
+            var waterLevel = dataTable.AsEnumerable().Select(s => s["index"].ParseToLong());
+            return await _baseService.SaveBaseDataWithCommitAsync(buzKey, waterLevel.Max(m => m), summaryBo);
+
         }
 
+    }
+
+    /// <summary>
+    /// 服务
+    /// </summary>
+    public partial class OP120Service
+    {
+        /// <summary>
+        /// 参数编码集合
+        /// </summary>
+        private static readonly List<string> _parameterCodes = new()
+        {
+            "WorkCount",
+            "SpindleWorkPositionSpeed",
+            "SpindleWork1AxisSpeed",
+            "SpindleWorkSingleSpeed",
+            "SpindleWorkPosition",
+            "SpindleWork1stPosition",
+            "SpindleWorkEndPosition"
+        };
     }
 }

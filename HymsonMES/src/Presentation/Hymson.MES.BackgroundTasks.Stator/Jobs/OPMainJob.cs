@@ -11,11 +11,12 @@ namespace Hymson.MES.BackgroundTasks.Stator
     internal class OPMainJob : IJob
     {
         /// <summary>
-        /// 
+        /// 日志接口
         /// </summary>
         private readonly ILogger<OPMainJob> _logger;
         private readonly IOP010Service _op010Service;
         private readonly IOP070Service _op070Service;
+        private readonly IOP120Service _op120Service;
         private readonly IOP190Service _op190Service;
         private readonly IOP210Service _op210Service;
         private readonly IOP340Service _op340Service;
@@ -27,6 +28,7 @@ namespace Hymson.MES.BackgroundTasks.Stator
         /// <param name="logger"></param>
         /// <param name="op010Service"></param>
         /// <param name="op070Service"></param>
+        /// <param name="op120Service"></param>
         /// <param name="op190Service"></param>
         /// <param name="op210Service"></param>
         /// <param name="op340Service"></param>
@@ -34,6 +36,7 @@ namespace Hymson.MES.BackgroundTasks.Stator
         public OPMainJob(ILogger<OPMainJob> logger,
             IOP010Service op010Service,
             IOP070Service op070Service,
+            IOP120Service op120Service,
             IOP190Service op190Service,
             IOP210Service op210Service,
             IOP340Service op340Service,
@@ -42,6 +45,7 @@ namespace Hymson.MES.BackgroundTasks.Stator
             _logger = logger;
             _op010Service = op010Service;
             _op070Service = op070Service;
+            _op120Service = op120Service;
             _op190Service = op190Service;
             _op210Service = op210Service;
             _op340Service = op340Service;
@@ -57,12 +61,14 @@ namespace Hymson.MES.BackgroundTasks.Stator
         {
             try
             {
-                _ = await _op070Service.ExecuteAsync(500);
-                _ = await _op010Service.ExecuteAsync(500);
-                _ = await _op190Service.ExecuteAsync(500);
-                _ = await _op210Service.ExecuteAsync(500);
-                _ = await _op340Service.ExecuteAsync(500);
-                _ = await _op490Service.ExecuteAsync(500);
+                // 顺序不要随意调整
+                _ = await _op070Service.ExecuteAsync(5000);
+                _ = await _op120Service.ExecuteAsync(5000);
+                _ = await _op010Service.ExecuteAsync(5000);
+                _ = await _op190Service.ExecuteAsync(5000);
+                _ = await _op210Service.ExecuteAsync(5000);
+                _ = await _op340Service.ExecuteAsync(5000);
+                _ = await _op490Service.ExecuteAsync(5000);
             }
             catch (Exception ex)
             {

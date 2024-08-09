@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Process;
+using System.Data;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
@@ -10,16 +11,27 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <summary>
         /// 获取基础配置（定子）
         /// </summary>
+        /// <param name="producreCode"></param>
         /// <returns></returns>
-        Task<BaseStatorBo> GetStatorBaseConfigAsync();
+        Task<BaseStatorBo> GetStatorBaseConfigAsync(string producreCode = "");
 
         /// <summary>
-        /// 保存转换数据
+        /// 保存转换数据（附带参数）
+        /// </summary>
+        /// <param name="dataTable"></param>
+        /// <param name="producreCode"></param>
+        /// <param name="parameterCodes"></param>
+        /// <returns></returns>
+        Task<StatorSummaryBo> ConvertDataTableAsync(DataTable dataTable, string producreCode, IEnumerable<string>? parameterCodes = null);
+
+        /// <summary>
+        /// 保存转换数据（附带参数）
         /// </summary>
         /// <param name="entities"></param>
         /// <param name="barCodes"></param>
+        /// <param name="parameterCodes"></param>
         /// <returns></returns>
-        Task<StatorSummaryBo> ConvertDataAsync<T>(IEnumerable<T> entities, IEnumerable<string> barCodes) where T : BaseOPEntity;
+        Task<StatorSummaryBo> ConvertDataListAsync<T>(IEnumerable<T> entities, IEnumerable<string> barCodes, IEnumerable<string>? parameterCodes = null) where T : BaseOPEntity;
 
         /// <summary>
         /// 获取参数编码
@@ -27,7 +39,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="parameterCodes"></param>
         /// <param name="statorBo"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcParameterEntity>> GetParameterEntitiesWithInitAsync(IEnumerable<string> parameterCodes, BaseStatorBo statorBo);
+        Task<IEnumerable<ProcParameterEntity>> GetParameterEntitiesAsync(IEnumerable<string> parameterCodes, BaseStatorBo statorBo);
 
         /// <summary>
         /// 保存数据

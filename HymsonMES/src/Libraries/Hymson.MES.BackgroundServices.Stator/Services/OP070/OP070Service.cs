@@ -1,5 +1,4 @@
-﻿using Hymson.Snowflake;
-using Hymson.Utils.Tools;
+﻿using Hymson.Utils.Tools;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
@@ -103,45 +102,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var barCodes = entities.Select(s => s.Barcode);
 
             // 获取转换数据（基础数据）
-            var summaryBo = await _baseService.ConvertDataAsync(entities, barCodes);
-
-            // 读取标准参数
-            var parameterEntities = await _baseService.GetParameterEntitiesWithInitAsync(_parameterCodes, summaryBo.StatorBo);
-
-            // 填充参数
-            foreach (var step in summaryBo.ManuSfcStepEntities)
-            {
-                // 当前记录
-                var entity = entities.FirstOrDefault(f => $"{f.index}" == step.Remark);
-                if (entity == null) continue;
-
-                // 遍历参数
-                foreach (var param in parameterEntities)
-                {
-                    // 指定对象获取值
-                    var paramValue = entity.GetType().GetProperty(param.ParameterCode)?.GetValue(entity);
-
-                    summaryBo.ManuProductParameterEntities.Add(new Core.Domain.Parameter.ManuProductParameterEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        ProcedureId = step.ProcedureId ?? 0,
-                        SfcstepId = step.Id,
-                        SFC = step.SFC,
-
-                        ParameterId = param.Id,
-                        ParameterValue = $"{paramValue}",
-                        ParameterGroupId = entity.Result == "OK" ? 1 : 0,
-                        CollectionTime = entity.RDate ?? step.CreatedOn,
-
-                        SiteId = step.SiteId,
-                        CreatedBy = step.CreatedBy,
-                        CreatedOn = step.CreatedOn,
-                        UpdatedBy = step.UpdatedBy,
-                        UpdatedOn = step.UpdatedOn
-                    });
-                }
-
-            }
+            var summaryBo = await _baseService.ConvertDataListAsync(entities, barCodes, _parameterCodes);
 
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();

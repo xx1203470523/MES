@@ -70,7 +70,7 @@
             var barCodes = entities.Select(s => s.LaserBarcode);
 
             // 获取转换数据（基础数据）
-            var summaryBo = await _baseService.ConvertDataAsync(entities, barCodes);
+            var summaryBo = await _baseService.ConvertDataListAsync(entities, barCodes);
 
             // 保存数据
             return await _baseService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);

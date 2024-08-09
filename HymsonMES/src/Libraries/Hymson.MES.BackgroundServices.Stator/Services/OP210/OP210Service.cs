@@ -70,11 +70,29 @@
             var barCodes = entities.Select(s => s.Barcode);
 
             // 获取转换数据（基础数据）
-            var summaryBo = await _baseService.ConvertDataAsync(entities, barCodes);
+            var summaryBo = await _baseService.ConvertDataListAsync(entities, barCodes, _parameterCodes);
 
             // 保存数据
             return await _baseService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
         }
 
+    }
+
+    /// <summary>
+    /// 服务
+    /// </summary>
+    public partial class OP210Service
+    {
+        /// <summary>
+        /// 参数编码集合
+        /// </summary>
+        private static readonly List<string> _parameterCodes = new()
+        {
+            "PeakPressure",
+            "EndPressure",
+            "EndPosition",
+            "WaitTime",
+            "PressTemp"
+        };
     }
 }
