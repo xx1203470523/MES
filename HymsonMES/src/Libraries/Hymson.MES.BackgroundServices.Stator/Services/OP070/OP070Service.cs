@@ -20,7 +20,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <summary>
         /// 服务接口（基础）
         /// </summary>
-        public readonly IBaseService _baseService;
+        public readonly IMainService _mainService;
 
         /// <summary>
         /// 服务接口（水位）
@@ -32,16 +32,16 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="opRepository"></param>
-        /// <param name="baseService"></param>
+        /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
         public OP070Service(ILogger<OP070Service> logger,
             IOPRepository<OP070> opRepository,
-            IBaseService baseService,
+            IMainService mainService,
             IWaterMarkService waterMarkService)
         {
             _logger = logger;
             _opRepository = opRepository;
-            _baseService = baseService;
+            _mainService = mainService;
             _waterMarkService = waterMarkService;
         }
 
@@ -102,13 +102,13 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var barCodes = entities.Select(s => s.Barcode);
 
             // 获取转换数据（基础数据）
-            var summaryBo = await _baseService.ConvertDataListAsync(entities, barCodes, _parameterCodes);
+            var summaryBo = await _mainService.ConvertDataListAsync(entities, barCodes, _parameterCodes);
 
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
 
             // 保存基础数据
-            rows += await _baseService.SaveBaseDataAsync(summaryBo);
+            rows += await _mainService.SaveBaseDataAsync(summaryBo);
 
             if (maxIndex_1 > 0) rows += await _waterMarkService.RecordWaterMarkAsync(buzKey_1, maxIndex_1);
             if (maxIndex_2 > 0) rows += await _waterMarkService.RecordWaterMarkAsync(buzKey_2, maxIndex_2);

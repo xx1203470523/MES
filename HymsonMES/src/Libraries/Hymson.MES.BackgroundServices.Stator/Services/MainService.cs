@@ -20,8 +20,14 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public class BaseService : IBaseService
+    public partial class MainService : IMainService
     {
+        /// <summary>
+        /// 默认值
+        /// </summary>
+        protected const string User = "LMS";
+        protected const decimal Qty = 1;
+
         /// <summary>
         /// 服务接口（水位）
         /// </summary>
@@ -110,7 +116,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="manuProductBadRecordRepository"></param>
         /// <param name="manuProductNgRecordRepository"></param>
         /// <param name="manuProductParameterRepository"></param>
-        public BaseService(IWaterMarkService waterMarkService,
+        public MainService(IWaterMarkService waterMarkService,
             ISysConfigRepository sysConfigRepository,
             IStatorBarCodeRepository statorBarCodeRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
@@ -276,8 +282,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var statorSFCEntities = await _statorBarCodeRepository.GetEntitiesAsync(statorQuery);
 
             // 遍历记录
-            var user = "LMS";
-            var qty = 1;
             var summaryBo = new StatorSummaryBo { };
             foreach (DataRow dr in dataTable.Rows)
             {
@@ -331,7 +335,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     ProductBOMId = statorBo.ProductBOMId,
                     ProcessRouteId = statorBo.ProcessRouteId,
                     SFCInfoId = manuSFCInfoEntity.Id,
-                    Qty = qty,
+                    Qty = Qty,
                     VehicleCode = "",
                     ProcedureId = statorBo.ProcedureId,
                     ResourceId = null,
@@ -345,7 +349,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = user,
+                    UpdatedBy = User,
                     UpdatedOn = time
                 };
                 summaryBo.ManuSfcStepEntities.Add(stepEntity);
@@ -372,7 +376,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = user,
+                    UpdatedBy = User,
                     UpdatedOn = time
                 });
 
@@ -387,7 +391,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = user,
+                    UpdatedBy = User,
                     UpdatedOn = time
                 });
 
@@ -457,8 +461,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var statorSFCEntities = await _statorBarCodeRepository.GetEntitiesAsync(statorQuery);
 
             // 遍历记录
-            var user = "LMS";
-            var qty = 1;
             var summaryBo = new StatorSummaryBo { };
             foreach (var opEntity in entities)
             {
@@ -553,7 +555,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     summaryBo.ManuSFCEntities.Add(new ManuSfcEntity
                     {
                         Id = manuSFCId,
-                        Qty = qty,
+                        Qty = Qty,
                         SFC = barCode,
                         IsUsed = YesOrNoEnum.No,
                         Type = SfcTypeEnum.NoProduce,
@@ -562,7 +564,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         SiteId = statorBo.SiteId,
                         CreatedBy = statorBo.User,
                         CreatedOn = statorBo.Time,
-                        UpdatedBy = user,
+                        UpdatedBy = User,
                         UpdatedOn = opEntity.RDate
                     });
                 }
@@ -586,7 +588,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = user,
+                    UpdatedBy = User,
                     UpdatedOn = opEntity.RDate
                 });
 
@@ -603,7 +605,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     ProductBOMId = statorBo.ProductBOMId,
                     ProcessRouteId = statorBo.ProcessRouteId,
                     SFCInfoId = manuSFCInfoId,
-                    Qty = qty,
+                    Qty = Qty,
                     VehicleCode = "",
                     ProcedureId = statorBo.ProcedureId,
                     ResourceId = null,
@@ -617,7 +619,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = user,
+                    UpdatedBy = User,
                     UpdatedOn = opEntity.RDate
                 };
                 summaryBo.ManuSfcStepEntities.Add(stepEntity);
@@ -644,7 +646,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = user,
+                    UpdatedBy = User,
                     UpdatedOn = opEntity.RDate
                 });
 
@@ -659,7 +661,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = user,
+                    UpdatedBy = User,
                     UpdatedOn = opEntity.RDate
                 });
 
@@ -715,7 +717,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 ParameterUnit = "1",
                 ParameterCode = s,
                 ParameterName = s,
-                Remark = "LMS",
+                Remark = User,
 
                 SiteId = statorBo.SiteId,
                 CreatedBy = statorBo.User,

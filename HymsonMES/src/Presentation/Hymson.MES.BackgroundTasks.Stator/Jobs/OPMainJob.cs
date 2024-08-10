@@ -62,19 +62,36 @@ namespace Hymson.MES.BackgroundTasks.Stator
             try
             {
                 // 顺序不要随意调整
-                _ = await _op070Service.ExecuteAsync(5000);
-                _ = await _op120Service.ExecuteAsync(5000);
-                _ = await _op010Service.ExecuteAsync(5000);
-                _ = await _op190Service.ExecuteAsync(5000);
-                _ = await _op210Service.ExecuteAsync(5000);
-                _ = await _op340Service.ExecuteAsync(5000);
-                _ = await _op490Service.ExecuteAsync(5000);
+                var limitCount = 500;
+                await LoopExecuteAsync(() => _op070Service.ExecuteAsync(limitCount));
+                await LoopExecuteAsync(() => _op120Service.ExecuteAsync(limitCount));
+                await LoopExecuteAsync(() => _op010Service.ExecuteAsync(limitCount));
+                await LoopExecuteAsync(() => _op190Service.ExecuteAsync(limitCount));
+                await LoopExecuteAsync(() => _op210Service.ExecuteAsync(limitCount));
+                await LoopExecuteAsync(() => _op340Service.ExecuteAsync(limitCount));
+                await LoopExecuteAsync(() => _op490Service.ExecuteAsync(limitCount));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "OPMainJob :");
             }
         }
+
+        /// <summary>
+        /// 循环执行
+        /// </summary>
+        /// <param name="asyncMethod"></param>
+        /// <returns></returns>
+        private static async Task LoopExecuteAsync(Func<Task<int>> asyncMethod)
+        {
+            while (true)
+            {
+                var rows = await asyncMethod();
+                if (rows <= 0) break;
+            }
+        }
+
+
 
     }
 }

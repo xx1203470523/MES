@@ -18,7 +18,7 @@
         /// <summary>
         /// 服务接口（基础）
         /// </summary>
-        public readonly IBaseService _baseService;
+        public readonly IMainService _mainService;
 
         /// <summary>
         /// 服务接口（水位）
@@ -30,16 +30,16 @@
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="opRepository"></param>
-        /// <param name="baseService"></param>
+        /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
         public OP210Service(ILogger<OP210Service> logger,
             IOPRepository<OP210> opRepository,
-            IBaseService baseService,
+            IMainService mainService,
             IWaterMarkService waterMarkService)
         {
             _logger = logger;
             _opRepository = opRepository;
-            _baseService = baseService;
+            _mainService = mainService;
             _waterMarkService = waterMarkService;
         }
 
@@ -70,10 +70,10 @@
             var barCodes = entities.Select(s => s.Barcode);
 
             // 获取转换数据（基础数据）
-            var summaryBo = await _baseService.ConvertDataListAsync(entities, barCodes, _parameterCodes);
+            var summaryBo = await _mainService.ConvertDataListAsync(entities, barCodes, _parameterCodes);
 
             // 保存数据
-            return await _baseService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
+            return await _mainService.SaveBaseDataWithCommitAsync(buzKey, entities.Max(m => m.index), summaryBo);
         }
 
     }

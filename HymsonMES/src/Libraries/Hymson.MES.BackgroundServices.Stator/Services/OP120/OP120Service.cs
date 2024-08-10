@@ -21,7 +21,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <summary>
         /// 服务接口（基础）
         /// </summary>
-        public readonly IBaseService _baseService;
+        public readonly IMainService _mainService;
 
         /// <summary>
         /// 服务接口（水位）
@@ -33,16 +33,16 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="opRepository"></param>
-        /// <param name="baseService"></param>
+        /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
         public OP120Service(ILogger<OP120Service> logger,
             IOPRepository<OP120> opRepository,
-            IBaseService baseService,
+            IMainService mainService,
             IWaterMarkService waterMarkService)
         {
             _logger = logger;
             _opRepository = opRepository;
-            _baseService = baseService;
+            _mainService = mainService;
             _waterMarkService = waterMarkService;
         }
 
@@ -70,11 +70,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             }
 
             // 获取转换数据（基础数据）
-            var summaryBo = await _baseService.ConvertDataTableAsync(dataTable, producreCode, _parameterCodes);
+            var summaryBo = await _mainService.ConvertDataTableAsync(dataTable, producreCode, _parameterCodes);
 
             // 保存数据
             var waterLevel = dataTable.AsEnumerable().Select(s => s["index"].ParseToLong());
-            return await _baseService.SaveBaseDataWithCommitAsync(buzKey, waterLevel.Max(m => m), summaryBo);
+            return await _mainService.SaveBaseDataWithCommitAsync(buzKey, waterLevel.Max(m => m), summaryBo);
 
         }
 

@@ -153,6 +153,11 @@ namespace Hymson.MES.HttpClients.Requests.XnebulaWMS
         /// </summary>
         public string Batch { get; set; } = "";
 
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; } = "";
+
     }
 
     /// <summary>

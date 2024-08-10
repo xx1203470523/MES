@@ -6,7 +6,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public interface IBaseService
+    public interface IMainService
     {
         /// <summary>
         /// 获取基础配置（定子）

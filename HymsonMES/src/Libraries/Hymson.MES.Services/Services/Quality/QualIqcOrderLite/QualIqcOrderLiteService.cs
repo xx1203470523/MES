@@ -885,6 +885,7 @@ namespace Hymson.MES.Services.Services.Quality
                             PlanQty = receiptDetailEntity.PlanQty,
                             Qty = qualifiedQty, // 合格数量
                             IsQualified = 1,
+                            Remark = item.Remark,
                             BarCode = receiptDetailEntity.BarCode,
                             SyncId = receiptDetailEntity.SyncId,
                             WarehouseCode = GetWarehouseCode(TrueOrFalseEnum.Yes)
@@ -899,6 +900,7 @@ namespace Hymson.MES.Services.Services.Quality
                         PlanQty = receiptDetailEntity.PlanQty,
                         Qty = item.UnQualifiedQty,
                         IsQualified = 0, // 不合格数量
+                        Remark = item.Remark,
                         BarCode = receiptDetailEntity.BarCode,
                         SyncId = receiptDetailEntity.SyncId,
                         WarehouseCode = GetWarehouseCode(TrueOrFalseEnum.No)
@@ -913,6 +915,7 @@ namespace Hymson.MES.Services.Services.Quality
                         PlanQty = receiptDetailEntity.PlanQty,
                         Qty = receiptDetailEntity.Qty,
                         IsQualified = (item.IsQualified ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes ? 1 : 0,
+                        Remark = item.Remark,
                         BarCode = receiptDetailEntity.BarCode,
                         SyncId = receiptDetailEntity.SyncId,
                         WarehouseCode = GetWarehouseCode(item.IsQualified)

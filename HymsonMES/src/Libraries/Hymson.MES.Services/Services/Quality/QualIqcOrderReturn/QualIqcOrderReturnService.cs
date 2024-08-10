@@ -7,9 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Quality;
-using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Quality;
@@ -32,7 +30,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
-using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -918,6 +915,7 @@ namespace Hymson.MES.Services.Services.Quality
                             WorkOrderCode = planWorkOrderEntity?.OrderCode,
 
                             SyncId = item.Id,
+                            Remark = item.Remark,
                             UniqueCode = returnOrderDetail.MaterialBarCode,
                             Quantity = returnOrderDetail.Qty,
                             MaterialCode = materialEntity?.MaterialCode,
@@ -929,43 +927,6 @@ namespace Hymson.MES.Services.Services.Quality
                 }
                 warehousingEntryDto.Details = details;
                 warehousingEntries.Add(warehousingEntryDto);
-
-                /*
-                // 遍历退料明细
-                var itemDetails = returnDetailEntities.Where(x => updateDetailEntities.Any(o => o.IsQualified == isQualified.Key && o.BarCode == x.MaterialBarCode));
-                foreach (var item in itemDetails)
-                {
-                    var whMaterialInventoryEntity = materialInventoryEntities.FirstOrDefault(x => x.MaterialBarCode == item.MaterialBarCode)
-                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES15138)).WithData("MaterialCode", item.MaterialBarCode);
-
-                    var materialEntity = materialEntities.FirstOrDefault(x => x.Id == whMaterialInventoryEntity.MaterialId);
-
-                    var planWorkPlanMaterialEntity = planWorkPlanMaterialEntities.FirstOrDefault(x => x.MaterialId == item.MaterialId);
-                    if (planWorkPlanMaterialEntity != null)
-                    {
-                        warehousingEntryDto.Details = new List<ReceiptDetailDto>
-                        {
-                            new ReceiptDetailDto
-                            {
-                                ProductionOrder = planWorkPlanEntity.WorkPlanCode,
-                                ProductionOrderDetailID = planWorkOrderEntity?.WorkPlanProductId,
-                                ProductionOrderComponentID = planWorkPlanMaterialEntity.Id,
-
-                                ProductionOrderNumber = planWorkOrderEntity?.OrderCode,
-                                SyncId = item.Id,
-                                MaterialCode = materialEntity?.MaterialCode,
-                                LotCode = whMaterialInventoryEntity.Batch,
-                                UnitCode = materialEntity?.Unit,
-                                UniqueCode = item.MaterialBarCode,
-                                Batch = whMaterialInventoryEntity.Batch ?? "",
-                                Quantity = item.Qty
-                            }
-                        };
-                    }
-                    warehousingEntries.Add(warehousingEntryDto);
-                }
-                */
-
             }
 
             foreach (var item in warehousingEntries)
@@ -976,29 +937,6 @@ namespace Hymson.MES.Services.Services.Quality
                     throw new CustomerValidationException(nameof(ErrorCode.MES15139)).WithData("System", "WMS").WithData("Msg", response.Message);
                 }
             }
-
-            //List<IQCReturnMaterialResultDto> details = new();
-            //foreach (var item in updateDetailEntities)
-            //{
-            //    var returnDetailEntity = returnDetailEntities.FirstOrDefault(f => f.Id == item.ReturnOrderDetailId);
-            //    if (returnDetailEntity == null) continue;
-
-            //    details.Add(new IQCReturnMaterialResultDto
-            //    {
-            //        MaterialCode = returnDetailEntity.MaterialBarCode,
-            //        PlanQty = returnDetailEntity.Qty,
-            //        Qty = returnDetailEntity.Qty,
-            //        IsQualified = item.IsQualified ?? TrueOrFalseEnum.No
-            //    });
-            //}
-
-            //// 将结果推送给WMS
-            //await _wmsApiClient.IQCReturnCallBackAsync(new IQCReturnResultDto
-            //{
-            //    ReturnOrderCode = returnEntity.ReturnOrderCode,
-            //    WorkOrderCode = workOrderEntity?.OrderCode ?? "",
-            //    Details = details
-            //});
         }
 
         /// <summary>
