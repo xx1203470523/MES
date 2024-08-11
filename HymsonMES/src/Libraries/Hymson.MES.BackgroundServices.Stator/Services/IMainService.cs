@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Domain.Process;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using System.Data;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
@@ -56,6 +57,28 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="summaryBo"></param>
         /// <returns></returns>
         Task<int> SaveBaseDataWithCommitAsync(string buzKey, long waterLevel, StatorSummaryBo summaryBo);
+
+
+
+        #region 仓储方法
+        /// <summary>
+        /// 批量获取条码（MES）
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="barCodes"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcEntity>> GetSFCEntitiesAsync(long siteId, IEnumerable<string> barCodes);
+
+        /// <summary>
+        /// 批量读取条码（定子）
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<StatorBarCodeEntity>> GetStatorBarCodeEntitiesAsync(long siteId, IEnumerable<string> ids);
+
+        #endregion
+
 
     }
 }

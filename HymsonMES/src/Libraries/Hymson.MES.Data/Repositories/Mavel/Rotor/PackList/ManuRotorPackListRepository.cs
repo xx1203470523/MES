@@ -125,19 +125,21 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor.PackList
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
+            sqlBuilder.OrderBy("ProductCode");
 
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
             if (!string.IsNullOrWhiteSpace(query.BoxCode))
             {
-                sqlBuilder.Where("BoxCode=@BoxCode ");
+                sqlBuilder.Where("BoxCode = @BoxCode ");
             }
 
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
-                sqlBuilder.Where("ProductCode=@Sfc ");
+                sqlBuilder.Where("ProductCode = @Sfc ");
             }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuRotorPackListEntity>(template.RawSql, query);
         }
@@ -178,7 +180,7 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor.PackList
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM manu_rotor_pack_list /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_rotor_pack_list /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_rotor_pack_list /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_rotor_pack_list /**where**/ /**orderby**/ ";
 
         const string InsertSql = "INSERT INTO manu_rotor_pack_list(  `Id`, `BoxCode`, `ProductCode`, `ProductNo`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @BoxCode, @ProductCode, @ProductNo, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
         const string InsertsSql = "INSERT INTO manu_rotor_pack_list(  `Id`, `BoxCode`, `ProductCode`, `ProductNo`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @BoxCode, @ProductCode, @ProductNo, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";

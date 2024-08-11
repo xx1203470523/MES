@@ -15,13 +15,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         /// </summary>
         public string? Sfc { get; set; }
 
-        public string WorkCenterCode {  get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string WorkCenterCode { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public long SiteId { get; set; }
 
         /// <summary>
         /// 工单
         /// </summary>
         public string OrderCode { get; set; }
+
     }
 }

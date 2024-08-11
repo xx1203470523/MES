@@ -20,5 +20,15 @@
         /// </summary>
         public const string BARCODE_PREFIX = "CSCW188";
 
+        /// <summary>
+        /// 默认值
+        /// </summary>
+        public const string USER = "LMS";
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public const decimal QTY = 1;
+
     }
 }

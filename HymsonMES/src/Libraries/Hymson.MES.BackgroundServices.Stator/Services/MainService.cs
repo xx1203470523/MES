@@ -23,12 +23,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     public partial class MainService : IMainService
     {
         /// <summary>
-        /// 默认值
-        /// </summary>
-        protected const string User = "LMS";
-        protected const decimal Qty = 1;
-
-        /// <summary>
         /// 服务接口（水位）
         /// </summary>
         private readonly IWaterMarkService _waterMarkService;
@@ -261,25 +255,14 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
 
             // 批量读取条码（MES）
             var barCodes = dataTable.AsEnumerable().Select(s => $"{s[barCode_key]}").Distinct();
-            var manuSFCEntities = await _manuSfcRepository.GetEntitiesAsync(new ManuSfcQuery
-            {
-                SiteId = statorBo.SiteId,
-                SFCs = barCodes
-            });
+            var manuSFCEntities = await GetSFCEntitiesAsync(statorBo.SiteId, barCodes);
 
             // 批量读取条码信息（MES）
             var manuSFCInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSFCEntities.Select(s => s.Id));
 
-            // 提前查询条件
-            var ids = dataTable.AsEnumerable().Select(s => $"{s[id_key]}").Distinct();
-            var statorQuery = new StatorBarCodeQuery
-            {
-                SiteId = statorBo.SiteId,
-                InnerIds = ids
-            };
-
             // 批量读取条码（定子）
-            var statorSFCEntities = await _statorBarCodeRepository.GetEntitiesAsync(statorQuery);
+            var ids = dataTable.AsEnumerable().Select(s => $"{s[id_key]}").Distinct();
+            var statorSFCEntities = await GetStatorBarCodeEntitiesAsync(statorBo.SiteId, ids);
 
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
@@ -335,7 +318,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     ProductBOMId = statorBo.ProductBOMId,
                     ProcessRouteId = statorBo.ProcessRouteId,
                     SFCInfoId = manuSFCInfoEntity.Id,
-                    Qty = Qty,
+                    Qty = StatorConst.QTY,
                     VehicleCode = "",
                     ProcedureId = statorBo.ProcedureId,
                     ResourceId = null,
@@ -349,7 +332,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = User,
+                    UpdatedBy = StatorConst.USER,
                     UpdatedOn = time
                 };
                 summaryBo.ManuSfcStepEntities.Add(stepEntity);
@@ -376,7 +359,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = User,
+                    UpdatedBy = StatorConst.USER,
                     UpdatedOn = time
                 });
 
@@ -391,7 +374,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = User,
+                    UpdatedBy = StatorConst.USER,
                     UpdatedOn = time
                 });
 
@@ -444,21 +427,10 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var statorBo = await GetStatorBaseConfigAsync(producreCode);
 
             // 批量读取条码（MES）
-            var manuSFCEntities = await _manuSfcRepository.GetEntitiesAsync(new ManuSfcQuery
-            {
-                SiteId = statorBo.SiteId,
-                SFCs = barCodes
-            });
-
-            // 提前查询条件
-            var statorQuery = new StatorBarCodeQuery
-            {
-                SiteId = statorBo.SiteId,
-                InnerIds = entities.Select(s => s.ID).Distinct()
-            };
+            var manuSFCEntities = await GetSFCEntitiesAsync(statorBo.SiteId, barCodes);
 
             // 批量读取条码（定子）
-            var statorSFCEntities = await _statorBarCodeRepository.GetEntitiesAsync(statorQuery);
+            var statorSFCEntities = await GetStatorBarCodeEntitiesAsync(statorBo.SiteId, entities.Select(s => s.ID).Distinct());
 
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
@@ -555,7 +527,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     summaryBo.ManuSFCEntities.Add(new ManuSfcEntity
                     {
                         Id = manuSFCId,
-                        Qty = Qty,
+                        Qty = StatorConst.QTY,
                         SFC = barCode,
                         IsUsed = YesOrNoEnum.No,
                         Type = SfcTypeEnum.NoProduce,
@@ -564,7 +536,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         SiteId = statorBo.SiteId,
                         CreatedBy = statorBo.User,
                         CreatedOn = statorBo.Time,
-                        UpdatedBy = User,
+                        UpdatedBy = StatorConst.USER,
                         UpdatedOn = opEntity.RDate
                     });
                 }
@@ -588,7 +560,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = User,
+                    UpdatedBy = StatorConst.USER,
                     UpdatedOn = opEntity.RDate
                 });
 
@@ -605,7 +577,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     ProductBOMId = statorBo.ProductBOMId,
                     ProcessRouteId = statorBo.ProcessRouteId,
                     SFCInfoId = manuSFCInfoId,
-                    Qty = Qty,
+                    Qty = StatorConst.QTY,
                     VehicleCode = "",
                     ProcedureId = statorBo.ProcedureId,
                     ResourceId = null,
@@ -619,7 +591,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = User,
+                    UpdatedBy = StatorConst.USER,
                     UpdatedOn = opEntity.RDate
                 };
                 summaryBo.ManuSfcStepEntities.Add(stepEntity);
@@ -646,7 +618,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = User,
+                    UpdatedBy = StatorConst.USER,
                     UpdatedOn = opEntity.RDate
                 });
 
@@ -661,7 +633,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     SiteId = statorBo.SiteId,
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
-                    UpdatedBy = User,
+                    UpdatedBy = StatorConst.USER,
                     UpdatedOn = opEntity.RDate
                 });
 
@@ -717,7 +689,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 ParameterUnit = "1",
                 ParameterCode = s,
                 ParameterName = s,
-                Remark = User,
+                Remark = StatorConst.USER,
 
                 SiteId = statorBo.SiteId,
                 CreatedBy = statorBo.User,
@@ -790,6 +762,44 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
 
             return rows;
         }
+
+
+
+        #region 仓储方法
+        /// <summary>
+        /// 批量获取（条码）
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="barCodes"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcEntity>> GetSFCEntitiesAsync(long siteId, IEnumerable<string> barCodes)
+        {
+            // 批量读取条码（MES）
+            return await _manuSfcRepository.GetEntitiesAsync(new ManuSfcQuery
+            {
+                SiteId = siteId,
+                SFCs = barCodes
+            });
+        }
+
+        /// <summary>
+        /// 批量获取（定子条码）
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<StatorBarCodeEntity>> GetStatorBarCodeEntitiesAsync(long siteId, IEnumerable<string> ids)
+        {
+            // 批量读取条码（定子）
+            return await _statorBarCodeRepository.GetEntitiesAsync(new StatorBarCodeQuery
+            {
+                SiteId = siteId,
+                InnerIds = ids
+            });
+
+        }
+
+        #endregion
 
     }
 }

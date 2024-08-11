@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 构造函数
         /// </summary>
         public ManuRotorPackListService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ManuRotorPackListSaveDto> validationSaveRules,
-            IManuRotorPackListRepository manuRotorPackListRepository, ISequenceService sequenceService, 
+            IManuRotorPackListRepository manuRotorPackListRepository, ISequenceService sequenceService,
             IQualFqcInspectionMavalRepository qualFqcInspectionMavalRepository,
             IOptions<WMSOptions> wmsOptions,
             IInteWorkCenterRepository inteWorkCenterRepository
@@ -190,12 +190,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuRotorPackViewDto>> QueryByIdAsync(ManuRotorPackListQuery query)
         {
-            List<ManuRotorPackViewDto> manuRotors = new List<ManuRotorPackViewDto>();
-            var manuRotorPackListEntity = await _manuRotorPackListRepository.GetEntitiesAsync(new ManuRotorPackListQuery { BoxCode = query.BoxCode, Sfc = query.Sfc, SiteId = _currentSite.SiteId ?? 0 });
-            if (manuRotorPackListEntity.Any() == false)
-                return manuRotors;
+            List<ManuRotorPackViewDto> manuRotors = new();
+            var manuRotorPackEntities = await _manuRotorPackListRepository.GetEntitiesAsync(new ManuRotorPackListQuery { BoxCode = query.BoxCode, Sfc = query.Sfc, SiteId = _currentSite.SiteId ?? 0 });
+            if (manuRotorPackEntities.Any() == false) return manuRotors;
 
-            var sfcs = manuRotorPackListEntity.Select(x => x.ProductCode).ToList();
+            var sfcs = manuRotorPackEntities.Select(x => x.ProductCode).ToList();
             var qualFqcs = await _qualFqcInspectionMavalRepository.GetQualFqcInspectionMavalEntitiesAsync(new QualFqcInspectionMavalQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
@@ -203,22 +202,22 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
 
 
-            //获取工作中心编码
+            // 获取工作中心编码
             EntityByCodeQuery workQuery = new EntityByCodeQuery();
             workQuery.Site = _currentSite.SiteId;
             workQuery.Code = query.WorkCenterCode;
             var workCenterModel = await _inteWorkCenterRepository.GetByCodeAsync(workQuery);
-            if(workQuery == null || string.IsNullOrEmpty(workCenterModel.LineCoding) == true)
+            if (workQuery == null || string.IsNullOrEmpty(workCenterModel.LineCoding) == true)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10541)).WithData("Code",query.WorkCenterCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10541)).WithData("Code", query.WorkCenterCode);
             }
             string lineBrevityCode = workCenterModel.LineCoding!;
 
             string inspectionOrder = string.Empty;
             string dateStr = HymsonClock.Now().ToString("yyyyMMdd");
             string serialNumKey = $"{dateStr}{query.OrderCode}FAI";
-            int curKeyNum = await _sequenceService.GetCurrentValueAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay,serialNumKey);
-            if(curKeyNum == 0)
+            int curKeyNum = await _sequenceService.GetCurrentValueAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, serialNumKey);
+            if (curKeyNum == 0)
             {
                 var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, serialNumKey);
                 inspectionOrder = $"{lineBrevityCode}{dateStr}{sequence.ToString().PadLeft(3, '0')}";
@@ -228,7 +227,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 inspectionOrder = $"{lineBrevityCode}{dateStr}{curKeyNum.ToString().PadLeft(3, '0')}";
             }
 
-            foreach (var item in manuRotorPackListEntity)
+            foreach (var item in manuRotorPackEntities)
             {
                 //var sequence = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.ByDay, "FAI");
                 //var InspectionOrder = $"{query.WorkCenterCode?.Substring(0, 2)}{DateTime.UtcNow.ToString("yyyyMMdd")}{sequence.ToString().PadLeft(3, '0')}";
@@ -239,7 +238,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 // type = ProductReceiptQualifiedStatusEnum.Qualified;
                 if (qualFqc != null)
                 {
-                    if (qualFqc.JudgmentResults== FqcJudgmentResultsEnum.Unqualified)
+                    if (qualFqc.JudgmentResults == FqcJudgmentResultsEnum.Unqualified)
                     {
                         WarehouseCode = "不良品仓";
                         type = ProductReceiptQualifiedStatusEnum.Unqualified;
@@ -265,6 +264,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
                 manuRotors.Add(manuRotorPackView);
             };
+
+            manuRotors.OrderBy(o => o.Sfc);
             return manuRotors;
         }
     }
