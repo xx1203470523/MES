@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Warehouse;
 
 namespace Hymson.MES.BackgroundServices.Stator
 {
@@ -38,6 +39,11 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// 集合（步骤信息）
         /// </summary>
         public List<ManuSfcStepEntity> ManuSfcStepEntities { get; set; } = new();
+
+        /// <summary>
+        /// 集合（物料库存）
+        /// </summary>
+        public List<WhMaterialInventoryEntity> UpdateWhMaterialInventoryEntities { get; set; } = new();
 
         /// <summary>
         /// 集合（流转信息）

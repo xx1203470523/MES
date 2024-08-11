@@ -292,6 +292,16 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             return await conn.ExecuteAsync(UpdatesSql, whMaterialInventoryEntitys);
         }
 
+        /// 批量更新
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQtyAsync(IEnumerable<WhMaterialInventoryEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpQuantityResidueByBarCodeSql, entities);
+        }
+
         /// <summary>
         /// 更新状态
         /// </summary>
@@ -639,7 +649,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
 #endif
 
-
+        const string UpQuantityResidueByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND MaterialBarCode = @BarCode; ";
         const string UpPointByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateWhMaterialInventoryStatusAndQtyByIdSql = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id; ";
         const string UpStatusByBarCodeSql = "UPDATE wh_material_inventory SET Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode = @BarCode; ";

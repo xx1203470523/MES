@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Warehouse;
 using System.Data;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
@@ -68,6 +69,21 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="barCodes"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcEntity>> GetSFCEntitiesAsync(long siteId, IEnumerable<string> barCodes);
+
+        /// <summary>
+        /// 批量获取（条码信息）
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcInfoEntity>> GetSFCInfoEntitiesAsync(IEnumerable<long> sfcIds);
+
+        /// <summary>
+        /// 批量获取（库存条码）
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="barCodes"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WhMaterialInventoryEntity>> GetMaterialInventoryEntitiesAsync(long siteId, IEnumerable<string> barCodes);
 
         /// <summary>
         /// 批量读取条码（定子）

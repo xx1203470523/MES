@@ -97,6 +97,8 @@ namespace Hymson.MES.SystemServices.Services.Plan
         {
             if (requestDtos == null || !requestDtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
+            _logger.LogDebug($"同步信息（生产计划） -> {requestDtos.ToSerialize()}");
+
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
 
@@ -147,11 +149,13 @@ namespace Hymson.MES.SystemServices.Services.Plan
         /// <summary>
         /// 取消（生产计划）
         /// </summary>
-        /// <param name="WorkPlanCodes"></param>
+        /// <param name="workPlanCodes"></param>
         /// <returns></returns>
-        public async Task<int> CancelWorkPlanAsync(IEnumerable<string> WorkPlanCodes)
+        public async Task<int> CancelWorkPlanAsync(IEnumerable<string> workPlanCodes)
         {
-            if (WorkPlanCodes == null || !WorkPlanCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            if (workPlanCodes == null || !workPlanCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            _logger.LogDebug($"取消（生产计划） -> {workPlanCodes.ToSerialize()}");
 
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10139));
@@ -168,7 +172,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
             var workPlanEntities = await _planWorkPlanRepository.GetEntitiesAsync(new PlanWorkPlanQuery
             {
                 SiteId = siteId,
-                Codes = WorkPlanCodes
+                Codes = workPlanCodes
             });
 
             // 如果存在不是"未开始"的生产计划，不允许取消

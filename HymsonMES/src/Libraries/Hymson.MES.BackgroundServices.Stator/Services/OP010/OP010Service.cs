@@ -1,9 +1,7 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Extension;
 using Hymson.Snowflake;
-using Hymson.Utils;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
@@ -109,6 +107,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 批量读取条码（MES）
             var manuSFCEntities = await _mainService.GetSFCEntitiesAsync(statorBo.SiteId, barCodes);
 
+            // 批量读取条码信息（MES）
+            var manuSFCInfoEntities = await _mainService.GetSFCInfoEntitiesAsync(manuSFCEntities.Select(s => s.Id));
+
             // 批量读取条码（定子）
             var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, entities.Select(s => s.ID).Distinct());
 
@@ -116,83 +117,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var summaryBo = new StatorSummaryBo { };
             foreach (var opEntity in entities)
             {
-                var barCode = "";
+                var barCode = $"{opEntity.GetType().GetProperty("wire1_barcode")?.GetValue(opEntity)}";
+                if (StatorConst.IgnoreString.Contains(barCode) || string.IsNullOrWhiteSpace(barCode)) continue;
 
-                // ID是否无效数据
-                var id = opEntity.ID.ParseToLong();
-                if (id == 0) continue;
-
-                StatorBarCodeEntity? statorSFCEntity = statorSFCEntities.FirstOrDefault(f => f.InnerId == id);
-                switch (producreCode)
-                {
-                    case "OP010":
-                        barCode = $"{opEntity.GetType().GetProperty("wire1_barcode")?.GetValue(opEntity)}";
-                        break;
-                    case "OP190":
-                    case "OP210":
-                        barCode = opEntity.Barcode;
-                        if (statorSFCEntity != null)
-                        {
-                            statorSFCEntity.OuterBarCode = barCode;
-                            statorSFCEntity.UpdatedOn = statorBo.Time;
-                            summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
-                        }
-                        break;
-                    case "OP340":
-                        barCode = $"{opEntity.GetType().GetProperty("busbar_barcode")?.GetValue(opEntity)}";
-                        if (statorSFCEntity != null)
-                        {
-                            statorSFCEntity.BusBarCode = barCode;
-                            statorSFCEntity.UpdatedOn = statorBo.Time;
-                            summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
-                        }
-                        break;
-                    case "OP490":
-                        barCode = $"{opEntity.GetType().GetProperty("LaserBarcode")?.GetValue(opEntity)}";
-                        if (statorSFCEntity != null)
-                        {
-                            statorSFCEntity.ProductionCode = barCode;
-                            statorSFCEntity.UpdatedOn = statorBo.Time;
-                            summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
-                        }
-                        break;
-                    case "OP070":
-                        barCode = opEntity.Barcode;
-                        break;
-                    default:
-                        break;
-                }
-
-                // 条码是否无效数据
-                if (barCode == "-" || barCode == "_" || string.IsNullOrWhiteSpace(barCode)) continue;
-
-                // OP070特殊处理
-                if (producreCode == "OP070")
-                {
-                    var uniqueId = $"{id}{barCode}".ToLongID();
-
-                    // 不存在就插入
-                    if (statorSFCEntity != null)
-                    {
-                        //if (barCode == "-" || string.IsNullOrWhiteSpace(barCode)) break;
-                        if (statorSFCEntity.InnerBarCode != "-" && !string.IsNullOrWhiteSpace(statorSFCEntity.InnerBarCode)) break;
-
-                        statorSFCEntity.InnerBarCode = barCode;
-                        statorSFCEntity.UpdatedOn = statorBo.Time;
-                        summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
-                    }
-                    else if (!summaryBo.AddStatorBarCodeEntities.Any(a => a.Id == uniqueId))
-                    {
-                        summaryBo.AddStatorBarCodeEntities.Add(new StatorBarCodeEntity
-                        {
-                            Id = uniqueId,
-                            InnerId = id,
-                            InnerBarCode = barCode,
-                            SiteId = statorBo.SiteId,
-                            CreatedOn = statorBo.Time
-                        });
-                    }
-                }
+                // 是否已存在条码记录
+                if (manuSFCEntities.Any(a => a.SFC == barCode) || summaryBo.ManuSFCEntities.Any(a => a.SFC == barCode)) continue;
 
                 // 条码ID
                 var manuSFCId = IdGenProvider.Instance.CreateId();
@@ -200,6 +129,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var manuSFCStepId = IdGenProvider.Instance.CreateId();
                 var manuBadRecordId = IdGenProvider.Instance.CreateId();
 
+                // 条码
                 var manuSFCEntity = manuSFCEntities.FirstOrDefault(f => f.SFC == barCode);
                 if (manuSFCEntity == null)
                 {
@@ -226,23 +156,33 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     manuSFCId = manuSFCEntity.Id;
                 }
 
-                // 插入条码信息
-                summaryBo.ManuSFCInfoEntities.Add(new ManuSfcInfoEntity
+                // 条码信息
+                var manuSFCInfoEntity = manuSFCInfoEntities.FirstOrDefault(f => f.SfcId == manuSFCId);
+                if (manuSFCInfoEntity == null)
                 {
-                    Id = manuSFCInfoId,
-                    SfcId = manuSFCId,
-                    WorkOrderId = statorBo.WorkOrderId,
-                    ProductId = statorBo.ProductId,
-                    ProductBOMId = statorBo.ProductBOMId,
-                    ProcessRouteId = statorBo.ProcessRouteId,
-                    IsUsed = false,
+                    // 插入条码信息
+                    summaryBo.ManuSFCInfoEntities.Add(new ManuSfcInfoEntity
+                    {
+                        Id = manuSFCInfoId,
+                        SfcId = manuSFCId,
+                        WorkOrderId = statorBo.WorkOrderId,
+                        ProductId = statorBo.ProductId,
+                        ProductBOMId = statorBo.ProductBOMId,
+                        ProcessRouteId = statorBo.ProcessRouteId,
+                        IsUsed = false,
 
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = opEntity.RDate
-                });
+                        SiteId = statorBo.SiteId,
+                        CreatedBy = statorBo.User,
+                        CreatedOn = statorBo.Time,
+                        UpdatedBy = StatorConst.USER,
+                        UpdatedOn = opEntity.RDate
+                    });
+                }
+                else
+                {
+                    // 已存在条码
+                    manuSFCInfoId = manuSFCInfoEntity.Id;
+                }
 
                 // 插入步骤表
                 var stepEntity = new ManuSfcStepEntity
@@ -379,5 +319,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             "FormingLowerLHXSpeed",
             "FormingLowerRHXSpeed"
         };
+
     }
 }

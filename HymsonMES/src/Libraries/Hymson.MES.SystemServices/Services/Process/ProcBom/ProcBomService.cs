@@ -93,6 +93,8 @@ namespace Hymson.MES.SystemServices.Services.Process
         {
             if (requestDtos == null || !requestDtos.Any()) return 0;
 
+            _logger.LogDebug($"同步信息（BOM） -> {requestDtos.ToSerialize()}");
+
             var configEntities = await _sysConfigRepository.GetEntitiesAsync(new SysConfigQuery { Type = SysConfigEnum.MainSite });
             if (configEntities == null || !configEntities.Any()) return 0;
 

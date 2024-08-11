@@ -1,4 +1,9 @@
-﻿using Hymson.Utils;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Extension;
+using Hymson.Snowflake;
+using Hymson.Utils;
 using System.Data;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
@@ -70,12 +75,177 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             }
 
             // 获取转换数据（基础数据）
-            var summaryBo = await _mainService.ConvertDataTableAsync(dataTable, producreCode, _parameterCodes);
+            var summaryBo = await ConvertDataTableAsync(dataTable, producreCode, _parameterCodes);
 
             // 保存数据
             var waterLevel = dataTable.AsEnumerable().Select(s => s["index"].ParseToLong());
             return await _mainService.SaveBaseDataWithCommitAsync(buzKey, waterLevel.Max(m => m), summaryBo);
 
+        }
+
+        /// <summary>
+        /// 保存转换数据（附带参数）
+        /// </summary>
+        /// <param name="dataTable"></param>
+        /// <param name="producreCode"></param>
+        /// <param name="parameterCodes"></param>
+        /// <returns></returns>
+        private async Task<StatorSummaryBo> ConvertDataTableAsync(DataTable dataTable, string producreCode, IEnumerable<string>? parameterCodes = null)
+        {
+            // 初始化对象
+            var statorBo = await _mainService.GetStatorBaseConfigAsync(producreCode);
+
+            var id_key = "ID_stator";
+            var barCode_key = "Barcode";
+
+            // 批量读取条码（MES）
+            var barCodes = dataTable.AsEnumerable().Select(s => $"{s[barCode_key]}").Distinct();
+            var manuSFCEntities = await _mainService.GetSFCEntitiesAsync(statorBo.SiteId, barCodes);
+
+            // 批量读取条码信息（MES）
+            var manuSFCInfoEntities = await _mainService.GetSFCInfoEntitiesAsync(manuSFCEntities.Select(s => s.Id));
+
+            // 批量读取条码（定子）
+            var ids = dataTable.AsEnumerable().Select(s => $"{s[id_key]}").Distinct();
+            var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, ids);
+
+            // 遍历记录
+            var summaryBo = new StatorSummaryBo { };
+            foreach (DataRow dr in dataTable.Rows)
+            {
+                // ID是否无效数据
+                var statorId = dr[id_key].ParseToLong();
+                if (statorId == 0) continue;
+
+                StatorBarCodeEntity? statorSFCEntity = statorSFCEntities.FirstOrDefault(f => f.InnerId == statorId);
+                if (statorSFCEntity == null) continue;
+
+                statorSFCEntity.WireID_1 = dr["ID_wire1"].ParseToLong();
+                statorSFCEntity.WireID_2 = dr["ID_wire2"].ParseToLong();
+                statorSFCEntity.UpdatedOn = statorBo.Time;
+                summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
+
+                var time = dr["RDate"].ToTime();
+                var barCode = $"{dr[barCode_key]}";
+
+                // 条码是否无效数据
+                if (StatorConst.IgnoreString.Contains(barCode) || string.IsNullOrWhiteSpace(barCode)) continue;
+
+                // 条码ID
+                var manuSFCStepId = IdGenProvider.Instance.CreateId();
+                var manuBadRecordId = IdGenProvider.Instance.CreateId();
+
+                var manuSFCEntity = manuSFCEntities.FirstOrDefault(f => f.SFC == barCode);
+                if (manuSFCEntity == null) continue;
+
+                var manuSFCInfoEntity = manuSFCInfoEntities.FirstOrDefault(f => f.SfcId == manuSFCEntity.Id);
+                if (manuSFCInfoEntity == null) continue;
+
+                // 插入步骤表
+                var stepEntity = new ManuSfcStepEntity
+                {
+                    Id = manuSFCStepId,
+                    Operatetype = ManuSfcStepTypeEnum.OutStock,
+                    CurrentStatus = SfcStatusEnum.Activity,
+                    SFC = barCode,
+                    ProductId = statorBo.ProductId,
+                    WorkOrderId = statorBo.WorkOrderId,
+                    WorkCenterId = statorBo.WorkLineId,
+                    ProductBOMId = statorBo.ProductBOMId,
+                    ProcessRouteId = statorBo.ProcessRouteId,
+                    SFCInfoId = manuSFCInfoEntity.Id,
+                    Qty = StatorConst.QTY,
+                    VehicleCode = "",
+                    ProcedureId = statorBo.ProcedureId,
+                    ResourceId = null,
+                    EquipmentId = null,
+                    OperationProcedureId = statorBo.ProcedureId,
+                    OperationResourceId = null,
+                    OperationEquipmentId = null,
+
+                    Remark = $"{dr["index"]}",   // 这个ID是为了外层找到对应记录
+
+                    SiteId = statorBo.SiteId,
+                    CreatedBy = statorBo.User,
+                    CreatedOn = statorBo.Time,
+                    UpdatedBy = StatorConst.USER,
+                    UpdatedOn = time
+                };
+                summaryBo.ManuSfcStepEntities.Add(stepEntity);
+
+                // 如果是不合格
+                var isOk = $"{dr["Result"]}" == "OK";
+                if (isOk) continue;
+
+                // 插入不良记录
+                summaryBo.ManuProductBadRecordEntities.Add(new ManuProductBadRecordEntity
+                {
+                    Id = manuBadRecordId,
+                    FoundBadOperationId = statorBo.ProcedureId,
+                    OutflowOperationId = statorBo.ProcedureId,
+                    UnqualifiedId = 0,
+                    SFC = barCode,
+                    SfcInfoId = 0,
+                    SfcStepId = manuSFCStepId,
+                    Qty = 1,
+                    Status = ProductBadRecordStatusEnum.Open,
+                    Source = ProductBadRecordSourceEnum.EquipmentReBad,
+                    Remark = "",
+
+                    SiteId = statorBo.SiteId,
+                    CreatedBy = statorBo.User,
+                    CreatedOn = statorBo.Time,
+                    UpdatedBy = StatorConst.USER,
+                    UpdatedOn = time
+                });
+
+                // 插入NG记录
+                summaryBo.ManuProductNgRecordEntities.Add(new ManuProductNgRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    BadRecordId = manuBadRecordId,
+                    UnqualifiedId = 0,
+                    NGCode = "未知",
+
+                    SiteId = statorBo.SiteId,
+                    CreatedBy = statorBo.User,
+                    CreatedOn = statorBo.Time,
+                    UpdatedBy = StatorConst.USER,
+                    UpdatedOn = time
+                });
+
+                // 如果没有需要解析的参数
+                if (parameterCodes == null || !parameterCodes.Any()) continue;
+
+                // 读取标准参数
+                var parameterEntities = await _mainService.GetParameterEntitiesAsync(parameterCodes, summaryBo.StatorBo);
+
+                // 遍历参数
+                foreach (var param in parameterEntities)
+                {
+                    summaryBo.ManuProductParameterEntities.Add(new Core.Domain.Parameter.ManuProductParameterEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        ProcedureId = stepEntity.ProcedureId ?? 0,
+                        SfcstepId = stepEntity.Id,
+                        SFC = stepEntity.SFC,
+
+                        ParameterId = param.Id,
+                        ParameterValue = $"{dr[param.ParameterCode]}",
+                        ParameterGroupId = 0,
+                        CollectionTime = time,
+
+                        SiteId = stepEntity.SiteId,
+                        CreatedBy = stepEntity.CreatedBy,
+                        CreatedOn = stepEntity.CreatedOn,
+                        UpdatedBy = stepEntity.UpdatedBy,
+                        UpdatedOn = stepEntity.UpdatedOn
+                    });
+                }
+            }
+
+            summaryBo.StatorBo = statorBo;
+            return summaryBo;
         }
 
     }
@@ -90,13 +260,32 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// </summary>
         private static readonly List<string> _parameterCodes = new()
         {
-            "WorkCount",
             "SpindleWorkPositionSpeed",
             "SpindleWork1AxisSpeed",
             "SpindleWorkSingleSpeed",
             "SpindleWorkPosition",
             "SpindleWork1stPosition",
-            "SpindleWorkEndPosition"
+            "SpindleWorkEndPosition",
+            "90Degree1stCalibPositionStart",
+            "90Degree1stCalibPositionWork",
+            "90Degree2ndCalibPositionStart",
+            "90Degree2ndCalibPositionWork",
+            "90Degree3rdCalibPositionStart",
+            "90Degree3rdCalibPositionWork",
+            "90Degree4thCalibPositionStart",
+            "90Degree4thCalibPositionWork",
+            "90Degree5thCalibPositionStart",
+            "90Degree5thCalibPositionWork",
+            "60Degree1stCalibPositionStart",
+            "60Degree1stCalibPositionWork",
+            "60Degree2ndCalibPositionStart",
+            "60Degree2ndCalibPositionWork",
+            "60Degree3rdCalibPositionStart",
+            "60Degree3rdCalibPositionWork",
+            "60Degree4thCalibPositionStart",
+            "60Degree4thCalibPositionWork",
+            "60Degree5thCalibPositionStart",
+            "60Degree5thCalibPositionWork"
         };
     }
 }

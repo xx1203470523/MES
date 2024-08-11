@@ -30,5 +30,10 @@
         /// </summary>
         public const decimal QTY = 1;
 
+        /// <summary>
+        /// 忽略的字符串
+        /// </summary>
+        public static string[] IgnoreString = new string[] { "-", "_" };
+
     }
 }

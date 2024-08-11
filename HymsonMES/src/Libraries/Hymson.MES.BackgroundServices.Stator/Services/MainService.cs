@@ -2,6 +2,7 @@
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Extension;
@@ -10,6 +11,7 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Stator;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -58,6 +60,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         private readonly IProcParameterRepository _procParameterRepository;
 
         /// <summary>
+        /// 仓储接口（物料库存）
+        /// </summary>
+        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
+
+        /// <summary>
         /// 仓储接口（条码）
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
@@ -103,6 +110,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procParameterRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
@@ -117,6 +125,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcParameterRepository procParameterRepository,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -132,6 +141,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             _planWorkOrderRepository = planWorkOrderRepository;
             _procProcedureRepository = procProcedureRepository;
             _procParameterRepository = procParameterRepository;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
@@ -293,7 +303,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var barCode = $"{dr[barCode_key]}";
 
                 // 条码是否无效数据
-                if (barCode == "-" || barCode == "_" || string.IsNullOrWhiteSpace(barCode)) continue;
+                if (StatorConst.IgnoreString.Contains(barCode) || string.IsNullOrWhiteSpace(barCode)) continue;
 
                 // 条码ID
                 var manuSFCStepId = IdGenProvider.Instance.CreateId();
@@ -429,6 +439,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 批量读取条码（MES）
             var manuSFCEntities = await GetSFCEntitiesAsync(statorBo.SiteId, barCodes);
 
+            // 批量读取条码信息（MES）
+            var manuSFCInfoEntities = await GetSFCInfoEntitiesAsync(manuSFCEntities.Select(s => s.Id));
+
             // 批量读取条码（定子）
             var statorSFCEntities = await GetStatorBarCodeEntitiesAsync(statorBo.SiteId, entities.Select(s => s.ID).Distinct());
 
@@ -484,7 +497,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 }
 
                 // 条码是否无效数据
-                if (barCode == "-" || barCode == "_" || string.IsNullOrWhiteSpace(barCode)) continue;
+                if (StatorConst.IgnoreString.Contains(barCode) || string.IsNullOrWhiteSpace(barCode)) continue;
 
                 // OP070特殊处理
                 if (producreCode == "OP070")
@@ -520,6 +533,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var manuSFCStepId = IdGenProvider.Instance.CreateId();
                 var manuBadRecordId = IdGenProvider.Instance.CreateId();
 
+                // 条码
                 var manuSFCEntity = manuSFCEntities.FirstOrDefault(f => f.SFC == barCode);
                 if (manuSFCEntity == null)
                 {
@@ -546,23 +560,33 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     manuSFCId = manuSFCEntity.Id;
                 }
 
-                // 插入条码信息
-                summaryBo.ManuSFCInfoEntities.Add(new ManuSfcInfoEntity
+                // 条码信息
+                var manuSFCInfoEntity = manuSFCInfoEntities.FirstOrDefault(f => f.SfcId == manuSFCId);
+                if (manuSFCInfoEntity == null)
                 {
-                    Id = manuSFCInfoId,
-                    SfcId = manuSFCId,
-                    WorkOrderId = statorBo.WorkOrderId,
-                    ProductId = statorBo.ProductId,
-                    ProductBOMId = statorBo.ProductBOMId,
-                    ProcessRouteId = statorBo.ProcessRouteId,
-                    IsUsed = false,
+                    // 插入条码信息
+                    summaryBo.ManuSFCInfoEntities.Add(new ManuSfcInfoEntity
+                    {
+                        Id = manuSFCInfoId,
+                        SfcId = manuSFCId,
+                        WorkOrderId = statorBo.WorkOrderId,
+                        ProductId = statorBo.ProductId,
+                        ProductBOMId = statorBo.ProductBOMId,
+                        ProcessRouteId = statorBo.ProcessRouteId,
+                        IsUsed = false,
 
-                    SiteId = statorBo.SiteId,
-                    CreatedBy = statorBo.User,
-                    CreatedOn = statorBo.Time,
-                    UpdatedBy = StatorConst.USER,
-                    UpdatedOn = opEntity.RDate
-                });
+                        SiteId = statorBo.SiteId,
+                        CreatedBy = statorBo.User,
+                        CreatedOn = statorBo.Time,
+                        UpdatedBy = StatorConst.USER,
+                        UpdatedOn = opEntity.RDate
+                    });
+                }
+                else
+                {
+                    // 已存在条码
+                    manuSFCInfoId = manuSFCInfoEntity.Id;
+                }
 
                 // 插入步骤表
                 var stepEntity = new ManuSfcStepEntity
@@ -727,6 +751,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 _manuSfcRepository.ReplaceRangeAsync(summaryBo.ManuSFCEntities),
                 _manuSfcInfoRepository.ReplaceRangeAsync(summaryBo.ManuSFCInfoEntities),
                 _manuSfcStepRepository.InsertRangeAsync(summaryBo.ManuSfcStepEntities),
+                _whMaterialInventoryRepository.UpdateQtyAsync(summaryBo.UpdateWhMaterialInventoryEntities),
                 _manuSfcCirculationRepository.InsertRangeAsync(summaryBo.ManuSfcCirculationEntities),
                 _manuProductBadRecordRepository.InsertRangeAsync(summaryBo.ManuProductBadRecordEntities),
                 _manuProductNgRecordRepository.InsertRangeAsync(summaryBo.ManuProductNgRecordEntities),
@@ -779,6 +804,33 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             {
                 SiteId = siteId,
                 SFCs = barCodes
+            });
+        }
+
+        /// <summary>
+        /// 批量获取（条码信息）
+        /// </summary>
+        /// <param name="sfcIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcInfoEntity>> GetSFCInfoEntitiesAsync(IEnumerable<long> sfcIds)
+        {
+            // 批量读取条码信息（MES）
+            return await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcIds);
+        }
+
+        /// <summary>
+        /// 批量获取（库存条码）
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="barCodes"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WhMaterialInventoryEntity>> GetMaterialInventoryEntitiesAsync(long siteId, IEnumerable<string> barCodes)
+        {
+            // 批量读取条码（MES）
+            return await _whMaterialInventoryRepository.GetByBarCodesAsync(new Data.Repositories.Warehouse.WhMaterialInventory.Query.WhMaterialInventoryBarCodesQuery
+            {
+                SiteId = siteId,
+                BarCodes = barCodes
             });
         }
 

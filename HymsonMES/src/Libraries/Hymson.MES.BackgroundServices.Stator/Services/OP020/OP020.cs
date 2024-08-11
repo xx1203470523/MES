@@ -3,27 +3,23 @@
     /// <summary>
     /// 
     /// </summary>
-    public class OP120 : BaseOPEntity
+    public class OP020 : BaseOPEntity
     {
         /// <summary>
         /// 
         /// </summary>
-        public string ID_stator { get; set; }
+        public string wire_cart { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string ID_wire1 { get; set; }
+        public string wire1_barcode { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string ID_wire2 { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string WorkCount { get; set; }
+        public string wire2_barcode { get; set; }
 
     }
+
 }
