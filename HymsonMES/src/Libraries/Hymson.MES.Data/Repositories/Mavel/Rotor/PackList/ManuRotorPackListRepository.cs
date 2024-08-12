@@ -151,7 +151,7 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor.PackList
         /// <returns></returns>
         public async Task<IEnumerable<ManuRotorPackListEntity>> GetEntitiesAsync(ManuRotorSfcListQuery query)
         {
-            if (query.SfcList != null && query.SfcList.Count() > 0)
+            if (query.SfcList == null || query.SfcList.Count == 0)
             {
                 return new List<ManuRotorPackListEntity>();
             }

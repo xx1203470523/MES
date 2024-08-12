@@ -6,6 +6,7 @@ using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Mavel.Rotor;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.PackList;
@@ -109,49 +110,61 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             List<ManuRotorPackListEntity> insertList = new List<ManuRotorPackListEntity>();
             List<ManuRotorPackListEntity> updateList = new List<ManuRotorPackListEntity>();
+            DeleteCommand delModel = new DeleteCommand();
+            delModel.UserId = "LMSJOB";
+            delModel.DeleteOn = HymsonClock.Now();
+            delModel.Ids = new List<long>();
+            List<long> idList = new List<long>();
             foreach (var item in packDbList)
             {
                 ManuRotorPackListEntity? dbSfcModel = dbSfcList.Where(m => m.ProductCode == item.ProductCode).FirstOrDefault();
-                if(dbSfcModel == null)
+
+                if (item.IsDeleted == true)
                 {
-                    ManuRotorPackListEntity model = new ManuRotorPackListEntity();
-
-                    model.Id = IdGenProvider.Instance.CreateId();
-                    model.CreatedOn = HymsonClock.Now();
-                    model.UpdatedOn = model.CreatedOn;
-                    model.CreatedBy = "LMSJOB";
-                    model.UpdatedBy = "LMSJOB";
-                    model.IsDeleted = 0;
-                    model.SiteId = siteID;
-                    model.BoxCode = item.BoxCode;
-                    model.ProductCode = item.ProductCode;
-                    model.ProductNo = item.ProductNo;
-
-                    insertList.Add(model);
+                    if(dbSfcModel != null)
+                    {
+                        idList.Add(dbSfcModel.Id);
+                    }
                 }
                 else
                 {
-                    dbSfcModel.IsDeleted = dbSfcModel.IsDeleted;
-                    dbSfcModel.UpdatedBy = dbSfcModel.UpdatedBy;
-                    dbSfcModel.UpdatedOn = dbSfcModel.UpdatedOn;
-                    dbSfcModel.BoxCode = item.BoxCode;
-                    dbSfcModel.ProductCode = item.ProductCode;
-                    dbSfcModel.ProductNo = item.ProductNo;
+                    if(dbSfcModel != null)
+                    {
+                        dbSfcModel.UpdatedBy = item.UpdateID;
+                        dbSfcModel.UpdatedOn = HymsonClock.Now();
+                        dbSfcModel.BoxCode = item.BoxCode;
+                        updateList.Add(dbSfcModel);
+                    }
+                    else
+                    {
+                        ManuRotorPackListEntity model = new ManuRotorPackListEntity();
 
-                    updateList.Add(dbSfcModel);
+                        model.Id = IdGenProvider.Instance.CreateId();
+                        model.CreatedOn = HymsonClock.Now();
+                        model.UpdatedOn = model.CreatedOn;
+                        model.CreatedBy = "LMSJOB";
+                        model.UpdatedBy = "LMSJOB";
+                        model.IsDeleted = item.IsDeleted == true ? 1 : 0;
+                        model.SiteId = siteID;
+                        model.BoxCode = item.BoxCode;
+                        model.ProductCode = item.ProductCode;
+                        model.ProductNo = item.ProductNo;
+
+                        insertList.Add(model);
+                    }
                 }
-
             }
+            delModel.Ids = idList;
 
             //水位数据更新
-            DateTime maxCreateTime = packDbList.Max(x => x.CreateTime);
-            long timestamp = GetTimestampInMilliseconds(maxCreateTime);
+            DateTime maxUpdateTime = packDbList.Max(x => x.UpdateTime);
+            long timestamp = GetTimestampInMilliseconds(maxUpdateTime);
 
             //MES数据入库
             using var trans = TransactionHelper.GetTransactionScope();
 
+            await _manuRotorPackListRepository.DeletesAsync(delModel);
             await _manuRotorPackListRepository.InsertRangeAsync(insertList);
-            await _manuRotorPackListRepository.UpdateRangeAsync(updateList);
             await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
 
             trans.Complete();
