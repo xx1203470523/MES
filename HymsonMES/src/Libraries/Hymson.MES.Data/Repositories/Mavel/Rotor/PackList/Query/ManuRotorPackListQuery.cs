@@ -31,4 +31,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
         public string OrderCode { get; set; }
 
     }
+
+    /// <summary>
+    /// 条码查询
+    /// </summary>
+    public class ManuRotorSfcListQuery
+    {
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public List<string> SfcList { get; set; }
+    }
 }

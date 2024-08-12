@@ -145,6 +145,28 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor.PackList
         }
 
         /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuRotorPackListEntity>> GetEntitiesAsync(ManuRotorSfcListQuery query)
+        {
+            if (query.SfcList == null || query.SfcList.Count == 0)
+            {
+                return new List<ManuRotorPackListEntity>();
+            }
+
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("ProductCode in @SfcList ");
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuRotorPackListEntity>(template.RawSql, query);
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
