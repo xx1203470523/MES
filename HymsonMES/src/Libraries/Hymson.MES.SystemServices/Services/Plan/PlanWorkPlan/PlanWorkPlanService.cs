@@ -284,6 +284,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
                         // TODO: 这里的字段需要确认
                         OverScale = 0,
                         Type = planDto.Type,
+                        PlanType = planDto.PlanType,
                         Status = PlanWorkPlanStatusEnum.NotStarted,
 
                         Remark = "",
@@ -315,6 +316,7 @@ namespace Hymson.MES.SystemServices.Services.Plan
 
                     planEntity.Status = PlanWorkPlanStatusEnum.NotStarted;
                     planEntity.Type = planDto.Type;
+                    planEntity.PlanType = planDto.PlanType;
                     planEntity.UpdatedBy = currentBo.User;
                     planEntity.UpdatedOn = currentBo.Time;
                     resposeBo.Updates.Add(planEntity);
