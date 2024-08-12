@@ -14,28 +14,28 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.EquEquipment
     public interface IEquEquipmentService
     {
         /// <summary>
-        /// 获取设备资源对应的基础信息
+        /// 获取设备资源对应的基础信息(设备，资源，资源类型，工序，线体，车间)
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         Task<EquEquipmentResAllView> GetEquResAllAsync(QknyBaseDto param);
 
         /// <summary>
-        /// 获取设备资源对应的基础信息
+        /// 获取设备资源对应的基础信息(设备，资源)
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         Task<EquEquipmentResAllView> GetEquResAsync(QknyBaseDto param);
 
         /// <summary>
-        ///  获取设备资源对应的线体基础信息
+        ///  获取设备资源对应的线体基础信息(设备，资源，线体)
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         Task<EquEquipmentResAllView> GetEquResLineAsync(QknyBaseDto param);
 
         /// <summary>
-        ///  获取设备资源对应的工序基础信息
+        ///  获取设备资源对应的工序基础信息(设备，资源，工序)
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>

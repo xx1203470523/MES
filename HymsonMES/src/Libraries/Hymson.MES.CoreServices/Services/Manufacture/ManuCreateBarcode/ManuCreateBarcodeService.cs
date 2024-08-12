@@ -1208,12 +1208,165 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         }
 
         /// <summary>
+        /// 生成电芯码
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<string> CreateCellBarCodeAsync(CreateCellBarcodeBo bo)
+        {
+            var workOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
+            {
+                WorkOrderId = bo.WorkOrderId,
+                IsVerifyActivation = false
+            });
+
+            //按编码规则生成电芯码
+            var materialCode = (await _procMaterialRepository.GetByIdAsync(workOrderEntity.ProductId))?.MaterialCode ?? "";
+            var inteCodeRule = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(new InteCodeRulesByProductQuery
+            {
+                CodeType = CodeRuleCodeTypeEnum.ProcessControlSeqCode,
+                ProductId = workOrderEntity.ProductId,
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", materialCode);
+
+            var barcodes = await _manuGenerateBarcodeService.GenerateBarcodeListByIdAsync(new Bos.Manufacture.ManuGenerateBarcode.GenerateBarcodeBo
+            {
+                SiteId = bo.SiteId,
+                CodeRuleId = inteCodeRule.Id,
+                Count = 1,
+                ProductId = workOrderEntity.ProductId,
+                WorkOrderId = bo.WorkOrderId,
+                InteWorkCenterId = workOrderEntity.WorkCenterId,
+                UserName = bo.UserName
+            });
+            if (barcodes == null || !barcodes.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16200));
+            }
+
+            var cellSFC = barcodes.First();
+
+            //校验电芯码长度
+            if (cellSFC.Length != 24)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16512)).WithData("SFC", cellSFC);
+            }
+
+            #region 组装数据
+
+            var sfcEntity = new ManuSfcEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = bo.SiteId,
+                SFC = cellSFC,
+                Qty = 1,
+                IsUsed = YesOrNoEnum.Yes,
+                Status = bo.IsInStock ? SfcStatusEnum.Activity : SfcStatusEnum.lineUp,
+                Type = SfcTypeEnum.Produce,
+                CreatedBy = bo.UserName,
+                UpdatedBy = bo.UserName
+            };
+            var sfcInfoEntity = new ManuSfcInfoEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = bo.SiteId,
+                SfcId = sfcEntity.Id,
+                WorkOrderId = workOrderEntity.Id,
+                ProductId = workOrderEntity.ProductId,
+                ProductBOMId = workOrderEntity.ProductBOMId,
+                ProcessRouteId = workOrderEntity.ProcessRouteId,
+                IsUsed = true,
+                CreatedBy = bo.UserName,
+                UpdatedBy = bo.UserName
+            };
+            var sfcProduceEntity = new ManuSfcProduceEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = bo.SiteId,
+                SFC = cellSFC,
+                SFCId = sfcEntity.Id,
+                ProductId = workOrderEntity.ProductId,
+                WorkOrderId = workOrderEntity.Id,
+                BarCodeInfoId = sfcInfoEntity.Id,
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId,
+                ProcessRouteId = workOrderEntity.ProcessRouteId,
+                WorkCenterId = workOrderEntity.WorkCenterId ?? 0,
+                ProductBOMId = workOrderEntity.ProductBOMId,
+                Qty = 1,
+                ProcedureId = bo.ProcedureId,
+                Status = bo.IsInStock ? SfcStatusEnum.Activity : SfcStatusEnum.lineUp,
+                RepeatedCount = 0,
+                IsScrap = TrueOrFalseEnum.No,
+                CreatedBy = bo.UserName,
+                UpdatedBy = bo.UserName
+            };
+            //步骤表数据
+            var sfcStepEntities = new List<ManuSfcStepEntity>
+            {
+                //电芯码下达步骤
+                new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = bo.SiteId,
+                    SFC = cellSFC,
+                    ProductId = workOrderEntity.ProductId,
+                    WorkOrderId = workOrderEntity.Id,
+                    ProductBOMId = workOrderEntity.ProductBOMId,
+                    WorkCenterId = workOrderEntity.WorkCenterId,
+                    EquipmentId = bo.EquipmentId,
+                    ResourceId = bo.ResourceId,
+                    Qty = 1,
+                    ProcedureId = bo.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.Create,
+                    CurrentStatus = SfcStatusEnum.lineUp,
+                    CreatedBy = bo.UserName,
+                    UpdatedBy = bo.UserName
+                }
+            };
+            if (bo.IsInStock)
+            {
+                //电芯码进站步骤
+                sfcStepEntities.Add(new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = bo.SiteId,
+                    SFC = cellSFC,
+                    ProductId = workOrderEntity.ProductId,
+                    WorkOrderId = workOrderEntity.Id,
+                    ProductBOMId = workOrderEntity.ProductBOMId,
+                    WorkCenterId = workOrderEntity.WorkCenterId,
+                    EquipmentId = bo.EquipmentId,
+                    ResourceId = bo.ResourceId,
+                    Qty = 1,
+                    ProcedureId = bo.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.InStock,
+                    CurrentStatus = SfcStatusEnum.lineUp,
+                    AfterOperationStatus = SfcStatusEnum.Activity,
+                    CreatedBy = bo.UserName,
+                    UpdatedBy = bo.UserName
+                });
+            }
+
+            #endregion
+
+            //数据库操作
+            using var trans = TransactionHelper.GetTransactionScope();
+            await _manuSfcRepository.InsertAsync(sfcEntity);
+            await _manuSfcInfoRepository.InsertAsync(sfcInfoEntity);
+            await _manuSfcProduceRepository.InsertAsync(sfcProduceEntity);
+            await _manuSfcStepRepository.InsertRangeAsync(sfcStepEntities);
+            trans.Complete();
+
+            return cellSFC;
+        }
+
+        /// <summary>
         /// 根据极组码生成电芯码
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<string> CreateCellBarCodeBySfcAsync(CreateCellBarcodeBo bo)
+        public async Task<string> CreateCellBarCodeBySfcAsync(CreateCellBarcodeBySfcBo bo)
         {
             //查询极组在制信息
             var manuSfcProduceEntities = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
@@ -1371,52 +1524,52 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     UpdatedBy = bo.UserName
                 });
             }
-            //极组码完成步骤
-            foreach (var item in manuSfcProduceEntities)
-            {
-                sfcStepEntities.Add(new ManuSfcStepEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = item.SiteId,
-                    SFC = item.SFC,
-                    ProductId = item.ProductId,
-                    WorkOrderId = item.WorkOrderId,
-                    ProductBOMId = item.ProductBOMId,
-                    WorkCenterId = item.WorkCenterId,
-                    EquipmentId = bo.EquipmentId,
-                    ResourceId = bo.ResourceId,
-                    Qty = item.Qty,
-                    ProcedureId = item.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.OutStock,
-                    CurrentStatus = item.Status,
-                    AfterOperationStatus = SfcStatusEnum.Complete,
-                    CreatedBy = bo.UserName,
-                    UpdatedBy = bo.UserName
-                });
-            }
+            ////极组码完成步骤
+            //foreach (var item in manuSfcProduceEntities)
+            //{
+            //    sfcStepEntities.Add(new ManuSfcStepEntity
+            //    {
+            //        Id = IdGenProvider.Instance.CreateId(),
+            //        SiteId = item.SiteId,
+            //        SFC = item.SFC,
+            //        ProductId = item.ProductId,
+            //        WorkOrderId = item.WorkOrderId,
+            //        ProductBOMId = item.ProductBOMId,
+            //        WorkCenterId = item.WorkCenterId,
+            //        EquipmentId = bo.EquipmentId,
+            //        ResourceId = bo.ResourceId,
+            //        Qty = item.Qty,
+            //        ProcedureId = item.ProcedureId,
+            //        Operatetype = ManuSfcStepTypeEnum.OutStock,
+            //        CurrentStatus = item.Status,
+            //        AfterOperationStatus = SfcStatusEnum.Complete,
+            //        CreatedBy = bo.UserName,
+            //        UpdatedBy = bo.UserName
+            //    });
+            //}
 
-            //流转记录
-            var manuSfcCirculationEntitys = new List<ManuSfcCirculationEntity>();
-            foreach (var item in bo.Barcodes)
-            {
-                manuSfcCirculationEntitys.Add(new ManuSfcCirculationEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = bo.SiteId,
-                    ProcedureId = bo.ProcedureId,
-                    ResourceId = bo.ResourceId,
-                    SFC = item,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    ProductId = sfcProduceEntity.ProductId,
-                    CirculationBarCode = cellSFC,
-                    CirculationProductId = sfcProduceEntity.ProductId,
-                    CirculationMainProductId = sfcProduceEntity.ProductId,
-                    CirculationQty = sfcProduceEntity.Qty,
-                    CirculationType = SfcCirculationTypeEnum.Merge,
-                    CreatedBy = bo.UserName,
-                    UpdatedBy = bo.UserName
-                });
-            }
+            ////流转记录
+            //var manuSfcCirculationEntitys = new List<ManuSfcCirculationEntity>();
+            //foreach (var item in bo.Barcodes)
+            //{
+            //    manuSfcCirculationEntitys.Add(new ManuSfcCirculationEntity
+            //    {
+            //        Id = IdGenProvider.Instance.CreateId(),
+            //        SiteId = bo.SiteId,
+            //        ProcedureId = bo.ProcedureId,
+            //        ResourceId = bo.ResourceId,
+            //        SFC = item,
+            //        WorkOrderId = sfcProduceEntity.WorkOrderId,
+            //        ProductId = sfcProduceEntity.ProductId,
+            //        CirculationBarCode = cellSFC,
+            //        CirculationProductId = sfcProduceEntity.ProductId,
+            //        CirculationMainProductId = sfcProduceEntity.ProductId,
+            //        CirculationQty = sfcProduceEntity.Qty,
+            //        CirculationType = SfcCirculationTypeEnum.Merge,
+            //        CreatedBy = bo.UserName,
+            //        UpdatedBy = bo.UserName
+            //    });
+            //}
 
             #endregion
 
@@ -1426,26 +1579,26 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             await _manuSfcInfoRepository.InsertAsync(sfcInfoEntity);
             await _manuSfcProduceRepository.InsertAsync(sfcProduceEntity);
             await _manuSfcStepRepository.InsertRangeAsync(sfcStepEntities);
-            if (manuSfcCirculationEntitys.Any())
-            {
-                await _manuSfcCirculationRepository.InsertRangeAsync(manuSfcCirculationEntitys);
-            }
-            //更新极组条码为完成状态
-            await _manuSfcRepository.UpdateStatusAsync(new ManuSfcUpdateCommand
-            {
-                SiteId = bo.SiteId,
-                Sfcs = bo.Barcodes.ToArray(),
-                Status = Core.Enums.SfcStatusEnum.Complete,
-                UpdatedOn = HymsonClock.Now(),
-                UserId = bo.UserName
-            });
+            //if (manuSfcCirculationEntitys.Any())
+            //{
+            //    await _manuSfcCirculationRepository.InsertRangeAsync(manuSfcCirculationEntitys);
+            //}
+            ////更新极组条码为完成状态
+            //await _manuSfcRepository.UpdateStatusAsync(new ManuSfcUpdateCommand
+            //{
+            //    SiteId = bo.SiteId,
+            //    Sfcs = bo.Barcodes.ToArray(),
+            //    Status = Core.Enums.SfcStatusEnum.Complete,
+            //    UpdatedOn = HymsonClock.Now(),
+            //    UserId = bo.UserName
+            //});
             trans.Complete();
 
             return cellSFC;
         }
 
         /// <summary>
-        /// 根据极组码生成电芯码
+        /// 接收设备下发的电芯码
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
