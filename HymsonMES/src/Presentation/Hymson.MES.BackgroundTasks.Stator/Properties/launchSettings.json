@@ -11,6 +11,12 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Staging"
       }
+    },
+    "BackgroundTasks.Stator【Production】": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Production"
+      }
     }
   }
 }

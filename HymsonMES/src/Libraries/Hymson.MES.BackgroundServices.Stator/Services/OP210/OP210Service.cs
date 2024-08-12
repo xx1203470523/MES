@@ -231,7 +231,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 {
                     // 扣减物料库存
                     inventoryEntity.QuantityResidue -= StatorConst.QTY;
-                    inventoryEntity.Status = WhMaterialInventoryStatusEnum.InUse;
+                    inventoryEntity.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
                     inventoryEntity.UpdatedOn = statorBo.Time;
                     inventoryEntity.UpdatedBy = StatorConst.USER;
                     summaryBo.UpdateWhMaterialInventoryEntities.Add(inventoryEntity);
