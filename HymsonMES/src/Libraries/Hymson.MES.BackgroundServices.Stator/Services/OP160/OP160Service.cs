@@ -10,17 +10,17 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
     /// <summary>
     /// 服务
     /// </summary>
-    public partial class OP340Service : IOP340Service
+    public partial class OP160Service : IOP160Service
     {
         /// <summary>
         /// 日志接口
         /// </summary>
-        private readonly ILogger<OP340Service> _logger;
+        private readonly ILogger<OP160Service> _logger;
 
         /// <summary>
         /// 仓储接口（工序）
         /// </summary>
-        private readonly IOPRepository<OP340> _opRepository;
+        private readonly IOPRepository<OP160> _opRepository;
 
         /// <summary>
         /// 服务接口（基础）
@@ -39,8 +39,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="opRepository"></param>
         /// <param name="mainService"></param>
         /// <param name="waterMarkService"></param>
-        public OP340Service(ILogger<OP340Service> logger,
-            IOPRepository<OP340> opRepository,
+        public OP160Service(ILogger<OP160Service> logger,
+            IOPRepository<OP160> opRepository,
             IMainService mainService,
             IWaterMarkService waterMarkService)
         {
@@ -57,7 +57,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <returns></returns>
         public async Task<int> ExecuteAsync(int limitCount)
         {
-            var producreCode = $"{typeof(OP340).Name}";
+            var producreCode = $"{typeof(OP160).Name}";
             var buzKey = $"{StatorConst.BUZ_KEY_PREFIX}-{producreCode}";
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(buzKey);
 
@@ -74,7 +74,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             }
 
             // 先定位条码位置
-            var barCodes = entities.Select(s => s.busbar_barcode);
+            var barCodes = entities.Select(s => s.PaperLotBarcode);
 
             // 获取转换数据（基础数据）
             var summaryBo = await ConvertDataListAsync(entities, barCodes);
@@ -90,9 +90,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="barCodes"></param>
         /// <param name="parameterCodes"></param>
         /// <returns></returns>
-        private async Task<StatorSummaryBo> ConvertDataListAsync<T>(IEnumerable<T> entities, IEnumerable<string> barCodes, IEnumerable<string>? parameterCodes = null) where T : BaseOPEntity
+        private async Task<StatorSummaryBo> ConvertDataListAsync(IEnumerable<OP160> entities, IEnumerable<string> barCodes, IEnumerable<string>? parameterCodes = null)
         {
-            var producreCode = $"{typeof(T).Name}";
+            var producreCode = $"{typeof(OP160).Name}";
 
             // 初始化对象
             var statorBo = await _mainService.GetStatorBaseConfigAsync(producreCode);
@@ -116,7 +116,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             var summaryBo = new StatorSummaryBo { };
             foreach (var opEntity in entities)
             {
-                var barCode = $"{opEntity.GetType().GetProperty("busbar_barcode")?.GetValue(opEntity)}";
+                var barCode = opEntity.PaperLotBarcode;
                 var time = opEntity.RDate;
 
                 // ID是否无效数据

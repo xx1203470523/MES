@@ -121,7 +121,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 var barCode1 = opEntity.wire1_barcode;
                 var barCode2 = opEntity.wire2_barcode;
 
-                /*
                 // ID是否无效数据
                 var id = opEntity.ID.ParseToLong();
                 if (id == 0) continue;
@@ -129,24 +128,30 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 StatorBarCodeEntity? statorSFCEntity = statorSFCEntities.FirstOrDefault(f => f.WireID_1 == id || f.WireID_2 == id);
                 if (statorSFCEntity == null) continue;
 
-                statorSFCEntity.WireBarCode_1 = barCode1;
-                statorSFCEntity.WireBarCode_2 = barCode2;
+                if (!StatorConst.IgnoreString.Contains(barCode1) && !string.IsNullOrWhiteSpace(barCode1))
+                {
+                    statorSFCEntity.WireBarCode_1 = barCode1;
+                }
+
+                if (!StatorConst.IgnoreString.Contains(barCode2) && !string.IsNullOrWhiteSpace(barCode2))
+                {
+                    statorSFCEntity.WireBarCode_2 = barCode2;
+                }
+
                 statorSFCEntity.UpdatedOn = statorBo.Time;
                 summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
 
                 // 条码ID
-                var manuSFCId = IdGenProvider.Instance.CreateId();
-                var manuSFCInfoId = IdGenProvider.Instance.CreateId();
                 var manuSFCStepId = IdGenProvider.Instance.CreateId();
                 var manuBadRecordId = IdGenProvider.Instance.CreateId();
 
                 // 条码
-                var barCode = "TODO";
+                var barCode = statorSFCEntity.InnerBarCode;
                 var manuSFCEntity = manuSFCEntities.FirstOrDefault(f => f.SFC == barCode);
                 if (manuSFCEntity == null) continue;
 
                 // 条码信息
-                var manuSFCInfoEntity = manuSFCInfoEntities.FirstOrDefault(f => f.SfcId == manuSFCId);
+                var manuSFCInfoEntity = manuSFCInfoEntities.FirstOrDefault(f => f.SfcId == manuSFCEntity.Id);
                 if (manuSFCInfoEntity == null) continue;
 
                 // 插入步骤表
@@ -161,7 +166,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     WorkCenterId = statorBo.WorkLineId,
                     ProductBOMId = statorBo.ProductBOMId,
                     ProcessRouteId = statorBo.ProcessRouteId,
-                    SFCInfoId = manuSFCInfoId,
+                    SFCInfoId = manuSFCInfoEntity.Id,
                     Qty = StatorConst.QTY,
                     VehicleCode = "",
                     ProcedureId = statorBo.ProcedureId,
@@ -224,7 +229,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
 
                 // 如果没有需要解析的参数
                 if (parameterCodes == null || !parameterCodes.Any()) continue;
-                */
 
             }
 

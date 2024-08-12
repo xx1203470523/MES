@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.Snowflake;
@@ -105,6 +106,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 批量读取物料条码（MES）
             var inventoryEntities = await _mainService.GetMaterialInventoryEntitiesAsync(statorBo.SiteId, barCodes);
 
+            // 批量读取物料信息（MES）
+            var materialEntities = await _mainService.GetMaterialEntitiesAsync(inventoryEntities.Select(s => s.MaterialId));
+
             // 批量读取条码（定子）
             var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, entities.Select(s => s.ID).Distinct());
 
@@ -113,6 +117,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             foreach (var opEntity in entities)
             {
                 var barCode = opEntity.Barcode;
+                var time = opEntity.RDate;
 
                 // ID是否无效数据
                 var id = opEntity.ID.ParseToLong();
@@ -152,7 +157,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         CreatedBy = statorBo.User,
                         CreatedOn = statorBo.Time,
                         UpdatedBy = StatorConst.USER,
-                        UpdatedOn = opEntity.RDate
+                        UpdatedOn = time
                     });
                 }
                 else
@@ -180,7 +185,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         CreatedBy = statorBo.User,
                         CreatedOn = statorBo.Time,
                         UpdatedBy = StatorConst.USER,
-                        UpdatedOn = opEntity.RDate
+                        UpdatedOn = time
                     });
                 }
                 else
@@ -217,7 +222,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
                     UpdatedBy = StatorConst.USER,
-                    UpdatedOn = opEntity.RDate
+                    UpdatedOn = time
                 };
                 summaryBo.ManuSfcStepEntities.Add(stepEntity);
 
@@ -230,6 +235,32 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     inventoryEntity.UpdatedOn = statorBo.Time;
                     inventoryEntity.UpdatedBy = StatorConst.USER;
                     summaryBo.UpdateWhMaterialInventoryEntities.Add(inventoryEntity);
+                }
+
+                var materialId = inventoryEntity?.MaterialId ?? 0;
+                var materialEntity = materialEntities.FirstOrDefault(f => f.Id == materialId);
+                if (materialEntity != null)
+                {
+                    // 添加台账
+                    summaryBo.WhMaterialStandingbookEntities.Add(new WhMaterialStandingbookEntity
+                    {
+                        MaterialCode = materialEntity.MaterialCode,
+                        MaterialName = materialEntity.MaterialName,
+                        MaterialVersion = materialEntity.Version ?? "",
+                        MaterialBarCode = barCode,
+                        //Batch = "",//自制品 没有
+                        Quantity = StatorConst.QTY,
+                        Unit = materialEntity.Unit ?? "",
+                        Type = WhMaterialInventoryTypeEnum.ManuComplete,
+                        Source = MaterialInventorySourceEnum.ManuComplete,
+
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = statorBo.SiteId,
+                        CreatedBy = statorBo.User,
+                        CreatedOn = statorBo.Time,
+                        UpdatedBy = StatorConst.USER,
+                        UpdatedOn = time
+                    });
 
                     // 插入流转记录
                     summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
@@ -241,8 +272,8 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         SFC = statorSFCEntity.InnerBarCode,
 
                         CirculationBarCode = barCode,
-                        CirculationProductId = inventoryEntity.MaterialId,
-                        CirculationMainProductId = inventoryEntity.MaterialId,
+                        CirculationProductId = materialId,
+                        CirculationMainProductId = materialId,
                         CirculationQty = StatorConst.QTY,
                         CirculationType = SfcCirculationTypeEnum.Consume,
 
@@ -251,7 +282,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         CreatedBy = statorBo.User,
                         CreatedOn = statorBo.Time,
                         UpdatedBy = StatorConst.USER,
-                        UpdatedOn = opEntity.RDate
+                        UpdatedOn = time
                     });
                 }
 
@@ -278,7 +309,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
                     UpdatedBy = StatorConst.USER,
-                    UpdatedOn = opEntity.RDate
+                    UpdatedOn = time
                 });
 
                 // 插入NG记录
@@ -293,7 +324,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     CreatedBy = statorBo.User,
                     CreatedOn = statorBo.Time,
                     UpdatedBy = StatorConst.USER,
-                    UpdatedOn = opEntity.RDate
+                    UpdatedOn = time
                 });
 
                 // 如果没有需要解析的参数
@@ -318,7 +349,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                         ParameterId = param.Id,
                         ParameterValue = $"{paramValue}",
                         ParameterGroupId = 0,
-                        CollectionTime = opEntity.RDate ?? stepEntity.CreatedOn,
+                        CollectionTime = time ?? stepEntity.CreatedOn,
 
                         SiteId = stepEntity.SiteId,
                         CreatedBy = stepEntity.CreatedBy,

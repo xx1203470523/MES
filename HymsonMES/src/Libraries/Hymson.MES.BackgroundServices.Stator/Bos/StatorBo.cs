@@ -46,6 +46,11 @@ namespace Hymson.MES.BackgroundServices.Stator
         public List<WhMaterialInventoryEntity> UpdateWhMaterialInventoryEntities { get; set; } = new();
 
         /// <summary>
+        /// 集合（物料台账）
+        /// </summary>
+        public List<WhMaterialStandingbookEntity> WhMaterialStandingbookEntities { get; set; } = new();
+
+        /// <summary>
         /// 集合（流转信息）
         /// </summary>
         public List<ManuSfcCirculationEntity> ManuSfcCirculationEntities { get; set; } = new();

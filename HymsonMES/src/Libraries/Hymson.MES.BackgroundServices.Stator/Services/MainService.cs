@@ -50,6 +50,11 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
+        /// 仓储接口（物料维护）
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+        /// <summary>
         /// 仓储接口（工序维护）
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
@@ -108,6 +113,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="statorBarCodeRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="procMaterialRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procParameterRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
@@ -123,6 +129,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             IStatorBarCodeRepository statorBarCodeRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IProcMaterialRepository procMaterialRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcParameterRepository procParameterRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
@@ -139,6 +146,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             _statorBarCodeRepository = statorBarCodeRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _procMaterialRepository = procMaterialRepository;
             _procProcedureRepository = procProcedureRepository;
             _procParameterRepository = procParameterRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
@@ -816,6 +824,16 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         {
             // 批量读取条码信息（MES）
             return await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcIds);
+        }
+
+        /// <summary>
+        /// 批量获取（物料信息）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialEntity>> GetMaterialEntitiesAsync(IEnumerable<long> ids)
+        {
+            return await _procMaterialRepository.GetByIdsAsync(ids);
         }
 
         /// <summary>

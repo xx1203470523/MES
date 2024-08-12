@@ -78,6 +78,13 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         Task<IEnumerable<ManuSfcInfoEntity>> GetSFCInfoEntitiesAsync(IEnumerable<long> sfcIds);
 
         /// <summary>
+        /// 批量获取（物料信息）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaterialEntity>> GetMaterialEntitiesAsync(IEnumerable<long> ids);
+
+        /// <summary>
         /// 批量获取（库存条码）
         /// </summary>
         /// <param name="siteId"></param>

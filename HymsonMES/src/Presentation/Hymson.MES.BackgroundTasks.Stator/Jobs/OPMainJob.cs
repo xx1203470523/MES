@@ -17,7 +17,9 @@ namespace Hymson.MES.BackgroundTasks.Stator
         private readonly IOP010Service _op010Service;
         private readonly IOP020Service _op020Service;
         private readonly IOP070Service _op070Service;
+        private readonly IOP080Service _op080Service;
         private readonly IOP120Service _op120Service;
+        private readonly IOP160Service _op160Service;
         private readonly IOP190Service _op190Service;
         private readonly IOP210Service _op210Service;
         private readonly IOP340Service _op340Service;
@@ -38,7 +40,9 @@ namespace Hymson.MES.BackgroundTasks.Stator
             IOP010Service op010Service,
             IOP020Service op020Service,
             IOP070Service op070Service,
+            IOP080Service op080Service,
             IOP120Service op120Service,
+            IOP160Service op160Service,
             IOP190Service op190Service,
             IOP210Service op210Service,
             IOP340Service op340Service,
@@ -48,7 +52,9 @@ namespace Hymson.MES.BackgroundTasks.Stator
             _op010Service = op010Service;
             _op020Service = op020Service;
             _op070Service = op070Service;
+            _op080Service = op080Service;
             _op120Service = op120Service;
+            _op160Service = op160Service;
             _op190Service = op190Service;
             _op210Service = op210Service;
             _op340Service = op340Service;
@@ -70,6 +76,8 @@ namespace Hymson.MES.BackgroundTasks.Stator
                 await LoopExecuteAsync(() => _op120Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op010Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op020Service.ExecuteAsync(limitCount));
+                await LoopExecuteAsync(() => _op080Service.ExecuteAsync(limitCount));
+                await LoopExecuteAsync(() => _op160Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op190Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op210Service.ExecuteAsync(limitCount));
                 await LoopExecuteAsync(() => _op340Service.ExecuteAsync(limitCount));

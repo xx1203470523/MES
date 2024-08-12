@@ -1,10 +1,13 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Extension;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Data;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.BackgroundServices.Stator.Services
 {
@@ -105,6 +108,12 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 批量读取条码信息（MES）
             var manuSFCInfoEntities = await _mainService.GetSFCInfoEntitiesAsync(manuSFCEntities.Select(s => s.Id));
 
+            // 批量读取物料条码（MES）
+            var inventoryEntities = await _mainService.GetMaterialInventoryEntitiesAsync(statorBo.SiteId, barCodes);
+
+            // 批量读取物料信息（MES）
+            var materialEntities = await _mainService.GetMaterialEntitiesAsync(inventoryEntities.Select(s => s.MaterialId));
+
             // 批量读取条码（定子）
             var ids = dataTable.AsEnumerable().Select(s => $"{s[id_key]}").Distinct();
             var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, ids);
@@ -172,6 +181,66 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                     UpdatedOn = time
                 };
                 summaryBo.ManuSfcStepEntities.Add(stepEntity);
+
+                var inventoryEntity = inventoryEntities.FirstOrDefault(f => f.MaterialBarCode == barCode);
+                if (inventoryEntity != null)
+                {
+                    // 扣减物料库存
+                    inventoryEntity.QuantityResidue -= StatorConst.QTY;
+                    inventoryEntity.Status = WhMaterialInventoryStatusEnum.InUse;
+                    inventoryEntity.UpdatedOn = statorBo.Time;
+                    inventoryEntity.UpdatedBy = StatorConst.USER;
+                    summaryBo.UpdateWhMaterialInventoryEntities.Add(inventoryEntity);
+                }
+
+                var materialId = inventoryEntity?.MaterialId ?? 0;
+                var materialEntity = materialEntities.FirstOrDefault(f => f.Id == materialId);
+                if (materialEntity != null)
+                {
+                    // 添加台账
+                    summaryBo.WhMaterialStandingbookEntities.Add(new WhMaterialStandingbookEntity
+                    {
+                        MaterialCode = materialEntity.MaterialCode,
+                        MaterialName = materialEntity.MaterialName,
+                        MaterialVersion = materialEntity.Version ?? "",
+                        MaterialBarCode = barCode,
+                        //Batch = "",//自制品 没有
+                        Quantity = StatorConst.QTY,
+                        Unit = materialEntity.Unit ?? "",
+                        Type = WhMaterialInventoryTypeEnum.ManuComplete,
+                        Source = MaterialInventorySourceEnum.ManuComplete,
+
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = statorBo.SiteId,
+                        CreatedBy = statorBo.User,
+                        CreatedOn = statorBo.Time,
+                        UpdatedBy = StatorConst.USER,
+                        UpdatedOn = time
+                    });
+
+                    // 插入流转记录
+                    summaryBo.ManuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                    {
+                        WorkOrderId = statorBo.WorkOrderId,
+                        ProductId = statorBo.ProductId,
+                        ProcedureId = statorBo.ProcedureId,
+                        ResourceId = null,
+                        SFC = statorSFCEntity.InnerBarCode,
+
+                        CirculationBarCode = barCode,
+                        CirculationProductId = materialId,
+                        CirculationMainProductId = materialId,
+                        CirculationQty = StatorConst.QTY,
+                        CirculationType = SfcCirculationTypeEnum.Consume,
+
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = statorBo.SiteId,
+                        CreatedBy = statorBo.User,
+                        CreatedOn = statorBo.Time,
+                        UpdatedBy = StatorConst.USER,
+                        UpdatedOn = time
+                    });
+                }
 
                 // 如果是不合格
                 var isOk = $"{dr["Result"]}" == "OK";
