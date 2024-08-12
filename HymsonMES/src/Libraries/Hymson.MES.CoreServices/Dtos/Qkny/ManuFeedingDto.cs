@@ -177,6 +177,11 @@ namespace Hymson.MES.CoreServices.Dtos.Qkny
     public class ManuFeedingMaterialSaveDto : CoreBaseDto
     {
         /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }

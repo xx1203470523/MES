@@ -4,6 +4,8 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSFCNode.View;
+using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.CoreServices.Services
 {
@@ -27,20 +29,29 @@ namespace Hymson.MES.CoreServices.Services
         /// </summary>
         private readonly IManuSFCNodeDestinationRepository _manuSFCNodeDestinationRepository;
 
+        private readonly IManuSfcRepository _manuSfcRepository;
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentEquipment"></param>
         /// <param name="manuSFCNodeRepository"></param>
         /// <param name="manuSFCNodeSourceRepository"></param>
         /// <param name="manuSFCNodeDestinationRepository"></param>
         public TracingSourceCoreService(IManuSFCNodeRepository manuSFCNodeRepository,
             IManuSFCNodeSourceRepository manuSFCNodeSourceRepository,
-            IManuSFCNodeDestinationRepository manuSFCNodeDestinationRepository)
+            IManuSFCNodeDestinationRepository manuSFCNodeDestinationRepository,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            IProcMaterialRepository procMaterialRepository)
         {
             _manuSFCNodeRepository = manuSFCNodeRepository;
             _manuSFCNodeSourceRepository = manuSFCNodeSourceRepository;
             _manuSFCNodeDestinationRepository = manuSFCNodeDestinationRepository;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _procMaterialRepository = procMaterialRepository;
         }
         /// <summary>
         /// 条码追溯（反向）  原始数据 平铺数据 没经过加工的树
@@ -131,6 +142,83 @@ namespace Hymson.MES.CoreServices.Services
             if (filledNodes == null) return rootNode;
 
             return filledNodes;
+        }
+
+        /// <summary>
+        /// 条码追溯（正向） 平铺列表数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSFCNodeView>> DestinationListAsync(EntityBySFCQuery query)
+        {
+            var sfcNodes = new List<ManuSFCNodeView>();
+
+            var rootNodeEntity = await _manuSFCNodeRepository.GetBySFCAsync(query);
+
+            //外部条码接收或产出条码没有消耗时，流转表与节点表会没有数据，返回原条码
+            if (rootNodeEntity == null)
+            {
+                var sfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery { SiteId = query.SiteId, SFC = query.SFC })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES12802)).WithData("sfc", query.SFC);
+
+                var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(new[] { sfcEntity.Id });
+                if (sfcInfoEntities == null || !sfcInfoEntities.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12802)).WithData("sfc", query.SFC);
+                }
+
+                var materialId = sfcInfoEntities.OrderBy(x => x.Id).First().ProductId;
+                var matertialEntity = await _procMaterialRepository.GetByIdAsync(materialId);
+
+                sfcNodes.Add(new ManuSFCNodeView
+                {
+                    SFC = query.SFC,
+                    ProductId = materialId,
+                    Name = matertialEntity?.MaterialName ?? ""
+                });
+                return sfcNodes;
+            }
+
+            //添加跟节点数据
+            sfcNodes.Add(new ManuSFCNodeView
+            {
+                Id = rootNodeEntity.Id,
+                ProductId = rootNodeEntity.ProductId,
+                SFC = rootNodeEntity.SFC,
+                Name = rootNodeEntity.Name,
+                Location = rootNodeEntity.Location
+            });
+
+            // 取得该根节点下面的所有树节点
+            var destinationEntities = await _manuSFCNodeDestinationRepository.GetTreeEntitiesAsync(rootNodeEntity.Id);
+
+            //没有下级节点数据，直接返回
+            if (destinationEntities == null || !destinationEntities.Any()) return sfcNodes;
+
+            // 取得整个树的基础信息方便下文填充数据
+            var nodeIds = destinationEntities.Select(s => s.NodeId).Union(destinationEntities.Select(s => s.DestinationId)).Distinct();
+            var nodeEntities = await _manuSFCNodeRepository.GetByIdsAsync(nodeIds);
+
+            foreach (var item in destinationEntities)
+            {
+                var nodeEntity = nodeEntities.FirstOrDefault(x => x.Id == item.DestinationId);
+                if (nodeEntity == null) { continue; }
+
+                var parentNodeEntity = nodeEntities.FirstOrDefault(x => x.Id == item.NodeId);
+
+                sfcNodes.Add(new ManuSFCNodeView
+                {
+                    Id = nodeEntity.Id,
+                    ProductId = nodeEntity.ProductId,
+                    SFC = nodeEntity.SFC,
+                    Name = nodeEntity.Name,
+                    Location = nodeEntity.Location,
+                    ParentNodeId = parentNodeEntity?.Id ?? 0,
+                    ParentNodeSFC = parentNodeEntity?.SFC ?? ""
+                });
+            }
+
+            return sfcNodes;
         }
 
         /// <summary>

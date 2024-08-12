@@ -13,12 +13,14 @@ using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Qkny;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcMarking;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.CoreServices.Services.Qkny;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -178,6 +180,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
         /// <summary>
+        /// Marking仓储
+        /// </summary>
+        private readonly IManuSfcMarkingExecuteRepository _manuSfcMarkingExecuteRepository;
+
+        /// <summary>
+        /// Marking拦截Service
+        /// </summary>
+        private readonly IManuSfcMarkingCoreService _manuSfcMarkingCoreService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -204,7 +216,9 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuProductParameterService manuProductParameterService,
             IProcMaterialRepository procMaterialRepository,
             IManuSfcGradeRepository manuSfcGradeRepository,
-            IManuProductBadRecordRepository manuProductBadRecordRepository)
+            IManuProductBadRecordRepository manuProductBadRecordRepository,
+            IManuSfcMarkingExecuteRepository manuSfcMarkingExecuteRepository,
+            IManuSfcMarkingCoreService manuSfcMarkingCoreService)
         {
             _equEquipmentRepository = equEquipmentRepository;
             _planWorkOrderService = planWorkOrderService;
@@ -232,6 +246,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuProductParameterService = manuProductParameterService;
             _manuSfcGradeRepository = manuSfcGradeRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
+            _manuSfcMarkingExecuteRepository = manuSfcMarkingExecuteRepository;
+            _manuSfcMarkingCoreService = manuSfcMarkingCoreService;
         }
 
 
@@ -243,30 +259,39 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         public async Task FeedingAsync(FeedingDto dto)
         {
             long siteId = 0;
-            var feedingMaterialSaveDto = new ManuFeedingMaterialSaveDto()
-            {
-                UserName = dto.EquipmentCode
-            };
             //组装参数
             var feedingMaterialSaveDtos = new List<ManuFeedingMaterialSaveDto>();
-            if (dto.IsFeedingPoint == true)
+            if (dto.IsFeedingPoint == true)  //上料点
             {
-                ProcLoadPointQuery query = new ProcLoadPointQuery();
-                query.LoadPoint = dto.EquipmentCode;
-                var loadPoint = await _procLoadPointService.GetProcLoadPointAsync(query);
+                var loadPoint = await _procLoadPointService.GetProcLoadPointAsync(new ProcLoadPointQuery { LoadPoint = dto.EquipmentCode });
                 siteId = loadPoint.SiteId;
-                //saveDto.ResourceId = res.FirstOrDefault()!.ResourceId!;
-                feedingMaterialSaveDto.Source = ManuSFCFeedingSourceEnum.FeedingPoint;
-                feedingMaterialSaveDto.FeedingPointId = loadPoint.Id;
-                feedingMaterialSaveDto.BarCode = dto.Sfc;
-                feedingMaterialSaveDto.SiteId = siteId;
-                feedingMaterialSaveDtos.Add(feedingMaterialSaveDto);
+
+                feedingMaterialSaveDtos.Add(new ManuFeedingMaterialSaveDto
+                {
+                    SiteId = siteId,
+                    UserName = dto.EquipmentCode,
+                    Source = ManuSFCFeedingSourceEnum.FeedingPoint,
+                    FeedingPointId = loadPoint.Id,
+                    BarCode = dto.Sfc
+                });
             }
             else
             {
                 //1. 获取设备基础信息
-                EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAsync(dto);
+                EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResProcedureAsync(dto);
                 siteId = equResModel.SiteId;
+
+                //Marking拦截
+                await _manuSfcMarkingCoreService.MarkingInterceptAsync(new MarkingInterceptBo
+                {
+                    SiteId = siteId,
+                    UserName = dto.EquipmentCode,
+                    EquipmentId = equResModel.EquipmentId,
+                    ResourceId = equResModel.ResId,
+                    ProcedureId = equResModel.ProcedureId,
+                    SFCs = new[] { dto.Sfc }
+                });
+
                 var sfcs = new List<string>() { dto.Sfc };
                 if (dto.IsTooling)
                 {
@@ -287,25 +312,25 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
 
                 foreach (var item in sfcs)
                 {
-                    feedingMaterialSaveDto = new ManuFeedingMaterialSaveDto()
+                    var feedingMaterialSaveDto = new ManuFeedingMaterialSaveDto()
                     {
                         SiteId = equResModel.SiteId,
                         UserName = dto.EquipmentCode,
+                        Source = ManuSFCFeedingSourceEnum.BOM,
+                        EquipmentId = equResModel.EquipmentId,
+                        ResourceId = equResModel.ResId,
+                        ProcedureId = equResModel.ProcedureId,
                         BarCode = item
                     };
-
-                    feedingMaterialSaveDto.Source = ManuSFCFeedingSourceEnum.BOM;
-                    feedingMaterialSaveDto.ResourceId = equResModel.ResId;
                     feedingMaterialSaveDtos.Add(feedingMaterialSaveDto);
                 }
-
             }
 
             //3. 上料
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             foreach (var item in feedingMaterialSaveDtos)
             {
-                var feedResult = await _manuFeedingService.CreateAsync(item);
+                await _manuFeedingService.CreateAsync(item);
             }
             //工装解绑
             if (dto.IsTooling)
@@ -340,14 +365,28 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             EquEquipmentResAllView equResModel = await _equEquipmentService.GetEquResAllAsync(dto);
             PlanWorkOrderEntity planEntity = await _planWorkOrderService.GetByWorkLineIdAsync(equResModel);
             //2. 构造数据
-            ManuFeedingMaterialSaveDto saveDto = new ManuFeedingMaterialSaveDto();
-            saveDto.BarCode = dto.Sfc;
-            saveDto.Source = ManuSFCFeedingSourceEnum.BOM;
-            saveDto.SiteId = equResModel.SiteId;
-            saveDto.ResourceId = equResModel.ResId;
-            saveDto.ProcedureId = equResModel.ProcedureId;
+            ManuFeedingMaterialSaveDto saveDto = new ManuFeedingMaterialSaveDto
+            {
+                BarCode = dto.Sfc,
+                Source = ManuSFCFeedingSourceEnum.BOM,
+                SiteId = equResModel.SiteId,
+                UserName = equResModel.EquipmentCode,
+                EquipmentId = equResModel.EquipmentId,
+                ResourceId = equResModel.ResId,
+                ProcedureId = equResModel.ProcedureId
+            };
+            //Marking拦截
+            await _manuSfcMarkingCoreService.MarkingInterceptAsync(new MarkingInterceptBo
+            {
+                SiteId = equResModel.SiteId,
+                UserName = equResModel.EquipmentCode,
+                EquipmentId = equResModel.EquipmentId,
+                ResourceId = equResModel.ResId,
+                ProcedureId = equResModel.ProcedureId,
+                SFCs = new[] { dto.Sfc }
+            });
             //3. 上料
-            var feedResult = await _manuFeedingService.CreateAsync(saveDto);
+            await _manuFeedingService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -958,6 +997,25 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             }
 
             //查询Marking信息
+            var markingEntities = await _manuSfcMarkingExecuteRepository.GetEntitiesAsync(new ManuSfcMarkingExecuteQuery
+            {
+                SiteId = equResModel.SiteId,
+                SFCs = dto.SfcList
+            });
+            if (markingEntities != null && markingEntities.Any())
+            {
+                foreach (var item in markingEntities)
+                {
+                    //Marking与降级都存在时，Marking优先
+                    var index = sfcList.FindIndex(x => x.SFC == item.SFC);
+                    if (index >= 0)
+                    {
+                        sfcList[index].Grade = "2";
+                        continue;
+                    }
+                    sfcList.Add(new SortingSfcInfo { SFC = item.SFC, Grade = "2" });
+                }
+            }
 
             return sfcList;
         }

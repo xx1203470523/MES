@@ -31,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var sqlBuilder = new StringBuilder(InsertSql);
             foreach (var e in entities)
             {
-                sqlBuilder.Append($"({e.Id}, {e.SiteId}, {e.WorkOrderId}, '{e.SFC}', {e.Status}, @User, @Time, @User, @Time),");
+                sqlBuilder.Append($"({e.Id}, {e.SiteId}, {e.WorkOrderId}, '{e.SFC}', {(int)e.Status}, @User, @Time, @User, @Time),");
             }
 
             // 移除最后一个逗号
@@ -118,10 +118,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuWorkOrderSFCRepository
     {
         const string InsertSql = "INSERT INTO manu_workorder_sfc (`Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES ";
-        const string IgnoreSql = "INSERT IGNORE manu_workorder_sfc (`Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
 
 #if DM
-        const string InsertsSql = "MERGE INTO manu_workorder_sfc t " +
+        const string IgnoreSql = "MERGE INTO manu_workorder_sfc t " +
             "USING (SELECT @WorkOrderId AS WorkOrderId, @SFC AS SFC FROM dual) s " +
             "ON (t.WorkOrderId = s.WorkOrderId AND t.SFC = s.SFC) " +
             "WHEN NOT MATCHED THEN " +
@@ -142,6 +141,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
               "INSERT (Id, SiteId, WorkOrderId, SFC, Status, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn) " +
               "VALUES (@Id, @SiteId, s.WorkOrderId, s.SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn); ";
 #else
+        const string IgnoreSql = "INSERT IGNORE manu_workorder_sfc (`Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
 
         const string ReplacesSql = "REPLACE INTO manu_workorder_sfc(  `Id`, `SiteId`, `WorkOrderId`, `SFC`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (@Id, @SiteId, @WorkOrderId, @SFC, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn) ";
 #endif

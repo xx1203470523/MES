@@ -21,6 +21,11 @@ namespace Hymson.MES.Core.Enums
         /// 上料点上料条码下发到设备
         /// </summary>
         [Description("UpMaterialSendEqu")]
-        UpMaterialSendEqu = 3
+        UpMaterialSendEqu = 3,
+        /// <summary>
+        /// 工序排序
+        /// </summary>
+        [Description("ProcedureSort")]
+        ProcedureSort = 4
     }
 }

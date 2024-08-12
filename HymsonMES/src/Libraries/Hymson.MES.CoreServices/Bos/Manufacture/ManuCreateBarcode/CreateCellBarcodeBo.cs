@@ -1,5 +1,4 @@
 ﻿using Hymson.MES.CoreServices.Bos.Common;
-using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
 {
@@ -24,12 +23,43 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         public long ProcedureId { get; set; }
 
         /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 电芯码是否自动进站(默认自动进站)
+        /// </summary>
+        public bool IsInStock { get; set; } = true;
+    }
+
+    /// <summary>
+    /// 根据极组码创建电芯码
+    /// </summary>
+    public class CreateCellBarcodeBySfcBo : CoreBaseBo
+    {
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
         /// 极组条码集合
         /// </summary>
         public IEnumerable<string> Barcodes { get; set; }
 
         /// <summary>
-        /// 电芯码是否自动进站
+        /// 电芯码是否自动进站(默认自动进站)
         /// </summary>
         public bool IsInStock { get; set; } = true;
     }

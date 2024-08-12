@@ -35,7 +35,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// <summary>
         /// 极组条码
         /// </summary>
-        public string Sfc { get; set; } = string.Empty;
+        public string? Sfc { get; set; } = string.Empty;
     }
 
     /// <summary>

@@ -29,13 +29,13 @@ namespace Hymson.MES.Data.Repositories.Marking
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoReportDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoReportCountSqlTemplate);
             pagedQuery.PageSize = 10;
-            sqlBuilder.Select("msmi.SFC,msmi.FindProcedureId,msmi.AppointInterceptProcedureId,msmir.InterceptProcedureId," +
+            sqlBuilder.Select("msmi.SFC,msmi.FoundBadProcedureId FindProcedureId,msmi.ShouldInterceptProcedureId AppointInterceptProcedureId,msmir.InterceptProcedureId," +
                 "msmir.InterceptEquipmentId,quc.UnqualifiedCode,quc.Type,quc.UnqualifiedCodeName," +
                 "quc.Status,ms.Qty,msmir.InterceptOn,msi.ProductId,msi.WorkOrderId,msp.ResourceId,msmi.`CreatedBy` MarkingCreatedBy," +
                 "msmi.`CreatedOn` MarkingCreatedOn,msmi.`UpdatedBy` MarkingClosedBy,msmi.`UpdatedOn` MarkingClosedOn,msmi.`Status` MarkingStatus");
             sqlBuilder.Where("msmi.IsDeleted = 0");
             sqlBuilder.Where("msmi.SiteId=@SiteId");
-            sqlBuilder.LeftJoin("manu_sfc_marking_intercept_record msmir ON msmir.SfcMarkingInfoId = msmi.id");
+            sqlBuilder.LeftJoin("manu_sfc_marking_intercept msmir ON msmir.SfcMarkingId = msmi.id");
             sqlBuilder.LeftJoin("qual_unqualified_code quc on quc.id=msmi.UnqualifiedCodeId");
             sqlBuilder.LeftJoin("manu_sfc ms on ms.SFC=msmi.SFC");
             sqlBuilder.LeftJoin("manu_sfc_info msi on msi.SfcId=ms.id");
@@ -144,28 +144,9 @@ namespace Hymson.MES.Data.Repositories.Marking
     /// </summary>
     public partial class MarkingRecordReportRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_marking_info` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_sfc_marking_info` /**where**/ ";
         const string GetPagedInfoReportDataSqlTemplate = @"
-                  SELECT /**select**/ FROM manu_sfc_marking_info msmi /**join**/ /**leftjoin**/  /**where**/ 	ORDER BY  msmi.UpdatedOn DESC  LIMIT @Offset,@Rows  ";
+                  SELECT /**select**/ FROM manu_sfc_marking msmi /**join**/ /**leftjoin**/  /**where**/ 	ORDER BY  msmi.UpdatedOn DESC  LIMIT @Offset,@Rows  ";
         const string GetPagedInfoReportCountSqlTemplate = @"select COUNT(*) from (
-                       SELECT /**select**/  FROM manu_sfc_marking_info msmi  /**innerjoin**/ /**leftjoin**/ /**join**/  /**where**/ /**groupby**/  ) AS subquery_table ";
-
-        const string GetMarkingInterceptReportEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `manu_sfc_marking_info` /**where**/  ";
-
-        const string InsertSql = "INSERT INTO `manu_sfc_marking_info`(  `Id`, `SiteId`, `ParentSFC`, `SFC`, `FindProcedureId`, `AppointInterceptProcedureId`, `UnqualifiedCodeId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParentSFC, @SFC, @FindProcedureId, @AppointInterceptProcedureId, @UnqualifiedCodeId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_sfc_marking_info`(  `Id`, `SiteId`, `ParentSFC`, `SFC`, `FindProcedureId`, `AppointInterceptProcedureId`, `UnqualifiedCodeId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParentSFC, @SFC, @FindProcedureId, @AppointInterceptProcedureId, @UnqualifiedCodeId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-
-        const string UpdateSql = "UPDATE `manu_sfc_marking_info` SET   SiteId = @SiteId, ParentSFC = @ParentSFC, SFC = @SFC, FindProcedureId = @FindProcedureId, AppointInterceptProcedureId = @AppointInterceptProcedureId, UnqualifiedCodeId = @UnqualifiedCodeId, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_sfc_marking_info` SET   SiteId = @SiteId, ParentSFC = @ParentSFC, SFC = @SFC, FindProcedureId = @FindProcedureId, AppointInterceptProcedureId = @AppointInterceptProcedureId, UnqualifiedCodeId = @UnqualifiedCodeId, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-
-        const string DeleteSql = "UPDATE `manu_sfc_marking_info` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `manu_sfc_marking_info` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
-
-        const string GetByIdSql = @"SELECT * FROM `manu_sfc_marking_info`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM `manu_sfc_marking_info`  WHERE Id IN @Ids ";
-
+                       SELECT /**select**/  FROM manu_sfc_marking msmi  /**innerjoin**/ /**leftjoin**/ /**join**/  /**where**/ /**groupby**/  ) AS subquery_table ";
     }
 }

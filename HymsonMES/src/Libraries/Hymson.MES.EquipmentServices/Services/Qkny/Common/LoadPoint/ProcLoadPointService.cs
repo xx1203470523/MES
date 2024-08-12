@@ -39,7 +39,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
         public async Task<ProcLoadPointEntity> GetProcLoadPointEntitiesAsync(ProcLoadPointQuery procLoadPointQuery)
         {
             var dbList = await _procLoadPointRepository.GetProcLoadPointEntitiesAsync(procLoadPointQuery);
-            if(dbList.IsNullOrEmpty() == true)
+            if (dbList.IsNullOrEmpty() == true)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45070));
             }
@@ -53,7 +53,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
         /// <returns></returns>
         public async Task<List<PointOrEquipmentView>> GetPointOrEquipmmentAsync(ProcLoadPointEquipmentQuery query)
         {
-            if(query == null || query.CodeList == null || query.CodeList.Count != query.CodeList.Count)
+            if (query == null || query.CodeList == null || query.CodeList.Count != query.CodeList.Count)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45074));
             }
@@ -63,7 +63,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
             //    //上料点会关联多个资源
             //    throw new CustomerValidationException(nameof(ErrorCode.MES45074));
             //}
-            foreach(var item in query.CodeList)
+            foreach (var item in query.CodeList)
             {
                 var dbCode = dbList.Where(m => m.Code == item).FirstOrDefault();
                 if (dbCode == null)
@@ -96,7 +96,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
             if (dbModel == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45070))
-                    .WithData("LoadPoint", query?.LoadPoint);
+                    .WithData("LoadPoint", query.LoadPoint ?? "");
             }
             return dbModel;
         }
@@ -112,7 +112,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny.LoadPoint
             if (dbList.IsNullOrEmpty() == true)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES45076))
-                    .WithData("LoadPoint", query?.LoadPoint);
+                    .WithData("LoadPoint", query.LoadPoint ?? "");
             }
             return dbList.ToList();
         }

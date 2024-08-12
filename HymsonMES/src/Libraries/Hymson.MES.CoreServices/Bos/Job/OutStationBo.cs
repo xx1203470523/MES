@@ -45,6 +45,10 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public IEnumerable<OutStationUnqualifiedBo>? OutStationUnqualifiedList { get; set; }
 
+        /// <summary>
+        /// 绑定的条码(电芯绑定极组出站使用,此时极组没有写在消耗中)
+        /// </summary>
+        public IEnumerable<string>? BindSfcs { get; set; }
     }
 
     /// <summary>
@@ -111,6 +115,16 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 降级品录入记录对象
         /// </summary>
         public IEnumerable<ManuDowngradingRecordEntity> DowngradingRecordEntities { get; set; }
+
+        /// <summary>
+        /// Marking信息表对象
+        /// </summary>
+        public IEnumerable<ManuSfcMarkingEntity> MarkingEntities { get; set; }
+
+        /// <summary>
+        /// Marking执行表对象
+        /// </summary>
+        public IEnumerable<ManuSfcMarkingExecuteEntity> MarkingExecuteEntities { get; set; }
 
         /// <summary>
         /// 不良品录入对象
@@ -183,6 +197,16 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 降级品录入记录对象
         /// </summary>
         public IEnumerable<ManuDowngradingRecordEntity>? DowngradingRecordEntities { get; set; }
+
+        /// <summary>
+        /// Marking信息表对象
+        /// </summary>
+        public IEnumerable<ManuSfcMarkingEntity>? MarkingEntities { get; set; }
+
+        /// <summary>
+        /// Marking执行表对象
+        /// </summary>
+        public IEnumerable<ManuSfcMarkingExecuteEntity>? MarkingExecuteEntities { get; set; }
 
         /// <summary>
         /// 不良品录入对象

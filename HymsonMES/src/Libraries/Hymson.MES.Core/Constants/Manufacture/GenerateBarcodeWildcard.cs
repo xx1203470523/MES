@@ -132,5 +132,11 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// </summary>
         [GenerateBarcodeWildcardDescriptionAttribute("设备编码通配符", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
         public const string EquipmentMappingCode = "%EQUIPMENTMAPPINGCODE%";
+
+        /// <summary>
+        /// 当年第几周
+        /// </summary>
+        [GenerateBarcodeWildcardDescriptionAttribute("当年第几周", new CodeRuleCodeTypeEnum[] { CodeRuleCodeTypeEnum.ProcessControlSeqCode, CodeRuleCodeTypeEnum.PackagingSeqCode, CodeRuleCodeTypeEnum.IQC, CodeRuleCodeTypeEnum.OQC, CodeRuleCodeTypeEnum.FQC }, new CodeRuleCodeModeEnum[] { CodeRuleCodeModeEnum.More, CodeRuleCodeModeEnum.One })]
+        public const string WeekOfYear = "%WEEKOFYEAR%";
     }
 }

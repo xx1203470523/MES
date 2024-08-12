@@ -11,6 +11,8 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcMarking.Command;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
@@ -45,6 +47,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IProcResourceRepository _procResourceRepository;
+        private readonly IManuSfcMarkingRepository _manuSfcMarkingRepository;
+        private readonly IManuSfcMarkingExecuteRepository _manuSfcMarkingExecuteRepository;
 
         #endregion
 
@@ -57,19 +61,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="procProcedureRepository"></param>
-        /// <param name="validationCheckRules"></param>
-        /// <param name="currentSite"></param>
-        /// <param name="qualUnqualifiedCodeRepository"></param>
-        /// <param name="manuSfcRepository"></param>
-        /// <param name="manuSfcInfoRepository"></param>
-        /// <param name="procMaterialRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
-        /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuProductBadRecordRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
-        /// <param name="currentUser"></param>
-        public ManuMarkingService(IProcProcedureRepository procProcedureRepository, AbstractValidator<ManuMarkingCheckDto> validationCheckRules, ICurrentSite currentSite, IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository, IManuSfcRepository manuSfcRepository, IManuSfcInfoRepository manuSfcInfoRepository, IProcMaterialRepository procMaterialRepository, IPlanWorkOrderRepository planWorkOrderRepository, IManuSfcProduceRepository manuSfcProduceRepository, IManuProductBadRecordRepository manuProductBadRecordRepository, ICurrentUser currentUser, IManuSfcStepRepository manuSfcStepRepository, IProcResourceRepository procResourceRepository)
+        public ManuMarkingService(IProcProcedureRepository procProcedureRepository,
+            AbstractValidator<ManuMarkingCheckDto> validationCheckRules,
+            ICurrentSite currentSite,
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuProductBadRecordRepository manuProductBadRecordRepository,
+            ICurrentUser currentUser,
+            IManuSfcStepRepository manuSfcStepRepository,
+            IProcResourceRepository procResourceRepository,
+            IManuSfcMarkingRepository manuSfcMarkingRepository,
+            IManuSfcMarkingExecuteRepository manuSfcMarkingExecuteRepository)
         {
             _procProcedureRepository = procProcedureRepository;
             _validationCheckRules = validationCheckRules;
@@ -84,6 +90,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
             _currentUser = currentUser;
             _manuSfcStepRepository = manuSfcStepRepository;
             _procResourceRepository = procResourceRepository;
+            _manuSfcMarkingRepository = manuSfcMarkingRepository;
+            _manuSfcMarkingExecuteRepository = manuSfcMarkingExecuteRepository;
         }
 
         /// <summary>
@@ -214,6 +222,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
                 throw new CustomerValidationException(nameof(ErrorCode.MES19709)).WithData("code", checkDto.Sfc);
             }
 
+            //校验是否已打过Marking
+            var markedEntities = await _manuSfcMarkingExecuteRepository.GetEntitiesAsync(new ManuSfcMarkingExecuteQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFC = checkDto.Sfc,
+                UnqualifiedCodeId = unqualifiedCodeEntity.Id
+            });
+            if (markedEntities != null && markedEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19715)).WithData("sfc", checkDto.Sfc).WithData("unqualifiedCode", unqualifiedCodeEntity.UnqualifiedCode);
+            }
+
             //获取物料信息
             var materialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity.ProductId);
 
@@ -274,37 +294,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19706)).WithData("code", sfc);
             }
-            else
-            {
-                switch (sfcEntity.Status)
-                {
-                    case SfcStatusEnum.Scrapping:
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19707)).WithData("code", sfc).WithData("status", SfcStatusEnum.Invalid.GetDescription());
-                    //break;
-                    case SfcStatusEnum.Delete:
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19707)).WithData("code", sfc).WithData("status", SfcStatusEnum.Delete.GetDescription());
-                    //break;
-                    case SfcStatusEnum.Invalid:
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19707)).WithData("code", sfc).WithData("status", SfcStatusEnum.Invalid.GetDescription());
-                    //break;
-                    default:
-                        break;
-                }
-            }
 
-            var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery { SFC = sfc, SiteId = _currentSite.SiteId ?? 0 });
+            var markingEntities = await _manuSfcMarkingExecuteRepository.GetEntitiesAsync(new ManuSfcMarkingExecuteQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                SFC = sfc
+            });
 
             var result = new List<MarkingCloseViewDto>();
 
-            if (manuProductBadRecordEntities != null && manuProductBadRecordEntities.Any())
+            if (markingEntities != null && markingEntities.Any())
             {
-
                 //获取不合格代码信息
-                var qualUnqualifiedCodeIds = manuProductBadRecordEntities.Select(a => a.UnqualifiedId).Distinct();
+                var qualUnqualifiedCodeIds = markingEntities.Select(a => a.UnqualifiedCodeId).Distinct();
                 var qualUnqualifiedEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(qualUnqualifiedCodeIds);
 
                 //获取拦截工序信息
-                var interceptOperationIds = manuProductBadRecordEntities.Select(a => a.InterceptOperationId.GetValueOrDefault()).Distinct();
+                var interceptOperationIds = markingEntities.Select(a => a.ShouldInterceptProcedureId).Distinct();
                 var procProcedureEntities = await _procProcedureRepository.GetByIdsAsync(interceptOperationIds);
 
                 var sfcProcedureInfoEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = sfc, SiteId = _currentSite.SiteId ?? 0 });
@@ -315,28 +321,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
                     resourceEntity = await _procResourceRepository.GetByIdAsync(sfcProcedureInfoEntity.ResourceId.GetValueOrDefault());
                 }
 
-                foreach (var item in manuProductBadRecordEntities)
+                foreach (var item in markingEntities)
                 {
                     var model = new MarkingCloseViewDto();
                     model.Id = item.Id;
                     model.Remark = item.Remark;
-                    if (item.Status == ProductBadRecordStatusEnum.Open)
-                    {
-                        model.Status = true;
-                    }
-                    if (item.Status == ProductBadRecordStatusEnum.Close)
-                    {
-                        model.Status = false;
-                    }
-                    //model.Status = item.Status;
+                    model.Status = false;
 
-                    var qualUnqualifiedEntity = qualUnqualifiedEntities.FirstOrDefault(a => a.Id == item.UnqualifiedId);
+                    var qualUnqualifiedEntity = qualUnqualifiedEntities.FirstOrDefault(a => a.Id == item.UnqualifiedCodeId);
                     model.UnqualifiedCode = qualUnqualifiedEntity?.UnqualifiedCode;
                     model.UnqualifiedName = qualUnqualifiedEntity?.UnqualifiedCodeName;
 
-                    var procProcedureEntity = procProcedureEntities.FirstOrDefault(a => a.Id == item.InterceptOperationId);
+                    var procProcedureEntity = procProcedureEntities.FirstOrDefault(a => a.Id == item.ShouldInterceptProcedureId);
                     model.InterceptProcedureCode = procProcedureEntity?.Code;
-                    model.ResourceCode = resourceEntity?.ResCode;
+                    model.ResourceCode = item.CreatedBy;
 
                     result.Add(model);
                 }
@@ -391,117 +389,52 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
         /// <summary>
         /// Marking关闭确认提交
         /// </summary>
-        /// <param name="markingCloseConfirmDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task SaveMarkingCloseAsync(MarkingCloseConfirmDto markingCloseConfirmDto)
+        public async Task SaveMarkingCloseAsync(MarkingCloseConfirmDto dto)
         {
-            if (string.IsNullOrWhiteSpace(markingCloseConfirmDto.Sfc))
+            if (string.IsNullOrWhiteSpace(dto.Sfc))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15432));
             }
 
-            if (markingCloseConfirmDto.MarkingCloseConfirmBadRecords == null || !markingCloseConfirmDto.MarkingCloseConfirmBadRecords.Any())
+            if (dto.MarkingCloseConfirmBadRecords == null || !dto.MarkingCloseConfirmBadRecords.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19711));
             }
 
-            //获取条码信息
-            var sfcEntity = await _manuSfcRepository.GetSingleAsync(new ManuSfcQuery
+            //查询Marking记录
+            var markingExecuteEntities = await _manuSfcMarkingExecuteRepository.GetByIdsAsync(dto.MarkingCloseConfirmBadRecords.Select(x => x.Id.GetValueOrDefault()).ToArray());
+            if (!markingExecuteEntities.Any())
             {
-                SFC = markingCloseConfirmDto.Sfc,
-                SiteId = _currentSite.SiteId ?? 0,
-                Type = SfcTypeEnum.Produce
-            });
-            if (sfcEntity == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15439)).WithData("sfc", markingCloseConfirmDto.Sfc);
-            }
-            //校验SFC状态
-            switch (sfcEntity.Status)
-            {
-                case SfcStatusEnum.Scrapping:
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19707)).WithData("code", markingCloseConfirmDto.Sfc).WithData("status", SfcStatusEnum.Invalid.GetDescription());
-                //break;
-                case SfcStatusEnum.Delete:
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19707)).WithData("code", markingCloseConfirmDto.Sfc).WithData("status", SfcStatusEnum.Delete.GetDescription());
-                //break;
-                case SfcStatusEnum.Invalid:
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19707)).WithData("code", markingCloseConfirmDto.Sfc).WithData("status", SfcStatusEnum.Invalid.GetDescription());
-                //break;
-                default:
-                    break;
+                return;
             }
 
-            //在制品信息
-            var manuSfcProduceInfoEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = markingCloseConfirmDto.Sfc, SiteId = _currentSite.SiteId ?? 0 });
-
-            //条码信息表
-            var sfcInfoEntity = await _manuSfcInfoRepository.GetBySFCIdWithIsUseAsync(sfcEntity.Id);
-
-            //组装步骤表数据
-            var manuSfcStepEntity = new ManuSfcStepEntity
+            //
+            var updateMarkingList = new List<UpdateMarkingStatusCommand>();
+            foreach (var item in dto.MarkingCloseConfirmBadRecords)
             {
-                Id = IdGenProvider.Instance.CreateId(),
-                SFC = markingCloseConfirmDto.Sfc,
-                ProductId = sfcInfoEntity?.ProductId ?? 0,
-                WorkOrderId = sfcInfoEntity?.WorkOrderId ?? 0,
-                WorkCenterId = manuSfcProduceInfoEntity?.WorkCenterId,
-                ProductBOMId = manuSfcProduceInfoEntity?.ProductBOMId,
-                Qty = sfcEntity?.Qty ?? 0,
-                EquipmentId = manuSfcProduceInfoEntity?.EquipmentId,
-                ResourceId = manuSfcProduceInfoEntity?.ResourceId,
-                ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
-                Operatetype = ManuSfcStepTypeEnum.BadEntry,
-                CurrentStatus = sfcEntity!.Status,
-                SiteId = _currentSite.SiteId ?? 0,
-                CreatedOn = HymsonClock.Now(),
-                CreatedBy = _currentUser.UserName,
-                UpdatedOn = HymsonClock.Now(),
-                UpdatedBy = _currentUser.UserName,
-                Remark = markingCloseConfirmDto.SfcStepRemark
-            };
-
-            //组装不良录入数据
-            var updateManuProductBadRecords = new List<ManuProductBadRecordEntity>();
-            foreach (var item in markingCloseConfirmDto.MarkingCloseConfirmBadRecords)
-            {
-                if (item.Id == null || item.Status == null)
+                var entity = markingExecuteEntities.FirstOrDefault(x => x.Id == item.Id);
+                if (entity == null)
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19711));
+                    continue;
                 }
-
-                var manuProductBadRecordEntity = new ManuProductBadRecordEntity
+                updateMarkingList.Add(new UpdateMarkingStatusCommand
                 {
-                    Id = item.Id.GetValueOrDefault(),
-                    Remark = item.Remark ?? "",
-                    Status = item.Status.GetValueOrDefault(),
+                    Id = entity.SfcMarkingId,
+                    Status = MarkingStatusEnum.Close,
+                    Remark = string.IsNullOrWhiteSpace(item.Remark) ? dto.SfcStepRemark : item.Remark,
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
-                };
-
-                updateManuProductBadRecords.Add(manuProductBadRecordEntity);
+                });
             }
 
-            using (var trans = TransactionHelper.GetTransactionScope())
-            {
-                //修改不合格记录
-                if (updateManuProductBadRecords != null && updateManuProductBadRecords.Any())
-                {
-                    var insertResult = await _manuProductBadRecordRepository.UpdateByMarkingCloseRangeAsync(updateManuProductBadRecords);
-                    if (insertResult != updateManuProductBadRecords.Count)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES19712));
-                    }
-                }
-                //插入步骤表
-                var insertSfcStepResult = await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
-                if (insertSfcStepResult == 0)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19712));
-                }
-
-                trans.Complete();
-            }
+            using var trans = TransactionHelper.GetTransactionScope();
+            //物理删除manu_sfc_marking_execute表数据
+            await _manuSfcMarkingExecuteRepository.DeletesPhysicsAsync(markingExecuteEntities.Select(x => x.Id).Distinct());
+            //修改manu_sfc_marking状态
+            await _manuSfcMarkingRepository.UpdateMarkingStatusAsync(updateMarkingList);
+            trans.Complete();
         }
     }
 }

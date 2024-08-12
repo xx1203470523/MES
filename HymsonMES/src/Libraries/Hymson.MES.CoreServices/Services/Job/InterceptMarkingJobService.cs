@@ -1,13 +1,8 @@
-﻿using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Attribute.Job;
-using Hymson.MES.Core.Constants;
+﻿using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums.Job;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Quality;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcMarking;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -17,24 +12,14 @@ namespace Hymson.MES.CoreServices.Services.Job
     [Job("Marking拦截", JobTypeEnum.Standard)]
     public class InterceptMarkingJobService : IJobService
     {
-        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
-        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
-        private readonly IProcProcedureRepository _procProcedureRepository;
+        private readonly IManuSfcMarkingCoreService _manuSfcMarkingCoreService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuProductBadRecordRepository"></param>
-        /// <param name="qualUnqualifiedCodeRepository"></param>
-        /// <param name="procProcedureRepository"></param>
-        public InterceptMarkingJobService(IManuSfcProduceRepository manuSfcProduceRepository, IManuProductBadRecordRepository manuProductBadRecordRepository, IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository, IProcProcedureRepository procProcedureRepository)
+        public InterceptMarkingJobService(IManuSfcMarkingCoreService manuSfcMarkingCoreService)
         {
-            _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuProductBadRecordRepository = manuProductBadRecordRepository;
-            _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
-            _procProcedureRepository = procProcedureRepository;
+            _manuSfcMarkingCoreService = manuSfcMarkingCoreService;
         }
 
         /// <summary>
@@ -94,37 +79,18 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (commonBo == null) return;
             if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return;
 
-            // 临时中转变量 commonBo.InStationRequestBos.Select(s => s.SFC)
+            // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
 
-            //获取条码生产信息,判断条码是否在制品
-            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs= multiSFCBo.SFCs, SiteId= multiSFCBo.SiteId});
-            if (sfcProduceEntities == null || !sfcProduceEntities.Any())
-            { 
-                return;
-            }
-            //var procedureIds = sfcProduceEntities.Select(a => a.ProcedureId).Distinct();
-            ////判断当前工序是否排队在制品
-            //if (!procedureIds.Contains(commonBo.ProcedureId))
-            //{
-            //    return;
-            //}
-            else {
-                //查询条码和工序是否在需要拦截
-                var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery { SFCs = multiSFCBo.SFCs, InterceptOperationId = commonBo.ProcedureId, Status = ProductBadRecordStatusEnum.Open,SiteId= multiSFCBo.SiteId });
-                if (manuProductBadRecordEntities == null || !manuProductBadRecordEntities.Any())
-                {
-                    return;
-                }
-                else {
-                    var unqualifiedIds = manuProductBadRecordEntities.Select(a => a.UnqualifiedId).Distinct();
-                    var qualUnqualifiedEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(unqualifiedIds);
-
-                    var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId);
-
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19713)).WithData("sfc", string.Join(",", multiSFCBo.SFCs)).WithData("produceCode",procedureEntity?.Name??"").WithData("unqualifiedCode", string.Join(",", qualUnqualifiedEntities.Select(a=>a.UnqualifiedCodeName).Distinct()));
-                }
-            }
+            await _manuSfcMarkingCoreService.MarkingInterceptAsync(new Bos.Manufacture.MarkingInterceptBo
+            {
+                SiteId = commonBo.SiteId,
+                UserName = commonBo.UserName,
+                ProcedureId = commonBo.ProcedureId,
+                EquipmentId = commonBo.EquipmentId ?? 0,
+                ResourceId = commonBo.ResourceId,
+                SFCs = multiSFCBo.SFCs
+            });
         }
     }
 }

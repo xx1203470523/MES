@@ -131,19 +131,19 @@ namespace Hymson.MES.Services.Services.Marking
             var resourceIds = pagedInfoData.Select(x => x.ResourceId).Distinct().ToArray();
             var resourceInfos = await _procResourceRepository.GetListByIdsAsync(resourceIds);
 
-            var interceptWorkCenterIds = workOrderInfos?.Select(x => x.WorkCenterId.GetValueOrDefault()).Distinct().ToArray();
+            var interceptWorkCenterIds = workOrderInfos.Select(x => x.WorkCenterId.GetValueOrDefault()).Distinct().ToArray();
             var workCenterInfos = await _inteWorkCenterRepository.GetByIdsAsync(interceptWorkCenterIds);
 
             foreach (var item in pagedInfoData)
             {
                 var procMaterialInfo = procMaterialInfos.FirstOrDefault(x => x.Id == item.ProductId);
-                var workOrderInfo = workOrderInfos?.FirstOrDefault(x => x.Id == item.WorkOrderId);
+                var workOrderInfo = workOrderInfos.FirstOrDefault(x => x.Id == item.WorkOrderId);
                 var findProcedureInfo = procedureInfos.FirstOrDefault(x => x.Id == item.FindProcedureId);
                 var appointInterceptInfo = procedureInfos.FirstOrDefault(x => x.Id == item.AppointInterceptProcedureId);
                 var interceptProcedureInfo = procedureInfos.FirstOrDefault(x => x.Id == item.InterceptProcedureId);
                 var interceptEquipmentInfo = interceptEquipmentInfos.FirstOrDefault(x => x.Id == item.InterceptEquipmentId);
                 var resourceInfo = resourceInfos.FirstOrDefault(x => x.Id == item.ResourceId);
-                var workCenterInfo = workCenterInfos.FirstOrDefault(x => x.Id !=null);
+                var workCenterInfo = workCenterInfos.FirstOrDefault(x => x.Id == (workOrderInfo?.WorkCenterId ?? 0));
 
                 // 实体到DTO转换 装载数据
                 listDto.Add(new MarkingRecordReportDto
@@ -152,8 +152,8 @@ namespace Hymson.MES.Services.Services.Marking
                     MaterialCode = procMaterialInfo?.MaterialCode ?? "",
                     MaterialName = procMaterialInfo?.MaterialName ?? "",
                     OrderCode = workOrderInfo?.OrderCode ?? "",
-                    WorkCenterName=workCenterInfo?.Name ?? "",
-                    OrderType = workOrderInfo!.Type,
+                    WorkCenterName = workCenterInfo?.Name ?? "",
+                    OrderType = workOrderInfo?.Type,
                     FindProcedureName = findProcedureInfo?.Name ?? "",
                     AppointInterceptProcedureName = appointInterceptInfo?.Name ?? "",
                     InterceptProcedureName = interceptProcedureInfo?.Name ?? "",
@@ -161,15 +161,15 @@ namespace Hymson.MES.Services.Services.Marking
                     ResourceName = resourceInfo?.ResName ?? "",
                     UnqualifiedCode = item.UnqualifiedCode,
                     UnqualifiedCodeName = item.UnqualifiedCodeName,
-                    UnqualifiedStatus = item.Status,
-                    UnqualifiedType=item.Type,
+                    UnqualifiedStatus = item.MarkingStatus == 1 ? "1" : "2",
+                    UnqualifiedType = item.Type,
                     Qty = item.Qty,
                     InterceptOn = item.InterceptOn,
-                    MarkingCreatedBy=item.MarkingCreatedBy,
-                    MarkingCreatedOn=item.MarkingCreatedOn,
-                    MarkingClosedBy= item.MarkingStatus == 0 ? item.MarkingClosedBy : null,
-                    MarkingClosedOn= item.MarkingStatus == 0 ? item.MarkingClosedOn : null,
-                });;
+                    MarkingCreatedBy = item.MarkingCreatedBy,
+                    MarkingCreatedOn = item.MarkingCreatedOn,
+                    MarkingClosedBy = item.MarkingStatus == 0 ? item.MarkingClosedBy : null,
+                    MarkingClosedOn = item.MarkingStatus == 0 ? item.MarkingClosedOn : null,
+                }); ;
             }
             return new PagedInfo<MarkingRecordReportDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }

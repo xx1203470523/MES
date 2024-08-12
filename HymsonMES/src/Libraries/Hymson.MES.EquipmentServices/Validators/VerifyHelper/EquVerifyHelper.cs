@@ -274,10 +274,10 @@ namespace Hymson.MES.EquipmentServices.Validators.EquVerifyHelper
         /// <exception cref="CustomerValidationException"></exception>
         public static void GenerateDxSfcDto(GenerateDxSfcDto dto)
         {
-            if (string.IsNullOrEmpty(dto.Sfc) == true)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19003));
-            }
+            //if (string.IsNullOrEmpty(dto.Sfc) == true)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19003));
+            //}
         }
 
         /// <summary>

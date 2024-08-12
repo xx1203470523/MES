@@ -15,6 +15,7 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcMarking;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
@@ -104,6 +105,21 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
         /// <summary>
+        /// Marking信息表仓储
+        /// </summary>
+        private readonly IManuSfcMarkingRepository _manuSfcMarkingRepository;
+
+        /// <summary>
+        /// Marking执行表仓储
+        /// </summary>
+        private readonly IManuSfcMarkingExecuteRepository _manuSfcMarkingExecuteRepository;
+
+        /// <summary>
+        /// Marking继承
+        /// </summary>
+        private readonly IManuSfcMarkingCoreService _manuSfcMarkingCoreService;
+
+        /// <summary>
         /// 多语言服务
         /// </summary>
         private readonly ILocalizationService _localizationService;
@@ -116,21 +132,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="masterDataService"></param>
-        /// <param name="manuDegradedProductExtendService"></param>
-        /// <param name="manuFeedingRepository"></param>
-        /// <param name="manuSfcRepository"></param>
-        /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
-        /// <param name="manuSfcCirculationRepository"></param>
-        /// <param name="manuDowngradingRepository"></param>
-        /// <param name="manuDowngradingRecordRepository"></param>
-        /// <param name="manuProductBadRecordRepository"></param>
-        /// <param name="manuProductNgRecordRepository"></param>
-        /// <param name="whMaterialInventoryRepository"></param>
-        /// <param name="whMaterialStandingbookRepository"></param>
-        /// <param name="localizationService"></param>
         public OutStationJobService(ILogger<OutStationJobService> logger,
             IMasterDataService masterDataService,
             IManuDegradedProductExtendService manuDegradedProductExtendService,
@@ -145,6 +146,9 @@ namespace Hymson.MES.CoreServices.Services.Job
             IManuProductNgRecordRepository manuProductNgRecordRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+            IManuSfcMarkingRepository manuSfcMarkingRepository,
+            IManuSfcMarkingExecuteRepository manuSfcMarkingExecuteRepository,
+            IManuSfcMarkingCoreService manuSfcMarkingCoreService,
             ILocalizationService localizationService,
             IPlanWorkOrderRepository planWorkOrderRepository)
         {
@@ -162,6 +166,9 @@ namespace Hymson.MES.CoreServices.Services.Job
             _manuProductNgRecordRepository = manuProductNgRecordRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
+            _manuSfcMarkingRepository = manuSfcMarkingRepository;
+            _manuSfcMarkingExecuteRepository = manuSfcMarkingExecuteRepository;
+            _manuSfcMarkingCoreService = manuSfcMarkingCoreService;
             _localizationService = localizationService;
             _planWorkOrderRepository = planWorkOrderRepository;
         }
@@ -406,7 +413,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
                 #endregion
 
-                #region 降级品信息
+                #region 降级品继承
                 if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute
                     && responseBo.ManuSfcCirculationEntities != null
                     && responseBo.ManuSfcCirculationEntities.Any())
@@ -423,6 +430,14 @@ namespace Hymson.MES.CoreServices.Services.Job
                         BarCode = s.CirculationBarCode,
                         SFC = sfcProduceEntity.SFC
                     }));
+                    if (requestBo.BindSfcs != null && requestBo.BindSfcs.Any())
+                    {
+                        degradedProductExtendBo.KeyValues.AddRange(requestBo.BindSfcs.Select(item => new DegradedProductExtendKeyValueBo
+                        {
+                            BarCode = item,
+                            SFC = sfcProduceEntity.SFC
+                        }));
+                    }
 
                     // 取得降级品记录
                     var downgradingEntities = await _manuDegradedProductExtendService.GetManuDownGradingsAsync(degradedProductExtendBo);
@@ -431,6 +446,29 @@ namespace Hymson.MES.CoreServices.Services.Job
                     responseBo.DowngradingEntities = manuDowngradingEntities;
                     responseBo.DowngradingRecordEntities = manuDowngradingRecordEntities;
                 }
+                #endregion
+
+                #region Marking继承
+
+                if (responseBo.ManuSfcCirculationEntities != null && responseBo.ManuSfcCirculationEntities.Any())
+                {
+                    var consumeSfcs = responseBo.ManuSfcCirculationEntities.Select(x => x.CirculationBarCode);
+                    if (requestBo.BindSfcs != null && requestBo.BindSfcs.Any())
+                    {
+                        consumeSfcs = consumeSfcs.Concat(requestBo.BindSfcs).Distinct();
+                    }
+                    var (markingEntities, markingExecuteEntities) = await _manuSfcMarkingCoreService.GetMarkingInheritEntityAsync(new ManuSfcMarkingBo
+                    {
+                        SiteId = commonBo.SiteId,
+                        UserName = commonBo.UserName,
+                        SFC = sfcProduceEntity.SFC,
+                        ConsumeSFCs = consumeSfcs
+                    });
+
+                    responseBo.MarkingEntities = markingEntities;
+                    responseBo.MarkingExecuteEntities = markingExecuteEntities;
+                }
+
                 #endregion
 
                 responseSummaryBo.Code = requestBo.SFC;
@@ -457,6 +495,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseSummaryBo.ProductBadRecordEntities = responseBos.Where(w => w.ProductBadRecordEntities != null).SelectMany(s => s.ProductBadRecordEntities);
             responseSummaryBo.ProductNgRecordEntities = responseBos.Where(w => w.ProductNgRecordEntities != null).SelectMany(s => s.ProductNgRecordEntities);
             responseSummaryBo.SFCProduceBusinessEntities = responseBos.Where(w => w.SFCProduceBusinessEntity != null).Select(s => s.SFCProduceBusinessEntity);
+            responseSummaryBo.MarkingEntities = responseBos.Where(w => w.MarkingEntities != null).SelectMany(s => s.MarkingEntities);
+            responseSummaryBo.MarkingExecuteEntities = responseBos.Where(w => w.MarkingExecuteEntities != null).SelectMany(s => s.MarkingExecuteEntities);
 
             // 删除 manu_sfc_produce
             responseSummaryBo.DeletePhysicalByProduceIdsCommand = new PhysicalDeleteSFCProduceByIdsCommand
@@ -541,7 +581,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 _manuProductNgRecordRepository.InsertRangeAsync(data.ProductNgRecordEntities),
                 
                 // 添加在制维修业务
-                _manuSfcProduceRepository.InsertSfcProduceBusinessRangeAsync(data.SFCProduceBusinessEntities)
+                _manuSfcProduceRepository.InsertSfcProduceBusinessRangeAsync(data.SFCProduceBusinessEntities),
+
+                //Marking继承
+                _manuSfcMarkingRepository.InsertRangeAsync(data.MarkingEntities),
+                _manuSfcMarkingExecuteRepository.InsertRangeAsync(data.MarkingExecuteEntities)
             };
 
             var rowArray = await Task.WhenAll(tasks);

@@ -2159,7 +2159,10 @@
         public const string MES19710 = "产品序列码，不良发现工序，拦截工序，不合格代码已经存在!";
         public const string MES19711 = "Marking关闭传入数据为空!";
         public const string MES19712 = "Marking关闭保存失败!";
-        public const string MES19713 = "产品序列码【{sfc}】在工序【{produceCode}】拦截不合格代码【{unqualifiedCode}】!";
+        public const string MES19713 = "产品序列码【{sfc}】Marking拦截-不合格代码【{unqualifiedCode}({unqualifiedName})】，应拦截工序【{procedureCode}({procedureName})】!";
+        public const string MES19714 = "存在相同产品序列码、不合格代码的数据，请检查!";
+        public const string MES19715 = "产品序列码【{sfc}】已标记过相同不合格代码【{unqualifiedCode}】的Marking记录!";
+
         #endregion
 
         #region 生产日历
