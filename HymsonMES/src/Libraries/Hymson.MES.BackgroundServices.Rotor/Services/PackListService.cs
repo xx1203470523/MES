@@ -7,6 +7,7 @@ using Hymson.MES.Core.Domain.Mavel.Rotor;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Mavel.Rotor.PackList;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -100,23 +101,46 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
                 return 0;
             }
 
+            //判断条码是否已经存在
+            List<string> sfcList = packDbList.Select(m => m.ProductCode).Distinct().ToList();
+            ManuRotorSfcListQuery packQuery = new ManuRotorSfcListQuery();
+            packQuery.SfcList = sfcList;
+            var dbSfcList = await _manuRotorPackListRepository.GetEntitiesAsync(packQuery);
+
             List<ManuRotorPackListEntity> insertList = new List<ManuRotorPackListEntity>();
-            foreach(var item in packDbList)
+            List<ManuRotorPackListEntity> updateList = new List<ManuRotorPackListEntity>();
+            foreach (var item in packDbList)
             {
-                ManuRotorPackListEntity model = new ManuRotorPackListEntity();
+                ManuRotorPackListEntity? dbSfcModel = dbSfcList.Where(m => m.ProductCode == item.ProductCode).FirstOrDefault();
+                if(dbSfcModel == null)
+                {
+                    ManuRotorPackListEntity model = new ManuRotorPackListEntity();
 
-                model.Id = IdGenProvider.Instance.CreateId();
-                model.CreatedOn = HymsonClock.Now();
-                model.UpdatedOn = model.CreatedOn;
-                model.CreatedBy = "LMSJOB";
-                model.UpdatedBy = "LMSJOB";
-                model.IsDeleted = 0;
-                model.SiteId = siteID;
-                model.BoxCode = item.BoxCode;
-                model.ProductCode = item.ProductCode;
-                model.ProductNo = item.ProductNo;
+                    model.Id = IdGenProvider.Instance.CreateId();
+                    model.CreatedOn = HymsonClock.Now();
+                    model.UpdatedOn = model.CreatedOn;
+                    model.CreatedBy = "LMSJOB";
+                    model.UpdatedBy = "LMSJOB";
+                    model.IsDeleted = 0;
+                    model.SiteId = siteID;
+                    model.BoxCode = item.BoxCode;
+                    model.ProductCode = item.ProductCode;
+                    model.ProductNo = item.ProductNo;
 
-                insertList.Add(model);
+                    insertList.Add(model);
+                }
+                else
+                {
+                    dbSfcModel.IsDeleted = dbSfcModel.IsDeleted;
+                    dbSfcModel.UpdatedBy = dbSfcModel.UpdatedBy;
+                    dbSfcModel.UpdatedOn = dbSfcModel.UpdatedOn;
+                    dbSfcModel.BoxCode = item.BoxCode;
+                    dbSfcModel.ProductCode = item.ProductCode;
+                    dbSfcModel.ProductNo = item.ProductNo;
+
+                    updateList.Add(dbSfcModel);
+                }
+
             }
 
             //水位数据更新
@@ -127,6 +151,7 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
             using var trans = TransactionHelper.GetTransactionScope();
 
             await _manuRotorPackListRepository.InsertRangeAsync(insertList);
+            await _manuRotorPackListRepository.UpdateRangeAsync(updateList);
             await _waterMarkService.RecordWaterMarkAsync(busKey, timestamp);
 
             trans.Complete();
@@ -147,9 +172,8 @@ namespace Hymson.MES.BackgroundServices.Rotor.Services
 
             string sql = $@"
                 select top {rows} * from pack_packlist
-                where isdeleted = 0
-                and createTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
-                order by createTime asc
+                where UpdateTime > '{start.ToString("yyyy-MM-dd HH:mm:ss.fff")}'
+                order by UpdateTime asc
             ";
 
             List<PackListDto> dbList = await _packListRepository.GetList(sql);

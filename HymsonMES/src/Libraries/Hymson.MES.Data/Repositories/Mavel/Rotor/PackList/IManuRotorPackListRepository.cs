@@ -79,6 +79,13 @@ namespace Hymson.MES.Data.Repositories.Mavel.Rotor.PackList
         Task<IEnumerable<ManuRotorPackListEntity>> GetEntitiesAsync(ManuRotorPackListQuery query);
 
         /// <summary>
+        /// 获取List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuRotorPackListEntity>> GetEntitiesAsync(ManuRotorSfcListQuery query);
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
