@@ -88,12 +88,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomDetailEntity>> GetByBomIdAsync(long bomId)
         {
-          //  var key = $"{CachedTables.PROC_BOM_DETAIL}&{bomId}";
-         ////   return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-          //  {
-                using var conn = GetMESDbConnection();
-                return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIdSql, new { bomId });
-          //  });
+            //  var key = $"{CachedTables.PROC_BOM_DETAIL}&{bomId}";
+            ////   return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            //  {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIdSql, new { bomId });
+            //  });
         }
 
         /// <summary>
@@ -269,10 +269,11 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateSql = "UPDATE `proc_bom_detail` SET  ProcedureId = @ProcedureId, MaterialId = @MaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , DataCollectionWay=@DataCollectionWay,IsEnableReplace=@IsEnableReplace,Seq=@Seq WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_bom_detail` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_bom_detail` SET IsDeleted = Id,UpdatedBy = @UserId,UpdatedOn = @DeleteOn  WHERE Id in @ids";
+
         /// <summary>
         /// 批量删除关联的BomId的数据
         /// </summary>
-        const string DeleteBomIDsSql = "UPDATE `proc_bom_detail` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE BomId IN @bomIds";
+        const string DeleteBomIDsSql = "DELETE FROM proc_bom_detail WHERE BomId IN @bomIds";
         const string GetByIdSql = @"SELECT * FROM `proc_bom_detail`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_bom_detail`  WHERE Id IN @ids ";
 

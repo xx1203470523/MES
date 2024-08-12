@@ -216,10 +216,11 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateSql = "UPDATE `proc_bom_detail_replace_material` SET BomDetailId = @BomDetailId, ReplaceMaterialId = @ReplaceMaterialId, ReferencePoint = @ReferencePoint, Usages = @Usages, Loss = @Loss, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , DataCollectionWay=@DataCollectionWay WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted = Id,UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
+
         /// <summary>
         /// 批量删除关联的BomId的数据
         /// </summary>
-        const string DeleteBomIDsSql = "UPDATE `proc_bom_detail_replace_material` SET IsDeleted =Id,UpdatedBy = @UserId,UpdatedOn = @DeleteOn WHERE BomId in @bomIds ";
+        const string DeleteBomIDsSql = "DELETE FROM proc_bom_detail_replace_material WHERE BomId IN @bomIds ";
         const string GetByIdSql = @"SELECT * FROM `proc_bom_detail_replace_material`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_bom_detail_replace_material`  WHERE Id IN @ids ";
         const string GetByBomIdSql = "SELECT * FROM proc_bom_detail_replace_material WHERE IsDeleted = 0 AND BomId = @bomId ";
