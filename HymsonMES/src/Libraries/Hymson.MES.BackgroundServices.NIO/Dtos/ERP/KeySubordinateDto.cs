@@ -28,7 +28,7 @@
         /// <summary>  
         /// 关键下级件类型  
         /// </summary>  
-        public string SubordinateType { get; set; }
+        //public string SubordinateType { get; set; }
 
         /// <summary>  
         /// 关键下级件物料编码  
@@ -103,7 +103,7 @@
         /// <summary>  
         /// 下级件来料批次号（可选）  
         /// </summary>  
-        public string SubordinateBatch { get; set; }
+        //public string SubordinateBatch { get; set; }
 
         /// <summary>  
         /// 单位  

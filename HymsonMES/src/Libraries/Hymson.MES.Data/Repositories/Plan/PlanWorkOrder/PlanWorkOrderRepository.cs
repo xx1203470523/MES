@@ -759,6 +759,17 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.ExecuteAsync(UpdatesSql, planWorkOrderEntitys);
         }
 
+        /// <summary>
+        /// 根据物料获取激活的工单
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderEntity?> GetOrderByMaterialCodeAsync(PlanWorkOrderMaterialQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderEntity>(GetOrderByMaterialCodeSql, query);
+        }
+
         #endregion
     }
 
@@ -783,7 +794,10 @@ namespace Hymson.MES.Data.Repositories.Plan
                          LEFT JOIN proc_bom b on wo.ProductBOMId = b.Id
                          LEFT JOIN proc_process_route pr on wo.ProcessRouteId = pr.Id
                          LEFT JOIN inte_work_center wc on wo.WorkCenterId = wc.Id
-                        /**where**/ Order by wo.CreatedOn DESC LIMIT @Offset, @Rows ";
+                        /**where**/ 
+                        ORDER BY CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(OrderCode, '-', -2), '-', 1) AS UNSIGNED),
+                        CAST(SUBSTRING_INDEX(OrderCode, '-', -1) AS SIGNED) LIMIT @Offset, @Rows ";
+
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                          FROM `plan_work_order` wo 
                          LEFT JOIN plan_work_order_record wor on wo.Id = wor.WorkOrderId
@@ -875,5 +889,15 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string UpdateWorkOrderPlantQuantitySql = "UPDATE plan_work_order SET " +
             "Qty = (CASE WHEN Qty IS NULL THEN 0 ELSE Qty END) + @Qty, " +
             "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND Id = @WorkOrderId;";
+        const string GetOrderByMaterialCodeSql = $@"
+            select t1.*
+            from plan_work_order t1
+            inner join proc_material t2 on t1.ProductId = t2.Id and t2.IsDeleted = 0
+            inner join plan_work_order_activation t3 on t3.WorkOrderId = t1.Id  and t3.IsDeleted = 0
+            where t1.IsDeleted = 0
+            and t2.MaterialCode = @MaterialCode
+            -- and t1.SiteId  = @SiteId
+            order by t3.CreatedOn desc
+        ";
     }
 }

@@ -50,6 +50,20 @@
         /// </summary>
         public WMSBusinessOptions ProductReceiptCancel { get; set; }
 
+        /// <summary>
+        /// NIO合作伙伴精益与库存信息
+        /// </summary>
+        public WMSBusinessOptions NioStockInfo { get; set; }
+
+        /// <summary>
+        /// 关键下级键
+        /// </summary>
+        public WMSBusinessOptions NioKeyItemInfo { get; set; }
+
+        /// <summary>
+        /// 实际交付情况
+        /// </summary>
+        public WMSBusinessOptions NioActualDelivery { get; set; }
     }
 
     /// <summary>

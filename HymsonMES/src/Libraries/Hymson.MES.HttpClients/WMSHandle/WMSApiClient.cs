@@ -2,6 +2,7 @@
 using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.WMS;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
+using Hymson.MES.HttpClients.Responses.NioWms;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -244,6 +245,56 @@ namespace Hymson.MES.HttpClients
             return await httpResponse.Content.ReadFromJsonAsync<BaseResponse>();
         }
 
+        /// <summary>
+        /// NIO合作伙伴精益与库存信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<NioStockInfoResponse?> NioStockInfoAsync(List<StockMesNIODto> request)
+        {
+            _logger.LogDebug($"NIO合作伙伴精益与库存信息 -> Request: {request.ToSerialize()}");
+
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.NioStockInfo.Route, request);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"NIO合作伙伴精益与库存信息 -> Response: {jsonResponse}");
+
+            return await httpResponse.Content.ReadFromJsonAsync<NioStockInfoResponse>();
+        }
+
+        /// <summary>
+        /// 关键下级键
+        /// </summary>
+        /// <returns></returns>
+        public async Task<NioKeyItemInfoResponse?> NioKeyItemInfoAsync(List<StockMesNIODto> request)
+        {
+            _logger.LogDebug($"NIO合作伙伴精益与库存信息 -> Request: {request.ToSerialize()}");
+
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.NioKeyItemInfo.Route, request);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"NIO合作伙伴精益与库存信息 -> Response: {jsonResponse}");
+
+            return await httpResponse.Content.ReadFromJsonAsync<NioKeyItemInfoResponse>();
+        }
+
+        /// <summary>
+        /// 实际交付情况
+        /// </summary>
+        /// <returns></returns>
+        public async Task<NioWmsActualDeliveryResponse?> NioActualDeliveryAsync(StockMesDataDto request)
+        {
+            _logger.LogDebug($"实际交付情况 -> Request: {request.ToSerialize()}");
+
+            var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.NioActualDelivery.Route, request);
+            await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
+
+            string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+            _logger.LogDebug($"实际交付情况 -> Response: {jsonResponse}");
+
+            return await httpResponse.Content.ReadFromJsonAsync<NioWmsActualDeliveryResponse>();
+        }
 
     }
 }

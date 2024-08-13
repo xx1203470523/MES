@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.View;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -64,6 +65,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcStepEntity>> GetSfcStepMavelAsync(EntityByWaterSiteIdQuery query);
+
+        /// <summary>
+        /// 根据工序获取步骤表数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SfcStepProcedureNumView>> GetSfcStepEndOpMavelAsync(SfcStepProcedureQuery query);
 
         /// <summary>
         /// 更新

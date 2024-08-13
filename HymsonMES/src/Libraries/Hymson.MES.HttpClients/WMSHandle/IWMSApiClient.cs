@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.HttpClients.Requests;
 using Hymson.MES.HttpClients.Requests.WMS;
 using Hymson.MES.HttpClients.Requests.XnebulaWMS;
+using Hymson.MES.HttpClients.Responses.NioWms;
 
 namespace Hymson.MES.HttpClients
 {
@@ -73,7 +74,22 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         Task<bool> ProductReceiptCancelAsync(ProductReceiptCancelDto request);
 
+        /// <summary>
+        /// NIO合作伙伴精益与库存信息
+        /// </summary>
+        /// <returns></returns>
+        Task<NioStockInfoResponse> NioStockInfoAsync(List<StockMesNIODto> request);
 
+        /// <summary>
+        /// 关键下级键
+        /// </summary>
+        /// <returns></returns>
+        Task<NioKeyItemInfoResponse> NioKeyItemInfoAsync(List<StockMesNIODto> request);
 
+        /// <summary>
+        /// 实际交付情况
+        /// </summary>
+        /// <returns></returns>
+        Task<NioWmsActualDeliveryResponse?> NioActualDeliveryAsync(StockMesDataDto request);
     }
 }

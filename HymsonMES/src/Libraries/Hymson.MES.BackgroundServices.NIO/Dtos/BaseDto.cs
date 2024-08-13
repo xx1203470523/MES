@@ -139,5 +139,40 @@ namespace Hymson.MES.BackgroundServices.NIO.Dtos
         /// 项目名
         /// </summary>
         public string NioProjectName { get; set; }
+
+        /// <summary>
+        /// 排班数/天
+        /// </summary>
+        public int WorkingSchedule { get; set; } = 1;
+
+        /// <summary>
+        /// 计划产能
+        /// </summary>
+        public decimal PlannedCapacity { get; set; } = 105;
+
+        /// <summary>
+        /// 稼动率
+        /// </summary>
+        public decimal Efficiency { get; set; } = 0.8m;
+
+        /// <summary>
+        /// 节拍（s）
+        /// </summary>
+        public decimal Beat { get; set; } = 0.0025m;
+
+        /// <summary>
+        /// 日生产工单或生产计划
+        /// </summary>
+        public decimal Dailyproductionplan { get; set; } = 105;
+
+        /// <summary>
+        /// 瓶颈工序
+        /// </summary>
+        public string BottleneckProcess { get; set; } = "暂无";
+
+        /// <summary>
+        /// 计划产量
+        /// </summary>
+        public decimal PlanOutput { get; set; } = 105;
     }
 }
