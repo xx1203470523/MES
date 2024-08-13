@@ -51,9 +51,8 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         public async Task<BaseERPResponse> EnabledPlanAsync(PlanRequestDto request)
         {
-            var responseDto = new BaseERPResponse { Status = false, Message = "未知的错误" };
-
             _logger.LogDebug($"切换生产计划启用状态 -> Request: {request.ToSerialize()}");
+            var responseDto = new BaseERPResponse { Status = false, Message = "未知的错误" };
 
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.EnabledPlanRoute, request);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);

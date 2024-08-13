@@ -52,9 +52,8 @@ namespace Hymson.MES.HttpClients
         /// <returns></returns>
         public async Task<BaseResponse> IQCReceiptCallBackAsync(IQCReceiptResultDto dto)
         {
-            var responseDto = new BaseResponse { Code = -1, Message = "未知的错误" };
-
             _logger.LogDebug($"来料IQC -> Request: {dto.ToSerialize()}");
+            var responseDto = new BaseResponse { Code = -1, Message = "未知的错误" };
 
             var httpResponse = await _httpClient.PostAsJsonAsync(_options.Value.IQCReceipt.Route, dto);
             await CommonHttpClient.HandleResponse(httpResponse).ConfigureAwait(false);
@@ -83,7 +82,6 @@ namespace Hymson.MES.HttpClients
         public async Task<BaseResponse> WarehousingEntryRequestAsync(WarehousingEntryDto request)
         {
             _logger.LogDebug($"退料入库 -> Request: {request.ToSerialize()}");
-
             WarehousingEntryRequest materialReturnRequest = new WarehousingEntryRequest()
             {
                 Type = request.Type,
@@ -117,7 +115,6 @@ namespace Hymson.MES.HttpClients
         public async Task<BaseResponse> WarehousingDeliveryRequestAsync(DeliveryDto request)
         {
             _logger.LogDebug($"领料出库 -> Request: {request.ToSerialize()}");
-
             DeliveryRequest deliveryRequest = new()
             {
                 Type = request.Type,

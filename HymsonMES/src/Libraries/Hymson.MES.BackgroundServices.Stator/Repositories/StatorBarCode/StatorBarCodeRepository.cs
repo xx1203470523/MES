@@ -4,7 +4,7 @@ using Hymson.MES.BackgroundServices.Stator;
 namespace Hymson.MES.Data.Repositories.Stator
 {
     /// <summary>
-    /// 仓储（定子条码关系表）
+    /// 仓储（定子条码表）
     /// </summary>
     public partial class StatorBarCodeRepository : BaseRepository, IStatorBarCodeRepository
     {
@@ -101,15 +101,15 @@ namespace Hymson.MES.Data.Repositories.Stator
 
 
     /// <summary>
-    /// 定子条码关系表
+    /// 定子条码表
     /// </summary>
     public partial class StatorBarCodeRepository
     {
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_stator_barcode /**where**/  ";
 
-        const string InsertSql = "INSERT INTO manu_stator_barcode(ID, InnerId, InnerBarCode, OuterBarCode, BusBarCode, WireID_1, WireBarCode_1, WireID_2, WireBarCode_2, ProductionCode, Remark, CreatedOn, UpdatedOn, SiteId) VALUES (@ID, @InnerId, @InnerBarCode, @OuterBarCode, @BusBarCode, @WireID_1, @WireBarCode_1, @WireID_2, @WireBarCode_2, @ProductionCode, @Remark, @CreatedOn, @UpdatedOn, @SiteId) ";
+        const string InsertSql = "INSERT INTO manu_stator_barcode(ID, InnerId, InnerBarCode, OuterBarCode, BusBarCode, PaperBottomLotBarcode, PaperTopLotBarcode, ProductionCode, Remark, CreatedOn, UpdatedOn, SiteId) VALUES (@ID, @InnerId, @InnerBarCode, @OuterBarCode, @BusBarCode, @PaperBottomLotBarcode, @PaperTopLotBarcode, @ProductionCode, @Remark, @CreatedOn, @UpdatedOn, @SiteId) ";
 
-        const string UpdateSql = "UPDATE manu_stator_barcode SET OuterBarCode = @OuterBarCode, BusBarCode = @BusBarCode, WireID_1 = @WireID_1, WireBarCode_1 = @WireBarCode_1, WireID_2 = @WireID_2, WireBarCode_2 = @WireBarCode_2, ProductionCode = @ProductionCode, Remark = @Remark, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE manu_stator_barcode SET OuterBarCode = @OuterBarCode, BusBarCode = @BusBarCode, PaperBottomLotBarcode = @PaperBottomLotBarcode, PaperTopLotBarcode = @PaperTopLotBarcode, ProductionCode = @ProductionCode, Remark = @Remark, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string GetByIdSql = @"SELECT * FROM manu_stator_barcode WHERE Id = @Id ";
 

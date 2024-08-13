@@ -33,7 +33,7 @@
         /// <summary>
         /// 忽略的字符串
         /// </summary>
-        public static string[] IgnoreString = new string[] { "-", "_" };
+        public static string[] IgnoreString = new string[] { "-", "_", "NO_BARCODE", "ID_ERROR" };
 
     }
 }

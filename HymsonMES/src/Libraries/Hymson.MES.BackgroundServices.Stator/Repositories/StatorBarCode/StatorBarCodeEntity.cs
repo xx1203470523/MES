@@ -1,7 +1,7 @@
 ﻿namespace Hymson.MES.BackgroundServices.Stator
 {
     /// <summary>
-    /// 
+    /// 定子条码表
     /// </summary>
     public class StatorBarCodeEntity
     {
@@ -31,24 +31,14 @@
         public string BusBarCode { get; set; }
 
         /// <summary>
-        /// 铜线ID_1
+        /// 槽底纸编码
         /// </summary>
-        public long WireID_1 { get; set; }
+        public string PaperBottomLotBarcode { get; set; }
 
         /// <summary>
-        /// 铜线编码_1
+        /// 槽盖纸编码
         /// </summary>
-        public string WireBarCode_1 { get; set; }
-
-        /// <summary>
-        /// 铜线ID_2
-        /// </summary>
-        public long WireID_2 { get; set; }
-
-        /// <summary>
-        /// 铜线编码_2
-        /// </summary>
-        public string WireBarCode_2 { get; set; }
+        public long PaperTopLotBarcode { get; set; }
 
         /// <summary>
         /// 成品码

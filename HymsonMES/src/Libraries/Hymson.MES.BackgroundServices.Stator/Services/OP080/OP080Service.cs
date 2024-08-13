@@ -126,7 +126,7 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 StatorBarCodeEntity? statorSFCEntity = statorSFCEntities.FirstOrDefault(f => f.InnerId == id);
                 if (statorSFCEntity == null) continue;
 
-                statorSFCEntity.BusBarCode = barCode;
+                statorSFCEntity.PaperBottomLotBarcode = barCode;
                 statorSFCEntity.UpdatedOn = statorBo.Time;
                 summaryBo.UpdateStatorBarCodeEntities.Add(statorSFCEntity);
 

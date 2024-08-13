@@ -35,9 +35,19 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         private readonly ISysConfigRepository _sysConfigRepository;
 
         /// <summary>
-        /// 仓储接口（定子条码关系）
+        /// 仓储接口（铜线条码）
+        /// </summary>
+        private readonly IWireBarCodeRepository _wireBarCodeRepository;
+
+        /// <summary>
+        /// 仓储接口（定子条码）
         /// </summary>
         private readonly IStatorBarCodeRepository _statorBarCodeRepository;
+
+        /// <summary>
+        /// 仓储接口（定子铜线关系）
+        /// </summary>
+        private readonly IStatorWireRelationRepository _statorWireRelationRepository;
 
         /// <summary>
         /// 仓储接口（工作中心）
@@ -110,7 +120,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// </summary>
         /// <param name="waterMarkService"></param>
         /// <param name="sysConfigRepository"></param>
+        /// <param name="wireBarCodeRepository"></param>
         /// <param name="statorBarCodeRepository"></param>
+        /// <param name="statorWireRelationRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procMaterialRepository"></param>
@@ -126,7 +138,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         /// <param name="manuProductParameterRepository"></param>
         public MainService(IWaterMarkService waterMarkService,
             ISysConfigRepository sysConfigRepository,
+            IWireBarCodeRepository wireBarCodeRepository,
             IStatorBarCodeRepository statorBarCodeRepository,
+            IStatorWireRelationRepository statorWireRelationRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcMaterialRepository procMaterialRepository,
@@ -143,7 +157,9 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         {
             _waterMarkService = waterMarkService;
             _sysConfigRepository = sysConfigRepository;
+            _wireBarCodeRepository = wireBarCodeRepository;
             _statorBarCodeRepository = statorBarCodeRepository;
+            _statorWireRelationRepository = statorWireRelationRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procMaterialRepository = procMaterialRepository;
@@ -755,6 +771,13 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 _statorBarCodeRepository.InsertRangeAsync(summaryBo.AddStatorBarCodeEntities),
                 _statorBarCodeRepository.UpdateRangeAsync(summaryBo.UpdateStatorBarCodeEntities),
 
+                // 铜线数据
+                _wireBarCodeRepository.InsertRangeAsync(summaryBo.AddWireBarCodeEntities),
+                _wireBarCodeRepository.UpdateRangeAsync(summaryBo.UpdateWireBarCodeEntities),
+
+                // 定子铜线关系
+                _statorWireRelationRepository.InsertRangeAsync(summaryBo.AddStatorWireRelationEntities),
+
                 // 基础信息
                 _manuSfcRepository.ReplaceRangeAsync(summaryBo.ManuSFCEntities),
                 _manuSfcInfoRepository.ReplaceRangeAsync(summaryBo.ManuSFCInfoEntities),
@@ -850,6 +873,23 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
                 SiteId = siteId,
                 BarCodes = barCodes
             });
+        }
+
+        /// <summary>
+        /// 批量获取（铜线条码）
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WireBarCodeEntity>> GetWireBarCodeEntitiesAsync(long siteId, IEnumerable<string> ids)
+        {
+            // 批量读取条码（定子）
+            return await _wireBarCodeRepository.GetEntitiesAsync(new WireBarCodeQuery
+            {
+                SiteId = siteId,
+                InnerIds = ids
+            });
+
         }
 
         /// <summary>

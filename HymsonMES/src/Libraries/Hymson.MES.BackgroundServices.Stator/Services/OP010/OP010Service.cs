@@ -110,9 +110,6 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
             // 批量读取条码信息（MES）
             var manuSFCInfoEntities = await _mainService.GetSFCInfoEntitiesAsync(manuSFCEntities.Select(s => s.Id));
 
-            // 批量读取条码（定子）
-            var statorSFCEntities = await _mainService.GetStatorBarCodeEntitiesAsync(statorBo.SiteId, entities.Select(s => s.ID).Distinct());
-
             // 遍历记录
             var summaryBo = new StatorSummaryBo { };
             foreach (var opEntity in entities)

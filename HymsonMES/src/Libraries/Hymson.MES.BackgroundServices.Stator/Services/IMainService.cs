@@ -93,6 +93,14 @@ namespace Hymson.MES.BackgroundServices.Stator.Services
         Task<IEnumerable<WhMaterialInventoryEntity>> GetMaterialInventoryEntitiesAsync(long siteId, IEnumerable<string> barCodes);
 
         /// <summary>
+        /// 批量获取（铜线条码）
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WireBarCodeEntity>> GetWireBarCodeEntitiesAsync(long siteId, IEnumerable<string> ids);
+
+        /// <summary>
         /// 批量读取条码（定子）
         /// </summary>
         /// <param name="siteId"></param>

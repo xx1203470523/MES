@@ -24,6 +24,21 @@ namespace Hymson.MES.BackgroundServices.Stator
         /// </summary>
         public List<StatorBarCodeEntity> UpdateStatorBarCodeEntities { get; set; } = new();
 
+        /// <summary>
+        /// 集合（铜线条码）
+        /// </summary>
+        public List<WireBarCodeEntity> AddWireBarCodeEntities { get; set; } = new();
+
+        /// <summary>
+        /// 集合（铜线条码）
+        /// </summary>
+        public List<WireBarCodeEntity> UpdateWireBarCodeEntities { get; set; } = new();
+
+        /// <summary>
+        /// 集合（定子铜线关系）
+        /// </summary>
+        public List<StatorWireRelationEntity> AddStatorWireRelationEntities { get; set; } = new();
+
 
         /// <summary>
         /// 集合（条码）
