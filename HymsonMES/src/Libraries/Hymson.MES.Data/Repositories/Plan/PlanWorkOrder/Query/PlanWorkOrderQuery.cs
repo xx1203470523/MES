@@ -49,4 +49,20 @@ namespace Hymson.MES.Data.Repositories.Plan
         public IEnumerable<string>? Codes { get; set; }
 
     }
+
+    /// <summary>
+    /// 根据物料查询
+    /// </summary>
+    public class PlanWorkOrderMaterialQuery
+    {
+        /// <summary>
+        /// 物料
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; }
+    }
 }

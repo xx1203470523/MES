@@ -13,7 +13,7 @@
         /// <summary>  
         /// 订单号  
         /// </summary>  
-        public string OrderNo { get; set; }
+        //public string OrderNo { get; set; }
 
         /// <summary>  
         /// 物料编码  
@@ -63,12 +63,12 @@
         /// <summary>  
         /// 实际产量  
         /// </summary>  
-        public decimal ActualityOutput { get; set; }
+        //public decimal ActualityOutput { get; set; }
 
         /// <summary>  
         /// 计划产量  
         /// </summary>  
-        public decimal PlanOutput { get; set; }
+        //public decimal PlanOutput { get; set; }
 
         /// <summary>  
         /// 下线合格数量  
@@ -108,12 +108,12 @@
         /// <summary>  
         /// 产品批次号  
         /// </summary>  
-        public string VendorProductBatch { get; set; }
+        //public string VendorProductBatch { get; set; }
 
         /// <summary>  
         /// 检测数量  
         /// </summary>  
-        public decimal ParaConfigQty { get; set; }
+        //public decimal ParaConfigQty { get; set; }
 
         /// <summary>  
         /// 单位  
@@ -123,6 +123,6 @@
         /// <summary>  
         /// 停留天数  
         /// </summary>  
-        public decimal StayDays { get; set; }
+        //public decimal StayDays { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.View;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -177,6 +178,26 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcStepEntity>(sql, query);
+        }
+
+        /// <summary>
+        /// 获取马威末尾工序数量数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SfcStepProcedureNumView>> GetSfcStepEndOpMavelAsync(SfcStepProcedureQuery query)
+        {
+            string sql = $@"
+                select t1.ProductId ,count(*) Num
+                from manu_sfc_step t1 
+                inner join proc_procedure t2 on t1.ProcedureId = t2.Id and t2.IsDeleted = 0
+                where t1.CreatedOn >= '{query.BeginDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+                and t1.CreatedOn < '{query.EndDate.ToString("yyyy-MM-dd HH:mm:ss")}'
+                and t2.Code in @ProcedureCodeList
+                group by t1.ProductId 
+            ";
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<SfcStepProcedureNumView>(sql, query);
         }
 
         /// <summary>

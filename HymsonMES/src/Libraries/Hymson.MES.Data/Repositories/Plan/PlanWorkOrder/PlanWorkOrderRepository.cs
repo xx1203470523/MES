@@ -759,6 +759,17 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.ExecuteAsync(UpdatesSql, planWorkOrderEntitys);
         }
 
+        /// <summary>
+        /// 根据物料获取激活的工单
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderEntity?> GetOrderByMaterialCodeAsync(PlanWorkOrderMaterialQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderEntity>(GetOrderByMaterialCodeSql, query);
+        }
+
         #endregion
     }
 
@@ -875,5 +886,15 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string UpdateWorkOrderPlantQuantitySql = "UPDATE plan_work_order SET " +
             "Qty = (CASE WHEN Qty IS NULL THEN 0 ELSE Qty END) + @Qty, " +
             "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND Id = @WorkOrderId;";
+        const string GetOrderByMaterialCodeSql = $@"
+            select t1.*
+            from plan_work_order t1
+            inner join proc_material t2 on t1.ProductId = t2.Id and t2.IsDeleted = 0
+            inner join plan_work_order_activation t3 on t3.WorkOrderId = t1.Id  and t3.IsDeleted = 0
+            where t1.IsDeleted = 0
+            and t2.MaterialCode = @MaterialCode
+            -- and t1.SiteId  = @SiteId
+            order by t3.CreatedOn desc
+        ";
     }
 }

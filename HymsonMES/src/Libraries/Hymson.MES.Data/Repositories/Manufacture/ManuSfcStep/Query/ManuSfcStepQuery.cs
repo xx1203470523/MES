@@ -47,4 +47,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string Sfc { get; set; }
 
     }
+
+    /// <summary>
+    /// 根据工序获取数量
+    /// </summary>
+    public class SfcStepProcedureQuery
+    {
+        /// <summary>
+        /// 工序列表
+        /// </summary>
+        public List<string> ProcedureCodeList { get; set; } = new List<string>();
+
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        public DateTime BeginDate { get; set; }
+
+        /// <summary>
+        /// 结束时间
+        /// </summary>
+        public DateTime EndDate { get; set; }
+    }
 }
