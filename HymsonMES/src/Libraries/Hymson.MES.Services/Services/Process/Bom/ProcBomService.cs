@@ -11,6 +11,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuRequistionOrder;
 using Hymson.MES.Data.Repositories.Plan;
@@ -761,6 +762,11 @@ namespace Hymson.MES.Services.Services.Process
             // 查询物料
             var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkPlanMaterialEntities.Select(x => x.MaterialId));
 
+            var bomIds = planWorkPlanMaterialEntities.Select(x => x.BomId.GetValueOrDefault()).Distinct().ToArray();
+
+            // 查询bom详情
+            var procBomDetailEntities = await _procBomDetailRepository.GetByIdsAsync(bomIds);
+
             IEnumerable<ManuRequistionOrderDetailEntity> requistionOrderDetailEntities = new List<ManuRequistionOrderDetailEntity>();
             // 查找领料单集合
             var requistionOrderEntities = await _manuRequistionOrderRepository.GetByOrderCodeAsync(planWorkOrderEntity.Id, planWorkOrderEntity.SiteId);
@@ -781,6 +787,9 @@ namespace Hymson.MES.Services.Services.Process
                 var procMaterialEntity = procMaterialEntities.FirstOrDefault(f => f.Id == planMaterial.MaterialId);
                 if (procMaterialEntity == null) continue;
 
+                var procBomDetailEntitie = procBomDetailEntities.FirstOrDefault(f => f.MaterialId == planMaterial.MaterialId);
+                if (procBomDetailEntitie != null && procBomDetailEntitie.BomProductType == ManuProductTypeEnum.ByProduct) continue;
+
                 var needQty = 0M;
                 if (dto.InputQty == 0)
                 {
@@ -798,6 +807,7 @@ namespace Hymson.MES.Services.Services.Process
                     MaterialCode = procMaterialEntity.MaterialCode,
                     MaterialName = procMaterialEntity.MaterialName,
                     Version = procMaterialEntity.Version ?? "",
+                    Unit = procMaterialEntity.Unit ?? "",
                     Usages = needQty - receiveQty,
                     Batch = procMaterialEntity.Batch ?? 0
                 });

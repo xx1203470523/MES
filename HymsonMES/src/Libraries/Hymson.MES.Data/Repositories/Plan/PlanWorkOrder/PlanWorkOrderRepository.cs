@@ -794,7 +794,10 @@ namespace Hymson.MES.Data.Repositories.Plan
                          LEFT JOIN proc_bom b on wo.ProductBOMId = b.Id
                          LEFT JOIN proc_process_route pr on wo.ProcessRouteId = pr.Id
                          LEFT JOIN inte_work_center wc on wo.WorkCenterId = wc.Id
-                        /**where**/ Order by wo.CreatedOn DESC LIMIT @Offset, @Rows ";
+                        /**where**/ 
+                        ORDER BY CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(OrderCode, '-', -2), '-', 1) AS UNSIGNED),
+                        CAST(SUBSTRING_INDEX(OrderCode, '-', -1) AS SIGNED) LIMIT @Offset, @Rows ";
+
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                          FROM `plan_work_order` wo 
                          LEFT JOIN plan_work_order_record wor on wo.Id = wor.WorkOrderId

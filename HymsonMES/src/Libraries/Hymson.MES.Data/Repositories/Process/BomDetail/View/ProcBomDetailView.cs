@@ -133,5 +133,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 批次大小
         /// </summary>
         public decimal Batch { get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string Unit {  get; set; }
     }
 }
