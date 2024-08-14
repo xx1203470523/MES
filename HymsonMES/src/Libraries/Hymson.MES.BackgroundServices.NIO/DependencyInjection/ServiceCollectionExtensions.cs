@@ -1,4 +1,6 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.HttpClients;
+using Hymson.MES.HttpClients.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -37,6 +39,9 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<WMSOptions>(configuration.GetSection(nameof(WMSOptions)));
+            services.Configure<ERPOptions>(configuration.GetSection(nameof(ERPOptions)));
+
             return services;
         }
 
@@ -46,6 +51,9 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <param name="services"></param>
         static void AddServices(IServiceCollection services)
         {
+            services.AddSingleton<IWMSApiClient, WMSApiClient>();
+            services.AddSingleton<IERPApiClient, ERPApiClient>();
+
             var typeFinder = Singleton<ITypeFinder>.Instance;
             var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
             foreach (var keyValuePair in keyValuePairs)
