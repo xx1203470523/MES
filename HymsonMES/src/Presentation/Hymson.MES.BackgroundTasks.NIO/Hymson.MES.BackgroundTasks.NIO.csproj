@@ -90,6 +90,5 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="HostedServices\" />
-	  <Folder Include="Jobs\ERP\" />
 	</ItemGroup>
 </Project>
