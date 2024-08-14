@@ -1,5 +1,4 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,9 +50,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <param name="services"></param>
         static void AddServices(IServiceCollection services)
         {
-            services.AddSingleton<IWMSApiClient, WMSApiClient>();
-            services.AddSingleton<IERPApiClient, ERPApiClient>();
-
             var typeFinder = Singleton<ITypeFinder>.Instance;
             var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
             foreach (var keyValuePair in keyValuePairs)
